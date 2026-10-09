@@ -1,0 +1,82 @@
+import json
+
+import pytest
+
+from arrhenius_fracture.fem_backend_adapter import inspect_fem_backend, require_fem_backend
+from arrhenius_fracture.shared_execution import build_execution_plan, construct_and_attest
+from arrhenius_fracture.shared_options import (
+    CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
+    PlasticityMode, SharedOptions, SourceLifecycle, SourceLocation,
+)
+
+
+def by_role(plan):
+    return {item.role: item for item in plan.bindings}
+
+
+def test_loading_role_is_not_discarded_by_bulk_scheduler_selection():
+    options = SharedOptions(
+        loading=LoadingMode.EXPLICIT_CYCLIC,
+        source_location=SourceLocation.BULK_UNIFORM,
+        source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        plasticity=PlasticityMode.FULL_FIELD_EVOLVING_RHO,
+        kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
+    )
+    plan = build_execution_plan(options)
+    roles = by_role(plan)
+    assert roles["loading"].attribute == "FatigueWaveform"
+    assert roles["source_location"].attribute == "accepted_bulk_load_step"
+    assert not plan.executable
+    assert "no qualified shared native executor" in plan.limitation
+
+
+def test_cavity_does_not_imply_branch_permission_or_current_source():
+    options = SharedOptions(cavity=CavityMode.FULL_ORDER_V5)
+    plan = build_execution_plan(options)
+    roles = by_role(plan)
+    assert roles["crack_path"].requested == "single_front"
+    assert roles["source_lifecycle"].requested == "persistent_reusable"
+    assert roles["cavity"].attribute == "build_production_void_state"
+
+
+def test_fixed_range_branch_is_preserved_but_explicitly_pending():
+    options = SharedOptions(
+        loading=LoadingMode.FIXED_DELTA_K,
+        crack_path=CrackPathMode.BRANCHING_MULTIFRONT,
+        source_lifecycle=SourceLifecycle.CURRENT_SOURCE,
+        kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
+    )
+    plan = build_execution_plan(options)
+    assert by_role(plan)["loading"].attribute == "install_fixed_deltaK_waveform"
+    assert by_role(plan)["crack_path"].requested == "branching_multifront"
+    assert not plan.executable
+
+
+def test_construct_attestation_measures_loaded_files_and_seed(monkeypatch):
+    options = PRESETS["pf_monotonic_tip_persistent"]
+    monkeypatch.setenv("CLEAVAGE_HAZARD_SEED", str(options.random_seed))
+    plan = build_execution_plan(options)
+    executor, receipt = construct_and_attest(plan, options)
+    assert callable(executor)
+    assert receipt["status"] == "constructed"
+    assert receipt["execution_verified"] is False
+    assert receipt["seed"]["hazard"] == options.random_seed
+    assert receipt["observed_bindings"]
+    assert all(len(row["module_sha256"]) == 64 for row in receipt["observed_bindings"])
+    assert receipt["source"]["commit"]
+
+
+def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path):
+    receipt = inspect_fem_backend()
+    assert receipt.available
+    assert receipt.observed_commit == receipt.expected_commit
+    assert receipt.clean is True
+    assert len(receipt.entry_sha256) == 64
+    assert receipt.execution_verified is False
+    with pytest.raises(RuntimeError, match="backend unavailable"):
+        require_fem_backend(tmp_path)
+
+
+def test_plan_is_json_serializable():
+    payload = build_execution_plan(PRESETS["pf_cyclic_tip_persistent"]).to_dict()
+    assert json.loads(json.dumps(payload))["executable"] is True

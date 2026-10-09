@@ -40,16 +40,16 @@ def test_source_geography_and_lifecycle_are_independent_axes():
         plasticity=PlasticityMode.FULL_FIELD_EVOLVING_RHO,
     )
     assert len({item.fingerprint for item in (persistent_tip, finite_tip, finite_bulk)}) == 3
-    assert resolve_runtime(persistent_tip).providers[1].identity.startswith("v10.2.21")
-    assert "finite" in resolve_runtime(finite_tip).providers[1].identity
+    assert any(p.identity.startswith("v10.2.21") for p in resolve_runtime(persistent_tip).providers)
+    assert any("finite" in p.identity for p in resolve_runtime(finite_tip).providers)
     assert any(p.role == "bulk_plasticity" for p in resolve_runtime(finite_bulk).providers)
 
 
 def test_unsupported_combinations_fail_before_solver_execution():
     with pytest.raises(ValueError, match="bulk source geography"):
         SharedOptions(source_location=SourceLocation.BULK_UNIFORM)
-    with pytest.raises(ValueError, match="branching_multifront"):
-        SharedOptions(cavity=CavityMode.FULL_ORDER_V5)
+    # Cavity ownership infrastructure does not itself enable branching.
+    SharedOptions(cavity=CavityMode.FULL_ORDER_V5)
     with pytest.raises(ValueError, match="fixed crack front"):
         SharedOptions(
             kinetics=KineticsStrategy.OPERATOR_CONSISTENT_V3_6,
@@ -82,11 +82,33 @@ def test_external_full_fem_is_a_pinned_pair_not_a_pf_import():
     assert receipt.providers == ()
     assert receipt.external_pair["commit"] == FEM_COMMIT
     assert receipt.external_pair["relationship"].startswith("comparison backend")
+    assert receipt.external_pair["available"] is True
+    assert receipt.execution_verified is False
+
+
+def test_bulk_does_not_replace_explicit_cyclic_loading_controller():
+    options = SharedOptions(
+        loading=LoadingMode.EXPLICIT_CYCLIC,
+        source_location=SourceLocation.BULK_UNIFORM,
+        source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        plasticity=PlasticityMode.FULL_FIELD_EVOLVING_RHO,
+        kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
+    )
+    receipt = resolve_runtime(options)
+    by_role = {item.role: item for item in receipt.providers}
+    assert by_role["loading_controller"].identity == "phase_resolved_explicit_cyclic"
+    assert by_role["event_scheduler"].required_attribute == "advance_event_aware_coupled_interval"
 
 
 def test_unknown_option_fields_are_rejected():
     with pytest.raises(ValueError, match="unknown"):
         SharedOptions.from_dict({"loading": LoadingMode.MONOTONIC.value, "surprise": 1})
+
+
+@pytest.mark.parametrize("seed", [True, False, 1.0, "1"])
+def test_seed_rejects_bool_float_and_string(seed):
+    with pytest.raises(TypeError, match="integer and not Boolean"):
+        SharedOptions(random_seed=seed)
 
 
 def test_restart_requires_same_options_and_provider_identities():

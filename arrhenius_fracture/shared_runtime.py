@@ -4,6 +4,8 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from functools import lru_cache
 import json
+import hashlib
+import importlib.util
 from pathlib import Path
 import subprocess
 import sys
@@ -32,6 +34,15 @@ class ProviderBinding:
 
     def verify(self) -> None:
         _verify_provider_isolated(self.module, self.required_attribute, self.role)
+
+    def to_dict(self) -> dict[str, Any]:
+        spec = importlib.util.find_spec(self.module)
+        path = None if spec is None else spec.origin
+        digest = None
+        if path and Path(path).is_file():
+            digest = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        return {**asdict(self), "observed_module_file": path,
+                "observed_module_sha256": digest}
 
 
 @lru_cache(maxsize=None)
@@ -65,15 +76,19 @@ class RuntimeReceipt:
     providers: tuple[ProviderBinding, ...]
     external_pair: dict[str, Any] | None
     units: dict[str, str]
+    verification_level: str = "isolated_import_checked_resolution"
+    execution_verified: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema": self.schema,
             "options": self.options,
             "options_sha256": self.options_sha256,
-            "providers": [asdict(provider) for provider in self.providers],
+            "providers": [provider.to_dict() for provider in self.providers],
             "external_pair": self.external_pair,
             "units": self.units,
+            "verification_level": self.verification_level,
+            "execution_verified": self.execution_verified,
         }
 
     def verify(self) -> None:
@@ -85,13 +100,6 @@ class RuntimeReceipt:
 
 
 def _pf_driver(options: SharedOptions) -> ProviderBinding:
-    if (options.cavity is CavityMode.FULL_ORDER_V5
-            or options.plasticity is not PlasticityMode.TIP_PROCESS_ONLY):
-        return ProviderBinding(
-            "driver", "arrhenius_fracture.global_physical_scheduler_v1",
-            "unified_2d_event_aware_coupled_interval_v1",
-            "advance_event_aware_coupled_interval",
-        )
     if options.crack_path is CrackPathMode.BRANCHING_MULTIFRONT:
         if options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE:
             return ProviderBinding(
@@ -112,26 +120,52 @@ def _pf_driver(options: SharedOptions) -> ProviderBinding:
                            "v10.2.27_full_spatial_pf", "main")
 
 
+def _loading_controller(options: SharedOptions) -> ProviderBinding:
+    return {
+        LoadingMode.MONOTONIC: ProviderBinding(
+            "loading_controller", "arrhenius_fracture.sharp_front",
+            "native_displacement_step", "run_2d"),
+        LoadingMode.EXPLICIT_CYCLIC: ProviderBinding(
+            "loading_controller", "arrhenius_fracture.fatigue_v1",
+            "phase_resolved_explicit_cyclic", "FatigueWaveform"),
+        LoadingMode.FIXED_DELTA_K: ProviderBinding(
+            "loading_controller", "arrhenius_fracture.fixed_deltaK_v1021",
+            "prescribed_local_deltaK", "install_fixed_deltaK_waveform"),
+        LoadingMode.HOLD_DWELL: ProviderBinding(
+            "loading_controller", "arrhenius_fracture.global_physical_scheduler_v1",
+            "hold_ramp_load_history", "advance_event_aware_coupled_interval"),
+    }[options.loading]
+
+
 def resolve_runtime(options: SharedOptions) -> RuntimeReceipt:
     """Return and import-check the exact providers selected by *options*."""
     options.validate()
     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
+        from .fem_backend_adapter import inspect_fem_backend
+        external = inspect_fem_backend().to_dict()
+        external.update({
+            "commit": FEM_COMMIT,
+            "branch": FEM_BRANCH,
+            "configuration": "theta0 full anisotropic adaptive-CZM parity",
+            "relationship": "comparison backend; not source-merged into PF",
+        })
         receipt = RuntimeReceipt(
             schema="shared-fracture-fatigue-runtime-receipt/1",
             options=options.to_dict(), options_sha256=options.fingerprint,
             providers=(),
-            external_pair={
-                "repository": FEM_REPOSITORY,
-                "commit": FEM_COMMIT,
-                "branch": FEM_BRANCH,
-                "configuration": "theta0 full anisotropic adaptive-CZM parity",
-                "relationship": "comparison backend; not source-merged into PF",
-            },
+            external_pair=external,
             units=_units(),
         )
         return receipt
 
-    providers = [_pf_driver(options)]
+    providers = [_pf_driver(options), _loading_controller(options)]
+    if (options.cavity is CavityMode.FULL_ORDER_V5
+            or options.plasticity is not PlasticityMode.TIP_PROCESS_ONLY
+            or options.loading is LoadingMode.HOLD_DWELL):
+        providers.append(ProviderBinding(
+            "event_scheduler", "arrhenius_fracture.global_physical_scheduler_v1",
+            "unified_2d_event_aware_coupled_interval_v1",
+            "advance_event_aware_coupled_interval"))
     lifecycle = {
         SourceLifecycle.PERSISTENT_REUSABLE: ProviderBinding(
             "source_lifecycle", "arrhenius_fracture.persistent_site_source_v10221",
@@ -191,11 +225,13 @@ def require_restart_compatible(saved_receipt: dict[str, Any], options: SharedOpt
     if saved_receipt.get("options_sha256") != current["options_sha256"]:
         raise RuntimeError("restart option fingerprint mismatch")
     saved_providers = [
-        (item.get("role"), item.get("module"), item.get("identity"))
+        (item.get("role"), item.get("module"), item.get("identity"),
+         item.get("observed_module_sha256"))
         for item in saved_receipt.get("providers", [])
     ]
     current_providers = [
-        (item["role"], item["module"], item["identity"])
+        (item["role"], item["module"], item["identity"],
+         item.get("observed_module_sha256"))
         for item in current["providers"]
     ]
     if saved_providers != current_providers:

@@ -11,6 +11,7 @@ from enum import Enum
 import hashlib
 import json
 from pathlib import Path
+import numbers
 from typing import Any, Mapping
 
 
@@ -105,8 +106,11 @@ class SharedOptions:
                 object.__setattr__(self, name, enum_type(value))
         if self.schema != SCHEMA:
             raise ValueError(f"unsupported option schema: {self.schema!r}")
+        if isinstance(self.random_seed, bool) or not isinstance(self.random_seed, numbers.Integral):
+            raise TypeError("random_seed must be an integer and not Boolean")
         if self.random_seed < 0:
             raise ValueError("random_seed must be non-negative")
+        object.__setattr__(self, "random_seed", int(self.random_seed))
         self.validate()
 
     def validate(self) -> None:
@@ -129,10 +133,8 @@ class SharedOptions:
         if self.cavity is CavityMode.FULL_ORDER_V5:
             if self.mechanics is not MechanicsBackend.SPATIAL_PF:
                 errors.append("full_order_v5 is a spatial-PF strategy")
-            if self.crack_path is not CrackPathMode.BRANCHING_MULTIFRONT:
-                errors.append("full_order_v5 requires branching_multifront topology")
-            if self.source_lifecycle is not SourceLifecycle.CURRENT_SOURCE:
-                errors.append("full_order_v5 requires the current_source lifecycle")
+            # Multi-owner infrastructure is a construction dependency, not
+            # permission to nucleate daughter cracks or a source-law choice.
         if self.kinetics is KineticsStrategy.OPERATOR_CONSISTENT_V3_6:
             if self.mechanics is not MechanicsBackend.SPATIAL_PF:
                 errors.append("operator_consistent_v3_6 is a spatial-PF strategy")
@@ -222,8 +224,9 @@ PRESETS: dict[str, SharedOptions] = {
     ),
     "fem_czm_theta0": SharedOptions(
         mechanics=MechanicsBackend.FULL_FEM_CZM,
-        source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        source_lifecycle=SourceLifecycle.PERSISTENT_REUSABLE,
         output=OutputProfile.PUBLICATION_RESTART,
+        random_seed=8666,
     ),
 }
 
