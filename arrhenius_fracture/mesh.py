@@ -26,6 +26,10 @@ class TriMesh:
     dNdx_e: np.ndarray         # (ne, 2, 3) shape function gradients per element
     B_e: np.ndarray            # (ne, 3, 6) strain-displacement matrices
     hbar_tip: float = 0.0      # tip-local mean edge length (process-zone resolution)
+    # Optional P0 sharp-wake material state used by nested refinement.  When
+    # present, children inherit their parent's exact degradation instead of
+    # re-averaging a nodal visualization field.
+    element_damage_gp: np.ndarray | None = None
 
 
 @dataclass
@@ -186,13 +190,48 @@ def rebuild_tri_mesh(nodes: np.ndarray, elems: np.ndarray, tip_centers=None, val
         hbar_tip = hbar
     else:
         tc = np.asarray(tip_centers, dtype=float)
-        tc = tc.reshape(1,2) if tc.ndim == 1 else tc[:, :2]
-        hbar_tip = float(min(_estimate_hbar_tip(nodes, elems, float(c[0]), float(c[1])) for c in tc))
+        if tc.size == 0:
+            hbar_tip = hbar
+        else:
+            tc = tc.reshape(1,2) if tc.ndim == 1 else tc[:, :2]
+            hbar_tip = float(min(_estimate_hbar_tip(nodes, elems, float(c[0]), float(c[1])) for c in tc))
     return TriMesh(
         nodes=nodes, elems=elems, nn=len(nodes), ne=len(elems), ndof=2*len(nodes),
         hbar=float(hbar), area_e=area_e, dNdx_e=dNdx_e, B_e=B_e,
         hbar_tip=float(hbar_tip),
     )
+
+
+def restore_tri_mesh(nodes: np.ndarray, elems: np.ndarray, metadata: dict) -> TriMesh:
+    """Restore checkpoint-authoritative mesh metrics without moving their anchor.
+
+    ``hbar_tip`` is part of the directional selector because it defines the
+    near-tip stress averaging radius.  Recomputing it around the current crack
+    tip changes the physical query after a topology-preserving crack event.
+    """
+    required = {"hbar_m", "hbar_tip_m", "tip_reference_centers_m"}
+    missing = sorted(required - set(metadata or {}))
+    if missing:
+        raise ValueError(f"checkpoint lacks authoritative mesh metadata: {missing}")
+    checkpoint_elems = np.ascontiguousarray(np.asarray(elems))
+    if checkpoint_elems.dtype.kind not in "iu":
+        raise ValueError("checkpoint element connectivity must have integer dtype")
+    mesh = rebuild_tri_mesh(
+        nodes, checkpoint_elems, tip_centers=metadata["tip_reference_centers_m"]
+    )
+    # ``rebuild_tri_mesh`` normalizes connectivity to the platform integer type.
+    # Restoration must retain the checkpoint representation too: forensic hashes
+    # and byte-level equivalence checks include the array dtype.
+    mesh.elems = checkpoint_elems
+    expected_hbar = float(metadata["hbar_m"])
+    expected_tip = float(metadata["hbar_tip_m"])
+    if mesh.hbar != expected_hbar or mesh.hbar_tip != expected_tip:
+        raise ValueError(
+            "checkpoint mesh metrics cannot be reconstructed exactly: "
+            f"hbar={mesh.hbar!r}/{expected_hbar!r}, "
+            f"hbar_tip={mesh.hbar_tip!r}/{expected_tip!r}"
+        )
+    return mesh
 
 def make_boundary_data(mesh: TriMesh, geom: GeometryConfig) -> BoundaryData:
     """Identify boundary node sets and notch region."""

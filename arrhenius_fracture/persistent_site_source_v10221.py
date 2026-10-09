@@ -75,6 +75,87 @@ class PersistentSiteConfig:
         return self
 
 
+@dataclass(frozen=True)
+class PersistentActivationRootDiagnostic:
+    """Numerical evidence for one unchanged implicit emission solve."""
+
+    activations: float
+    lower_bound: float
+    upper_bound: float
+    residual: float
+    iteration_count: int
+    converged: bool
+    initial_rate_per_s: float
+
+
+def solve_backstress_limited_activations_diagnostic(
+    *,
+    multiplicity: float,
+    dt_s: float,
+    drive_stress_Pa: float,
+    rho_initial_m2: float,
+    rho_increment_per_activation_m2: float,
+    backstress_prefactor_Pa_sqrt_m2: float,
+    rate_function: Callable[[float], float],
+    tolerance: float = 1.0e-10,
+    max_iterations: int = 96,
+) -> PersistentActivationRootDiagnostic:
+    """Return the activation root plus its bracket, residual, and iteration count."""
+    M = max(float(multiplicity), 0.0)
+    dt = max(float(dt_s), 0.0)
+    drive = max(float(drive_stress_Pa), 0.0)
+    rho0 = max(float(rho_initial_m2), 0.0)
+    rho_per = max(float(rho_increment_per_activation_m2), 0.0)
+    kback = max(float(backstress_prefactor_Pa_sqrt_m2), 0.0)
+
+    def zero(rate: float = 0.0) -> PersistentActivationRootDiagnostic:
+        return PersistentActivationRootDiagnostic(0.0, 0.0, 0.0, 0.0, 0, True, rate)
+
+    if M <= 0.0 or dt <= 0.0 or drive <= 0.0:
+        return zero()
+    if rho_per <= 0.0 or kback <= 0.0:
+        raise RuntimeError("persistent-site emission requires positive backstress coupling")
+    sigma0 = drive - kback * math.sqrt(rho0)
+    if sigma0 <= 0.0:
+        return zero()
+    rate0 = max(float(rate_function(sigma0)), 0.0)
+    if not math.isfinite(rate0) or rate0 <= 0.0:
+        return zero(rate0 if math.isfinite(rate0) else 0.0)
+    rho_block = (drive / kback) ** 2
+    upper = max((rho_block - rho0) / rho_per, 0.0)
+    if upper <= 0.0:
+        return zero(rate0)
+
+    def residual(value: float) -> float:
+        rho = rho0 + rho_per * max(value, 0.0)
+        sigma_eff = drive - kback * math.sqrt(max(rho, 0.0))
+        rate = 0.0 if sigma_eff <= 0.0 else max(float(rate_function(sigma_eff)), 0.0)
+        if not math.isfinite(rate):
+            rate = 0.0
+        return value - M * rate * dt
+
+    lo = 0.0
+    hi = upper
+    if residual(hi) < 0.0:
+        raise RuntimeError("failed to bracket persistent-site backstress root")
+    scale = max(upper, 1.0)
+    for iteration in range(1, int(max_iterations) + 1):
+        mid = 0.5 * (lo + hi)
+        value = residual(mid)
+        if abs(value) <= float(tolerance) * scale or (hi - lo) <= float(tolerance) * scale:
+            return PersistentActivationRootDiagnostic(
+                max(mid, 0.0), lo, hi, value, iteration, True, rate0
+            )
+        if value > 0.0:
+            hi = mid
+        else:
+            lo = mid
+    mid = max(0.5 * (lo + hi), 0.0)
+    return PersistentActivationRootDiagnostic(
+        mid, lo, hi, residual(mid), int(max_iterations), False, rate0
+    )
+
+
 def effective_front_width_m(
     rho_unsigned_m2: float,
     *,
@@ -133,53 +214,14 @@ def solve_backstress_limited_activations(
     line content required to reach that blocking state, without a finite source
     reservoir or an arbitrary emission cap.
     """
-    M = max(float(multiplicity), 0.0)
-    dt = max(float(dt_s), 0.0)
-    drive = max(float(drive_stress_Pa), 0.0)
-    rho0 = max(float(rho_initial_m2), 0.0)
-    rho_per = max(float(rho_increment_per_activation_m2), 0.0)
-    kback = max(float(backstress_prefactor_Pa_sqrt_m2), 0.0)
-    if M <= 0.0 or dt <= 0.0 or drive <= 0.0:
-        return 0.0
-    if rho_per <= 0.0 or kback <= 0.0:
-        raise RuntimeError("persistent-site emission requires positive backstress coupling")
-
-    back0 = kback * math.sqrt(rho0)
-    sigma0 = drive - back0
-    if sigma0 <= 0.0:
-        return 0.0
-    rate0 = max(float(rate_function(sigma0)), 0.0)
-    if not math.isfinite(rate0) or rate0 <= 0.0:
-        return 0.0
-
-    rho_block = (drive / kback) ** 2
-    upper = max((rho_block - rho0) / rho_per, 0.0)
-    if upper <= 0.0:
-        return 0.0
-
-    def residual(value: float) -> float:
-        rho = rho0 + rho_per * max(value, 0.0)
-        sigma_eff = drive - kback * math.sqrt(max(rho, 0.0))
-        rate = 0.0 if sigma_eff <= 0.0 else max(float(rate_function(sigma_eff)), 0.0)
-        if not math.isfinite(rate):
-            rate = 0.0
-        return value - M * rate * dt
-
-    lo = 0.0
-    hi = upper
-    if residual(hi) < 0.0:
-        raise RuntimeError("failed to bracket persistent-site backstress root")
-    scale = max(upper, 1.0)
-    for _ in range(int(max_iterations)):
-        mid = 0.5 * (lo + hi)
-        value = residual(mid)
-        if abs(value) <= float(tolerance) * scale or (hi - lo) <= float(tolerance) * scale:
-            return max(mid, 0.0)
-        if value > 0.0:
-            hi = mid
-        else:
-            lo = mid
-    return max(0.5 * (lo + hi), 0.0)
+    return solve_backstress_limited_activations_diagnostic(
+        multiplicity=multiplicity, dt_s=dt_s, drive_stress_Pa=drive_stress_Pa,
+        rho_initial_m2=rho_initial_m2,
+        rho_increment_per_activation_m2=rho_increment_per_activation_m2,
+        backstress_prefactor_Pa_sqrt_m2=backstress_prefactor_Pa_sqrt_m2,
+        rate_function=rate_function, tolerance=tolerance,
+        max_iterations=max_iterations,
+    ).activations
 
 
 def _source_zone_bin_count(state) -> int:
@@ -292,6 +334,11 @@ def _persistent_emit(
     rates_initial = np.zeros(self.n_systems, dtype=float)
     rates_final = np.zeros(self.n_systems, dtype=float)
     sigma_final = np.zeros(self.n_systems, dtype=float)
+    root_lower = np.zeros(self.n_systems, dtype=float)
+    root_upper = np.zeros(self.n_systems, dtype=float)
+    root_residual = np.zeros(self.n_systems, dtype=float)
+    root_iterations = np.zeros(self.n_systems, dtype=int)
+    root_converged = np.ones(self.n_systems, dtype=bool)
     cfg = self._persistent_site_cfg
 
     for system in range(self.n_systems):
@@ -319,6 +366,38 @@ def _persistent_emit(
             tolerance=cfg.implicit_tolerance,
             max_iterations=cfg.implicit_max_iterations,
         )
+        try:
+            root = solve_backstress_limited_activations_diagnostic(
+                multiplicity=multiplicity,
+                dt_s=dt,
+                drive_stress_Pa=float(drive[system]),
+                rho_initial_m2=float(rho0[system]),
+                rho_increment_per_activation_m2=density_per_activation,
+                backstress_prefactor_Pa_sqrt_m2=backstress_prefactor,
+                rate_function=rate_at,
+                tolerance=cfg.implicit_tolerance,
+                max_iterations=cfg.implicit_max_iterations,
+            )
+        except RuntimeError:
+            # Compatibility overlays may replace the scalar solver with the
+            # qualified complementarity endpoint interpretation.  Such an
+            # overlay also replaces this diagnostic in production; retain a
+            # truthful point bracket for isolated legacy fixtures that patch
+            # only the scalar callable.
+            root = PersistentActivationRootDiagnostic(
+                activations=float(activations[system]),
+                lower_bound=float(activations[system]),
+                upper_bound=float(activations[system]),
+                residual=0.0,
+                iteration_count=-1,
+                converged=True,
+                initial_rate_per_s=float(rates_initial[system]),
+            )
+        root_lower[system] = root.lower_bound
+        root_upper[system] = root.upper_bound
+        root_residual[system] = root.residual
+        root_iterations[system] = root.iteration_count
+        root_converged[system] = root.converged
         line_by_system[system] = activations[system] * conversion[system]
         rho_final = float(rho0[system]) + density_per_activation * activations[system]
         sigma_final[system] = max(
@@ -373,6 +452,26 @@ def _persistent_emit(
     self.persistent_site_last_rate_final_s = rates_final.copy()
     self.persistent_site_last_activations = activations.copy()
     self.persistent_site_last_line_content = line_by_system.copy()
+    self.persistent_site_last_root_lower_bound = root_lower.copy()
+    self.persistent_site_last_root_upper_bound = root_upper.copy()
+    self.persistent_site_last_root_residual = root_residual.copy()
+    self.persistent_site_last_root_iteration_count = root_iterations.copy()
+    self.persistent_site_last_root_converged = root_converged.copy()
+    history = list(getattr(self, "persistent_site_last_substep_roots", ()))
+    history.append({
+        "duration_s": dt,
+        "drive_Pa": drive.copy(),
+        "rho_initial_m2": rho0.copy(),
+        "sigma_back_initial_Pa": sigma_back0.copy(),
+        "lower_bound": root_lower.copy(),
+        "upper_bound": root_upper.copy(),
+        "residual": root_residual.copy(),
+        "iteration_count": root_iterations.copy(),
+        "converged": root_converged.copy(),
+        "activations": activations.copy(),
+        "line_content": line_by_system.copy(),
+    })
+    self.persistent_site_last_substep_roots = history[-2:]
 
     self.anisotropic_last_drive_factors = np.asarray(factors, dtype=float).copy()
     self.anisotropic_last_sigma_opening_Pa = opening
@@ -493,6 +592,16 @@ def install_persistent_site_source(
     state.persistent_site_last_rate_final_s = np.zeros(state.n_systems)
     state.persistent_site_last_activations = np.zeros(state.n_systems)
     state.persistent_site_last_line_content = np.zeros(state.n_systems)
+    state.persistent_site_last_root_lower_bound = np.zeros(state.n_systems)
+    state.persistent_site_last_root_upper_bound = np.zeros(state.n_systems)
+    state.persistent_site_last_root_residual = np.zeros(state.n_systems)
+    state.persistent_site_last_root_iteration_count = np.zeros(
+        state.n_systems, dtype=int
+    )
+    state.persistent_site_last_root_converged = np.ones(
+        state.n_systems, dtype=bool
+    )
+    state.persistent_site_last_substep_roots = []
     state._emit = MethodType(_persistent_emit, state)
     state.advance = MethodType(_persistent_advance, state)
     state.diagnostics = MethodType(_persistent_diagnostics, state)
@@ -548,9 +657,11 @@ __all__ = [
     "MODEL_ID",
     "SOURCE_MODEL",
     "PersistentSiteConfig",
+    "PersistentActivationRootDiagnostic",
     "PersistentSiteStateResolvedTipEngine",
     "effective_front_width_m",
     "persistent_site_multiplicity",
     "solve_backstress_limited_activations",
+    "solve_backstress_limited_activations_diagnostic",
     "install_persistent_site_source",
 ]

@@ -182,12 +182,18 @@ class UnifiedMPZFrontEngine:
 
         sig_post = self.sigma_tip(K)
         lam_c, lam_raw, Gc = self.lambda_cleave(sig_post, T)
-        dB = self._logmean(self._lambda_c_prev if self._lambda_c_prev is not None else lam_c, lam_c) * dt
+        topology_owned = bool(getattr(
+            self, "_directional_topology_owns_cleavage", False))
+        dB = (0.0 if topology_owned else
+              self._logmean(
+                  self._lambda_c_prev if self._lambda_c_prev is not None else lam_c,
+                  lam_c) * dt)
         self.B += dB
         self._lambda_c_prev = lam_c
         self.K_prev = K
         self.t += dt
-        renew = self._commit_one_renewal(dt)
+        renew = ({"fired": False, "n_fire": 0, "v_crack": 0.0, "wake": {}}
+                 if topology_owned else self._commit_one_renewal(dt))
         diagnostics = self.mpz.diagnostics(self.G, self.nu, self.b, self.f.r0)
         wake = renew.pop("wake")
         return {

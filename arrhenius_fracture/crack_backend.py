@@ -7,7 +7,7 @@ mechanics remain in ``sharp_front.py``.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 import csv
 
@@ -72,8 +72,18 @@ class SharpWakeBackend:
         selected = distance2 <= radius ** 2
 
         dnew = np.asarray(damage, dtype=float).copy()
+        inherited = getattr(mesh, "element_damage_gp", None)
+        element_damage = (
+            np.mean(dnew[mesh.elems], axis=1)
+            if inherited is None else np.asarray(inherited, dtype=float).copy()
+        )
         if np.any(selected):
             dnew[mesh.elems[selected]] = 1.0
+            element_damage[selected] = 1.0
+        mesh_result = (
+            replace(mesh, element_damage_gp=element_damage)
+            if inherited is not None else mesh
+        )
 
         self.advance_log.append({
             "front_id": int(front_id),
@@ -90,7 +100,7 @@ class SharpWakeBackend:
             "n_killed_elements": int(np.count_nonzero(selected)),
         })
         return CrackAdvanceResult(
-            mesh=mesh,
+            mesh=mesh_result,
             boundary=boundary,
             damage=dnew,
             displacement=np.asarray(displacement, dtype=float),

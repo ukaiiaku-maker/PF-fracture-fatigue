@@ -11,6 +11,7 @@ dependencies = ["numpy>=1.24", "scipy>=1.10", "matplotlib>=3.7"]
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
+analysis = ["pandas>=2"]
 
 [tool.setuptools]
 packages = ["arrhenius_fracture"]

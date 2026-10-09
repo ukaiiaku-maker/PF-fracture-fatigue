@@ -131,6 +131,38 @@ def plan_prescribed_geometry_anchors(
     return anchors
 
 
+def plan_explicit_prescribed_geometry_anchors(
+    configuration: MechanicalKernelConfiguration,
+    extension_levels_um: tuple[float, ...],
+) -> list[PrescribedGeometryAnchor]:
+    """Plan an explicit append-only list of measured geometry stations."""
+    if not extension_levels_um:
+        raise ValueError("explicit prescribed-geometry levels cannot be empty")
+    da = _finite_positive(configuration.da_phys_m, "configuration.da_phys_m")
+    direction = prescribed_crack_direction(configuration)
+    origin = np.array([configuration.initial_crack_length_m, 0.0], dtype=float)
+    levels_m: list[float] = []
+    for value_um in extension_levels_um:
+        value_m = 1.0e-6 * float(value_um)
+        if not math.isfinite(value_m) or value_m < 0.0:
+            raise ValueError("explicit prescribed-geometry levels must be finite and nonnegative")
+        quantum = round(value_m / da)
+        if not math.isclose(value_m, quantum * da, rel_tol=0.0, abs_tol=1.0e-12 * da):
+            raise ValueError("explicit prescribed-geometry levels must align with da_phys_m")
+        levels_m.append(float(quantum * da))
+    if any(right <= left for left, right in zip(levels_m, levels_m[1:])):
+        raise ValueError("explicit prescribed-geometry levels must be strictly increasing")
+    return [
+        PrescribedGeometryAnchor(
+            state_id=f"E{int(round(1.0e6 * extension)):07d}",
+            extension_m=extension,
+            crack_tip_xy_m=tuple(float(value) for value in origin + extension * direction),
+            crack_direction=(float(direction[0]), float(direction[1])),
+        )
+        for extension in levels_m
+    ]
+
+
 def _isotropic_elastic_properties(
     configuration: MechanicalKernelConfiguration,
 ) -> tuple[ElasticProperties, np.ndarray, dict[str, float]]:
@@ -317,6 +349,8 @@ def build_prescribed_geometry_snapshots(
     required_max_extension_um: float,
     outroot: str | Path,
     reference_opening_strain: float = 1.0e-5,
+    explicit_extension_levels_um: tuple[float, ...] | None = None,
+    mesh_seed_indices: tuple[int, ...] | None = None,
 ) -> dict[str, Any]:
     """Build all deterministic fixed-crack states required by one kernel family."""
     if configuration.branching_mode != "single_front" or configuration.maximum_fronts != 1:
@@ -327,7 +361,28 @@ def build_prescribed_geometry_snapshots(
         raise FileExistsError(f"refusing to overwrite prescribed-geometry root: {root}")
     root.mkdir(parents=True)
 
-    anchors = plan_prescribed_geometry_anchors(configuration, required_max_extension_um)
+    anchors = (
+        plan_prescribed_geometry_anchors(configuration, required_max_extension_um)
+        if explicit_extension_levels_um is None
+        else plan_explicit_prescribed_geometry_anchors(
+            configuration, explicit_extension_levels_um
+        )
+    )
+    if explicit_extension_levels_um is not None and not math.isclose(
+        1.0e6 * anchors[-1].extension_m,
+        float(required_max_extension_um),
+        rel_tol=0.0,
+        abs_tol=1.0e-9,
+    ):
+        raise ValueError("required_max_extension_um must equal the final explicit level")
+    if mesh_seed_indices is None:
+        seed_indices = tuple(range(len(anchors)))
+    else:
+        seed_indices = tuple(int(value) for value in mesh_seed_indices)
+        if len(seed_indices) != len(anchors):
+            raise ValueError("mesh_seed_indices must match the explicit anchor count")
+        if any(value < 0 for value in seed_indices) or len(set(seed_indices)) != len(seed_indices):
+            raise ValueError("mesh_seed_indices must be unique nonnegative integers")
     material, D, elasticity = _isotropic_elastic_properties(configuration)
     geometry = GeometryConfig(
         Lx=float(configuration.specimen_length_x_m),
@@ -350,13 +405,13 @@ def build_prescribed_geometry_snapshots(
     start = np.array([configuration.initial_crack_length_m, 0.0], dtype=float)
 
     state_rows: list[dict[str, Any]] = []
-    for anchor_index, anchor in enumerate(anchors):
+    for anchor, seed_index in zip(anchors, seed_indices):
         tip = np.asarray(anchor.crack_tip_xy_m, dtype=float)
         direction = np.asarray(anchor.crack_direction, dtype=float)
         mesh = make_tri_mesh(
             geometry,
             mesh_cfg,
-            seed=1729 + anchor_index,
+            seed=1729 + seed_index,
             tip_center=tip,
         )
         boundary = make_boundary_data(mesh, geometry)
@@ -478,6 +533,11 @@ def build_prescribed_geometry_snapshots(
         "da_phys_m": float(configuration.da_phys_m),
         "anchors": state_rows,
     }
+    if explicit_extension_levels_um is not None:
+        anchor_plan["explicit_extension_levels_um"] = [
+            float(value) for value in explicit_extension_levels_um
+        ]
+        anchor_plan["mesh_seed_indices"] = list(seed_indices)
     (root / "prescribed_geometry_anchor_plan.json").write_text(
         json.dumps(anchor_plan, indent=2, sort_keys=True) + "\n"
     )
@@ -524,5 +584,6 @@ __all__ = [
     "PrescribedGeometryAnchor",
     "prescribed_crack_direction",
     "plan_prescribed_geometry_anchors",
+    "plan_explicit_prescribed_geometry_anchors",
     "build_prescribed_geometry_snapshots",
 ]

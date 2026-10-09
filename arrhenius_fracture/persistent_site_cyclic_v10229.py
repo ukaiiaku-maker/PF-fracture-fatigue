@@ -61,11 +61,18 @@ class PersistentSiteCyclicTipEngine(PersistentSiteStateResolvedTipEngine):
         elapsed_s = 0.0
 
         for kval in Kvals:
-            K = max(float(kval), 0.0)
+            K_signed = float(kval)
+            K = max(K_signed, 0.0)
             half = 0.5 * dt_phase
+
+            if bool(getattr(trial.mpz, "_reversible_transport_installed", False)):
+                trial.mpz._reversible_transport_K_signed_Pa_sqrt_m = K_signed
+                trial.mpz._reversible_tip_radius_m = float(trial.r_eff())
 
             sig0 = float(trial.sigma_tip(K))
             first = trial._plastic_half_step(half, T_K, sig0)
+            if bool(getattr(trial.mpz, "_reversible_transport_installed", False)):
+                trial.mpz._reversible_tip_radius_m = float(trial.r_eff())
             sig_mid = float(trial.sigma_tip(K))
             lam_mid, _raw_mid, _Gc_mid = trial.lambda_cleave(sig_mid, T_K)
             lam_mid = max(float(lam_mid), 0.0) if math.isfinite(lam_mid) else 0.0

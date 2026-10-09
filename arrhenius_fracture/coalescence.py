@@ -48,10 +48,14 @@ def segment_intersection_first(
         return None
     ta = float(((a - p0) @ r) / rr)
     tb = float(((b - p0) @ r) / rr)
-    candidates = [value for value in (ta, tb) if value > t_eps and value <= 1.0 + 1.0e-10]
-    if not candidates:
+    overlap_lo = max(min(ta, tb), float(t_eps))
+    overlap_hi = min(max(ta, tb), 1.0)
+    if overlap_hi < overlap_lo:
         return None
-    tt = min(max(min(candidates), 0.0), 1.0)
+    # A pre-existing collinear segment may span the complete proposal, in which
+    # case neither of its endpoints lies inside the proposal.  Treat the first
+    # positive overlap as a physical coalescence instead of an invisible trial.
+    tt = min(max(overlap_lo, 0.0), 1.0)
     return tt, p0 + tt * r
 
 

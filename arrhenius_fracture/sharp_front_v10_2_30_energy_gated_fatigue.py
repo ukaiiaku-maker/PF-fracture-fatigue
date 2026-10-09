@@ -72,6 +72,8 @@ def _observed_waveform_factory(original):
 
     observed.__name__ = getattr(original, "__name__", "ObservedFatigueWaveform")
     observed.__doc__ = getattr(original, "__doc__", None)
+    if bool(getattr(original, "_prescribed_fixed_deltaK_control", False)):
+        observed._prescribed_fixed_deltaK_control = True
     return observed
 
 

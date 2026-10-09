@@ -221,6 +221,8 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
             if lambda_override is not None:
                 lam0 = max(float(lambda_override), 0.0)
                 raw0 = lam0
+            if bool(getattr(self, "_directional_topology_owns_cleavage", False)):
+                lam0 = 0.0
             lam0 = max(float(lam0), 0.0) if math.isfinite(lam0) else 0.0
             h = self._substep_limit(remaining, lam0)
 
@@ -235,6 +237,8 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
             if lambda_override is not None:
                 lam_mid = max(float(lambda_override), 0.0)
                 raw_mid = lam_mid
+            if bool(getattr(self, "_directional_topology_owns_cleavage", False)):
+                lam_mid = 0.0
             lam_mid = max(float(lam_mid), 0.0) if math.isfinite(lam_mid) else 0.0
             remaining_action = max(1.0 - float(self.B), 0.0)
             if lam_mid > 0.0 and lam_mid * h > remaining_action + 1.0e-12:
@@ -248,6 +252,8 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
                 if lambda_override is not None:
                     lam_mid = max(float(lambda_override), 0.0)
                     raw_mid = lam_mid
+                if bool(getattr(self, "_directional_topology_owns_cleavage", False)):
+                    lam_mid = 0.0
                 lam_mid = max(float(lam_mid), 0.0) if math.isfinite(lam_mid) else 0.0
 
             dB = min(lam_mid * h, max(1.0 - float(self.B), 0.0))

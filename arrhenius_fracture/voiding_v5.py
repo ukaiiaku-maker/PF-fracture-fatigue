@@ -1,0 +1,592 @@
+"""Authoritative production-owned state and kinetics for one explicit 2-D void."""
+from __future__ import annotations
+
+from dataclasses import dataclass, field, replace
+from enum import Enum
+import hashlib
+import json
+import math
+from typing import Any, Mapping
+
+import numpy as np
+from .canonical_kinetic_time_v1 import exact, packed, unpacked
+
+KB = 1.380649e-23
+SCHEMA = "v12.production-voiding/5"
+
+
+class VoidPhase(str, Enum):
+    AVAILABLE_SITE = "AVAILABLE_SITE"
+    EMBRYO = "EMBRYO"
+    HEALED_SITE = "HEALED_SITE"
+    STABLE_SUBGRID_VOID = "STABLE_SUBGRID_VOID"
+    RESOLVED_VOID = "RESOLVED_VOID"
+    CONNECTED_VOID = "CONNECTED_VOID"
+    DOWNSTREAM_FRONT_ACTIVE = "DOWNSTREAM_FRONT_ACTIVE"
+    MERGED_OR_CONSUMED = "MERGED_OR_CONSUMED"
+
+
+@dataclass(frozen=True)
+class VoidingConfig:
+    enabled: bool = False
+    required_birth_hits: int = 2
+    attempt_frequency_s: float = 1.0e12
+    birth_barrier_J: float = 1.2e-19
+    stabilization_barrier_J: float = 0.8e-19
+    healing_barrier_J: float = 1.0e-19
+    birth_hydrostatic_volume_m3: float = 2.0e-29
+    birth_normal_area_m2: float = 2.0e-20
+    birth_normal_separation_m: float = 2.5e-10
+    birth_shear_volume_m3: float = 5.0e-30
+    stabilization_activation_volume_m3: float = 1.0e-29
+    healing_activation_volume_m3: float = 1.0e-29
+    plane_strain_poisson_ratio: float = 0.30
+    promotion_radius_m: float = 8.0e-6
+    surface_reaction_barrier_J: float = 0.7e-19
+    vacancy_transport_barrier_J: float = 0.9e-19
+    radial_growth_scale_m: float = 1.0e-8
+    hydrostatic_work_coefficient: float = 1.0
+    normal_opening_work_coefficient: float = 1.0
+    signed_shear_work_coefficient: float = 1.0
+    plastic_accommodation_barrier_J: float = 1.0e-19
+    shrinkage_mobility_m_per_J_s: float = 1.0e8
+    chemical_potential_reference_J: float = 1.0e-20
+    schema: str = SCHEMA
+
+
+@dataclass(frozen=True)
+class HazardClock:
+    accumulated: float
+    threshold: float
+    integrated_action_exact: tuple[int, int] | None = None
+
+    def action_exact(self):
+        stored = self.integrated_action_exact
+        return exact(self.accumulated) if stored is None else unpacked(stored)
+
+    def crossing_time_exact(self, rate_s):
+        return None if rate_s <= 0 else max(exact(self.threshold)-self.action_exact(), 0)/exact(rate_s)
+
+    def advance(self, rate_s, duration_s):
+        if rate_s < 0 or duration_s < 0: raise ValueError('negative hazard interval')
+        if rate_s == 0 or duration_s == 0: return self
+        value = min(exact(self.threshold), self.action_exact()+exact(rate_s)*exact(duration_s))
+        return replace(self, accumulated=float(value), integrated_action_exact=packed(value))
+
+    def crossing_time(self, rate_s: float) -> float:
+        value = self.crossing_time_exact(rate_s)
+        return math.inf if value is None else float(value)
+
+
+@dataclass(frozen=True)
+class VoidSite:
+    site_id: str
+    center_m: tuple[float, float]
+    phase: VoidPhase
+    hits: int
+    required_hits: int
+    candidate_weight: float
+    birth: HazardClock
+    stabilization: HazardClock
+    healing: HazardClock
+    normal_xy: tuple[float, float] = (1.0, 0.0)
+
+
+@dataclass(frozen=True)
+class Cavity2D:
+    cavity_id: str
+    parent_site_id: str
+    center_m: tuple[float, float]
+    radius_m: float
+    area_m2: float
+    inventory_area_m2: float
+    phase: VoidPhase
+    geometry_generation: int = 0
+    lineage: tuple[str, ...] = ()
+    connection_entry_m: tuple[float, float] | None = None
+    connection_exit_m: tuple[float, float] | None = None
+    connection_direction_xy: tuple[float, float] | None = None
+
+    def __post_init__(self):
+        expected = math.pi * float(self.radius_m) ** 2
+        if not math.isclose(float(self.area_m2), expected, rel_tol=1.0e-12, abs_tol=1.0e-24):
+            raise ValueError("production cavity area must use the 2-D pi*R^2 convention")
+
+
+@dataclass(frozen=True)
+class ProductionVoidState:
+    sites: tuple[VoidSite, ...]
+    cavities: tuple[Cavity2D, ...] = ()
+    rng_state: Mapping[str, Any] = field(default_factory=dict)
+    event_history: tuple[Mapping[str, Any], ...] = ()
+    length_ledgers: Mapping[str, float] = field(default_factory=lambda: {
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "traversed_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "active_front_coordinate_advance_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+    })
+    available_defect_inventory_area_m2: float = 1.0e-8
+    consumed_defect_inventory_area_m2: float = 0.0
+    schema: str = SCHEMA
+    kinetic_integrals_v1: Mapping[str, Any] | None = None
+    # The direct dislocation-interaction owner is nested here so topology
+    # commits, isolated trials, checkpoints, rollback, and the complete state
+    # fingerprint carry both birth mechanisms atomically.  ``None`` preserves
+    # checkpoints made before the mechanism-completeness extension.
+    dislocation_interaction_state: Any = None
+    # One mechanism-resolved physical owner per born embryo/cavity. Nested
+    # ownership makes topology commit, rollback, fingerprint and checkpoint
+    # atomic without adding a parallel scientific checkpoint path.
+    embryo_growth_states: tuple[Any, ...] = ()
+    embryo_growth_configuration: Any = None
+
+
+def arrhenius_rates(config: VoidingConfig, *, temperature_K: float,
+                    stress_tensor_Pa: np.ndarray,
+                    normal_xy: tuple[float, float] = (1.0, 0.0),
+                    vacancy_attachment_frequency_s: float | None = None,
+                    vacancy_growth: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """Compute rates from the local production tensor; no candidate weight here."""
+    stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
+    eigenvalues = np.linalg.eigvalsh(stress)
+    tensile = max(float(eigenvalues[-1]), 0.0)
+    in_plane_mean = float(np.trace(stress) / 2.0)
+    sigma_zz = config.plane_strain_poisson_ratio * float(np.trace(stress))
+    stress3 = np.array([[stress[0, 0], stress[0, 1], 0.0],
+                        [stress[1, 0], stress[1, 1], 0.0],
+                        [0.0, 0.0, sigma_zz]])
+    hydrostatic = float(np.trace(stress3) / 3.0)
+    deviator3 = stress3 - np.eye(3) * hydrostatic
+    von_mises_3d = math.sqrt(max(1.5 * float(np.sum(deviator3 * deviator3)), 0.0))
+    normal = np.asarray(normal_xy, dtype=float)
+    normal /= max(float(np.linalg.norm(normal)), 1.0e-300)
+    tangent = np.array((-normal[1], normal[0]))
+    normal_opening = float(normal @ stress @ normal)
+    signed_shear = float(tangent @ stress @ normal)
+    thermal = KB * float(temperature_K)
+    if thermal <= 0.0:
+        raise ValueError("temperature must be positive")
+    def rate(barrier, work=0.0):
+        effective = max(float(barrier) - float(work), 0.0)
+        return config.attempt_frequency_s * math.exp(-effective / thermal)
+    hydro_work = config.hydrostatic_work_coefficient * hydrostatic * config.birth_hydrostatic_volume_m3
+    normal_work = (config.normal_opening_work_coefficient * max(normal_opening, 0.0)
+                   * config.birth_normal_area_m2 * config.birth_normal_separation_m)
+    shear_work = config.signed_shear_work_coefficient * signed_shear * config.birth_shear_volume_m3
+    birth_work = hydro_work + normal_work + shear_work
+    stabilization_work = max(tensile, 0.0) * config.stabilization_activation_volume_m3
+    healing_work = -max(tensile, 0.0) * config.healing_activation_volume_m3
+    surface = rate(config.surface_reaction_barrier_J, max(hydrostatic, 0.0) * config.stabilization_activation_volume_m3)
+    transport = rate(config.vacancy_transport_barrier_J, max(hydrostatic, 0.0) * config.stabilization_activation_volume_m3)
+    accommodation = rate(config.plastic_accommodation_barrier_J, von_mises_3d * config.stabilization_activation_volume_m3)
+    series = 0.0 if surface <= 0.0 or transport <= 0.0 else 1.0 / (1.0 / surface + 1.0 / transport)
+    series = 0.0 if series <= 0.0 or accommodation <= 0.0 else 1.0 / (1.0 / series + 1.0 / accommodation)
+    birth_prefactor = (
+        config.attempt_frequency_s
+        if vacancy_attachment_frequency_s is None
+        else float(vacancy_attachment_frequency_s)
+    )
+    if not math.isfinite(birth_prefactor) or birth_prefactor < 0.0:
+        raise ValueError("vacancy attachment frequency must be finite and nonnegative")
+    birth_effective = max(float(config.birth_barrier_J) - birth_work, 0.0)
+    birth = birth_prefactor * math.exp(-birth_effective / thermal)
+    result = {
+        "birth_s": birth,
+        "stabilization_s": rate(config.stabilization_barrier_J, stabilization_work),
+        "healing_s": rate(config.healing_barrier_J, healing_work),
+        "local_max_principal_stress_Pa": tensile,
+        "local_in_plane_mean_stress_Pa": in_plane_mean,
+        "local_sigma_zz_Pa": sigma_zz,
+        "local_hydrostatic_stress_Pa": hydrostatic,
+        "local_von_mises_stress_Pa": von_mises_3d,
+        "local_normal_opening_stress_Pa": normal_opening,
+        "local_signed_shear_stress_Pa": signed_shear,
+        "birth_activation_work_J": birth_work,
+        "birth_hydrostatic_work_J": hydro_work,
+        "birth_normal_opening_work_J": normal_work,
+        "birth_signed_shear_work_J": shear_work,
+        "stabilization_activation_work_J": stabilization_work,
+        "healing_activation_work_J": healing_work,
+        "surface_reaction_s": surface,
+        "vacancy_transport_s": transport,
+        "plastic_accommodation_s": accommodation,
+        "series_limited_growth_s": series,
+    }
+    if vacancy_growth is not None:
+        radial_scale = float(config.radial_growth_scale_m)
+        result.update({
+            "vacancy_transport_s": float(vacancy_growth["Rdot_diff_m_s"]) / radial_scale,
+            "plastic_accommodation_s": float(vacancy_growth["Rdot_plast_m_s"]) / radial_scale,
+            "series_limited_growth_s": float(vacancy_growth["Rdot_m_s"]) / radial_scale,
+            "Rdot_diff_m_s": float(vacancy_growth["Rdot_diff_m_s"]),
+            "Rdot_plast_m_s": float(vacancy_growth["Rdot_plast_m_s"]),
+            "Rdot_m_s": float(vacancy_growth["Rdot_m_s"]),
+            "controlling_branch": str(vacancy_growth["controlling_branch"]),
+        })
+    return result
+
+
+def advance_site(state: ProductionVoidState, site_id: str, dt_s: float, *,
+                 rates: Mapping[str, float], failure_injector=None) -> tuple[ProductionVoidState, tuple[str, ...]]:
+    """Localize all first passages and retain threshold/RNG ownership in state."""
+    site = next(item for item in state.sites if item.site_id == site_id)
+    if not math.isfinite(float(dt_s)) or dt_s < 0: raise ValueError('finite nonnegative site interval required')
+    remaining = exact(dt_s)
+    events = []
+    current = site
+    def inject(stage):
+        if failure_injector is not None:
+            trial=replace(state,sites=tuple(current if item.site_id==site_id else item for item in state.sites),
+                event_history=state.event_history+tuple({"event":event,"site_id":site_id} for event in events))
+            failure_injector(stage,trial)
+    while remaining > 0:
+        if current.phase == VoidPhase.AVAILABLE_SITE:
+            birth_rate = max(float(rates["birth_s"]), 0.0) * current.candidate_weight
+            crossing = current.birth.crossing_time_exact(birth_rate)
+            reached = crossing is not None and float(crossing) <= float(remaining)
+            step = crossing if reached else remaining
+            clock = current.birth.advance(birth_rate, step)
+            current = replace(current, birth=clock)
+            remaining = max(remaining-step, 0)
+            if not reached:
+                break
+            hits = current.hits + 1
+            if hits < current.required_hits:
+                rng = np.random.default_rng()
+                rng.bit_generator.state = dict(state.rng_state)
+                renewed = float(rng.exponential())
+                state = replace(state, rng_state=rng.bit_generator.state)
+                current = replace(current, hits=hits, birth=HazardClock(0.0, renewed))
+                events.append("BIRTH_HIT")
+                inject("first_hit_threshold_renewal")
+                continue
+            current = replace(current, hits=hits, phase=VoidPhase.EMBRYO)
+            events.append("EMBRYO")
+            inject("second_hit_embryo_transition")
+            continue
+        if current.phase == VoidPhase.EMBRYO:
+            growth_at_start = next((item for item in state.embryo_growth_states
+                                    if item.site_id == site_id), None)
+            waiting = bool(growth_at_start is not None and
+                growth_at_start.stabilization_action_complete_waiting_for_radius)
+            below_stable_radius = bool(waiting and growth_at_start.radius_m <
+                growth_at_start.cavity_emission_state.parameter_row.minimum_stable_radius_m)
+            stabilization_rate = (0.0 if below_stable_radius else
+                                  float(rates["stabilization_s"]))
+            ts = current.stabilization.crossing_time_exact(stabilization_rate)
+            th = current.healing.crossing_time_exact(float(rates["healing_s"]))
+            ts = math.inf if ts is None else ts
+            th = math.inf if th is None else th
+            crossing = min(ts, th)
+            reached = math.isfinite(crossing) and float(crossing) <= float(remaining)
+            step = crossing if reached else remaining
+            current = replace(
+                current,
+                stabilization=current.stabilization.advance(stabilization_rate, step),
+                healing=current.healing.advance(float(rates['healing_s']), step),
+            )
+            remaining = max(remaining-step, 0)
+            if not reached:
+                break
+            growth = next((item for item in state.embryo_growth_states
+                           if item.site_id == site_id), None)
+            if th <= ts and growth is not None and growth.emitted_loop_count_effective > 0.0:
+                # Escaped/retained loops are accepted plastic defects and may
+                # not disappear in a pristine-site healing transition.
+                from .embryo_growth_v1 import heal_embryo
+                residual, _ = heal_embryo(growth)
+                state = replace(state, embryo_growth_states=tuple(
+                    residual if item.site_id == site_id else item
+                    for item in state.embryo_growth_states
+                ))
+                phase = VoidPhase.STABLE_SUBGRID_VOID
+                current = replace(current, phase=phase)
+                events.append("HEALING_PROHIBITED_RESIDUAL_DEFECT")
+                inject("healing")
+                break
+            if ts < th and growth is not None:
+                minimum = growth.cavity_emission_state.parameter_row.minimum_stable_radius_m
+                if growth.radius_m < minimum:
+                    state = replace(state, embryo_growth_states=tuple(
+                        replace(item, stabilization_action_complete_waiting_for_radius=True)
+                        if item.site_id == site_id else item
+                        for item in state.embryo_growth_states
+                    ))
+                    events.append("STABILIZATION_RADIUS_NOT_REACHED")
+                    break
+            phase = VoidPhase.HEALED_SITE if th <= ts else VoidPhase.STABLE_SUBGRID_VOID
+            if phase == VoidPhase.STABLE_SUBGRID_VOID and growth is not None:
+                state = replace(state, embryo_growth_states=tuple(
+                    replace(item, stabilization_action_complete_waiting_for_radius=False)
+                    if item.site_id == site_id else item
+                    for item in state.embryo_growth_states
+                ))
+            current = replace(current, phase=phase)
+            events.append("HEALED" if phase == VoidPhase.HEALED_SITE else "STABILIZED")
+            inject("healing" if phase == VoidPhase.HEALED_SITE else "stabilization")
+            break
+        break
+    sites = tuple(current if item.site_id == site_id else item for item in state.sites)
+    history = state.event_history + tuple({"event": event, "site_id": site_id} for event in events)
+    return replace(state, sites=sites, event_history=history), tuple(events)
+
+
+def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
+                          radius_m: float, *, failure_injector=None) -> ProductionVoidState:
+    site = next(item for item in state.sites if item.site_id == site_id)
+    if site.phase != VoidPhase.STABLE_SUBGRID_VOID:
+        raise ValueError("site has not stabilized")
+    if any(item.parent_site_id == site_id for item in state.cavities):
+        raise ValueError("a stabilized site may own only one cavity")
+    growth = next((item for item in state.embryo_growth_states
+                   if item.site_id == site_id), None)
+    area = growth.area_m2 if growth is not None else math.pi * float(radius_m) ** 2
+    radius_m = growth.radius_m if growth is not None else float(radius_m)
+    if growth is None and area > state.available_defect_inventory_area_m2:
+        raise ValueError("initial cavity seed exceeds available defect inventory")
+    cavity = Cavity2D("void:" + site_id, site_id, site.center_m, radius_m, area, area,
+                      VoidPhase.STABLE_SUBGRID_VOID, lineage=(site_id,))
+    growth_states = state.embryo_growth_states
+    if growth is not None:
+        growth_states = tuple(
+            replace(item, cavity_id=cavity.cavity_id)
+            if item.site_id == site_id else item for item in growth_states
+        )
+    result = replace(
+        state, cavities=state.cavities + (cavity,),
+        available_defect_inventory_area_m2=(state.available_defect_inventory_area_m2
+            if growth is not None else state.available_defect_inventory_area_m2-area),
+        consumed_defect_inventory_area_m2=(state.consumed_defect_inventory_area_m2
+            if growth is not None else state.consumed_defect_inventory_area_m2+area),
+        embryo_growth_states=growth_states,
+        event_history=state.event_history + ({"event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT",
+                                              "cavity_id": cavity.cavity_id, "area_m2": area},),
+    )
+    if failure_injector is not None: failure_injector("initial_inventory_debit",result)
+    return result
+
+
+def grow_cavity_2d(cavity: Cavity2D, delta_radius_m: float) -> Cavity2D:
+    radius = float(cavity.radius_m) + float(delta_radius_m)
+    if radius <= 0.0:
+        raise ValueError("growth consumes the cavity")
+    area = math.pi * radius ** 2
+    inventory_increment = area - cavity.area_m2
+    return replace(
+        cavity, radius_m=radius, area_m2=area,
+        inventory_area_m2=cavity.inventory_area_m2 + inventory_increment,
+        geometry_generation=cavity.geometry_generation + 1,
+    )
+
+
+def grow_cavity_from_rate(cavity: Cavity2D, *, rates: Mapping[str, float],
+                          dt_s: float, radial_growth_scale_m: float,
+                          chemical_potential_drive_J: float = 1.0e-20,
+                          chemical_potential_reference_J: float = 1.0e-20,
+                          shrinkage_mobility_m_per_J_s: float = 1.0e8,
+                          available_inventory_area_m2: float = math.inf) -> Cavity2D:
+    """Advance radius only through the measured series-limited kinetic rate."""
+    drive = float(chemical_potential_drive_J)
+    rate = max(float(rates["series_limited_growth_s"]), 0.0)
+    dt = max(float(dt_s), 0.0)
+    if drive > 0.0:
+        scale = drive / max(abs(float(chemical_potential_reference_J)), 1.0e-300)
+        delta = float(radial_growth_scale_m) * rate * dt * scale
+        requested_area = math.pi * ((cavity.radius_m + delta) ** 2 - cavity.radius_m ** 2)
+        if requested_area > max(float(available_inventory_area_m2), 0.0):
+            target_area = cavity.area_m2 + max(float(available_inventory_area_m2), 0.0)
+            delta = math.sqrt(target_area / math.pi) - cavity.radius_m
+    elif drive < 0.0:
+        delta = -min(cavity.radius_m * 0.5, abs(drive) * dt * float(shrinkage_mobility_m_per_J_s))
+    else:
+        delta = 0.0
+    return grow_cavity_2d(cavity, delta) if delta != 0.0 else cavity
+
+
+def positive_growth_velocity(rates,radial_growth_scale_m,chemical_potential_drive_J=1e-20,
+                             chemical_potential_reference_J=1e-20):
+    """The existing positive growth law, shared by integration and localization."""
+    return (float(radial_growth_scale_m)*max(float(rates['series_limited_growth_s']),0.)
+        *float(chemical_potential_drive_J)/max(abs(float(chemical_potential_reference_J)),1e-300))
+
+
+def growth_time_to_radius_exact(state,cavity_id,target_radius_m,*,rates,radial_growth_scale_m):
+    """Localize a positive-growth boundary from the accepted integral, not rounded radius."""
+    cavity=next(c for c in state.cavities if c.cavity_id==cavity_id)
+    velocity=positive_growth_velocity(rates,radial_growth_scale_m)
+    if velocity<=0:return None
+    anchor=(state.kinetic_integrals_v1 or {}).get(cavity_id)
+    radius=exact(cavity.radius_m)
+    if anchor is not None and anchor['phase']==cavity.phase.value and anchor['last_radius_m']==cavity.radius_m:
+        radius=exact(anchor['radius_anchor_m'])+unpacked(anchor['integrated_radius_m'])
+    return max(exact(target_radius_m)-radius,0)/exact(velocity)
+
+
+def update_cavity_growth(state: ProductionVoidState, cavity_id: str, *,
+                         rates: Mapping[str, float], dt_s: float,
+                         radial_growth_scale_m: float,
+                         chemical_potential_drive_J: float = 1.0e-20,
+                         chemical_potential_reference_J: float = 1.0e-20,
+                         shrinkage_mobility_m_per_J_s: float = 1.0e8,
+                         failure_injector=None) -> ProductionVoidState:
+    """Atomically advance a cavity and its finite 2-D defect inventory.
+
+    Growth transfers area from available to consumed inventory.  Shrinkage
+    returns the released area to available inventory; consumed inventory may
+    never become negative.
+    """
+    cavity = next(item for item in state.cavities if item.cavity_id == cavity_id)
+    owned_total=math.fsum((state.available_defect_inventory_area_m2,
+                          state.consumed_defect_inventory_area_m2))
+    grown = grow_cavity_from_rate(
+        cavity, rates=rates, dt_s=dt_s,
+        radial_growth_scale_m=radial_growth_scale_m,
+        chemical_potential_drive_J=chemical_potential_drive_J,
+        chemical_potential_reference_J=chemical_potential_reference_J,
+        shrinkage_mobility_m_per_J_s=shrinkage_mobility_m_per_J_s,
+        available_inventory_area_m2=state.available_defect_inventory_area_m2,
+    )
+    integrals = dict(state.kinetic_integrals_v1 or {})
+    # The positive constant-rate law has an exact cumulative-radius update.
+    # Persist its anchor, not a list/count of caller subdivisions. Bounded
+    # shrinkage retains its existing safety rule and is qualified separately.
+    if chemical_potential_drive_J > 0 and dt_s > 0 and rates['series_limited_growth_s'] > 0:
+        anchor = integrals.get(cavity_id)
+        if (anchor is None or anchor['phase'] != cavity.phase.value
+                or anchor['last_radius_m'] != cavity.radius_m):
+            anchor = {'phase': cavity.phase.value, 'radius_anchor_m': cavity.radius_m,
+                'area_anchor_m2': cavity.area_m2, 'inventory_anchor_m2': cavity.inventory_area_m2,
+                'consumed_anchor_m2': state.consumed_defect_inventory_area_m2,
+                'total_inventory_m2': owned_total, 'integrated_radius_m': (0, 1),
+                'geometry_generation_anchor': cavity.geometry_generation}
+        velocity = positive_growth_velocity(rates,radial_growth_scale_m,
+            chemical_potential_drive_J,chemical_potential_reference_J)
+        integrated = unpacked(anchor['integrated_radius_m'])+exact(velocity)*exact(dt_s)
+        radius = float(exact(anchor['radius_anchor_m'])+integrated)
+        area = math.pi*radius**2
+        target = cavity.area_m2+state.available_defect_inventory_area_m2
+        if area > target:
+            radius = math.sqrt(target/math.pi); area = math.pi*radius**2
+            integrated = exact(radius)-exact(anchor['radius_anchor_m'])
+        inventory = float(exact(anchor['inventory_anchor_m2'])+exact(area)-exact(anchor['area_anchor_m2']))
+        # ``geometry_generation`` describes a physical represented-geometry
+        # update, not the number of caller-selected kinetic subdivisions.  A
+        # cumulative positive resolved-growth interval therefore owns exactly
+        # one generation beyond its anchor.  Subgrid growth still has no
+        # represented geometry to regenerate.
+        grown = replace(grown, radius_m=radius, area_m2=area, inventory_area_m2=inventory,
+            geometry_generation=(anchor['geometry_generation_anchor'] if cavity.phase == VoidPhase.STABLE_SUBGRID_VOID
+                                 else anchor['geometry_generation_anchor'] + 1))
+        integrals[cavity_id] = {**anchor, 'integrated_radius_m': packed(integrated), 'last_radius_m': radius}
+    elif chemical_potential_drive_J < 0 and dt_s > 0:
+        integrals.pop(cavity_id, None)
+    delta_area = grown.area_m2 - cavity.area_m2
+    if failure_injector is not None:
+        failure_injector("state_owned_growth",replace_cavity(state,grown))
+    if delta_area >= 0.0:
+        anchor = integrals.get(cavity_id)
+        consumed = (float(exact(anchor['consumed_anchor_m2'])+exact(grown.area_m2)-exact(anchor['area_anchor_m2']))
+                    if anchor is not None else state.consumed_defect_inventory_area_m2 + delta_area)
+        if anchor is not None: owned_total = anchor['total_inventory_m2']
+    else:
+        returned = min(-delta_area, state.consumed_defect_inventory_area_m2)
+        # A cavity cannot return inventory that was not previously consumed.
+        if returned < -delta_area:
+            target_area = cavity.area_m2 - returned
+            grown = replace(grown, radius_m=math.sqrt(target_area / math.pi),
+                            area_m2=target_area,
+                            inventory_area_m2=cavity.inventory_area_m2 - returned)
+        consumed = state.consumed_defect_inventory_area_m2 - returned
+    # Compute the complementary account once. Independently adding and
+    # subtracting the same transfer let repeated partitions drift by an ULP
+    # beyond the frozen inventory tolerance; no physical transfer is changed.
+    available=owned_total-consumed
+    result = replace(
+        replace_cavity(state, grown),
+        available_defect_inventory_area_m2=max(float(available), 0.0),
+        consumed_defect_inventory_area_m2=max(float(consumed), 0.0),
+        kinetic_integrals_v1=integrals or None,
+    )
+    if failure_injector is not None and delta_area < 0.:
+        failure_injector("inventory_return_under_shrinkage",result)
+    return result
+
+
+def replace_cavity(state: ProductionVoidState, cavity: Cavity2D) -> ProductionVoidState:
+    return replace(state, cavities=tuple(
+        cavity if item.cavity_id == cavity.cavity_id else item for item in state.cavities
+    ))
+
+
+def promote_cavity(state: ProductionVoidState, cavity_id: str,
+                   minimum_radius_m: float, *, failure_injector=None) -> ProductionVoidState:
+    cavity = next(item for item in state.cavities if item.cavity_id == cavity_id)
+    if cavity.phase != VoidPhase.STABLE_SUBGRID_VOID or cavity.radius_m < minimum_radius_m:
+        raise ValueError("cavity is not eligible for geometric promotion")
+    if failure_injector is not None: failure_injector("promotion_criterion",state)
+    updated = replace(
+        cavity, phase=VoidPhase.RESOLVED_VOID,
+        geometry_generation=cavity.geometry_generation + 1,
+        lineage=cavity.lineage + ("GEOMETRIC_PROMOTION",),
+    )
+    growth_states = state.embryo_growth_states
+    growth = next((item for item in growth_states if item.cavity_id == cavity_id), None)
+    if growth is not None:
+        from .embryo_growth_v1 import promote_representation
+        promoted_growth = promote_representation(growth, cavity_id)
+        growth_states = tuple(promoted_growth if item is growth else item for item in growth_states)
+    return replace(
+        replace_cavity(state, updated), embryo_growth_states=growth_states,
+        event_history=state.event_history + ({"event": "GEOMETRIC_PROMOTION", "cavity_id": cavity_id},),
+    )
+
+
+def fingerprint(state: ProductionVoidState | None) -> str:
+    return hashlib.sha256(serialize(state).encode()).hexdigest()
+
+
+def serialize(state: ProductionVoidState | None) -> str:
+    def encode(value):
+        if isinstance(value, Enum): return value.value
+        if hasattr(value, "__dataclass_fields__"):
+            return {name: encode(getattr(value, name)) for name in value.__dataclass_fields__
+                    if not ((name in (
+                        'integrated_action_exact', 'kinetic_integrals_v1',
+                        'dislocation_interaction_state', 'embryo_growth_configuration',
+                    ) and getattr(value, name) is None)
+                    or (name == 'cavity_emission_parameter_row'
+                        and getattr(value, name) is None)
+                    or (name == 'embryo_growth_states' and not getattr(value, name)))}
+        if isinstance(value, Mapping): return {str(k): encode(v) for k, v in value.items()}
+        if isinstance(value, (tuple, list)): return [encode(v) for v in value]
+        if isinstance(value, np.generic): return value.item()
+        # Infinity is a legitimate *identity* value for an exhausted or
+        # currently ineligible stochastic clock.  JSON's non-standard bare
+        # ``Infinity`` token is deliberately disabled below, so preserve the
+        # value with an explicit, reversible tag instead of dropping it or
+        # replacing it with a finite sentinel.  This is primarily encountered
+        # after a final direct-interaction hit; it is not a kinetic estimate.
+        if isinstance(value, float) and not math.isfinite(value):
+            if math.isnan(value):
+                return {"__nonfinite_float__": "nan"}
+            return {"__nonfinite_float__": (
+                "positive_infinity" if value > 0.0 else "negative_infinity"
+            )}
+        return value
+    return json.dumps(encode(state), sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+
+__all__ = [
+    "Cavity2D", "HazardClock", "ProductionVoidState", "SCHEMA", "VoidPhase",
+    "VoidSite", "VoidingConfig", "advance_site", "arrhenius_rates",
+    "create_subgrid_cavity", "fingerprint", "grow_cavity_2d", "grow_cavity_from_rate",
+    "promote_cavity", "replace_cavity", "serialize", "update_cavity_growth",
+]

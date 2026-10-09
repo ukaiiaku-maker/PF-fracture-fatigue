@@ -705,6 +705,16 @@ def update_plasticity(
         'pt_rho_mobile_gp': np.asarray(pt_diag.get('rho_mobile_m2', np.zeros(ne)), dtype=float),
         'pt_G_peierls_eV_gp': np.asarray(pt_diag.get('G_peierls_eV', np.zeros(ne)), dtype=float),
         'pt_G_taylor_eV_gp': np.asarray(pt_diag.get('G_taylor_eV', np.zeros(ne)), dtype=float),
+        'rho_storage_rate_gp_m2_s': np.asarray(drho_store, dtype=float),
+        'rho_dynamic_annihilation_rate_gp_m2_s': np.asarray(drho_dyn, dtype=float),
+        'rho_static_recovery_rate_gp_m2_s': np.asarray(gamma_static, dtype=float),
+        'rho_net_rate_gp_m2_s': np.asarray(drho_store-drho_dyn-gamma_static, dtype=float),
+        'rho_previous_gp_m2': np.asarray(rho, dtype=float).copy(),
+        'rho_accepted_gp_m2': np.asarray(rho_gp, dtype=float).copy(),
+        'pt_peierls_forward_rate_gp': np.asarray(pt_diag.get('peierls_forward_rate_s', np.zeros(ne)), dtype=float),
+        'pt_peierls_reverse_rate_gp': np.asarray(pt_diag.get('peierls_reverse_rate_s', np.zeros(ne)), dtype=float),
+        'pt_taylor_forward_single_hit_rate_gp': np.asarray(pt_diag.get('taylor_forward_single_hit_rate_s', np.zeros(ne)), dtype=float),
+        'pt_taylor_reverse_single_hit_rate_gp': np.asarray(pt_diag.get('taylor_reverse_single_hit_rate_s', np.zeros(ne)), dtype=float),
     }
     return (ep_gp, rho_gp, dot_ep_gp, info) if return_info else (ep_gp, rho_gp, dot_ep_gp)
 

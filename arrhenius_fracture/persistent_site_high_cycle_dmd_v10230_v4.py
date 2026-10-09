@@ -306,15 +306,23 @@ def propagate_dmd_cycles(
 
         midpoint_state = _snapshot_with_vector(current_state, midpoint_vector)
         endpoint_state = _snapshot_with_vector(current_state, endpoint_vector)
-        start_exact = one_cycle_map(
-            engine, controller, waveform, temperature_K, state=current_state
-        )
-        midpoint_exact = one_cycle_map(
-            engine, controller, waveform, temperature_K, state=midpoint_state
-        )
-        endpoint_exact = one_cycle_map(
-            engine, controller, waveform, temperature_K, state=endpoint_state
-        )
+        try:
+            start_exact = one_cycle_map(
+                engine, controller, waveform, temperature_K, state=current_state
+            )
+            midpoint_exact = one_cycle_map(
+                engine, controller, waveform, temperature_K, state=midpoint_state
+            )
+            endpoint_exact = one_cycle_map(
+                engine, controller, waveform, temperature_K, state=endpoint_state
+            )
+        except (ValueError, np.linalg.LinAlgError, OverflowError, FloatingPointError):
+            # These are private constitutive trials on projected states.  A DMD
+            # endpoint that cannot be evaluated is outside the admissible local
+            # map, not a failure of the last committed physical state.
+            proposal //= 2
+            failure_reason = "dmd_projected_state_constitutive_rejected"
+            continue
 
         predicted_mid_raw, predicted_mid_output = _one_step_prediction(
             model, midpoint_vector

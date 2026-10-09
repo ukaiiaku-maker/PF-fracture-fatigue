@@ -37,6 +37,30 @@ def solve_backstress_limited_activations(
     larger than the admissible increment all the way to the blocking state, the
     complementarity solution is exactly ``dN_block``.
     """
+    return solve_backstress_limited_activations_diagnostic(
+        multiplicity=multiplicity, dt_s=dt_s, drive_stress_Pa=drive_stress_Pa,
+        rho_initial_m2=rho_initial_m2,
+        rho_increment_per_activation_m2=rho_increment_per_activation_m2,
+        backstress_prefactor_Pa_sqrt_m2=backstress_prefactor_Pa_sqrt_m2,
+        rate_function=rate_function, tolerance=tolerance,
+        max_iterations=max_iterations,
+    ).activations
+
+
+def solve_backstress_limited_activations_diagnostic(
+    *,
+    multiplicity: float,
+    dt_s: float,
+    drive_stress_Pa: float,
+    rho_initial_m2: float,
+    rho_increment_per_activation_m2: float,
+    backstress_prefactor_Pa_sqrt_m2: float,
+    rate_function: Callable[[float], float],
+    tolerance: float = 1.0e-10,
+    max_iterations: int = 96,
+) -> _source.PersistentActivationRootDiagnostic:
+    """Qualified complementarity solve with exact numerical audit fields."""
+    Diagnostic = _source.PersistentActivationRootDiagnostic
     M = max(float(multiplicity), 0.0)
     dt = max(float(dt_s), 0.0)
     drive = max(float(drive_stress_Pa), 0.0)
@@ -44,8 +68,10 @@ def solve_backstress_limited_activations(
     rho_per = max(float(rho_increment_per_activation_m2), 0.0)
     kback = max(float(backstress_prefactor_Pa_sqrt_m2), 0.0)
     tol = max(float(tolerance), 1.0e-15)
+    def zero(rate: float = 0.0):
+        return Diagnostic(0.0, 0.0, 0.0, 0.0, 0, True, rate)
     if M <= 0.0 or dt <= 0.0 or drive <= 0.0:
-        return 0.0
+        return zero()
     if rho_per <= 0.0 or kback <= 0.0:
         raise RuntimeError(
             "persistent-site emission requires positive backstress coupling"
@@ -53,15 +79,15 @@ def solve_backstress_limited_activations(
 
     sigma0 = drive - kback * math.sqrt(rho0)
     if sigma0 <= 0.0:
-        return 0.0
+        return zero()
     rate0 = max(float(rate_function(sigma0)), 0.0)
     if not math.isfinite(rate0) or rate0 <= 0.0:
-        return 0.0
+        return zero(rate0 if math.isfinite(rate0) else 0.0)
 
     rho_block = (drive / kback) ** 2
     upper = max((rho_block - rho0) / rho_per, 0.0)
     if upper <= 0.0:
-        return 0.0
+        return zero(rate0)
 
     def residual(value: float) -> float:
         rho = rho0 + rho_per * max(value, 0.0)
@@ -79,14 +105,14 @@ def solve_backstress_limited_activations(
     # endpoint the hard mechanical gate is active by definition.
     hi_inside = math.nextafter(upper, 0.0)
     if hi_inside <= 0.0:
-        return upper
+        return Diagnostic(upper, upper, upper, 0.0, 0, True, rate0)
     r_hi_inside = residual(hi_inside)
 
     # No interior root exists: the aggregate hazard would overrun the
     # mechanically admissible state, so the complementarity solution is the
     # blocking increment. This is backstress saturation, not a source cap.
     if r_hi_inside <= 0.0:
-        return upper
+        return Diagnostic(upper, hi_inside, upper, 0.0, 0, True, rate0)
 
     # Because the rate decreases monotonically as backstress accumulates, the
     # unrelaxed explicit increment M*lambda(sigma0)*dt is an upper bound on any
@@ -103,22 +129,30 @@ def solve_backstress_limited_activations(
 
     hi_scale = max(abs(hi), 1.0)
     if abs(r_hi) <= tol * hi_scale:
-        return min(max(hi, 0.0), upper)
+        value = min(max(hi, 0.0), upper)
+        return Diagnostic(value, lo, hi, r_hi, 0, True, rate0)
 
-    for _ in range(int(max_iterations)):
+    for iteration in range(1, int(max_iterations) + 1):
         mid = 0.5 * (lo + hi)
         value = residual(mid)
         root_scale = max(abs(mid), 1.0)
         if abs(value) <= tol * root_scale:
-            return min(max(mid, 0.0), upper)
+            activation = min(max(mid, 0.0), upper)
+            return Diagnostic(activation, lo, hi, value, iteration, True, rate0)
         if value > 0.0:
             hi = mid
         else:
             lo = mid
         interval_scale = max(abs(lo), abs(hi), 1.0)
         if (hi - lo) <= tol * interval_scale:
-            return min(max(0.5 * (lo + hi), 0.0), upper)
-    return min(max(0.5 * (lo + hi), 0.0), upper)
+            activation = min(max(0.5 * (lo + hi), 0.0), upper)
+            return Diagnostic(
+                activation, lo, hi, residual(activation), iteration, True, rate0
+            )
+    activation = min(max(0.5 * (lo + hi), 0.0), upper)
+    return Diagnostic(
+        activation, lo, hi, residual(activation), int(max_iterations), False, rate0
+    )
 
 
 def install_backstress_complementarity_fix() -> None:
@@ -126,9 +160,13 @@ def install_backstress_complementarity_fix() -> None:
     _source.solve_backstress_limited_activations = (
         solve_backstress_limited_activations
     )
+    _source.solve_backstress_limited_activations_diagnostic = (
+        solve_backstress_limited_activations_diagnostic
+    )
 
 
 __all__ = [
     "solve_backstress_limited_activations",
+    "solve_backstress_limited_activations_diagnostic",
     "install_backstress_complementarity_fix",
 ]
