@@ -225,12 +225,24 @@ def restore_tri_mesh(nodes: np.ndarray, elems: np.ndarray, metadata: dict) -> Tr
     mesh.elems = checkpoint_elems
     expected_hbar = float(metadata["hbar_m"])
     expected_tip = float(metadata["hbar_tip_m"])
-    if mesh.hbar != expected_hbar or mesh.hbar_tip != expected_tip:
+    def _derived_metric_matches(recomputed, expected):
+        # Permit only recomputation-scale drift: 64 ULPs or 1e-12 relative,
+        # whichever is larger.  This is intentionally much tighter than
+        # np.allclose's defaults at micrometre scale.
+        scale = max(abs(recomputed), abs(expected), np.finfo(float).tiny)
+        tolerance = max(64.0 * abs(np.spacing(scale)), 1.0e-12 * scale)
+        return abs(recomputed - expected) <= tolerance
+    if (not _derived_metric_matches(mesh.hbar, expected_hbar)
+            or not _derived_metric_matches(mesh.hbar_tip, expected_tip)):
         raise ValueError(
-            "checkpoint mesh metrics cannot be reconstructed exactly: "
+            "checkpoint mesh metrics exceed recomputation tolerance: "
             f"hbar={mesh.hbar!r}/{expected_hbar!r}, "
             f"hbar_tip={mesh.hbar_tip!r}/{expected_tip!r}"
         )
+    # Serialized values are authoritative after validation; restoring them
+    # avoids a restart-dependent selector radius from recomputation order.
+    mesh.hbar = expected_hbar
+    mesh.hbar_tip = expected_tip
     return mesh
 
 def make_boundary_data(mesh: TriMesh, geom: GeometryConfig) -> BoundaryData:
