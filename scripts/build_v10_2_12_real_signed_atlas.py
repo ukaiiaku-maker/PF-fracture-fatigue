@@ -11,6 +11,10 @@ import subprocess
 import sys
 import tempfile
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from arrhenius_fracture.checked_spatial_station_projection_v10212 import (
     KERNEL_RADIUS_COMPATIBILITY_COORDINATE,
     expand_station_response_files,
@@ -18,7 +22,6 @@ from arrhenius_fracture.checked_spatial_station_projection_v10212 import (
 from arrhenius_fracture.mechanics_normalization_v10212 import MODEL_ID as NORMALIZATION_MODEL_ID
 from arrhenius_fracture.physical_fem_snapshot_v10212 import RESPONSE_COLUMNS
 
-ROOT = Path(__file__).resolve().parents[1]
 BASE_BUILDER = ROOT / "scripts" / "build_v10_2_12_compatibility_radius_family.py"
 MODEL_ID = "v10.2.12_real_signed_state_resolved_2d_shielding_atlas"
 REVIEW_SCHEMA = "v10.2.12_independent_real_signed_atlas_review"

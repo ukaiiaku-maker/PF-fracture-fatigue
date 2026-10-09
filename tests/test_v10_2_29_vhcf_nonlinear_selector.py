@@ -108,7 +108,7 @@ def test_nonlinear_selector_bisects_actual_emission_increment(monkeypatch):
     assert diag["cycles"] > 1.0e4
 
 
-def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):
+def test_delegate_commits_preselected_global_cycle_cap_without_reselection(monkeypatch):
     class Front:
         persistent_site_cyclic_v10229 = True
 
@@ -118,21 +118,15 @@ def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):
         def cycle_step_waveform(
             self, ctrl, waveform, temperature, requested_cycles=None, force_cycles=None
         ):
-            assert force_cycles is None
+            assert force_cycles == 123.0
             assert requested_cycles == 123.0
-            assert ctrl.cfg.max_block_cycles == 123.0
-            pred = self.preview_cycle_waveform(ctrl, waveform, temperature)
-            return ctrl.choose_block_cycles_diagnostic(pred, requested_cycles)
+            assert ctrl.cfg.max_block_cycles == 1.0e6
+            return {"cycles": force_cycles, "limiter": "forced_global_commit"}
 
     monkeypatch.setattr(
         delegate,
         "select_nonlinear_block",
-        lambda ctrl, pred, requested, linear: {
-            "cycles": requested,
-            "limiter": "nonlinear_test",
-            "unlimited_cycles": requested,
-            "candidate_limits": {"nonlinear_selected_cycles": requested},
-        },
+        lambda *args, **kwargs: pytest.fail("forced commit must not re-enter selection"),
     )
     ctrl = controller(max_block=1.0e6)
     original_max = ctrl.cfg.max_block_cycles
@@ -144,5 +138,5 @@ def test_delegate_reenters_selector_under_global_cycle_cap(monkeypatch):
         )
     finally:
         delegate.restore_engine_native_cycle_preview()
-    assert out["limiter"] == "nonlinear_test"
+    assert out["limiter"] == "forced_global_commit"
     assert ctrl.cfg.max_block_cycles == original_max

@@ -8,7 +8,6 @@ continue to use the original strict event-semantics implementation.
 from __future__ import annotations
 
 import json
-import math
 from pathlib import Path
 
 from . import sharp_front_v10_1_7_3 as _entry73
@@ -17,6 +16,10 @@ _ORIGINAL_REWRITE = _entry73._rewrite_summary_event_semantics
 
 
 def _rewrite_summary_event_semantics_allow_zero(args: list[str]) -> None:
+    # The later v10.1.7.3 implementation now validates and records zero-event
+    # runs itself (including consistency with n_advances).  Delegate first so
+    # this compatibility overlay cannot replace those stronger checks.
+    _ORIGINAL_REWRITE(args)
     out = _entry73._option_value(args, "--out")
     if not out:
         return
@@ -33,29 +36,11 @@ def _rewrite_summary_event_semantics_allow_zero(args: list[str]) -> None:
     if not isinstance(summary, list) or not summary:
         raise RuntimeError("summary.json contains no rows")
     if geometry:
-        _ORIGINAL_REWRITE(args)
         return
-
-    da_value = _entry73._option_value(args, "--da-phys")
-    if da_value is None:
-        raise RuntimeError("zero-event summary requires --da-phys")
-    nominal_checkpoint_m = float(da_value)
-    if not math.isfinite(nominal_checkpoint_m) or nominal_checkpoint_m <= 0.0:
-        raise RuntimeError("zero-event summary requires positive finite --da-phys")
 
     row = summary[0]
     row.update(
         {
-            "n_geometry_events": 0,
-            "n_equivalent_checkpoints_exact": 0.0,
-            "n_equivalent_checkpoints_rounded": 0,
-            "nominal_checkpoint_length_m": nominal_checkpoint_m,
-            "geometry_path_length_m": 0.0,
-            "geometry_projected_extension_m": 0.0,
-            "n_advances_semantics": "rounded_path_length_over_nominal_checkpoint",
-            "n_geometry_events_semantics": (
-                "accepted_cleavage_renewals_and_geometry_commits"
-            ),
             "geometry_event_status": "no_accepted_events",
             "zero_event_run_is_valid": True,
         }

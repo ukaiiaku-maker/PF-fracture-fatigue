@@ -24,7 +24,13 @@ STATION_SCHEMA = "v10.2.12_fem_resolved_signed_spatial_station_responses"
 ACTIVE_ONLY_STATION_SCHEMA = (
     "v10.2.14_exact_endpoint_active_signed_spatial_station_responses"
 )
-ACCEPTED_STATION_SCHEMAS = {STATION_SCHEMA, ACTIVE_ONLY_STATION_SCHEMA}
+MESH_RESOLVED_ACTIVE_ONLY_STATION_SCHEMA = (
+    "v10.2.27_exact_endpoint_mesh_resolved_active_signed_spatial_station_responses"
+)
+ACCEPTED_STATION_SCHEMAS = {
+    STATION_SCHEMA, ACTIVE_ONLY_STATION_SCHEMA,
+    MESH_RESOLVED_ACTIVE_ONLY_STATION_SCHEMA,
+}
 
 
 def _finite(row: dict[str, str], name: str) -> float:
@@ -212,7 +218,7 @@ def expand_station_response_files(
         if audit.get("responses_are_measured_stations_not_full_grid") is not True:
             raise ValueError(f"{audit_path} does not distinguish measured stations")
         active_only = bool(
-            schema == ACTIVE_ONLY_STATION_SCHEMA
+            schema in {ACTIVE_ONLY_STATION_SCHEMA, MESH_RESOLVED_ACTIVE_ONLY_STATION_SCHEMA}
             or (
                 audit.get("active_kernel_mechanically_measured") is True
                 and audit.get("wake_kernel_mechanically_measured") is False
@@ -471,6 +477,7 @@ __all__ = [
     "MODEL_ID",
     "STATION_SCHEMA",
     "ACTIVE_ONLY_STATION_SCHEMA",
+    "MESH_RESOLVED_ACTIVE_ONLY_STATION_SCHEMA",
     "ACCEPTED_STATION_SCHEMAS",
     "expand_station_response_files",
 ]

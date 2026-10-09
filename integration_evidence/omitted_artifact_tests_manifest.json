@@ -1,0 +1,449 @@
+{
+  "count": 88,
+  "restore_instruction": "Restore the recorded donor test source plus its named external fixtures, verify these hashes, then collect explicitly; the fast suite does not download artifacts.",
+  "schema": "omitted-artifact-tests/1",
+  "source_directory": "/private/tmp/unported_donor_tests.4KsyL6",
+  "status": "external_not_collected",
+  "tests": [
+    {
+      "bytes": 2734,
+      "name": "test_arc_resolved_cavity_traction_v1.py",
+      "sha256": "f28bde4d5a5aacf58e25c3e5402f9237bf8c299369f9c60d2b9d567d6b7c4edf"
+    },
+    {
+      "bytes": 1058,
+      "name": "test_boundary_segment_bounding_v1.py",
+      "sha256": "dc3361f5fe3d8380143e2cdedc124eb3babd400fde6f410f5a2935b76f8ef192"
+    },
+    {
+      "bytes": 3255,
+      "name": "test_branch_cluster_guard_v11.py",
+      "sha256": "4f669996ff8c2f9e70f28bbe70e709befe315e187067cd148a34c0e67efcf002"
+    },
+    {
+      "bytes": 8083,
+      "name": "test_canonical_kinetic_time_v1.py",
+      "sha256": "8a041e7efa337843ce0fe97f6028d59731a88cc2bb1a63a81e039c54a598cc9d"
+    },
+    {
+      "bytes": 6733,
+      "name": "test_cavity_boundary_patch_recovery_v1.py",
+      "sha256": "e368aca84d62935ce34b4dbd0dffb51256275593ed01d6407c857a9fc3fe3660"
+    },
+    {
+      "bytes": 3183,
+      "name": "test_cavity_free_boundary_verification.py",
+      "sha256": "ce435f6907088d62c78f6f8495199873fc343d7bb7886435e4e7d89df230352e"
+    },
+    {
+      "bytes": 3124,
+      "name": "test_cavity_recovery_transfer_budget_v1.py",
+      "sha256": "2771840cddcf7cd2b8cd833e5a2df7bd182f0771c39b59d82b54791e1ccdfa97"
+    },
+    {
+      "bytes": 13807,
+      "name": "test_cavity_source_conforming_geometry_v4.py",
+      "sha256": "1fdb9ef73fcde0d58409f1b3fb0d0fd6627c9935ec864708830c1c25417af5a2"
+    },
+    {
+      "bytes": 5888,
+      "name": "test_cavity_source_raw_traction_closure_v6.py",
+      "sha256": "947019a44be7ff53d51e81945b32d3c3c882a828288597a30d32da72ac229f35"
+    },
+    {
+      "bytes": 9499,
+      "name": "test_cavity_source_recovery_v2.py",
+      "sha256": "37a40d9bc7f180b7f884e6422a4bf9f80d420921f8950fad3b3a2ddf5ede656f"
+    },
+    {
+      "bytes": 10366,
+      "name": "test_cavity_source_recovery_v3.py",
+      "sha256": "dbcb0346571ae31ae7915e440bce98c17507d8f1e460265aaa794d23f77e4eb9"
+    },
+    {
+      "bytes": 7649,
+      "name": "test_cavity_source_shape_regular_mesh_v5.py",
+      "sha256": "fca3d62894ccb149c4749818eb9883ab9299de0e266f75c3e2c783b4969c3af0"
+    },
+    {
+      "bytes": 5951,
+      "name": "test_closure_lifecycle_evidence.py",
+      "sha256": "12511850144ced6140404f6effdbda3ff2b2b2ca334e8fab1d7e72ae2438f1ec"
+    },
+    {
+      "bytes": 5470,
+      "name": "test_closure_lifecycle_rollback.py",
+      "sha256": "1cb8311f06cbc0c03f66bd415c53a7e974439e58a44a2aa351e18c7cff39398c"
+    },
+    {
+      "bytes": 2598,
+      "name": "test_closure_mechanics_evidence.py",
+      "sha256": "16fee4fa4501997a77c1c803e4b44a71973de50e0f6cea19a455e314f2aae8d7"
+    },
+    {
+      "bytes": 5796,
+      "name": "test_closure_production_topology_audit.py",
+      "sha256": "4e6fbfe86aa91d43f6e09051338f00dc568707c552b1dae71701306dd5bc6af0"
+    },
+    {
+      "bytes": 2162,
+      "name": "test_closure_publication_package.py",
+      "sha256": "5e1ac390a37f0633ce888a64df360cf8273343bd50c889b10c8ea64cad653f23"
+    },
+    {
+      "bytes": 4197,
+      "name": "test_closure_static_evidence.py",
+      "sha256": "8f106bfed0c03694cdbf3b0ed512c3f3b28ed4085bf3ef466c2b6245c109f5f1"
+    },
+    {
+      "bytes": 4941,
+      "name": "test_common_restart_protocol_v1.py",
+      "sha256": "88cc6509d24eaa3075eedfcf1c93cb94e680f41ce10d545e63b5f6c64e3227e1"
+    },
+    {
+      "bytes": 1061,
+      "name": "test_compressed_closure_checkpoint_v1.py",
+      "sha256": "4f390fcfb6305edba9a90aba4e1999c3ff56e56368b7d4356d5c0dafcaf7a8d1"
+    },
+    {
+      "bytes": 1891,
+      "name": "test_controlled_history_v3.py",
+      "sha256": "59860030a255a50dd67b2aa7d6431ea0d9d5d9d2009c63e641dc03e92cf89941"
+    },
+    {
+      "bytes": 3547,
+      "name": "test_crack_network_v11.py",
+      "sha256": "71aab3c7cb74d6b35c0bbbf40df4cf6c1a962584e114a41042674c64060fac3e"
+    },
+    {
+      "bytes": 6105,
+      "name": "test_crack_void_fixed_geometry_v3.py",
+      "sha256": "ecb1e1ab1de8f0f982ee840b7f31746cca155f6a523da555a3bb805790f39ccd"
+    },
+    {
+      "bytes": 3900,
+      "name": "test_directional_competition_serialization_v11.py",
+      "sha256": "1338cbd0d6d6e44410b9cc021dff6402b2080a6576c5d0281b57b47d948a7d94"
+    },
+    {
+      "bytes": 4117,
+      "name": "test_directional_competition_symmetry_v11.py",
+      "sha256": "ffe2d45ae8edc4f9bcbe3620d8d551d84778a477e3dd44200f673976f46f854a"
+    },
+    {
+      "bytes": 4903,
+      "name": "test_directional_competition_transactions_v11.py",
+      "sha256": "4c4a8fa089de724af678352dbf1be155acb20bd0855164ecad83114d7e8a1595"
+    },
+    {
+      "bytes": 4375,
+      "name": "test_directional_competition_v11.py",
+      "sha256": "1467d95139dd4e0bd61a73d8a007a9ae570da7eab9b733a569b22d3177a80c52"
+    },
+    {
+      "bytes": 3409,
+      "name": "test_disabled_causal_neutrality_v1.py",
+      "sha256": "a082584b89a1427e5d97e56caffca9df28fb9ab38027cc82b6053a4cf185b9ba"
+    },
+    {
+      "bytes": 26340,
+      "name": "test_embryo_growth_v1.py",
+      "sha256": "cfea9e761cf3cdd5bae8652f61b6fa72357cc52e7e8b5b24dd0e62ef3f14bc47"
+    },
+    {
+      "bytes": 7735,
+      "name": "test_equilibrium_observables_v6.py",
+      "sha256": "c9e5d131812158c6aa1d5d9d7222e05cbf0940b1ae5dcdf1d1331c6074037d24"
+    },
+    {
+      "bytes": 11252,
+      "name": "test_event_aware_composition_v1.py",
+      "sha256": "ffad67f722049b0624ea19e75efda204245525bbc9fbcacef2e1afb9c311591a"
+    },
+    {
+      "bytes": 3927,
+      "name": "test_evidence_ontology_v5.py",
+      "sha256": "3e6af18c11f0b00dc8ea1a9ca7bd543a1a605c67aabaa5cb1d2bc95591cd3737"
+    },
+    {
+      "bytes": 1557,
+      "name": "test_explicit_cavity_v5.py",
+      "sha256": "3feb35897a82fb0b12cc194a91af63bca13a6d905b99d9de5105f52de965867e"
+    },
+    {
+      "bytes": 3769,
+      "name": "test_final_campaign_archive_v1.py",
+      "sha256": "cc9596ea1cbc0ba9bcbab07415b949fb7aa78d6059619c3d951e99c26b6fb69d"
+    },
+    {
+      "bytes": 8930,
+      "name": "test_finalization_v3_closure_schema.py",
+      "sha256": "cd2892b3998237dad5944dc47b8433187e5cb377cad2379cb221b4349c4e492d"
+    },
+    {
+      "bytes": 2525,
+      "name": "test_finalization_v3_schema.py",
+      "sha256": "e37cc2f5c905794e74aede627db3725e45e68fa567d56f4d5b121902fc1df554"
+    },
+    {
+      "bytes": 2777,
+      "name": "test_future_causal_state_fingerprint_v1.py",
+      "sha256": "9970dfb95ed5d4c95a591ba62fc102996f1893ba6b8a4554a63b459f3e7ef14d"
+    },
+    {
+      "bytes": 59146,
+      "name": "test_global_physical_scheduler_v1.py",
+      "sha256": "c1a872abb50a59c1e9b2eb73fad35f12ff032d5960a8ecdeac5a93aa1c399877"
+    },
+    {
+      "bytes": 4763,
+      "name": "test_legacy_front_process_adapter.py",
+      "sha256": "25763214301569a2b5fcad1f442d3297ff9ca8a6379acde644c2e771b5ed7cdb"
+    },
+    {
+      "bytes": 17362,
+      "name": "test_live_topology_kernel_v11.py",
+      "sha256": "057cc6fcd7bb341783533f7abee65da3f2c1d34770e233bae055d8dc18141ac7"
+    },
+    {
+      "bytes": 2204,
+      "name": "test_natural_drive_bounded_retry.py",
+      "sha256": "669cbedd74920eb65aee5ecafbb7565650f7aad93ea5615c873b6ae75d692feb"
+    },
+    {
+      "bytes": 4459,
+      "name": "test_natural_future_physical_replay_v2.py",
+      "sha256": "32cc242cb19b4b33390c32bd61be85a359f3a9d96c96f6b212d869e7ffdb423b"
+    },
+    {
+      "bytes": 1151,
+      "name": "test_off_axis_void_steering.py",
+      "sha256": "9358fb744a411ec9165c5afb2134a3246945c773f8c0535921ca549c1b55de54"
+    },
+    {
+      "bytes": 1055,
+      "name": "test_one_void_final_closure_v2.py",
+      "sha256": "476a26b67fd5904b16c6045566aa2f143e595c6f919c68a83db6586785be385e"
+    },
+    {
+      "bytes": 5369,
+      "name": "test_piecewise_equilibrated_boundary_stress_v2.py",
+      "sha256": "36034d0155943745e646b205530dbe487a80001ff0216d74508bae0673558529"
+    },
+    {
+      "bytes": 834,
+      "name": "test_piecewise_equilibrated_stress_v2_contract.py",
+      "sha256": "4efb11c45707cc26f66def7245233d6f1b230d9ebc35ce1886b64b40d8314ace"
+    },
+    {
+      "bytes": 1957,
+      "name": "test_piecewise_equilibrated_stress_v2_dbtt.py",
+      "sha256": "1507371814c7b3809730220637aa0433ebb257e24587aeca17630494a20f3a9f"
+    },
+    {
+      "bytes": 1828,
+      "name": "test_plasticity_vacancy_budget_v1.py",
+      "sha256": "53644fe266683956edbb498dab0c279cd9fd46253870bedf63e73da88d47ac01"
+    },
+    {
+      "bytes": 18799,
+      "name": "test_plasticity_vacancy_coupling_v1.py",
+      "sha256": "9b19040827e140e7f9d53be64210031ff186e59a45d349d84edf695d1d7de039"
+    },
+    {
+      "bytes": 8067,
+      "name": "test_production_closure_contract.py",
+      "sha256": "e71b15442dc494cb4c4761362f381403e853ec62b13807c59c67908a2a14c740"
+    },
+    {
+      "bytes": 14841,
+      "name": "test_production_source_resolution_v3.py",
+      "sha256": "f0da1830bce1b740895ed0911cfb5b630988fba24d9963a42cbd5f39aa1ddb2f"
+    },
+    {
+      "bytes": 5539,
+      "name": "test_production_vacancy_transport_integration.py",
+      "sha256": "917bee2e0004f0132a696e30e398e2a300300141403f06ce99d9f8f86c64dd55"
+    },
+    {
+      "bytes": 2164,
+      "name": "test_quality_constrained_mesh_v1.py",
+      "sha256": "40da4b0ea2a65cfbabbd9d3f3a49b20b8f8646c32e9f13d4e4094e8e21f53df7"
+    },
+    {
+      "bytes": 1671,
+      "name": "test_r_tip_constitutive_handoff_v2.py",
+      "sha256": "8d8e9532b51bb47a41095951f2fd270f6a965bdf80c4e795f09ca76cd6febeaf"
+    },
+    {
+      "bytes": 17185,
+      "name": "test_restricted_production_closeout.py",
+      "sha256": "fe7aae2ea763eccd949807c4d3fcd4df2d9dc84fdb310ca74ece10e96b8face0"
+    },
+    {
+      "bytes": 990,
+      "name": "test_sharp_wake_backend_v12.py",
+      "sha256": "af725cf8b68d82734d25e5081ef58d8ab6069487eb964cc53bb66aa114c4329f"
+    },
+    {
+      "bytes": 14583,
+      "name": "test_source_resolution_campaign_v1.py",
+      "sha256": "658cf846e25735c523282020721cf2deaa952fe36ed3e3eef84993513a9f9970"
+    },
+    {
+      "bytes": 1832,
+      "name": "test_source_transfer_budget_v1.py",
+      "sha256": "a99a9c963652455da4b84db4eba00203bb169e13bdd959407897cdcaac233d9d"
+    },
+    {
+      "bytes": 494,
+      "name": "test_stage2_criterion_v12.py",
+      "sha256": "02ace52738978b36db8685f3bfa1318256a32b474e3e5422c862ed9f39d3ba06"
+    },
+    {
+      "bytes": 2667,
+      "name": "test_static_numerical_family_v1.py",
+      "sha256": "a3ef6312d1c8bca95a5ae74a4d15561ccf45d94d82fcf74916cd4581b79e7003"
+    },
+    {
+      "bytes": 2171,
+      "name": "test_static_numerical_family_v2.py",
+      "sha256": "269c16dae733a74e65dc0fee5fca52c64900a8048567730df0eb5130031b6a94"
+    },
+    {
+      "bytes": 26656,
+      "name": "test_topology_transaction_v11.py",
+      "sha256": "6136e55e22605eeed1cb121ac0ec49c5c69968415cc17a77dfd9674df26cd1d1"
+    },
+    {
+      "bytes": 16483,
+      "name": "test_two_mechanism_voiding.py",
+      "sha256": "72f41dc3b111391cc48068e4c962d527f34c6b65265ac6162c88b8df465aefc7"
+    },
+    {
+      "bytes": 12057,
+      "name": "test_v11_adaptive_multitip_mesh.py",
+      "sha256": "bad02298efd75831bb18fd352ed5fc90e7b510c326b44e69c6d0e34076c7f410"
+    },
+    {
+      "bytes": 2075,
+      "name": "test_v11_branch_scale_identity.py",
+      "sha256": "d1a6b83d04daa31ad4d4502c8a1b6c2e915d70e19c38e3ad019fa0a3f21db035"
+    },
+    {
+      "bytes": 972,
+      "name": "test_v11_branching_campaign_status.py",
+      "sha256": "8a7be88e4151003027a0a6423d782bda138364c074362982af457a04d05643d9"
+    },
+    {
+      "bytes": 5044,
+      "name": "test_v11_causal_sharp_wake.py",
+      "sha256": "e258a6a66d20ea4b03b3f28c2e0cf8466755a7a58623bb3df742df09bb7ff553"
+    },
+    {
+      "bytes": 1785,
+      "name": "test_v11_live_topology_multitip.py",
+      "sha256": "152268c5480ec179710c3dfe687b8fdcae10e31ce0427844cd92f47fa80c2a0c"
+    },
+    {
+      "bytes": 2829,
+      "name": "test_v11_multi_tip_step_loop.py",
+      "sha256": "5a5f8f2b48ba2e3c92843259b4669153c2cedfb52b9b7fe67a2991b28fe9139e"
+    },
+    {
+      "bytes": 1869,
+      "name": "test_v11_network_growth_metrics.py",
+      "sha256": "ffe9a9de1378407472dbc496d00ec8f47021edd8c632cff9dafb7ee0ececd137"
+    },
+    {
+      "bytes": 3186,
+      "name": "test_v11_process_state_ownership.py",
+      "sha256": "3d3e30f002f7ed969c71fb3cfb7b0973790494f67f6df1e7ab6679a6250bd6a6"
+    },
+    {
+      "bytes": 3266,
+      "name": "test_v11_process_update_semantics.py",
+      "sha256": "ba9d9d1ae720c376da02e188b1539b65c45137c6a8a9f1b38278ae8a4dc7e108"
+    },
+    {
+      "bytes": 783,
+      "name": "test_v11_production_counts.py",
+      "sha256": "7d53b52644e7cb6d1e582f8ae481f8c3bbbfe5bf719fdf200207ba97eb357d8c"
+    },
+    {
+      "bytes": 8071,
+      "name": "test_v11_production_step_loop.py",
+      "sha256": "0410b79778c56a9f5c5c141105fd997f210a23fd0d23facfd0f1a0fb7e939176"
+    },
+    {
+      "bytes": 4045,
+      "name": "test_v11_resolved_tip_handoff.py",
+      "sha256": "517129b2781c0e43ceca9c4f8c3c87e952356569d031fe650fb47e98a10b5e2f"
+    },
+    {
+      "bytes": 6755,
+      "name": "test_v11_shared_cluster_production.py",
+      "sha256": "ecccd88eafb54e507def074c72041a5afdd7432a2dfe9358a362127e0293cac5"
+    },
+    {
+      "bytes": 2409,
+      "name": "test_v11_stochastic_directional_thresholds.py",
+      "sha256": "81d35ca2f20402e94a9b6c4ef2c0d7dde7e78c0a39dc8b886fa6045fc417fb14"
+    },
+    {
+      "bytes": 2162,
+      "name": "test_v12_physical_event_context.py",
+      "sha256": "188193d7e3862cec9f94b8cd2b10389944b7f6e788971d390673bd591631f09d"
+    },
+    {
+      "bytes": 8265,
+      "name": "test_v5_bounded_sharp_front_adapter.py",
+      "sha256": "797ca2b2dff312fd707c4bbaf0f8e2a2deb61323d0b6568dd48f5dc7ded871b6"
+    },
+    {
+      "bytes": 1788,
+      "name": "test_v5_clean_historical_neutrality.py",
+      "sha256": "2dcc35abfdf89705e390ec2d5c253754972d3dd2929620749bf01915a1094f26"
+    },
+    {
+      "bytes": 36798,
+      "name": "test_v5_hybrid_directional_drive.py",
+      "sha256": "baead873f52ada3cae25b41c5e15cc705f43fd6ae70da028e80af1cc6dd0e32c"
+    },
+    {
+      "bytes": 1403,
+      "name": "test_v5_numerical_runtime_v1.py",
+      "sha256": "1851850b76c53aafc9d1a6082a4f44af836486b5290e6012494d3121ad9e119f"
+    },
+    {
+      "bytes": 20715,
+      "name": "test_v5_unified_model_lineage.py",
+      "sha256": "6792c80af7588f7deb9bf128f66a4f0a80da1edf106594f3e81d6d32d7c9d329"
+    },
+    {
+      "bytes": 27081,
+      "name": "test_vacancy_transport_phase_field_v2.py",
+      "sha256": "c4a23982a69e8973ffa97ec04cfb47df4a57439d87f2bdc25afdac6da92b583a"
+    },
+    {
+      "bytes": 1284,
+      "name": "test_void_formation_mechanism.py",
+      "sha256": "39772346a38e65103ac4edeb65b1fa6a7062a805d0ae7a3b9d909e8f9ddec1ea"
+    },
+    {
+      "bytes": 2927,
+      "name": "test_voiding_lifecycle_driver_v5.py",
+      "sha256": "7dee00f675eafa1a7fd869e5933fb11e35a2f331db64ca6c91925ea1758fcbb1"
+    },
+    {
+      "bytes": 41136,
+      "name": "test_voiding_v5.py",
+      "sha256": "9908047b1ca9a7fb7ac9301676ccefdcd80fe42d7ad5b08fa58d532c1d2bc4d2"
+    },
+    {
+      "bytes": 1149,
+      "name": "test_voiding_v5_ci_inheritance.py",
+      "sha256": "35b0795c1b26c9e408dc112ac01a7de9b09313549b03a3c9fce5b51d60b24651"
+    }
+  ]
+}

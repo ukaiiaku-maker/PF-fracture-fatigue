@@ -36,12 +36,15 @@ def _pid_alive(pid: int | None) -> bool:
 
 
 def _process_table() -> str:
-    completed = subprocess.run(
-        ["ps", "-ax", "-o", "pid=,command="],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
+    try:
+        completed = subprocess.run(
+            ["ps", "-ax", "-o", "pid=,command="],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+    except OSError:
+        return ""
     return completed.stdout if completed.returncode == 0 else ""
 
 
