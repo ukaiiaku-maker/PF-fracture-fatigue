@@ -31,7 +31,7 @@ fields while preserving native mechanics observations and restart:
 The retained 1 mm example occupies 65 MiB, the complete V11 pair 740 MiB, the
 theta-40 probe 7.4 MiB, and all current positive-transport evidence 73 MiB. A
 conservative allowance of 500 MiB for two new long histories plus temporary
-checkpoint overlap is small relative to the measured 18 GiB free on
+checkpoint overlap is small relative to the measured 17 GiB free on
 `/Volumes/Data`. Production output should remain under a new run root, retain
 only milestone fields plus rolling/native restart generations, and avoid
 duplicate image sequences. No existing trajectory is deleted or overwritten.
