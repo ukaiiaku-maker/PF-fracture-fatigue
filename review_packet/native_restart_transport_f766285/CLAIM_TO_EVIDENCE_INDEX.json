@@ -1,0 +1,66 @@
+{
+  "schema": "fracture-claim-to-evidence-index/2",
+  "date": "2026-10-10",
+  "integration_branch": "codex/shared-fracture-fatigue-options-v1",
+  "full_artifact_backup": {
+    "status": "pending_external_duplicate",
+    "reason": "/Volumes/My Passport disappeared before archive publication",
+    "local_final_artifacts": "integration_evidence/native_restart_transport_f766285",
+    "local_v3_artifacts": "integration_evidence/native_restart_transport_a30a78c/v36_*"
+  },
+  "claims": [
+    {
+      "id": "v10_4_native_restart",
+      "category": "clean committed-source execution",
+      "source_commit": "f766285",
+      "scope": "bounded pure-bulk two-boundary and tip-plus-bulk one-boundary public restart comparisons",
+      "compact_evidence": "RESTART_AND_TRANSPORT_RESULTS.json",
+      "full_artifacts": "integration_evidence/native_restart_transport_f766285/{pure_*,combined_*}"
+    },
+    {
+      "id": "v3_6_native_restart",
+      "category": "clean committed-source execution",
+      "source_commit": "a30a78c",
+      "scope": "six cyclic phase intervals with two public restart boundaries",
+      "compact_evidence": "RESTART_AND_TRANSPORT_RESULTS.json",
+      "full_artifacts": "integration_evidence/native_restart_transport_a30a78c/v36_*",
+      "source_correspondence": "f766285 changes only V10.4 process-local audit checkpoint content"
+    },
+    {
+      "id": "v5_transport_rejection",
+      "category": "clean committed-source diagnostic",
+      "source_commit": "f766285",
+      "scope": "nearest retained 0.50002 s pair; first rejected 0.1 s interval plus converged accepted prefix",
+      "compact_evidence": "RESTART_AND_TRANSPORT_RESULTS.json",
+      "full_artifacts": "integration_evidence/native_restart_transport_f766285/v5_*"
+    },
+    {
+      "id": "v5_cavity_growth_fixture",
+      "category": "committed-source functional fixture",
+      "source_commit": "f766285",
+      "scope": "test-only extreme-reservoir 25-to-55 micrometre growth, two remeshes, and checkpoint/re-equilibration",
+      "compact_evidence": "RESTART_AND_TRANSPORT_RESULTS.json",
+      "full_artifacts": "integration_evidence/native_restart_transport_f766285/v5_growth_fixture*"
+    },
+    {
+      "id": "developed_growth_query_regression",
+      "category": "observer-only regression",
+      "simulation_source": "unchanged retained 300 K trajectory",
+      "observer_source_commit": "f766285",
+      "scope": "repeated lengths, jump brackets, terminal/out-of-range, and projected/path plots",
+      "compact_evidence": "RESTART_AND_TRANSPORT_RESULTS.json",
+      "full_artifacts": "integration_evidence/targeted_completion/current_single_front_1000um"
+    },
+    {
+      "id": "repository_tests",
+      "category": "committed-source verification",
+      "source_commit": "f766285",
+      "scope": "complete tests directory",
+      "result": "775 passed"
+    }
+  ],
+  "pending": [
+    "positivity-preserving conservative full-order V5 transport discretization",
+    "combined branching-plus-cavity compatibility calculation"
+  ]
+}

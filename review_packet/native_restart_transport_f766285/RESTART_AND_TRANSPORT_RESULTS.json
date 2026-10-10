@@ -1,0 +1,95 @@
+{
+  "schema": "native-restart-transport-results/1",
+  "date": "2026-10-10",
+  "numerical_source_commit": "f766285",
+  "v10_4": {
+    "public_interface": true,
+    "pure_bulk": {
+      "restart_boundaries": 2,
+      "terminal_step": 3,
+      "all_11_checkpoint_arrays_exact": true,
+      "driver_geometry_history_exact": true,
+      "kinetic_payload_exact_except_timestamp": true,
+      "plastic_strain_max_abs": 0.0002446130164396426,
+      "density_range_m2": 1280723074168.6016,
+      "nonzero_tip_population_entries": 0
+    },
+    "tip_plus_bulk": {
+      "restart_boundaries": 1,
+      "terminal_step": 2,
+      "all_11_checkpoint_arrays_exact": true,
+      "driver_geometry_history_exact": true,
+      "kinetic_payload_exact_except_timestamp": true,
+      "plastic_strain_max_abs": 2.077560650923406e-06,
+      "density_range_m2": 24578459334.88086,
+      "nonzero_tip_population_entries": 217,
+      "tip_population_max_abs": 1.33103089612493e-07
+    },
+    "process_local_audit_records_in_physical_checkpoint": false
+  },
+  "v3_6": {
+    "execution_source_commit": "a30a78c",
+    "public_interface": true,
+    "restart_boundaries": 2,
+    "terminal_cycles": 0.75,
+    "terminal_phase_intervals": 6,
+    "phase_steps_per_cycle": 8,
+    "seed": 1733,
+    "exact_categories": [
+      "native_state", "material_history", "cycle_and_phase", "hazard",
+      "pending_threshold", "rng_state", "events", "convergence",
+      "acceleration", "orbit", "recent_cycle_map", "cycle_snapshot",
+      "last_projected_metrics"
+    ],
+    "maximum_abs_active_plastic_shear": 1.2173938163373913e-53
+  },
+  "v5_transport": {
+    "attempted_interval_s": [0.50002, 0.60002],
+    "failed_test": "lower",
+    "lower_violation_count": 2,
+    "upper_violation_count": 0,
+    "linear_candidate_min": -9.76180956715588e-15,
+    "linear_candidate_max": 3.538787595785512e-09,
+    "effective_lower_bound": 1e-30,
+    "dilute_upper_bound": 0.01,
+    "unscaled_linear_residual_inf": 1.1404531925556672e-15,
+    "equilibrated_linear_residual_inf": 2.0760294670520323e-24,
+    "mechanics_projected_concentration": 3.635729012235712e-14,
+    "classification": "centered mixed-discretization positivity defect; not solver roundoff and not a physical upper-domain crossing",
+    "rollback": "exact paired parent retained",
+    "accepted_endpoint_s": 0.52002,
+    "time_step_convergence": {
+      "durations_s": [0.01, 0.005, 0.0025],
+      "relative_inf_difference_0p01_vs_0p0025": 7.971386461561637e-05,
+      "relative_inf_difference_0p005_vs_0p0025": 2.6605767154425177e-05
+    },
+    "repair_status": "unresolved; a conservative positivity-preserving full-order discretization is still required"
+  },
+  "cavity_growth_fixture": {
+    "production_eligible": false,
+    "label": "test-only extreme-reservoir functional fixture",
+    "radius_start_m": 2.5e-05,
+    "radius_end_m": 5.5e-05,
+    "remesh_generations": 2,
+    "checkpoint_restore_and_reequilibrate_exercised": true,
+    "combined_branching_plus_cavity": "unresolved"
+  },
+  "long_growth_regression": {
+    "trajectory_rerun": false,
+    "observation_rows": 2286,
+    "query_tests_passed": 12,
+    "projected_terminal_um": 1002.9028827375072,
+    "path_terminal_um": 1005.0,
+    "projected_100_um": "discrete_jump_bracket",
+    "projected_1000_um": "discrete_jump_bracket",
+    "path_1002_um": "discrete_jump_bracket",
+    "terminal_queries": "exact",
+    "1100_um_queries": "out_of_range",
+    "interpolation_performed": false,
+    "plots_regenerated": ["projected", "path_arclength"]
+  },
+  "repository_tests": {
+    "passed": 775,
+    "failed": 0
+  }
+}

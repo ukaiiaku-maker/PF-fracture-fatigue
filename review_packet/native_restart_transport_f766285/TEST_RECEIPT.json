@@ -1,0 +1,16 @@
+{
+  "schema": "fracture-test-receipt/1",
+  "date": "2026-10-10",
+  "source_commit": "f766285",
+  "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "command": "python -m pytest -q",
+  "passed": 775,
+  "failed": 0,
+  "elapsed_s": 71.69,
+  "long_growth_query_tests": {
+    "command": "python -m pytest -q tests/test_fracture_observation_history.py",
+    "passed": 12,
+    "failed": 0
+  },
+  "external_fem_czm": "not rerun; source and adapter interface unchanged"
+}
