@@ -405,17 +405,13 @@ def main(argv=None):
     original_selection = paper.SELECTION_RECORD
     original_options = paper.VALID_OPTIONS
     root = Path(__file__).resolve().parents[1]
-    # The V12 continuation consumes the immutable four-class records already
-    # shipped with this source tree.  Older development runs used aliases in a
-    # generated runtime_inputs directory; those aliases were never required
-    # physics inputs and are not part of the preserved checkpoint ancestry.
     paper.DEFAULT_REGISTRY = root / (
-        "arrhenius_fracture/data/materials/"
-        "v10_2_27_v913_four_class_paper_registry.csv"
+        "runtime_inputs/pf_current_source_branching/"
+        "pf_v2_four_class_pf_transfer_registry.csv"
     )
     paper.SELECTION_RECORD = root / (
-        "arrhenius_fracture/data/materials/"
-        "v10_2_27_v913_four_class_paper_selection.json"
+        "runtime_inputs/pf_current_source_branching/"
+        "pf_v2_four_class_pf_transfer_selection.json"
     )
     paper.VALID_OPTIONS = {
         "v913_paper_peak01_0242980_persistent_sites": "v913_zeroD_sobol_0242980",
