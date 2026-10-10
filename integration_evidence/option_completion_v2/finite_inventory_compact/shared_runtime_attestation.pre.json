@@ -1,0 +1,300 @@
+{
+  "checkpoint_policy": {
+    "checkpoint_directory": null,
+    "native_checkpoint_required": false,
+    "profile": "compact_smoke",
+    "rendered_snapshot_count": 0,
+    "restart_from": null
+  },
+  "execution_verified": false,
+  "executor": {
+    "callable": "main",
+    "module": "arrhenius_fracture.sharp_front_v10_1",
+    "module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_1.py",
+    "module_sha256": "f473914c52f51de680d5394caae77067d6b4bd9183df052ec421dd882b2ef91e"
+  },
+  "inputs": {},
+  "native_argv": [
+    "--mode",
+    "2d",
+    "--material-class",
+    "DBTT",
+    "--temperatures",
+    "900",
+    "--tip-source-model",
+    "finite_sites",
+    "--bulk-plasticity-mode",
+    "tip_only",
+    "--directional-j-mode",
+    "root_signed",
+    "--tip-kinetics-mode",
+    "moving_velocity",
+    "--tip-plasticity",
+    "--active-shielding",
+    "--signed-active-shielding",
+    "--mobile-shield-fraction",
+    "0",
+    "--no-wake-shielding",
+    "--steps",
+    "1",
+    "--nx",
+    "36",
+    "--ny",
+    "72",
+    "--dU",
+    "2e-7",
+    "--dt",
+    "8.4",
+    "--n-stagger",
+    "1",
+    "--tip-h-fine",
+    "1e-6",
+    "--tip-ratio",
+    "1.2",
+    "--da-phys",
+    "5e-6",
+    "--target-crack-extension-um",
+    "5",
+    "--crystal-aniso",
+    "--crystal-compete",
+    "--crystal-theta-deg",
+    "30",
+    "--crystal-material",
+    "w",
+    "--j-decomposition",
+    "cluster",
+    "--max-fronts",
+    "1",
+    "--print-every",
+    "1",
+    "--out",
+    "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/finite_inventory_compact",
+    "--save-snapshots",
+    "0",
+    "--no-plots"
+  ],
+  "observed_bindings": [
+    {
+      "attribute": "assemble_mechanics",
+      "consumer": "full spatial finite-element mechanics assembly",
+      "module": "arrhenius_fracture.fem",
+      "module_sha256": "e3694431927ffa1cba6a176747bd9e38a64050569c6dccacf909b30ce9d4c83d",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/fem.py",
+      "requested": "spatial_pf",
+      "role": "mechanics"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "native displacement-step controller",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "monotonic",
+      "role": "loading"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "tip/surface activation support",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "tip_surface",
+      "role": "source_location"
+    },
+    {
+      "attribute": "main",
+      "consumer": "native finite-site inventory and refresh entry",
+      "module": "arrhenius_fracture.sharp_front_v10_1",
+      "module_sha256": "f473914c52f51de680d5394caae77067d6b4bd9183df052ec421dd882b2ef91e",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_1.py",
+      "requested": "finite_inventory",
+      "role": "source_lifecycle"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "native signed state update",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "native_signed",
+      "role": "kinetics"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "single-front topology",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "single_front",
+      "role": "crack_path"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "adaptive accepted-state transaction",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "adaptive_transactional",
+      "role": "integration"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "native --save-snapshots/--no-plots retention flags",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "compact_smoke",
+      "role": "output"
+    },
+    {
+      "attribute": "_require_stochastic_seed",
+      "consumer": "CLEAVAGE_HAZARD_SEED before provider import",
+      "module": "arrhenius_fracture.sharp_front_v10_2_17",
+      "module_sha256": "2f0c61c15dfa6a0638d6f6520fba1e9a03877a06bca8bc846bf30c0f5ff5f11a",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_17.py",
+      "requested": "1733",
+      "role": "random_seed"
+    }
+  ],
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "single_front",
+    "integration": "adaptive_transactional",
+    "kernel_manifest": null,
+    "kinetics": "native_signed",
+    "loading": "monotonic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "compact_smoke",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "finite_inventory",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "07debf88d167b14d3698c4a245549a82c0fcbd7d9c9a9db8b5ba963c86b0e4ff",
+  "plan": {
+    "bindings": [
+      {
+        "attribute": "assemble_mechanics",
+        "consumer": "full spatial finite-element mechanics assembly",
+        "module": "arrhenius_fracture.fem",
+        "requested": "spatial_pf",
+        "role": "mechanics"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native displacement-step controller",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "monotonic",
+        "role": "loading"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "tip/surface activation support",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "tip_surface",
+        "role": "source_location"
+      },
+      {
+        "attribute": "main",
+        "consumer": "native finite-site inventory and refresh entry",
+        "module": "arrhenius_fracture.sharp_front_v10_1",
+        "requested": "finite_inventory",
+        "role": "source_lifecycle"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native signed state update",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "native_signed",
+        "role": "kinetics"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "single-front topology",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "single_front",
+        "role": "crack_path"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "adaptive accepted-state transaction",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "adaptive_transactional",
+        "role": "integration"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native --save-snapshots/--no-plots retention flags",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "compact_smoke",
+        "role": "output"
+      },
+      {
+        "attribute": "_require_stochastic_seed",
+        "consumer": "CLEAVAGE_HAZARD_SEED before provider import",
+        "module": "arrhenius_fracture.sharp_front_v10_2_17",
+        "requested": "1733",
+        "role": "random_seed"
+      }
+    ],
+    "executable": true,
+    "executor_attribute": "main",
+    "executor_module": "arrhenius_fracture.sharp_front_v10_1",
+    "limitation": null,
+    "options_sha256": "07debf88d167b14d3698c4a245549a82c0fcbd7d9c9a9db8b5ba963c86b0e4ff",
+    "restart_family": "legacy_single_front_no_public_restart",
+    "schema": "shared-execution-plan/1"
+  },
+  "python": {
+    "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "version": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]"
+  },
+  "schema": "shared-runtime-attestation/1",
+  "seed": {
+    "hazard": 1733,
+    "mode": "native_default"
+  },
+  "source": {
+    "commit": "5a82b6a482a96493f37a8b68570530d331b4927a",
+    "dirty": true,
+    "tree": "f7e38e8b705c372333b76915e79464c10cf3e5b9"
+  },
+  "source_policy": {
+    "calculation_changes": [
+      "arrhenius_fracture/shared_execution.py",
+      "arrhenius_fracture/shared_execution_worker.py",
+      "arrhenius_fracture/shared_operator_consistent_adapter.py",
+      "arrhenius_fracture/sharp_front_v10_1.py",
+      "scripts/run_v10_1_1_source_model_gate_700K.sh",
+      "scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py",
+      "tests/test_shared_execution.py",
+      "tests/test_v10_1_1_source_runner.py"
+    ],
+    "calculation_source_dirty": true,
+    "commit": "5a82b6a482a96493f37a8b68570530d331b4927a",
+    "global_dirty": true,
+    "policy": "development_snapshot",
+    "qualification": "sealed_development_snapshot",
+    "snapshot": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/finite_inventory_compact/development_source_snapshot",
+    "tree": "f7e38e8b705c372333b76915e79464c10cf3e5b9",
+    "untracked_calculation_files": [
+      "arrhenius_fracture/shared_operator_consistent_adapter.py"
+    ]
+  },
+  "status": "constructed",
+  "worker": {
+    "fresh_interpreter": true,
+    "pid": 99281
+  }
+}

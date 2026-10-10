@@ -105,6 +105,18 @@ def _verify_loaded_files(receipt: dict) -> None:
             raise RuntimeError(f"loaded calculation source changed during execution: {raw}")
 
 
+def _multifront_restart_flag(path: str | Path) -> str:
+    source = Path(path)
+    if source.suffix == ".json":
+        try:
+            schema = str(json.loads(source.read_text()).get("schema", ""))
+        except (OSError, ValueError) as error:
+            raise ValueError(f"cannot inspect multifront checkpoint: {source}") from error
+        if schema.startswith("v11.production-branch-network-checkpoint/"):
+            return "--v11-restart-checkpoint"
+    return "--v12-restart-checkpoint"
+
+
 def execute(request_path: str | Path) -> dict:
     request = json.loads(Path(request_path).read_text())
     options = SharedOptions.from_dict(request["options"])
@@ -118,7 +130,15 @@ def execute(request_path: str | Path) -> dict:
         OutputProfile.SELECTED_FIELDS: ["--save-snapshots", "4"],
         OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "0", "--no-plots"],
     }[options.output]
-    argv = [*request["native_args"], "--out", str(output), *output_flags]
+    native_args = list(request["native_args"])
+    restart_from = request.get("restart_from")
+    if restart_from and plan.restart_family == "v12_accepted_multifront":
+        restart_names = ("--v11-restart-checkpoint", "--v12-restart-checkpoint")
+        if any(item in restart_names or item.startswith(restart_names[0] + "=")
+               or item.startswith(restart_names[1] + "=") for item in native_args):
+            raise ValueError("restart checkpoint was supplied twice")
+        native_args.extend([_multifront_restart_flag(restart_from), restart_from])
+    argv = [*native_args, "--out", str(output), *output_flags]
     checkpoint = {
         "profile": options.output.value,
         "rendered_snapshot_count": int(output_flags[1]),

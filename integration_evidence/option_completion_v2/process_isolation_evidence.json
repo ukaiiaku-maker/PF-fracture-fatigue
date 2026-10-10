@@ -1,0 +1,94 @@
+{
+  "a_histories_identical": true,
+  "all_worker_pids_distinct": true,
+  "b_histories_identical": true,
+  "b_methods_identical": true,
+  "intentional_b_failure": "shared native execution failed in isolated worker: {\n  \"exception_class\": \"SystemExit\",\n  \"exception_message\": \"2\",\n  \"execution_verified\": false,\n  \"schema\": \"shared-runtime-failure/1\",\n  \"status\": \"failed\",\n  \"traceback\": \"Traceback (most recent call last):\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_execution_worker.py\\\", line 181, in main\\n    execute(request_path)\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_execution_worker.py\\\", line 158, in execute\\n    result = executor(argv)\\n             ^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_27_reversible_audited.py\\\", line 34, in main\\n    result = _audited.main(args)\\n             ^^^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_27_audited.py\\\", line 51, in main\\n    result = _entry.main(args)\\n             ^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_27.py\\\", line 288, in main\\n    result = _base.main(args)\\n             ^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_22.py\\\", line 185, in main\\n    result = _base.main(args)\\n             ^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_17.py\\\", line 320, in main\\n    result = _transport.main(args)\\n             ^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_1_7_5.py\\\", line 188, in main\\n    result = _v10174.main(args)\\n             ^^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_1_7_4.py\\\", line 239, in main\\n    result = _avalanche.main(args)\\n             ^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_1_7_3.py\\\", line 264, in main\\n    result = _campaign.main(args)\\n             ^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_1_5.py\\\", line 93, in main\\n    result = _protected.main(args)\\n             ^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_1.py\\\", line 302, in main\\n    result = sharp_front.main(args)\\n             ^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py\\\", line 4597, in main\\n    args = _build_parser().parse_args(argv)\\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \\\"/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/argparse.py\\\", line 1908, in parse_args\\n    self.error(msg)\\n  File \\\"/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/argparse.py\\\", line 2650, in error\\n    self.exit(2, _('%(prog)s: error: %(message)s\\\\n') % args)\\n  File \\\"/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/lib/python3.12/argparse.py\\\", line 2637, in exit\\n    _sys.exit(status)\\nSystemExit: 2\\n\"\n}\n",
+  "intentional_b_failure_observed": true,
+  "parent_environment_unchanged": true,
+  "passed": true,
+  "records": {
+    "aba_a1": {
+      "executor_sha256": "15b3b8045f812a36a287ac93271b65e1033ab2d81bd6cc0458fe1e111c4ebdb1",
+      "output": "/private/tmp/shared-isolation-20261009-v1/aba_a1",
+      "runtime_methods": null,
+      "steps_sha256": "06db980d5c674cd8f070974a847bb51527dbb55c4601cb00285f0dcecfe6b477",
+      "summary_sha256": "8de51d84d1645deb30da9be0fed0c3d280b742ba18462b0e009e51504e9799dd",
+      "worker_pid": 1201
+    },
+    "aba_a2": {
+      "executor_sha256": "15b3b8045f812a36a287ac93271b65e1033ab2d81bd6cc0458fe1e111c4ebdb1",
+      "output": "/private/tmp/shared-isolation-20261009-v1/aba_a2",
+      "runtime_methods": null,
+      "steps_sha256": "06db980d5c674cd8f070974a847bb51527dbb55c4601cb00285f0dcecfe6b477",
+      "summary_sha256": "8de51d84d1645deb30da9be0fed0c3d280b742ba18462b0e009e51504e9799dd",
+      "worker_pid": 1235
+    },
+    "aba_b": {
+      "executor_sha256": "fc3e7b3129d6f2e5c806277d65aac9525f4609d5e8c5b8f800570b85629cc444",
+      "output": "/private/tmp/shared-isolation-20261009-v1/aba_b",
+      "runtime_methods": [
+        {
+          "advance": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
+          "blunted_radius": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_blunted_radius",
+          "diagnostics": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_diagnostics",
+          "evolve": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+          "local_slip_count": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_local_slip_count"
+        }
+      ],
+      "steps_sha256": "3be01de37ef153540f5a9064160742e8974ef7f866c4d549fcf2d5114b1458a9",
+      "summary_sha256": "8de51d84d1645deb30da9be0fed0c3d280b742ba18462b0e009e51504e9799dd",
+      "worker_pid": 1218
+    },
+    "bab_a": {
+      "executor_sha256": "15b3b8045f812a36a287ac93271b65e1033ab2d81bd6cc0458fe1e111c4ebdb1",
+      "output": "/private/tmp/shared-isolation-20261009-v1/bab_a",
+      "runtime_methods": null,
+      "steps_sha256": "06db980d5c674cd8f070974a847bb51527dbb55c4601cb00285f0dcecfe6b477",
+      "summary_sha256": "8de51d84d1645deb30da9be0fed0c3d280b742ba18462b0e009e51504e9799dd",
+      "worker_pid": 1310
+    },
+    "bab_b1": {
+      "executor_sha256": "fc3e7b3129d6f2e5c806277d65aac9525f4609d5e8c5b8f800570b85629cc444",
+      "output": "/private/tmp/shared-isolation-20261009-v1/bab_b1",
+      "runtime_methods": [
+        {
+          "advance": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
+          "blunted_radius": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_blunted_radius",
+          "diagnostics": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_diagnostics",
+          "evolve": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+          "local_slip_count": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_local_slip_count"
+        }
+      ],
+      "steps_sha256": "3be01de37ef153540f5a9064160742e8974ef7f866c4d549fcf2d5114b1458a9",
+      "summary_sha256": "8de51d84d1645deb30da9be0fed0c3d280b742ba18462b0e009e51504e9799dd",
+      "worker_pid": 1285
+    },
+    "bab_b2": {
+      "executor_sha256": "fc3e7b3129d6f2e5c806277d65aac9525f4609d5e8c5b8f800570b85629cc444",
+      "output": "/private/tmp/shared-isolation-20261009-v1/bab_b2",
+      "runtime_methods": [
+        {
+          "advance": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
+          "blunted_radius": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_blunted_radius",
+          "diagnostics": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_diagnostics",
+          "evolve": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+          "local_slip_count": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_local_slip_count"
+        }
+      ],
+      "steps_sha256": "3be01de37ef153540f5a9064160742e8974ef7f866c4d549fcf2d5114b1458a9",
+      "summary_sha256": "8de51d84d1645deb30da9be0fed0c3d280b742ba18462b0e009e51504e9799dd",
+      "worker_pid": 1326
+    },
+    "post_failure_a": {
+      "executor_sha256": "15b3b8045f812a36a287ac93271b65e1033ab2d81bd6cc0458fe1e111c4ebdb1",
+      "output": "/private/tmp/shared-isolation-20261009-v1/post_failure_a",
+      "runtime_methods": null,
+      "steps_sha256": "06db980d5c674cd8f070974a847bb51527dbb55c4601cb00285f0dcecfe6b477",
+      "summary_sha256": "8de51d84d1645deb30da9be0fed0c3d280b742ba18462b0e009e51504e9799dd",
+      "worker_pid": 1358
+    }
+  },
+  "schema": "shared-process-isolation-evidence/1",
+  "source_policy": "development_snapshot"
+}

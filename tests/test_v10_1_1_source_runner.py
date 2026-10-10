@@ -10,6 +10,7 @@ def test_source_model_gate_compares_continuum_and_finite_modes():
     assert 'KINETIC_MAX_ACTION_SUBSTEP=${KINETIC_MAX_ACTION_SUBSTEP:-0.01}' in text
     assert 'KINETIC_MAX_TRANSLATION_SUBSTEP_M=${KINETIC_MAX_TRANSLATION_SUBSTEP_M:-5e-8}' in text
     assert 'v10_1_driver_modes.json' in text
+    assert 'expected_source == "finite_sites"' in text
 
 
 def test_source_gate_fails_fast_on_no_advance_or_absurd_initiation_toughness():

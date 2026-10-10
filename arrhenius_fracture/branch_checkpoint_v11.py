@@ -1,7 +1,7 @@
 """Atomic production restart contract for bounded v11 branch networks."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import MISSING, dataclass, fields
 import hashlib
 import json
 import math
@@ -22,6 +22,38 @@ SCHEMA = "v11.production-branch-network-checkpoint/2"
 
 def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _restore_additive_dataclass_defaults(instance: Any) -> tuple[str, ...]:
+    """Populate fields added after an older pickle without touching the file.
+
+    Pickle bypasses ``__init__`` and therefore does not apply dataclass
+    defaults introduced by a later source release.  Only declared additive
+    defaults are eligible here; missing required physical state still fails.
+    """
+    restored = []
+    for item in fields(type(instance)):
+        if hasattr(instance, item.name):
+            continue
+        if item.default is not MISSING:
+            value = item.default
+        elif item.default_factory is not MISSING:
+            value = item.default_factory()
+        else:
+            raise ValueError(f"checkpoint lacks required field {item.name!r}")
+        object.__setattr__(instance, item.name, value)
+        restored.append(item.name)
+    return tuple(restored)
+
+
+def _recorded_manifest_matches(recorded: Any, expected: Any) -> bool:
+    """Require every recorded value while permitting later additive fields."""
+    if isinstance(recorded, Mapping) and isinstance(expected, Mapping):
+        return all(
+            key in expected and _recorded_manifest_matches(value, expected[key])
+            for key, value in recorded.items()
+        )
+    return recorded == expected
 
 
 @dataclass(frozen=True)
@@ -162,6 +194,13 @@ def restore_branch_checkpoint(path: str | Path) -> ProductionBranchCheckpoint:
     checkpoint = pickle.loads(data)
     if not isinstance(checkpoint, ProductionBranchCheckpoint):
         raise ValueError("production branch checkpoint payload has the wrong type")
+    _restore_additive_dataclass_defaults(checkpoint)
+    added_state_fields = _restore_additive_dataclass_defaults(checkpoint.state)
+    if added_state_fields:
+        # Reapply the current accepted-state validation and construct only the
+        # declared neutral defaults (for example the equilibrium vacancy field)
+        # that did not exist in the older schema-2 pickle.
+        checkpoint.state.__post_init__()
     expected = checkpoint.manifest_fields()
     actual = {
         key: value for key, value in manifest.items()
@@ -170,7 +209,7 @@ def restore_branch_checkpoint(path: str | Path) -> ProductionBranchCheckpoint:
     # Schema-2 checkpoints predate additive refinement/count diagnostics.  All
     # fields actually recorded remain strict hash-checked; newly derived fields
     # are reconstructed from the pickled accepted state on restore.
-    if any(expected.get(key) != value for key, value in actual.items()):
+    if not _recorded_manifest_matches(actual, expected):
         raise ValueError("production branch checkpoint manifest does not match state")
     return checkpoint
 

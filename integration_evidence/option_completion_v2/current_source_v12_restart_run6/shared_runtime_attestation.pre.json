@@ -1,0 +1,310 @@
+{
+  "checkpoint_policy": {
+    "checkpoint_directory": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/current_source_v12_restart_run6/checkpoint",
+    "native_checkpoint_required": true,
+    "profile": "publication_restart",
+    "rendered_snapshot_count": 0,
+    "restart_from": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_integrated_envelope_v5_4_step1_migrations_20260901T130000Z_final/enabled_max2/step0000001_migrated_v5_4.json"
+  },
+  "execution_verified": false,
+  "executor": {
+    "callable": "main",
+    "module": "arrhenius_fracture.sharp_front_current_source_multifront_physical_v12",
+    "module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_current_source_multifront_physical_v12.py",
+    "module_sha256": "36dd3d4db50ba6b8937069eb242e8db369a7e441ba99fd0aaa7b05423fef91a8"
+  },
+  "inputs": {},
+  "native_argv": [
+    "--signed-kernel-family",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+    "--mode",
+    "2d",
+    "--parameter-option",
+    "v913_paper_peak01_0242980_persistent_sites",
+    "--temperatures",
+    "900",
+    "--steps",
+    "1",
+    "--dU",
+    "2e-7",
+    "--dt",
+    "8.4",
+    "--n-stagger",
+    "1",
+    "--da-phys",
+    "5e-6",
+    "--target-crack-extension-um",
+    "5",
+    "--front-state-model",
+    "moving_pz",
+    "--tip-source-model",
+    "continuum",
+    "--tip-kinetics-mode",
+    "moving_velocity",
+    "--bulk-plasticity-mode",
+    "tip_only",
+    "--directional-j-mode",
+    "root_signed",
+    "--tip-plasticity",
+    "--active-shielding",
+    "--signed-active-shielding",
+    "--mobile-shield-fraction",
+    "0",
+    "--no-wake-shielding",
+    "--crystal-aniso",
+    "--crystal-compete",
+    "--crystal-theta-deg",
+    "45",
+    "--crystal-material",
+    "w",
+    "--j-decomposition",
+    "cluster",
+    "--crack-backend",
+    "sharp_wake",
+    "--print-every",
+    "1",
+    "--maximum-fronts",
+    "1",
+    "--v12-target-added-extension-um",
+    "0",
+    "--v11-restart-checkpoint",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_integrated_envelope_v5_4_step1_migrations_20260901T130000Z_final/enabled_max2/step0000001_migrated_v5_4.json",
+    "--out",
+    "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/current_source_v12_restart_run6",
+    "--save-snapshots",
+    "0",
+    "--no-plots"
+  ],
+  "observed_bindings": [
+    {
+      "attribute": "assemble_mechanics",
+      "consumer": "full spatial finite-element mechanics assembly",
+      "module": "arrhenius_fracture.fem",
+      "module_sha256": "e3694431927ffa1cba6a176747bd9e38a64050569c6dccacf909b30ce9d4c83d",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/fem.py",
+      "requested": "spatial_pf",
+      "role": "mechanics"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "native displacement-step controller",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "monotonic",
+      "role": "loading"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "tip/surface activation support",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "tip_surface",
+      "role": "source_location"
+    },
+    {
+      "attribute": "MODEL_ID",
+      "consumer": "current-source state binding",
+      "module": "arrhenius_fracture.current_source_runtime_bindings",
+      "module_sha256": "28cb934835cc41709bfe6a7f3069dfb14beff0406b665b2d655143d7fac5af16",
+      "observed_attribute_type": "str",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/current_source_runtime_bindings.py",
+      "requested": "current_source",
+      "role": "source_lifecycle"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "native signed state update",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "native_signed",
+      "role": "kinetics"
+    },
+    {
+      "attribute": "main",
+      "consumer": "multifront ownership graph",
+      "module": "arrhenius_fracture.sharp_front_v11_branching",
+      "module_sha256": "5d4f5b0cec2a107a6fcafb19e17663ca91e82705db912f23a170ab0f30f9e0b7",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v11_branching.py",
+      "requested": "branching_multifront",
+      "role": "crack_path"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "adaptive accepted-state transaction",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "adaptive_transactional",
+      "role": "integration"
+    },
+    {
+      "attribute": "run_2d",
+      "consumer": "native --save-snapshots/--no-plots retention flags",
+      "module": "arrhenius_fracture.sharp_front",
+      "module_sha256": "bb10c5cb364a002c1f5a84de9327f9ee4c4f56a71e838741513362b1e790e65b",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front.py",
+      "requested": "publication_restart",
+      "role": "output"
+    },
+    {
+      "attribute": "_require_stochastic_seed",
+      "consumer": "CLEAVAGE_HAZARD_SEED before provider import",
+      "module": "arrhenius_fracture.sharp_front_v10_2_17",
+      "module_sha256": "2f0c61c15dfa6a0638d6f6520fba1e9a03877a06bca8bc846bf30c0f5ff5f11a",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_17.py",
+      "requested": "1733",
+      "role": "random_seed"
+    }
+  ],
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "branching_multifront",
+    "integration": "adaptive_transactional",
+    "kernel_manifest": null,
+    "kinetics": "native_signed",
+    "loading": "monotonic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "publication_restart",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "current_source",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "6e6ce32a90c307ad1833e82cf787dab7f2fed1d31c047ecfbc35801ac08c606b",
+  "plan": {
+    "bindings": [
+      {
+        "attribute": "assemble_mechanics",
+        "consumer": "full spatial finite-element mechanics assembly",
+        "module": "arrhenius_fracture.fem",
+        "requested": "spatial_pf",
+        "role": "mechanics"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native displacement-step controller",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "monotonic",
+        "role": "loading"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "tip/surface activation support",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "tip_surface",
+        "role": "source_location"
+      },
+      {
+        "attribute": "MODEL_ID",
+        "consumer": "current-source state binding",
+        "module": "arrhenius_fracture.current_source_runtime_bindings",
+        "requested": "current_source",
+        "role": "source_lifecycle"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native signed state update",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "native_signed",
+        "role": "kinetics"
+      },
+      {
+        "attribute": "main",
+        "consumer": "multifront ownership graph",
+        "module": "arrhenius_fracture.sharp_front_v11_branching",
+        "requested": "branching_multifront",
+        "role": "crack_path"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "adaptive accepted-state transaction",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "adaptive_transactional",
+        "role": "integration"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native --save-snapshots/--no-plots retention flags",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "publication_restart",
+        "role": "output"
+      },
+      {
+        "attribute": "_require_stochastic_seed",
+        "consumer": "CLEAVAGE_HAZARD_SEED before provider import",
+        "module": "arrhenius_fracture.sharp_front_v10_2_17",
+        "requested": "1733",
+        "role": "random_seed"
+      }
+    ],
+    "executable": true,
+    "executor_attribute": "main",
+    "executor_module": "arrhenius_fracture.sharp_front_current_source_multifront_physical_v12",
+    "limitation": null,
+    "options_sha256": "6e6ce32a90c307ad1833e82cf787dab7f2fed1d31c047ecfbc35801ac08c606b",
+    "restart_family": "v12_accepted_multifront",
+    "schema": "shared-execution-plan/1"
+  },
+  "python": {
+    "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "version": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]"
+  },
+  "schema": "shared-runtime-attestation/1",
+  "seed": {
+    "hazard": 1733,
+    "mode": "native_default"
+  },
+  "source": {
+    "commit": "5a82b6a482a96493f37a8b68570530d331b4927a",
+    "dirty": true,
+    "tree": "f7e38e8b705c372333b76915e79464c10cf3e5b9"
+  },
+  "source_policy": {
+    "calculation_changes": [
+      "arrhenius_fracture/branch_checkpoint_v11.py",
+      "arrhenius_fracture/canonical_v2_registry_v10230.py",
+      "arrhenius_fracture/shared_execution.py",
+      "arrhenius_fracture/shared_execution_worker.py",
+      "arrhenius_fracture/shared_operator_consistent_adapter.py",
+      "arrhenius_fracture/sharp_front_current_source_multifront_physical_v12.py",
+      "arrhenius_fracture/sharp_front_v10_1.py",
+      "scripts/corrected_thermodynamic_joint_search_v10230.py",
+      "scripts/run_v10_1_1_source_model_gate_700K.sh",
+      "scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py",
+      "scripts/run_v3_stage_d_reduced_developed_fatigue_v10230.py",
+      "scripts/select_v2_3_exact_row_cycle_hazard_loads_v10230.py",
+      "scripts/v3_3_support_v10230.py",
+      "tests/test_shared_execution.py",
+      "tests/test_v10_1_1_source_runner.py"
+    ],
+    "calculation_source_dirty": true,
+    "commit": "5a82b6a482a96493f37a8b68570530d331b4927a",
+    "global_dirty": true,
+    "policy": "development_snapshot",
+    "qualification": "sealed_development_snapshot",
+    "snapshot": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/current_source_v12_restart_run6/development_source_snapshot",
+    "tree": "f7e38e8b705c372333b76915e79464c10cf3e5b9",
+    "untracked_calculation_files": [
+      "arrhenius_fracture/shared_operator_consistent_adapter.py",
+      "scripts/corrected_thermodynamic_joint_search_v10230.py"
+    ]
+  },
+  "status": "constructed",
+  "worker": {
+    "fresh_interpreter": true,
+    "pid": 566
+  }
+}

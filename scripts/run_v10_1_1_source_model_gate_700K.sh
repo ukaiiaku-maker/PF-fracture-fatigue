@@ -104,7 +104,7 @@ kmax = float(sys.argv[7])
 
 modes = json.loads(mode_path.read_text())
 assert modes["tip_source_model"] == expected_source, modes
-assert modes["finite_distributed_source_inventory"] is False, modes
+assert modes["finite_distributed_source_inventory"] is (expected_source == "finite_sites"), modes
 
 summary = json.loads(summary_path.read_text())
 assert summary and isinstance(summary, list), summary

@@ -1,0 +1,38 @@
+{
+  "schema": "v10.1_kinetic_moving_tip_cell",
+  "config": {
+    "enabled": true,
+    "plasticity_enabled": true,
+    "active_shielding": true,
+    "signed_active_shielding": true,
+    "mobile_shield_fraction": 0.0,
+    "packet_length_m": 2.5e-10,
+    "velocity_scale": 1.0,
+    "max_action_substep": 0.02,
+    "max_translation_substep_m": 1e-07,
+    "min_substep_s": 1e-15,
+    "max_internal_steps": 20000,
+    "coupling_scheme": "strang"
+  },
+  "records": [
+    {
+      "engine_id": 1,
+      "material_class": "DBTT",
+      "time_s": 8.4,
+      "K_Pa_sqrt_m": 338446.4618639916,
+      "sigma_tip_Pa": 134390373.74425647,
+      "lambda_c_s-1": 1.9074325271574873e-94,
+      "crack_velocity_m_s": 9.537162635787439e-100,
+      "micro_advance_step_m": 8.011216614061448e-99,
+      "micro_advance_total_m": 8.011216614061448e-99,
+      "checkpoint_progress_action": 1.6022433228122895e-93,
+      "checkpoint_committed_total_m": 0.0,
+      "active_mobile": 28.017467553746986,
+      "active_retained": 7.266169827335998e-09,
+      "active_K_shield_signed_Pa_sqrt_m": 0.00012565915844423172,
+      "wake_K_shield_signed_Pa_sqrt_m": 0.0,
+      "fired": false,
+      "microsteps": 1
+    }
+  ]
+}

@@ -54,8 +54,13 @@ def load_external_fatigue():
     return importlib.import_module(f"{name}.fatigue_v914")
 
 
-def exact_candidate_and_physics(fatigue):
-    row = load_row(CANDIDATE_ID)
+def exact_candidate_and_physics(fatigue, *, registry_path=None, manifest_path=None):
+    loader = {}
+    if registry_path is not None:
+        loader["path"] = registry_path
+    if manifest_path is not None:
+        loader["manifest_path"] = manifest_path
+    row = load_row(CANDIDATE_ID, **loader)
     parent = json.loads(row["parent_complete_registry_row_json"])
     opening, emission = surface_adapters(row)
     types = importlib.import_module("immutable_v914.emergent_gnd_types_v913")

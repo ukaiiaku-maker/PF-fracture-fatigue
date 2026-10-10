@@ -1,0 +1,38 @@
+[
+  {
+    "T": 900.0,
+    "Kc_first_MPa_sqrt_m": null,
+    "a_final_mm": 0.5,
+    "n_advances": 0,
+    "n_advances_primary": 0,
+    "n_advances_branch": 0,
+    "n_fronts": 1,
+    "n_active_fronts_final": 1,
+    "n_coalesced": 0,
+    "n_stagnant_retired": 0,
+    "branch_length_dx_mm": 0.0,
+    "N_em_final": 28.017467561013156,
+    "W_emit_J_per_m": 0.00010365242921310016,
+    "sigma_back_init_GPa": 0.0,
+    "r_eff_over_r0_init": 1.0094010786952619,
+    "N_em_init": 28.017467561013156,
+    "hbar_tip_m": 1.384579911336366e-06,
+    "n_nodes": 1124,
+    "deflection_deg": 0.0,
+    "path_span_dy_mm": 0.0,
+    "branched": false,
+    "mode": "no-fracture",
+    "shelf": {
+      "lambda_c_max": 62.01443486006221,
+      "lambda_e_max": 21092249194.43187,
+      "t_min_fire_s": 0.016125277965630676,
+      "clock_completable": true,
+      "lambda_e_shelf": 21092249194.43187,
+      "lambda_c_shelf": 62.01443486006221,
+      "t_emit_min": 4.7410780651310975e-11,
+      "t_cleave_min": 0.016125277965630676,
+      "t_total": 8.4,
+      "material_class": "DBTT"
+    }
+  }
+]

@@ -1,0 +1,252 @@
+{
+  "checkpoint_policy": {
+    "checkpoint_directory": null,
+    "native_checkpoint_required": false,
+    "profile": "selected_fields",
+    "rendered_snapshot_count": 4,
+    "restart_from": null
+  },
+  "execution_verified": false,
+  "executor": {
+    "callable": "main",
+    "module": "arrhenius_fracture.shared_operator_consistent_adapter",
+    "module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_operator_consistent_adapter.py",
+    "module_sha256": "83eeaa6bf7fdeec430897e4f48c5af4104195623b98964b8ee53a787567644dc"
+  },
+  "inputs": {},
+  "native_argv": [
+    "--registry",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_6_operator_consistent_developed_fatigue/v3_1_optimized_candidate_registry.json",
+    "--parent-registry",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json",
+    "--canonical-registry",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv",
+    "--canonical-manifest",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_manifest.json",
+    "--loads",
+    "4.781762498950186",
+    "--maximum-cycles",
+    "0.25",
+    "--target-events",
+    "1",
+    "--phase-steps",
+    "4",
+    "--out",
+    "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/operator_consistent_bounded_run3",
+    "--save-snapshots",
+    "4"
+  ],
+  "observed_bindings": [
+    {
+      "attribute": "OperatorConsistentProjection",
+      "consumer": "fixed-crack full spatial FEM projection",
+      "module": "arrhenius_fracture.operator_consistent_projection_v10230",
+      "module_sha256": "781cee92e5ccdd6175fac16ff8619a9f9496d54d5e97615b925d051f76158e40",
+      "observed_attribute_type": "type",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/operator_consistent_projection_v10230.py",
+      "requested": "spatial_pf",
+      "role": "mechanics"
+    },
+    {
+      "attribute": "advance_basic",
+      "consumer": "phase-resolved native waveform advance",
+      "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+      "module_sha256": "8e9abd88512255b92d6dd97719f5047f2d7ef44f5588023f466494c335b604d7",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py",
+      "requested": "explicit_cyclic",
+      "role": "loading"
+    },
+    {
+      "attribute": "MechanismSpecificFeedback",
+      "consumer": "material tip-slip support",
+      "module": "arrhenius_fracture.mechanism_specific_feedback_v10230",
+      "module_sha256": "cc726a0b20aaf635362037c30cbba308d0838340b3f9cb6aff65f31d06af03b9",
+      "observed_attribute_type": "type",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/mechanism_specific_feedback_v10230.py",
+      "requested": "tip_surface",
+      "role": "source_location"
+    },
+    {
+      "attribute": "MaterialHistory",
+      "consumer": "material-frame active and archived patch ledger",
+      "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+      "module_sha256": "8e9abd88512255b92d6dd97719f5047f2d7ef44f5588023f466494c335b604d7",
+      "observed_attribute_type": "type",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py",
+      "requested": "persistent_reusable",
+      "role": "source_lifecycle"
+    },
+    {
+      "attribute": "OperatorConsistentProjection",
+      "consumer": "V3.6 operator-consistent strategy",
+      "module": "arrhenius_fracture.operator_consistent_projection_v10230",
+      "module_sha256": "781cee92e5ccdd6175fac16ff8619a9f9496d54d5e97615b925d051f76158e40",
+      "observed_attribute_type": "type",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/operator_consistent_projection_v10230.py",
+      "requested": "operator_consistent_v3_6",
+      "role": "kinetics"
+    },
+    {
+      "attribute": "converged_interval",
+      "consumer": "full-versus-two-half accepted interval",
+      "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+      "module_sha256": "8e9abd88512255b92d6dd97719f5047f2d7ef44f5588023f466494c335b604d7",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py",
+      "requested": "coupled_full_half",
+      "role": "integration"
+    },
+    {
+      "attribute": "main",
+      "consumer": "native compact CSV, event checkpoint and mechanics contract",
+      "module": "arrhenius_fracture.shared_operator_consistent_adapter",
+      "module_sha256": "83eeaa6bf7fdeec430897e4f48c5af4104195623b98964b8ee53a787567644dc",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_operator_consistent_adapter.py",
+      "requested": "selected_fields",
+      "role": "output"
+    },
+    {
+      "attribute": "run_load",
+      "consumer": "explicit NumPy generator seed",
+      "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+      "module_sha256": "8e9abd88512255b92d6dd97719f5047f2d7ef44f5588023f466494c335b604d7",
+      "observed_attribute_type": "function",
+      "observed_module_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py",
+      "requested": "1733",
+      "role": "random_seed"
+    }
+  ],
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "single_front",
+    "integration": "coupled_full_half",
+    "kernel_manifest": null,
+    "kinetics": "operator_consistent_v3_6",
+    "loading": "explicit_cyclic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "selected_fields",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "persistent_reusable",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "1387e09af8dd0ed5cfe516216ff41abaa4df5139791620141e5ff39c94cd4d3f",
+  "plan": {
+    "bindings": [
+      {
+        "attribute": "OperatorConsistentProjection",
+        "consumer": "fixed-crack full spatial FEM projection",
+        "module": "arrhenius_fracture.operator_consistent_projection_v10230",
+        "requested": "spatial_pf",
+        "role": "mechanics"
+      },
+      {
+        "attribute": "advance_basic",
+        "consumer": "phase-resolved native waveform advance",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "explicit_cyclic",
+        "role": "loading"
+      },
+      {
+        "attribute": "MechanismSpecificFeedback",
+        "consumer": "material tip-slip support",
+        "module": "arrhenius_fracture.mechanism_specific_feedback_v10230",
+        "requested": "tip_surface",
+        "role": "source_location"
+      },
+      {
+        "attribute": "MaterialHistory",
+        "consumer": "material-frame active and archived patch ledger",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "persistent_reusable",
+        "role": "source_lifecycle"
+      },
+      {
+        "attribute": "OperatorConsistentProjection",
+        "consumer": "V3.6 operator-consistent strategy",
+        "module": "arrhenius_fracture.operator_consistent_projection_v10230",
+        "requested": "operator_consistent_v3_6",
+        "role": "kinetics"
+      },
+      {
+        "attribute": "converged_interval",
+        "consumer": "full-versus-two-half accepted interval",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "coupled_full_half",
+        "role": "integration"
+      },
+      {
+        "attribute": "main",
+        "consumer": "native compact CSV, event checkpoint and mechanics contract",
+        "module": "arrhenius_fracture.shared_operator_consistent_adapter",
+        "requested": "selected_fields",
+        "role": "output"
+      },
+      {
+        "attribute": "run_load",
+        "consumer": "explicit NumPy generator seed",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "1733",
+        "role": "random_seed"
+      }
+    ],
+    "executable": true,
+    "executor_attribute": "main",
+    "executor_module": "arrhenius_fracture.shared_operator_consistent_adapter",
+    "limitation": null,
+    "options_sha256": "1387e09af8dd0ed5cfe516216ff41abaa4df5139791620141e5ff39c94cd4d3f",
+    "restart_family": "v3_6_event_checkpoint_write_only",
+    "schema": "shared-execution-plan/1"
+  },
+  "python": {
+    "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "version": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]"
+  },
+  "schema": "shared-runtime-attestation/1",
+  "seed": {
+    "hazard": 1733,
+    "mode": "native_default"
+  },
+  "source": {
+    "commit": "5a82b6a482a96493f37a8b68570530d331b4927a",
+    "dirty": true,
+    "tree": "f7e38e8b705c372333b76915e79464c10cf3e5b9"
+  },
+  "source_policy": {
+    "calculation_changes": [
+      "arrhenius_fracture/canonical_v2_registry_v10230.py",
+      "arrhenius_fracture/shared_execution.py",
+      "arrhenius_fracture/shared_execution_worker.py",
+      "arrhenius_fracture/shared_operator_consistent_adapter.py",
+      "arrhenius_fracture/sharp_front_v10_1.py",
+      "scripts/corrected_thermodynamic_joint_search_v10230.py",
+      "scripts/run_v10_1_1_source_model_gate_700K.sh",
+      "scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py",
+      "scripts/run_v3_stage_d_reduced_developed_fatigue_v10230.py",
+      "scripts/select_v2_3_exact_row_cycle_hazard_loads_v10230.py",
+      "scripts/v3_3_support_v10230.py",
+      "tests/test_shared_execution.py",
+      "tests/test_v10_1_1_source_runner.py"
+    ],
+    "calculation_source_dirty": true,
+    "commit": "5a82b6a482a96493f37a8b68570530d331b4927a",
+    "global_dirty": true,
+    "policy": "development_snapshot",
+    "qualification": "sealed_development_snapshot",
+    "snapshot": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/operator_consistent_bounded_run3/development_source_snapshot",
+    "tree": "f7e38e8b705c372333b76915e79464c10cf3e5b9",
+    "untracked_calculation_files": [
+      "arrhenius_fracture/shared_operator_consistent_adapter.py",
+      "scripts/corrected_thermodynamic_joint_search_v10230.py"
+    ]
+  },
+  "status": "constructed",
+  "worker": {
+    "fresh_interpreter": true,
+    "pid": 99658
+  }
+}

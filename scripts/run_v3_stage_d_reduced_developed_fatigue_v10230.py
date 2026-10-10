@@ -52,9 +52,13 @@ def canonical_hash(value) -> str:
     ).hexdigest()
 
 
-def load_candidate(fatigue, complete: dict):
+def load_candidate(
+    fatigue, complete: dict, *, canonical_registry=None, canonical_manifest=None,
+):
     exact_row.CANDIDATE_ID = complete["source_candidate_id"]
-    source, physics, row = exact_row.exact_candidate_and_physics(fatigue)
+    source, physics, row = exact_row.exact_candidate_and_physics(
+        fatigue, registry_path=canonical_registry, manifest_path=canonical_manifest,
+    )
     surface = deserialize_surface(complete["opening_surface"])
     parent = json.loads(row["parent_material_manifest_json"])["cleavage"]
     adapter = ThermodynamicBarrierAdapter(surface, parent)

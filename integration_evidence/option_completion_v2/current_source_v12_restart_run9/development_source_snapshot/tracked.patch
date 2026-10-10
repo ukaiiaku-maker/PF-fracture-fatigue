@@ -1,0 +1,438 @@
+diff --git a/arrhenius_fracture/branch_checkpoint_v11.py b/arrhenius_fracture/branch_checkpoint_v11.py
+index adba081..b1db01a 100644
+--- a/arrhenius_fracture/branch_checkpoint_v11.py
++++ b/arrhenius_fracture/branch_checkpoint_v11.py
+@@ -1,7 +1,7 @@
+ """Atomic production restart contract for bounded v11 branch networks."""
+ from __future__ import annotations
+ 
+-from dataclasses import dataclass
++from dataclasses import MISSING, dataclass, fields
+ import hashlib
+ import json
+ import math
+@@ -24,6 +24,38 @@ def _sha(data: bytes) -> str:
+     return hashlib.sha256(data).hexdigest()
+ 
+ 
++def _restore_additive_dataclass_defaults(instance: Any) -> tuple[str, ...]:
++    """Populate fields added after an older pickle without touching the file.
++
++    Pickle bypasses ``__init__`` and therefore does not apply dataclass
++    defaults introduced by a later source release.  Only declared additive
++    defaults are eligible here; missing required physical state still fails.
++    """
++    restored = []
++    for item in fields(type(instance)):
++        if hasattr(instance, item.name):
++            continue
++        if item.default is not MISSING:
++            value = item.default
++        elif item.default_factory is not MISSING:
++            value = item.default_factory()
++        else:
++            raise ValueError(f"checkpoint lacks required field {item.name!r}")
++        object.__setattr__(instance, item.name, value)
++        restored.append(item.name)
++    return tuple(restored)
++
++
++def _recorded_manifest_matches(recorded: Any, expected: Any) -> bool:
++    """Require every recorded value while permitting later additive fields."""
++    if isinstance(recorded, Mapping) and isinstance(expected, Mapping):
++        return all(
++            key in expected and _recorded_manifest_matches(value, expected[key])
++            for key, value in recorded.items()
++        )
++    return recorded == expected
++
++
+ @dataclass(frozen=True)
+ class ProductionBranchCheckpoint:
+     state: LiveFEMTopologyState
+@@ -162,6 +194,13 @@ def restore_branch_checkpoint(path: str | Path) -> ProductionBranchCheckpoint:
+     checkpoint = pickle.loads(data)
+     if not isinstance(checkpoint, ProductionBranchCheckpoint):
+         raise ValueError("production branch checkpoint payload has the wrong type")
++    _restore_additive_dataclass_defaults(checkpoint)
++    added_state_fields = _restore_additive_dataclass_defaults(checkpoint.state)
++    if added_state_fields:
++        # Reapply the current accepted-state validation and construct only the
++        # declared neutral defaults (for example the equilibrium vacancy field)
++        # that did not exist in the older schema-2 pickle.
++        checkpoint.state.__post_init__()
+     expected = checkpoint.manifest_fields()
+     actual = {
+         key: value for key, value in manifest.items()
+@@ -170,7 +209,7 @@ def restore_branch_checkpoint(path: str | Path) -> ProductionBranchCheckpoint:
+     # Schema-2 checkpoints predate additive refinement/count diagnostics.  All
+     # fields actually recorded remain strict hash-checked; newly derived fields
+     # are reconstructed from the pickled accepted state on restore.
+-    if any(expected.get(key) != value for key, value in actual.items()):
++    if not _recorded_manifest_matches(actual, expected):
+         raise ValueError("production branch checkpoint manifest does not match state")
+     return checkpoint
+ 
+diff --git a/arrhenius_fracture/canonical_v2_registry_v10230.py b/arrhenius_fracture/canonical_v2_registry_v10230.py
+index 02a57ea..d5b06a7 100644
+--- a/arrhenius_fracture/canonical_v2_registry_v10230.py
++++ b/arrhenius_fracture/canonical_v2_registry_v10230.py
+@@ -27,7 +27,10 @@ def canonical_hash(value: Any) -> str:
+     ).hexdigest()
+ 
+ 
+-def load_rows(path: str | Path = REGISTRY) -> dict[str, dict[str, str]]:
++def load_rows(
++    path: str | Path = REGISTRY,
++    manifest_path: str | Path = MANIFEST,
++) -> dict[str, dict[str, str]]:
+     source = Path(path)
+     with source.open(newline="") as stream:
+         rows = list(csv.DictReader(stream))
+@@ -48,7 +51,7 @@ def load_rows(path: str | Path = REGISTRY) -> dict[str, dict[str, str]]:
+         if missing:
+             raise ValueError(f"{candidate_id} lacks canonical fields {missing}")
+         result[candidate_id] = row
+-    manifest = json.loads(Path(MANIFEST).read_text())
++    manifest = json.loads(Path(manifest_path).read_text())
+     expected = {item["candidate_id"]: item["complete_bound_row_sha256"]
+                 for item in manifest["candidates"]}
+     actual = {key: row["complete_bound_row_sha256"] for key, row in result.items()}
+@@ -57,8 +60,12 @@ def load_rows(path: str | Path = REGISTRY) -> dict[str, dict[str, str]]:
+     return result
+ 
+ 
+-def load_row(candidate_id: str, path: str | Path = REGISTRY) -> dict[str, str]:
+-    rows = load_rows(path)
++def load_row(
++    candidate_id: str,
++    path: str | Path = REGISTRY,
++    manifest_path: str | Path = MANIFEST,
++) -> dict[str, str]:
++    rows = load_rows(path, manifest_path)
+     if candidate_id not in rows:
+         raise KeyError(f"unknown canonical candidate alias {candidate_id!r}")
+     return rows[candidate_id].copy()
+diff --git a/arrhenius_fracture/shared_execution.py b/arrhenius_fracture/shared_execution.py
+index e37b3e5..36ae3d6 100644
+--- a/arrhenius_fracture/shared_execution.py
++++ b/arrhenius_fracture/shared_execution.py
+@@ -62,6 +62,47 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+                              "external_fem_native", exact,
+                              None if exact else "only the exact fem_czm_theta0 preset is mapped")
+ 
++    operator_exact = (
++        options.loading is LoadingMode.EXPLICIT_CYCLIC
++        and options.source_location is SourceLocation.TIP_SURFACE
++        and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE
++        and options.plasticity is PlasticityMode.TIP_PROCESS_ONLY
++        and options.crack_path is CrackPathMode.SINGLE_FRONT
++        and options.cavity is CavityMode.DISABLED
++        and options.kinetics is KineticsStrategy.OPERATOR_CONSISTENT_V3_6
++        and options.integration is IntegrationStrategy.COUPLED_FULL_HALF
++        and options.output is not OutputProfile.PUBLICATION_RESTART
++    )
++    if operator_exact:
++        campaign = "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230"
++        bindings = (
++            _binding("mechanics", options.mechanics,
++                     "arrhenius_fracture.operator_consistent_projection_v10230",
++                     "OperatorConsistentProjection", "fixed-crack full spatial FEM projection"),
++            _binding("loading", options.loading, campaign, "advance_basic",
++                     "phase-resolved native waveform advance"),
++            _binding("source_location", options.source_location,
++                     "arrhenius_fracture.mechanism_specific_feedback_v10230",
++                     "MechanismSpecificFeedback", "material tip-slip support"),
++            _binding("source_lifecycle", options.source_lifecycle, campaign,
++                     "MaterialHistory", "material-frame active and archived patch ledger"),
++            _binding("kinetics", options.kinetics,
++                     "arrhenius_fracture.operator_consistent_projection_v10230",
++                     "OperatorConsistentProjection", "V3.6 operator-consistent strategy"),
++            _binding("integration", options.integration, campaign, "converged_interval",
++                     "full-versus-two-half accepted interval"),
++            _binding("output", options.output,
++                     "arrhenius_fracture.shared_operator_consistent_adapter", "main",
++                     "native compact CSV, event checkpoint and mechanics contract"),
++            _binding("random_seed", options.random_seed, campaign, "run_load",
++                     "explicit NumPy generator seed"),
++        )
++        return ExecutionPlan(
++            "shared-execution-plan/1", options.fingerprint, bindings,
++            "arrhenius_fracture.shared_operator_consistent_adapter", "main",
++            "v3_6_event_checkpoint_write_only", True, None,
++        )
++
+     bindings = [
+         _binding("mechanics", options.mechanics, "arrhenius_fracture.fem", "assemble_mechanics",
+                  "full spatial finite-element mechanics assembly"),
+@@ -81,7 +122,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+     bindings.append(_binding("source_location", options.source_location, *location_map[options.source_location]))
+     lifecycle_map = {
+         SourceLifecycle.PERSISTENT_REUSABLE: ("arrhenius_fracture.persistent_site_source_v10221", "install_persistent_site_source", "persistent site ledger installer"),
+-        SourceLifecycle.FINITE_INVENTORY: ("arrhenius_fracture.sharp_front_v10_2_0", "main", "finite inventory native entry"),
++        SourceLifecycle.FINITE_INVENTORY: ("arrhenius_fracture.sharp_front_v10_1", "main", "native finite-site inventory and refresh entry"),
+         SourceLifecycle.CURRENT_SOURCE: ("arrhenius_fracture.current_source_runtime_bindings", "MODEL_ID", "current-source state binding"),
+     }
+     bindings.append(_binding("source_lifecycle", options.source_lifecycle, *lifecycle_map[options.source_lifecycle]))
+@@ -134,6 +175,13 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+         elif options.loading is LoadingMode.FIXED_DELTA_K and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
+             executor = "arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK"
+             restart = "combined_outer_and_high_cycle"
++    elif (simple and options.crack_path is CrackPathMode.SINGLE_FRONT
++          and options.source_lifecycle is SourceLifecycle.FINITE_INVENTORY
++          and options.loading is LoadingMode.MONOTONIC
++          and options.kinetics is KineticsStrategy.NATIVE_SIGNED
++          and options.output is not OutputProfile.PUBLICATION_RESTART):
++        executor = "arrhenius_fracture.sharp_front_v10_1"
++        restart = "legacy_single_front_no_public_restart"
+     elif (simple and options.loading is LoadingMode.MONOTONIC
+           and options.crack_path is CrackPathMode.BRANCHING_MULTIFRONT):
+         if options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE:
+diff --git a/arrhenius_fracture/shared_execution_worker.py b/arrhenius_fracture/shared_execution_worker.py
+index 37520c7..b1fe9ad 100644
+--- a/arrhenius_fracture/shared_execution_worker.py
++++ b/arrhenius_fracture/shared_execution_worker.py
+@@ -105,6 +105,18 @@ def _verify_loaded_files(receipt: dict) -> None:
+             raise RuntimeError(f"loaded calculation source changed during execution: {raw}")
+ 
+ 
++def _multifront_restart_flag(path: str | Path) -> str:
++    source = Path(path)
++    if source.suffix == ".json":
++        try:
++            schema = str(json.loads(source.read_text()).get("schema", ""))
++        except (OSError, ValueError) as error:
++            raise ValueError(f"cannot inspect multifront checkpoint: {source}") from error
++        if schema.startswith("v11.production-branch-network-checkpoint/"):
++            return "--v11-restart-checkpoint"
++    return "--v12-restart-checkpoint"
++
++
+ def execute(request_path: str | Path) -> dict:
+     request = json.loads(Path(request_path).read_text())
+     options = SharedOptions.from_dict(request["options"])
+@@ -118,7 +130,15 @@ def execute(request_path: str | Path) -> dict:
+         OutputProfile.SELECTED_FIELDS: ["--save-snapshots", "4"],
+         OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "0", "--no-plots"],
+     }[options.output]
+-    argv = [*request["native_args"], "--out", str(output), *output_flags]
++    native_args = list(request["native_args"])
++    restart_from = request.get("restart_from")
++    if restart_from and plan.restart_family == "v12_accepted_multifront":
++        restart_names = ("--v11-restart-checkpoint", "--v12-restart-checkpoint")
++        if any(item in restart_names or item.startswith(restart_names[0] + "=")
++               or item.startswith(restart_names[1] + "=") for item in native_args):
++            raise ValueError("restart checkpoint was supplied twice")
++        native_args.extend([_multifront_restart_flag(restart_from), restart_from])
++    argv = [*native_args, "--out", str(output), *output_flags]
+     checkpoint = {
+         "profile": options.output.value,
+         "rendered_snapshot_count": int(output_flags[1]),
+diff --git a/arrhenius_fracture/sharp_front_v10_1.py b/arrhenius_fracture/sharp_front_v10_1.py
+index 245be8d..bd6e71b 100644
+--- a/arrhenius_fracture/sharp_front_v10_1.py
++++ b/arrhenius_fracture/sharp_front_v10_1.py
+@@ -218,9 +218,16 @@ def _write_mode_audit(
+         "schema": "v10.1.1_driver_modes",
+         "tip_kinetics_mode": kinetics_mode,
+         "tip_source_model": source_model,
+-        "distributed_source_representation": "continuum_peierls_taylor_storage",
+-        "finite_distributed_source_inventory": False,
+-        "source_sites_per_system_role": "legacy_rate_multiplicity_only",
++        "distributed_source_representation": (
++            "continuum_peierls_taylor_storage"
++            if source_model == "continuum" else "native_finite_tip_sites"
++        ),
++        "finite_distributed_source_inventory": source_model == "finite_sites",
++        "source_sites_per_system_role": (
++            "legacy_rate_multiplicity_only"
++            if source_model == "continuum"
++            else "depletable_capacity_with_native_advance_refresh"
++        ),
+         "tip_plasticity_enabled": cfg.plasticity_enabled,
+         "active_shielding_enabled": cfg.active_shielding,
+         "signed_active_shielding": cfg.signed_active_shielding,
+diff --git a/scripts/run_v10_1_1_source_model_gate_700K.sh b/scripts/run_v10_1_1_source_model_gate_700K.sh
+index cb1a7df..a90eed0 100644
+--- a/scripts/run_v10_1_1_source_model_gate_700K.sh
++++ b/scripts/run_v10_1_1_source_model_gate_700K.sh
+@@ -104,7 +104,7 @@ kmax = float(sys.argv[7])
+ 
+ modes = json.loads(mode_path.read_text())
+ assert modes["tip_source_model"] == expected_source, modes
+-assert modes["finite_distributed_source_inventory"] is False, modes
++assert modes["finite_distributed_source_inventory"] is (expected_source == "finite_sites"), modes
+ 
+ summary = json.loads(summary_path.read_text())
+ assert summary and isinstance(summary, list), summary
+diff --git a/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py b/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py
+index 58238fc..0da3e69 100644
+--- a/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py
++++ b/scripts/run_v3_6_operator_consistent_developed_fatigue_v10230.py
+@@ -4,6 +4,7 @@ from __future__ import annotations
+ 
+ import argparse
+ import copy
++import hashlib
+ import json
+ import math
+ from pathlib import Path
+@@ -255,14 +256,25 @@ def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles
+                        "final_extension_m":state.extension_m,"pending_hazard":hazard,"pending_threshold":threshold,**last_metrics}}
+ 
+ 
+-def main():
++def main(argv=None):
+     p=argparse.ArgumentParser(); p.add_argument("--registry",type=Path,required=True); p.add_argument("--out-root",type=Path,required=True)
++    p.add_argument("--parent-registry",type=Path,default=None)
++    p.add_argument("--canonical-registry",type=Path,default=None)
++    p.add_argument("--canonical-manifest",type=Path,default=None)
+     p.add_argument("--seed",type=int,default=1720); p.add_argument("--maximum-cycles",type=float,default=1e6); p.add_argument("--target-events",type=int,default=12)
+     p.add_argument("--loads",default=','.join(str(x) for x in LOADS))
+     p.add_argument("--phase-steps",type=int,default=64)
+-    a=p.parse_args(); a.out_root.mkdir(parents=True,exist_ok=True); ck=a.out_root/"checkpoints"; ck.mkdir(exist_ok=True)
++    a=p.parse_args(argv); a.out_root.mkdir(parents=True,exist_ok=True); ck=a.out_root/"checkpoints"; ck.mkdir(exist_ok=True)
+     reg=json.loads(a.registry.read_text()); row=next(x for x in reg["rows"] if x["candidate_id"]=="V3_ceramic_V2_P25_007__V3_1_TRUST1")
+-    fatigue=exact_row.load_external_fatigue(); candidate,physics,_,parent=load_v3_1_candidate(fatigue,row); projection=OperatorConsistentProjection(orientation_signs=physics.emission_signs)
++    fatigue=exact_row.load_external_fatigue()
++    loader_options = {
++        key: value for key, value in {
++            "registry_path": a.parent_registry,
++            "canonical_registry": a.canonical_registry,
++            "canonical_manifest": a.canonical_manifest,
++        }.items() if value is not None
++    }
++    candidate,physics,_,parent=load_v3_1_candidate(fatigue,row,**loader_options); projection=OperatorConsistentProjection(orientation_signs=physics.emission_signs)
+     all_events=[]; all_conv=[]; all_acc=[]; all_orbit=[]; summaries=[]
+     selected_loads=tuple(float(x) for x in a.loads.split(',') if x.strip())
+     for K in selected_loads:
+@@ -276,7 +288,10 @@ def main():
+       "observation_weight":"fixed physical element-area measure","equal_element_role":"historical audit only","cleavage_feedback":"area-weighted opening stress",
+       "slip_feedback":"system-resolved FEM shear on active physical support","unresolved_internal_feedback":"native tau_gnd and source backstress retained separately",
+       "initial_nucleus_swept_area":"UNSPECIFIED; zero in conditional glide-only lane, not a physical proof","barriers_prefactors_q_tau_event_lengths_changed":False,
+-      "root_policy":"all candidate roots from same pre-step state; earliest physical phase commits","high_load_is_gate":False}
++      "root_policy":"all candidate roots from same pre-step state; earliest physical phase commits","high_load_is_gate":False,
++      "input_registries":{"optimized":{"path":str(a.registry.resolve()),"sha256":hashlib.sha256(a.registry.read_bytes()).hexdigest()},
++      "parent":{"path":str((a.parent_registry or Path(__file__).resolve().parents[1]/"analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json").resolve()),
++      "sha256":hashlib.sha256((a.parent_registry or Path(__file__).resolve().parents[1]/"analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json").read_bytes()).hexdigest()}}}
+     contract["phase_steps"]=a.phase_steps
+     (a.out_root/"mechanical_contract.json").write_text(json.dumps(contract,indent=2,sort_keys=True)+"\n")
+     return 0
+diff --git a/scripts/run_v3_stage_d_reduced_developed_fatigue_v10230.py b/scripts/run_v3_stage_d_reduced_developed_fatigue_v10230.py
+index 5a6e3e4..aaf0f18 100644
+--- a/scripts/run_v3_stage_d_reduced_developed_fatigue_v10230.py
++++ b/scripts/run_v3_stage_d_reduced_developed_fatigue_v10230.py
+@@ -52,9 +52,13 @@ def canonical_hash(value) -> str:
+     ).hexdigest()
+ 
+ 
+-def load_candidate(fatigue, complete: dict):
++def load_candidate(
++    fatigue, complete: dict, *, canonical_registry=None, canonical_manifest=None,
++):
+     exact_row.CANDIDATE_ID = complete["source_candidate_id"]
+-    source, physics, row = exact_row.exact_candidate_and_physics(fatigue)
++    source, physics, row = exact_row.exact_candidate_and_physics(
++        fatigue, registry_path=canonical_registry, manifest_path=canonical_manifest,
++    )
+     surface = deserialize_surface(complete["opening_surface"])
+     parent = json.loads(row["parent_material_manifest_json"])["cleavage"]
+     adapter = ThermodynamicBarrierAdapter(surface, parent)
+diff --git a/scripts/select_v2_3_exact_row_cycle_hazard_loads_v10230.py b/scripts/select_v2_3_exact_row_cycle_hazard_loads_v10230.py
+index 0a6d2d8..acebdc3 100644
+--- a/scripts/select_v2_3_exact_row_cycle_hazard_loads_v10230.py
++++ b/scripts/select_v2_3_exact_row_cycle_hazard_loads_v10230.py
+@@ -54,8 +54,13 @@ def load_external_fatigue():
+     return importlib.import_module(f"{name}.fatigue_v914")
+ 
+ 
+-def exact_candidate_and_physics(fatigue):
+-    row = load_row(CANDIDATE_ID)
++def exact_candidate_and_physics(fatigue, *, registry_path=None, manifest_path=None):
++    loader = {}
++    if registry_path is not None:
++        loader["path"] = registry_path
++    if manifest_path is not None:
++        loader["manifest_path"] = manifest_path
++    row = load_row(CANDIDATE_ID, **loader)
+     parent = json.loads(row["parent_complete_registry_row_json"])
+     opening, emission = surface_adapters(row)
+     types = importlib.import_module("immutable_v914.emergent_gnd_types_v913")
+diff --git a/scripts/v3_3_support_v10230.py b/scripts/v3_3_support_v10230.py
+index c086366..2665422 100644
+--- a/scripts/v3_3_support_v10230.py
++++ b/scripts/v3_3_support_v10230.py
+@@ -14,10 +14,17 @@ ROOT=Path(__file__).resolve().parents[1]
+ V3_REGISTRY=ROOT/'analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json'
+ 
+ 
+-def load_v3_1_candidate(fatigue, optimized_row):
+-    parents={x['candidate_id']:x for x in json.loads(V3_REGISTRY.read_text())['rows']}
++def load_v3_1_candidate(
++    fatigue, optimized_row, *, registry_path=V3_REGISTRY,
++    canonical_registry=None, canonical_manifest=None,
++):
++    registry_path = Path(registry_path).resolve()
++    parents={x['candidate_id']:x for x in json.loads(registry_path.read_text())['rows']}
+     parent=parents[optimized_row['parent_candidate_id']]
+-    base,physics,source=stage_d.load_candidate(fatigue,parent)
++    base,physics,source=stage_d.load_candidate(
++        fatigue,parent,canonical_registry=canonical_registry,
++        canonical_manifest=canonical_manifest,
++    )
+     opening=deserialize_surface(optimized_row['opening_surface'])
+     emission=deserialize_thermodynamic(optimized_row['emission_surface'])
+     candidate=replace(base,candidate_id=optimized_row['candidate_id'],
+diff --git a/tests/test_shared_execution.py b/tests/test_shared_execution.py
+index 7a58d8e..85d9c7d 100644
+--- a/tests/test_shared_execution.py
++++ b/tests/test_shared_execution.py
+@@ -4,6 +4,7 @@ import pytest
+ 
+ from arrhenius_fracture.fem_backend_adapter import inspect_fem_backend, require_fem_backend
+ from arrhenius_fracture.shared_execution import build_execution_plan, construct_and_attest
++from arrhenius_fracture.shared_execution_worker import _multifront_restart_flag
+ from arrhenius_fracture.shared_options import (
+     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
+     PlasticityMode, SharedOptions, SourceLifecycle, SourceLocation,
+@@ -74,6 +75,28 @@ def test_monotonic_reversible_uses_effective_native_executor():
+     assert by_role(plan)["kinetics"].attribute == "install_reversible_transport"
+ 
+ 
++def test_finite_inventory_maps_to_native_finite_site_driver():
++    options = SharedOptions(source_lifecycle=SourceLifecycle.FINITE_INVENTORY)
++    plan = build_execution_plan(options)
++    assert plan.executable
++    assert plan.executor_module == "arrhenius_fracture.sharp_front_v10_1"
++    assert by_role(plan)["source_lifecycle"].module.endswith("sharp_front_v10_1")
++
++
++def test_operator_consistent_preset_maps_to_developed_native_campaign():
++    plan = build_execution_plan(PRESETS["pf_operator_consistent_cyclic"])
++    assert plan.executable
++    assert plan.executor_module.endswith("shared_operator_consistent_adapter")
++    assert plan.restart_family == "v3_6_event_checkpoint_write_only"
++
++
++def test_multifront_restart_dispatches_v11_without_discarding_owners(tmp_path):
++    checkpoint = tmp_path / "accepted.json"
++    checkpoint.write_text(json.dumps({"schema": "v11.production-branch-network-checkpoint/2"}))
++    assert _multifront_restart_flag(checkpoint) == "--v11-restart-checkpoint"
++    assert _multifront_restart_flag(tmp_path / "latest.v12.pkl") == "--v12-restart-checkpoint"
++
++
+ def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path):
+     receipt = inspect_fem_backend()
+     assert receipt.available
+diff --git a/tests/test_v10_1_1_source_runner.py b/tests/test_v10_1_1_source_runner.py
+index d244832..ed6087f 100644
+--- a/tests/test_v10_1_1_source_runner.py
++++ b/tests/test_v10_1_1_source_runner.py
+@@ -10,6 +10,7 @@ def test_source_model_gate_compares_continuum_and_finite_modes():
+     assert 'KINETIC_MAX_ACTION_SUBSTEP=${KINETIC_MAX_ACTION_SUBSTEP:-0.01}' in text
+     assert 'KINETIC_MAX_TRANSLATION_SUBSTEP_M=${KINETIC_MAX_TRANSLATION_SUBSTEP_M:-5e-8}' in text
+     assert 'v10_1_driver_modes.json' in text
++    assert 'expected_source == "finite_sites"' in text
+ 
+ 
+ def test_source_gate_fails_fast_on_no_advance_or_absurd_initiation_toughness():

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -255,14 +256,25 @@ def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles
                        "final_extension_m":state.extension_m,"pending_hazard":hazard,"pending_threshold":threshold,**last_metrics}}
 
 
-def main():
+def main(argv=None):
     p=argparse.ArgumentParser(); p.add_argument("--registry",type=Path,required=True); p.add_argument("--out-root",type=Path,required=True)
+    p.add_argument("--parent-registry",type=Path,default=None)
+    p.add_argument("--canonical-registry",type=Path,default=None)
+    p.add_argument("--canonical-manifest",type=Path,default=None)
     p.add_argument("--seed",type=int,default=1720); p.add_argument("--maximum-cycles",type=float,default=1e6); p.add_argument("--target-events",type=int,default=12)
     p.add_argument("--loads",default=','.join(str(x) for x in LOADS))
     p.add_argument("--phase-steps",type=int,default=64)
-    a=p.parse_args(); a.out_root.mkdir(parents=True,exist_ok=True); ck=a.out_root/"checkpoints"; ck.mkdir(exist_ok=True)
+    a=p.parse_args(argv); a.out_root.mkdir(parents=True,exist_ok=True); ck=a.out_root/"checkpoints"; ck.mkdir(exist_ok=True)
     reg=json.loads(a.registry.read_text()); row=next(x for x in reg["rows"] if x["candidate_id"]=="V3_ceramic_V2_P25_007__V3_1_TRUST1")
-    fatigue=exact_row.load_external_fatigue(); candidate,physics,_,parent=load_v3_1_candidate(fatigue,row); projection=OperatorConsistentProjection(orientation_signs=physics.emission_signs)
+    fatigue=exact_row.load_external_fatigue()
+    loader_options = {
+        key: value for key, value in {
+            "registry_path": a.parent_registry,
+            "canonical_registry": a.canonical_registry,
+            "canonical_manifest": a.canonical_manifest,
+        }.items() if value is not None
+    }
+    candidate,physics,_,parent=load_v3_1_candidate(fatigue,row,**loader_options); projection=OperatorConsistentProjection(orientation_signs=physics.emission_signs)
     all_events=[]; all_conv=[]; all_acc=[]; all_orbit=[]; summaries=[]
     selected_loads=tuple(float(x) for x in a.loads.split(',') if x.strip())
     for K in selected_loads:
@@ -271,12 +283,19 @@ def main():
     pd.DataFrame(all_events).to_csv(a.out_root/"developed_events.csv",index=False); pd.DataFrame(all_conv).to_csv(a.out_root/"coupled_step_convergence.csv",index=False)
     pd.DataFrame(all_acc).to_csv(a.out_root/"validated_cycle_acceleration.csv",index=False); pd.DataFrame(all_orbit).to_csv(a.out_root/"cycle_orbit_history.csv",index=False)
     pd.DataFrame(summaries).to_csv(a.out_root/"load_summary.csv",index=False)
+    parent_registry = a.parent_registry or Path(__file__).resolve().parents[1]/"analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json"
+    canonical_registry = a.canonical_registry or exact_row.ROOT/"analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv"
+    canonical_manifest = a.canonical_manifest or exact_row.ROOT/"analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_manifest.json"
+    input_paths = {"optimized": a.registry, "parent": parent_registry,
+                   "canonical": canonical_registry, "canonical_manifest": canonical_manifest}
     contract={"schema":"v10.2.30_v3_6_operator_consistent_developed_fatigue_v1","candidate_id":row["candidate_id"],"parent_row_sha256":parent["complete_v3_row_sha256"],
       "loads_MPa_sqrt_m":list(selected_loads),"maximum_cycles":a.maximum_cycles,"target_events":a.target_events,"support_width_m":2e-6,"patch_length_m":5e-6,
       "observation_weight":"fixed physical element-area measure","equal_element_role":"historical audit only","cleavage_feedback":"area-weighted opening stress",
       "slip_feedback":"system-resolved FEM shear on active physical support","unresolved_internal_feedback":"native tau_gnd and source backstress retained separately",
       "initial_nucleus_swept_area":"UNSPECIFIED; zero in conditional glide-only lane, not a physical proof","barriers_prefactors_q_tau_event_lengths_changed":False,
-      "root_policy":"all candidate roots from same pre-step state; earliest physical phase commits","high_load_is_gate":False}
+      "root_policy":"all candidate roots from same pre-step state; earliest physical phase commits","high_load_is_gate":False,
+      "input_registries":{name:{"path":str(path.resolve()),"sha256":hashlib.sha256(path.read_bytes()).hexdigest()}
+      for name,path in input_paths.items()}}
     contract["phase_steps"]=a.phase_steps
     (a.out_root/"mechanical_contract.json").write_text(json.dumps(contract,indent=2,sort_keys=True)+"\n")
     return 0

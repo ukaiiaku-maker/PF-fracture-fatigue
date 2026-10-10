@@ -62,6 +62,47 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
                              "external_fem_native", exact,
                              None if exact else "only the exact fem_czm_theta0 preset is mapped")
 
+    operator_exact = (
+        options.loading is LoadingMode.EXPLICIT_CYCLIC
+        and options.source_location is SourceLocation.TIP_SURFACE
+        and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE
+        and options.plasticity is PlasticityMode.TIP_PROCESS_ONLY
+        and options.crack_path is CrackPathMode.SINGLE_FRONT
+        and options.cavity is CavityMode.DISABLED
+        and options.kinetics is KineticsStrategy.OPERATOR_CONSISTENT_V3_6
+        and options.integration is IntegrationStrategy.COUPLED_FULL_HALF
+        and options.output is not OutputProfile.PUBLICATION_RESTART
+    )
+    if operator_exact:
+        campaign = "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230"
+        bindings = (
+            _binding("mechanics", options.mechanics,
+                     "arrhenius_fracture.operator_consistent_projection_v10230",
+                     "OperatorConsistentProjection", "fixed-crack full spatial FEM projection"),
+            _binding("loading", options.loading, campaign, "advance_basic",
+                     "phase-resolved native waveform advance"),
+            _binding("source_location", options.source_location,
+                     "arrhenius_fracture.mechanism_specific_feedback_v10230",
+                     "MechanismSpecificFeedback", "material tip-slip support"),
+            _binding("source_lifecycle", options.source_lifecycle, campaign,
+                     "MaterialHistory", "material-frame active and archived patch ledger"),
+            _binding("kinetics", options.kinetics,
+                     "arrhenius_fracture.operator_consistent_projection_v10230",
+                     "OperatorConsistentProjection", "V3.6 operator-consistent strategy"),
+            _binding("integration", options.integration, campaign, "converged_interval",
+                     "full-versus-two-half accepted interval"),
+            _binding("output", options.output,
+                     "arrhenius_fracture.shared_operator_consistent_adapter", "main",
+                     "native compact CSV, event checkpoint and mechanics contract"),
+            _binding("random_seed", options.random_seed, campaign, "run_load",
+                     "explicit NumPy generator seed"),
+        )
+        return ExecutionPlan(
+            "shared-execution-plan/1", options.fingerprint, bindings,
+            "arrhenius_fracture.shared_operator_consistent_adapter", "main",
+            "v3_6_event_checkpoint_write_only", True, None,
+        )
+
     bindings = [
         _binding("mechanics", options.mechanics, "arrhenius_fracture.fem", "assemble_mechanics",
                  "full spatial finite-element mechanics assembly"),
@@ -81,7 +122,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
     bindings.append(_binding("source_location", options.source_location, *location_map[options.source_location]))
     lifecycle_map = {
         SourceLifecycle.PERSISTENT_REUSABLE: ("arrhenius_fracture.persistent_site_source_v10221", "install_persistent_site_source", "persistent site ledger installer"),
-        SourceLifecycle.FINITE_INVENTORY: ("arrhenius_fracture.sharp_front_v10_2_0", "main", "finite inventory native entry"),
+        SourceLifecycle.FINITE_INVENTORY: ("arrhenius_fracture.sharp_front_v10_1", "main", "native finite-site inventory and refresh entry"),
         SourceLifecycle.CURRENT_SOURCE: ("arrhenius_fracture.current_source_runtime_bindings", "MODEL_ID", "current-source state binding"),
     }
     bindings.append(_binding("source_lifecycle", options.source_lifecycle, *lifecycle_map[options.source_lifecycle]))
@@ -134,6 +175,13 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         elif options.loading is LoadingMode.FIXED_DELTA_K and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
             executor = "arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK"
             restart = "combined_outer_and_high_cycle"
+    elif (simple and options.crack_path is CrackPathMode.SINGLE_FRONT
+          and options.source_lifecycle is SourceLifecycle.FINITE_INVENTORY
+          and options.loading is LoadingMode.MONOTONIC
+          and options.kinetics is KineticsStrategy.NATIVE_SIGNED
+          and options.output is not OutputProfile.PUBLICATION_RESTART):
+        executor = "arrhenius_fracture.sharp_front_v10_1"
+        restart = "legacy_single_front_no_public_restart"
     elif (simple and options.loading is LoadingMode.MONOTONIC
           and options.crack_path is CrackPathMode.BRANCHING_MULTIFRONT):
         if options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE:

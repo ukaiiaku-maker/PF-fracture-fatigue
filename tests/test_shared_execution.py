@@ -4,6 +4,7 @@ import pytest
 
 from arrhenius_fracture.fem_backend_adapter import inspect_fem_backend, require_fem_backend
 from arrhenius_fracture.shared_execution import build_execution_plan, construct_and_attest
+from arrhenius_fracture.shared_execution_worker import _multifront_restart_flag
 from arrhenius_fracture.shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
     PlasticityMode, SharedOptions, SourceLifecycle, SourceLocation,
@@ -72,6 +73,28 @@ def test_monotonic_reversible_uses_effective_native_executor():
     assert plan.executable
     assert plan.executor_module.endswith("sharp_front_v10_2_27_reversible_audited")
     assert by_role(plan)["kinetics"].attribute == "install_reversible_transport"
+
+
+def test_finite_inventory_maps_to_native_finite_site_driver():
+    options = SharedOptions(source_lifecycle=SourceLifecycle.FINITE_INVENTORY)
+    plan = build_execution_plan(options)
+    assert plan.executable
+    assert plan.executor_module == "arrhenius_fracture.sharp_front_v10_1"
+    assert by_role(plan)["source_lifecycle"].module.endswith("sharp_front_v10_1")
+
+
+def test_operator_consistent_preset_maps_to_developed_native_campaign():
+    plan = build_execution_plan(PRESETS["pf_operator_consistent_cyclic"])
+    assert plan.executable
+    assert plan.executor_module.endswith("shared_operator_consistent_adapter")
+    assert plan.restart_family == "v3_6_event_checkpoint_write_only"
+
+
+def test_multifront_restart_dispatches_v11_without_discarding_owners(tmp_path):
+    checkpoint = tmp_path / "accepted.json"
+    checkpoint.write_text(json.dumps({"schema": "v11.production-branch-network-checkpoint/2"}))
+    assert _multifront_restart_flag(checkpoint) == "--v11-restart-checkpoint"
+    assert _multifront_restart_flag(tmp_path / "latest.v12.pkl") == "--v12-restart-checkpoint"
 
 
 def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path):

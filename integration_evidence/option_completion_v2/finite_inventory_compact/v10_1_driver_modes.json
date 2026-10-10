@@ -1,0 +1,23 @@
+{
+  "schema": "v10.1.1_driver_modes",
+  "bulk_plasticity_mode": "tip_only",
+  "directional_j_mode": "root_signed",
+  "wake_shielding": false,
+  "legacy_full_field_enabled": false,
+  "dependency_closed_sharp_backend": true,
+  "mpz_csv_diagnostic_aliases_enabled": true,
+  "tip_kinetics_mode": "moving_velocity",
+  "tip_source_model": "finite_sites",
+  "distributed_source_representation": "native_finite_tip_sites",
+  "finite_distributed_source_inventory": true,
+  "source_sites_per_system_role": "depletable_capacity_with_native_advance_refresh",
+  "tip_plasticity_enabled": true,
+  "active_shielding_enabled": true,
+  "signed_active_shielding": true,
+  "mobile_shield_fraction": 0.0,
+  "packet_length_m": 2.5e-10,
+  "kinetic_velocity_scale": 1.0,
+  "kinetic_max_action_substep": 0.02,
+  "kinetic_max_translation_substep_m": 1e-07,
+  "fractional_moving_frame": true
+}

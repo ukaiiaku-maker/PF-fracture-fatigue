@@ -27,7 +27,10 @@ def canonical_hash(value: Any) -> str:
     ).hexdigest()
 
 
-def load_rows(path: str | Path = REGISTRY) -> dict[str, dict[str, str]]:
+def load_rows(
+    path: str | Path = REGISTRY,
+    manifest_path: str | Path = MANIFEST,
+) -> dict[str, dict[str, str]]:
     source = Path(path)
     with source.open(newline="") as stream:
         rows = list(csv.DictReader(stream))
@@ -48,7 +51,7 @@ def load_rows(path: str | Path = REGISTRY) -> dict[str, dict[str, str]]:
         if missing:
             raise ValueError(f"{candidate_id} lacks canonical fields {missing}")
         result[candidate_id] = row
-    manifest = json.loads(Path(MANIFEST).read_text())
+    manifest = json.loads(Path(manifest_path).read_text())
     expected = {item["candidate_id"]: item["complete_bound_row_sha256"]
                 for item in manifest["candidates"]}
     actual = {key: row["complete_bound_row_sha256"] for key, row in result.items()}
@@ -57,8 +60,12 @@ def load_rows(path: str | Path = REGISTRY) -> dict[str, dict[str, str]]:
     return result
 
 
-def load_row(candidate_id: str, path: str | Path = REGISTRY) -> dict[str, str]:
-    rows = load_rows(path)
+def load_row(
+    candidate_id: str,
+    path: str | Path = REGISTRY,
+    manifest_path: str | Path = MANIFEST,
+) -> dict[str, str]:
+    rows = load_rows(path, manifest_path)
     if candidate_id not in rows:
         raise KeyError(f"unknown canonical candidate alias {candidate_id!r}")
     return rows[candidate_id].copy()

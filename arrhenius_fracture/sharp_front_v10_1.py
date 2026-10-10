@@ -218,9 +218,16 @@ def _write_mode_audit(
         "schema": "v10.1.1_driver_modes",
         "tip_kinetics_mode": kinetics_mode,
         "tip_source_model": source_model,
-        "distributed_source_representation": "continuum_peierls_taylor_storage",
-        "finite_distributed_source_inventory": False,
-        "source_sites_per_system_role": "legacy_rate_multiplicity_only",
+        "distributed_source_representation": (
+            "continuum_peierls_taylor_storage"
+            if source_model == "continuum" else "native_finite_tip_sites"
+        ),
+        "finite_distributed_source_inventory": source_model == "finite_sites",
+        "source_sites_per_system_role": (
+            "legacy_rate_multiplicity_only"
+            if source_model == "continuum"
+            else "depletable_capacity_with_native_advance_refresh"
+        ),
         "tip_plasticity_enabled": cfg.plasticity_enabled,
         "active_shielding_enabled": cfg.active_shielding,
         "signed_active_shielding": cfg.signed_active_shielding,

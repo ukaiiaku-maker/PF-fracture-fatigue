@@ -1,0 +1,32 @@
+{
+  "barriers_prefactors_q_tau_event_lengths_changed": false,
+  "candidate_id": "V3_ceramic_V2_P25_007__V3_1_TRUST1",
+  "cleavage_feedback": "area-weighted opening stress",
+  "equal_element_role": "historical audit only",
+  "high_load_is_gate": false,
+  "initial_nucleus_swept_area": "UNSPECIFIED; zero in conditional glide-only lane, not a physical proof",
+  "input_registries": {
+    "optimized": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_6_operator_consistent_developed_fatigue/v3_1_optimized_candidate_registry.json",
+      "sha256": "26a47de359e0234bcd1a71ab761960db08ec808ba13f0f431dd31e3247be75a7"
+    },
+    "parent": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json",
+      "sha256": "016af3a9e79fc7489c18e4b9d825b27f4b1b4e830553e61623b5aa9a573af14f"
+    }
+  },
+  "loads_MPa_sqrt_m": [
+    4.781762498950186
+  ],
+  "maximum_cycles": 0.25,
+  "observation_weight": "fixed physical element-area measure",
+  "parent_row_sha256": "660a5750ca950464b71083fa0f301dabdaf98e2378df20236c0c7b2ed980eccc",
+  "patch_length_m": 5e-06,
+  "phase_steps": 4,
+  "root_policy": "all candidate roots from same pre-step state; earliest physical phase commits",
+  "schema": "v10.2.30_v3_6_operator_consistent_developed_fatigue_v1",
+  "slip_feedback": "system-resolved FEM shear on active physical support",
+  "support_width_m": 2e-06,
+  "target_events": 1,
+  "unresolved_internal_feedback": "native tau_gnd and source backstress retained separately"
+}

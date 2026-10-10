@@ -1,0 +1,8 @@
+{
+  "exception_class": "FileNotFoundError",
+  "exception_message": "missing generated v10.2.27 registry or selection record; run python scripts/install_v10_2_27_four_class_registry.py",
+  "execution_verified": false,
+  "schema": "shared-runtime-failure/1",
+  "status": "failed",
+  "traceback": "Traceback (most recent call last):\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_execution_worker.py\", line 181, in main\n    execute(request_path)\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_execution_worker.py\", line 158, in execute\n    result = executor(argv)\n             ^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_current_source_multifront_physical_v12.py\", line 425, in main\n    return entry.main(forwarded)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_28_audited.py\", line 44, in main\n    result = _entry.main(args)\n             ^^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_28.py\", line 149, in main\n    return _base.main(argv)\n           ^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/sharp_front_v10_2_27.py\", line 265, in main\n    raise FileNotFoundError(\nFileNotFoundError: missing generated v10.2.27 registry or selection record; run python scripts/install_v10_2_27_four_class_registry.py\n"
+}

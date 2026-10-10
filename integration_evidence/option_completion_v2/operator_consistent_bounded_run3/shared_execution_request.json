@@ -1,0 +1,108 @@
+{
+  "native_args": [
+    "--registry",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_6_operator_consistent_developed_fatigue/v3_1_optimized_candidate_registry.json",
+    "--parent-registry",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json",
+    "--canonical-registry",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv",
+    "--canonical-manifest",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_manifest.json",
+    "--loads",
+    "4.781762498950186",
+    "--maximum-cycles",
+    "0.25",
+    "--target-events",
+    "1",
+    "--phase-steps",
+    "4"
+  ],
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "single_front",
+    "integration": "coupled_full_half",
+    "kernel_manifest": null,
+    "kinetics": "operator_consistent_v3_6",
+    "loading": "explicit_cyclic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "selected_fields",
+    "plasticity": "tip_process_only",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "persistent_reusable",
+    "source_location": "tip_surface"
+  },
+  "options_sha256": "1387e09af8dd0ed5cfe516216ff41abaa4df5139791620141e5ff39c94cd4d3f",
+  "output_dir": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/operator_consistent_bounded_run3",
+  "plan": {
+    "bindings": [
+      {
+        "attribute": "OperatorConsistentProjection",
+        "consumer": "fixed-crack full spatial FEM projection",
+        "module": "arrhenius_fracture.operator_consistent_projection_v10230",
+        "requested": "spatial_pf",
+        "role": "mechanics"
+      },
+      {
+        "attribute": "advance_basic",
+        "consumer": "phase-resolved native waveform advance",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "explicit_cyclic",
+        "role": "loading"
+      },
+      {
+        "attribute": "MechanismSpecificFeedback",
+        "consumer": "material tip-slip support",
+        "module": "arrhenius_fracture.mechanism_specific_feedback_v10230",
+        "requested": "tip_surface",
+        "role": "source_location"
+      },
+      {
+        "attribute": "MaterialHistory",
+        "consumer": "material-frame active and archived patch ledger",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "persistent_reusable",
+        "role": "source_lifecycle"
+      },
+      {
+        "attribute": "OperatorConsistentProjection",
+        "consumer": "V3.6 operator-consistent strategy",
+        "module": "arrhenius_fracture.operator_consistent_projection_v10230",
+        "requested": "operator_consistent_v3_6",
+        "role": "kinetics"
+      },
+      {
+        "attribute": "converged_interval",
+        "consumer": "full-versus-two-half accepted interval",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "coupled_full_half",
+        "role": "integration"
+      },
+      {
+        "attribute": "main",
+        "consumer": "native compact CSV, event checkpoint and mechanics contract",
+        "module": "arrhenius_fracture.shared_operator_consistent_adapter",
+        "requested": "selected_fields",
+        "role": "output"
+      },
+      {
+        "attribute": "run_load",
+        "consumer": "explicit NumPy generator seed",
+        "module": "scripts.run_v3_6_operator_consistent_developed_fatigue_v10230",
+        "requested": "1733",
+        "role": "random_seed"
+      }
+    ],
+    "executable": true,
+    "executor_attribute": "main",
+    "executor_module": "arrhenius_fracture.shared_operator_consistent_adapter",
+    "limitation": null,
+    "options_sha256": "1387e09af8dd0ed5cfe516216ff41abaa4df5139791620141e5ff39c94cd4d3f",
+    "restart_family": "v3_6_event_checkpoint_write_only",
+    "schema": "shared-execution-plan/1"
+  },
+  "restart_from": null,
+  "schema": "shared-execution-request/1",
+  "source_policy": "development_snapshot"
+}
