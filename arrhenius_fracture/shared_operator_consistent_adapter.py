@@ -43,6 +43,9 @@ def main(argv=None):
     checkpoint = os.environ.get("V10230_HIGH_CYCLE_CHECKPOINT_DIR", "").strip()
     if checkpoint and _value(values, "--checkpoint-dir") is None:
         values.extend(["--checkpoint-dir", checkpoint])
+    seed = os.environ.get("CLEAVAGE_HAZARD_SEED", "").strip()
+    if seed and _value(values, "--seed") is None:
+        values.extend(["--seed", seed])
     from scripts.run_v3_6_operator_consistent_developed_fatigue_v10230 import (
         main as native_main,
     )
