@@ -51,3 +51,16 @@ within-cycle unload/reload samples, so a phase-resolved reload K(a) curve is
 unavailable from that file. The limitation is recorded rather than filled with
 synthetic points. Compact source tables and plots are under
 `integration_evidence/corrected_k_history/`.
+
+## New online event history
+
+The qualified three-step full-spatial run under
+`integration_evidence/option_completion_v2/event_online_qualified/` emits the
+schema `/2` history while the native accepted state is live. It contains one
+`reequilibrated` loading record and paired `pre_event`/`committed` records for
+two accepted events. The pre-event rows retain the native direct J and K_J;
+the committed rows retain the exact projected geometry jump and deliberately
+leave K/J null. This solver does not perform a fixed-load solve immediately
+after committing geometry, so the next native load step is the next separately
+recorded equilibration. Intermediate lengths inside either jump return
+`discrete_jump_bracket` and are never interpolated.

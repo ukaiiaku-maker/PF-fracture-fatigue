@@ -12,8 +12,8 @@ top-level composition is not yet qualified.
 | C04 | corrected | exact clean FEM checkout and project interpreter are verified; 4 native theta0 adapter tests pass; only the exact mapped comparison preset is accepted |
 | C05 | corrected | Boolean, float and string seeds are rejected; the public PF run observed seed 1733 inside native startup |
 | C06 | corrected for constructed paths | qualified runs reject dirty calculation source; development runs seal a binary patch plus untracked sources; loaded hashes and source status are rechecked after execution |
-| C07 | corrected | the base-to-HEAD blank EOF line was reproduced, removed, and the same explicit range is rechecked in the final test record |
-| C08 | bounded/activated | P0 damage and collinear overlap corrections have consequence-specific tests; no false neutrality claim; coupled immutable base/current trajectory remains open |
+| C07 | corrected for live source | the base-to-final live-source whitespace check passes; sealed development patches and copied native CSV evidence retain their original bytes and are excluded from that formatting assertion |
+| C08 | corrected and bounded | P0 damage and collinear overlap corrections have consequence-specific tests; matched immutable base/current fallback and accepted-event trajectories are complete, while intended activated-P0 differences remain non-neutral |
 | C09 | corrected for single-front PF; topology coverage partial | publication output retains three atomic generations independently of images; a fresh worker continued a two-step checkpoint and matched the uninterrupted three-step history byte-for-byte |
 | C10 | corrected | PF uses the recorded Python 3.12 environment; FEM uses its recorded `arrhenius-fem-czm` interpreter; metadata resolution does not import every installer into a shared process |
 | C11 | corrected | schema /2 preserves every raw row, native `K_J`/probe identity, unknown stage/validity, load segments, repeated lengths and absolute/extension coordinates |
@@ -22,9 +22,13 @@ top-level composition is not yet qualified.
 
 ## Executed results
 
-- Final clean-source PF suite: 740 unique tests passed in one qualified interpreter.
-- External FEM theta0 adapter suite: 4 passed in `arrhenius-fem-czm`.
-- Current targeted PF/FEM/restart set: 51 passed after the isolated-worker changes.
+- Final clean-source PF suite: 757 tests passed in one qualified interpreter
+  at source `9507fce1`.
+- External FEM theta0 adapter suite: 4 passed in `arrhenius-fem-czm`; the two
+  formerly disk-blocked checks are included and the storage failure did not
+  reproduce.
+- Final observer/shared-execution targeted set: 35 passed before the complete
+  suite.
 - A-B-A/B-A-B isolation: seven distinct successful worker PIDs; native and
   reversible histories were internally identical in both orders, and A remained
   identical after an intentionally failed B; parent environment unchanged.
