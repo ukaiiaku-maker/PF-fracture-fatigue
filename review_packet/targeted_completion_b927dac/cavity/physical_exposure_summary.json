@@ -1,0 +1,38 @@
+{
+  "schema": "v5-physical-exposure-summary/1",
+  "protocol": {
+    "temperature_K": 1200.0,
+    "applied_opening_m": 4e-7,
+    "common_start": "native matched enabled/suppressed V5 pair",
+    "predeclared_target_s": 1.00002,
+    "accepted_endpoint_s": 0.50002,
+    "validity_boundary": "native vacancy concentration bound fails during the next 0.1 s interval even after shared bisection below 1e-8 s",
+    "rate_or_barrier_modification": false
+  },
+  "enabled_terminal_sites": [
+    {
+      "site_id": "site-1",
+      "phase": "AVAILABLE_SITE",
+      "hits": 0,
+      "birth_action": 1.7610804105582585e-6,
+      "birth_threshold": 0.460630952057483,
+      "threshold_fraction": 3.823191651998431e-6
+    },
+    {
+      "site_id": "site-2",
+      "phase": "AVAILABLE_SITE",
+      "hits": 0,
+      "birth_action": 1.5997431980986898e-6,
+      "birth_threshold": 0.9028159466332175,
+      "threshold_fraction": 1.7719483179982082e-6
+    }
+  ],
+  "outcome": {
+    "cavity_events": 0,
+    "cavity_area_m2": null,
+    "cavity_radius_m": null,
+    "shared_mechanical_fields_exact": true,
+    "restart_matches_uninterrupted_exact": true,
+    "scope": "paired execution and censored no-event response through the accepted endpoint; not evidence of no longer-time cavity influence"
+  }
+}

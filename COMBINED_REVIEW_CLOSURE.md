@@ -14,7 +14,7 @@ top-level composition is not yet qualified.
 | C06 | corrected for constructed paths | qualified runs reject dirty calculation source; development runs seal a binary patch plus untracked sources; loaded hashes and source status are rechecked after execution |
 | C07 | corrected for live source | the base-to-final live-source whitespace check passes; sealed development patches and copied native CSV evidence retain their original bytes and are excluded from that formatting assertion |
 | C08 | corrected and bounded | P0 damage and collinear overlap corrections have consequence-specific tests; matched immutable base/current fallback and accepted-event trajectories are complete, while intended activated-P0 differences remain non-neutral |
-| C09 | corrected for single-front PF; topology coverage partial | publication output retains three atomic generations independently of images; a fresh worker continued a two-step checkpoint and matched the uninterrupted three-step history byte-for-byte |
+| C09 | corrected for single-front PF and bounded two-front V12 | publication output retains three atomic generations independently of images; single-front continuation is byte-exact; the exact theta=40 two-front accepted boundary is exact across interrupted/uninterrupted execution |
 | C10 | corrected | PF uses the recorded Python 3.12 environment; FEM uses its recorded `arrhenius-fem-czm` interpreter; metadata resolution does not import every installer into a shared process |
 | C11 | corrected | schema /2 preserves every raw row, native `K_J`/probe identity, unknown stage/validity, load segments, repeated lengths and absolute/extension coordinates |
 | C12 | corrected construction | loading/lifecycle/kinetics/topology/cavity roles are independent; cavity infrastructure does not grant branch permission or force current-source lifecycle |
@@ -22,8 +22,8 @@ top-level composition is not yet qualified.
 
 ## Executed results
 
-- Final clean-source PF suite: 763 tests passed in one qualified interpreter
-  at source `348343f`.
+- Final clean-source PF suite: 777 tests passed in one qualified interpreter
+  at numerical source `b927dac`.
 - External FEM theta0 adapter suite: 4 passed in `arrhenius-fem-czm`; the two
   formerly disk-blocked checks are included and the storage failure did not
   reproduce.
@@ -44,9 +44,12 @@ top-level composition is not yet qualified.
   zero stress and introduced no fitted parameter.
 - Physical V5 cavity pair: enabled and disabled arms start from exact common
   native mechanical, vacancy, transport, fracture-RNG state and advance through
-  the same qualified directional provider. Both completed 20 µs without an
-  event. Paired checkpoint round trips and fresh-worker versus uninterrupted
-  terminal fingerprints are exact. The former extreme-reservoir lifecycle is
+  the same qualified directional provider. Both reach 0.50002 s without an
+  event; the intended 1.00002 s censor is bounded by the native vacancy
+  concentration condition during the next interval. Shared fields and
+  observables remain exact, and fresh-worker versus uninterrupted terminal
+  states are exact within each arm. The result is censored, not evidence of no
+  longer-time cavity influence. The former extreme-reservoir lifecycle remains
   explicitly test-only and production-ineligible.
 - Source geography: matched 900 K two-step runs attest tip-only, genuine
   pure-uniform-bulk (persistent tip disabled), and tip-plus-bulk execution.
@@ -79,23 +82,29 @@ top-level composition is not yet qualified.
 - Long history: 2,085/2,085 rows retained; 201 event and 1,884 non-event
   rows; 1,883 repeated committed-length rows; `K_J` finite on every row and
   `K_I` deliberately absent.
-- Current developed-growth history: the qualified 300 K full-spatial run
+- Current developed-growth history: the 300 K full-spatial run
   reaches 1002.9028827375072 µm projected extension. Its 2,286 observation
   rows preserve 2,085 signed direct-J evaluations, leave independently absent
-  G and path arclength null, and associate pre-event mechanics with the prior
-  accepted geometry. Exact-repeat and discrete-jump query modes are exercised.
+  G null, and associate pre-event mechanics with the prior accepted geometry.
+  The 201 retained native event segments recover 1005.0000000000018 µm path
+  arclength. Exact-repeat and projected/path discrete-jump queries are exercised.
+- Exact theta=40 continuation: clean committed-source executions at `b927dac`
+  complete the inherited two-front interval and accepted 5 µm event. All FEM
+  and stress arrays and every restart-owned registry category match exactly
+  between uninterrupted and restarted endpoints.
 - Explicit cyclic accepted history: 5/5 rows retained with native probe K and
   Kmin/Kmax envelope columns. It does not contain within-cycle phase samples,
   so it is not promoted to a phase-resolved reload K(a) curve.
 
 ## Open release boundaries
 
-The branch now executes and distinguishes tip-only, pure-uniform-bulk, and
+The branch executes and distinguishes tip-only, pure-uniform-bulk, and
 tip-plus-uniform-bulk source geographies. V3.6 remains a bounded no-event
-censor. The exact theta=40 `adb775...` family and V11 checkpoint have been
-recovered; V12 enters the inherited two-front topology transaction and fails
-closed at `unreliable_tensor_probe_for_anisotropic_normalization` for both the
-historical and compact interval. No orientation or mechanics substitute was
-used. Consequently, successful branching-family interrupted continuation and
-the combined branching-plus-cavity calculation remain open. The corrected
-observer does not invent missing within-cycle phase samples in older CSVs.
+censor. Native public restart for V10.4 bulk and V3.6 operator-consistent modes
+is still pending; requests now fail closed instead of silently starting fresh.
+The exact theta=40 `adb775...` family continuation and interrupted comparison
+are complete without an orientation or mechanics substitute. The combined
+branching-plus-cavity calculation remains open. The corrected observer does
+not invent missing within-cycle phase samples in older CSVs. Newly generated
+full artifacts still need an external duplicate because no archive disk was
+mounted during this pass.

@@ -74,18 +74,23 @@ recorded equilibration. Intermediate lengths inside either jump return
 
 ## Current developed-growth calculation
 
-The current qualified full-spatial calculation under
+The current full-spatial calculation under
 `integration_evidence/targeted_completion/current_single_front_1000um/`
 reaches 1002.9028827375072 µm projected extension in 2,085 accepted rows and
 201 events at 300 K. Its regenerated schema `/2` history contains 2,286
 chronological observations: 1,884 reequilibrated, 201 pre-event, and 201
 committed rows. Signed direct J is finite on all 2,085 mechanically evaluated
-rows; independently computed G is absent. The native steps table has no path
-arclength, so that coordinate remains unavailable rather than being inferred
-from projected advance.
+rows; independently computed G is absent. The steps table itself has no path
+arclength, but the retained native geometry-event file contains all 201
+accepted segment endpoints. Strict chronological association recovers
+1005.0000000000018 µm terminal arclength while independently reproducing the
+1002.9028827375072 µm projected endpoint. This is transparent geometry
+postprocessing; no K, J, time, or intermediate geometry is manufactured.
 
-Exact repeated-length queries are demonstrated near 5 µm. Targets at 100,
-600, and 1,000 µm fall inside accepted geometry jumps and correctly return
-`discrete_jump_bracket`. This monotonic calculation supports a developed
-K-versus-projected-extension history; it is not presented as a phase-resolved
-cyclic reload R-curve.
+Exact repeated-length queries are demonstrated near 5 µm. Projected targets
+at 100, 600, and 1,000 µm and the path-arclength target at 1002 µm fall inside
+accepted geometry jumps and correctly return `discrete_jump_bracket`. Initial
+and terminal path-coordinate queries and a path-arclength K plot are retained
+in the compact review packet. This monotonic calculation supports developed K
+histories against projected extension and path arclength; it is not presented
+as a phase-resolved cyclic reload R-curve.

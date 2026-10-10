@@ -1,0 +1,16 @@
+{
+  "schema": "targeted-completion-test-receipt/1",
+  "date": "2026-10-10",
+  "commit": "b927dac18c58f2fb896fe3520fb4c23ba950ec7e",
+  "tree": "fb9a756076f172cffde1ccace3229ff4d8fd1857",
+  "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "command": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q tests",
+  "passed": 777,
+  "failed": 0,
+  "seconds": 62.45,
+  "external_fem_czm": {
+    "passed": 4,
+    "rerun_in_this_pass": false,
+    "reason": "external FEM/CZM source and adapter interface were unchanged"
+  }
+}

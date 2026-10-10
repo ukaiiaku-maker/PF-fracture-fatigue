@@ -1,0 +1,85 @@
+{
+  "schema": "fracture-claim-to-evidence-index/1",
+  "date": "2026-10-10",
+  "integration_source": {
+    "commit": "b927dac18c58f2fb896fe3520fb4c23ba950ec7e",
+    "tree": "fb9a756076f172cffde1ccace3229ff4d8fd1857",
+    "branch": "codex/shared-fracture-fatigue-options-v1"
+  },
+  "claims": [
+    {
+      "id": "theta40_two_front_restart",
+      "category": "committed-source execution",
+      "scope": "one compact accepted two-front continuation and one interrupted/uninterrupted V12 comparison at 700 K",
+      "executor": "arrhenius_fracture.sharp_front_current_source_multifront_physical_v12.main",
+      "source_commit": "b927dac18c58f2fb896fe3520fb4c23ba950ec7e",
+      "kernel_model_fingerprint": "adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0",
+      "kernel_file_sha256": "423bc3232326b8ccc3ffcca0aa6b5363c67bad2c64debee49925bf1e6413e8cb",
+      "hazard_seed": 1733,
+      "initial_checkpoint": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_current_source_branching_capability_20260829/theta40_matched_pair/theta40_enabled_max2_seed3621/checkpoint/latest.json",
+      "achieved": {"step": 2184, "physical_time_s": 13935.60007250726, "physical_extension_um": 410.0000000000013, "active_fronts": 2, "accepted_event_um": 5.000000000000013},
+      "result": "byte-exact FEM/stress fields and exact equality of all restart-owned runtime categories",
+      "compact_evidence": "theta40/",
+      "full_artifacts": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_{probe,uninterrupted,restarted}",
+      "full_artifact_backup": "single local copy; external archive disk was unavailable"
+    },
+    {
+      "id": "v5_physical_pair",
+      "category": "sealed-development diagnostic",
+      "scope": "matched 1200 K enabled/suppressed native V5 pair through 0.50002 s accepted physical time",
+      "executor": "arrhenius_fracture.shared_v5_cavity_adapter.main",
+      "source_chain": "development snapshots sealed in each run; implementation subsequently committed at b927dac",
+      "protocol": {"opening_m": 4e-7, "predeclared_target_s": 1.00002, "accepted_endpoint_s": 0.50002},
+      "result": "no cavity event; shared mechanical/vacancy fields exact; restart/uninterrupted terminal states exact within each arm; next interval reaches the native concentration-validity boundary",
+      "compact_evidence": "cavity/",
+      "full_artifacts": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/v5_physical_*",
+      "full_artifact_backup": "single local copy; external archive disk was unavailable"
+    },
+    {
+      "id": "developed_growth_geometry",
+      "category": "reanalysis-only result",
+      "scope": "geometry-only export from unchanged accepted 300 K long-growth history",
+      "solver_rows": 2085,
+      "events": 201,
+      "observation_rows": 2286,
+      "projected_extension_um": 1002.9028827375072,
+      "path_arclength_um": 1005.0000000000018,
+      "raw_steps_sha256": "466761fcbf93115ac327a3e2ca94c683d991d712a363fc2465f21646968d8d34",
+      "geometry_events_sha256": "5c3b9e93ee21080a2385557a7b376439cae8c570beac31ea99ff0b41ef267d4c",
+      "geometry_aware_observations_sha256": "7d84c29b7588d4317dfc74b50dc8f153e45556524b47ed8f698f49bdf5b5f8dc",
+      "analysis_source": "scripts/export_developed_geometry_observations.py at b927dac",
+      "compact_evidence": "growth/",
+      "full_artifacts": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/current_single_front_1000um",
+      "full_artifact_backup": "single local copy for new export; underlying trajectory was previously preserved"
+    },
+    {
+      "id": "base_current_mechanics",
+      "category": "historical validated reference",
+      "scope": "native V10.2.21 fallback and two-step one-event matched comparison only",
+      "source_pair": ["9e884fb0", "1cd1738"],
+      "result": "byte-identical fallback and accepted-event histories; intended activated P0 correction excluded from neutrality claim",
+      "compact_evidence": "mechanics/comparison.json",
+      "applies_to_final_source": "core sharp-front/FEM path unchanged through a473daf; P0 and collinear fixtures exercised in the 777-test suite"
+    },
+    {
+      "id": "source_geography",
+      "category": "historical validated reference",
+      "scope": "matched two-step 900 K tip-only, pure-bulk, and tip-plus-bulk executions",
+      "result": "tip and bulk work/source populations remain distinct",
+      "compact_evidence": "source_geography/comparison.json",
+      "restart_limit": "V10.4 public restart remains pending; requests now fail closed instead of starting fresh"
+    },
+    {
+      "id": "repository_tests",
+      "category": "committed-source verification",
+      "scope": "entire repository tests directory",
+      "compact_evidence": "TEST_RECEIPT.json"
+    }
+  ],
+  "pending": [
+    "native public load-and-continue for V10.4 pure-bulk/tip-plus-bulk",
+    "native public load-and-continue for the V3.6 operator-consistent path",
+    "combined branching-plus-cavity calculation",
+    "external duplicate of newly generated full artifacts"
+  ]
+}

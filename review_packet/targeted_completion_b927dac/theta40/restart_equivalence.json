@@ -1,0 +1,84 @@
+{
+  "accepted_boundary": {
+    "accepted_opening_m_equal": true,
+    "accepted_state_id_equal": true,
+    "mechanics_source_identity_equal": true,
+    "physical_time_s_equal": true,
+    "step_count_equal": true,
+    "stress_field_state_id_equal": true
+  },
+  "all_fem_arrays_byte_exact": true,
+  "all_runtime_fields_equal": true,
+  "fem_arrays": {
+    "damage": {
+      "byte_exact": true,
+      "maximum_absolute_difference": 0.0,
+      "same_shape": true,
+      "shape": [
+        4057
+      ]
+    },
+    "displacement": {
+      "byte_exact": true,
+      "maximum_absolute_difference": 0.0,
+      "same_shape": true,
+      "shape": [
+        8114
+      ]
+    },
+    "ep": {
+      "byte_exact": true,
+      "maximum_absolute_difference": 0.0,
+      "same_shape": true,
+      "shape": [
+        3,
+        7992
+      ]
+    },
+    "rho": {
+      "byte_exact": true,
+      "maximum_absolute_difference": 0.0,
+      "same_shape": true,
+      "shape": [
+        7992
+      ]
+    },
+    "sigma_gp": {
+      "byte_exact": true,
+      "maximum_absolute_difference": 0.0,
+      "same_shape": true,
+      "shape": [
+        3,
+        7992
+      ]
+    },
+    "vacancy": {
+      "byte_exact": true,
+      "maximum_absolute_difference": 0.0,
+      "same_shape": true,
+      "shape": [
+        7992
+      ]
+    }
+  },
+  "mutable_engine_metadata_differences": [],
+  "restarted": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl",
+  "runtime_field_equal": {
+    "accepted_fem_state_identity": true,
+    "crack_topology": true,
+    "family_identity_and_exact_prefix_policy": true,
+    "front_competition_action_threshold_ordinal": true,
+    "front_registry": true,
+    "front_rng": true,
+    "junctions": true,
+    "mutable_engines": true,
+    "output_counters": true,
+    "owner_ledgers": true,
+    "owner_local_kernel_coordinates": true,
+    "owner_registry": true,
+    "reservoirs": true,
+    "scheduler": true
+  },
+  "schema": "v12.restart-equivalence-comparison/1",
+  "uninterrupted": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_uninterrupted/checkpoint/latest.v12.pkl"
+}

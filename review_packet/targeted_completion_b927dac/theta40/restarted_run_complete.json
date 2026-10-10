@@ -1,0 +1,34 @@
+{
+  "accepted_duration_s": 5.922283889958635e-07,
+  "accepted_opening_m": 0.0003321184471935145,
+  "active_front_count": 2,
+  "added_extension_um": 5.000000000000013,
+  "at_least_four_cumulative_births_observed": false,
+  "branch_birth_count": 1,
+  "checkpoint": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl",
+  "claim_label": "CAPABILITY_DEMONSTRATION_NOT_VALIDATED_BRANCHING_PHYSICS",
+  "cumulative_binary_branch_births": 1,
+  "disposition": "accepted_event",
+  "events_after_target_birth": 1,
+  "front_resource_limit_bound": false,
+  "maximum_concurrent_active_fronts": 2,
+  "maximum_network_forward_reach_um": 306.06652750567395,
+  "owner_local_coordinates_um": {
+    "owner:v11:jc9ec4d7327bde23": 5.000000000000012
+  },
+  "physical_extension_um": 410.0000000000013,
+  "physical_time_s": 13935.60007250726,
+  "predictive_recursive_branching_physics": "NOT_VALIDATED",
+  "registry_fingerprint": "c01eb2150801ac0b3a917fd667c4cb6424fa23a3d52805293340edaeb207fa13",
+  "runtime_sha256": "c01eb2150801ac0b3a917fd667c4cb6424fa23a3d52805293340edaeb207fa13",
+  "schema": "v12.bounded-physical-multifront-result/1",
+  "source": {
+    "kind": "v12_accepted_boundary",
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_probe/checkpoint/latest.v12.pkl",
+    "payload_sha256": "d10ec7af6a78dddc923107ced700a8f847676f8353d2cd02a17365acef8f2430"
+  },
+  "step": 2184,
+  "target_1000um_reached": false,
+  "termination": "step_limit_reached",
+  "topology_fingerprint": "29f71dab56bff323cc91b14613264a9d8c08ebffe31011e2664d71ac7e4966f9"
+}

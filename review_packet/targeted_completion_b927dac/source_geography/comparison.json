@@ -1,0 +1,24 @@
+{
+  "schema": "source-geography-comparison/1",
+  "temperature_K": 900.0,
+  "loading_steps": 2,
+  "tip_only": {
+    "tip_enabled": true,
+    "bulk_work_J": 0.0,
+    "tip_work_J": 8.875457089296442e-11
+  },
+  "pure_bulk": {
+    "tip_enabled": false,
+    "bulk_work_J": 2.301945248745819e-5,
+    "tip_work_J": 0.0
+  },
+  "tip_plus_bulk": {
+    "tip_enabled": true,
+    "bulk_work_J": 2.301945248745819e-5,
+    "tip_work_J": 8.875457088811362e-11
+  },
+  "restart_scope": {
+    "pure_bulk": "public restart unsupported and now rejected explicitly",
+    "tip_plus_bulk": "public restart unsupported and now rejected explicitly"
+  }
+}

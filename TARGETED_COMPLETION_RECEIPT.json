@@ -1,51 +1,65 @@
 {
-  "schema": "targeted-physical-completion-receipt/1",
-  "date": "2026-10-09",
+  "schema": "targeted-physical-completion-receipt/2",
+  "date": "2026-10-10",
   "branch": "codex/shared-fracture-fatigue-options-v1",
-  "tested_commit": "348343f76675d008e5370fb246158ac3db79fd17",
-  "tested_tree": "cfb1f199ec6a44864b1fbd770ef4c3ea427d8bdc",
-  "pf_tests": {"passed": 763, "failed": 0, "seconds": 54.65},
+  "numerical_commit": "b927dac18c58f2fb896fe3520fb4c23ba950ec7e",
+  "numerical_tree": "fb9a756076f172cffde1ccace3229ff4d8fd1857",
+  "pf_tests": {"passed": 777, "failed": 0, "seconds": 62.45},
   "physical_cavity_pair": {
     "temperature_K": 1200.0,
-    "physical_time_per_arm_s": 0.00002,
+    "predeclared_endpoint_s": 1.00002,
+    "accepted_endpoint_s": 0.50002,
+    "terminal_status": "CENSORED_AT_NATIVE_VACANCY_CONCENTRATION_BOUND",
     "event_status": "COMPLETED_NO_EVENT",
     "common_start_exact": true,
-    "checkpoint_roundtrip_exact": true,
     "restart_matches_uninterrupted_exact": true,
-    "disabled_terminal_fingerprint": "2000998ab65c755c1398092d7bf1378e76d6caee7c1be20f6e79afee1ba0b85d",
-    "enabled_terminal_fingerprint": "b1659e81241dda5ae1de1465c5e8460d1ed77082b2e293d6304f5b76f591c93a"
+    "shared_fields_exact": true,
+    "maximum_birth_threshold_fraction": 3.823191651998431e-6,
+    "disabled_terminal_fingerprint": "89f8eae4db4edad033e5347bf609b49222fffcc1777389af4374eef6ba208621",
+    "enabled_terminal_fingerprint": "ebdefeb41b1f83ddccff47a1981d517d892690d4a6ad3100a6858057096d31d7"
   },
   "source_geography": {
     "temperature_K": 900.0,
     "loading_steps": 2,
     "tip_only": {"tip_enabled": true, "bulk_work_J": 0.0, "tip_work_J": 8.875457089296442e-11},
     "pure_bulk": {"tip_enabled": false, "bulk_work_J": 2.301945248745819e-5, "tip_work_J": 0.0},
-    "tip_plus_bulk": {"tip_enabled": true, "bulk_work_J": 2.301945248745819e-5, "tip_work_J": 8.875457088811362e-11}
+    "tip_plus_bulk": {"tip_enabled": true, "bulk_work_J": 2.301945248745819e-5, "tip_work_J": 8.875457088811362e-11},
+    "native_public_restart": "pending_and_explicitly_rejected"
   },
   "developed_growth": {
     "temperature_K": 300.0,
     "accepted_rows": 2085,
     "events": 201,
     "projected_extension_um": 1002.9028827375072,
+    "path_arclength_um": 1005.0000000000018,
     "observation_rows": 2286,
-    "reequilibrated_rows": 1884,
-    "pre_event_rows": 201,
-    "committed_rows": 201,
-    "signed_J_finite_rows": 2085,
-    "G_finite_rows": 0,
-    "path_arclength_finite_rows": 0,
+    "path_arclength_finite_rows": 2286,
     "steps_sha256": "466761fcbf93115ac327a3e2ca94c683d991d712a363fc2465f21646968d8d34",
-    "observation_sha256": "974c38cc1b97e3b53f3a86ebd3c63af0d08fd97ea1424468da1c1907fc646427"
+    "geometry_events_sha256": "5c3b9e93ee21080a2385557a7b376439cae8c570beac31ea99ff0b41ef267d4c",
+    "observation_sha256": "7d84c29b7588d4317dfc74b50dc8f153e45556524b47ed8f698f49bdf5b5f8dc"
   },
   "theta40_branching": {
+    "evidence_level": "clean_committed_source_execution",
     "exact_family_model_fingerprint": "adb7754436a66542a38c17d671bc62639939d85075168a5db721b93b791e87d0",
     "exact_family_file_sha256": "423bc3232326b8ccc3ffcca0aa6b5363c67bad2c64debee49925bf1e6413e8cb",
-    "checkpoint_recovered": true,
-    "continuation_completed": false,
-    "failure_boundary": "unreliable_tensor_probe_for_anisotropic_normalization",
-    "failure_reproduced_with_historical_and_compact_intervals": true,
-    "substitution_or_retuning_used": false
+    "continuation_completed": true,
+    "restart_equivalence_exact": true,
+    "accepted_event_um": 5.000000000000013,
+    "physical_extension_um": 410.0000000000013,
+    "active_front_count": 2,
+    "predictive_recursive_branching_physics": "NOT_VALIDATED"
   },
-  "storage": {"data_volume_available_KiB": 30115908, "temporary_volume_available_KiB": 96958648, "scientific_data_deleted": false},
-  "exclusions": ["Stateful Kitagawa", "parameter refit", "broad sweep", "default-branch merge", "manuscript release"]
+  "storage": {
+    "data_volume_available_KiB": 27994520,
+    "temporary_volume_available_KiB": 97331060,
+    "scientific_data_deleted": false,
+    "new_full_artifacts_externally_duplicated": false
+  },
+  "compact_packet": "review_packet/targeted_completion_b927dac",
+  "pending": [
+    "V10.4 native public restart",
+    "V3.6 operator-consistent native public restart",
+    "combined branching-plus-cavity execution",
+    "external duplicate of new full artifacts"
+  ]
 }

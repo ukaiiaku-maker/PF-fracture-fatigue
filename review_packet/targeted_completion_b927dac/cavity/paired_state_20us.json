@@ -1,0 +1,230 @@
+{
+  "crack_network_exact": true,
+  "fracture_rng_exact": true,
+  "manifest_fingerprints_verified": true,
+  "observables": {
+    "applied_opening_m": {
+      "absolute_difference": 0.0,
+      "disabled": 4e-07,
+      "enabled": 4e-07,
+      "relative_difference": 0.0
+    },
+    "bottom_reaction_N_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": -40590.51849313012,
+      "enabled": -40590.51849313012,
+      "relative_difference": 0.0
+    },
+    "compliance_m2_per_N": {
+      "absolute_difference": 0.0,
+      "disabled": 9.850368183033186e-12,
+      "enabled": 9.850368183033186e-12,
+      "relative_difference": 0.0
+    },
+    "constrained_reaction_l2_N_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 27789.925193068706,
+      "enabled": 27789.925193068706,
+      "relative_difference": 0.0
+    },
+    "energy_J_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 0.008124917566945408,
+      "enabled": 0.008124917566945408,
+      "relative_difference": 0.0
+    },
+    "energy_identity_reference_J_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 0.008124917566945408,
+      "enabled": 0.008124917566945408,
+      "relative_difference": 0.0
+    },
+    "energy_reaction_identity": {
+      "absolute_difference": 0.0,
+      "disabled": 0.0,
+      "enabled": 0.0,
+      "relative_difference": null
+    },
+    "external_work_J_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 0.00812494397502264,
+      "enabled": 0.00812494397502264,
+      "relative_difference": 0.0
+    },
+    "free_dof_residual_l2_N_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 1.4304226981887442e-10,
+      "enabled": 1.4304226981887442e-10,
+      "relative_difference": 0.0
+    },
+    "full_residual_including_reactions_N_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 27789.925193068706,
+      "enabled": 27789.925193068706,
+      "relative_difference": 0.0
+    },
+    "graph_length_m": {
+      "absolute_difference": 0.0,
+      "disabled": 0.0005725993004046688,
+      "enabled": 0.0005725993004046688,
+      "relative_difference": 0.0
+    },
+    "mesh_elements": {
+      "absolute_difference": 0.0,
+      "disabled": 800.0,
+      "enabled": 800.0,
+      "relative_difference": 0.0
+    },
+    "mesh_maximum_aspect_ratio": {
+      "absolute_difference": 0.0,
+      "disabled": 31.4376906845176,
+      "enabled": 31.4376906845176,
+      "relative_difference": 0.0
+    },
+    "mesh_minimum_quality": {
+      "absolute_difference": 0.0,
+      "disabled": 0.3117878388141192,
+      "enabled": 0.3117878388141192,
+      "relative_difference": 0.0
+    },
+    "mesh_nodes": {
+      "absolute_difference": 0.0,
+      "disabled": 417.0,
+      "enabled": 417.0,
+      "relative_difference": 0.0
+    },
+    "plastic_eigenstrain_half_work_J_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 2.6408077232380818e-08,
+      "enabled": 2.6408077232380818e-08,
+      "relative_difference": 0.0
+    },
+    "reaction_N_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 40624.719875113195,
+      "enabled": 40624.719875113195,
+      "relative_difference": 0.0
+    },
+    "stored_recoverable_energy_J_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 0.008124917566945408,
+      "enabled": 0.008124917566945408,
+      "relative_difference": 0.0
+    },
+    "top_bottom_reaction_balance": {
+      "absolute_difference": 0.0,
+      "disabled": 0.0008422405122546262,
+      "enabled": 0.0008422405122546262,
+      "relative_difference": 0.0
+    },
+    "top_reaction_N_per_m": {
+      "absolute_difference": 0.0,
+      "disabled": 40624.719875113195,
+      "enabled": 40624.719875113195,
+      "relative_difference": 0.0
+    },
+    "vacancy_conservation_lhs_area_m2": {
+      "absolute_difference": 0.0,
+      "disabled": 3.595029781384959e-20,
+      "enabled": 3.595029781384959e-20,
+      "relative_difference": 0.0
+    },
+    "vacancy_conservation_residual_m2": {
+      "absolute_difference": 0.0,
+      "disabled": 0.0,
+      "enabled": 0.0,
+      "relative_difference": null
+    },
+    "vacancy_conservation_rhs_area_m2": {
+      "absolute_difference": 0.0,
+      "disabled": 3.595029781384959e-20,
+      "enabled": 3.595029781384959e-20,
+      "relative_difference": 0.0
+    },
+    "vacancy_field_inventory_area_m2": {
+      "absolute_difference": 0.0,
+      "disabled": 3.595029781384959e-20,
+      "enabled": 3.595029781384959e-20,
+      "relative_difference": 0.0
+    },
+    "vacancy_fraction_max": {
+      "absolute_difference": 0.0,
+      "disabled": 3.635729012235712e-14,
+      "enabled": 3.635729012235712e-14,
+      "relative_difference": 0.0
+    }
+  },
+  "pair_checkpoint": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/v5_physical_v2_restarted/checkpoint/accepted_v5_pair.json",
+  "pair_checkpoint_sha256": "a025b135e2a42a451bff32fde720bd2ffdade4758ed56ed10dba5fc595825482",
+  "physical_time_s": 2e-05,
+  "schema": "v5-physical-paired-state-comparison/1",
+  "shared_fields": {
+    "damage": {
+      "exact": true,
+      "l2_difference": 0.0,
+      "max_abs_difference": 0.0,
+      "relative_l2_difference": 0.0,
+      "shape": [
+        417
+      ],
+      "unit": "1"
+    },
+    "displacement": {
+      "exact": true,
+      "l2_difference": 0.0,
+      "max_abs_difference": 0.0,
+      "relative_l2_difference": 0.0,
+      "shape": [
+        834
+      ],
+      "unit": "m"
+    },
+    "ep_gp": {
+      "exact": true,
+      "l2_difference": 0.0,
+      "max_abs_difference": 0.0,
+      "relative_l2_difference": 0.0,
+      "shape": [
+        3,
+        800
+      ],
+      "unit": "strain"
+    },
+    "rho_gp": {
+      "exact": true,
+      "l2_difference": 0.0,
+      "max_abs_difference": 0.0,
+      "relative_l2_difference": 0.0,
+      "shape": [
+        800
+      ],
+      "unit": "m^-2"
+    },
+    "vacancy_fraction_gp": {
+      "exact": true,
+      "l2_difference": 0.0,
+      "max_abs_difference": 0.0,
+      "relative_l2_difference": 0.0,
+      "shape": [
+        800
+      ],
+      "unit": "1"
+    }
+  },
+  "shared_mesh_exact": true,
+  "structural_differences": {
+    "cavity_enabled": {
+      "disabled": false,
+      "enabled": true
+    },
+    "cavity_rng_independent": true,
+    "void_owner_present": {
+      "disabled": false,
+      "enabled": true
+    }
+  },
+  "terminal_fingerprints": {
+    "disabled": "2000998ab65c755c1398092d7bf1378e76d6caee7c1be20f6e79afee1ba0b85d",
+    "enabled": "b1659e81241dda5ae1de1465c5e8460d1ed77082b2e293d6304f5b76f591c93a"
+  }
+}
