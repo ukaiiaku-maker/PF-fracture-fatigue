@@ -24,6 +24,11 @@ from .shared_options import (
     SourceLifecycle, SourceLocation,
 )
 
+_BUNDLED_V104_MANIFEST = (
+    Path(__file__).resolve().parent
+    / "data" / "materials" / "v10_4_dbtt_selected_bulk.csv"
+)
+
 @dataclass(frozen=True)
 class RoleBinding:
     role: str
@@ -190,6 +195,19 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         elif options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE:
             executor = "arrhenius_fracture.sharp_front_v11_branching_audited"
             restart = "v11_native_multifront"
+    elif (
+        options.loading is LoadingMode.MONOTONIC
+        and options.source_location is SourceLocation.TIP_PLUS_BULK
+        and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE
+        and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
+        and options.crack_path is CrackPathMode.SINGLE_FRONT
+        and options.cavity is CavityMode.DISABLED
+        and options.kinetics is KineticsStrategy.NATIVE_SIGNED
+        and options.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
+        and options.output is not OutputProfile.PUBLICATION_RESTART
+    ):
+        executor = "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited"
+        restart = "v10_4_combined_full_field_no_public_restart"
     if executor is None:
         limitation = ("accepted components resolve, but this composed combination has no qualified "
                       "shared native executor; use its preserved legacy launcher until an adapter is completed")
@@ -260,9 +278,16 @@ def execute_shared(
     restart_from: str | Path | None = None,
 ) -> dict[str, Any]:
     """Execute one native path in a fresh interpreter and return its receipt."""
-    if options.material_manifest or options.kernel_manifest:
-        raise RuntimeError("shared manifest-to-native-argument mapping is not yet qualified")
     plan = build_execution_plan(options)
+    if options.kernel_manifest:
+        raise RuntimeError("shared kernel-manifest mapping is not yet qualified")
+    if options.material_manifest and not (
+        plan.executor_module
+        == "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited"
+    ):
+        raise RuntimeError(
+            "material_manifest is mapped only for the native v10.4 combined bulk path"
+        )
     output = Path(output_dir).resolve()
     if any(arg == "--out" or arg.startswith("--out=") for arg in native_args):
         raise ValueError("--out is owned by execute_shared")

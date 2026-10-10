@@ -199,8 +199,14 @@ PRESETS: dict[str, SharedOptions] = {
     ),
     "pf_monotonic_bulk": SharedOptions(
         source_location=SourceLocation.BULK_UNIFORM,
-        source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        source_lifecycle=SourceLifecycle.PERSISTENT_REUSABLE,
         plasticity=PlasticityMode.FULL_FIELD_EVOLVING_RHO,
+        output=OutputProfile.SELECTED_FIELDS,
+    ),
+    "pf_monotonic_tip_plus_bulk": SharedOptions(
+        source_location=SourceLocation.TIP_PLUS_BULK,
+        source_lifecycle=SourceLifecycle.PERSISTENT_REUSABLE,
+        plasticity=PlasticityMode.TIP_PLUS_FULL_FIELD,
         output=OutputProfile.SELECTED_FIELDS,
     ),
     "pf_branching_current": SharedOptions(

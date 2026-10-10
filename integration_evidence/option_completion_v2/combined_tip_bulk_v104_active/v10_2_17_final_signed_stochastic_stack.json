@@ -1,0 +1,1235 @@
+{
+  "active_kernel_mechanically_measured": true,
+  "anisotropic_emission": {
+    "cleavage_shielding_only": true,
+    "crystal_theta_deg": 30.0,
+    "damage_cutoff": 0.85,
+    "directional_factor_location": "inside_emission_stress_before_barrier",
+    "enabled": true,
+    "full_3d_crystal_plasticity": false,
+    "min_elements": 3,
+    "model_id": "v10.1.7.4_reduced_2d_slip_trace_anisotropic_emission",
+    "observer_failed_probe_count": 0,
+    "observer_fallback_drive_count": 0,
+    "observer_reliable_drive_count": 1,
+    "opening_stress_unshielded": true,
+    "post_hazard_directional_weighting": false,
+    "probe_radius_m": 1e-05,
+    "require_reliable_probe": true,
+    "schmid_reference": 0.5,
+    "sector_half_angle_deg": 25.0,
+    "shared_forest_density": true,
+    "taylor_backstress_emission_only": true,
+    "two_reduced_slip_trace_channels": true
+  },
+  "campaign_calibration": {
+    "active_shielding_saturation": "population_dynamics_only",
+    "backstress_scale": 1.0,
+    "legacy_manifest_shielding_reference_only": true,
+    "refresh_length_scale": 1.0,
+    "shielding_cap_from_manifest": false,
+    "shielding_model": "signed_linear_elastic_population_limited_uncapped",
+    "source_budget_from_manifest": true,
+    "temporal_source_recycling": false
+  },
+  "cleavage_hazard_mode": "exponential",
+  "cleavage_hazard_seed": 1733,
+  "config": {
+    "active_shielding": true,
+    "coupling_scheme": "strang",
+    "enabled": true,
+    "max_action_substep": 0.02,
+    "max_internal_steps": 20000,
+    "max_translation_substep_m": 1e-07,
+    "min_substep_s": 1e-15,
+    "mobile_shield_fraction": 0.0,
+    "packet_length_m": 2.5e-10,
+    "plasticity_enabled": true,
+    "signed_active_shielding": true,
+    "velocity_scale": 1.0
+  },
+  "constitutive_K_shield_cap_applied": false,
+  "differential_hazard_energy_gate_v10230": {
+    "accepted_da": "proposed_event_length*gate_fraction*dB",
+    "event_geometry_length": "sum_of_accepted_microstep_advances",
+    "gate_resolution": "every_internal_Strang_microstep",
+    "hazard_clock_modified": false,
+    "model_id": "v10.2.30_microstep_hazard_energy_gated_engine",
+    "plasticity_opening_modified": false,
+    "work_inequality": "Gamma_haz*da_accepted<=J_event*da_proposed"
+  },
+  "effective_opening_fixed_point_enabled": true,
+  "engine_model_id": "v10.2.14_shared_active_only_signed_burgers_engine",
+  "event_length_mode": "threshold_scaled",
+  "event_length_uses_same_integrated_hazard_threshold": true,
+  "final_engine": "arrhenius_fracture.state_resolved_signed_engine_v10214",
+  "final_family": "arrhenius_fracture.signed_kernel_family_v10214",
+  "hazard_energy_gate_v10230": {
+    "absolute_athermal_Gc": false,
+    "anisotropic_hazard_drive": "K_event/sqrt(gamma_rel)",
+    "dissipation_density": "gamma_rel*m*DeltaG_cleave_eff(T,sigma)/b^2",
+    "event_initiation": "Arrhenius_first_passage_only",
+    "fixed_DeltaK_energy_scaling": "(K_event/K_probe)^2",
+    "gate_application": "differential_event_reward_before_MPZ_translation",
+    "model_id": "v10.2.30_hazard_derived_energy_gated_extension",
+    "positive_signed_J_required": true,
+    "schema": "v10.2.30_hazard_energy_gate_v1"
+  },
+  "loading_path": "monotonic",
+  "low_level_driver": "arrhenius_fracture.sharp_front_v10_1_7_5",
+  "observed_hazard_energy_gate_v10230": {
+    "absolute_athermal_Gc": false,
+    "adaptive_prediction_and_commit_use_same_gate": true,
+    "dissipation_scaling": "gamma_rel*m*DeltaG_cleave_eff/b^2",
+    "event_work_accumulated_differentially": true,
+    "fixed_DeltaK_probe_scaling": "J_probe*(K_event/K_probe)^2",
+    "geometry_veto_policy": "fail_closed_no_partial_state_rollback",
+    "hazard_opening_scaling": "sigma_physical/sqrt(gamma_rel)",
+    "model_id": "v10.2.30_observed_hazard_energy_gated_persistent_site_engine",
+    "physical_opening_for_plasticity": true,
+    "single_front_only": true
+  },
+  "parameter_selection_audit": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/combined_tip_bulk_v104_active/v10_2_22_parameter_selection.json",
+  "persistent_site_source_v10221": {
+    "backstress_population": "unsigned_mobile_plus_retained_line_content",
+    "config": {
+      "implicit_max_iterations": 96,
+      "implicit_tolerance": 1e-10,
+      "maximum_front_width_m": 4.9999999999999996e-05,
+      "minimum_front_width_m": 0.0,
+      "reference_density_m2": 5000000000000.0,
+      "reference_front_width_m": 9.999999999999999e-06,
+      "reference_source_area_m2": 2.5e-11,
+      "rho_site0_m2": 523948859759023.8,
+      "source_zone_length_m": 2e-06
+    },
+    "emission_integrator": "implicit_backward_euler_backstress_root",
+    "finite_source_inventory": false,
+    "front_width_state": "reference_width*sqrt(reference_density/rho_unsigned)",
+    "mechanical_zero_drive_gate": true,
+    "model_id": "v10.2.21_persistent_site_backstress_blunting",
+    "multiplicity_geometry": "rho_site0*c_arc*r_tip*w_eff",
+    "resharpening": "moving_frame_convection_of_accumulated_slip",
+    "shielding_population": "signed_retained_line_content",
+    "site_multiplicity_in_arrhenius_hazard": true,
+    "source_depletion_on_emission": false,
+    "source_model": "persistent_areal_sites_backstress_limited_no_inventory",
+    "source_refresh_on_crack_advance": false,
+    "tip_radius_state": "r0+c_blunt*b*local_accumulated_slip"
+  },
+  "physical_kernel_axes": [
+    "cumulative_crack_path_extension_m"
+  ],
+  "production_parameterization_allowed": true,
+  "records": [
+    {
+      "K_Pa_sqrt_m": 1692232.3093199574,
+      "active_K_shield_signed_Pa_sqrt_m": -9.131756773703576e-16,
+      "active_mobile": 6.118948383963376e-14,
+      "active_retained": 1.9568810558685614e-17,
+      "anisotropic_channel_names": [
+        "(110)",
+        "(1-10)"
+      ],
+      "anisotropic_dN_emit_by_system": [
+        4.220484836523961e-15,
+        2.638403973565235e-14
+      ],
+      "anisotropic_drive_factors": [
+        0.32209902346877783,
+        0.5140167394041321
+      ],
+      "anisotropic_drive_reliable": true,
+      "anisotropic_drive_serial": 1,
+      "anisotropic_emission_enabled": true,
+      "anisotropic_emission_model_id": "v10.1.7.4_reduced_2d_slip_trace_anisotropic_emission",
+      "anisotropic_emission_probability_by_system": [
+        0.0,
+        0.0
+      ],
+      "anisotropic_factors_clipped": false,
+      "anisotropic_factors_normalized": false,
+      "anisotropic_fallback_count": 0,
+      "anisotropic_lambda_emit_by_system_s": [
+        8.408038437247419e-20,
+        5.256221106176199e-19
+      ],
+      "anisotropic_mechanics_serial": 2,
+      "anisotropic_post_hazard_weighting_applied": false,
+      "anisotropic_sigma_back_by_system_Pa": [
+        3.9137915327683253,
+        9.785593621479718
+      ],
+      "anisotropic_sigma_emit_by_system_Pa": [
+        217450016.8040476,
+        347014237.4379037
+      ],
+      "anisotropic_tau_signed_Pa": [
+        31586738.08167773,
+        -50407206.89651559
+      ],
+      "anisotropic_transport_channel_resolved": false,
+      "anisotropic_transport_mode": "validated_scalar",
+      "anisotropic_transport_validated_common_operator": true,
+      "anisotropic_transport_velocity_by_system_m_s": [
+        0.0,
+        0.0
+      ],
+      "avalanche_base_checkpoint_m": 5e-06,
+      "avalanche_checkpoint_synchronized": true,
+      "avalanche_current_event_advance_m": 5e-06,
+      "avalanche_current_event_length_factor": 1.0,
+      "avalanche_driver_checkpoint_m": 5e-06,
+      "avalanche_event_advance_m": 0.0,
+      "avalanche_event_length_factor": 0.0,
+      "avalanche_event_length_history_count": 0,
+      "avalanche_geometry_subsegment_fraction": 0.1,
+      "avalanche_last_completed_advance_m": 0.0,
+      "avalanche_last_completed_factor": 0.0,
+      "avalanche_length_mode": "fixed",
+      "avalanche_maximum_factor": 4.0,
+      "avalanche_mean_length_preserved": true,
+      "avalanche_minimum_factor": 0.5,
+      "avalanche_noise_added_to_K": false,
+      "avalanche_noise_added_to_barriers": false,
+      "campaign_active_K_shield_cap_Pa_sqrt_m": 0.0,
+      "campaign_active_K_shield_effective_Pa_sqrt_m": -9.131756773703576e-16,
+      "campaign_active_K_shield_raw_Pa_sqrt_m": -9.131756773703576e-16,
+      "campaign_backstress_scale": 1.0,
+      "campaign_legacy_K_shield_cap_reference_Pa_sqrt_m": 0.0,
+      "campaign_refresh_length_scale": 1.0,
+      "campaign_shielding_cap_applied": false,
+      "campaign_shielding_model": "signed_linear_elastic_population_limited_uncapped",
+      "campaign_shielding_population_limited": true,
+      "campaign_source_budget_consumed": 0.0,
+      "campaign_source_budget_remaining": 282.1181134953842,
+      "campaign_source_budget_total": 282.1181134953842,
+      "campaign_source_model": "campaign_calibrated_tip_budget",
+      "campaign_source_refresh_fraction": 0.0,
+      "campaign_source_refresh_length_m": 6.249999999999999e-07,
+      "campaign_temporal_source_recycling": false,
+      "checkpoint_committed_total_m": 0.0,
+      "checkpoint_progress_action": 3.6334830514397234e-58,
+      "crack_velocity_m_s": 4.003751168927612e-65,
+      "dN_emit_raw": 6.120905265019245e-14,
+      "dN_escaped": 3.1554436208840472e-30,
+      "dN_recovered": 0.0,
+      "dN_released": 0.0,
+      "dN_trapped": 1.9568810558685614e-17,
+      "developed_state_active_count": 6.120905265019244e-14,
+      "developed_state_active_residence_count_s": 5.141560422616166e-13,
+      "developed_state_cumulative_emitted": 6.120905265019245e-14,
+      "developed_state_cumulative_escaped": 3.1554436208840472e-30,
+      "developed_state_cumulative_recovered": 0.0,
+      "developed_state_cumulative_refreshed": 0.0,
+      "developed_state_cumulative_released": 0.0,
+      "developed_state_cumulative_trapped": 1.9568810558685614e-17,
+      "developed_state_mobile_count": 6.118948383963376e-14,
+      "developed_state_mobile_residence_count_s": 5.139916642529236e-13,
+      "developed_state_retained_count": 1.9568810558685614e-17,
+      "developed_state_retained_fraction": 0.0003197045161035357,
+      "developed_state_retained_residence_count_s": 1.6437800869295918e-16,
+      "developed_state_schema": "v10.1.7_dbtt_developed_state",
+      "engine_id": 1,
+      "fired": false,
+      "hazard_action_completed": 0.0,
+      "hazard_action_current": 3.6334830514397234e-58,
+      "hazard_energy_gate_active": true,
+      "hazard_energy_gate_completed_event_count": 0,
+      "hazard_energy_gate_context": {
+        "J_probe_J_per_m2": 6.436926863199457,
+        "K_event_Pa_sqrt_m": 1692232.3093199574,
+        "K_probe_Pa_sqrt_m": 1692232.3093199574,
+        "gamma_rel": 1.1555018669425294,
+        "loading_mode": "monotonic",
+        "probe_source": "cleave_direction_competition:root_signed_directional_J"
+      },
+      "hazard_energy_gate_event_accumulated_m": 3.363150981899194e-64,
+      "hazard_energy_gate_last": {},
+      "hazard_energy_gate_model_id": "v10.2.30_hazard_derived_energy_gated_extension",
+      "hazard_energy_gate_schema": "v10.2.30_hazard_energy_gate_v1",
+      "hazard_event_index": 0,
+      "hazard_last_completed_action": 0.0,
+      "hazard_last_completed_threshold": 0.0,
+      "hazard_last_progress_rate_s-1": 4.325575061237766e-59,
+      "hazard_noise_added_to_K": false,
+      "hazard_noise_added_to_barriers": false,
+      "hazard_progress_rate_s-1": 0.0,
+      "hazard_seed": 1733,
+      "hazard_threshold_completed_action": 0.0,
+      "hazard_threshold_current_action": 1.0,
+      "hazard_threshold_history_count": 0,
+      "hazard_threshold_mode": "deterministic",
+      "hazard_threshold_next_action": 0.0,
+      "kinetic_dt_consumed_s": 8.4,
+      "lambda_c_s-1": 4.325575061237766e-59,
+      "material_class": "v913_paper_dbtt01_0202500_persistent_sites",
+      "micro_advance_step_m": 3.363150981899194e-64,
+      "micro_advance_total_m": 3.363150981899194e-64,
+      "microsteps": 1,
+      "physical_hazard_action_step": 0.0,
+      "sigma_cleave_eff_Pa": 675103016.4490864,
+      "sigma_emission_backstress_Pa": 6.849692577124022,
+      "sigma_emission_effective_Pa": 282232127.1209757,
+      "sigma_opening_tip_Pa": 675103016.4490864,
+      "sigma_tip_Pa": 675103016.4490864,
+      "source_sites_refreshed": 0.0,
+      "stochastic_avalanche_length_enabled": false,
+      "stochastic_avalanche_schema": "v10.1.7.3_threshold_correlated_event_length",
+      "stochastic_hazard_enabled": false,
+      "stochastic_hazard_schema": "v10.1.7.2_stochastic_cleavage_threshold",
+      "stress_channels_separated": true,
+      "time_s": 8.4,
+      "tip_source_activity_mean": 1.0,
+      "tip_source_activity_min": 1.0,
+      "tip_source_aggregate_hazard_s": 7.986323555025057e-15,
+      "tip_source_backstress_equivalent_Pa": 6.849692577124022,
+      "tip_source_backstress_shear_Pa": 3.954671853268736,
+      "tip_source_clear_rate_s": 0.0,
+      "tip_source_effective_emission_stress_Pa": 282232127.1209757,
+      "tip_source_effective_emission_stress_min_Pa": 217450016.8040476,
+      "tip_source_effective_multiplicity_total": 26197.442987951137,
+      "tip_source_emission_rate_s": 7.986323555025057e-15,
+      "tip_source_local_density_m2": 0.009613433692658374,
+      "tip_source_model": "persistent_areal_sites_backstress_limited_no_inventory",
+      "tip_source_reference_multiplicity_per_system": 141.0590567476921,
+      "tip_source_throughput_bound_step": Infinity,
+      "wake_K_shield_signed_Pa_sqrt_m": 0.0
+    }
+  ],
+  "same_signed_engine_for_monotonic_and_fatigue": true,
+  "schema": "v10.2.17_stage3_final_signed_stochastic_parameter_overlay",
+  "selected_material_manifest": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/combined_tip_bulk_v104_active/selected_material_manifest_v10_2_22.csv",
+  "selected_option": {
+    "candidate_id": "v913_zeroD_sobol_0202500",
+    "exact_registry_row": {
+      "L_pz_um_recommended": "50.0",
+      "Tref_K": "481.33",
+      "c_blunt": "2.929164256900549",
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "cleave_G00_eV": "2.357721022795886",
+      "cleave_exp_a": "0.4968366474844515",
+      "cleave_exp_n": "2.618804107885808",
+      "cleave_floor_frac": "0.026239358201278",
+      "cleave_gT_eV_per_K": "0.0056085130451247",
+      "cleave_sT_GPa_per_K": "-0.0012041387008503",
+      "cleave_sigc0_GPa": "6.7501407796517015",
+      "emit_G00_eV": "3.344896922819316",
+      "emit_exp_a": "0.1572539726179093",
+      "emit_exp_n": "0.5156166724395007",
+      "emit_floor_frac": "0.0103682254353579",
+      "emit_gT_eV_per_K": "0.0061668124636635",
+      "emit_sT_GPa_per_K": "-0.0052233074344694",
+      "emit_sigc0_GPa": "2.7143102660775185",
+      "encounter_efficiency": "9.160246308716648",
+      "explicit_recovery_active": "0",
+      "legacy_source_refresh_active": "0",
+      "legacy_source_sites_active": "0",
+      "material_class": "DBTT",
+      "mechanism_summary": "Preferred classical DBTT example: low-temperature shelf, sharp transition near 1000 K, and stable upper shelf.",
+      "mobile_shield_fraction": "0.0",
+      "n_bins_recommended": "80",
+      "n_slip_channels": "2",
+      "option_key": "v913_paper_dbtt01_0202500_persistent_sites",
+      "peierls_H0_eV": "3.525720003992319",
+      "peierls_activation_entropy_kB": "-36.33932862430811",
+      "peierls_exp_a": "1.448395521938801",
+      "peierls_exp_n": "1.871259921230376",
+      "peierls_nu0_s": "1000000000000.0",
+      "peierls_stress_fraction": "0.5773502691896258",
+      "recovery_H0_eV": "0.0",
+      "recovery_activation_entropy_kB": "0.0",
+      "recovery_nu0_s": "0.0",
+      "reference_front_width_um": "10.0",
+      "reference_source_area_um2": "25.0",
+      "retained_recovery_rate_s": "0.0",
+      "rho_forest_floor_m2": "5000000000000.0",
+      "rho_source0_m2": "523948859759023.8",
+      "role": "paper primary DBTT 1",
+      "source_recovery_rate_s": "0.0",
+      "source_refresh_length_um": "0.0",
+      "source_sites_per_system": "141.0590567476921",
+      "source_zone_length_um": "2.0",
+      "taylor_H0_eV": "1.4998139148950578",
+      "taylor_activation_entropy_kB": "31.365934647619724",
+      "taylor_corr_rho_c_m2": "22042481205294.297",
+      "taylor_corr_scale": "1.2690231726199324",
+      "taylor_exp_a": "0.7048910272121429",
+      "taylor_exp_n": "0.5389550719410181",
+      "taylor_nu0_s": "100000000000.0",
+      "taylor_stress_fraction": "0.5773502691896258",
+      "validation_status": "v10.2.25 paper campaign selection; exact active parameters transferred from v10.2.24; persistent sites, no finite source inventory, no source refresh, and no explicit recovery."
+    },
+    "material_class": "DBTT",
+    "mechanism_summary": "Preferred classical DBTT example: low-temperature shelf, sharp transition near 1000 K, and stable upper shelf.",
+    "mpz_length_um": 50.0,
+    "mpz_n_bins": 80,
+    "option_key": "v913_paper_dbtt01_0202500_persistent_sites",
+    "registry_path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv",
+    "registry_sha256": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760",
+    "role": "paper primary DBTT 1",
+    "schema": "MPZ_v9_11_1_parameter_registry",
+    "validation_status": "v10.2.25 paper campaign selection; exact active parameters transferred from v10.2.24; persistent sites, no finite source inventory, no source refresh, and no explicit recovery."
+  },
+  "signed_burgers_population_required": true,
+  "signed_burgers_shared_physics": {
+    "arbitrary_shielding_attenuation": false,
+    "backstress_population": "absolute_line_content",
+    "constitutive_K_shield_cap": false,
+    "kernel": {
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "active_kernel_mechanically_measured": true,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "analytical_r_eff_used_for_interpolation": false,
+      "append_only_legacy_domain_active": false,
+      "complete_cartesian_state_grid": true,
+      "constitutive_K_shield_cap": false,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "finite_radius_fem_geometry_claimed": false,
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "last_opening_boundary_action": "none",
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode_II_operator_retained": true,
+      "n_states": 7,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "opening_strength_fraction_used_for_interpolation": false,
+      "runtime_grid_binding": {
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "runtime_active_bins": 80,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_wake_bins": 160,
+        "source_active_bins": 80,
+        "source_active_x_max_m": 4.96875e-05,
+        "source_active_x_min_m": 3.125e-07,
+        "wake_operator": "identically_zero"
+      },
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "wake_kernel_forced_zero": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shape": [
+        2,
+        160
+      ],
+      "wake_shielding_supported": false
+    },
+    "model_id": "v10.2.5_shared_signed_burgers_population",
+    "population_state": "nonnegative_positive_and_negative_Burgers_species",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "shielding_population": "signed_line_content",
+    "transport_mode": "validated_scalar"
+  },
+  "state_resolved_kernel_family": {
+    "activation_to_line_content_by_system": [
+      0.9124087591240877,
+      0.9124087591240877
+    ],
+    "active_kernel_mechanically_measured": true,
+    "active_physical_kernel_axes": [
+      "cumulative_crack_path_extension_m"
+    ],
+    "active_shape": [
+      2,
+      80
+    ],
+    "analytical_r_eff_used_for_interpolation": false,
+    "append_only_legacy_domain_active": false,
+    "complete_cartesian_state_grid": true,
+    "constitutive_K_shield_cap": false,
+    "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+    "finite_radius_fem_geometry_claimed": false,
+    "fixed_kernel_assessment": {
+      "active_I": {
+        "maximum_relative_variation": 1.5281136356173028,
+        "significance_floor": 4.8311480153593385,
+        "worst_state_id": "E0001000"
+      },
+      "active_II": {
+        "maximum_relative_variation": 2565.8357292390556,
+        "significance_floor": 0.7607382595515255,
+        "worst_state_id": "E0000600"
+      },
+      "fixed_kernel_accepted": false,
+      "maximum_relative_variation_all_modes": 2565.8357292390556,
+      "maximum_relative_variation_mode_I": 1.5281136356173028,
+      "reference_state_id": "E0000000",
+      "tolerance": 0.05,
+      "wake_I": {
+        "maximum_relative_variation": 0.0,
+        "significance_floor": 0.001,
+        "worst_state_id": "E0000000"
+      },
+      "wake_II": {
+        "maximum_relative_variation": 0.0,
+        "significance_floor": 0.001,
+        "worst_state_id": "E0000000"
+      }
+    },
+    "interpolation": {
+      "envelope_relative_tolerance": 1e-10,
+      "extrapolation_allowed": false,
+      "method": "inverse_distance",
+      "neighbors": 4,
+      "power": 2.0
+    },
+    "kernel_opening_compatibility_coordinate": 0.0,
+    "kernel_radius_axis_policy": "disabled_constant_compatibility",
+    "kernel_radius_compatibility_coordinate": 1.0,
+    "last_observed_analytical_r_eff_over_r0": 1.0,
+    "last_opening_boundary_action": "none",
+    "last_query": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "last_state_ids": [
+      "E0000000"
+    ],
+    "last_weights": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "mode_II_operator_retained": true,
+    "n_states": 7,
+    "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+    "opening_boundary_policy": {
+      "policy": "strict"
+    },
+    "opening_strength_fraction_used_for_interpolation": false,
+    "runtime_grid_binding": {
+      "active_interpolation": "piecewise_linear_in_physical_x",
+      "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+      "runtime_active_bins": 80,
+      "runtime_active_x_max_m": 4.9687499999999995e-05,
+      "runtime_active_x_min_m": 3.1249999999999997e-07,
+      "runtime_wake_bins": 160,
+      "source_active_bins": 80,
+      "source_active_x_max_m": 4.96875e-05,
+      "source_active_x_min_m": 3.125e-07,
+      "wake_operator": "identically_zero"
+    },
+    "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+    "source_capacity_bounds_per_system": [
+      [
+        0.0,
+        18249.0
+      ],
+      [
+        0.0,
+        18249.0
+      ]
+    ],
+    "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+    "state_axes": [
+      "r_eff_over_r0",
+      "opening_strength_fraction",
+      "crack_extension_m"
+    ],
+    "state_envelope_max": [
+      1.0,
+      0.0,
+      0.001175
+    ],
+    "state_envelope_min": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "wake_kernel_forced_zero": true,
+    "wake_kernel_mechanically_measured": false,
+    "wake_shape": [
+      2,
+      160
+    ],
+    "wake_shielding_supported": false
+  },
+  "state_resolved_signed_kernel": {
+    "constitutive_K_shield_cap": false,
+    "family": {
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "active_kernel_mechanically_measured": true,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "analytical_r_eff_used_for_interpolation": false,
+      "append_only_legacy_domain_active": false,
+      "complete_cartesian_state_grid": true,
+      "constitutive_K_shield_cap": false,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "finite_radius_fem_geometry_claimed": false,
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "last_opening_boundary_action": "none",
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode_II_operator_retained": true,
+      "n_states": 7,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "opening_strength_fraction_used_for_interpolation": false,
+      "runtime_grid_binding": {
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "runtime_active_bins": 80,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_wake_bins": 160,
+        "source_active_bins": 80,
+        "source_active_x_max_m": 4.96875e-05,
+        "source_active_x_min_m": 3.125e-07,
+        "wake_operator": "identically_zero"
+      },
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "wake_kernel_forced_zero": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shape": [
+        2,
+        160
+      ],
+      "wake_shielding_supported": false
+    },
+    "model_id": "v10.2.6_shared_state_resolved_signed_burgers_engine",
+    "out_of_envelope_policy": "fail_closed",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "schema": "v10.2.6_state_resolved_signed_kernel_family",
+    "state_axes": [
+      "r_eff_over_r0",
+      "opening_strength_fraction",
+      "crack_extension_m"
+    ]
+  },
+  "state_resolved_signed_kernel_v10212": {
+    "analytical_r_eff_used_for_interpolation": false,
+    "constitutive_K_shield_cap": false,
+    "family": {
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "active_kernel_mechanically_measured": true,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "analytical_r_eff_used_for_interpolation": false,
+      "append_only_legacy_domain_active": false,
+      "complete_cartesian_state_grid": true,
+      "constitutive_K_shield_cap": false,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "finite_radius_fem_geometry_claimed": false,
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "last_opening_boundary_action": "none",
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode_II_operator_retained": true,
+      "n_states": 7,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "opening_strength_fraction_used_for_interpolation": false,
+      "runtime_grid_binding": {
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "runtime_active_bins": 80,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_wake_bins": 160,
+        "source_active_bins": 80,
+        "source_active_x_max_m": 4.96875e-05,
+        "source_active_x_min_m": 3.125e-07,
+        "wake_operator": "identically_zero"
+      },
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "wake_kernel_forced_zero": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shape": [
+        2,
+        160
+      ],
+      "wake_shielding_supported": false
+    },
+    "kernel_radius_axis_policy": "disabled_constant_compatibility",
+    "kernel_state_opening_drive": "effective_K_after_signed_shielding",
+    "model_id": "v10.2.12_shared_real_2d_signed_burgers_engine",
+    "physical_kernel_axes": [
+      "opening_strength_fraction",
+      "crack_extension_m"
+    ],
+    "same_engine_for_monotonic_and_fatigue": true,
+    "schema": "v10.2.12_real_signed_state_resolved_2d_shielding_atlas"
+  },
+  "state_resolved_signed_kernel_v10214": {
+    "active_kernel_mechanically_measured": true,
+    "analytical_r_eff_used_for_interpolation": false,
+    "constitutive_K_shield_cap": false,
+    "family": {
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "active_kernel_mechanically_measured": true,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "analytical_r_eff_used_for_interpolation": false,
+      "append_only_legacy_domain_active": false,
+      "complete_cartesian_state_grid": true,
+      "constitutive_K_shield_cap": false,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "finite_radius_fem_geometry_claimed": false,
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "last_opening_boundary_action": "none",
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode_II_operator_retained": true,
+      "n_states": 7,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "opening_strength_fraction_used_for_interpolation": false,
+      "runtime_grid_binding": {
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "runtime_active_bins": 80,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_wake_bins": 160,
+        "source_active_bins": 80,
+        "source_active_x_max_m": 4.96875e-05,
+        "source_active_x_min_m": 3.125e-07,
+        "wake_operator": "identically_zero"
+      },
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "wake_kernel_forced_zero": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shape": [
+        2,
+        160
+      ],
+      "wake_shielding_supported": false
+    },
+    "model_id": "v10.2.14_shared_active_only_signed_burgers_engine",
+    "opening_strength_fraction_used_for_interpolation": false,
+    "physical_kernel_axes": [
+      "cumulative_crack_path_extension_m"
+    ],
+    "runtime_mpz_grid_binding": "piecewise_linear_in_physical_x_before_engine_installation",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+    "wake_kernel_mechanically_measured": false,
+    "wake_shielding_enabled": false,
+    "zero_event_summary_is_valid": true
+  },
+  "state_resolved_signed_kernel_v1029": {
+    "constitutive_K_shield_cap": false,
+    "family": {
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "active_kernel_mechanically_measured": true,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "analytical_r_eff_used_for_interpolation": false,
+      "append_only_legacy_domain_active": false,
+      "complete_cartesian_state_grid": true,
+      "constitutive_K_shield_cap": false,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "finite_radius_fem_geometry_claimed": false,
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "last_opening_boundary_action": "none",
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "mode_II_operator_retained": true,
+      "n_states": 7,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "opening_strength_fraction_used_for_interpolation": false,
+      "runtime_grid_binding": {
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "runtime_active_bins": 80,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_wake_bins": 160,
+        "source_active_bins": 80,
+        "source_active_x_max_m": 4.96875e-05,
+        "source_active_x_min_m": 3.125e-07,
+        "wake_operator": "identically_zero"
+      },
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "wake_kernel_forced_zero": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shape": [
+        2,
+        160
+      ],
+      "wake_shielding_supported": false
+    },
+    "fixed_point_damping": 0.5,
+    "fixed_point_max_iterations": 80,
+    "fixed_point_tolerance": 1e-08,
+    "kernel_state_opening_drive": "effective_K_after_signed_shielding",
+    "model_id": "v10.2.9_shared_effective_opening_signed_burgers_engine",
+    "out_of_envelope_policy": "axis_specific_fail_closed",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "schema": "v10.2.9_state_resolved_signed_kernel_family"
+  },
+  "stochastic_avalanche": {
+    "geometry_subsegment_fraction": 0.1,
+    "geometry_subsegments_re_equilibrated": false,
+    "length_reference": "driver_final_physical_checkpoint",
+    "maximum_factor": 4.0,
+    "mean_length_preserved": true,
+    "minimum_factor": 0.5,
+    "mode": "fixed",
+    "noise_added_to_K": false,
+    "noise_added_to_barriers": false,
+    "schema": "v10.1.7.3_threshold_correlated_event_length"
+  },
+  "stochastic_hazard": {
+    "distribution": "delta_at_one",
+    "minimum_threshold": 1e-12,
+    "mode": "deterministic",
+    "noise_added_to_K": false,
+    "noise_added_to_barriers": false,
+    "schema": "v10.1.7.2_stochastic_cleavage_threshold",
+    "seed": 1733
+  },
+  "transport_mode": "validated_scalar",
+  "wake_kernel_mechanically_measured": false,
+  "wake_shielding_enabled": false
+}

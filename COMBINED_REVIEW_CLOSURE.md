@@ -32,6 +32,12 @@ top-level composition is not yet qualified.
   depletable native site capacity with advance refresh.
 - Operator-consistent V3.6 public path: one bounded phase interval completed
   through the full spatial FEM projection and full/two-half convergence check.
+- Combined tip-plus-bulk public path: the retained v10.4.1 full-spatial entry
+  completed one selected-row 2-D step with one constitutive update over 2,126
+  elements. The observed maximum Peierls and series rates were both
+  `3.2505955739788827e-13 s^-1`, Taylor completion was active, density evolved,
+  and accepted plastic work remained nonnegative. Detailed balance was exact at
+  zero stress and introduced no fitted parameter.
 - Public shared PF execution: two full spatial 2-D load steps returned normally,
   with spatial process-zone state active and pre/post in-process receipts.
 - Compact and selected-field executions produced byte-identical step, front and
@@ -45,8 +51,11 @@ top-level composition is not yet qualified.
 
 ## Open release boundaries
 
-The branch does not yet provide qualified shared top-level executors for every
-accepted bulk/cavity/hold composition or for fixed-range branching. V3.6 is now
+The branch now exposes the established persistent tip-plus-uniform-bulk v10.4.1
+composition. The pure uniform-bulk state-step evidence remains separate because
+the v10.4 crack driver also owns a persistent tip population; it is not falsely
+labeled bulk-only. The branch does not yet provide qualified shared top-level
+executors for cavity/hold compositions or fixed-range branching. V3.6 is now
 publicly executable but its bounded evidence is a no-event censor. Current-source
 V12 bootstrap is blocked specifically by the absent theta=40 `adb775...` kernel;
 the schema-2 checkpoint, current-source material registry, and V11/V12 argument

@@ -69,7 +69,8 @@ def test_pf_monotonic_cyclic_branch_void_and_bulk_bindings_are_distinct():
         key: tuple(provider.identity for provider in resolve_runtime(PRESETS[key]).providers)
         for key in (
             "pf_monotonic_tip_persistent", "pf_cyclic_tip_persistent",
-            "pf_monotonic_bulk", "pf_branching_current", "pf_branching_void_v5",
+            "pf_monotonic_bulk", "pf_monotonic_tip_plus_bulk",
+            "pf_branching_current", "pf_branching_void_v5",
         )
     }
     assert len(set(identities.values())) == len(identities)

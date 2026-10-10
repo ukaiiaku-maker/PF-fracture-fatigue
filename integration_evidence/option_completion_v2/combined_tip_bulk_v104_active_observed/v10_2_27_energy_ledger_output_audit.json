@@ -1,0 +1,29 @@
+{
+  "bulk_plasticity_accounting": "W_bulk_plastic is the accepted cumulative FEM plastic-work ledger; it is zero in tip_only mode and nonzero when a validated full_field mode is used",
+  "direct_configurational_J_is_not_total_absorbed_energy": true,
+  "record_count": 1,
+  "records": [
+    {
+      "accepted_step_histories": true,
+      "adaptive_rejected_trials_excluded": true,
+      "columns_added": [
+        "J_effective_direct_J_per_m2",
+        "J_signed_direct_J_per_m2",
+        "W_ext_cumulative_J_per_m",
+        "U_elastic_J_per_m",
+        "W_bulk_plastic_cumulative_J_per_m",
+        "W_tip_emit_cumulative_J_per_m",
+        "W_fracture_residual_cumulative_J_per_m"
+      ],
+      "direct_J_provenance": "root_front_direct_J",
+      "effective_modulus_Pa_used_only_for_exact_inverse_fallback": 444878472222.2222,
+      "energy_balance_definition": "W_fracture_residual=W_ext-U_elastic-W_bulk_plastic-W_tip_emit; residual contains fracture-surface work plus discretization error",
+      "row_count": 1,
+      "schema": "v10.2.27_accepted_step_energy_ledger_v1",
+      "steps_csv": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/combined_tip_bulk_v104_active_observed/steps_0900K.csv",
+      "supports_tip_only_and_full_field_bulk_plasticity": true
+    }
+  ],
+  "schema": "v10.2.27_accepted_step_energy_ledger_v1",
+  "tip_emission_accounting": "W_tip_emit is the accepted cumulative process-zone emission-work ledger"
+}

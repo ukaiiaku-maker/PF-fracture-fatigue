@@ -14,6 +14,7 @@ from typing import Any
 from .shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode,
     MechanicsBackend, PlasticityMode, SharedOptions, SourceLifecycle,
+    SourceLocation,
 )
 
 
@@ -100,6 +101,22 @@ class RuntimeReceipt:
 
 
 def _pf_driver(options: SharedOptions) -> ProviderBinding:
+    if (
+        options.loading is LoadingMode.MONOTONIC
+        and options.source_location is SourceLocation.TIP_PLUS_BULK
+        and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
+    ):
+        return ProviderBinding(
+            "driver",
+            "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited",
+            "v10.4.1_full_spatial_tip_plus_bulk_detailed_balance",
+            "main",
+        )
+    if options.source_location is SourceLocation.BULK_UNIFORM:
+        return ProviderBinding(
+            "driver", "arrhenius_fracture.bulk_plasticity_v104",
+            "accepted_full_fem_bulk_state_step", "accepted_bulk_load_step",
+        )
     if options.crack_path is CrackPathMode.BRANCHING_MULTIFRONT:
         if options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE:
             return ProviderBinding(

@@ -9,7 +9,10 @@ import subprocess
 import sys
 import traceback
 
-from .shared_execution import _file_sha256, build_execution_plan, construct_and_attest
+from .shared_execution import (
+    _BUNDLED_V104_MANIFEST, _file_sha256, build_execution_plan,
+    construct_and_attest,
+)
 from .shared_options import MechanicsBackend, OutputProfile, SharedOptions
 
 
@@ -131,6 +134,12 @@ def execute(request_path: str | Path) -> dict:
         OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "0", "--no-plots"],
     }[options.output]
     native_args = list(request["native_args"])
+    if plan.executor_module == "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited":
+        if any(item == "--material-manifest" or item.startswith("--material-manifest=")
+               for item in native_args):
+            raise ValueError("--material-manifest is owned by the shared v10.4 adapter")
+        manifest = options.material_manifest or str(_BUNDLED_V104_MANIFEST)
+        native_args.extend(["--material-manifest", str(Path(manifest).resolve())])
     restart_from = request.get("restart_from")
     if restart_from and plan.restart_family == "v12_accepted_multifront":
         restart_names = ("--v11-restart-checkpoint", "--v12-restart-checkpoint")

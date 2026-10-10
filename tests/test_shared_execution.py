@@ -90,6 +90,14 @@ def test_operator_consistent_preset_maps_to_developed_native_campaign():
     assert plan.restart_family == "v3_6_event_checkpoint_write_only"
 
 
+def test_combined_tip_and_bulk_maps_to_native_v104_full_field_entry():
+    plan = build_execution_plan(PRESETS["pf_monotonic_tip_plus_bulk"])
+    assert plan.executable
+    assert plan.executor_module.endswith("sharp_front_v10_4_bulk_peierls_taylor_audited")
+    assert by_role(plan)["source_location"].requested == "tip_plus_bulk"
+    assert by_role(plan)["plasticity"].requested == "tip_plus_full_field"
+
+
 def test_multifront_restart_dispatches_v11_without_discarding_owners(tmp_path):
     checkpoint = tmp_path / "accepted.json"
     checkpoint.write_text(json.dumps({"schema": "v11.production-branch-network-checkpoint/2"}))
