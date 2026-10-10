@@ -556,4 +556,3 @@ __all__ = [
     "hazard_dissipation_density_J_per_m2",
     "probe_to_event_energy_scale",
 ]
-

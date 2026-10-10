@@ -375,4 +375,3 @@ __all__ = [
     "MODEL_ID",
     "DifferentialHazardEnergyGatedPersistentSiteCyclicTipEngine",
 ]
-

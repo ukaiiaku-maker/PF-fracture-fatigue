@@ -201,4 +201,3 @@ __all__ = [
     "reset_observer",
     "restore_observer",
 ]
-
