@@ -22,7 +22,7 @@ from typing import Any, Iterable, Mapping, Sequence
 import numpy as np
 from scipy import sparse
 from scipy.spatial import cKDTree
-from scipy.sparse.linalg import eigsh, spsolve
+from scipy.sparse.linalg import eigsh, factorized, spsolve
 from .mesh import rebuild_tri_mesh
 
 from .vacancy_coupling_v1 import (
@@ -36,7 +36,7 @@ from .vacancy_coupling_v1 import (
 
 
 SCHEMA = "unified-2d.vacancy-transport-phase-field/2"
-MODEL_ID = "MIXED_RT0_P0_ELEMENT_MASS_BACKWARD_EULER"
+MODEL_ID = "MIXED_RT0_P0_CONSERVATIVE_POSITIVE_FLUX_CORRECTION"
 LOCAL_REACTION_V1_LEGACY = "LOCAL_REACTION_V1_LEGACY"
 REFERENCE_UNCALIBRATED = "REFERENCE_UNCALIBRATED"
 KAPPA_V = 0.0
@@ -1162,6 +1162,87 @@ def _rt0_system(
     return matrix, rhs, unknown_faces, B
 
 
+def _project_face_fluxes_to_positive_cell_balance(
+    divergence_operator: sparse.csr_matrix,
+    high_order_flux: np.ndarray,
+    diagonal_reaction: np.ndarray,
+    reaction_rhs: np.ndarray,
+    *, concentration_floor: float,
+    maximum_iterations: int = 20000,
+    relative_tolerance: float = 5.0e-13,
+) -> tuple[np.ndarray, np.ndarray, Mapping[str, Any]]:
+    """Minimally correct shared face fluxes subject to positive cell balance.
+
+    The correction is the Euclidean projection of the integrated RT0 face-flux
+    vector onto ``B q <= r-C*c_floor``.  It is solved by scaled ADMM.  The
+    concentration is then reconstructed from ``C c + B q = r`` rather than
+    clipped, so every cell balance and every shared-face cancellation remains
+    algebraically conservative.  If the high-order state is admissible this
+    routine is not called and the RT0 result is unchanged.
+    """
+    B = divergence_operator.tocsr()
+    q_high = np.asarray(high_order_flux, dtype=float)
+    diagonal = np.asarray(diagonal_reaction, dtype=float)
+    source = np.asarray(reaction_rhs, dtype=float)
+    if np.any(diagonal <= 0.0) or np.any(~np.isfinite(diagonal)):
+        raise RuntimeError("positive flux correction requires a positive reaction diagonal")
+    flux_scale = max(
+        float(np.linalg.norm(q_high, ord=np.inf)),
+        float(np.linalg.norm(source, ord=np.inf)),
+        np.finfo(float).tiny,
+    )
+    x0 = q_high/flux_scale
+    upper = (source-diagonal*float(concentration_floor))/flux_scale
+    rho = 1.0
+    normal = sparse.eye(B.shape[1], format="csc") + rho*(B.T@B).tocsc()
+    solve_normal = factorized(normal)
+    x = x0.copy()
+    Bx = np.asarray(B@x).reshape(-1)
+    z = np.minimum(Bx, upper)
+    dual = Bx-z
+    primal_residual = math.inf
+    dual_residual = math.inf
+    for iteration in range(1, int(maximum_iterations)+1):
+        x = np.asarray(solve_normal(x0+rho*np.asarray(B.T@(z-dual)).reshape(-1)))
+        Bx = np.asarray(B@x).reshape(-1)
+        old_z = z
+        z = np.minimum(Bx+dual, upper)
+        dual = dual+Bx-z
+        primal_residual = float(np.linalg.norm(Bx-z, ord=np.inf))
+        dual_residual = float(
+            rho*np.linalg.norm(np.asarray(B.T@(z-old_z)).reshape(-1), ord=np.inf)
+        )
+        scale = max(
+            1.0, float(np.linalg.norm(Bx, ord=np.inf)),
+            float(np.linalg.norm(z, ord=np.inf)),
+        )
+        if max(primal_residual, dual_residual) <= relative_tolerance*scale:
+            break
+    else:
+        raise RuntimeError("conservative positive face-flux correction did not converge")
+    corrected_flux = flux_scale*x
+    concentration = (
+        source-np.asarray(B@corrected_flux).reshape(-1)
+    )/diagonal
+    balance_residual = diagonal*concentration + np.asarray(B@corrected_flux).reshape(-1)-source
+    return corrected_flux, concentration, {
+        "method": "SCALED_ADMM_EUCLIDEAN_SHARED_FACE_FLUX_PROJECTION",
+        "iterations": int(iteration),
+        "relative_tolerance": float(relative_tolerance),
+        "scaled_primal_residual_inf": primal_residual,
+        "scaled_dual_residual_inf": dual_residual,
+        "flux_scale_fraction_area_per_s": flux_scale,
+        "flux_correction_inf_fraction_area_per_s": float(
+            np.linalg.norm(corrected_flux-q_high, ord=np.inf)),
+        "flux_correction_l2_fraction_area_per_s": float(
+            np.linalg.norm(corrected_flux-q_high)),
+        "cell_balance_residual_inf": float(np.linalg.norm(balance_residual, ord=np.inf)),
+        "active_lower_cell_count": int(np.count_nonzero(
+            concentration <= float(concentration_floor)*(1.0+1.0e-8)
+        )),
+    }
+
+
 def solve_transport_interval(
     previous: VacancyTransportStateV2,
     mesh: Any,
@@ -1251,6 +1332,10 @@ def solve_transport_interval(
     linear_equilibration_used = False
     unscaled_rejected_candidate = None
     unscaled_rejected_residual = None
+    positivity_line_search_steps = 0
+    positivity_line_search_min_factor = 1.0
+    conservative_flux_corrections = []
+    high_order_linear_residual_inf = math.inf
     if failure_injector is not None:
         failure_injector("transport_matrix_assembly", previous)
     for iteration in range(1, maximum_picard_iterations + 1):
@@ -1307,9 +1392,86 @@ def solve_transport_interval(
             mixed_solution = scaling*solved
             candidate = mixed_solution[len(unknown_faces):]
             linear_equilibration_used = True
+        high_order_linear_residual_inf = float(
+            np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf)
+        )
+        if np.any(candidate < effective_c_min):
+            # The centered RT0 constitutive solve can have a non-positive P0
+            # fixed point on a general triangular mesh.  Correct the registered
+            # shared-face fluxes, then derive c from the unchanged cell balance.
+            # A guard above underflow absorbs only the projection tolerance; it
+            # is many orders below every physical concentration scale here.
+            positive_scale_guard = max(
+                effective_c_min,
+                256.0*np.finfo(float).eps*max(
+                    float(np.max(c0)), float(np.max(ceq_climb)),
+                    float(np.max(np.maximum(candidate, 0.0))),
+                ),
+            )
+            high_order_candidate_min = float(np.min(candidate))
+            corrected_flux, candidate, correction_audit = (
+                _project_face_fluxes_to_positive_cell_balance(
+                    divergence_operator,
+                    mixed_solution[:len(unknown_faces)],
+                    diagonal,
+                    reaction_rhs,
+                    concentration_floor=positive_scale_guard,
+                )
+            )
+            mixed_solution = np.concatenate((corrected_flux, candidate))
+            conservative_flux_corrections.append({
+                **dict(correction_audit),
+                "nonlinear_iteration": int(iteration),
+                "concentration_guard": float(positive_scale_guard),
+                "high_order_candidate_min": high_order_candidate_min,
+                "corrected_candidate_min": float(np.min(candidate)),
+            })
+        picard_residual = float(np.linalg.norm(candidate-c, ord=np.inf) /
+                                max(float(np.linalg.norm(candidate, ord=np.inf)), effective_c_min))
+
+        # A Picard linearization is an iteration, not an accepted physical
+        # state.  Keep the iterate strictly in the native thermodynamic domain
+        # while retaining the original RT0/P0 fixed point.  At convergence the
+        # undamped candidate (and its flux) is accepted, so this is neither
+        # concentration clipping nor a mass correction.
+        native_upper = np.nextafter(1.0, 0.0)
+        delta = candidate-c
+        line_search_factor = 1.0
+        decreasing = delta < 0.0
+        increasing = delta > 0.0
+        if np.any(decreasing):
+            line_search_factor = min(
+                line_search_factor,
+                0.9*float(np.min((c[decreasing]-effective_c_min)/(-delta[decreasing]))),
+            )
+        if np.any(increasing):
+            line_search_factor = min(
+                line_search_factor,
+                0.9*float(np.min((native_upper-c[increasing])/delta[increasing])),
+            )
+        needs_native_line_search = bool(
+            np.any(candidate < effective_c_min) or np.any(candidate >= 1.0)
+        )
+        line_search_failed = False
+        if needs_native_line_search and picard_residual > relative_tolerance:
+            if (not math.isfinite(line_search_factor)
+                    or line_search_factor <= 32.0*np.finfo(float).eps):
+                line_search_failed = True
+            else:
+                line_search_factor = min(line_search_factor, 1.0)
+                c = c + line_search_factor*delta
+                if (np.any(c <= effective_c_min) or np.any(c >= 1.0)
+                        or np.any(~np.isfinite(c))):
+                    raise RuntimeError("vacancy positivity line search left thermodynamic domain")
+                positivity_line_search_steps += 1
+                positivity_line_search_min_factor = min(
+                    positivity_line_search_min_factor, line_search_factor,
+                )
+                continue
         below = np.flatnonzero(candidate < effective_c_min)
         above = np.flatnonzero(candidate > c_max)
-        if len(below) or len(above):
+        if line_search_failed or ((len(below) or len(above))
+                                  and picard_residual <= relative_tolerance):
             centers = np.asarray(mesh.nodes, float)[np.asarray(mesh.elems, int)].mean(axis=1)
             violating = np.unique(np.concatenate((below, above)))
             # Preserve the extrema and a bounded set of offending cells; this
@@ -1363,6 +1525,10 @@ def solve_transport_interval(
                 "candidate_inf_scale": max(float(np.linalg.norm(candidate, ord=np.inf)), effective_c_min),
                 "relative_tolerance": float(relative_tolerance),
                 "maximum_picard_iterations": int(maximum_picard_iterations),
+                "positivity_line_search_steps": int(positivity_line_search_steps),
+                "positivity_line_search_min_factor": float(
+                    positivity_line_search_min_factor),
+                "positivity_line_search_failed": bool(line_search_failed),
                 "violating_cells": [{
                     "transport_cell_id": i,
                     "parent_mechanics_element_id": int(previous.parent_mechanics_element_ids[i]),
@@ -1395,8 +1561,6 @@ def solve_transport_interval(
                     np.ascontiguousarray(previous.parent_mechanics_element_ids).tobytes()
                 ).hexdigest(),
             })
-        picard_residual = float(np.linalg.norm(candidate-c, ord=np.inf) /
-                                max(float(np.linalg.norm(candidate, ord=np.inf)), effective_c_min))
         c = candidate
         if picard_residual <= relative_tolerance:
             break
@@ -1538,8 +1702,22 @@ def solve_transport_interval(
         "surface_registry_fingerprint": registry.fingerprint,
         "nonlinear_iteration_count": iteration,
         "nonlinear_relative_residual": picard_residual,
-        "linear_residual_inf": float(np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf)),
+        "linear_residual_inf": high_order_linear_residual_inf,
+        "high_order_linear_residual_inf": high_order_linear_residual_inf,
+        "accepted_corrected_mixed_residual_inf": float(
+            np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf)),
         "linear_equilibration_used": linear_equilibration_used,
+        "positivity_line_search_used": bool(positivity_line_search_steps),
+        "positivity_line_search_steps": int(positivity_line_search_steps),
+        "positivity_line_search_min_factor": float(positivity_line_search_min_factor),
+        "accepted_nonlinear_fixed_point": True,
+        "accepted_undamped_high_order_fixed_point": not bool(
+            conservative_flux_corrections),
+        "conservative_positive_flux_correction_used": bool(
+            conservative_flux_corrections),
+        "conservative_positive_flux_correction_count": int(
+            len(conservative_flux_corrections)),
+        "conservative_positive_flux_corrections": conservative_flux_corrections,
         "unscaled_rejected_linear_residual_inf": unscaled_rejected_residual,
         "unscaled_rejected_concentration_min": (None if unscaled_rejected_candidate is None
             else float(np.min(unscaled_rejected_candidate))),
