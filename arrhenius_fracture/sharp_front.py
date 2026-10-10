@@ -2500,19 +2500,6 @@ def run_2d(args):
             base_backend_log = copy.deepcopy(
                 getattr(getattr(crack_backend, 'base_backend', None), 'advance_log', []))
             stochastic = kinetic_payload.get('stochastic', {})
-            def checkpoint_audit_records(records):
-                # Observer invocation serials are process-local diagnostics,
-                # not physical history. Event/geometry identity is retained
-                # independently in the transaction and stochastic records.
-                transient = {
-                    'anisotropic_drive_serial', 'anisotropic_mechanics_serial',
-                    'hazard_energy_gate_completed_event_count',
-                }
-                return [
-                    {key: copy.deepcopy(value) for key, value in record.items()
-                     if key not in transient}
-                    for record in records
-                ]
             outer = {
                 'case': _restart_case(),
                 'provenance': {
@@ -2555,8 +2542,11 @@ def run_2d(args):
                     'branch_rows': [list(row) for row in branch_rows],
                     'fronts_rows': [list(row) for row in fronts_rows],
                     'hist': {key: list(value) for key, value in hist.items()},
-                    'kinetic_audit_records': checkpoint_audit_records(
-                        getattr(type(engine_for_checkpoint), '_audit_records', [])),
+                    # This class-level list contains observer invocation
+                    # counters and derived snapshots. It is retained in each
+                    # run's audit output, but is not authoritative physical
+                    # state and must not cross a process boundary.
+                    'kinetic_audit_records': [],
                     'energy_gate_event_records': copy.deepcopy(_energy_observer.event_records),
                     'energy_gate_mechanics_serial': int(_energy_observer.mechanics_serial),
                     'energy_gate_direction_serial': int(_energy_observer.direction_serial),
