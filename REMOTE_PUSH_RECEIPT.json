@@ -2,10 +2,10 @@
   "schema": "shared-fracture-fatigue-remote-push-receipt/1",
   "repository": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
   "branch": "codex/shared-fracture-fatigue-options-v1",
-  "tested_numerical_source_commit": "9507fce1a1555dbf1d783be37f9bda758b82410a",
-  "tested_numerical_source_tree": "704972e0b92434be476420fc290fe7f79faf514b",
-  "tested_evidence_commit": "b5c8f14ad21b6ec15fdeadd150469582731f34d1",
-  "remote_verified_head_before_receipt_follow_up": "b5c8f14ad21b6ec15fdeadd150469582731f34d1",
+  "tested_numerical_source_commit": "b927dac18c58f2fb896fe3520fb4c23ba950ec7e",
+  "tested_numerical_source_tree": "fb9a756076f172cffde1ccace3229ff4d8fd1857",
+  "tested_evidence_commit": "e167bbe520019dddf1383fd2bd60a7a770d6832e",
+  "remote_verified_head_before_receipt_follow_up": "e167bbe520019dddf1383fd2bd60a7a770d6832e",
   "receipt_commit": "self (the commit containing this file)",
   "verification_command": "git ls-remote --heads origin refs/heads/codex/shared-fracture-fatigue-options-v1",
   "verified": true,
@@ -13,5 +13,5 @@
   "default_branch_modified": false,
   "pull_request_created": false,
   "receipt_follow_up_changes_calculation_source": false,
-  "qualification_receipt": "COMBINED_REVIEW_TEST_RECEIPT.json"
+  "qualification_receipt": "review_packet/targeted_completion_b927dac/TEST_RECEIPT.json"
 }
