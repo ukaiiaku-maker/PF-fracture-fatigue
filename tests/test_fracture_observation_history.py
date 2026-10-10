@@ -207,5 +207,5 @@ def test_projected_pre_event_length_uses_previous_state_not_path_increment():
     assert pre_event.pre_length_m == pytest.approx(9e-6)
     assert committed.pre_length_m == pytest.approx(9e-6)
     assert committed.committed_length_m == pytest.approx(13e-6)
-    assert pre_event.path_arclength_m == pytest.approx(0.0)
-    assert committed.path_arclength_m == pytest.approx(5e-6)
+    assert math.isnan(pre_event.path_arclength_m)
+    assert math.isnan(committed.path_arclength_m)
