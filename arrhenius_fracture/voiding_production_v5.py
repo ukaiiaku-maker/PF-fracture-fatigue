@@ -241,7 +241,8 @@ def advance_production_vacancy_transport_interval(
     """
     from .vacancy_coupling_v1 import equivalent_plastic_strain_rate_s
     from .vacancy_transport_phase_field_v2 import (
-        accepted_elastoplastic_stress_3d, compete_on_common_transport_clock,
+        VacancyTransportBoundsError, accepted_elastoplastic_stress_3d,
+        compete_on_common_transport_clock,
     )
     transport = previous_accepted_state.vacancy_transport_state_v2
     if transport is None or transport.parameter_row is None or transport.transport_mesh is None:
@@ -296,16 +297,30 @@ def advance_production_vacancy_transport_interval(
             birth_stress_work_J=work,
         ))
     prepared = replace(transport, site_states=tuple(updated_sites))
-    competition = compete_on_common_transport_clock(
-        prepared, transport.transport_mesh, transport.surface_registry,
-        row=row, maximum_duration_s=duration,
-        accepted_equivalent_plastic_strain_rate_s=epdot,
-        accepted_dislocation_density_m2=rho,
-        accepted_mean_stress_Pa=mean_stress,
-        external_event_times_s=dict(external_event_times_s or {}),
-        failure_injector=failure_injector,
-        linear_solver_provider=transport_linear_solver_provider,
-    )
+    try:
+        competition = compete_on_common_transport_clock(
+            prepared, transport.transport_mesh, transport.surface_registry,
+            row=row, maximum_duration_s=duration,
+            accepted_equivalent_plastic_strain_rate_s=epdot,
+            accepted_dislocation_density_m2=rho,
+            accepted_mean_stress_Pa=mean_stress,
+            external_event_times_s=dict(external_event_times_s or {}),
+            failure_injector=failure_injector,
+            linear_solver_provider=transport_linear_solver_provider,
+        )
+    except VacancyTransportBoundsError as error:
+        projected = np.asarray(accepted_mechanical_state.vacancy_fraction_gp, float)
+        error.add_context(
+            mechanics_projected_concentration_min=float(np.min(projected)),
+            mechanics_projected_concentration_max=float(np.max(projected)),
+            accepted_mechanics_element_count=int(len(projected)),
+            accepted_mechanics_ep_min=float(np.min(accepted_mechanical_state.ep_gp)),
+            accepted_mechanics_ep_max=float(np.max(accepted_mechanical_state.ep_gp)),
+            accepted_mechanics_rho_min_m2=float(np.min(accepted_mechanical_state.rho_gp)),
+            accepted_mechanics_rho_max_m2=float(np.max(accepted_mechanical_state.rho_gp)),
+            mapping="transport P0 cell -> parent_mechanics_element_ids -> mechanics GP0",
+        )
+        raise
     if failure_injector is not None:
         failure_injector("topology_commit", previous_accepted_state)
     directional_rates = dict(directional_rate_by_candidate_s or {})

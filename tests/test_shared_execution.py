@@ -91,21 +91,7 @@ def test_operator_consistent_preset_maps_to_developed_native_campaign():
     plan = build_execution_plan(PRESETS["pf_operator_consistent_cyclic"])
     assert plan.executable
     assert plan.executor_module.endswith("shared_operator_consistent_adapter")
-    assert plan.restart_family == "v3_6_event_checkpoint_write_only"
-
-
-@pytest.mark.parametrize("name", [
-    "pf_operator_consistent_cyclic",
-    "pf_monotonic_bulk",
-    "pf_monotonic_tip_plus_bulk",
-])
-def test_public_restart_is_rejected_for_write_only_or_unsupported_paths(name, tmp_path):
-    restart = tmp_path / "would-be-restart"
-    restart.mkdir()
-    output = tmp_path / "output"
-    with pytest.raises(ValueError, match="not supported by this public execution path"):
-        execute_shared(PRESETS[name], [], output, restart_from=restart)
-    assert not output.exists()
+    assert plan.restart_family == "v3_6_material_frame_native"
 
 
 def test_hold_dwell_maps_to_native_ramp_then_hold_fatigue_entry():
@@ -121,13 +107,14 @@ def test_combined_tip_and_bulk_maps_to_native_v104_full_field_entry():
     assert plan.executor_module.endswith("sharp_front_v10_4_bulk_peierls_taylor_audited")
     assert by_role(plan)["source_location"].requested == "tip_plus_bulk"
     assert by_role(plan)["plasticity"].requested == "tip_plus_full_field"
+    assert plan.restart_family == "v10_4_tip_plus_bulk_combined_outer"
 
 
 def test_pure_bulk_maps_to_same_native_full_field_entry_with_distinct_restart_scope():
     plan = build_execution_plan(PRESETS["pf_monotonic_bulk"])
     assert plan.executable
     assert plan.executor_module.endswith("sharp_front_v10_4_bulk_peierls_taylor_audited")
-    assert plan.restart_family == "v10_4_pure_bulk_full_field_no_public_restart"
+    assert plan.restart_family == "v10_4_pure_bulk_combined_outer"
     assert by_role(plan)["source_location"].requested == "bulk_uniform"
 
 

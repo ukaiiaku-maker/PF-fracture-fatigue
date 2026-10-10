@@ -2478,6 +2478,10 @@ def run_2d(args):
                 'seed': int(os.environ.get('CLEAVAGE_HAZARD_SEED', '0')),
                 'da_phys_m': float(da_phys),
                 'crack_backend': str(crack_backend.name),
+                'source_geography': os.environ.get(
+                    'V104_SOURCE_GEOGRAPHY', 'native_tip_process'),
+                'material_manifest_sha256': os.environ.get(
+                    'V104_MATERIAL_MANIFEST_SHA256', ''),
             }
 
         def _outer_checkpoint_provider(engine_for_checkpoint, kinetic_payload):
@@ -2496,6 +2500,19 @@ def run_2d(args):
             base_backend_log = copy.deepcopy(
                 getattr(getattr(crack_backend, 'base_backend', None), 'advance_log', []))
             stochastic = kinetic_payload.get('stochastic', {})
+            def checkpoint_audit_records(records):
+                # Observer invocation serials are process-local diagnostics,
+                # not physical history. Event/geometry identity is retained
+                # independently in the transaction and stochastic records.
+                transient = {
+                    'anisotropic_drive_serial', 'anisotropic_mechanics_serial',
+                    'hazard_energy_gate_completed_event_count',
+                }
+                return [
+                    {key: copy.deepcopy(value) for key, value in record.items()
+                     if key not in transient}
+                    for record in records
+                ]
             outer = {
                 'case': _restart_case(),
                 'provenance': {
@@ -2538,7 +2555,7 @@ def run_2d(args):
                     'branch_rows': [list(row) for row in branch_rows],
                     'fronts_rows': [list(row) for row in fronts_rows],
                     'hist': {key: list(value) for key, value in hist.items()},
-                    'kinetic_audit_records': copy.deepcopy(
+                    'kinetic_audit_records': checkpoint_audit_records(
                         getattr(type(engine_for_checkpoint), '_audit_records', [])),
                     'energy_gate_event_records': copy.deepcopy(_energy_observer.event_records),
                     'energy_gate_mechanics_serial': int(_energy_observer.mechanics_serial),

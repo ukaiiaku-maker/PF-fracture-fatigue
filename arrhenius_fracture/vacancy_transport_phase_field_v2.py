@@ -43,6 +43,18 @@ KAPPA_V = 0.0
 DEFAULT_C_MIN = 1.0e-30
 DEFAULT_C_MAX = DILUTE_VACANCY_FRACTION_LIMIT
 
+
+class VacancyTransportBoundsError(RuntimeError):
+    """Fail-closed transport rejection with a compact reproducibility record."""
+
+    def __init__(self, diagnostic: Mapping[str, Any]):
+        super().__init__("vacancy transport solve exceeded fail-closed concentration bounds")
+        self.diagnostic = dict(diagnostic)
+
+    def add_context(self, **values: Any) -> "VacancyTransportBoundsError":
+        self.diagnostic.update(values)
+        return self
+
 # These are study coordinates, not fitted material values. Keeping the table
 # immutable and constructing the full row from the accepted material prevents
 # a variant run from silently falling back to the reference activation energy.
@@ -1236,6 +1248,9 @@ def solve_transport_interval(
     unknown_faces = None
     divergence_operator = None
     picard_residual = math.inf
+    linear_equilibration_used = False
+    unscaled_rejected_candidate = None
+    unscaled_rejected_residual = None
     if failure_injector is not None:
         failure_injector("transport_matrix_assembly", previous)
     for iteration in range(1, maximum_picard_iterations + 1):
@@ -1270,8 +1285,116 @@ def solve_transport_interval(
         candidate = mixed_solution[len(unknown_faces):]
         if np.any(~np.isfinite(candidate)):
             raise RuntimeError("singular vacancy transport solve")
-        if np.any(candidate < effective_c_min) or np.any(candidate > c_max):
-            raise RuntimeError("vacancy transport solve exceeded fail-closed concentration bounds")
+        if ((np.any(candidate < effective_c_min) or np.any(candidate > c_max))
+                and linear_solver_provider is None):
+            # The mixed matrix couples flux unknowns O(1e-20) to atomic
+            # fractions O(1e-15).  SuperLU on the raw units can lose enough
+            # digits to create a small negative P0 value.  Symmetric diagonal
+            # equilibration solves the identical assembled equations; it is
+            # neither a concentration projection nor a modified flux law.
+            unscaled_rejected_candidate = candidate.copy()
+            unscaled_rejected_residual = float(
+                np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf))
+            diagonal_scale = np.abs(np.asarray(matrix.diagonal(), float))
+            positive_diagonal = diagonal_scale[diagonal_scale > 0.0]
+            floor = (float(np.min(positive_diagonal))*np.finfo(float).eps
+                     if len(positive_diagonal) else np.finfo(float).tiny)
+            scaling = 1.0/np.sqrt(np.maximum(diagonal_scale, floor))
+            scaling_matrix = sparse.diags(scaling, format="csr")
+            equilibrated = scaling_matrix@matrix@scaling_matrix
+            equilibrated_rhs = scaling*rhs
+            solved = np.asarray(spsolve(equilibrated, equilibrated_rhs), float)
+            mixed_solution = scaling*solved
+            candidate = mixed_solution[len(unknown_faces):]
+            linear_equilibration_used = True
+        below = np.flatnonzero(candidate < effective_c_min)
+        above = np.flatnonzero(candidate > c_max)
+        if len(below) or len(above):
+            centers = np.asarray(mesh.nodes, float)[np.asarray(mesh.elems, int)].mean(axis=1)
+            violating = np.unique(np.concatenate((below, above)))
+            # Preserve the extrema and a bounded set of offending cells; this
+            # is enough to reproduce/classify the solve without dumping fields.
+            ranked = sorted(
+                (int(i) for i in violating),
+                key=lambda i: max(
+                    effective_c_min-float(candidate[i]),
+                    float(candidate[i])-float(c_max),
+                ),
+                reverse=True,
+            )[:16]
+            flux_unknown = mixed_solution[:len(unknown_faces)]
+            boundary_flux = {
+                kind: float(math.fsum(
+                    float(flux_unknown[index])
+                    for index, face in enumerate(unknown_faces)
+                    if face.kind == kind
+                ))
+                for kind in PERFECT_SINK_KINDS
+            }
+            raise VacancyTransportBoundsError({
+                "schema": "vacancy-transport-bounds-rejection/1",
+                "test_failed": (
+                    "both" if len(below) and len(above) else
+                    "lower" if len(below) else "upper"
+                ),
+                "nonlinear_iteration": int(iteration),
+                "duration_s": dt,
+                "transport_time_start_s": float(previous.transport_time_s),
+                "transport_time_end_attempted_s": float(previous.transport_time_s)+dt,
+                "concentration_input_min": float(np.min(c0)),
+                "concentration_input_max": float(np.max(c0)),
+                "last_nonlinear_iterate_min": float(np.min(c)),
+                "last_nonlinear_iterate_max": float(np.max(c)),
+                "linear_candidate_min": float(np.min(candidate)),
+                "linear_candidate_max": float(np.max(candidate)),
+                "unscaled_linear_candidate_min": (None if unscaled_rejected_candidate is None
+                    else float(np.min(unscaled_rejected_candidate))),
+                "unscaled_linear_candidate_max": (None if unscaled_rejected_candidate is None
+                    else float(np.max(unscaled_rejected_candidate))),
+                "unscaled_linear_residual_inf": unscaled_rejected_residual,
+                "equilibrated_retry_used": bool(linear_equilibration_used),
+                "equilibrated_linear_residual_inf": float(
+                    np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf)),
+                "effective_lower_bound": float(effective_c_min),
+                "upper_bound": float(c_max),
+                "lower_violation_count": int(len(below)),
+                "upper_violation_count": int(len(above)),
+                "candidate_iterate_inf_delta": float(np.linalg.norm(candidate-c, ord=np.inf)),
+                "candidate_inf_scale": max(float(np.linalg.norm(candidate, ord=np.inf)), effective_c_min),
+                "relative_tolerance": float(relative_tolerance),
+                "maximum_picard_iterations": int(maximum_picard_iterations),
+                "violating_cells": [{
+                    "transport_cell_id": i,
+                    "parent_mechanics_element_id": int(previous.parent_mechanics_element_ids[i]),
+                    "centroid_m": centers[i].tolist(),
+                    "area_m2": float(area[i]),
+                    "candidate": float(candidate[i]),
+                    "lower_violation": max(float(effective_c_min-candidate[i]), 0.0),
+                    "upper_violation": max(float(candidate[i]-c_max), 0.0),
+                    "input": float(c0[i]),
+                    "last_iterate": float(c[i]),
+                    "plastic_source_rate_s": float(source0[i]),
+                    "climb_sink_rate_s": float(climb[i]),
+                    "equilibrium_fraction": float(ceq_climb[i]),
+                    "equivalent_plastic_strain_rate_s": float(epdot[i]),
+                    "dislocation_density_m2": float(rho[i]),
+                    "mean_stress_Pa": float(stress[i]),
+                } for i in ranked],
+                "source_rate_min_s": float(np.min(source0)),
+                "source_rate_max_s": float(np.max(source0)),
+                "sink_rate_min_s": float(np.min(climb)),
+                "sink_rate_max_s": float(np.max(climb)),
+                "boundary_integrated_flux_by_kind": boundary_flux,
+                "diffusivity_m2_s": diffusivity,
+                "temperature_K": temperature,
+                "parameter_row_id": row.row_id,
+                "parameter_row_fingerprint": row.fingerprint,
+                "surface_registry_fingerprint": registry.fingerprint,
+                "transport_cell_count": int(len(candidate)),
+                "transport_to_mechanics_mapping_sha256": hashlib.sha256(
+                    np.ascontiguousarray(previous.parent_mechanics_element_ids).tobytes()
+                ).hexdigest(),
+            })
         picard_residual = float(np.linalg.norm(candidate-c, ord=np.inf) /
                                 max(float(np.linalg.norm(candidate, ord=np.inf)), effective_c_min))
         c = candidate
@@ -1416,6 +1539,10 @@ def solve_transport_interval(
         "nonlinear_iteration_count": iteration,
         "nonlinear_relative_residual": picard_residual,
         "linear_residual_inf": float(np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf)),
+        "linear_equilibration_used": linear_equilibration_used,
+        "unscaled_rejected_linear_residual_inf": unscaled_rejected_residual,
+        "unscaled_rejected_concentration_min": (None if unscaled_rejected_candidate is None
+            else float(np.min(unscaled_rejected_candidate))),
         "matrix_condition_estimate": _condition_estimate(matrix),
         "local_element_conservation_residual_inf": float(np.linalg.norm(reaction_residual, ord=np.inf)),
         "local_element_conservation_residuals": reaction_residual.tolist(),
@@ -2289,7 +2416,8 @@ __all__ = [
     "DEFAULT_C_MAX", "DEFAULT_C_MIN", "KAPPA_V", "LOCAL_REACTION_V1_LEGACY",
     "ExactCutTransportMesh", "LocalizedCaptureSite", "MODEL_ID", "PERFECT_SINK_KINDS", "REFERENCE_UNCALIBRATED",
     "SCHEMA", "SurfaceKind", "TRANSPORT_LEDGER_KEYS", "TransportFace",
-    "TransportSurfaceRegistry", "VacancyTransportParameterRowV2", "VacancyTransportStateV2",
+    "TransportSurfaceRegistry", "VacancyTransportBoundsError",
+    "VacancyTransportParameterRowV2", "VacancyTransportStateV2",
     "VACANCY_ENERGY_STUDY_SPECS", "vacancy_energy_study_row",
     "atomic_volume_from_burgers_vector_m", "build_transport_surface_registry",
     "build_registry_from_accepted_topology",

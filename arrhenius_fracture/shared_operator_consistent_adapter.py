@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
 import sys
 
 
@@ -36,6 +37,12 @@ def main(argv=None):
         raise SystemExit("V3.6 shared execution requires --out")
     values = _remove(values, "--out", "--save-snapshots")
     values = [item for item in values if item != "--no-plots"]
+    restart = os.environ.get("V10230_RESTART_CHECKPOINT_DIR", "").strip()
+    if restart and _value(values, "--restart-checkpoint") is None:
+        values.extend(["--restart-checkpoint", restart])
+    checkpoint = os.environ.get("V10230_HIGH_CYCLE_CHECKPOINT_DIR", "").strip()
+    if checkpoint and _value(values, "--checkpoint-dir") is None:
+        values.extend(["--checkpoint-dir", checkpoint])
     from scripts.run_v3_6_operator_consistent_developed_fatigue_v10230 import (
         main as native_main,
     )

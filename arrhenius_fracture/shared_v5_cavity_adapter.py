@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from collections.abc import Mapping
 import copy
+import hashlib
 import json
 import math
 import os
@@ -31,7 +32,8 @@ from .voiding_production_v5 import (
 
 MODEL_ID = "shared.native_v5_physical_paired_cavity/2"
 FIXTURE_MODEL_ID = "shared.test_only_v5_extreme_reservoir_lifecycle_fixture/1"
-PAIR_CHECKPOINT_SCHEMA = "shared-v5-physical-pair-checkpoint/1"
+PAIR_CHECKPOINT_SCHEMA = "shared-v5-physical-pair-checkpoint/2"
+LEGACY_PAIR_CHECKPOINT_SCHEMA = "shared-v5-physical-pair-checkpoint/1"
 DEFAULT_SITES_M = ((6.0e-4, 6.0e-5), (7.5e-4, -6.0e-5))
 DEFAULT_PARTITION = (0.50, 0.10, 0.40)
 TRANSPORT_BOUND_FAILURE = "vacancy transport solve exceeded fail-closed concentration bounds"
@@ -61,6 +63,14 @@ def _mechanical_arrays_equal(left, right) -> bool:
         and all(np.array_equal(getattr(left, name), getattr(right, name))
                 for name in fields)
     )
+
+
+def _accepted_fingerprint(state) -> str:
+    """Production fingerprint with a deterministic scalar-test fallback."""
+    try:
+        return complete_accepted_state_fingerprint(state)
+    except AttributeError:
+        return hashlib.sha256(repr(state).encode()).hexdigest()
 
 
 def _common_start_audit(disabled, enabled) -> dict:
@@ -150,18 +160,28 @@ def _write_pair_checkpoint(states, root: Path, metadata: dict) -> Path:
         "V10230_HIGH_CYCLE_CHECKPOINT_DIR", root / "checkpoint"
     )).resolve()
     directory.mkdir(parents=True, exist_ok=True)
+    fingerprints = {
+        arm: complete_accepted_state_fingerprint(state)
+        for arm, state in states.items()
+    }
+    identity = hashlib.sha256(json.dumps({
+        "physical_time_s": metadata.get("physical_time_s"),
+        "interval_count": metadata.get("interval_count"),
+        "fingerprints": fingerprints,
+    }, sort_keys=True).encode()).hexdigest()[:16]
     paths = {}
     for arm, state in states.items():
-        path = directory / f"accepted_v5_{arm}.json"
+        path = directory / f"accepted_v5_{identity}_{arm}.json"
         write_checkpoint(state, path, compression="gzip")
-        paths[arm] = str(path)
+        restored = restore_checkpoint(path)
+        if complete_accepted_state_fingerprint(restored) != fingerprints[arm]:
+            raise RuntimeError(f"paired V5 {arm} checkpoint verification failed")
+        paths[arm] = path.name
     payload = {
         "schema": PAIR_CHECKPOINT_SCHEMA,
         "arms": paths,
-        "fingerprints": {
-            arm: complete_accepted_state_fingerprint(state)
-            for arm, state in states.items()
-        },
+        "generation": identity,
+        "fingerprints": fingerprints,
         **metadata,
     }
     target = directory / "accepted_v5_pair.json"
@@ -174,7 +194,9 @@ def _write_pair_checkpoint(states, root: Path, metadata: dict) -> Path:
 def _restore_pair(path: str | Path):
     source = Path(path).resolve()
     payload = json.loads(source.read_text())
-    if payload.get("schema") != PAIR_CHECKPOINT_SCHEMA:
+    if payload.get("schema") not in {
+        PAIR_CHECKPOINT_SCHEMA, LEGACY_PAIR_CHECKPOINT_SCHEMA,
+    }:
         raise RuntimeError(
             "physical V5 restart requires a paired native checkpoint manifest"
         )
@@ -190,33 +212,89 @@ def _restore_pair(path: str | Path):
     return states, payload
 
 
+class _PairedRefinementFailure(RuntimeError):
+    def __init__(self, states, segments, diagnostic):
+        super().__init__(TRANSPORT_BOUND_FAILURE)
+        self.states = states
+        self.segments = segments
+        self.diagnostic = diagnostic
+
+
 def _advance_paired_with_refinement(
     states, duration_s: float, advance, *, minimum_duration_s: float,
+    requested_duration_s: float | None = None, depth: int = 0,
+    trial_counter: list[int] | None = None,
 ):
     """Advance both controls on one shared, fail-closed native time partition."""
     trial = {}
     schedulers = {}
+    if trial_counter is None:
+        trial_counter = [0]
+    if requested_duration_s is None:
+        requested_duration_s = float(duration_s)
     try:
         for arm in ("disabled", "enabled"):
+            trial_counter[0] += 1
             trial[arm], schedulers[arm] = advance(
                 copy.deepcopy(states[arm]), float(duration_s), arm
             )
         return trial, [(float(duration_s), schedulers, trial)]
     except RuntimeError as error:
+        if isinstance(error, _PairedRefinementFailure):
+            raise
         if str(error) != TRANSPORT_BOUND_FAILURE:
             raise
+        diagnostic = dict(getattr(error, "diagnostic", {}))
+        projected_raw = getattr(states[arm], "vacancy_fraction_gp", None)
+        mechanics_projected = (None if projected_raw is None else
+                               np.asarray(projected_raw, float))
+        void_state = getattr(states[arm], "void_state", None)
+        void_rng = None if void_state is None else getattr(
+            void_state, "rng_state", None)
+        transport_state = getattr(states[arm], "vacancy_transport_state_v2", None)
+        parent_fingerprints = {
+            name: _accepted_fingerprint(state)
+            for name, state in states.items()
+        }
+        diagnostic.update({
+            "arm": arm,
+            "requested_interval_s": float(requested_duration_s),
+            "actual_subinterval_s": float(duration_s),
+            "refinement_depth": int(depth),
+            "trial_number": int(trial_counter[0]),
+            "parent_accepted_state_fingerprints": parent_fingerprints,
+            "rollback_result": "exact-paired-parent-retained",
+            "mechanics_projected_concentration_min": (None if mechanics_projected is None
+                else float(np.min(mechanics_projected))),
+            "mechanics_projected_concentration_max": (None if mechanics_projected is None
+                else float(np.max(mechanics_projected))),
+            "fracture_rng_sha256": hashlib.sha256(
+                repr(getattr(states[arm], "rng_state", None)).encode()).hexdigest(),
+            "cavity_rng_sha256": (None if void_rng is None else hashlib.sha256(
+                repr(void_rng).encode()).hexdigest()),
+            "transport_clock_start_s": (None if transport_state is None else
+                float(transport_state.transport_time_s)),
+        })
         half = 0.5 * float(duration_s)
         if half < float(minimum_duration_s):
-            raise RuntimeError(
-                f"{TRANSPORT_BOUND_FAILURE}; paired refinement reached "
-                f"minimum duration {minimum_duration_s:.17g} s"
-            ) from error
+            diagnostic["minimum_duration_s"] = float(minimum_duration_s)
+            raise _PairedRefinementFailure(states, [], diagnostic) from error
         midpoint, first = _advance_paired_with_refinement(
             states, half, advance, minimum_duration_s=minimum_duration_s,
+            requested_duration_s=requested_duration_s, depth=depth+1,
+            trial_counter=trial_counter,
         )
-        terminal, second = _advance_paired_with_refinement(
-            midpoint, half, advance, minimum_duration_s=minimum_duration_s,
-        )
+        try:
+            terminal, second = _advance_paired_with_refinement(
+                midpoint, half, advance, minimum_duration_s=minimum_duration_s,
+                requested_duration_s=requested_duration_s, depth=depth+1,
+                trial_counter=trial_counter,
+            )
+        except _PairedRefinementFailure as rejection:
+            raise _PairedRefinementFailure(
+                rejection.states, [*first, *rejection.segments],
+                rejection.diagnostic,
+            ) from rejection
         return terminal, [*first, *second]
 
 
@@ -249,6 +327,8 @@ def _physical_main(args):
     if not math.isfinite(minimum_duration) or minimum_duration <= 0.0:
         raise SystemExit("--transport-refinement-min-duration-s must be positive")
     requested_interval_count = 0
+    terminal_rejection = None
+    requested_exposure = duration * intervals
     for _ in range(intervals):
         requested_interval_count += 1
         starts = {
@@ -261,9 +341,14 @@ def _physical_main(args):
                 temperature_K=float(args.temperature_K),
                 directional_observation_provider=observer,
             )
-        states, accepted_segments = _advance_paired_with_refinement(
-            states, duration, advance, minimum_duration_s=minimum_duration,
-        )
+        try:
+            states, accepted_segments = _advance_paired_with_refinement(
+                states, duration, advance, minimum_duration_s=minimum_duration,
+            )
+        except _PairedRefinementFailure as rejection:
+            states = rejection.states
+            accepted_segments = rejection.segments
+            terminal_rejection = rejection.diagnostic
         segment_start = physical_time
         prior = starts
         for accepted_duration, schedulers, segment_states in accepted_segments:
@@ -288,7 +373,22 @@ def _physical_main(args):
                 }))
                 prior[arm] = fingerprint
             segment_start = segment_end
-        physical_time += duration
+        physical_time = segment_start
+        if terminal_rejection is not None:
+            terminal_rejection.update({
+                "last_successfully_accepted_pair_time_s": physical_time,
+                "last_successfully_accepted_pair_fingerprints": {
+                    arm: complete_accepted_state_fingerprint(state)
+                    for arm, state in states.items()
+                },
+                "rejected_interval_start_s": physical_time,
+                "rejected_interval_end_s": physical_time + float(
+                    terminal_rejection["actual_subinterval_s"]),
+                "unused_requested_duration_s": max(
+                    requested_exposure-(physical_time-float(
+                        0.0 if ancestry is None else ancestry["physical_time_s"])), 0.0),
+            })
+            break
 
     checkpoint = _write_pair_checkpoint(
         states, out,
@@ -322,7 +422,15 @@ def _physical_main(args):
         "production_eligible": True,
         "selected_arm": selected_arm,
         "both_arms_evolved": True,
-        "physical_exposure_s_per_arm_this_call": duration * intervals,
+        "status": ("transport_rejected_after_accepted_prefix"
+                   if terminal_rejection is not None else "requested_exposure_completed"),
+        "physical_exposure_s_per_arm_this_call": (
+            physical_time-float(0.0 if ancestry is None else ancestry["physical_time_s"])
+        ),
+        "requested_physical_exposure_s_per_arm_this_call": requested_exposure,
+        "unused_requested_duration_s": max(
+            requested_exposure-(physical_time-float(
+                0.0 if ancestry is None else ancestry["physical_time_s"])), 0.0),
         "physical_time_s": physical_time,
         "interval_count": interval_index,
         "requested_interval_count_this_call": requested_interval_count,
@@ -344,6 +452,7 @@ def _physical_main(args):
         },
         "native_pair_checkpoint": str(checkpoint),
         "native_checkpoint_round_trip_exact": round_trip,
+        "transport_rejection": terminal_rejection,
     })
     (out / "shared_v5_cavity_audit.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n"

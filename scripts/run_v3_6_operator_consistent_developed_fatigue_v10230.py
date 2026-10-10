@@ -7,8 +7,10 @@ import copy
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import sys
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -21,6 +23,7 @@ from scripts import select_v2_3_exact_row_cycle_hazard_loads_v10230 as exact_row
 from scripts.v3_3_support_v10230 import load_v3_1_candidate
 
 LOADS = (4.781762498950186, 8.598738351065925, 15.462474735549586)
+CHECKPOINT_SCHEMA = "v10.2.30_v3_6_material_frame_checkpoint_v2"
 
 
 class MaterialHistory:
@@ -45,6 +48,107 @@ class MaterialHistory:
         return {"material_history_abs_gamma_before": before, "material_history_abs_gamma_after": after,
                 "coordinate_motion_plastic_increment": after - before,
                 "old_tip_m": float(old_tip_m), "new_tip_m": float(new_tip_m)}
+
+
+def _history_to_checkpoint(history):
+    return {
+        "material_patches": [x.__dict__ for x in history.archived],
+        "active_anchor_m": history.active_anchor_m,
+        "active_id": history.active_id,
+        "active_ledger": {
+            "plastic_shear": history.ledger.plastic_shear.tolist(),
+            "cumulative_abs_swept_area_per_volume":
+                history.ledger.cumulative_abs_swept_area_per_volume.tolist(),
+            "nucleation_patch_shear": history.ledger.nucleation_patch_shear.tolist(),
+        },
+    }
+
+
+def _history_from_checkpoint(physics, saved):
+    history = MaterialHistory(physics.n_bins)
+    history.archived = [MaterialSlipPatch(
+        int(row["patch_id"]), float(row["material_anchor_m"]), tuple(row["gamma"])
+    ) for row in saved["material_patches"]]
+    history.active_anchor_m = float(saved["active_anchor_m"])
+    history.active_id = int(saved["active_id"])
+    history.ledger.plastic_shear = np.asarray(
+        saved["active_ledger"]["plastic_shear"], float)
+    history.ledger.cumulative_abs_swept_area_per_volume = np.asarray(
+        saved["active_ledger"]["cumulative_abs_swept_area_per_volume"], float)
+    history.ledger.nucleation_patch_shear = np.asarray(
+        saved["active_ledger"]["nucleation_patch_shear"], float)
+    return history
+
+
+def _recent_to_checkpoint(recent):
+    return [{
+        "action": float(action),
+        "state_delta": {key: value.tolist() for key, value in state_delta.items()},
+        "ledger_delta": [value.tolist() for value in ledger_delta],
+    } for action, state_delta, ledger_delta in recent]
+
+
+def _recent_from_checkpoint(saved):
+    return [(float(row["action"]),
+             {key: np.asarray(value, float) for key, value in row["state_delta"].items()},
+             tuple(np.asarray(value, float) for value in row["ledger_delta"]))
+            for row in saved]
+
+
+def _checkpoint_digest(payload):
+    return hashlib.sha256(json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), allow_nan=True,
+    ).encode()).hexdigest()
+
+
+def _case_identity(candidate, physics, projection, Kmax, seed, phase_steps):
+    return {
+        "Kmax_MPa_sqrt_m": float(Kmax), "seed": int(seed),
+        "phase_steps": int(phase_steps), "candidate_id": candidate.candidate_id,
+        "candidate_physics_sha256": hashlib.sha256(
+            repr((candidate, physics)).encode()).hexdigest(),
+        "projection_nodes_sha256": hashlib.sha256(
+            np.ascontiguousarray(projection.mesh.nodes).tobytes()).hexdigest(),
+        "projection_elements_sha256": hashlib.sha256(
+            np.ascontiguousarray(projection.mesh.elems).tobytes()).hexdigest(),
+    }
+
+
+def _write_checkpoint(directory, payload):
+    directory.mkdir(parents=True, exist_ok=True)
+    complete = dict(payload)
+    complete["integrity_sha256"] = _checkpoint_digest(payload)
+    identity = hashlib.sha256(json.dumps({
+        "K": payload["case"]["Kmax_MPa_sqrt_m"],
+        "phase_intervals": payload["phase_intervals"],
+        "state": complete["integrity_sha256"],
+    }, sort_keys=True).encode()).hexdigest()[:20]
+    generation = directory / f"v3_6_generation_{identity}.json"
+    if not generation.exists():
+        generation.write_text(json.dumps(complete, indent=2, sort_keys=True)+"\n")
+    manifest = {"schema": CHECKPOINT_SCHEMA, "generation": generation.name,
+                "generation_sha256": hashlib.sha256(generation.read_bytes()).hexdigest()}
+    with tempfile.NamedTemporaryFile("w", dir=directory, delete=False) as stream:
+        json.dump(manifest, stream, indent=2, sort_keys=True); stream.write("\n")
+        temporary = Path(stream.name)
+    os.replace(temporary, directory/"v3_6_restart.json")
+    return directory/"v3_6_restart.json"
+
+
+def _load_checkpoint(path):
+    source = Path(path)
+    manifest_path = source/"v3_6_restart.json" if source.is_dir() else source
+    manifest = json.loads(manifest_path.read_text())
+    if manifest.get("schema") != CHECKPOINT_SCHEMA:
+        raise RuntimeError("incompatible V3.6 restart checkpoint schema")
+    generation = manifest_path.parent/manifest["generation"]
+    if hashlib.sha256(generation.read_bytes()).hexdigest() != manifest["generation_sha256"]:
+        raise RuntimeError("V3.6 restart checkpoint generation hash mismatch")
+    payload = json.loads(generation.read_text())
+    integrity = payload.pop("integrity_sha256", None)
+    if integrity != _checkpoint_digest(payload):
+        raise RuntimeError("V3.6 restart checkpoint integrity mismatch")
+    return payload
 
 
 def strip_adapter(state):
@@ -137,16 +241,60 @@ def apply_affine_projection(state, history, state_delta, ledger_delta, cycles):
     state.time_s += float(cycles) * 1e-3
 
 
-def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles, target_events, checkpoint_dir, phase_steps=64):
-    state = fatigue.EmergentGNDState(candidate, physics); history = MaterialHistory(physics.n_bins)
+def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles,
+             target_events, checkpoint_dir, phase_steps=64, restart=None,
+             stop_after_phase_intervals=None):
     load = fatigue.FatigueLoading(deltaK_MPa_sqrt_m=.9*Kmax, R=.1, frequency_Hz=1000., temperature_K=300., phase_steps=int(phase_steps))
-    rng = np.random.default_rng(seed); threshold = float(rng.exponential()); hazard = 0.0
-    cycles = 0.0; events = []; convergence = []; acceleration = []; orbit = []
-    recent = []; cycle_snapshot_state = copy.deepcopy(state); cycle_snapshot_history = copy.deepcopy(history); cycle_action_start = 0.0
+    if restart is None:
+        state = fatigue.EmergentGNDState(candidate, physics); history = MaterialHistory(physics.n_bins)
+        rng = np.random.default_rng(seed); threshold = float(rng.exponential()); hazard = 0.0
+        cycles = 0.0; events = []; convergence = []; acceleration = []; orbit = []
+        recent = []; cycle_snapshot_state = copy.deepcopy(state); cycle_snapshot_history = copy.deepcopy(history); cycle_action_start = 0.0
+        phase_intervals = 0
+        last_metrics = {"projected_beta_p_max_abs":0.0,"projected_engineering_eigenstrain_max_abs":0.0,
+          "projected_displacement_gradient_max_abs":0.0,"projected_rotation_max_abs":0.0,"projected_elastic_strain_max_abs":0.0}
+    else:
+        expected = _case_identity(candidate, physics, projection, Kmax, seed, phase_steps)
+        mismatch = {key: (restart["case"].get(key), value) for key, value in expected.items()
+                    if restart["case"].get(key) != value}
+        if mismatch:
+            raise RuntimeError(f"V3.6 restart case incompatibility: {mismatch}")
+        state = fatigue._state_from_checkpoint(candidate, physics, restart["state"])
+        history = _history_from_checkpoint(physics, restart["history"])
+        rng = np.random.default_rng(); rng.bit_generator.state = restart["rng_state"]
+        threshold = float(restart["pending_threshold"]); hazard = float(restart["hazard"])
+        cycles = float(restart["cycles"]); events = list(restart["events"])
+        convergence = list(restart["convergence"]); acceleration = list(restart["acceleration"]); orbit = list(restart["orbit"])
+        recent = _recent_from_checkpoint(restart["recent"])
+        cycle_snapshot_state = fatigue._state_from_checkpoint(candidate, physics, restart["cycle_snapshot_state"])
+        cycle_snapshot_history = _history_from_checkpoint(physics, restart["cycle_snapshot_history"])
+        cycle_action_start = float(restart["cycle_action_start"])
+        phase_intervals = int(restart["phase_intervals"])
+        last_metrics = dict(restart["last_metrics"])
     status = "requested_horizon_censor"
-    last_metrics = {"projected_beta_p_max_abs":0.0,"projected_engineering_eigenstrain_max_abs":0.0,
-      "projected_displacement_gradient_max_abs":0.0,"projected_rotation_max_abs":0.0,"projected_elastic_strain_max_abs":0.0}
+    call_phase_intervals = 0
+
+    def commit_checkpoint(reason):
+        return _write_checkpoint(checkpoint_dir, {
+            "schema": CHECKPOINT_SCHEMA,
+            "case": _case_identity(candidate, physics, projection, Kmax, seed, phase_steps),
+            "reason": reason, "state": fatigue._state_to_checkpoint(state),
+            "history": _history_to_checkpoint(history), "cycles": cycles,
+            "hazard": hazard, "pending_threshold": threshold,
+            "rng_state": rng.bit_generator.state, "events": events,
+            "convergence": convergence, "acceleration": acceleration,
+            "orbit": orbit, "recent": _recent_to_checkpoint(recent),
+            "cycle_snapshot_state": fatigue._state_to_checkpoint(cycle_snapshot_state),
+            "cycle_snapshot_history": _history_to_checkpoint(cycle_snapshot_history),
+            "cycle_action_start": cycle_action_start,
+            "phase_intervals": phase_intervals, "last_metrics": last_metrics,
+        })
+
+    commit_checkpoint("initial_committed_state" if restart is None else "restored_committed_state")
     while cycles < maximum_cycles and len(events) < target_events:
+        if (stop_after_phase_intervals is not None
+                and call_phase_intervals >= int(stop_after_phase_intervals)):
+            status = "requested_phase_interval_stop"; break
         cycle_index = int(math.floor(cycles + 1e-12)); phase_index = int(round((cycles-cycle_index)*load.phase_steps))
         if phase_index >= load.phase_steps: cycle_index += 1; phase_index = 0
         p0 = phase_index/load.phase_steps; p1 = (phase_index+1)/load.phase_steps
@@ -161,6 +309,7 @@ def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles
             err = {"state_relative_error":math.nan,"gamma_absolute_error":math.nan,"action_relative_error":math.nan,
                    "stress_absolute_error_Pa":math.nan,"accepted_native_steps":native_steps}
         hazard += da; cycles = cycle_index + p1
+        phase_intervals += 1; call_phase_intervals += 1
         fast_field = projection.project(history.patches(), crack_extension_m=state.extension_m,
                                         K_MPa_sqrt_m=load.K_at_phase(p1), compute_kinematics=False)
         fast_beta = float(np.max(abs(fast_field["beta_p"])))
@@ -202,7 +351,8 @@ def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles
             if metrics is None: metrics, _ = domain_metrics(projection, history, state, load.K_at_phase(p0+hi*(p1-p0)))
             last_metrics = dict(metrics)
             if root == "domain":
-                status = "operator_consistent_kinematic_domain_exit"; break
+                status = "operator_consistent_kinematic_domain_exit"
+                commit_checkpoint("accepted_domain_exit_state"); break
             factor = fatigue._event_length_factor(threshold, fatigue.FatigueNumerics(base_event_length_m=5e-6, event_length_factor_min=.5, event_length_factor_max=4.))
             advance = 5e-6*factor; old_tip = float(state.extension_m); state.translate_tip(advance)
             transaction = history.commit_advance(old_tip, float(state.extension_m))
@@ -210,13 +360,8 @@ def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles
                      "phase": cycles-math.floor(cycles), "threshold": threshold, "hazard_action": hazard,
                      "advance_m": advance, "extension_m": state.extension_m, **metrics, **transaction}
             events.append(event); hazard = 0.0; threshold = float(rng.exponential())
-            checkpoint = {"schema":"v10.2.30_v3_6_material_frame_checkpoint_v1", "state":fatigue._state_to_checkpoint(state),
-                "material_patches":[x.__dict__ for x in history.archived], "active_anchor_m":history.active_anchor_m,
-                "active_id":history.active_id, "active_ledger":{"plastic_shear":history.ledger.plastic_shear.tolist(),
-                "cumulative_abs_swept_area_per_volume":history.ledger.cumulative_abs_swept_area_per_volume.tolist()},
-                "cycles":cycles,"hazard":hazard,"pending_threshold":threshold,"rng_state":rng.bit_generator.state,"events":events}
-            (checkpoint_dir/f"K{Kmax:.8g}_event_{len(events):03d}.json").write_text(json.dumps(checkpoint,indent=2,sort_keys=True)+"\n")
             recent.clear(); cycle_snapshot_state = copy.deepcopy(state); cycle_snapshot_history = copy.deepcopy(history); cycle_action_start = 0.0
+            commit_checkpoint("accepted_event")
             continue
         if not convergence or all(math.isfinite(float(err[k])) for k in ("state_relative_error","action_relative_error")):
             convergence.append({"Kmax_MPa_sqrt_m":Kmax,"cycles":cycles,"phase":p1,**err})
@@ -249,11 +394,13 @@ def run_load(fatigue, candidate, physics, projection, Kmax, seed, maximum_cycles
                         "cumulative_state_curvature_bound":bound,"projected_gamma_bound":mech_per_cycle*proposed,
                         "action_per_cycle":action_cycle,"pending_threshold":threshold})
                     recent.clear()
+        commit_checkpoint("accepted_phase_interval")
     else:
         status = "target_events_completed" if len(events) >= target_events else "requested_horizon_censor"
     return {"events":events,"convergence":convergence,"acceleration":acceleration,"orbit":orbit,
             "summary":{"Kmax_MPa_sqrt_m":Kmax,"seed":seed,"status":status,"events":len(events),"final_cycles":cycles,
-                       "final_extension_m":state.extension_m,"pending_hazard":hazard,"pending_threshold":threshold,**last_metrics}}
+                       "final_extension_m":state.extension_m,"pending_hazard":hazard,"pending_threshold":threshold,
+                       "phase_intervals":phase_intervals,"checkpoint":str(checkpoint_dir/"v3_6_restart.json"),**last_metrics}}
 
 
 def main(argv=None):
@@ -264,7 +411,11 @@ def main(argv=None):
     p.add_argument("--seed",type=int,default=1720); p.add_argument("--maximum-cycles",type=float,default=1e6); p.add_argument("--target-events",type=int,default=12)
     p.add_argument("--loads",default=','.join(str(x) for x in LOADS))
     p.add_argument("--phase-steps",type=int,default=64)
-    a=p.parse_args(argv); a.out_root.mkdir(parents=True,exist_ok=True); ck=a.out_root/"checkpoints"; ck.mkdir(exist_ok=True)
+    p.add_argument("--restart-checkpoint",type=Path,default=None)
+    p.add_argument("--checkpoint-dir",type=Path,default=None)
+    p.add_argument("--stop-after-phase-intervals",type=int,default=None)
+    a=p.parse_args(argv); a.out_root.mkdir(parents=True,exist_ok=True)
+    ck=(a.checkpoint_dir or (a.out_root/"checkpoint")).resolve(); ck.mkdir(parents=True,exist_ok=True)
     reg=json.loads(a.registry.read_text()); row=next(x for x in reg["rows"] if x["candidate_id"]=="V3_ceramic_V2_P25_007__V3_1_TRUST1")
     fatigue=exact_row.load_external_fatigue()
     loader_options = {
@@ -277,8 +428,12 @@ def main(argv=None):
     candidate,physics,_,parent=load_v3_1_candidate(fatigue,row,**loader_options); projection=OperatorConsistentProjection(orientation_signs=physics.emission_signs)
     all_events=[]; all_conv=[]; all_acc=[]; all_orbit=[]; summaries=[]
     selected_loads=tuple(float(x) for x in a.loads.split(',') if x.strip())
+    restart = None if a.restart_checkpoint is None else _load_checkpoint(a.restart_checkpoint)
+    if restart is not None and len(selected_loads) != 1:
+        raise SystemExit("V3.6 restart continuation requires exactly one selected load")
     for K in selected_loads:
-        result=run_load(fatigue,candidate,physics,projection,K,a.seed,a.maximum_cycles,a.target_events,ck,a.phase_steps)
+        result=run_load(fatigue,candidate,physics,projection,K,a.seed,a.maximum_cycles,a.target_events,ck,a.phase_steps,
+                        restart=restart,stop_after_phase_intervals=a.stop_after_phase_intervals)
         all_events+=result["events"]; all_conv+=result["convergence"]; all_acc+=result["acceleration"]; all_orbit+=result["orbit"]; summaries.append(result["summary"])
     pd.DataFrame(all_events).to_csv(a.out_root/"developed_events.csv",index=False); pd.DataFrame(all_conv).to_csv(a.out_root/"coupled_step_convergence.csv",index=False)
     pd.DataFrame(all_acc).to_csv(a.out_root/"validated_cycle_acceleration.csv",index=False); pd.DataFrame(all_orbit).to_csv(a.out_root/"cycle_orbit_history.csv",index=False)

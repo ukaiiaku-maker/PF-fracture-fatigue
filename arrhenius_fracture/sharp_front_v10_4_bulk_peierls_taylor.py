@@ -7,7 +7,9 @@ Peierls--Taylor constitutive update.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -107,7 +109,15 @@ def _full_field_v101_main(argv=None):
     original_engine = _v101.sharp_front.UnifiedMPZFrontEngine
     had_shield_cfg = hasattr(_v101.UnifiedMPZState, "_v101_shield_cfg")
     old_shield_cfg = getattr(_v101.UnifiedMPZState, "_v101_shield_cfg", None)
+    old_geography = os.environ.get("V104_SOURCE_GEOGRAPHY")
+    old_manifest_sha = os.environ.get("V104_MATERIAL_MANIFEST_SHA256")
     try:
+        os.environ["V104_SOURCE_GEOGRAPHY"] = (
+            "tip_plus_bulk" if tip_cfg.plasticity_enabled else "bulk_uniform"
+        )
+        os.environ["V104_MATERIAL_MANIFEST_SHA256"] = hashlib.sha256(
+            Path(manifest_path).read_bytes()
+        ).hexdigest()
         _v101.plasticity.update_plasticity = coupling.wrap(original_update)
         _v101.UnifiedMPZState.diagnostics = _v101._diagnostics_with_csv_aliases
         if kinetics_mode == "moving_velocity":
@@ -144,6 +154,14 @@ def _full_field_v101_main(argv=None):
             _v101.UnifiedMPZState._v101_shield_cfg = old_shield_cfg
         elif hasattr(_v101.UnifiedMPZState, "_v101_shield_cfg"):
             delattr(_v101.UnifiedMPZState, "_v101_shield_cfg")
+        if old_geography is None:
+            os.environ.pop("V104_SOURCE_GEOGRAPHY", None)
+        else:
+            os.environ["V104_SOURCE_GEOGRAPHY"] = old_geography
+        if old_manifest_sha is None:
+            os.environ.pop("V104_MATERIAL_MANIFEST_SHA256", None)
+        else:
+            os.environ["V104_MATERIAL_MANIFEST_SHA256"] = old_manifest_sha
 
 
 def _write_model_audit(args: list[str]) -> None:

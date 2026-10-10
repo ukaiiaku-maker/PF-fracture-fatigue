@@ -105,7 +105,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         return ExecutionPlan(
             "shared-execution-plan/1", options.fingerprint, bindings,
             "arrhenius_fracture.shared_operator_consistent_adapter", "main",
-            "v3_6_event_checkpoint_write_only", True, None,
+            "v3_6_material_frame_native", True, None,
         )
 
     v5_cavity_pair = (
@@ -266,9 +266,9 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
     ):
         executor = "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited"
         restart = (
-            "v10_4_pure_bulk_full_field_no_public_restart"
+            "v10_4_pure_bulk_combined_outer"
             if options.source_location is SourceLocation.BULK_UNIFORM else
-            "v10_4_combined_full_field_no_public_restart"
+            "v10_4_tip_plus_bulk_combined_outer"
         )
     if executor is None:
         limitation = ("accepted components resolve, but this composed combination has no qualified "
@@ -343,10 +343,7 @@ def execute_shared(
     plan = build_execution_plan(options)
     if restart_from is not None and plan.restart_family in {
         "unmapped",
-        "v3_6_event_checkpoint_write_only",
         "legacy_single_front_no_public_restart",
-        "v10_4_pure_bulk_full_field_no_public_restart",
-        "v10_4_combined_full_field_no_public_restart",
     }:
         raise ValueError(
             "restart_from is not supported by this public execution path "
@@ -389,7 +386,12 @@ def execute_shared(
     })
     pythonpath = environment.get("PYTHONPATH", "")
     environment["PYTHONPATH"] = str(root) + (os.pathsep + pythonpath if pythonpath else "")
-    if options.output is OutputProfile.PUBLICATION_RESTART:
+    if (options.output is OutputProfile.PUBLICATION_RESTART
+            or plan.restart_family in {
+                "v10_4_pure_bulk_combined_outer",
+                "v10_4_tip_plus_bulk_combined_outer",
+                "v3_6_material_frame_native",
+            }):
         environment["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = str(output / "checkpoint")
         environment.setdefault("V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS", "0")
         environment.setdefault("V10230_CHECKPOINT_GENERATIONS", "3")
