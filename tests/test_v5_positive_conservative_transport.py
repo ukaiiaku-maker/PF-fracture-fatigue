@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import math
 
 import numpy as np
 from scipy import sparse
@@ -12,6 +13,7 @@ from arrhenius_fracture.vacancy_transport_phase_field_v2 import (
     initial_transport_state,
     solve_transport_interval,
 )
+from arrhenius_fracture.vacancy_coupling_v1 import EV_J, KB_J_PER_K
 
 
 def _nonorthogonal_mesh():
@@ -33,6 +35,18 @@ def _closed_registry(mesh):
         for edge, adjacent in owners.items() if len(adjacent) == 1
     }
     return build_transport_surface_registry(mesh, boundary_tags=tags)
+
+
+def _structured_mesh(nx, ny, lx=4.0e-6, ly=2.0e-6):
+    nodes = np.asarray([
+        (i*lx/nx, j*ly/ny) for j in range(ny+1) for i in range(nx+1)
+    ])
+    elems = []
+    for j in range(ny):
+        for i in range(nx):
+            a = j*(nx+1)+i
+            elems.extend(((a, a+1, a+nx+2), (a, a+nx+2, a+nx+1)))
+    return rebuild_tri_mesh(nodes, np.asarray(elems))
 
 
 def test_shared_face_flux_projection_is_positive_and_locally_conservative():
@@ -78,3 +92,40 @@ def test_admissible_uniform_state_keeps_original_rt0_operator_on_nonorthogonal_m
     assert abs(audit["global_conservation_residual_area_m2"]) <= audit[
         "conservation_roundoff_budget_area_m2"
     ]
+
+
+def test_rt0_spatial_refinement_converges_for_neumann_diffusion_mode():
+    row = VacancyTransportParameterRowV2.from_material(SimpleNamespace(b=2.74e-10))
+    temperature = 1800.0
+    dt = 1.0e-3
+    lx = 4.0e-6
+    diffusivity = row.vacancy_diffusivity_prefactor_m2_s*math.exp(
+        -row.vacancy_migration_energy_eV*EV_J/(KB_J_PER_K*temperature)
+    )
+    errors = []
+    for nx, ny in ((4, 2), (8, 4), (16, 8)):
+        mesh = _structured_mesh(nx, ny, lx=lx)
+        registry = _closed_registry(mesh)
+        centers = mesh.nodes[mesh.elems].mean(axis=1)
+        initial_c = 1.0e-5 + 2.0e-6*np.cos(np.pi*centers[:, 0]/lx)
+        state = initial_transport_state(
+            mesh, temperature_K=temperature, row=row, registry=registry,
+            vacancy_fraction_gp=initial_c,
+        )
+        zeros = np.zeros(mesh.ne)
+        advanced = solve_transport_interval(
+            state, mesh, registry, row=row, duration_s=dt,
+            accepted_equivalent_plastic_strain_rate_s=zeros,
+            accepted_dislocation_density_m2=zeros,
+            accepted_mean_stress_Pa=zeros,
+        )
+        exact = 1.0e-5 + (
+            2.0e-6/(1.0+dt*diffusivity*(np.pi/lx)**2)
+        )*np.cos(np.pi*centers[:, 0]/lx)
+        error = math.sqrt(float(np.sum(mesh.area_e*(advanced.vacancy_fraction_gp-exact)**2)))
+        errors.append(error)
+        assert advanced.last_solver_audit[
+            "conservative_positive_flux_correction_used"
+        ] is False
+    assert errors[1] < 0.6*errors[0]
+    assert errors[2] < 0.6*errors[1]
