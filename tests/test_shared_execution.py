@@ -9,6 +9,8 @@ from arrhenius_fracture.shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
     PlasticityMode, SharedOptions, SourceLifecycle, SourceLocation,
 )
+from arrhenius_fracture.branch_cluster_v11 import BranchClusterState
+from arrhenius_fracture.stateful_multifront_production_v12 import _json_compatible_state
 
 
 def by_role(plan):
@@ -145,3 +147,15 @@ def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path)
 def test_plan_is_json_serializable():
     payload = build_execution_plan(PRESETS["pf_cyclic_tip_persistent"]).to_dict()
     assert json.loads(json.dumps(payload))["executable"] is True
+
+
+def test_v12_wake_audit_serializes_typed_branch_cluster_state():
+    # Historical V11 restarts legitimately carry this typed object in their
+    # junction registry; a V12 transaction record must preserve it as data.
+    cluster = BranchClusterState(
+        cluster_id="j1", junction_xy_m=(0.0, 0.0), parent_branch_id="b0",
+        arm_branch_ids=("b1", "b2"), shared_process_state={"clock": 0.5},
+        conserved_ledgers={},
+    )
+    payload = _json_compatible_state({"branch_clusters": (cluster,)})
+    assert json.loads(json.dumps(payload))["branch_clusters"][0]["cluster_id"] == "j1"

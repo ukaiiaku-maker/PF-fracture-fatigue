@@ -5,7 +5,7 @@ start a worker and it never substitutes an uncached mechanics calculation.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, fields, is_dataclass, replace
 import copy
 import hashlib
 import json
@@ -88,6 +88,36 @@ def load_cached_provider_result_for_topology(
 
 def _pickle_hash(value: Any) -> str:
     return hashlib.sha256(pickle.dumps(value, protocol=5)).hexdigest()
+
+
+def _json_compatible_state(value: Any):
+    """Serialize typed accepted-state audit content without losing ownership."""
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, np.generic):
+        return value.item()
+    if hasattr(value, "to_dict"):
+        return _json_compatible_state(value.to_dict())
+    if is_dataclass(value):
+        return {
+            field.name: _json_compatible_state(getattr(value, field.name))
+            for field in fields(value)
+        }
+    if isinstance(value, Mapping):
+        return {
+            str(key): _json_compatible_state(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (tuple, list)):
+        return [_json_compatible_state(item) for item in value]
+    if isinstance(value, float) and not math.isfinite(value):
+        return {"nonfinite": str(value)}
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    return {
+        "type": type(value).__qualname__,
+        "state": _json_compatible_state(getattr(value, "__dict__", str(value))),
+    }
 
 
 def _topology_hash(state: Any) -> str:
@@ -1801,7 +1831,7 @@ def execute_selected_topology_trial_v12(
         post.transaction_records[-1],
         realized_endpoints_m=tuple(item.end_xy_m for item in arms),
         realized_lengths_m=tuple(item.event_reward_m for item in arms),
-        wake_mutation=dict(trial.junction_process_state),
+        wake_mutation=_json_compatible_state(trial.junction_process_state),
         stored_energy_release_J_per_m=released,
         stored_energy_cost_J_per_m=cost,
         post_topology_fingerprint=exact_topology,
@@ -1841,7 +1871,7 @@ def execute_selected_topology_trial_v12(
         policy_bound_after=post.policy_bound,
         realized_endpoints_m=tuple(item.end_xy_m for item in arms),
         realized_lengths_m=lengths,
-        wake_mutation=dict(trial.junction_process_state),
+        wake_mutation=_json_compatible_state(trial.junction_process_state),
         released_energy_J_per_m=released,
         dissipative_cost_J_per_m=cost,
     )
