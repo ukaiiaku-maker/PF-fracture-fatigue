@@ -187,3 +187,25 @@ def test_online_history_distinguishes_reload_segments_and_event_multiplicity():
     assert history.rows[-2].event_multiplicity == 2
     assert history.rows[-1].aggregate_event_count == 3
     assert math.isnan(history.rows[-1].G_J_per_m2)
+
+
+def test_projected_pre_event_length_uses_previous_state_not_path_increment():
+    header = (
+        "step,Uapp_m,KJ_Pa_sqrtm,a_tip_m,crack_extension_m,"
+        "da_block_m,n_fire,dt_cur_s,fatigue_cycles"
+    )
+    steps = np.array([
+        [0, 1e-6, 9e6, 109e-6, 9e-6, 0, 0, 1e-9, 0],
+        # A 5 um deflected path increment advances projected length only 4 um.
+        [1, 2e-6, 12e6, 113e-6, 13e-6, 5e-6, 1, 1e-9, 0],
+    ])
+    history = online_observation_history(
+        steps, header, np.array([30., 50.]),
+        j_signed=np.array([30., 50.]), source_file="steps.csv",
+    )
+    pre_event, committed = history.rows[-2:]
+    assert pre_event.pre_length_m == pytest.approx(9e-6)
+    assert committed.pre_length_m == pytest.approx(9e-6)
+    assert committed.committed_length_m == pytest.approx(13e-6)
+    assert pre_event.path_arclength_m == pytest.approx(0.0)
+    assert committed.path_arclength_m == pytest.approx(5e-6)

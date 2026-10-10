@@ -277,6 +277,8 @@ def from_legacy_steps_csv(path: str | Path, *, front_id: str = "primary",
     previous_u = 0.0
     previous_direction: LoadDirection | None = None
     segment_number = -1
+    previous_committed = 0.0
+    path_arclength = 0.0
     for sequence, (source_row, row) in enumerate(enumerate(source, start=2)):
         u = _number(row, "Uapp_m")
         if math.isfinite(u):
@@ -293,13 +295,16 @@ def from_legacy_steps_csv(path: str | Path, *, front_id: str = "primary",
         n_fire = max(0, int(round(_number(row, "n_fire", 0.0))))
         committed = _number(row, "crack_extension_m", 0.0)
         increment = max(0.0, _number(row, "da_block_m", 0.0))
+        pre = previous_committed if n_fire else committed
+        pre_path_arclength = path_arclength
+        path_arclength += increment
         rows.append(FractureObservation(
             sequence=sequence, time_s=_number(row, "time_s"),
             cycle=_number(row, "fatigue_cycles", _number(row, "cycle", _number(row, "cycles"))),
             segment_id=f"{segment_id}-{segment_number:03d}-{direction.value}",
             stage=ObservationStage.UNKNOWN, front_id=front_id,
             event_id=str(row.get("step", sequence)) if n_fire else "",
-            load_direction=direction, pre_length_m=committed - increment if n_fire else committed,
+            load_direction=direction, pre_length_m=pre,
             committed_length_m=committed, K_J_Pa_sqrt_m=_number(row, "KJ_Pa_sqrtm"),
             K_probe_Pa_sqrt_m=_number(row, "KJ_probe_Pa_sqrtm"),
             J_J_per_m2=_number(row, "J_effective_direct_J_per_m2"),
@@ -311,7 +316,9 @@ def from_legacy_steps_csv(path: str | Path, *, front_id: str = "primary",
             contour_id=str(row.get("J_contour_id", "")), observer_id="legacy_KJ",
             initial_length_m=float(initial_length_m), aggregate_event_count=n_fire,
             event_multiplicity=n_fire,
+            path_arclength_m=(pre_path_arclength if n_fire else path_arclength),
             source_file=str(path), source_row=source_row))
+        previous_committed = committed
     return ObservationHistory(rows)
 
 __all__ = ["SCHEMA", "ObservationStage", "LoadDirection", "ValidityStatus",

@@ -177,6 +177,8 @@ def online_observation_history(
     sequence = event_count = 0
     previous_direction: LoadDirection | None = None
     segment_number = -1
+    previous_extension = 0.0
+    path_arclength = 0.0
     if j_signed is None:
         j_signed = np.full(len(steps), np.nan)
     for row_number, values in enumerate(steps, start=2):
@@ -194,7 +196,9 @@ def online_observation_history(
         cycles += max(float(values[index["fatigue_cycles"]]), 0.0)
         extension = float(values[index["crack_extension_m"]])
         increment = max(float(values[index["da_block_m"]]), 0.0)
-        pre = max(extension - increment, 0.0)
+        pre = previous_extension if increment > 0.0 else extension
+        pre_path_arclength = path_arclength
+        path_arclength += increment
         fires = max(int(round(float(values[index["n_fire"]]))), 0)
         kj = float(values[index["KJ_Pa_sqrtm"]])
         j = float(j_effective[row_number - 2])
@@ -223,6 +227,7 @@ def online_observation_history(
                 J_definition="accepted_direct_domain_J_effective_and_signed",
                 aggregate_event_count=event_count - fires, **common,
                 event_multiplicity=fires,
+                path_arclength_m=pre_path_arclength,
             ))
             sequence += 1
             records.append(FractureObservation(
@@ -230,6 +235,7 @@ def online_observation_history(
                 event_id=event_id, pre_length_m=pre,
                 committed_length_m=extension,
                 aggregate_event_count=event_count, event_multiplicity=fires,
+                path_arclength_m=path_arclength,
                 **common,
             ))
         else:
@@ -239,9 +245,11 @@ def online_observation_history(
                 committed_length_m=extension, K_J_Pa_sqrt_m=kj,
                 J_J_per_m2=j, J_signed_J_per_m2=signed_j,
                 J_definition="accepted_direct_domain_J_effective_and_signed",
-                aggregate_event_count=event_count, **common,
+                aggregate_event_count=event_count,
+                path_arclength_m=path_arclength, **common,
             ))
         sequence += 1
+        previous_extension = extension
     return ObservationHistory(records)
 
 
