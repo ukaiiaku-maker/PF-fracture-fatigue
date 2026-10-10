@@ -1169,7 +1169,7 @@ def _project_face_fluxes_to_positive_cell_balance(
     reaction_rhs: np.ndarray,
     *, concentration_floor: float,
     maximum_iterations: int = 20000,
-    relative_tolerance: float = 5.0e-13,
+    relative_tolerance: float = 5.0e-15,
 ) -> tuple[np.ndarray, np.ndarray, Mapping[str, Any]]:
     """Minimally correct shared face fluxes subject to positive cell balance.
 
@@ -1220,6 +1220,32 @@ def _project_face_fluxes_to_positive_cell_balance(
             break
     else:
         raise RuntimeError("conservative positive face-flux correction did not converge")
+    scaled_constraint_violation = float(np.max(np.maximum(Bx-upper, 0.0)))
+    scaled_stationarity_residual = float(np.linalg.norm(
+        x-x0+rho*np.asarray(B.T@dual).reshape(-1), ord=np.inf,
+    ))
+    scaled_dual_feasibility_residual = float(max(-float(np.min(dual)), 0.0))
+    scaled_complementarity_residual = float(np.linalg.norm(
+        dual*np.maximum(upper-z, 0.0), ord=np.inf,
+    ))
+    acceptance_scale = max(
+        1.0, float(np.linalg.norm(x, ord=np.inf)),
+        float(np.linalg.norm(x0, ord=np.inf)),
+        float(np.linalg.norm(upper, ord=np.inf)),
+    )
+    acceptance_tolerance = max(
+        4.0*float(relative_tolerance)*acceptance_scale,
+        128.0*np.finfo(float).eps*acceptance_scale,
+    )
+    if max(
+        scaled_constraint_violation,
+        scaled_stationarity_residual,
+        scaled_dual_feasibility_residual,
+        scaled_complementarity_residual,
+    ) > acceptance_tolerance:
+        raise RuntimeError(
+            "conservative positive face-flux correction failed KKT acceptance"
+        )
     corrected_flux = flux_scale*x
     concentration = (
         source-np.asarray(B@corrected_flux).reshape(-1)
@@ -1231,6 +1257,11 @@ def _project_face_fluxes_to_positive_cell_balance(
         "relative_tolerance": float(relative_tolerance),
         "scaled_primal_residual_inf": primal_residual,
         "scaled_dual_residual_inf": dual_residual,
+        "scaled_constraint_violation_inf": scaled_constraint_violation,
+        "scaled_stationarity_residual_inf": scaled_stationarity_residual,
+        "scaled_dual_feasibility_residual_inf": scaled_dual_feasibility_residual,
+        "scaled_complementarity_residual_inf": scaled_complementarity_residual,
+        "scaled_kkt_acceptance_tolerance": acceptance_tolerance,
         "flux_scale_fraction_area_per_s": flux_scale,
         "flux_correction_inf_fraction_area_per_s": float(
             np.linalg.norm(corrected_flux-q_high, ord=np.inf)),
@@ -1336,6 +1367,7 @@ def solve_transport_interval(
     positivity_line_search_min_factor = 1.0
     conservative_flux_corrections = []
     high_order_linear_residual_inf = math.inf
+    capture_active_set_mismatch_count = 0
     if failure_injector is not None:
         failure_injector("transport_matrix_assembly", previous)
     for iteration in range(1, maximum_picard_iterations + 1):
@@ -1343,9 +1375,12 @@ def solve_transport_interval(
         reaction_rhs = area / dt * c0 + area * (source0 + climb * ceq_climb)
 
         capture_lambda = np.zeros_like(c)
+        assembled_capture_active = c > ceq_climb
         for site, weights in zip(previous.site_states, capture_weights):
-            active = c > ceq_climb
-            capture_lambda += float(site.capture_rate_area_per_s) * weights * active
+            capture_lambda += (
+                float(site.capture_rate_area_per_s) * weights
+                * assembled_capture_active
+            )
         diagonal += area * capture_lambda
         reaction_rhs += area * capture_lambda * ceq_climb
         matrix, rhs, unknown_faces, divergence_operator = _rt0_system(
@@ -1408,6 +1443,8 @@ def solve_transport_interval(
                     float(np.max(np.maximum(candidate, 0.0))),
                 ),
             )
+            high_order_candidate = candidate.copy()
+            high_order_flux = mixed_solution[:len(unknown_faces)].copy()
             high_order_candidate_min = float(np.min(candidate))
             corrected_flux, candidate, correction_audit = (
                 _project_face_fluxes_to_positive_cell_balance(
@@ -1419,12 +1456,57 @@ def solve_transport_interval(
                 )
             )
             mixed_solution = np.concatenate((corrected_flux, candidate))
+            flux_delta = corrected_flux-high_order_flux
+            support_tolerance = max(
+                128.0*np.finfo(float).eps*max(
+                    float(np.linalg.norm(high_order_flux, ord=np.inf)),
+                    float(correction_audit["flux_scale_fraction_area_per_s"]),
+                ),
+                np.finfo(float).tiny,
+            )
+            affected_face_indices = np.flatnonzero(
+                np.abs(flux_delta) > support_tolerance
+            )
+            if len(affected_face_indices):
+                affected_cell_indices = np.unique(
+                    divergence_operator[:, affected_face_indices].nonzero()[0]
+                )
+                local_high_order_flux_scale = float(np.max(
+                    np.abs(high_order_flux[affected_face_indices])
+                ))
+            else:
+                affected_cell_indices = np.asarray([], dtype=int)
+                local_high_order_flux_scale = 0.0
             conservative_flux_corrections.append({
                 **dict(correction_audit),
                 "nonlinear_iteration": int(iteration),
                 "concentration_guard": float(positive_scale_guard),
                 "high_order_candidate_min": high_order_candidate_min,
                 "corrected_candidate_min": float(np.min(candidate)),
+                "affected_face_count": int(len(affected_face_indices)),
+                "affected_cell_count": int(len(affected_cell_indices)),
+                "affected_face_ids": [
+                    unknown_faces[int(index)].face_id
+                    for index in affected_face_indices[:32]
+                ],
+                "affected_cell_ids": [
+                    int(index) for index in affected_cell_indices[:32]
+                ],
+                "local_high_order_flux_scale_fraction_area_per_s": (
+                    local_high_order_flux_scale
+                ),
+                "local_flux_correction_relative_inf": float(
+                    np.linalg.norm(flux_delta, ord=np.inf)
+                    / max(local_high_order_flux_scale, np.finfo(float).tiny)
+                ),
+                "concentration_correction_integrated_abs_area": float(
+                    math.fsum(
+                        float(area[index]*abs(
+                            candidate[index]-high_order_candidate[index]
+                        ))
+                        for index in affected_cell_indices
+                    )
+                ),
             })
         picard_residual = float(np.linalg.norm(candidate-c, ord=np.inf) /
                                 max(float(np.linalg.norm(candidate, ord=np.inf)), effective_c_min))
@@ -1561,8 +1643,12 @@ def solve_transport_interval(
                     np.ascontiguousarray(previous.parent_mechanics_element_ids).tobytes()
                 ).hexdigest(),
             })
+        capture_active_set_mismatch_count = int(np.count_nonzero(
+            assembled_capture_active != (candidate > ceq_climb)
+        )) if previous.site_states else 0
         c = candidate
-        if picard_residual <= relative_tolerance:
+        if (picard_residual <= relative_tolerance
+                and capture_active_set_mismatch_count == 0):
             break
     else:
         raise RuntimeError("vacancy transport Picard iteration did not converge")
@@ -1706,11 +1792,20 @@ def solve_transport_interval(
         "high_order_linear_residual_inf": high_order_linear_residual_inf,
         "accepted_corrected_mixed_residual_inf": float(
             np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf)),
+        "centered_constitutive_residual_inf": float(np.linalg.norm(
+            (matrix@mixed_solution-rhs)[:len(unknown_faces)], ord=np.inf,
+        )),
+        "accepted_cell_balance_block_residual_inf": float(np.linalg.norm(
+            (matrix@mixed_solution-rhs)[len(unknown_faces):], ord=np.inf,
+        )),
         "linear_equilibration_used": linear_equilibration_used,
         "positivity_line_search_used": bool(positivity_line_search_steps),
         "positivity_line_search_steps": int(positivity_line_search_steps),
         "positivity_line_search_min_factor": float(positivity_line_search_min_factor),
         "accepted_nonlinear_fixed_point": True,
+        "final_capture_active_set_mismatch_count": int(
+            capture_active_set_mismatch_count
+        ),
         "accepted_undamped_high_order_fixed_point": not bool(
             conservative_flux_corrections),
         "conservative_positive_flux_correction_used": bool(
