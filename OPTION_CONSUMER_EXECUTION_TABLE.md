@@ -21,7 +21,7 @@ native entry, records observed files and hashes, and only sets
 | cavity | V5 production state builder | full-order cavity state | physical | public matching enabled/disabled runs; resolved cavity with zero branch births; exact fresh-worker restart parity |
 | kinetics | native, reversible installer, or V3.6 projection | signed transport/projection | physical/numerical | live reversible method receipt; bounded public V3.6 full-FEM projection execution |
 | integration | adaptive transaction, global event scheduler, or coupled waveform update | accepted-state integrator | numerical | callable/hash attestation; component suites |
-| output | native snapshot/plot flags plus independent checkpoint policy | retention only | output | compact public run; publication profile three-generation checkpoint and fresh-worker continuation |
+| output | native snapshot/plot flags plus independent checkpoint policy and stage-explicit online observation ledger | retention/observation only | output | compact public run; publication profile three-generation checkpoint and fresh-worker continuation; event rows distinguish pre-event mechanics from committed geometry without inventing post-event K/J |
 | material/kernel manifest | content reader/hash | attested input bytes | physical input | construction hash tests; exact one-row material manifest is mapped for v10.4.1; other unmapped manifests fail closed |
 | random seed | `CLEAVAGE_HAZARD_SEED` set before imports | native hazard RNG stream | stochastic | strict type tests and executed seed 1733 receipt |
 

@@ -20,6 +20,11 @@ from typing import Any
 
 import numpy as np
 
+from .fracture_observation_history import (
+    FractureObservation, LoadDirection, ObservationHistory,
+    ObservationStage, ValidityStatus,
+)
+
 
 SCHEMA = "v10.2.27_accepted_step_energy_ledger_v1"
 _EXTRA_COLUMNS = (
@@ -140,6 +145,89 @@ def augment_steps_table(
     return augmented, augmented_header, audit
 
 
+def online_observation_history(
+    steps: np.ndarray,
+    header: str,
+    j_effective: np.ndarray,
+    *,
+    source_file: str,
+) -> ObservationHistory:
+    """Create stage-explicit records while the native accepted state is live.
+
+    A firing step supplies equilibrated pre-event mechanics and a committed
+    geometry transaction. The committed row carries no invented post-event K/J:
+    this solver family next equilibrates when its next native load step begins.
+    """
+    names = [name.strip() for name in header.split(",")]
+    index = {name: offset for offset, name in enumerate(names)}
+    required = {
+        "step", "Uapp_m", "KJ_Pa_sqrtm", "a_tip_m",
+        "crack_extension_m", "da_block_m", "n_fire", "dt_cur_s",
+        "fatigue_cycles",
+    }
+    missing = required - set(index)
+    if missing:
+        raise RuntimeError(f"online observation source lacks columns: {sorted(missing)}")
+    initial_length = float(
+        steps[0, index["a_tip_m"]] - steps[0, index["crack_extension_m"]]
+    )
+    records: list[FractureObservation] = []
+    time_s = cycles = previous_u = 0.0
+    sequence = event_count = 0
+    for row_number, values in enumerate(steps, start=2):
+        step = int(round(float(values[index["step"]])))
+        u = float(values[index["Uapp_m"]])
+        direction = (LoadDirection.HOLD if u == previous_u else
+                     LoadDirection.LOADING if u > previous_u else
+                     LoadDirection.UNLOADING)
+        previous_u = u
+        time_s += max(float(values[index["dt_cur_s"]]), 0.0)
+        cycles += max(float(values[index["fatigue_cycles"]]), 0.0)
+        extension = float(values[index["crack_extension_m"]])
+        increment = max(float(values[index["da_block_m"]]), 0.0)
+        pre = max(extension - increment, 0.0)
+        fires = max(int(round(float(values[index["n_fire"]]))), 0)
+        kj = float(values[index["KJ_Pa_sqrtm"]])
+        j = float(j_effective[row_number - 2])
+        common = dict(
+            time_s=time_s, cycle=cycles,
+            segment_id=f"native-{direction.value}", front_id="primary",
+            load_direction=direction, initial_length_m=initial_length,
+            contour_valid=None, observer_valid=True,
+            validity_status=ValidityStatus.UNKNOWN,
+            validity_reason="native_J_observed_online; contour_certificate_not_emitted",
+            contour_id="native_directional_domain_J",
+            observer_id="v10.2.27_accepted_state_output_overlay",
+            source_file=source_file, source_row=row_number,
+        )
+        if fires:
+            event_count += fires
+            event_id = f"step-{step}-event-{event_count}"
+            records.append(FractureObservation(
+                sequence=sequence, stage=ObservationStage.PRE_EVENT,
+                event_id=event_id, pre_length_m=pre, committed_length_m=pre,
+                K_J_Pa_sqrt_m=kj, J_J_per_m2=j, G_J_per_m2=j,
+                aggregate_event_count=event_count - fires, **common,
+            ))
+            sequence += 1
+            records.append(FractureObservation(
+                sequence=sequence, stage=ObservationStage.COMMITTED,
+                event_id=event_id, pre_length_m=pre,
+                committed_length_m=extension,
+                aggregate_event_count=event_count, **common,
+            ))
+        else:
+            records.append(FractureObservation(
+                sequence=sequence, stage=ObservationStage.REEQUILIBRATED,
+                event_id="", pre_length_m=extension,
+                committed_length_m=extension, K_J_Pa_sqrt_m=kj,
+                J_J_per_m2=j, G_J_per_m2=j,
+                aggregate_event_count=event_count, **common,
+            ))
+        sequence += 1
+    return ObservationHistory(records)
+
+
 def _find_driver_locals(frame, nrows: int) -> dict[str, Any] | None:
     current = frame
     while current is not None:
@@ -190,6 +278,23 @@ def install_energy_ledger_output() -> None:
         call_kwargs = dict(kwargs)
         call_kwargs["header"] = new_header
         result = _original_savetxt(fname, augmented, *args, **call_kwargs)
+        online = online_observation_history(
+            values,
+            header,
+            augmented[:, -len(_EXTRA_COLUMNS)],
+            source_file=str(path.resolve()),
+        )
+        online_path = path.parent / "fracture_observations_online.jsonl"
+        online.write_jsonl(online_path)
+        audit["online_observation_history"] = str(online_path.resolve())
+        audit["online_observation_stages"] = sorted(
+            {record.stage.value for record in online.rows}
+        )
+        audit["post_geometry_fixed_load_reequilibration_emitted"] = False
+        audit["post_geometry_policy"] = (
+            "committed geometry carries no invented K/J; "
+            "the next native solve is recorded separately"
+        )
         audit["steps_csv"] = str(path.resolve())
         audit["effective_modulus_Pa_used_only_for_exact_inverse_fallback"] = (
             effective_modulus_pa

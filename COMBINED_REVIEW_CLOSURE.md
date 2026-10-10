@@ -51,6 +51,21 @@ top-level composition is not yet qualified.
   block three produced byte-identical step, front, and summary histories to an
   uninterrupted three-block run; the independent three-generation checkpoint
   retention remained active.
+- New event-bearing full-spatial calculation: the public reversible path
+  accepted a 5.000 µm path event at step two (`K_J=33.8446 MPa sqrt(m)`) and
+  continued to a second event after restart. Its fresh-worker post-event
+  continuation has byte-identical step/front/summary histories and
+  semantically identical geometry-event records to the uninterrupted run.
+  The accepted-state output overlay now also emits an online, stage-explicit
+  observation history: equilibrated loading states and pre-event mechanics
+  retain their native K/J, while the committed-geometry row deliberately has
+  no invented post-event K/J. This family performs its next equilibration at
+  the following native load step rather than at fixed load immediately after
+  the geometry transaction.
+- Immutable mechanics comparison: base `9e884fb0` and current `1cd1738` were
+  byte-identical for a fallback full-spatial case and for a matched two-step
+  accepted-event case, including reaction, K/J, state, and topology histories.
+  The P0-damage fixture retains the intended non-neutral stiffness correction.
 - Public shared PF execution: two full spatial 2-D load steps returned normally,
   with spatial process-zone state active and pre/post in-process receipts.
 - Compact and selected-field executions produced byte-identical step, front and
@@ -73,7 +88,6 @@ branching-plus-cavity composition. V3.6 is now
 publicly executable but its bounded evidence is a no-event censor. Current-source
 V12 bootstrap is blocked specifically by the absent theta=40 `adb775...` kernel;
 the schema-2 checkpoint, current-source material registry, and V11/V12 argument
-dispatch are restored. A same-state immutable base/current coupled mechanics
-trajectory and topology-family interruption continuations remain open. The
+dispatch are restored. Branching-family interruption continuation remains open. The
 corrected observer does not invent missing within-cycle phase samples in older
 CSVs.

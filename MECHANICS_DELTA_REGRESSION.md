@@ -13,9 +13,21 @@ Reviewed range: `9e884fb0b0845da621d2612bdf1042e481b8df49..current`.
 
 The element-damage test deliberately differs from the nodal average, so the
 corrected mechanics is expected to differ from the base in that activated
-case. No parameter was retuned to recover the old response. The unchanged
-54 MB 1002.903 µm trajectory remains evidence for commit `baedb069`; it is not
-presented as a base-versus-integration equivalence test. A controlled immutable
-base/current coupled trajectory at matched accepted state remains open; the
-current evidence establishes unchanged fallback behavior and the intended
-local consequences of the two reported mechanics corrections.
+case. No parameter was retuned to recover the old response. The historical
+schema has nodal damage only; the explicit native mapping is therefore absent
+`element_damage_gp` to the current nodal-average fallback. The activated P0
+fixture remains intentionally different at the exact expected degradation
+ratio.
+
+The immutable `9e884fb0` base and current `1cd1738` were also run through the
+same v10.2.21 full-spatial entry, material row, kernel family, seed, mesh, and
+loading. The one-step fallback case had byte-identical step, front, and event
+histories. A two-step event case was likewise byte-identical through one
+accepted geometry transaction: reactions, displacement, native K/J, front
+state, event geometry, and terminal topology all matched. Historical v10.2.21
+does not emit the later work-ledger columns; those absent values are not
+reconstructed. Exact values and classifications are retained in
+`integration_evidence/option_completion_v2/mechanics_base_current/comparison.json`.
+
+The unchanged 54 MB 1002.903 µm trajectory remains evidence for commit
+`baedb069`; it is not presented as a base-versus-integration equivalence test.

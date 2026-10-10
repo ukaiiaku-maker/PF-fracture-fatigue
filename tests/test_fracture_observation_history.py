@@ -2,8 +2,10 @@ import csv
 import json
 import math
 
+import numpy as np
 import pytest
 
+from arrhenius_fracture.energy_ledger_output_v10227 import online_observation_history
 from arrhenius_fracture.fracture_observation_history import (
     FractureObservation, LengthCoordinate, LoadDirection, ObservationHistory,
     ObservationStage, ValidityStatus, from_legacy_steps_csv,
@@ -122,3 +124,33 @@ def test_unknown_validity_is_not_finite_equals_valid(tmp_path):
                     "0,1e-6,9000000,1e-6,0,0\n")
     history = from_legacy_steps_csv(path)
     assert history.at_length(1e-6, validity="valid").status == "invalid_or_unqualified_at_length"
+
+
+def test_online_history_separates_pre_event_and_committed_geometry():
+    header = (
+        "step,Uapp_m,KJ_Pa_sqrtm,a_tip_m,crack_extension_m,"
+        "da_block_m,n_fire,dt_cur_s,fatigue_cycles"
+    )
+    steps = np.array([
+        [0, 1e-6, 9e6, 101e-6, 1e-6, 0, 0, 2e-9, 0],
+        [1, 2e-6, 12e6, 106e-6, 6e-6, 5e-6, 1, 3e-9, 0],
+    ])
+    history = online_observation_history(
+        steps, header, np.array([40.0, 90.0]), source_file="steps.csv"
+    )
+
+    assert [record.stage for record in history.rows] == [
+        ObservationStage.REEQUILIBRATED,
+        ObservationStage.PRE_EVENT,
+        ObservationStage.COMMITTED,
+    ]
+    assert history.rows[1].pre_length_m == pytest.approx(1e-6)
+    assert history.rows[1].committed_length_m == pytest.approx(1e-6)
+    assert history.rows[1].K_J_Pa_sqrt_m == pytest.approx(12e6)
+    assert history.rows[1].J_J_per_m2 == pytest.approx(90.0)
+    assert history.rows[2].committed_length_m == pytest.approx(6e-6)
+    assert math.isnan(history.rows[2].K_J_Pa_sqrt_m)
+    assert math.isnan(history.rows[2].J_J_per_m2)
+    query = history.at_length(3e-6)
+    assert query.status == "discrete_jump_bracket"
+    assert query.interpolation_performed is False

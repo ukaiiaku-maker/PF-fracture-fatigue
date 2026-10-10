@@ -1,0 +1,48 @@
+{
+  "schema": "matched-base-current-mechanics/1",
+  "base_commit": "9e884fb0b0845da621d2612bdf1042e481b8df49",
+  "current_commit": "1cd1738",
+  "entry_on_both_sides": "arrhenius_fracture.sharp_front_v10_2_21_audited",
+  "same_external_kernel_family": "4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873",
+  "same_material_row": "v912_top1_peak_persistent_sites",
+  "same_seed": 3621,
+  "fallback_case": {
+    "steps": 1,
+    "dU_m": 2e-7,
+    "reaction_N_per_m": 43567.971784240784,
+    "K_J_Pa_sqrt_m": 339676.1763529316,
+    "signed_J_J_per_m2": 0.2593515127721677,
+    "event_count": 0,
+    "step_history_byte_identical": true,
+    "front_history_byte_identical": true,
+    "geometry_history_byte_identical": true,
+    "classification": "fallback_equivalent"
+  },
+  "event_case": {
+    "steps": 2,
+    "dU_m": 1e-5,
+    "reactions_N_per_m": [2178398.5892120395, 4356797.17842408],
+    "K_J_Pa_sqrt_m": [16983808.81764658, 33967617.63529316],
+    "signed_J_J_per_m2": [648.3787819930419, 2593.5151279721677],
+    "accepted_event_count": 1,
+    "terminal_projected_length_m": 0.0005024335696912707,
+    "step_history_byte_identical": true,
+    "front_history_byte_identical": true,
+    "geometry_history_byte_identical": true,
+    "summary_byte_identical": true,
+    "classification": "coupled_event_path_equivalent"
+  },
+  "activated_P0_damage_case": {
+    "comparison_kind": "fixed_state",
+    "native_schema_mapping": "historical base has nodal damage only; current fallback uses the same nodal average when element_damage_gp is absent",
+    "fallback_matches_historical_mechanics": true,
+    "element_damage_gp_0p5_expected_stiffness_ratio": 0.25000074999925,
+    "intentional_difference": "current authoritative P0 element damage changes stiffness and energy relative to historical nodal averaging",
+    "evidence": "tests/test_mechanics_delta_regression.py"
+  },
+  "limits": {
+    "historical_v10_2_21_step_table_has_explicit_work_columns": false,
+    "work_not_invented_from_missing_historical_columns": true,
+    "trajectory_states_paired_only_before_any_divergence": true
+  }
+}
