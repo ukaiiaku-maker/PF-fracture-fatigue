@@ -1,0 +1,1406 @@
+{
+  "schema": "v10.1_kinetic_moving_tip_cell",
+  "config": {
+    "enabled": true,
+    "plasticity_enabled": true,
+    "active_shielding": true,
+    "signed_active_shielding": true,
+    "mobile_shield_fraction": 0.0,
+    "packet_length_m": 2.5e-10,
+    "velocity_scale": 1.0,
+    "max_action_substep": 0.02,
+    "max_translation_substep_m": 1e-07,
+    "min_substep_s": 1e-15,
+    "max_internal_steps": 20000,
+    "coupling_scheme": "strang"
+  },
+  "records": [
+    {
+      "B": 7.928990746115286e-105,
+      "B_pre": 0.0,
+      "coupled_hazard_config": {
+        "event_guard_cycles": 2.0,
+        "exact_burst_growth_factor": 2.0,
+        "exact_burst_initial_cycles": 8,
+        "exact_burst_maximum_cycles": 256,
+        "explicit_only": false,
+        "heartbeat_operations": 4,
+        "maximum_mode_operations": 256,
+        "maximum_projective_cycles": 1000000000.0,
+        "periodic_retry_initial_cycles": 32.0,
+        "periodic_retry_maximum_cycles": 4096.0,
+        "projective_growth_factor": 8.0,
+        "projective_retry_initial_cycles": 8.0,
+        "projective_retry_maximum_cycles": 4096.0,
+        "stationary_admission_distance": 1e-06,
+        "stationary_diagnostic_tolerance": 1e-05,
+        "stationary_relative_tolerance": 1e-07
+      },
+      "coupled_hazard_cycles_consumed": 0.25,
+      "coupled_hazard_cycles_requested": 0.25,
+      "coupled_hazard_event_localized": false,
+      "coupled_hazard_event_restart": true,
+      "coupled_hazard_geometry_preserved_before_event": true,
+      "coupled_hazard_growth_objective": "event_to_event_100um",
+      "coupled_hazard_high_cycle_engine": true,
+      "coupled_hazard_ledger_delta": {
+        "engine.N_em": 0.34433976970215546,
+        "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+        "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+        "mpz.cumulative_escaped_mobile[0,1]": 0.0,
+        "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+        "mpz.cumulative_escaped_mobile[1,1]": 0.0,
+        "mpz.cumulative_gross_return_activity": 0.0,
+        "mpz.cumulative_gross_source_activity": 0.34433976970215546,
+        "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+        "mpz.cumulative_returned_mobile[0,0]": 0.0,
+        "mpz.cumulative_returned_mobile[0,1]": 0.0,
+        "mpz.cumulative_returned_mobile[1,0]": 0.0,
+        "mpz.cumulative_returned_mobile[1,1]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+        "mpz.emitted_total": 0.34433976970215535,
+        "mpz.escaped_total": 0.0,
+        "mpz.signed_line_content_emitted_total": 0.34433976970215535,
+        "mpz.signed_source_activations_total": 0.37739638759356237
+      },
+      "coupled_hazard_live_checkpointing": true,
+      "coupled_hazard_mode_operations": 2,
+      "coupled_hazard_model_id": "v10.2.30_production_event_to_event_high_cycle_v5_rate_separated_positive_state_dmd",
+      "coupled_hazard_modes": [
+        {
+          "converged": false,
+          "current_map_residual": 1.0,
+          "cycles": 0.0,
+          "distance_from_current": 0.0,
+          "failure_reason": "discrete_transition_inside_cycle",
+          "fixed_point_residual": 1.0,
+          "iterations": 1,
+          "map_evaluations": 2,
+          "mode": "periodic_search",
+          "next_retry_cycles": 32.0
+        },
+        {
+          "attempts": 0,
+          "cycles": 0.0,
+          "drift_error": 0.0,
+          "failure_reason": null,
+          "hazard_error": 0.0,
+          "mode": "projective_rejected",
+          "next_retry_cycles": 8.0
+        },
+        {
+          "bracket_high": null,
+          "bracket_low": null,
+          "cycles": 0.24999999999999994,
+          "fired": false,
+          "initial_estimate_cycles": 0.25,
+          "initial_high_action": 7.928990746115283e-105,
+          "initial_high_cycles": 0.25,
+          "initial_high_fired": false,
+          "initial_rate": 1.8883247259489054e-104,
+          "mode": "first_passage_cycle_locator",
+          "partial": false,
+          "prefix_reuses": 0,
+          "trial_evaluations": 24
+        },
+        {
+          "bracket_high": null,
+          "bracket_low": null,
+          "cycles": 5.551115123125783e-17,
+          "fired": false,
+          "initial_estimate_cycles": 5.551115123125783e-17,
+          "initial_high_action": 2.7275422493988645e-120,
+          "initial_high_cycles": 5.551115123125783e-17,
+          "initial_high_fired": false,
+          "initial_rate": 1.8882127213481615e-104,
+          "mode": "first_passage_cycle_locator",
+          "partial": false,
+          "prefix_reuses": 0,
+          "trial_evaluations": 1
+        }
+      ],
+      "coupled_hazard_partial_return": false,
+      "coupled_hazard_periodic_solver": true,
+      "coupled_hazard_phase_resolved_poincare_map": true,
+      "coupled_hazard_positivity_preserving_coordinates": true,
+      "coupled_hazard_rate_separated_ledgers": true,
+      "coupled_hazard_slow_projective": true,
+      "coupled_hazard_stationary_first_passage": true,
+      "coupled_hazard_stochastic_threshold_preserved_until_event": true,
+      "coupled_hazard_wall_seconds": 4.5212880830004,
+      "coupled_hazard_work_budget_exhausted": false,
+      "cycle_applied_limiter": "global_forced",
+      "cycle_block_mode": "requested_cap",
+      "cycle_candidate_limits": {
+        "block_cycles": 0.25,
+        "cleavage_clock": 1.0591398674796149e+103,
+        "stored_pz": 7.99276187219752e+23
+      },
+      "cycle_effective_target_increments": {
+        "cleavage_clock": 0.2,
+        "emitted_pz": 0.0,
+        "escape_pz": 0.0,
+        "mobile_pz": 0.0,
+        "peierls_clock": 0.0,
+        "stored_pz": 0.25,
+        "taylor_clock": 0.0
+      },
+      "cycle_forced_below_adaptive_limit": false,
+      "cycle_limiter": "block_cycles",
+      "cycle_max_block_cycles": 1000000.0,
+      "cycle_min_block_cycles": 1e-06,
+      "cycle_nominal_block_cycles": 0.25,
+      "cycle_predicted_increments_per_cycle": {
+        "cleavage_clock": 1.888324725948902e-104,
+        "emitted_pz": 0.7514070239923332,
+        "escape_pz": 0.0,
+        "mobile_pz": 0.7514070239923336,
+        "peierls_clock": 2.606378176648557e-25,
+        "stored_pz": 3.1278299541190425e-25,
+        "taylor_clock": 0.0009999999999999966
+      },
+      "cycle_reported_candidate_limits": {
+        "global_forced": 0.25
+      },
+      "cycle_target_increments": {
+        "cleavage_clock": 0.2,
+        "emitted_pz": 0.0,
+        "escape_pz": 0.0,
+        "mobile_pz": 0.0,
+        "peierls_clock": 0.0,
+        "stored_pz": 0.25,
+        "taylor_clock": 0.0
+      },
+      "cycle_unlimited": 0.25,
+      "cycles_consumed": 0.25,
+      "cycles_consumed_fraction": 1.0,
+      "cycles_requested": 0.25,
+      "cycles_unused": 0.0,
+      "dB_block": 7.928990746115286e-105,
+      "engine_id": 1,
+      "engine_native_cycle_predictor": true,
+      "event_localized": false,
+      "explicit_recovery_active": false,
+      "fired": false,
+      "loading_mode": "cyclic",
+      "persistent_aggregate_emission_hazard_s": 1525.4126556367912,
+      "persistent_sigma_back_Pa": 24996607.72919021,
+      "persistent_site_front_width_m": 9.790435508774203e-06,
+      "persistent_site_multiplicity_per_system": 345195.16078377975,
+      "persistent_site_source_area_m2": 2.4477550119622527e-11,
+      "persistent_source_inventory_active": false,
+      "persistent_source_refresh_active": false,
+      "persistent_tip_radius_m": 1.0000597051146787e-06,
+      "physical_hazard_action_block": 7.928990746115286e-105,
+      "state_N_em": 0.34433976970215546,
+      "state_N_em_pre": 0.0,
+      "state_active_K_shield_signed_Pa_sqrt_m": -5.526211327762495e-24,
+      "state_active_K_shield_signed_Pa_sqrt_m_pre": 0.0,
+      "state_coupled_cleavage_hazard": true,
+      "state_emitted_total": 0.34433976970215535,
+      "state_emitted_total_pre": 0.0,
+      "state_escaped_total": 0.0,
+      "state_escaped_total_pre": 0.0,
+      "state_micro_advance_total_m": 0.0,
+      "state_micro_advance_total_m_pre": 0.0,
+      "state_mobile_count": 0.34433976970215546,
+      "state_mobile_count_pre": 0.0,
+      "state_retained_count": 5.230401780327112e-26,
+      "state_retained_count_pre": 0.0,
+      "state_sigma_back_Pa_pre": 0.0,
+      "state_wake_K_shield_signed_Pa_sqrt_m": 0.0,
+      "state_wake_K_shield_signed_Pa_sqrt_m_pre": 0.0,
+      "temperature_K": 900.0,
+      "time_s": 0.00025
+    },
+    {
+      "B": 1.5857303986226182e-104,
+      "B_pre": 7.928990746115286e-105,
+      "coupled_hazard_config": {
+        "event_guard_cycles": 2.0,
+        "exact_burst_growth_factor": 2.0,
+        "exact_burst_initial_cycles": 8,
+        "exact_burst_maximum_cycles": 256,
+        "explicit_only": false,
+        "heartbeat_operations": 4,
+        "maximum_mode_operations": 256,
+        "maximum_projective_cycles": 1000000000.0,
+        "periodic_retry_initial_cycles": 32.0,
+        "periodic_retry_maximum_cycles": 4096.0,
+        "projective_growth_factor": 8.0,
+        "projective_retry_initial_cycles": 8.0,
+        "projective_retry_maximum_cycles": 4096.0,
+        "stationary_admission_distance": 1e-06,
+        "stationary_diagnostic_tolerance": 1e-05,
+        "stationary_relative_tolerance": 1e-07
+      },
+      "coupled_hazard_cycles_consumed": 0.25,
+      "coupled_hazard_cycles_requested": 0.25,
+      "coupled_hazard_event_localized": false,
+      "coupled_hazard_event_restart": true,
+      "coupled_hazard_geometry_preserved_before_event": true,
+      "coupled_hazard_growth_objective": "event_to_event_100um",
+      "coupled_hazard_high_cycle_engine": true,
+      "coupled_hazard_ledger_delta": {
+        "engine.N_em": 0.2941201736056592,
+        "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+        "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+        "mpz.cumulative_escaped_mobile[0,1]": 0.0,
+        "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+        "mpz.cumulative_escaped_mobile[1,1]": 0.0,
+        "mpz.cumulative_gross_return_activity": 0.0,
+        "mpz.cumulative_gross_source_activity": 0.2941201736056592,
+        "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+        "mpz.cumulative_returned_mobile[0,0]": 0.0,
+        "mpz.cumulative_returned_mobile[0,1]": 0.0,
+        "mpz.cumulative_returned_mobile[1,0]": 0.0,
+        "mpz.cumulative_returned_mobile[1,1]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+        "mpz.emitted_total": 0.2941201736056592,
+        "mpz.escaped_total": 0.0,
+        "mpz.signed_line_content_emitted_total": 0.2941201736056592,
+        "mpz.signed_source_activations_total": 0.3223557102718025
+      },
+      "coupled_hazard_live_checkpointing": true,
+      "coupled_hazard_mode_operations": 2,
+      "coupled_hazard_model_id": "v10.2.30_production_event_to_event_high_cycle_v5_rate_separated_positive_state_dmd",
+      "coupled_hazard_modes": [
+        {
+          "bracket_high": null,
+          "bracket_low": null,
+          "cycles": 0.24999999999999994,
+          "fired": false,
+          "initial_estimate_cycles": 0.25,
+          "initial_high_action": 7.9283132401109e-105,
+          "initial_high_cycles": 0.25,
+          "initial_high_fired": false,
+          "initial_rate": 1.888212721348141e-104,
+          "mode": "first_passage_cycle_locator",
+          "partial": false,
+          "prefix_reuses": 0,
+          "trial_evaluations": 24
+        },
+        {
+          "bracket_high": null,
+          "bracket_low": null,
+          "cycles": 5.551115123125783e-17,
+          "fired": false,
+          "initial_estimate_cycles": 5.551115123125783e-17,
+          "initial_high_action": 2.7273092509447173e-120,
+          "initial_high_cycles": 5.551115123125783e-17,
+          "initial_high_fired": false,
+          "initial_rate": 1.8881124741183872e-104,
+          "mode": "first_passage_cycle_locator",
+          "partial": false,
+          "prefix_reuses": 0,
+          "trial_evaluations": 1
+        }
+      ],
+      "coupled_hazard_partial_return": false,
+      "coupled_hazard_periodic_solver": true,
+      "coupled_hazard_phase_resolved_poincare_map": true,
+      "coupled_hazard_positivity_preserving_coordinates": true,
+      "coupled_hazard_rate_separated_ledgers": true,
+      "coupled_hazard_slow_projective": true,
+      "coupled_hazard_stationary_first_passage": true,
+      "coupled_hazard_stochastic_threshold_preserved_until_event": true,
+      "coupled_hazard_wall_seconds": 3.6678120830038097,
+      "coupled_hazard_work_budget_exhausted": false,
+      "cycle_applied_limiter": "global_forced",
+      "cycle_block_mode": "requested_cap",
+      "cycle_candidate_limits": {
+        "block_cycles": 0.25,
+        "cleavage_clock": 1.0592026933130971e+103,
+        "stored_pz": 4.7155638344191277e+23
+      },
+      "cycle_effective_target_increments": {
+        "cleavage_clock": 0.2,
+        "emitted_pz": 0.0,
+        "escape_pz": 0.0,
+        "mobile_pz": 0.0,
+        "peierls_clock": 0.0,
+        "stored_pz": 0.25,
+        "taylor_clock": 0.0
+      },
+      "cycle_forced_below_adaptive_limit": false,
+      "cycle_limiter": "block_cycles",
+      "cycle_max_block_cycles": 1000000.0,
+      "cycle_min_block_cycles": 1e-06,
+      "cycle_nominal_block_cycles": 0.25,
+      "cycle_predicted_increments_per_cycle": {
+        "cleavage_clock": 1.8882127213481377e-104,
+        "emitted_pz": 0.596844676138077,
+        "escape_pz": 0.0,
+        "mobile_pz": 0.596844676138077,
+        "peierls_clock": 2.6062928906080465e-25,
+        "stored_pz": 5.301592954277025e-25,
+        "taylor_clock": 0.0009999999999999966
+      },
+      "cycle_reported_candidate_limits": {
+        "global_forced": 0.25
+      },
+      "cycle_target_increments": {
+        "cleavage_clock": 0.2,
+        "emitted_pz": 0.0,
+        "escape_pz": 0.0,
+        "mobile_pz": 0.0,
+        "peierls_clock": 0.0,
+        "stored_pz": 0.25,
+        "taylor_clock": 0.0
+      },
+      "cycle_unlimited": 0.25,
+      "cycles_consumed": 0.25,
+      "cycles_consumed_fraction": 1.0,
+      "cycles_requested": 0.25,
+      "cycles_unused": 0.0,
+      "dB_block": 7.928313240110904e-105,
+      "engine_id": 1,
+      "engine_native_cycle_predictor": true,
+      "event_localized": false,
+      "explicit_recovery_active": false,
+      "fired": false,
+      "loading_mode": "cyclic",
+      "persistent_aggregate_emission_hazard_s": 1496.7973802155655,
+      "persistent_sigma_back_Pa": 34004092.24260777,
+      "persistent_site_front_width_m": 9.6214975509462e-06,
+      "persistent_site_multiplicity_per_system": 339255.97679598094,
+      "persistent_site_source_area_m2": 2.405640669049414e-11,
+      "persistent_source_inventory_active": false,
+      "persistent_source_refresh_active": false,
+      "persistent_tip_radius_m": 1.0001107026474635e-06,
+      "physical_hazard_action_block": 7.928313240110904e-105,
+      "state_N_em": 0.6384599433078146,
+      "state_N_em_pre": 0.34433976970215546,
+      "state_active_K_shield_signed_Pa_sqrt_m": -2.274782330171773e-23,
+      "state_active_K_shield_signed_Pa_sqrt_m_pre": -5.526211327762495e-24,
+      "state_coupled_cleavage_hazard": true,
+      "state_emitted_total": 0.6384599433078145,
+      "state_emitted_total_pre": 0.34433976970215535,
+      "state_escaped_total": 0.0,
+      "state_escaped_total_pre": 0.0,
+      "state_micro_advance_total_m": 0.0,
+      "state_micro_advance_total_m_pre": 0.0,
+      "state_mobile_count": 0.6384599433078146,
+      "state_mobile_count_pre": 0.34433976970215546,
+      "state_retained_count": 2.1551082144130794e-25,
+      "state_retained_count_pre": 5.230401780327112e-26,
+      "state_sigma_back_Pa_pre": 24996607.72919021,
+      "state_wake_K_shield_signed_Pa_sqrt_m": 0.0,
+      "state_wake_K_shield_signed_Pa_sqrt_m_pre": 0.0,
+      "temperature_K": 900.0,
+      "time_s": 0.0005
+    },
+    {
+      "engine_id": 1,
+      "loading_mode": "cyclic",
+      "time_s": 0.0007500000000000012,
+      "temperature_K": 900.0,
+      "cycles_requested": 0.25,
+      "cycles_consumed": 0.25,
+      "cycles_unused": 0.0,
+      "event_localized": false,
+      "fired": false,
+      "B_pre": 1.5857303986226182e-104,
+      "B": 2.378504353676192e-104,
+      "dB_block": 7.927739550535738e-105,
+      "physical_hazard_action_block": 7.927739550535738e-105,
+      "persistent_sigma_back_Pa": 39990277.46148317,
+      "persistent_aggregate_emission_hazard_s": 1474.3353420187627,
+      "persistent_site_multiplicity_per_system": 334500.31157354766,
+      "persistent_site_front_width_m": 9.48621798659514e-06,
+      "persistent_site_source_area_m2": 2.3719185758514823e-11,
+      "persistent_tip_radius_m": 1.0001535192226075e-06,
+      "persistent_source_inventory_active": false,
+      "persistent_source_refresh_active": false,
+      "explicit_recovery_active": false,
+      "engine_native_cycle_predictor": true,
+      "state_coupled_cleavage_hazard": true,
+      "cycle_block_mode": "requested_cap",
+      "cycle_limiter": "block_cycles",
+      "cycle_applied_limiter": "global_forced",
+      "cycle_unlimited": 0.25,
+      "cycle_candidate_limits": {
+        "block_cycles": 0.25,
+        "cleavage_clock": 1.0592589305008765e+103,
+        "stored_pz": 3.447223722834791e+23
+      },
+      "cycle_reported_candidate_limits": {
+        "global_forced": 0.25
+      },
+      "cycle_target_increments": {
+        "cleavage_clock": 0.2,
+        "stored_pz": 0.25,
+        "emitted_pz": 0.0,
+        "mobile_pz": 0.0,
+        "escape_pz": 0.0,
+        "peierls_clock": 0.0,
+        "taylor_clock": 0.0
+      },
+      "cycle_effective_target_increments": {
+        "cleavage_clock": 0.2,
+        "stored_pz": 0.25,
+        "emitted_pz": 0.0,
+        "mobile_pz": 0.0,
+        "escape_pz": 0.0,
+        "peierls_clock": 0.0,
+        "taylor_clock": 0.0
+      },
+      "cycle_predicted_increments_per_cycle": {
+        "cleavage_clock": 1.888112474118381e-104,
+        "stored_pz": 7.252212797909586e-25,
+        "emitted_pz": 0.48464286612716856,
+        "mobile_pz": 0.48464286612716856,
+        "escape_pz": 0.0,
+        "peierls_clock": 2.6062163467142736e-25,
+        "taylor_clock": 0.0009999999999999966
+      },
+      "cycle_forced_below_adaptive_limit": false,
+      "cycles_consumed_fraction": 1.0,
+      "cycle_min_block_cycles": 1e-06,
+      "cycle_max_block_cycles": 1000000.0,
+      "cycle_nominal_block_cycles": 0.25,
+      "state_N_em": 0.8853977425876086,
+      "state_mobile_count": 0.8853977425876086,
+      "state_retained_count": 4.7211872193732105e-25,
+      "state_emitted_total": 0.885397742587609,
+      "state_escaped_total": 0.0,
+      "state_micro_advance_total_m": 0.0,
+      "state_active_K_shield_signed_Pa_sqrt_m": -4.9877879946823574e-23,
+      "state_wake_K_shield_signed_Pa_sqrt_m": 0.0,
+      "coupled_hazard_model_id": "v10.2.30_production_event_to_event_high_cycle_v5_rate_separated_positive_state_dmd",
+      "coupled_hazard_high_cycle_engine": true,
+      "coupled_hazard_phase_resolved_poincare_map": true,
+      "coupled_hazard_periodic_solver": true,
+      "coupled_hazard_stationary_first_passage": true,
+      "coupled_hazard_slow_projective": true,
+      "coupled_hazard_event_restart": true,
+      "coupled_hazard_rate_separated_ledgers": true,
+      "coupled_hazard_positivity_preserving_coordinates": true,
+      "coupled_hazard_live_checkpointing": true,
+      "coupled_hazard_growth_objective": "event_to_event_100um",
+      "coupled_hazard_work_budget_exhausted": false,
+      "coupled_hazard_partial_return": false,
+      "coupled_hazard_cycles_requested": 0.25,
+      "coupled_hazard_cycles_consumed": 0.25,
+      "coupled_hazard_event_localized": false,
+      "coupled_hazard_mode_operations": 2,
+      "coupled_hazard_modes": [
+        {
+          "mode": "periodic_search",
+          "cycles": 0.0,
+          "converged": false,
+          "iterations": 1,
+          "map_evaluations": 2,
+          "current_map_residual": 1.0,
+          "fixed_point_residual": 1.0,
+          "distance_from_current": 0.0,
+          "failure_reason": "discrete_transition_inside_cycle",
+          "next_retry_cycles": 32.0
+        },
+        {
+          "mode": "projective_rejected",
+          "cycles": 0.0,
+          "failure_reason": null,
+          "drift_error": 0.0,
+          "hazard_error": 0.0,
+          "attempts": 0,
+          "next_retry_cycles": 8.0
+        },
+        {
+          "mode": "first_passage_cycle_locator",
+          "cycles": 0.24999999999999994,
+          "fired": false,
+          "partial": false,
+          "bracket_low": null,
+          "bracket_high": null,
+          "trial_evaluations": 24,
+          "prefix_reuses": 0,
+          "initial_rate": 1.8881124741183845e-104,
+          "initial_estimate_cycles": 0.25,
+          "initial_high_cycles": 0.25,
+          "initial_high_action": 7.927739550535735e-105,
+          "initial_high_fired": false
+        },
+        {
+          "mode": "first_passage_cycle_locator",
+          "cycles": 5.551115123125783e-17,
+          "fired": false,
+          "partial": false,
+          "bracket_low": null,
+          "bracket_high": null,
+          "trial_evaluations": 1,
+          "prefix_reuses": 0,
+          "initial_rate": 1.8880294775406985e-104,
+          "initial_estimate_cycles": 5.551115123125783e-17,
+          "initial_high_cycles": 5.551115123125783e-17,
+          "initial_high_action": 2.727113660047774e-120,
+          "initial_high_fired": false
+        }
+      ],
+      "coupled_hazard_geometry_preserved_before_event": true,
+      "coupled_hazard_ledger_delta": {
+        "mpz.signed_source_activations_total": 0.27064382801065445,
+        "mpz.cumulative_returned_mobile[1,1]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+        "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+        "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+        "mpz.cumulative_gross_return_activity": 0.0,
+        "mpz.cumulative_escaped_mobile[0,1]": 0.0,
+        "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+        "mpz.cumulative_returned_mobile[0,1]": 0.0,
+        "mpz.emitted_total": 0.24693779927979442,
+        "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+        "mpz.cumulative_escaped_mobile[1,1]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+        "mpz.cumulative_returned_mobile[1,0]": 0.0,
+        "mpz.escaped_total": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+        "engine.N_em": 0.24693779927979398,
+        "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+        "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+        "mpz.signed_line_content_emitted_total": 0.24693779927979442,
+        "mpz.cumulative_returned_mobile[0,0]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+        "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+        "mpz.cumulative_gross_source_activity": 0.24693779927979398,
+        "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0
+      },
+      "coupled_hazard_stochastic_threshold_preserved_until_event": true,
+      "coupled_hazard_wall_seconds": 4.389338083004986,
+      "coupled_hazard_config": {
+        "explicit_only": false,
+        "stationary_relative_tolerance": 1e-07,
+        "stationary_diagnostic_tolerance": 1e-05,
+        "stationary_admission_distance": 1e-06,
+        "maximum_mode_operations": 256,
+        "heartbeat_operations": 4,
+        "exact_burst_initial_cycles": 8,
+        "exact_burst_maximum_cycles": 256,
+        "exact_burst_growth_factor": 2.0,
+        "periodic_retry_initial_cycles": 32.0,
+        "periodic_retry_maximum_cycles": 4096.0,
+        "projective_retry_initial_cycles": 8.0,
+        "projective_retry_maximum_cycles": 4096.0,
+        "projective_growth_factor": 8.0,
+        "maximum_projective_cycles": 1000000000.0,
+        "event_guard_cycles": 2.0
+      },
+      "state_N_em_pre": 0.6384599433078146,
+      "state_mobile_count_pre": 0.6384599433078146,
+      "state_retained_count_pre": 2.1551082144130794e-25,
+      "state_emitted_total_pre": 0.6384599433078145,
+      "state_escaped_total_pre": 0.0,
+      "state_micro_advance_total_m_pre": 0.0,
+      "state_active_K_shield_signed_Pa_sqrt_m_pre": -2.274782330171773e-23,
+      "state_wake_K_shield_signed_Pa_sqrt_m_pre": 0.0,
+      "state_sigma_back_Pa_pre": 34004092.24260777
+    }
+  ],
+  "campaign_calibration": {
+    "backstress_scale": 1.0,
+    "refresh_length_scale": 1.0,
+    "source_budget_from_manifest": true,
+    "shielding_model": "signed_linear_elastic_population_limited_uncapped",
+    "shielding_cap_from_manifest": false,
+    "legacy_manifest_shielding_reference_only": true,
+    "active_shielding_saturation": "population_dynamics_only",
+    "temporal_source_recycling": false
+  },
+  "stochastic_hazard": {
+    "schema": "v10.1.7.2_stochastic_cleavage_threshold",
+    "mode": "deterministic",
+    "seed": 1733,
+    "minimum_threshold": 1e-12,
+    "distribution": "delta_at_one",
+    "noise_added_to_K": false,
+    "noise_added_to_barriers": false
+  },
+  "stochastic_avalanche": {
+    "schema": "v10.1.7.3_threshold_correlated_event_length",
+    "mode": "fixed",
+    "minimum_factor": 0.5,
+    "maximum_factor": 4.0,
+    "geometry_subsegment_fraction": 0.1,
+    "length_reference": "driver_final_physical_checkpoint",
+    "mean_length_preserved": true,
+    "noise_added_to_K": false,
+    "noise_added_to_barriers": false,
+    "geometry_subsegments_re_equilibrated": false
+  },
+  "anisotropic_emission": {
+    "model_id": "v10.1.7.4_reduced_2d_slip_trace_anisotropic_emission",
+    "enabled": true,
+    "crystal_theta_deg": 30.0,
+    "probe_radius_m": 1e-05,
+    "sector_half_angle_deg": 25.0,
+    "damage_cutoff": 0.85,
+    "min_elements": 3,
+    "schmid_reference": 0.5,
+    "shared_forest_density": true,
+    "require_reliable_probe": true,
+    "two_reduced_slip_trace_channels": true,
+    "full_3d_crystal_plasticity": false,
+    "directional_factor_location": "inside_emission_stress_before_barrier",
+    "post_hazard_directional_weighting": false,
+    "opening_stress_unshielded": true,
+    "cleavage_shielding_only": true,
+    "taylor_backstress_emission_only": true,
+    "observer_reliable_drive_count": 1,
+    "observer_fallback_drive_count": 0,
+    "observer_failed_probe_count": 0
+  },
+  "signed_burgers_shared_physics": {
+    "model_id": "v10.2.5_shared_signed_burgers_population",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "population_state": "nonnegative_positive_and_negative_Burgers_species",
+    "backstress_population": "absolute_line_content",
+    "shielding_population": "signed_line_content",
+    "constitutive_K_shield_cap": false,
+    "arbitrary_shielding_attenuation": false,
+    "transport_mode": "validated_scalar",
+    "kernel": {
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "n_states": 7,
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "wake_shape": [
+        2,
+        160
+      ],
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "mode_II_operator_retained": true,
+      "constitutive_K_shield_cap": false,
+      "complete_cartesian_state_grid": true,
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "last_opening_boundary_action": "none",
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "analytical_r_eff_used_for_interpolation": false,
+      "finite_radius_fem_geometry_claimed": false,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "opening_strength_fraction_used_for_interpolation": false,
+      "active_kernel_mechanically_measured": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shielding_supported": false,
+      "wake_kernel_forced_zero": true,
+      "append_only_legacy_domain_active": false,
+      "runtime_grid_binding": {
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "source_active_bins": 80,
+        "runtime_active_bins": 80,
+        "source_active_x_min_m": 3.125e-07,
+        "source_active_x_max_m": 4.96875e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_wake_bins": 160,
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "wake_operator": "identically_zero"
+      }
+    }
+  },
+  "state_resolved_signed_kernel": {
+    "model_id": "v10.2.6_shared_state_resolved_signed_burgers_engine",
+    "schema": "v10.2.6_state_resolved_signed_kernel_family",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "family": {
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "n_states": 7,
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "wake_shape": [
+        2,
+        160
+      ],
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "mode_II_operator_retained": true,
+      "constitutive_K_shield_cap": false,
+      "complete_cartesian_state_grid": true,
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "last_opening_boundary_action": "none",
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "analytical_r_eff_used_for_interpolation": false,
+      "finite_radius_fem_geometry_claimed": false,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "opening_strength_fraction_used_for_interpolation": false,
+      "active_kernel_mechanically_measured": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shielding_supported": false,
+      "wake_kernel_forced_zero": true,
+      "append_only_legacy_domain_active": false,
+      "runtime_grid_binding": {
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "source_active_bins": 80,
+        "runtime_active_bins": 80,
+        "source_active_x_min_m": 3.125e-07,
+        "source_active_x_max_m": 4.96875e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_wake_bins": 160,
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "wake_operator": "identically_zero"
+      }
+    },
+    "state_axes": [
+      "r_eff_over_r0",
+      "opening_strength_fraction",
+      "crack_extension_m"
+    ],
+    "out_of_envelope_policy": "fail_closed",
+    "constitutive_K_shield_cap": false
+  },
+  "state_resolved_signed_kernel_v1029": {
+    "model_id": "v10.2.9_shared_effective_opening_signed_burgers_engine",
+    "schema": "v10.2.9_state_resolved_signed_kernel_family",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "kernel_state_opening_drive": "effective_K_after_signed_shielding",
+    "fixed_point_tolerance": 1e-08,
+    "fixed_point_max_iterations": 80,
+    "fixed_point_damping": 0.5,
+    "out_of_envelope_policy": "axis_specific_fail_closed",
+    "constitutive_K_shield_cap": false,
+    "family": {
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "n_states": 7,
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "wake_shape": [
+        2,
+        160
+      ],
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "mode_II_operator_retained": true,
+      "constitutive_K_shield_cap": false,
+      "complete_cartesian_state_grid": true,
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "last_opening_boundary_action": "none",
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "analytical_r_eff_used_for_interpolation": false,
+      "finite_radius_fem_geometry_claimed": false,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "opening_strength_fraction_used_for_interpolation": false,
+      "active_kernel_mechanically_measured": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shielding_supported": false,
+      "wake_kernel_forced_zero": true,
+      "append_only_legacy_domain_active": false,
+      "runtime_grid_binding": {
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "source_active_bins": 80,
+        "runtime_active_bins": 80,
+        "source_active_x_min_m": 3.125e-07,
+        "source_active_x_max_m": 4.96875e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_wake_bins": 160,
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "wake_operator": "identically_zero"
+      }
+    }
+  },
+  "state_resolved_signed_kernel_v10212": {
+    "model_id": "v10.2.12_shared_real_2d_signed_burgers_engine",
+    "schema": "v10.2.12_real_signed_state_resolved_2d_shielding_atlas",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "kernel_state_opening_drive": "effective_K_after_signed_shielding",
+    "physical_kernel_axes": [
+      "opening_strength_fraction",
+      "crack_extension_m"
+    ],
+    "analytical_r_eff_used_for_interpolation": false,
+    "kernel_radius_axis_policy": "disabled_constant_compatibility",
+    "constitutive_K_shield_cap": false,
+    "family": {
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "n_states": 7,
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "wake_shape": [
+        2,
+        160
+      ],
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "mode_II_operator_retained": true,
+      "constitutive_K_shield_cap": false,
+      "complete_cartesian_state_grid": true,
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "last_opening_boundary_action": "none",
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "analytical_r_eff_used_for_interpolation": false,
+      "finite_radius_fem_geometry_claimed": false,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "opening_strength_fraction_used_for_interpolation": false,
+      "active_kernel_mechanically_measured": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shielding_supported": false,
+      "wake_kernel_forced_zero": true,
+      "append_only_legacy_domain_active": false,
+      "runtime_grid_binding": {
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "source_active_bins": 80,
+        "runtime_active_bins": 80,
+        "source_active_x_min_m": 3.125e-07,
+        "source_active_x_max_m": 4.96875e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_wake_bins": 160,
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "wake_operator": "identically_zero"
+      }
+    }
+  },
+  "state_resolved_signed_kernel_v10214": {
+    "model_id": "v10.2.14_shared_active_only_signed_burgers_engine",
+    "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+    "same_engine_for_monotonic_and_fatigue": true,
+    "physical_kernel_axes": [
+      "cumulative_crack_path_extension_m"
+    ],
+    "opening_strength_fraction_used_for_interpolation": false,
+    "analytical_r_eff_used_for_interpolation": false,
+    "constitutive_K_shield_cap": false,
+    "active_kernel_mechanically_measured": true,
+    "wake_kernel_mechanically_measured": false,
+    "wake_shielding_enabled": false,
+    "runtime_mpz_grid_binding": "piecewise_linear_in_physical_x_before_engine_installation",
+    "zero_event_summary_is_valid": true,
+    "family": {
+      "schema": "v10.2.14_active_only_real_signed_2d_shielding_atlas",
+      "source_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+      "state_axes": [
+        "r_eff_over_r0",
+        "opening_strength_fraction",
+        "crack_extension_m"
+      ],
+      "n_states": 7,
+      "state_envelope_min": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "state_envelope_max": [
+        1.0,
+        0.0,
+        0.001175
+      ],
+      "fixed_kernel_assessment": {
+        "active_I": {
+          "maximum_relative_variation": 1.5281136356173028,
+          "significance_floor": 4.8311480153593385,
+          "worst_state_id": "E0001000"
+        },
+        "active_II": {
+          "maximum_relative_variation": 2565.8357292390556,
+          "significance_floor": 0.7607382595515255,
+          "worst_state_id": "E0000600"
+        },
+        "fixed_kernel_accepted": false,
+        "maximum_relative_variation_all_modes": 2565.8357292390556,
+        "maximum_relative_variation_mode_I": 1.5281136356173028,
+        "reference_state_id": "E0000000",
+        "tolerance": 0.05,
+        "wake_I": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        },
+        "wake_II": {
+          "maximum_relative_variation": 0.0,
+          "significance_floor": 0.001,
+          "worst_state_id": "E0000000"
+        }
+      },
+      "interpolation": {
+        "envelope_relative_tolerance": 1e-10,
+        "extrapolation_allowed": false,
+        "method": "inverse_distance",
+        "neighbors": 4,
+        "power": 2.0
+      },
+      "last_query": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "last_state_ids": [
+        "E0000000"
+      ],
+      "last_weights": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "active_shape": [
+        2,
+        80
+      ],
+      "wake_shape": [
+        2,
+        160
+      ],
+      "activation_to_line_content_by_system": [
+        0.9124087591240877,
+        0.9124087591240877
+      ],
+      "source_capacity_bounds_per_system": [
+        [
+          0.0,
+          18249.0
+        ],
+        [
+          0.0,
+          18249.0
+        ]
+      ],
+      "mode_II_operator_retained": true,
+      "constitutive_K_shield_cap": false,
+      "complete_cartesian_state_grid": true,
+      "opening_boundary_policy": {
+        "policy": "strict"
+      },
+      "last_opening_boundary_action": "none",
+      "kernel_radius_axis_policy": "disabled_constant_compatibility",
+      "kernel_radius_compatibility_coordinate": 1.0,
+      "active_physical_kernel_axes": [
+        "cumulative_crack_path_extension_m"
+      ],
+      "last_observed_analytical_r_eff_over_r0": 1.0,
+      "analytical_r_eff_used_for_interpolation": false,
+      "finite_radius_fem_geometry_claimed": false,
+      "opening_axis_policy": "validation_only_collapsed_constant_compatibility",
+      "kernel_opening_compatibility_coordinate": 0.0,
+      "crack_extension_m_semantics": "cumulative_crack_path_extension_m",
+      "opening_strength_fraction_used_for_interpolation": false,
+      "active_kernel_mechanically_measured": true,
+      "wake_kernel_mechanically_measured": false,
+      "wake_shielding_supported": false,
+      "wake_kernel_forced_zero": true,
+      "append_only_legacy_domain_active": false,
+      "runtime_grid_binding": {
+        "model_id": "v10.2.15_physical_x_kernel_to_runtime_mpz_grid",
+        "source_active_bins": 80,
+        "runtime_active_bins": 80,
+        "source_active_x_min_m": 3.125e-07,
+        "source_active_x_max_m": 4.96875e-05,
+        "runtime_active_x_min_m": 3.1249999999999997e-07,
+        "runtime_active_x_max_m": 4.9687499999999995e-05,
+        "runtime_wake_bins": 160,
+        "active_interpolation": "piecewise_linear_in_physical_x",
+        "wake_operator": "identically_zero"
+      }
+    }
+  },
+  "persistent_site_source_v10221": {
+    "model_id": "v10.2.21_persistent_site_backstress_blunting",
+    "source_model": "persistent_areal_sites_backstress_limited_no_inventory",
+    "finite_source_inventory": false,
+    "source_depletion_on_emission": false,
+    "source_refresh_on_crack_advance": false,
+    "site_multiplicity_in_arrhenius_hazard": true,
+    "multiplicity_geometry": "rho_site0*c_arc*r_tip*w_eff",
+    "tip_radius_state": "r0+c_blunt*b*local_accumulated_slip",
+    "resharpening": "moving_frame_convection_of_accumulated_slip",
+    "front_width_state": "reference_width*sqrt(reference_density/rho_unsigned)",
+    "backstress_population": "unsigned_mobile_plus_retained_line_content",
+    "shielding_population": "signed_retained_line_content",
+    "mechanical_zero_drive_gate": true,
+    "emission_integrator": "implicit_backward_euler_backstress_root",
+    "config": {
+      "rho_site0_m2": 1.4102520844479966e+16,
+      "reference_source_area_m2": 2.5e-11,
+      "reference_front_width_m": 9.999999999999999e-06,
+      "reference_density_m2": 5000000000000.0,
+      "source_zone_length_m": 2e-06,
+      "minimum_front_width_m": 0.0,
+      "maximum_front_width_m": 4.9999999999999996e-05,
+      "implicit_tolerance": 1e-10,
+      "implicit_max_iterations": 96
+    }
+  }
+}

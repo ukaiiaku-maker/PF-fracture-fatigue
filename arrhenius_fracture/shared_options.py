@@ -197,6 +197,11 @@ PRESETS: dict[str, SharedOptions] = {
         kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
         output=OutputProfile.PUBLICATION_RESTART,
     ),
+    "pf_hold_dwell_tip_persistent": SharedOptions(
+        loading=LoadingMode.HOLD_DWELL,
+        kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
+        output=OutputProfile.PUBLICATION_RESTART,
+    ),
     "pf_monotonic_bulk": SharedOptions(
         source_location=SourceLocation.BULK_UNIFORM,
         source_lifecycle=SourceLifecycle.PERSISTENT_REUSABLE,

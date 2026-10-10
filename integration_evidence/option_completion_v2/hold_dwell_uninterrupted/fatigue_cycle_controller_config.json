@@ -1,0 +1,81 @@
+{
+  "controller": {
+    "N_sat": Infinity,
+    "adaptive_cycles": false,
+    "block_cycles": 0.25,
+    "cycle_block_mode": "requested_cap",
+    "fixed_retained_fraction": 1.0,
+    "max_block_cycles": 1000000.0,
+    "min_block_cycles": 1e-06,
+    "n_phase": 96,
+    "recovery_per_s": 0.0,
+    "storage_model": "escape_limited",
+    "target_dB": 0.2,
+    "target_dN_emit": Infinity,
+    "target_dN_escape": Infinity,
+    "target_dN_mobile": Infinity,
+    "target_dN_peierls": Infinity,
+    "target_dN_store": 0.25,
+    "target_dN_taylor": Infinity
+  },
+  "emit_barrier": {
+    "base": {
+      "G00_eV": 1.94,
+      "Gfloor_fraction": 0.02,
+      "Gfloor_max_fraction": 0.95,
+      "Gfloor_min_eV": 0.0001,
+      "Tref_K": 481.33,
+      "a": 0.0845685,
+      "gT_eV_per_K": 0.003934,
+      "n": 1.0,
+      "name": "W[100]",
+      "sT_Pa_per_K": -656400.0,
+      "sigc0_Pa": 2298000000.0
+    },
+    "energy_scale": 1.0,
+    "entropy_scale": 1.0,
+    "mechanism": "crack_tip_dislocation_emission",
+    "rate_prefactor": 100000000000.0,
+    "stress_scale": 1.0
+  },
+  "peierls_barrier": {
+    "base": {
+      "G00_eV": 1.94,
+      "Gfloor_fraction": 0.02,
+      "Gfloor_max_fraction": 0.95,
+      "Gfloor_min_eV": 0.0001,
+      "Tref_K": 481.33,
+      "a": 0.0845685,
+      "gT_eV_per_K": 0.003934,
+      "n": 1.0,
+      "name": "W[100]",
+      "sT_Pa_per_K": -656400.0,
+      "sigc0_Pa": 2298000000.0
+    },
+    "energy_scale": 0.005,
+    "entropy_scale": 0.005,
+    "mechanism": "peierls_glide_escape",
+    "rate_prefactor": 1000000000000.0,
+    "stress_scale": 1.0
+  },
+  "taylor_barrier": {
+    "base": {
+      "G00_eV": 1.94,
+      "Gfloor_fraction": 0.02,
+      "Gfloor_max_fraction": 0.95,
+      "Gfloor_min_eV": 0.0001,
+      "Tref_K": 481.33,
+      "a": 0.0845685,
+      "gT_eV_per_K": 0.003934,
+      "n": 1.0,
+      "name": "W[100]",
+      "sT_Pa_per_K": -656400.0,
+      "sigc0_Pa": 2298000000.0
+    },
+    "energy_scale": 0.02,
+    "entropy_scale": 0.02,
+    "mechanism": "taylor_junction_depinning_escape",
+    "rate_prefactor": 100000000000.0,
+    "stress_scale": 1.0
+  }
+}

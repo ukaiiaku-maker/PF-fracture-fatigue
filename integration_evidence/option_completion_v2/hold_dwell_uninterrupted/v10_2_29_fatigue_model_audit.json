@@ -1,0 +1,25 @@
+{
+  "base_entry": "arrhenius_fracture.sharp_front_v10_2_28",
+  "canonical_options": {
+    "v913_paper_ceramic01_0077080_persistent_sites": "v913_zeroD_sobol_0077080",
+    "v913_paper_dbtt01_0202500_persistent_sites": "v913_zeroD_sobol_0202500",
+    "v913_paper_peak01_0242980_persistent_sites": "v913_zeroD_sobol_0242980",
+    "v913_paper_weakT01_0129902_persistent_sites": "v913_zeroD_sobol_0129902"
+  },
+  "cleavage_hazard_frozen_within_cycle_block": false,
+  "consumed_cycle_accounting": true,
+  "duplicate_spatial_fatigue_state": false,
+  "engine_native_cycle_predictor": true,
+  "explicit_recovery": false,
+  "finite_source_inventory": false,
+  "full_field_cyclic_mechanics": false,
+  "legacy_fatigue_barrier_predictor_used": false,
+  "one_outer_geometry_event_per_fem_state": true,
+  "parameter_refit": false,
+  "parameter_registry": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv",
+  "persistent_site_source": true,
+  "schema": "v10.2.29_hazard_cyclic_fatigue_long_growth",
+  "source_depletion": false,
+  "source_refresh": false,
+  "state_coupled_cleavage_hazard": true
+}

@@ -90,6 +90,13 @@ def test_operator_consistent_preset_maps_to_developed_native_campaign():
     assert plan.restart_family == "v3_6_event_checkpoint_write_only"
 
 
+def test_hold_dwell_maps_to_native_ramp_then_hold_fatigue_entry():
+    plan = build_execution_plan(PRESETS["pf_hold_dwell_tip_persistent"])
+    assert plan.executable
+    assert plan.executor_module.endswith("sharp_front_v10_2_30_energy_gated_fatigue")
+    assert by_role(plan)["loading"].consumer.startswith("native ramp-then-held")
+
+
 def test_combined_tip_and_bulk_maps_to_native_v104_full_field_entry():
     plan = build_execution_plan(PRESETS["pf_monotonic_tip_plus_bulk"])
     assert plan.executable

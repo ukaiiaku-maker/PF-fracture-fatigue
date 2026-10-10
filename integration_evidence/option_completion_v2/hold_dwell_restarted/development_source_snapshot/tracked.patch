@@ -1,0 +1,113 @@
+diff --git a/arrhenius_fracture/shared_execution.py b/arrhenius_fracture/shared_execution.py
+index 7cafd68..7905262 100644
+--- a/arrhenius_fracture/shared_execution.py
++++ b/arrhenius_fracture/shared_execution.py
+@@ -166,7 +166,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+         LoadingMode.MONOTONIC: ("arrhenius_fracture.sharp_front", "run_2d", "native displacement-step controller"),
+         LoadingMode.EXPLICIT_CYCLIC: ("arrhenius_fracture.fatigue_v1", "FatigueWaveform", "phase-resolved waveform controller"),
+         LoadingMode.FIXED_DELTA_K: ("arrhenius_fracture.fixed_deltaK_v1021", "install_fixed_deltaK_waveform", "prescribed local range controller"),
+-        LoadingMode.HOLD_DWELL: ("arrhenius_fracture.global_physical_scheduler_v1", "advance_event_aware_coupled_interval", "hold/ramp load_history consumer"),
++        LoadingMode.HOLD_DWELL: ("arrhenius_fracture.sharp_front", "run_2d", "native ramp-then-held-displacement fatigue controller"),
+     }
+     bindings.append(_binding("loading", options.loading, *loading_map[options.loading]))
+     location_map = {
+@@ -230,6 +230,9 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+         elif options.loading is LoadingMode.FIXED_DELTA_K and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
+             executor = "arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK"
+             restart = "combined_outer_and_high_cycle"
++        elif options.loading is LoadingMode.HOLD_DWELL and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
++            executor = "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue"
++            restart = "combined_outer_and_high_cycle"
+     elif (simple and options.crack_path is CrackPathMode.SINGLE_FRONT
+           and options.source_lifecycle is SourceLifecycle.FINITE_INVENTORY
+           and options.loading is LoadingMode.MONOTONIC
+diff --git a/arrhenius_fracture/shared_execution_worker.py b/arrhenius_fracture/shared_execution_worker.py
+index 346537e..a949045 100644
+--- a/arrhenius_fracture/shared_execution_worker.py
++++ b/arrhenius_fracture/shared_execution_worker.py
+@@ -134,6 +134,10 @@ def execute(request_path: str | Path) -> dict:
+         OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "0", "--no-plots"],
+     }[options.output]
+     native_args = list(request["native_args"])
++    if options.loading.value == "hold_dwell":
++        for flag in ("--fatigue-cycles", "--fatigue-hold-load"):
++            if flag not in native_args:
++                native_args.append(flag)
+     if plan.executor_module == "arrhenius_fracture.shared_v5_cavity_adapter":
+         native_args.append(
+             "--cavity-enabled" if options.cavity.value == "full_order_v5"
+diff --git a/arrhenius_fracture/shared_options.py b/arrhenius_fracture/shared_options.py
+index 17fe94a..2f99754 100644
+--- a/arrhenius_fracture/shared_options.py
++++ b/arrhenius_fracture/shared_options.py
+@@ -197,6 +197,11 @@ PRESETS: dict[str, SharedOptions] = {
+         kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
+         output=OutputProfile.PUBLICATION_RESTART,
+     ),
++    "pf_hold_dwell_tip_persistent": SharedOptions(
++        loading=LoadingMode.HOLD_DWELL,
++        kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
++        output=OutputProfile.PUBLICATION_RESTART,
++    ),
+     "pf_monotonic_bulk": SharedOptions(
+         source_location=SourceLocation.BULK_UNIFORM,
+         source_lifecycle=SourceLifecycle.PERSISTENT_REUSABLE,
+diff --git a/arrhenius_fracture/shared_runtime.py b/arrhenius_fracture/shared_runtime.py
+index 61c61ab..125faae 100644
+--- a/arrhenius_fracture/shared_runtime.py
++++ b/arrhenius_fracture/shared_runtime.py
+@@ -138,10 +138,11 @@ def _pf_driver(options: SharedOptions) -> ProviderBinding:
+             )
+         return ProviderBinding("driver", "arrhenius_fracture.sharp_front_v11_branching_audited",
+                                "persistent_multifront_v11", "main")
+-    if options.loading is LoadingMode.EXPLICIT_CYCLIC:
++    if options.loading in {LoadingMode.EXPLICIT_CYCLIC, LoadingMode.HOLD_DWELL}:
+         return ProviderBinding(
+             "driver", "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue",
+-            "v10.2.30_hazard_energy_gated_fatigue", "main",
++            ("v10.2.30_hazard_energy_gated_hold_dwell" if options.loading is LoadingMode.HOLD_DWELL
++             else "v10.2.30_hazard_energy_gated_fatigue"), "main",
+         )
+     if options.loading is LoadingMode.FIXED_DELTA_K:
+         return ProviderBinding("driver", "arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK",
+@@ -162,8 +163,8 @@ def _loading_controller(options: SharedOptions) -> ProviderBinding:
+             "loading_controller", "arrhenius_fracture.fixed_deltaK_v1021",
+             "prescribed_local_deltaK", "install_fixed_deltaK_waveform"),
+         LoadingMode.HOLD_DWELL: ProviderBinding(
+-            "loading_controller", "arrhenius_fracture.global_physical_scheduler_v1",
+-            "hold_ramp_load_history", "advance_event_aware_coupled_interval"),
++            "loading_controller", "arrhenius_fracture.sharp_front",
++            "native_ramp_then_held_displacement_fatigue", "run_2d"),
+     }[options.loading]
+ 
+ 
+diff --git a/tests/test_shared_execution.py b/tests/test_shared_execution.py
+index 5fe0609..caf840d 100644
+--- a/tests/test_shared_execution.py
++++ b/tests/test_shared_execution.py
+@@ -90,6 +90,13 @@ def test_operator_consistent_preset_maps_to_developed_native_campaign():
+     assert plan.restart_family == "v3_6_event_checkpoint_write_only"
+ 
+ 
++def test_hold_dwell_maps_to_native_ramp_then_hold_fatigue_entry():
++    plan = build_execution_plan(PRESETS["pf_hold_dwell_tip_persistent"])
++    assert plan.executable
++    assert plan.executor_module.endswith("sharp_front_v10_2_30_energy_gated_fatigue")
++    assert by_role(plan)["loading"].consumer.startswith("native ramp-then-held")
++
++
+ def test_combined_tip_and_bulk_maps_to_native_v104_full_field_entry():
+     plan = build_execution_plan(PRESETS["pf_monotonic_tip_plus_bulk"])
+     assert plan.executable
+diff --git a/tests/test_shared_options_resolution.py b/tests/test_shared_options_resolution.py
+index ec96488..fae1b76 100644
+--- a/tests/test_shared_options_resolution.py
++++ b/tests/test_shared_options_resolution.py
+@@ -69,6 +69,7 @@ def test_pf_monotonic_cyclic_branch_void_and_bulk_bindings_are_distinct():
+         key: tuple(provider.identity for provider in resolve_runtime(PRESETS[key]).providers)
+         for key in (
+             "pf_monotonic_tip_persistent", "pf_cyclic_tip_persistent",
++            "pf_hold_dwell_tip_persistent",
+             "pf_monotonic_bulk", "pf_monotonic_tip_plus_bulk",
+             "pf_branching_current", "pf_branching_void_v5",
+             "pf_cavity_v5_single_front", "pf_cavity_v5_disabled_control",

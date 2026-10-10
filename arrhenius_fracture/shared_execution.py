@@ -166,7 +166,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         LoadingMode.MONOTONIC: ("arrhenius_fracture.sharp_front", "run_2d", "native displacement-step controller"),
         LoadingMode.EXPLICIT_CYCLIC: ("arrhenius_fracture.fatigue_v1", "FatigueWaveform", "phase-resolved waveform controller"),
         LoadingMode.FIXED_DELTA_K: ("arrhenius_fracture.fixed_deltaK_v1021", "install_fixed_deltaK_waveform", "prescribed local range controller"),
-        LoadingMode.HOLD_DWELL: ("arrhenius_fracture.global_physical_scheduler_v1", "advance_event_aware_coupled_interval", "hold/ramp load_history consumer"),
+        LoadingMode.HOLD_DWELL: ("arrhenius_fracture.sharp_front", "run_2d", "native ramp-then-held-displacement fatigue controller"),
     }
     bindings.append(_binding("loading", options.loading, *loading_map[options.loading]))
     location_map = {
@@ -229,6 +229,9 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
             restart = "combined_outer_and_high_cycle"
         elif options.loading is LoadingMode.FIXED_DELTA_K and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
             executor = "arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK"
+            restart = "combined_outer_and_high_cycle"
+        elif options.loading is LoadingMode.HOLD_DWELL and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
+            executor = "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue"
             restart = "combined_outer_and_high_cycle"
     elif (simple and options.crack_path is CrackPathMode.SINGLE_FRONT
           and options.source_lifecycle is SourceLifecycle.FINITE_INVENTORY

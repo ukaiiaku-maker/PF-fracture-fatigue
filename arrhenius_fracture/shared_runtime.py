@@ -138,10 +138,11 @@ def _pf_driver(options: SharedOptions) -> ProviderBinding:
             )
         return ProviderBinding("driver", "arrhenius_fracture.sharp_front_v11_branching_audited",
                                "persistent_multifront_v11", "main")
-    if options.loading is LoadingMode.EXPLICIT_CYCLIC:
+    if options.loading in {LoadingMode.EXPLICIT_CYCLIC, LoadingMode.HOLD_DWELL}:
         return ProviderBinding(
             "driver", "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue",
-            "v10.2.30_hazard_energy_gated_fatigue", "main",
+            ("v10.2.30_hazard_energy_gated_hold_dwell" if options.loading is LoadingMode.HOLD_DWELL
+             else "v10.2.30_hazard_energy_gated_fatigue"), "main",
         )
     if options.loading is LoadingMode.FIXED_DELTA_K:
         return ProviderBinding("driver", "arrhenius_fracture.sharp_front_v10_2_30_fixed_deltaK",
@@ -162,8 +163,8 @@ def _loading_controller(options: SharedOptions) -> ProviderBinding:
             "loading_controller", "arrhenius_fracture.fixed_deltaK_v1021",
             "prescribed_local_deltaK", "install_fixed_deltaK_waveform"),
         LoadingMode.HOLD_DWELL: ProviderBinding(
-            "loading_controller", "arrhenius_fracture.global_physical_scheduler_v1",
-            "hold_ramp_load_history", "advance_event_aware_coupled_interval"),
+            "loading_controller", "arrhenius_fracture.sharp_front",
+            "native_ramp_then_held_displacement_fatigue", "run_2d"),
     }[options.loading]
 
 

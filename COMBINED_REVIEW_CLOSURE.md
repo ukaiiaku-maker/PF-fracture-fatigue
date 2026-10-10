@@ -45,6 +45,12 @@ top-level composition is not yet qualified.
   no cavity state. Both wrote exact atomic full-state checkpoints. A fresh-worker
   restored/re-equilibrated continuation was fingerprint- and observer-identical
   to the uninterrupted continuation.
+- Native hold/dwell path: a two-block run ramped once to `2e-7 m`, held that
+  displacement exactly for the second block, and consumed 0.25 physical cycles
+  per block. Restarting after block two in a fresh worker and continuing to
+  block three produced byte-identical step, front, and summary histories to an
+  uninterrupted three-block run; the independent three-generation checkpoint
+  retention remained active.
 - Public shared PF execution: two full spatial 2-D load steps returned normally,
   with spatial process-zone state active and pre/post in-process receipts.
 - Compact and selected-field executions produced byte-identical step, front and
@@ -62,7 +68,7 @@ The branch now exposes the established persistent tip-plus-uniform-bulk v10.4.1
 composition. The pure uniform-bulk state-step evidence remains separate because
 the v10.4 crack driver also owns a persistent tip population; it is not falsely
 labeled bulk-only. The branch does not yet provide qualified shared top-level
-executors for pure bulk, hold, fixed-range branching, or the combined
+executors for pure bulk, fixed-range branching, or the combined
 branching-plus-cavity composition. V3.6 is now
 publicly executable but its bounded evidence is a no-event censor. Current-source
 V12 bootstrap is blocked specifically by the absent theta=40 `adb775...` kernel;

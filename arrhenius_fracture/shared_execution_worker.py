@@ -134,6 +134,10 @@ def execute(request_path: str | Path) -> dict:
         OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "0", "--no-plots"],
     }[options.output]
     native_args = list(request["native_args"])
+    if options.loading.value == "hold_dwell":
+        for flag in ("--fatigue-cycles", "--fatigue-hold-load"):
+            if flag not in native_args:
+                native_args.append(flag)
     if plan.executor_module == "arrhenius_fracture.shared_v5_cavity_adapter":
         native_args.append(
             "--cavity-enabled" if options.cavity.value == "full_order_v5"

@@ -13,7 +13,7 @@ native entry, records observed files and hashes, and only sets
 | `loading=monotonic` | `sharp_front.run_2d` | displacement-step controller | physical | shared PF execution smoke |
 | `loading=explicit_cyclic` | `fatigue_v1.FatigueWaveform` | phase-resolved waveform | physical | consumer-composition tests; native cyclic suites retained |
 | `loading=fixed_delta_k` | `install_fixed_deltaK_waveform` | prescribed local range controller | physical | fixed-range consumer test; single-front native launcher retained |
-| `loading=hold_dwell` | global scheduler | `load_history` hold/ramp consumer | physical | constructor mapping; shared top-level executor pending |
+| `loading=hold_dwell` | `sharp_front.run_2d` via v10.2.30 fatigue entry | native ramp-then-held displacement controller | physical | public two-block hold plus fresh-worker continuation; byte-identical three-block histories |
 | source location | sharp-front support and/or `accepted_bulk_load_step` | tip, material-measure bulk, or composed support | physical | public tip-only and v10.4.1 tip-plus-bulk runs; paired pure-bulk accepted-state tests |
 | source lifecycle | persistent installer, `sharp_front_v10_1` finite-site engine, or current-source binding | owning source ledger/state equation | physical | public persistent and finite-site spatial executions; current-source V12 exact-kernel blocker recorded |
 | plasticity | tip process state or accepted bulk step | selected state update | physical | element/full-field tests; public v10.4.1 run observed nonzero local Peierls/Taylor rate and density evolution |
@@ -35,7 +35,7 @@ and V3.6 adapters have bounded public execution evidence. V12 restore now reads
 schema-2 additive fields and dispatches V11 versus V12 checkpoint arguments,
 but the retained theta=40 V11 state cannot yet continue because its exact
 `adb775...` signed-kernel family is absent from all retained caches. Pure
-bulk-only orchestration, hold, fixed-range branching, and the combined
+bulk-only orchestration, fixed-range branching, and the combined
 branching-plus-cavity composition remain open; their
 native modules and launchers remain present and are not replaced by a reduced
 solver.
