@@ -1,0 +1,10 @@
+{
+  "forward_reverse_barriers": "symmetric_about_zero_stress_barrier",
+  "net_slip_rate": "Gamma_forward_minus_Gamma_reverse",
+  "new_fitted_parameters": 0,
+  "one_way_arrhenius_rate_used_as_net_slip": false,
+  "reverse_barrier": "2*G_zero-G_forward",
+  "schema": "v10.4.1_bulk_peierls_taylor_detailed_balance",
+  "v10_4_0_outputs_physics_compatible": false,
+  "zero_stress_net_plastic_rate_exactly_zero": true
+}

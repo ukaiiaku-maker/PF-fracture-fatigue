@@ -134,6 +134,11 @@ def execute(request_path: str | Path) -> dict:
         OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "0", "--no-plots"],
     }[options.output]
     native_args = list(request["native_args"])
+    if plan.executor_module == "arrhenius_fracture.shared_v5_cavity_adapter":
+        native_args.append(
+            "--cavity-enabled" if options.cavity.value == "full_order_v5"
+            else "--cavity-disabled"
+        )
     if plan.executor_module == "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited":
         if any(item == "--material-manifest" or item.startswith("--material-manifest=")
                for item in native_args):
@@ -147,6 +152,11 @@ def execute(request_path: str | Path) -> dict:
                or item.startswith(restart_names[1] + "=") for item in native_args):
             raise ValueError("restart checkpoint was supplied twice")
         native_args.extend([_multifront_restart_flag(restart_from), restart_from])
+    elif restart_from and plan.restart_family == "v11_native_full_state_v5":
+        if any(item == "--restart-checkpoint" or item.startswith("--restart-checkpoint=")
+               for item in native_args):
+            raise ValueError("restart checkpoint was supplied twice")
+        native_args.extend(["--restart-checkpoint", restart_from])
     argv = [*native_args, "--out", str(output), *output_flags]
     checkpoint = {
         "profile": options.output.value,

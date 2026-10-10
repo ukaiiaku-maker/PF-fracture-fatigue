@@ -71,6 +71,7 @@ def test_pf_monotonic_cyclic_branch_void_and_bulk_bindings_are_distinct():
             "pf_monotonic_tip_persistent", "pf_cyclic_tip_persistent",
             "pf_monotonic_bulk", "pf_monotonic_tip_plus_bulk",
             "pf_branching_current", "pf_branching_void_v5",
+            "pf_cavity_v5_single_front", "pf_cavity_v5_disabled_control",
         )
     }
     assert len(set(identities.values())) == len(identities)

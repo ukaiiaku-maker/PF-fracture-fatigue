@@ -1,0 +1,136 @@
+{
+  "active_tip_ids": [
+    "b00000000"
+  ],
+  "cavity_enabled": false,
+  "continued_from_fingerprint": null,
+  "history": [
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": null,
+      "bottom_reaction_N_per_m": -41194.28617819362,
+      "cavity_area_m2": null,
+      "cavity_radius_m": null,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 9.723983961498722e-12,
+      "constrained_reaction_l2_N_per_m": 28025.39220415362,
+      "consumed_defect_inventory_area_m2": null,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.008308596340633138,
+      "energy_identity_reference_J_per_m": 0.008308596340633169,
+      "energy_reaction_identity": 3.758158573052436e-15,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 0,
+        "topology_actions": 0
+      },
+      "external_work_J_per_m": 0.008215304004600446,
+      "field_transfer_audit": null,
+      "fingerprint": "301e220d8311ad72cca0a934cc23bd692790387a97f4dd134415cd01c6359393",
+      "free_dof_residual_l2_N_per_m": 6.240193568237459e-10,
+      "full_residual_including_reactions_N_per_m": 28025.39220415362,
+      "graph_length_m": 0.0005725993004046688,
+      "inventory_area_m2": null,
+      "length_ledgers": {},
+      "mesh_elements": 800,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 417,
+      "operation": "disabled_control",
+      "plastic_eigenstrain_half_work_J_per_m": -9.329233603272319e-05,
+      "reaction_N_per_m": 41076.52002300241,
+      "site_phase": null,
+      "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.0028628905107167314,
+      "top_reaction_N_per_m": 41076.52002300241,
+      "vacancy_conservation_lhs_area_m2": 1.190966816461523e-24,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 1.190966816461523e-24,
+      "vacancy_field_inventory_area_m2": 1.190966816461523e-24,
+      "vacancy_fraction_max": 1.2044497182304425e-18,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 1.190966816461523e-24,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "void_event_history": [],
+      "void_phase": null
+    }
+  ],
+  "matching_enabled_disabled_initial_mechanical_arrays": true,
+  "native_checkpoint": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/v5_cavity_disabled_control/checkpoint/accepted_v5.json",
+  "native_checkpoint_round_trip_exact": true,
+  "physical_branch_birth_count": 0,
+  "physical_branch_birth_enabled": false,
+  "restart_input": null,
+  "restarted": false,
+  "schema": "shared.native_v5_cavity_branch_birth_disabled/1",
+  "terminal": {
+    "active_crack_branch_ids": [
+      "b00000000"
+    ],
+    "applied_opening_m": 4e-07,
+    "available_defect_inventory_area_m2": null,
+    "bottom_reaction_N_per_m": -41194.28617819362,
+    "cavity_area_m2": null,
+    "cavity_radius_m": null,
+    "closed_cavity_boundary_cycle_certificate": null,
+    "compliance_m2_per_N": 9.723983961498722e-12,
+    "constrained_reaction_l2_N_per_m": 28025.39220415362,
+    "consumed_defect_inventory_area_m2": null,
+    "crack_void_connection_certificate": null,
+    "energy_J_per_m": 0.008308596340633138,
+    "energy_identity_reference_J_per_m": 0.008308596340633169,
+    "energy_reaction_identity": 3.758158573052436e-15,
+    "event_counters": {
+      "accepted_steps": 0,
+      "mesh_generation": 0,
+      "topology_actions": 0
+    },
+    "external_work_J_per_m": 0.008215304004600446,
+    "field_transfer_audit": null,
+    "fingerprint": "301e220d8311ad72cca0a934cc23bd692790387a97f4dd134415cd01c6359393",
+    "free_dof_residual_l2_N_per_m": 6.240193568237459e-10,
+    "full_residual_including_reactions_N_per_m": 28025.39220415362,
+    "graph_length_m": 0.0005725993004046688,
+    "inventory_area_m2": null,
+    "length_ledgers": {},
+    "mesh_elements": 800,
+    "mesh_maximum_aspect_ratio": 31.4376906845176,
+    "mesh_minimum_quality": 0.3117878388141192,
+    "mesh_nodes": 417,
+    "operation": "terminal",
+    "plastic_eigenstrain_half_work_J_per_m": -9.329233603272319e-05,
+    "reaction_N_per_m": 41076.52002300241,
+    "site_phase": null,
+    "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+    "support_active_tip_ids": [
+      "b00000000"
+    ],
+    "top_bottom_reaction_balance": 0.0028628905107167314,
+    "top_reaction_N_per_m": 41076.52002300241,
+    "vacancy_conservation_lhs_area_m2": 1.190966816461523e-24,
+    "vacancy_conservation_residual_m2": 0.0,
+    "vacancy_conservation_rhs_area_m2": 1.190966816461523e-24,
+    "vacancy_field_inventory_area_m2": 1.190966816461523e-24,
+    "vacancy_fraction_max": 1.2044497182304425e-18,
+    "vacancy_ledgers": {
+      "vacancy_annihilation_area_m2": 0.0,
+      "vacancy_consumed_by_void_area_m2": 0.0,
+      "vacancy_initial_area_m2": 1.190966816461523e-24,
+      "vacancy_plastic_production_area_m2": 0.0,
+      "vacancy_thermal_exchange_area_m2": 0.0
+    },
+    "void_event_history": [],
+    "void_phase": null
+  },
+  "terminal_fingerprint": "301e220d8311ad72cca0a934cc23bd692790387a97f4dd134415cd01c6359393"
+}

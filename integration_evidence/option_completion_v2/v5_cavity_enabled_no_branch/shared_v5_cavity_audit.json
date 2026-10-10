@@ -1,0 +1,1078 @@
+{
+  "active_tip_ids": [
+    "b00000000"
+  ],
+  "cavity_enabled": true,
+  "continued_from_fingerprint": null,
+  "history": [
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.888057578786035e-07,
+      "bottom_reaction_N_per_m": -41194.28617819362,
+      "cavity_area_m2": null,
+      "cavity_radius_m": null,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 9.723983961498722e-12,
+      "constrained_reaction_l2_N_per_m": 28025.39220415362,
+      "consumed_defect_inventory_area_m2": 0.0,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.008308596340633138,
+      "energy_identity_reference_J_per_m": 0.008308596340633169,
+      "energy_reaction_identity": 3.758158573052436e-15,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 0,
+        "topology_actions": 0
+      },
+      "external_work_J_per_m": 0.008215304004600446,
+      "field_transfer_audit": null,
+      "fingerprint": "743cb34dea5299183170e55d47279dc33545944c5dadf0c760f451d5d76d426a",
+      "free_dof_residual_l2_N_per_m": 6.240193568237459e-10,
+      "full_residual_including_reactions_N_per_m": 28025.39220415362,
+      "graph_length_m": 0.0005725993004046688,
+      "inventory_area_m2": null,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "mesh_elements": 800,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 417,
+      "operation": "available_site",
+      "plastic_eigenstrain_half_work_J_per_m": -9.329233603272319e-05,
+      "reaction_N_per_m": 41076.52002300241,
+      "site_phase": "AVAILABLE_SITE",
+      "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.0028628905107167314,
+      "top_reaction_N_per_m": 41076.52002300241,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.0,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "void_event_history": [],
+      "void_phase": null
+    },
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.888057578786035e-07,
+      "bottom_reaction_N_per_m": -41194.286178193695,
+      "cavity_area_m2": null,
+      "cavity_radius_m": null,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 9.723983961498756e-12,
+      "constrained_reaction_l2_N_per_m": 28025.392204153573,
+      "consumed_defect_inventory_area_m2": 0.0,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.008308596340633138,
+      "energy_identity_reference_J_per_m": 0.008308596340633134,
+      "energy_reaction_identity": 4.1757317478360403e-16,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 0,
+        "topology_actions": 0
+      },
+      "events": [
+        "BIRTH_HIT"
+      ],
+      "external_work_J_per_m": 0.00821530400460041,
+      "field_transfer_audit": null,
+      "fingerprint": "0799de2a5661a843d5c1059871efefc49e04d62767c4a213ad2f40e69564bc73",
+      "free_dof_residual_l2_N_per_m": 1.3824531717937868e-10,
+      "full_residual_including_reactions_N_per_m": 28025.392204153577,
+      "graph_length_m": 0.0005725993004046688,
+      "inventory_area_m2": null,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "local_tensor_Pa": [
+        [
+          37746634.15374553,
+          1998492.7408914617
+        ],
+        [
+          1998492.7408914617,
+          147625171.7934846
+        ]
+      ],
+      "mesh_elements": 800,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 417,
+      "operation": "multi_hit_1",
+      "plastic_eigenstrain_half_work_J_per_m": -9.329233603272393e-05,
+      "rates": {
+        "birth_activation_work_J": 1.805281286015846e-21,
+        "birth_hydrostatic_work_J": 1.606555651542661e-21,
+        "birth_normal_opening_work_J": 1.8873317076872767e-22,
+        "birth_s": 73958266.75379056,
+        "birth_signed_shear_work_J": 9.992463704457307e-24,
+        "healing_activation_work_J": -1.4766150876106667e-21,
+        "healing_s": 283987812.354755,
+        "local_hydrostatic_stress_Pa": 80327782.57713306,
+        "local_in_plane_mean_stress_Pa": 92685902.97361507,
+        "local_max_principal_stress_Pa": 147661508.76106668,
+        "local_normal_opening_stress_Pa": 37746634.15374553,
+        "local_sigma_zz_Pa": 55611541.78416904,
+        "local_signed_shear_stress_Pa": 1998492.7408914617,
+        "local_von_mises_stress_Pa": 102183462.22700304,
+        "plastic_accommodation_s": 347234444.7331637,
+        "series_limited_growth_s": 224581712.20497066,
+        "stabilization_activation_work_J": 1.4766150876106667e-21,
+        "stabilization_s": 1801092602.0134304,
+        "surface_reaction_s": 3815148226.971527,
+        "vacancy_transport_s": 762944884.2767175
+      },
+      "reaction_N_per_m": 41076.520023002064,
+      "site_phase": "AVAILABLE_SITE",
+      "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.0028628905107270005,
+      "top_reaction_N_per_m": 41076.520023002064,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.0,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "vacancy_rate_audit": {},
+      "void_event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        }
+      ],
+      "void_phase": null
+    },
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.888057578786035e-07,
+      "bottom_reaction_N_per_m": -41194.28617819373,
+      "cavity_area_m2": null,
+      "cavity_radius_m": null,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 9.723983961498751e-12,
+      "constrained_reaction_l2_N_per_m": 28025.392204153577,
+      "consumed_defect_inventory_area_m2": 0.0,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.008308596340633138,
+      "energy_identity_reference_J_per_m": 0.008308596340633138,
+      "energy_reaction_identity": 0.0,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 0,
+        "topology_actions": 0
+      },
+      "events": [
+        "EMBRYO"
+      ],
+      "external_work_J_per_m": 0.008215304004600413,
+      "field_transfer_audit": null,
+      "fingerprint": "f6dd3c7cde7072ee4dbf7b777b282e56d45be93d78201e506a3b6375111bddf8",
+      "free_dof_residual_l2_N_per_m": 1.2607432445799636e-10,
+      "full_residual_including_reactions_N_per_m": 28025.39220415358,
+      "graph_length_m": 0.0005725993004046688,
+      "inventory_area_m2": null,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "local_tensor_Pa": [
+        [
+          37746634.15374559,
+          1998492.7408904748
+        ],
+        [
+          1998492.7408904748,
+          147625171.7934853
+        ]
+      ],
+      "mesh_elements": 800,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 417,
+      "operation": "multi_hit_2",
+      "plastic_eigenstrain_half_work_J_per_m": -9.329233603272395e-05,
+      "rates": {
+        "birth_activation_work_J": 1.8052812860158483e-21,
+        "birth_hydrostatic_work_J": 1.606555651542668e-21,
+        "birth_normal_opening_work_J": 1.8873317076872796e-22,
+        "birth_s": 73958266.75379056,
+        "birth_signed_shear_work_J": 9.992463704452373e-24,
+        "healing_activation_work_J": -1.4766150876106735e-21,
+        "healing_s": 283987812.354755,
+        "local_hydrostatic_stress_Pa": 80327782.5771334,
+        "local_in_plane_mean_stress_Pa": 92685902.97361545,
+        "local_max_principal_stress_Pa": 147661508.76106736,
+        "local_normal_opening_stress_Pa": 37746634.15374559,
+        "local_sigma_zz_Pa": 55611541.78416927,
+        "local_signed_shear_stress_Pa": 1998492.7408904748,
+        "local_von_mises_stress_Pa": 102183462.22700356,
+        "plastic_accommodation_s": 347234444.7331637,
+        "series_limited_growth_s": 224581712.20497066,
+        "stabilization_activation_work_J": 1.4766150876106735e-21,
+        "stabilization_s": 1801092602.0134304,
+        "surface_reaction_s": 3815148226.971527,
+        "vacancy_transport_s": 762944884.2767175
+      },
+      "reaction_N_per_m": 41076.520023002064,
+      "site_phase": "EMBRYO",
+      "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.0028628905107278835,
+      "top_reaction_N_per_m": 41076.520023002064,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.0,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "vacancy_rate_audit": {},
+      "void_event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        }
+      ],
+      "void_phase": null
+    },
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.888057578786035e-07,
+      "bottom_reaction_N_per_m": -41194.28617819373,
+      "cavity_area_m2": null,
+      "cavity_radius_m": null,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 9.723983961498751e-12,
+      "constrained_reaction_l2_N_per_m": 28025.392204153577,
+      "consumed_defect_inventory_area_m2": 0.0,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.008308596340633138,
+      "energy_identity_reference_J_per_m": 0.008308596340633138,
+      "energy_reaction_identity": 0.0,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 0,
+        "topology_actions": 0
+      },
+      "events": [
+        "STABILIZED"
+      ],
+      "external_work_J_per_m": 0.008215304004600413,
+      "field_transfer_audit": null,
+      "fingerprint": "d624449a5e4f651977018aede59907b2cc77a788335dde835ed25814cb6c8186",
+      "free_dof_residual_l2_N_per_m": 1.2617456346370362e-10,
+      "full_residual_including_reactions_N_per_m": 28025.39220415358,
+      "graph_length_m": 0.0005725993004046688,
+      "inventory_area_m2": null,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "local_tensor_Pa": [
+        [
+          37746634.15374566,
+          1998492.7408904855
+        ],
+        [
+          1998492.7408904855,
+          147625171.7934853
+        ]
+      ],
+      "mesh_elements": 800,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 417,
+      "operation": "stabilization",
+      "plastic_eigenstrain_half_work_J_per_m": -9.329233603272392e-05,
+      "rates": {
+        "birth_activation_work_J": 1.805281286015849e-21,
+        "birth_hydrostatic_work_J": 1.6065556515426682e-21,
+        "birth_normal_opening_work_J": 1.8873317076872829e-22,
+        "birth_s": 73958266.75379056,
+        "birth_signed_shear_work_J": 9.992463704452426e-24,
+        "healing_activation_work_J": -1.4766150876106739e-21,
+        "healing_s": 283987812.354755,
+        "local_hydrostatic_stress_Pa": 80327782.57713342,
+        "local_in_plane_mean_stress_Pa": 92685902.97361548,
+        "local_max_principal_stress_Pa": 147661508.7610674,
+        "local_normal_opening_stress_Pa": 37746634.15374566,
+        "local_sigma_zz_Pa": 55611541.78416929,
+        "local_signed_shear_stress_Pa": 1998492.7408904855,
+        "local_von_mises_stress_Pa": 102183462.22700351,
+        "plastic_accommodation_s": 347234444.7331637,
+        "series_limited_growth_s": 224581712.20497066,
+        "stabilization_activation_work_J": 1.4766150876106739e-21,
+        "stabilization_s": 1801092602.013432,
+        "surface_reaction_s": 3815148226.971527,
+        "vacancy_transport_s": 762944884.2767175
+      },
+      "reaction_N_per_m": 41076.520023002064,
+      "site_phase": "STABLE_SUBGRID_VOID",
+      "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.0028628905107278835,
+      "top_reaction_N_per_m": 41076.520023002064,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.0,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "vacancy_rate_audit": {},
+      "void_event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        }
+      ],
+      "void_phase": null
+    },
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.868422624701099e-07,
+      "bottom_reaction_N_per_m": -41194.28617819373,
+      "cavity_area_m2": 1.9634954084936207e-09,
+      "cavity_radius_m": 2.5e-05,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 9.723983961498751e-12,
+      "constrained_reaction_l2_N_per_m": 28025.39220415358,
+      "consumed_defect_inventory_area_m2": 1.9634954084936207e-09,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.008308596340633138,
+      "energy_identity_reference_J_per_m": 0.00830859634063314,
+      "energy_reaction_identity": 2.0878658739180202e-16,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 0,
+        "topology_actions": 0
+      },
+      "external_work_J_per_m": 0.008215304004600415,
+      "field_transfer_audit": null,
+      "fingerprint": "d963e27cf5c734feb134ad9f7bab5e56fb8d1cc5d5d273333d26a3545bcee638",
+      "free_dof_residual_l2_N_per_m": 1.2805699999724308e-10,
+      "full_residual_including_reactions_N_per_m": 28025.392204153584,
+      "graph_length_m": 0.0005725993004046688,
+      "inventory_area_m2": 1.9634954084936207e-09,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "mesh_elements": 800,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 417,
+      "operation": "subgrid_void",
+      "plastic_eigenstrain_half_work_J_per_m": -9.329233603272395e-05,
+      "reaction_N_per_m": 41076.520023002064,
+      "site_phase": "STABLE_SUBGRID_VOID",
+      "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.0028628905107278835,
+      "top_reaction_N_per_m": 41076.520023002064,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_debit_audit": {},
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.0,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "void_event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        },
+        {
+          "area_m2": 1.9634954084936207e-09,
+          "cavity_id": "void:site-1",
+          "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+        }
+      ],
+      "void_phase": "STABLE_SUBGRID_VOID"
+    },
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.80951776244629e-07,
+      "bottom_reaction_N_per_m": -41194.28617819374,
+      "cavity_area_m2": 7.853981633974483e-09,
+      "cavity_radius_m": 5e-05,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 9.72398396149875e-12,
+      "constrained_reaction_l2_N_per_m": 28025.39220415358,
+      "consumed_defect_inventory_area_m2": 7.853981633974483e-09,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.008308596340633138,
+      "energy_identity_reference_J_per_m": 0.008308596340633138,
+      "energy_reaction_identity": 0.0,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 0,
+        "topology_actions": 0
+      },
+      "external_work_J_per_m": 0.008215304004600413,
+      "field_transfer_audit": null,
+      "fingerprint": "5e5fbe34135c68a28204b7e8220ccf144ff05d8b61b14c191aecb7036554431e",
+      "free_dof_residual_l2_N_per_m": 1.2528486262866906e-10,
+      "full_residual_including_reactions_N_per_m": 28025.39220415358,
+      "graph_length_m": 0.0005725993004046688,
+      "growth_audit": {},
+      "growth_dt_s": 1.113180577106967e-05,
+      "inventory_area_m2": 7.853981633974483e-09,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "mesh_elements": 800,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 417,
+      "operation": "subgrid_growth",
+      "plastic_eigenstrain_half_work_J_per_m": -9.329233603272395e-05,
+      "rates": {
+        "birth_activation_work_J": 1.805281286015849e-21,
+        "birth_hydrostatic_work_J": 1.6065556515426682e-21,
+        "birth_normal_opening_work_J": 1.8873317076872829e-22,
+        "birth_s": 73958266.75379056,
+        "birth_signed_shear_work_J": 9.992463704452442e-24,
+        "healing_activation_work_J": -1.4766150876106739e-21,
+        "healing_s": 283987812.354755,
+        "local_hydrostatic_stress_Pa": 80327782.57713342,
+        "local_in_plane_mean_stress_Pa": 92685902.97361548,
+        "local_max_principal_stress_Pa": 147661508.7610674,
+        "local_normal_opening_stress_Pa": 37746634.15374566,
+        "local_sigma_zz_Pa": 55611541.78416929,
+        "local_signed_shear_stress_Pa": 1998492.7408904885,
+        "local_von_mises_stress_Pa": 102183462.22700351,
+        "plastic_accommodation_s": 347234444.7331637,
+        "series_limited_growth_s": 224581712.20497066,
+        "stabilization_activation_work_J": 1.4766150876106739e-21,
+        "stabilization_s": 1801092602.013432,
+        "surface_reaction_s": 3815148226.971527,
+        "vacancy_transport_s": 762944884.2767175
+      },
+      "reaction_N_per_m": 41076.520023002064,
+      "site_phase": "STABLE_SUBGRID_VOID",
+      "stored_recoverable_energy_J_per_m": 0.008308596340633138,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.00286289051072806,
+      "top_reaction_N_per_m": 41076.520023002064,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.0,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "vacancy_rate_audit": {},
+      "void_event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        },
+        {
+          "area_m2": 1.9634954084936207e-09,
+          "cavity_id": "void:site-1",
+          "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+        }
+      ],
+      "void_phase": "STABLE_SUBGRID_VOID"
+    },
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.80951776244629e-07,
+      "bottom_reaction_N_per_m": -38179.83737122064,
+      "cavity_area_m2": 7.853981633974483e-09,
+      "cavity_radius_m": 5e-05,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 1.050445572028656e-11,
+      "constrained_reaction_l2_N_per_m": 26421.765242043533,
+      "consumed_defect_inventory_area_m2": 7.853981633974483e-09,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.007683741488839937,
+      "energy_identity_reference_J_per_m": 0.0076837414888399425,
+      "energy_reaction_identity": 6.772963972680616e-16,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 1,
+        "refinement_operation_index": 1,
+        "topology_actions": 0
+      },
+      "executed_operations": [
+        "explicit_cavity_creation",
+        "remesh",
+        "field_projection",
+        "support_rebuild",
+        "equilibrium"
+      ],
+      "external_work_J_per_m": 0.0075956641552750144,
+      "field_transfer_audit": {
+        "active_capture_region_inventory": [
+          {
+            "capture_inventory_change_area_m2": -7.829853186147563e-09,
+            "capture_radius_m": 4.9999999999999996e-05,
+            "owner_id": "site-1",
+            "projected_capture_inventory_area_m2": 4.945908242557737e-11,
+            "source_capture_inventory_area_m2": 7.87931226857314e-09
+          },
+          {
+            "capture_inventory_change_area_m2": -7.940933880509066e-23,
+            "capture_radius_m": 9.999999999999999e-05,
+            "owner_id": "void:site-1",
+            "projected_capture_inventory_area_m2": 3.2345622979128565e-08,
+            "source_capture_inventory_area_m2": 3.2345622979128644e-08
+          }
+        ],
+        "density_integral_error": 0.0,
+        "plastic_integral_error": 4.8467614016778965e-27,
+        "projected_density_l2_m2": 1.4636729712560506e+16,
+        "projected_displacement_l2_m": 2.406522799885269e-06,
+        "projected_fields_nonzero": true,
+        "projected_plastic_history_l2": 0.00032004040368208164,
+        "projected_vacancy_inventory_area_m2": 9.888057578786033e-07,
+        "source_density_l2_m2": 1.4819511669222596e+16,
+        "source_displacement_l2_m": 2.4075625649035578e-06,
+        "source_plastic_history_l2": 0.0003240370349203929,
+        "source_vacancy_inventory_area_m2": 9.888057578786035e-07,
+        "vacancy_transfer": {
+          "locally_redistributed_area_m2": 7.879312268573059e-09,
+          "method": "ELEMENT_OVERLAP_CONSERVATIVE_P0",
+          "minimum_new_element_overlap_fraction": 0.9999999999999635,
+          "pre_redistribution_inventory_area_m2": 9.809264456100303e-07,
+          "roundoff_budget_m2": 1.405177496676804e-20,
+          "roundoff_correction_m2": 0.0,
+          "source_inventory_area_m2": 9.888057578786033e-07
+        },
+        "vacancy_transport_v2_transfer": null
+      },
+      "fingerprint": "de8b296bfc576725f7d156fced34a78d116d5a65f819f8c67ab592ba5a91c4f6",
+      "free_dof_residual_l2_N_per_m": 1.5238847195129253e-10,
+      "full_residual_including_reactions_N_per_m": 26421.76524204353,
+      "graph_length_m": 0.0005725993004046688,
+      "inventory_area_m2": 7.853981633974483e-09,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "mesh_elements": 768,
+      "mesh_maximum_aspect_ratio": 31.4376906845176,
+      "mesh_minimum_quality": 0.3117878388141192,
+      "mesh_nodes": 416,
+      "operation": "geometric_promotion",
+      "plastic_eigenstrain_half_work_J_per_m": -8.807733356492777e-05,
+      "reaction_N_per_m": 37978.32077637504,
+      "site_phase": "STABLE_SUBGRID_VOID",
+      "stored_recoverable_energy_J_per_m": 0.007683741488839937,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.0052920553686462745,
+      "top_reaction_N_per_m": 37978.32077637504,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.3220474211166495,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "void_event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        },
+        {
+          "area_m2": 1.9634954084936207e-09,
+          "cavity_id": "void:site-1",
+          "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+        },
+        {
+          "cavity_id": "void:site-1",
+          "event": "GEOMETRIC_PROMOTION"
+        }
+      ],
+      "void_phase": "RESOLVED_VOID"
+    },
+    {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 4e-07,
+      "available_defect_inventory_area_m2": 9.793024401014945e-07,
+      "bottom_reaction_N_per_m": -37979.76367744538,
+      "cavity_area_m2": 9.503317777109124e-09,
+      "cavity_radius_m": 5.5e-05,
+      "closed_cavity_boundary_cycle_certificate": null,
+      "compliance_m2_per_N": 1.0560726728036873e-11,
+      "constrained_reaction_l2_N_per_m": 26244.50324986273,
+      "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
+      "crack_void_connection_certificate": null,
+      "energy_J_per_m": 0.007642338814243513,
+      "energy_identity_reference_J_per_m": 0.007642338814243514,
+      "energy_reaction_identity": 1.1349427957470903e-16,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 2,
+        "refinement_operation_index": 2,
+        "topology_actions": 0
+      },
+      "external_work_J_per_m": 0.007554519776523583,
+      "field_transfer_audit": {
+        "active_capture_region_inventory": [
+          {
+            "capture_inventory_change_area_m2": 7.266663731857305e-12,
+            "capture_radius_m": 4.9999999999999996e-05,
+            "owner_id": "site-1",
+            "projected_capture_inventory_area_m2": 5.6725746157434676e-11,
+            "source_capture_inventory_area_m2": 4.945908242557737e-11
+          },
+          {
+            "capture_inventory_change_area_m2": 1.593440430370963e-09,
+            "capture_radius_m": 0.000105,
+            "owner_id": "void:site-1",
+            "projected_capture_inventory_area_m2": 3.556695118409901e-08,
+            "source_capture_inventory_area_m2": 3.3973510753728046e-08
+          }
+        ],
+        "density_integral_error": 1.1920928955078125e-07,
+        "plastic_integral_error": 9.693522803355793e-27,
+        "projected_density_l2_m2": 1.4680539127933012e+16,
+        "projected_displacement_l2_m": 2.502498260235294e-06,
+        "projected_fields_nonzero": true,
+        "projected_plastic_history_l2": 0.0003209983214175482,
+        "projected_vacancy_inventory_area_m2": 9.888057578786033e-07,
+        "source_density_l2_m2": 1.4636729712560506e+16,
+        "source_displacement_l2_m": 2.49562779419782e-06,
+        "source_plastic_history_l2": 0.0003200404036820812,
+        "source_vacancy_inventory_area_m2": 9.888057578786033e-07,
+        "vacancy_transfer": {
+          "locally_redistributed_area_m2": 2.187533137616536e-09,
+          "method": "ELEMENT_OVERLAP_CONSERVATIVE_P0",
+          "minimum_new_element_overlap_fraction": 0.9999999999999395,
+          "pre_redistribution_inventory_area_m2": 9.866182247409868e-07,
+          "roundoff_budget_m2": 1.405177496676804e-20,
+          "roundoff_correction_m2": 0.0,
+          "source_inventory_area_m2": 9.888057578786033e-07
+        },
+        "vacancy_transport_v2_transfer": null
+      },
+      "fingerprint": "425d4ec2799bc88b33fea61b89274ff5f97ab45580a5e3827739ce2244e95cee",
+      "free_dof_residual_l2_N_per_m": 1.4777433516454163e-10,
+      "full_residual_including_reactions_N_per_m": 26244.50324986273,
+      "graph_length_m": 0.0005725993004046688,
+      "growth_audit": {},
+      "growth_dt_s": 1.9380767110839173e-06,
+      "inventory_area_m2": 9.503317777109124e-09,
+      "length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "mesh_elements": 770,
+      "mesh_maximum_aspect_ratio": 52.8574733863615,
+      "mesh_minimum_quality": 0.2876126927678311,
+      "mesh_nodes": 417,
+      "operation": "resolved_growth",
+      "plastic_eigenstrain_half_work_J_per_m": -8.781903771993099e-05,
+      "rates": {
+        "birth_activation_work_J": 3.924594684612299e-21,
+        "birth_hydrostatic_work_J": 3.748380297901623e-21,
+        "birth_normal_opening_work_J": 2.1807401196441675e-22,
+        "birth_s": 87711928.92330575,
+        "birth_signed_shear_work_J": -4.185962525374029e-23,
+        "healing_activation_work_J": -3.890934920007142e-21,
+        "healing_s": 233839040.82947248,
+        "local_hydrostatic_stress_Pa": 187419014.89508116,
+        "local_in_plane_mean_stress_Pa": 216252709.49432442,
+        "local_max_principal_stress_Pa": 389093492.0007142,
+        "local_normal_opening_stress_Pa": 43614802.39288335,
+        "local_sigma_zz_Pa": 129751625.69659464,
+        "local_signed_shear_stress_Pa": -8371925.0507480595,
+        "local_von_mises_stress_Pa": 311615541.6381623,
+        "plastic_accommodation_s": 410980505.87553704,
+        "series_limited_growth_s": 257987724.19093904,
+        "stabilization_activation_work_J": 3.890934920007142e-21,
+        "stabilization_s": 2187352232.0301137,
+        "surface_reaction_s": 4158539000.744747,
+        "vacancy_transport_s": 831615409.9212931
+      },
+      "reaction_N_per_m": 37772.5988826179,
+      "site_phase": "STABLE_SUBGRID_VOID",
+      "stored_recoverable_energy_J_per_m": 0.007642338814243513,
+      "support_active_tip_ids": [
+        "b00000000"
+      ],
+      "top_bottom_reaction_balance": 0.005469526964607021,
+      "top_reaction_N_per_m": 37772.5988826179,
+      "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+      "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_fraction_max": 1.4060767123092903,
+      "vacancy_ledgers": {
+        "vacancy_annihilation_area_m2": 0.0,
+        "vacancy_consumed_by_void_area_m2": 0.0,
+        "vacancy_initial_area_m2": 9.888057578786033e-07,
+        "vacancy_plastic_production_area_m2": 0.0,
+        "vacancy_thermal_exchange_area_m2": 0.0
+      },
+      "vacancy_rate_audit": {},
+      "void_event_history": [
+        {
+          "event": "BIRTH_HIT",
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "site_id": "site-1"
+        },
+        {
+          "event": "STABILIZED",
+          "site_id": "site-1"
+        },
+        {
+          "area_m2": 1.9634954084936207e-09,
+          "cavity_id": "void:site-1",
+          "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+        },
+        {
+          "cavity_id": "void:site-1",
+          "event": "GEOMETRIC_PROMOTION"
+        }
+      ],
+      "void_phase": "RESOLVED_VOID"
+    }
+  ],
+  "matching_enabled_disabled_initial_mechanical_arrays": true,
+  "native_checkpoint": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/v5_cavity_enabled_no_branch/checkpoint/accepted_v5.json",
+  "native_checkpoint_round_trip_exact": true,
+  "physical_branch_birth_count": 0,
+  "physical_branch_birth_enabled": false,
+  "restart_input": null,
+  "restarted": false,
+  "schema": "shared.native_v5_cavity_branch_birth_disabled/1",
+  "terminal": {
+    "active_crack_branch_ids": [
+      "b00000000"
+    ],
+    "applied_opening_m": 4e-07,
+    "available_defect_inventory_area_m2": 9.793024401014945e-07,
+    "bottom_reaction_N_per_m": -37979.76367744538,
+    "cavity_area_m2": 9.503317777109124e-09,
+    "cavity_radius_m": 5.5e-05,
+    "closed_cavity_boundary_cycle_certificate": null,
+    "compliance_m2_per_N": 1.0560726728036873e-11,
+    "constrained_reaction_l2_N_per_m": 26244.50324986273,
+    "consumed_defect_inventory_area_m2": 9.503317777109124e-09,
+    "crack_void_connection_certificate": null,
+    "energy_J_per_m": 0.007642338814243513,
+    "energy_identity_reference_J_per_m": 0.007642338814243514,
+    "energy_reaction_identity": 1.1349427957470903e-16,
+    "event_counters": {
+      "accepted_steps": 0,
+      "mesh_generation": 2,
+      "refinement_operation_index": 2,
+      "topology_actions": 0
+    },
+    "external_work_J_per_m": 0.007554519776523583,
+    "field_transfer_audit": {
+      "active_capture_region_inventory": [
+        {
+          "capture_inventory_change_area_m2": 7.266663731857305e-12,
+          "capture_radius_m": 4.9999999999999996e-05,
+          "owner_id": "site-1",
+          "projected_capture_inventory_area_m2": 5.6725746157434676e-11,
+          "source_capture_inventory_area_m2": 4.945908242557737e-11
+        },
+        {
+          "capture_inventory_change_area_m2": 1.593440430370963e-09,
+          "capture_radius_m": 0.000105,
+          "owner_id": "void:site-1",
+          "projected_capture_inventory_area_m2": 3.556695118409901e-08,
+          "source_capture_inventory_area_m2": 3.3973510753728046e-08
+        }
+      ],
+      "density_integral_error": 1.1920928955078125e-07,
+      "plastic_integral_error": 9.693522803355793e-27,
+      "projected_density_l2_m2": 1.4680539127933012e+16,
+      "projected_displacement_l2_m": 2.502498260235294e-06,
+      "projected_fields_nonzero": true,
+      "projected_plastic_history_l2": 0.0003209983214175482,
+      "projected_vacancy_inventory_area_m2": 9.888057578786033e-07,
+      "source_density_l2_m2": 1.4636729712560506e+16,
+      "source_displacement_l2_m": 2.49562779419782e-06,
+      "source_plastic_history_l2": 0.0003200404036820812,
+      "source_vacancy_inventory_area_m2": 9.888057578786033e-07,
+      "vacancy_transfer": {
+        "locally_redistributed_area_m2": 2.187533137616536e-09,
+        "method": "ELEMENT_OVERLAP_CONSERVATIVE_P0",
+        "minimum_new_element_overlap_fraction": 0.9999999999999395,
+        "pre_redistribution_inventory_area_m2": 9.866182247409868e-07,
+        "roundoff_budget_m2": 1.405177496676804e-20,
+        "roundoff_correction_m2": 0.0,
+        "source_inventory_area_m2": 9.888057578786033e-07
+      },
+      "vacancy_transport_v2_transfer": null
+    },
+    "fingerprint": "425d4ec2799bc88b33fea61b89274ff5f97ab45580a5e3827739ce2244e95cee",
+    "free_dof_residual_l2_N_per_m": 1.4777433516454163e-10,
+    "full_residual_including_reactions_N_per_m": 26244.50324986273,
+    "graph_length_m": 0.0005725993004046688,
+    "inventory_area_m2": 9.503317777109124e-09,
+    "length_ledgers": {
+      "active_front_coordinate_advance_m": 0.0,
+      "connected_free_surface_extent_m": 0.0,
+      "connected_void_free_span_m": 0.0,
+      "fractured_ligament_length_m": 0.0,
+      "ordinary_crack_fractured_length_m": 0.0,
+      "physical_active_front_travel_m": 0.0,
+      "preexisting_void_free_span_m": 0.0,
+      "projected_connected_void_free_span_m": 0.0,
+      "projected_fractured_length_m": 0.0,
+      "projected_free_span_m": 0.0,
+      "projected_front_advance_m": 0.0,
+      "traversed_void_free_span_m": 0.0
+    },
+    "mesh_elements": 770,
+    "mesh_maximum_aspect_ratio": 52.8574733863615,
+    "mesh_minimum_quality": 0.2876126927678311,
+    "mesh_nodes": 417,
+    "operation": "terminal",
+    "plastic_eigenstrain_half_work_J_per_m": -8.781903771993099e-05,
+    "reaction_N_per_m": 37772.5988826179,
+    "site_phase": "STABLE_SUBGRID_VOID",
+    "stored_recoverable_energy_J_per_m": 0.007642338814243513,
+    "support_active_tip_ids": [
+      "b00000000"
+    ],
+    "top_bottom_reaction_balance": 0.005469526964607021,
+    "top_reaction_N_per_m": 37772.5988826179,
+    "vacancy_conservation_lhs_area_m2": 9.888057578786033e-07,
+    "vacancy_conservation_residual_m2": 0.0,
+    "vacancy_conservation_rhs_area_m2": 9.888057578786033e-07,
+    "vacancy_field_inventory_area_m2": 9.888057578786033e-07,
+    "vacancy_fraction_max": 1.4060767123092903,
+    "vacancy_ledgers": {
+      "vacancy_annihilation_area_m2": 0.0,
+      "vacancy_consumed_by_void_area_m2": 0.0,
+      "vacancy_initial_area_m2": 9.888057578786033e-07,
+      "vacancy_plastic_production_area_m2": 0.0,
+      "vacancy_thermal_exchange_area_m2": 0.0
+    },
+    "void_event_history": [
+      {
+        "event": "BIRTH_HIT",
+        "site_id": "site-1"
+      },
+      {
+        "event": "EMBRYO",
+        "site_id": "site-1"
+      },
+      {
+        "event": "STABILIZED",
+        "site_id": "site-1"
+      },
+      {
+        "area_m2": 1.9634954084936207e-09,
+        "cavity_id": "void:site-1",
+        "event": "INITIAL_CAVITY_SEED_INVENTORY_DEBIT"
+      },
+      {
+        "cavity_id": "void:site-1",
+        "event": "GEOMETRIC_PROMOTION"
+      }
+    ],
+    "void_phase": "RESOLVED_VOID"
+  },
+  "terminal_fingerprint": "425d4ec2799bc88b33fea61b89274ff5f97ab45580a5e3827739ce2244e95cee"
+}

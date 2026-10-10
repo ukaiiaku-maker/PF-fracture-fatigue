@@ -1,0 +1,107 @@
+{
+  "native_args": [
+    "--continue-one"
+  ],
+  "options": {
+    "cavity": "full_order_v5",
+    "crack_path": "single_front",
+    "integration": "explicit_event",
+    "kernel_manifest": null,
+    "kinetics": "native_signed",
+    "loading": "monotonic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "publication_restart",
+    "plasticity": "tip_plus_full_field",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "current_source",
+    "source_location": "tip_plus_bulk"
+  },
+  "options_sha256": "ace3550fedb1fe143d415f9ec70bc242614382fdbddede78c007251e68a47406",
+  "output_dir": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2/v5_cavity_enabled_uninterrupted",
+  "plan": {
+    "bindings": [
+      {
+        "attribute": "equilibrate_fixed_load_with_production_fem",
+        "consumer": "native full spatial fixed-load FEM equilibrium",
+        "module": "arrhenius_fracture.topology_transaction_v11",
+        "requested": "spatial_pf",
+        "role": "mechanics"
+      },
+      {
+        "attribute": "main",
+        "consumer": "bounded accepted-state cavity lifecycle",
+        "module": "arrhenius_fracture.shared_v5_cavity_adapter",
+        "requested": "monotonic",
+        "role": "loading"
+      },
+      {
+        "attribute": "build_production_void_state",
+        "consumer": "tip plus distributed V5 state",
+        "module": "arrhenius_fracture.voiding_production_v5",
+        "requested": "tip_plus_bulk",
+        "role": "source_location"
+      },
+      {
+        "attribute": "MODEL_ID",
+        "consumer": "current-source full topology state",
+        "module": "arrhenius_fracture.current_source_runtime_bindings",
+        "requested": "current_source",
+        "role": "source_lifecycle"
+      },
+      {
+        "attribute": "accepted_bulk_load_step",
+        "consumer": "accepted full-field state",
+        "module": "arrhenius_fracture.bulk_plasticity_v104",
+        "requested": "tip_plus_full_field",
+        "role": "plasticity"
+      },
+      {
+        "attribute": "deterministic_trajectory",
+        "consumer": "native local tensor Arrhenius clocks",
+        "module": "arrhenius_fracture.voiding_production_v5",
+        "requested": "native_signed",
+        "role": "kinetics"
+      },
+      {
+        "attribute": "main",
+        "consumer": "single active front; physical branch birth disabled",
+        "module": "arrhenius_fracture.shared_v5_cavity_adapter",
+        "requested": "single_front",
+        "role": "crack_path"
+      },
+      {
+        "attribute": "build_production_void_state",
+        "consumer": "full-order V5 or matched disabled control",
+        "module": "arrhenius_fracture.voiding_production_v5",
+        "requested": "full_order_v5",
+        "role": "cavity"
+      },
+      {
+        "attribute": "advance_event_aware_coupled_interval",
+        "consumer": "native event transactions",
+        "module": "arrhenius_fracture.global_physical_scheduler_v1",
+        "requested": "explicit_event",
+        "role": "integration"
+      },
+      {
+        "attribute": "write_checkpoint",
+        "consumer": "atomic full-state V11 checkpoint independent of images",
+        "module": "arrhenius_fracture.checkpoint_v11",
+        "requested": "publication_restart",
+        "role": "output"
+      }
+    ],
+    "executable": true,
+    "executor_attribute": "main",
+    "executor_module": "arrhenius_fracture.shared_v5_cavity_adapter",
+    "limitation": null,
+    "options_sha256": "ace3550fedb1fe143d415f9ec70bc242614382fdbddede78c007251e68a47406",
+    "restart_family": "v11_native_full_state_v5",
+    "schema": "shared-execution-plan/1"
+  },
+  "restart_from": null,
+  "schema": "shared-execution-request/1",
+  "source_policy": "development_snapshot"
+}

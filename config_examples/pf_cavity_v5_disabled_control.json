@@ -1,0 +1,16 @@
+{
+  "cavity": "disabled",
+  "crack_path": "single_front",
+  "integration": "explicit_event",
+  "kernel_manifest": null,
+  "kinetics": "native_signed",
+  "loading": "monotonic",
+  "material_manifest": null,
+  "mechanics": "spatial_pf",
+  "output": "publication_restart",
+  "plasticity": "tip_plus_full_field",
+  "random_seed": 1733,
+  "schema": "shared-fracture-fatigue-options/1",
+  "source_lifecycle": "current_source",
+  "source_location": "tip_plus_bulk"
+}

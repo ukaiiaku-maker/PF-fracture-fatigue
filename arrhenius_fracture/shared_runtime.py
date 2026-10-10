@@ -104,6 +104,19 @@ def _pf_driver(options: SharedOptions) -> ProviderBinding:
     if (
         options.loading is LoadingMode.MONOTONIC
         and options.source_location is SourceLocation.TIP_PLUS_BULK
+        and options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE
+        and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
+        and options.crack_path is CrackPathMode.SINGLE_FRONT
+        and options.integration.value == "explicit_event"
+    ):
+        mode = "enabled" if options.cavity is CavityMode.FULL_ORDER_V5 else "disabled"
+        return ProviderBinding(
+            "driver", "arrhenius_fracture.shared_v5_cavity_adapter",
+            f"native_v5_cavity_{mode}_branch_birth_disabled", "main",
+        )
+    if (
+        options.loading is LoadingMode.MONOTONIC
+        and options.source_location is SourceLocation.TIP_PLUS_BULK
         and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
     ):
         return ProviderBinding(

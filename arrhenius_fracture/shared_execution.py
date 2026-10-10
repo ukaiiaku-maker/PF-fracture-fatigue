@@ -108,6 +108,56 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
             "v3_6_event_checkpoint_write_only", True, None,
         )
 
+    v5_cavity_pair = (
+        options.loading is LoadingMode.MONOTONIC
+        and options.source_location is SourceLocation.TIP_PLUS_BULK
+        and options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE
+        and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
+        and options.crack_path is CrackPathMode.SINGLE_FRONT
+        and options.kinetics is KineticsStrategy.NATIVE_SIGNED
+        and options.integration is IntegrationStrategy.EXPLICIT_EVENT
+        and options.output is OutputProfile.PUBLICATION_RESTART
+    )
+    if v5_cavity_pair:
+        bindings = (
+            _binding("mechanics", options.mechanics,
+                     "arrhenius_fracture.topology_transaction_v11",
+                     "equilibrate_fixed_load_with_production_fem",
+                     "native full spatial fixed-load FEM equilibrium"),
+            _binding("loading", options.loading,
+                     "arrhenius_fracture.shared_v5_cavity_adapter", "main",
+                     "bounded accepted-state cavity lifecycle"),
+            _binding("source_location", options.source_location,
+                     "arrhenius_fracture.voiding_production_v5",
+                     "build_production_void_state", "tip plus distributed V5 state"),
+            _binding("source_lifecycle", options.source_lifecycle,
+                     "arrhenius_fracture.current_source_runtime_bindings", "MODEL_ID",
+                     "current-source full topology state"),
+            _binding("plasticity", options.plasticity,
+                     "arrhenius_fracture.bulk_plasticity_v104",
+                     "accepted_bulk_load_step", "accepted full-field state"),
+            _binding("kinetics", options.kinetics,
+                     "arrhenius_fracture.voiding_production_v5",
+                     "deterministic_trajectory", "native local tensor Arrhenius clocks"),
+            _binding("crack_path", options.crack_path,
+                     "arrhenius_fracture.shared_v5_cavity_adapter", "main",
+                     "single active front; physical branch birth disabled"),
+            _binding("cavity", options.cavity,
+                     "arrhenius_fracture.voiding_production_v5",
+                     "build_production_void_state", "full-order V5 or matched disabled control"),
+            _binding("integration", options.integration,
+                     "arrhenius_fracture.global_physical_scheduler_v1",
+                     "advance_event_aware_coupled_interval", "native event transactions"),
+            _binding("output", options.output,
+                     "arrhenius_fracture.checkpoint_v11", "write_checkpoint",
+                     "atomic full-state V11 checkpoint independent of images"),
+        )
+        return ExecutionPlan(
+            "shared-execution-plan/1", options.fingerprint, bindings,
+            "arrhenius_fracture.shared_v5_cavity_adapter", "main",
+            "v11_native_full_state_v5", True, None,
+        )
+
     bindings = [
         _binding("mechanics", options.mechanics, "arrhenius_fracture.fem", "assemble_mechanics",
                  "full spatial finite-element mechanics assembly"),
