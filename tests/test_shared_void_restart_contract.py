@@ -3,7 +3,9 @@ import pytest
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
 from arrhenius_fracture.unified_fracture_material_v5 import material_bundle
-from arrhenius_fracture.voiding_production_v5 import build_production_void_state, observables
+from arrhenius_fracture.voiding_production_v5 import (
+    _directional_rate_source_identity, build_production_void_state, observables,
+)
 from arrhenius_fracture.shared_v5_cavity_adapter import _common_start_audit
 
 
@@ -45,3 +47,20 @@ def test_physical_pair_has_exact_common_nonvoid_start_and_separate_cavity_owner(
     disabled, _ = build_production_void_state(enabled=False, **common)
     enabled, _ = build_production_void_state(enabled=True, **common)
     assert all(_common_start_audit(disabled, enabled).values())
+
+
+def test_directional_clock_identity_excludes_numerical_cache_diagnostics():
+    physical = {
+        "candidate_id": "c1", "process_owner_id": "b0",
+        "directional_drive_status": "AVAILABLE", "drive_source": "MARGINAL_G",
+        "G_kinetic_used_J_per_m2": 12.0, "signed_J_J_per_m2": -2.0,
+        "positive_J_J_per_m2": 12.0, "K_directional_Pa_sqrt_m": 3.0,
+        "K_effective_Pa_sqrt_m": 3.0, "resolved_opening_stress_Pa": 4.0,
+        "rate_s": 5.0, "effective_rate_s": 5.0,
+        "clock_increment_per_second": 5.0,
+    }
+    first = {**physical, "exact_factorization_cache": {"hits": 1}}
+    second = {**physical, "exact_factorization_cache": {"hits": 99}}
+    assert _directional_rate_source_identity([first]) == (
+        _directional_rate_source_identity([second])
+    )

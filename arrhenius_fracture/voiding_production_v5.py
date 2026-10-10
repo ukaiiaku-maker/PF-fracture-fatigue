@@ -2388,6 +2388,24 @@ def _source_identity(state, tensor, *, source_kind, source_front_id=None,
     return identity
 
 
+def _directional_rate_source_identity(rates):
+    """Keep physical directional inputs, excluding cache/timing diagnostics.
+
+    The full provider rows contain exact-factorization cache counters and
+    accepted-state diagnostic fingerprints.  Those are useful audit data but
+    are not kinetic inputs; including them in a clock-source identity caused a
+    checkpoint continuation to reset otherwise identical directional anchors.
+    """
+    keys = (
+        "candidate_id", "process_owner_id", "directional_drive_status",
+        "drive_source", "G_kinetic_used_J_per_m2", "signed_J_J_per_m2",
+        "positive_J_J_per_m2", "K_directional_Pa_sqrt_m",
+        "K_effective_Pa_sqrt_m", "resolved_opening_stress_Pa",
+        "rate_s", "effective_rate_s", "clock_increment_per_second",
+    )
+    return tuple({key: row.get(key) for key in keys} for row in rates)
+
+
 def _transition_competition_source(state, source, *, candidates=None):
     """Archive completed events and start source-owned fresh clocks."""
     junction = dict(state.junction_process_state)
@@ -3299,7 +3317,10 @@ def _complete_next_clock_fused(state, stress_tensor_Pa=None, *, source_kind="sha
         state, stress, source_kind=source_kind, source_front_id=source_front_id,
         source_cavity_id=source_cavity_id, source_boundary_site_id=source_boundary_site_id,
         source_position_m=source_position_m, source_probe_identity=source_probe_identity,
-        source_load_payload=front_load_rows,
+        source_load_payload=(
+            None if front_load_rows is None
+            else _directional_rate_source_identity(rates)
+        ),
     )
     from .finalization_v3_schema import canonical_hash
     source_signature = canonical_hash(source)
