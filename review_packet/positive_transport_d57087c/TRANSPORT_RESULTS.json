@@ -1,0 +1,86 @@
+{
+  "schema": "v5-conservative-positive-transport-results/1",
+  "simulation_source": "854d32d",
+  "analysis_test_source": "d57087c",
+  "method": {
+    "model_id": "MIXED_RT0_P0_CONSERVATIVE_POSITIVE_FLUX_CORRECTION",
+    "high_order_reference": "mixed RT0/P0 element-mass backward Euler",
+    "correction": "scaled-ADMM Euclidean projection of registered integrated shared-face fluxes",
+    "cell_balance": "C*c + B*q = r",
+    "concentration_clipping": false,
+    "mass_renormalization": false,
+    "dilute_upper_limit": 0.01
+  },
+  "retained_failure": {
+    "start_s": 0.50002,
+    "end_s": 0.60002,
+    "old_centered_candidate_min": -9.76180956715588e-15,
+    "corrected_disabled_min": 4.141703076280663e-22,
+    "corrected_enabled_min": 4.141696992526994e-22,
+    "corrected_max": 3.53878816841054e-9,
+    "maximum_face_flux_correction": 2.0133027334019456e-23,
+    "face_flux_scale": 5.2589174124975425e-17,
+    "local_balance_residual_inf": 5.970382827600431e-33,
+    "global_inventory_residual_area_m2": 5.620633949699709e-30,
+    "inventory_budget_area_m2": 1e-24,
+    "accepted_without_time_refinement": true
+  },
+  "paired_endpoint": {
+    "time_s": 1.00002,
+    "outcome": "COMPLETED_NO_EVENT",
+    "disabled_concentration_range": [6.172983434132487e-22, 4.937109681435935e-9],
+    "enabled_concentration_range": [6.172973647377395e-22, 4.9370952948509814e-9],
+    "restart_full_state_exact": true,
+    "restart_vacancy_field_exact": true,
+    "disabled_fingerprint": "cb456d98cef47d0c277e6024a84fdd86ac143578ac031b085f508ff7d7fe3d28",
+    "enabled_fingerprint": "d2c8ec7f61e2e00c051324e53acb6de603ec2ac058edb875d42f7a3493083d90"
+  },
+  "time_refinement_at_0p60002_s": {
+    "reference_dt_s": 0.025,
+    "disabled": {
+      "dt_0p1_relative_inf": 0.003355972409064311,
+      "dt_0p05_relative_inf": 0.0011329704390167766,
+      "dt_0p1_integrated_abs_area": 1.9757103540534638e-18,
+      "dt_0p05_integrated_abs_area": 6.676189392893654e-19
+    },
+    "enabled": {
+      "dt_0p1_relative_inf": 0.0033559942307943478,
+      "dt_0p05_relative_inf": 0.0011329780513604283,
+      "dt_0p1_integrated_abs_area": 1.975710901240062e-18,
+      "dt_0p05_integrated_abs_area": 6.676191304402385e-19,
+      "site_birth_action_dt_0p1": [2.4110151575580017e-6, 2.1942587906457907e-6],
+      "site_birth_action_dt_0p05": [2.3902932134841095e-6, 2.174933129738137e-6],
+      "site_birth_action_dt_0p025": [2.379543175992523e-6, 2.164911089488366e-6]
+    }
+  },
+  "spatial_refinement_neumann_mode": [
+    {"elements": 16, "area_weighted_l2_error": 5.469455578321478e-15},
+    {"elements": 64, "area_weighted_l2_error": 1.671050120107027e-15},
+    {"elements": 256, "area_weighted_l2_error": 2.9969942905435434e-16}
+  ],
+  "physical_cavity_comparison": {
+    "status": "BLOCKED_BY_MISSING_MATCHED_PHYSICAL_CAVITY_ANCESTRY",
+    "extreme_reservoir_used_as_physical_evidence": false
+  },
+  "combined_branching_cavity": {
+    "component_resolution": "PRESERVED",
+    "shared_native_executor": false,
+    "restart_family": "unmapped",
+    "scope": "genuinely new composition; no silent single-front or cavity-disabled fallback"
+  },
+  "v3_6_active_restart": {
+    "highest_established_load_MPa_sqrt_m": 15.462474735549586,
+    "phase_intervals_attempted": 2,
+    "projected_beta_p_max_abs": 2.561535e-40,
+    "meaningfully_active": false,
+    "existing_low_activity_six_phase_restart_preserved": true
+  },
+  "storage": {
+    "full_evidence_local_size": "73 MiB",
+    "data_volume_free": "22 GiB",
+    "external_volume": "/Volumes/My Passport",
+    "external_mount_mode": "read-only",
+    "supplemental_backup": "pending",
+    "data_deleted": false
+  }
+}

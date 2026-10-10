@@ -1,0 +1,22 @@
+{
+  "schema": "v5-conservative-positive-transport-test-receipt/1",
+  "analysis_test_source": "d57087c",
+  "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "tests": [
+    {
+      "scope": "complete repository",
+      "result": "778 passed",
+      "elapsed_s": 65.97
+    },
+    {
+      "scope": "positive transport and immutable paired checkpoint",
+      "result": "3 passed",
+      "elapsed_s": 0.45
+    },
+    {
+      "scope": "native fracture observations, plotting and R-curve interval semantics",
+      "result": "16 passed",
+      "elapsed_s": 1.28
+    }
+  ]
+}
