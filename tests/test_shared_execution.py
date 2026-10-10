@@ -3,7 +3,9 @@ import json
 import pytest
 
 from arrhenius_fracture.fem_backend_adapter import inspect_fem_backend, require_fem_backend
-from arrhenius_fracture.shared_execution import build_execution_plan, construct_and_attest
+from arrhenius_fracture.shared_execution import (
+    build_execution_plan, construct_and_attest, execute_shared,
+)
 from arrhenius_fracture.shared_execution_worker import _multifront_restart_flag
 from arrhenius_fracture.shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
@@ -90,6 +92,20 @@ def test_operator_consistent_preset_maps_to_developed_native_campaign():
     assert plan.executable
     assert plan.executor_module.endswith("shared_operator_consistent_adapter")
     assert plan.restart_family == "v3_6_event_checkpoint_write_only"
+
+
+@pytest.mark.parametrize("name", [
+    "pf_operator_consistent_cyclic",
+    "pf_monotonic_bulk",
+    "pf_monotonic_tip_plus_bulk",
+])
+def test_public_restart_is_rejected_for_write_only_or_unsupported_paths(name, tmp_path):
+    restart = tmp_path / "would-be-restart"
+    restart.mkdir()
+    output = tmp_path / "output"
+    with pytest.raises(ValueError, match="not supported by this public execution path"):
+        execute_shared(PRESETS[name], [], output, restart_from=restart)
+    assert not output.exists()
 
 
 def test_hold_dwell_maps_to_native_ramp_then_hold_fatigue_entry():

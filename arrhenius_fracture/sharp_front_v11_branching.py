@@ -460,7 +460,10 @@ def evolve_process_engine_v12_hook(
     require_same_tip_coupling(
         controlling_observation.tip_id, controlling_observation.tip_id,
     )
-    from .anisotropic_emission_v10174 import bind_explicit_accepted_tensor_drive
+    from .anisotropic_emission_v10174 import (
+        bind_explicit_accepted_tensor_drive,
+        install_explicit_accepted_tensor_drive,
+    )
     bound_drive = bind_explicit_accepted_tensor_drive(
         mesh=accepted_state.mesh, sigma_gp=accepted_sigma,
         damage=accepted_state.damage,
@@ -470,6 +473,17 @@ def evolve_process_engine_v12_hook(
         stress_field_state_id=stress_field_state_id,
     )
     engine_trial = copy.deepcopy(engine)
+    prior_drive = getattr(engine_trial, "_anisotropic_drive", None) or {}
+    # These counters order drives only within one physical engine.  Derive
+    # them from restored engine state so fresh-process observer diagnostics do
+    # not alter checkpoint identity or restart equivalence.
+    bound_drive["drive_serial"] = int(
+        getattr(engine_trial, "_anisotropic_drive_serial", -1)
+    ) + 1
+    bound_drive["mechanics_serial"] = int(
+        prior_drive.get("mechanics_serial", -1)
+    ) + 1
+    install_explicit_accepted_tensor_drive(engine_trial, bound_drive)
     engine_trial.B = float(pre_progress)
     if hasattr(engine_trial, "hazard_action_current"):
         engine_trial.hazard_action_current = float(pre_progress)

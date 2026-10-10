@@ -341,6 +341,18 @@ def execute_shared(
 ) -> dict[str, Any]:
     """Execute one native path in a fresh interpreter and return its receipt."""
     plan = build_execution_plan(options)
+    if restart_from is not None and plan.restart_family in {
+        "unmapped",
+        "v3_6_event_checkpoint_write_only",
+        "legacy_single_front_no_public_restart",
+        "v10_4_pure_bulk_full_field_no_public_restart",
+        "v10_4_combined_full_field_no_public_restart",
+    }:
+        raise ValueError(
+            "restart_from is not supported by this public execution path "
+            f"(restart_family={plan.restart_family!r}); the request was rejected "
+            "before native execution rather than silently starting a fresh run"
+        )
     if options.kernel_manifest:
         raise RuntimeError("shared kernel-manifest mapping is not yet qualified")
     if options.material_manifest and not (

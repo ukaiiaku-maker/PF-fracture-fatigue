@@ -9,12 +9,14 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from arrhenius_fracture.fracture_observation_history import (
-    ObservationHistory, from_legacy_steps_csv,
+    LengthCoordinate, ObservationHistory, from_legacy_steps_csv,
 )
 
 
 def plot_history(history: ObservationHistory, output: Path, *, front_id: str | None = None,
-                 segment_id: str | None = None) -> None:
+                 segment_id: str | None = None,
+                 coordinate: LengthCoordinate | str = LengthCoordinate.EXTENSION) -> None:
+    coordinate = LengthCoordinate(coordinate)
     rows = history.filtered(front_id=front_id, segment_id=segment_id)
     if not rows:
         raise ValueError("no observations selected")
@@ -24,14 +26,18 @@ def plot_history(history: ObservationHistory, output: Path, *, front_id: str | N
         groups.setdefault((row.segment_id, row.stage.value, row.validity_status.value), []).append(row)
     for (segment, stage, validity), selected in groups.items():
         axis.plot(
-            [row.stage_length_m * 1e6 for row in selected],
+            [row.length_m(coordinate) * 1e6 for row in selected],
             [(row.K_J_Pa_sqrt_m if math.isfinite(row.K_J_Pa_sqrt_m)
               else row.K_probe_Pa_sqrt_m if math.isfinite(row.K_probe_Pa_sqrt_m)
               else row.K_I_Pa_sqrt_m) * 1e-6 for row in selected],
             marker="o", markersize=2.5, linewidth=1.0,
             label=f"{segment}: {stage}; {validity}",
         )
-    axis.set_xlabel("Crack length or extension (µm)")
+    axis.set_xlabel({
+        LengthCoordinate.EXTENSION: "Projected crack extension (µm)",
+        LengthCoordinate.ABSOLUTE_PROJECTED: "Absolute projected crack length (µm)",
+        LengthCoordinate.PATH_ARCLENGTH: "Crack-path arclength (µm)",
+    }[coordinate])
     axis.set_ylabel(r"Native $K$ observer (MPa $\sqrt{\mathrm{m}}$)")
     if len(groups) > 1:
         axis.legend(frameon=False, fontsize=7)
@@ -48,10 +54,13 @@ def main(argv=None) -> int:
     parser.add_argument("--legacy-steps", action="store_true")
     parser.add_argument("--front-id")
     parser.add_argument("--segment-id")
+    parser.add_argument("--coordinate", choices=[item.value for item in LengthCoordinate],
+                        default=LengthCoordinate.EXTENSION.value)
     args = parser.parse_args(argv)
     history = (from_legacy_steps_csv(args.history)
                if args.legacy_steps else ObservationHistory.load(args.history))
-    plot_history(history, args.output, front_id=args.front_id, segment_id=args.segment_id)
+    plot_history(history, args.output, front_id=args.front_id, segment_id=args.segment_id,
+                 coordinate=args.coordinate)
     return 0
 
 

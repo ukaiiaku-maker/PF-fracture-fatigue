@@ -9,6 +9,7 @@ from arrhenius_fracture.energy_ledger_output_v10227 import online_observation_hi
 from arrhenius_fracture.fracture_observation_history import (
     FractureObservation, LengthCoordinate, LoadDirection, ObservationHistory,
     ObservationStage, ValidityStatus, from_legacy_steps_csv,
+    with_geometry_event_arclength,
 )
 
 
@@ -209,3 +210,38 @@ def test_projected_pre_event_length_uses_previous_state_not_path_increment():
     assert committed.committed_length_m == pytest.approx(13e-6)
     assert math.isnan(pre_event.path_arclength_m)
     assert math.isnan(committed.path_arclength_m)
+
+
+def test_native_geometry_events_attach_deflected_stage_arclength():
+    source = ObservationHistory([
+        row(0, 0, stage="reequilibrated"),
+        row(1, 0, stage="pre_event"),
+        FractureObservation(
+            **{
+                **row(2, 4, stage="committed", pre_um=0).to_dict(),
+                "event_id": "e1",
+                "event_multiplicity": 1,
+                "aggregate_event_count": 1,
+            }
+        ),
+        row(3, 4, stage="reequilibrated"),
+    ])
+    events = [{
+        "event_index": 0, "front_id": 0,
+        "x0": 100e-6, "y0": 0.0, "x1": 104e-6, "y1": 3e-6,
+        "event_advance_m": 5e-6,
+    }]
+    recovered = with_geometry_event_arclength(source, events)
+    assert [item.path_arclength_m for item in recovered.rows] == pytest.approx([
+        0.0, 0.0, 5e-6, 5e-6,
+    ])
+    assert recovered.at_length(
+        5e-6, coordinate=LengthCoordinate.PATH_ARCLENGTH
+    ).status == "exact_repeated"
+    bracket = recovered.at_length(
+        2.5e-6, coordinate=LengthCoordinate.PATH_ARCLENGTH
+    )
+    assert bracket.status == "discrete_jump_bracket"
+    assert [item.stage.value for item in bracket.crossing] == [
+        "pre_event", "committed",
+    ]

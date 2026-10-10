@@ -9,9 +9,20 @@ from arrhenius_fracture.anisotropic_emission_v10174 import (
     AnisotropicEmissionConfig,
     _anisotropic_campaign_emit,
     finite_source_emission_update,
+    install_explicit_accepted_tensor_drive,
     probe_tensor_ahead,
     resolve_channel_drives,
 )
+
+
+class _DriveOwner:
+    def __init__(self):
+        self._anisotropic_drive = {"reliable": False}
+        self._anisotropic_drive_serial = 999
+        self.installed = False
+
+    def _install_current_drive_on_state(self):
+        self.installed = True
 
 
 def _rotate_tensor(tensor, angle_deg):
@@ -76,6 +87,37 @@ def test_finite_source_update_is_exact_and_bounded():
     assert np.allclose(emitted, available * expected_probability)
     assert np.all(emitted >= 0.0)
     assert np.all(emitted <= available)
+
+
+def test_explicit_accepted_drive_replaces_higher_restored_diagnostic_serial():
+    engine = _DriveOwner()
+    drive = {
+        "tensor_drive_admissible": True,
+        "tensor_drive_reliable": True,
+        "reliable": True,
+        "drive_factors": [0.5, 1.5],
+        "drive_serial": 1,
+        "explicit_bound_accepted_state": True,
+        "accepted_state_id": "accepted:new",
+        "stress_field_state_id": "stress:new",
+    }
+    install_explicit_accepted_tensor_drive(engine, drive)
+    assert engine.installed is True
+    assert engine._anisotropic_drive_serial == 1
+    assert engine._anisotropic_drive["accepted_state_id"] == "accepted:new"
+
+
+def test_explicit_drive_install_rejects_unowned_observer_drive():
+    engine = _DriveOwner()
+    drive = {
+        "tensor_drive_admissible": True,
+        "tensor_drive_reliable": True,
+        "reliable": True,
+        "drive_factors": [1.0, 1.0],
+        "drive_serial": 1000,
+    }
+    with pytest.raises(RuntimeError, match="explicit accepted state"):
+        install_explicit_accepted_tensor_drive(engine, drive)
 
 
 def _fake_campaign_state():

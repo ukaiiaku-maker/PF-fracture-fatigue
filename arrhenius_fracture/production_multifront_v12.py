@@ -7,10 +7,12 @@ output, and checkpoint sequencing are owned here.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, fields, is_dataclass, replace
 import hashlib
 import pickle
 from typing import Any, Callable, Mapping, Sequence
+
+import numpy as np
 
 from .general_multifront_v12 import (
     AcceptedIntervalResult, FrontCandidateObservation, FrontRuntimeState,
@@ -313,18 +315,38 @@ def apply_exact_trial_delta(
 
 
 def accepted_fem_state_fingerprint(state: Any) -> str:
-    """Hash the canonical serialized form of one accepted FEM state.
+    """Hash physical FEM content independently of Python container history."""
+    def canonical(value: Any) -> Any:
+        if isinstance(value, np.ndarray):
+            array = np.ascontiguousarray(value)
+            return {
+                "array_dtype": str(array.dtype),
+                "array_shape": list(array.shape),
+                "array_sha256": hashlib.sha256(array.tobytes()).hexdigest(),
+            }
+        if isinstance(value, np.generic):
+            return value.item()
+        if is_dataclass(value):
+            return {
+                "dataclass": type(value).__qualname__,
+                "fields": {field.name: canonical(getattr(value, field.name))
+                           for field in fields(value)},
+            }
+        if isinstance(value, Mapping):
+            return {str(key): canonical(item)
+                    for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))}
+        if isinstance(value, (tuple, list)):
+            return [canonical(item) for item in value]
+        if hasattr(value, "__dict__"):
+            return {
+                "object": type(value).__qualname__,
+                "attributes": canonical(vars(value)),
+            }
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            return value
+        return {"type": type(value).__qualname__, "representation": repr(value)}
 
-    ``LiveFEMTopologyState`` freezes arrays and mapping containers on
-    construction.  Some producer-side objects therefore have a different
-    first pickle representation from the same object after checkpoint load
-    (notably writable array provenance and pickle-safe frozen mappings).  A
-    checkpoint identity must describe the restart object, not those transient
-    in-memory representation details.  Normalize through exactly one pickle
-    reconstruction before hashing so producer and loader bind the same bytes.
-    """
-    normalized = pickle.loads(pickle.dumps(state, protocol=5))
-    return hashlib.sha256(pickle.dumps(normalized, protocol=5)).hexdigest()
+    return canonical_hash(canonical(state))
 
 
 def rollover_accepted_state(

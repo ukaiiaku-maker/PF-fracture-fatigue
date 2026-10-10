@@ -6,7 +6,7 @@ mode-I or effective K.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, fields, replace
 from enum import Enum
 import csv
 import json
@@ -37,6 +37,7 @@ class ValidityStatus(str, Enum):
 class LengthCoordinate(str, Enum):
     EXTENSION = "extension"
     ABSOLUTE_PROJECTED = "absolute_projected"
+    PATH_ARCLENGTH = "path_arclength"
 
 @dataclass(frozen=True)
 class FractureObservation:
@@ -109,6 +110,8 @@ class FractureObservation:
         return self.stage_extension_m
 
     def length_m(self, coordinate: LengthCoordinate | str) -> float:
+        if LengthCoordinate(coordinate) is LengthCoordinate.PATH_ARCLENGTH:
+            return self.path_arclength_m
         value = self.stage_extension_m
         return value + self.initial_length_m if LengthCoordinate(coordinate) is LengthCoordinate.ABSOLUTE_PROJECTED else value
 
@@ -215,10 +218,25 @@ class ObservationHistory:
         position = lambda row: row.length_m(coordinate)
         exact = tuple(row for row in rows if abs(position(row) - target) <= atol_m)
         offset = lambda row: row.initial_length_m if coordinate is LengthCoordinate.ABSOLUTE_PROJECTED else 0.0
-        crossing = tuple(row for row in rows
-                         if row.committed_length_m - row.pre_length_m > atol_m
-                         and row.pre_length_m + offset(row) - atol_m <= target
-                         <= row.committed_length_m + offset(row) + atol_m)
+        if coordinate is LengthCoordinate.PATH_ARCLENGTH:
+            crossing_rows = []
+            for lower_row, upper_row in zip(rows, rows[1:]):
+                if (
+                    lower_row.stage is ObservationStage.PRE_EVENT
+                    and upper_row.stage is ObservationStage.COMMITTED
+                    and lower_row.event_id == upper_row.event_id
+                    and lower_row.front_id == upper_row.front_id
+                    and lower_row.segment_id == upper_row.segment_id
+                    and position(lower_row) + atol_m < target
+                    < position(upper_row) - atol_m
+                ):
+                    crossing_rows.extend((lower_row, upper_row))
+            crossing = tuple(crossing_rows)
+        else:
+            crossing = tuple(row for row in rows
+                             if row.committed_length_m - row.pre_length_m > atol_m
+                             and row.pre_length_m + offset(row) - atol_m <= target
+                             <= row.committed_length_m + offset(row) + atol_m)
         below = [row for row in rows if position(row) < target - atol_m]
         above = [row for row in rows if position(row) > target + atol_m]
         lower = max(below, key=lambda row: (position(row), row.sequence), default=None)
@@ -317,6 +335,58 @@ def from_legacy_steps_csv(path: str | Path, *, front_id: str = "primary",
         previous_committed = committed
     return ObservationHistory(rows)
 
+
+def with_geometry_event_arclength(
+    history: ObservationHistory,
+    geometry_events: Iterable[dict],
+    *,
+    observation_front_id: str = "primary",
+    geometry_front_id: int | str = 0,
+    atol_m: float = 1.0e-12,
+) -> ObservationHistory:
+    """Attach stage-specific arclength from ordered native geometry events.
+
+    The function is intentionally strict: it accepts one explicitly mapped
+    front, consumes events only at committed rows, verifies the projected
+    endpoint against the observation, and refuses incomplete associations.
+    """
+    events = sorted(
+        (dict(item) for item in geometry_events
+         if str(item.get("front_id")) == str(geometry_front_id)),
+        key=lambda item: int(item["event_index"]),
+    )
+    cursor = 0
+    arclength = 0.0
+    rows: list[FractureObservation] = []
+    for row in history.rows:
+        if row.front_id != observation_front_id:
+            rows.append(row)
+            continue
+        if row.stage is ObservationStage.COMMITTED:
+            count = int(row.event_multiplicity or row.aggregate_event_count)
+            selected = events[cursor:cursor + count]
+            if count < 1 or len(selected) != count:
+                raise ValueError("committed observation cannot be matched to geometry events")
+            for event in selected:
+                dx = float(event["x1"]) - float(event["x0"])
+                dy = float(event["y1"]) - float(event["y0"])
+                measured = math.hypot(dx, dy)
+                recorded = float(event.get("event_advance_m", measured))
+                if not math.isclose(measured, recorded, rel_tol=1.0e-10, abs_tol=atol_m):
+                    raise ValueError("native geometry event length is internally inconsistent")
+                arclength += measured
+            cursor += count
+            projected = float(selected[-1]["x1"] - events[0]["x0"])
+            if not math.isclose(
+                projected, row.committed_length_m, rel_tol=1.0e-10, abs_tol=atol_m
+            ):
+                raise ValueError("geometry endpoint differs from committed projected length")
+        rows.append(replace(row, path_arclength_m=arclength))
+    if cursor != len(events):
+        raise ValueError("unconsumed native geometry events remain")
+    return ObservationHistory(rows)
+
 __all__ = ["SCHEMA", "ObservationStage", "LoadDirection", "ValidityStatus",
            "LengthCoordinate", "FractureObservation", "LengthQueryResult",
-           "ObservationHistory", "from_legacy_steps_csv"]
+           "ObservationHistory", "from_legacy_steps_csv",
+           "with_geometry_event_arclength"]

@@ -2167,7 +2167,10 @@ def run_stateful_accepted_interval_v12(
                 raise StatefulProductionInterlock("stale sigma/FEM ownership sentinel failed")
             accepted_id_value = "accepted:" + canonical_hash({
                 "fem_state_sha256": fem_hash_value,
-                "prior_accepted_state_id": before_runtime.accepted_state_id,
+                # The physical boundary is identified by state, clock, load,
+                # and step.  Chaining the previous opaque identifier made the
+                # same boundary path-dependent across a checkpoint restore.
+                "step_count": before_step + 1,
                 "end_time_s": solved_value.physical_time_s,
                 "accepted_load_m": solved_value.accepted_load_m,
             })

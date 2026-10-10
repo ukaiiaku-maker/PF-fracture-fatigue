@@ -645,6 +645,25 @@ def bind_explicit_accepted_tensor_drive(
     return drive
 
 
+def install_explicit_accepted_tensor_drive(engine, drive: dict[str, Any]) -> None:
+    """Install an accepted-state drive without comparing process-local serials.
+
+    Observer serials are process-local diagnostics.  A restored engine can
+    legitimately carry a larger serial from its producing process, so ordering
+    a newly evaluated accepted-state drive against that number can retain a
+    stale parent/front drive.  Explicit binding is instead authoritative by
+    accepted-state and stress-field identity.
+    """
+    require_admissible_tensor_drive(drive)
+    if not bool(drive.get("explicit_bound_accepted_state", False)):
+        raise RuntimeError("tensor drive is not bound to an explicit accepted state")
+    if not drive.get("accepted_state_id") or not drive.get("stress_field_state_id"):
+        raise RuntimeError("explicit tensor drive lacks accepted-state ownership")
+    engine._anisotropic_drive = copy.deepcopy(drive)
+    engine._anisotropic_drive_serial = int(drive["drive_serial"])
+    engine._install_current_drive_on_state()
+
+
 def wrap_assemble_mechanics(original: Callable) -> Callable:
     """Capture the accepted FEM stress/damage state without altering mechanics."""
     def wrapped(*args, **kwargs):

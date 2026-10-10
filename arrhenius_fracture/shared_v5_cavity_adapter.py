@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Mapping
+import copy
 import json
 import math
 import os
@@ -33,6 +34,7 @@ FIXTURE_MODEL_ID = "shared.test_only_v5_extreme_reservoir_lifecycle_fixture/1"
 PAIR_CHECKPOINT_SCHEMA = "shared-v5-physical-pair-checkpoint/1"
 DEFAULT_SITES_M = ((6.0e-4, 6.0e-5), (7.5e-4, -6.0e-5))
 DEFAULT_PARTITION = (0.50, 0.10, 0.40)
+TRANSPORT_BOUND_FAILURE = "vacancy transport solve exceeded fail-closed concentration bounds"
 
 
 def _finite(value):
@@ -188,6 +190,36 @@ def _restore_pair(path: str | Path):
     return states, payload
 
 
+def _advance_paired_with_refinement(
+    states, duration_s: float, advance, *, minimum_duration_s: float,
+):
+    """Advance both controls on one shared, fail-closed native time partition."""
+    trial = {}
+    schedulers = {}
+    try:
+        for arm in ("disabled", "enabled"):
+            trial[arm], schedulers[arm] = advance(
+                copy.deepcopy(states[arm]), float(duration_s), arm
+            )
+        return trial, [(float(duration_s), schedulers, trial)]
+    except RuntimeError as error:
+        if str(error) != TRANSPORT_BOUND_FAILURE:
+            raise
+        half = 0.5 * float(duration_s)
+        if half < float(minimum_duration_s):
+            raise RuntimeError(
+                f"{TRANSPORT_BOUND_FAILURE}; paired refinement reached "
+                f"minimum duration {minimum_duration_s:.17g} s"
+            ) from error
+        midpoint, first = _advance_paired_with_refinement(
+            states, half, advance, minimum_duration_s=minimum_duration_s,
+        )
+        terminal, second = _advance_paired_with_refinement(
+            midpoint, half, advance, minimum_duration_s=minimum_duration_s,
+        )
+        return terminal, [*first, *second]
+
+
 def _physical_main(args):
     out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -213,26 +245,49 @@ def _physical_main(args):
         raise SystemExit("--steps must be at least one")
     observer = _directional_provider(float(args.temperature_K))
     history = {"disabled": [], "enabled": []}
+    minimum_duration = float(args.transport_refinement_min_duration_s)
+    if not math.isfinite(minimum_duration) or minimum_duration <= 0.0:
+        raise SystemExit("--transport-refinement-min-duration-s must be positive")
+    requested_interval_count = 0
     for _ in range(intervals):
-        interval_index += 1
-        for arm in ("disabled", "enabled"):
-            before = complete_accepted_state_fingerprint(states[arm])
-            state, scheduler = advance_event_aware_coupled_interval(
-                states[arm], duration,
+        requested_interval_count += 1
+        starts = {
+            arm: complete_accepted_state_fingerprint(state)
+            for arm, state in states.items()
+        }
+        def advance(state, accepted_duration, _arm):
+            return advance_event_aware_coupled_interval(
+                state, accepted_duration,
                 temperature_K=float(args.temperature_K),
                 directional_observation_provider=observer,
             )
-            states[arm] = state
-            history[arm].append(_finite({
-                "interval": interval_index,
-                "physical_time_start_s": physical_time,
-                "physical_time_end_s": physical_time + duration,
-                "duration_s": duration,
-                "input_fingerprint": before,
-                "output_fingerprint": complete_accepted_state_fingerprint(state),
-                "scheduler": scheduler,
-                "observables": observables(state, f"physical_interval_{interval_index}"),
-            }))
+        states, accepted_segments = _advance_paired_with_refinement(
+            states, duration, advance, minimum_duration_s=minimum_duration,
+        )
+        segment_start = physical_time
+        prior = starts
+        for accepted_duration, schedulers, segment_states in accepted_segments:
+            interval_index += 1
+            segment_end = segment_start + accepted_duration
+            for arm in ("disabled", "enabled"):
+                fingerprint = complete_accepted_state_fingerprint(
+                    segment_states[arm]
+                )
+                history[arm].append(_finite({
+                    "interval": interval_index,
+                    "requested_interval": requested_interval_count,
+                    "physical_time_start_s": segment_start,
+                    "physical_time_end_s": segment_end,
+                    "duration_s": accepted_duration,
+                    "input_fingerprint": prior[arm],
+                    "output_fingerprint": fingerprint,
+                    "scheduler": schedulers[arm],
+                    "observables": observables(
+                        segment_states[arm], f"physical_interval_{interval_index}"
+                    ),
+                }))
+                prior[arm] = fingerprint
+            segment_start = segment_end
         physical_time += duration
 
     checkpoint = _write_pair_checkpoint(
@@ -248,6 +303,7 @@ def _physical_main(args):
                 "vacancy_energy_variant": args.vacancy_energy_variant,
                 "loading_history": "hold_at_native_opening",
                 "interval_duration_s": duration,
+                "transport_refinement_min_duration_s": minimum_duration,
                 "test_only_extreme_reservoir": False,
                 "full_field_plasticity": True,
                 "earliest_event_and_remainder_scheduler": True,
@@ -269,6 +325,7 @@ def _physical_main(args):
         "physical_exposure_s_per_arm_this_call": duration * intervals,
         "physical_time_s": physical_time,
         "interval_count": interval_index,
+        "requested_interval_count_this_call": requested_interval_count,
         "restart_input": args.restart_checkpoint,
         "restart_ancestry": ancestry,
         "common_start": common_start,
@@ -353,6 +410,7 @@ def main(argv=None):
     parser.add_argument("--temperature-K", type=float, default=1200.0)
     parser.add_argument("--seed", type=int, default=3621)
     parser.add_argument("--duration-s", type=float, default=1.0e-5)
+    parser.add_argument("--transport-refinement-min-duration-s", type=float, default=1.0e-8)
     parser.add_argument("--steps", type=int, default=1)
     parser.add_argument("--vacancy-energy-variant", default="reference")
     parser.add_argument("--save-snapshots")
