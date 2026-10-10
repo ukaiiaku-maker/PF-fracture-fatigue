@@ -15,6 +15,9 @@ def main(argv=None) -> int:
     parser.add_argument("--plan-only", action="store_true")
     parser.add_argument("--out", type=Path)
     parser.add_argument("--native-args-json", default="[]")
+    parser.add_argument("--source-policy", choices=("qualified", "development_snapshot"),
+                        default="qualified")
+    parser.add_argument("--restart-from", type=Path)
     args = parser.parse_args(argv)
     options = PRESETS[args.preset] if args.preset else SharedOptions.load(args.options)
     plan = build_execution_plan(options)
@@ -26,7 +29,8 @@ def main(argv=None) -> int:
     native_args = json.loads(args.native_args_json)
     if not isinstance(native_args, list) or not all(isinstance(item, str) for item in native_args):
         parser.error("--native-args-json must encode a list of strings")
-    execute_shared(options, native_args, args.out)
+    execute_shared(options, native_args, args.out,
+                   source_policy=args.source_policy, restart_from=args.restart_from)
     return 0
 
 if __name__ == "__main__":

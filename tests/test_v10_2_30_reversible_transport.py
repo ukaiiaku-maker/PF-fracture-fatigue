@@ -7,6 +7,7 @@ from arrhenius_fracture.persistent_site_reversible_transport_v10230 import (
     advect_signed_mobile_populations,
     install_reversible_transport,
     net_source_slip,
+    reversible_binding_receipt,
     resolved_mobile_stress_profiles,
     signed_arrhenius_rate,
     signed_finite_tip_stress_Pa,
@@ -170,6 +171,16 @@ def test_installed_actual_state_reverses_mobile_and_bounds_net_blunting():
     assert np.sum(state.returned_slip_positive) <= 1.25
     assert np.all(net_source_slip(state) >= 0.0)
     assert state.blunted_radius(1.0e-6, 1.0e-10) <= before_radius
+
+
+def test_reversible_installation_is_exactly_once_and_attests_live_methods():
+    state = evolvable_actual_mpz()
+    first = reversible_binding_receipt(state)
+    second = install_reversible_transport(state)
+    assert first["all_expected_methods_bound"] is True
+    assert second["all_expected_methods_bound"] is True
+    assert second["installation_count"] == 1
+    assert state._reversible_base_advance is not state.advance
 
 
 def test_return_does_not_cancel_retained_population():

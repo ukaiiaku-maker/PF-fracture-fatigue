@@ -66,6 +66,14 @@ def test_construct_attestation_measures_loaded_files_and_seed(monkeypatch):
     assert receipt["source"]["commit"]
 
 
+def test_monotonic_reversible_uses_effective_native_executor():
+    options = SharedOptions(kinetics=KineticsStrategy.REVERSIBLE_SIGNED)
+    plan = build_execution_plan(options)
+    assert plan.executable
+    assert plan.executor_module.endswith("sharp_front_v10_2_27_reversible_audited")
+    assert by_role(plan)["kinetics"].attribute == "install_reversible_transport"
+
+
 def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path):
     receipt = inspect_fem_backend()
     assert receipt.available

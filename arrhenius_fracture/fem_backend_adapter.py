@@ -25,8 +25,10 @@ DEFAULT_FEM_PYTHON = Path(
 )
 
 def _run(root: Path, *args: str) -> str:
+    environment = dict(os.environ)
+    environment["GIT_OPTIONAL_LOCKS"] = "0"
     result = subprocess.run(args, cwd=root, text=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
+                            stderr=subprocess.PIPE, env=environment)
     if result.returncode:
         raise RuntimeError(result.stderr.strip() or "external command failed")
     return result.stdout.strip()
@@ -62,13 +64,29 @@ class FEMBackendReceipt:
     def dump(self, path: str | Path) -> None:
         Path(path).write_text(json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n")
 
-def inspect_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
+def resolve_fem_backend_metadata(root: str | Path | None = None) -> FEMBackendReceipt:
+    """Resolve the configured dependency without Git or Python execution."""
+    root = Path(root or os.environ.get("FRACTURE_FEM_ROOT", DEFAULT_FEM_ROOT)).resolve()
+    entry = root / ENTRY_RELATIVE
+    interpreter = Path(os.environ.get("FRACTURE_FEM_PYTHON", DEFAULT_FEM_PYTHON)).resolve()
+    installed = root.is_dir()
+    return FEMBackendReceipt(
+        "fem-backend-receipt/2", FEM_REPOSITORY, str(root), FEM_COMMIT, None,
+        FEM_BRANCH, None, None, str(entry), None, f"{ENTRY_MODULE}:main",
+        str(interpreter), False, False,
+        "configured dependency present but uninspected" if installed
+        else "configured dependency is not installed")
+
+
+def inspect_fem_backend(
+    root: str | Path | None = None, *, probe_import: bool = False,
+) -> FEMBackendReceipt:
     root = Path(root or os.environ.get("FRACTURE_FEM_ROOT", DEFAULT_FEM_ROOT)).resolve()
     entry = root / ENTRY_RELATIVE
     try:
         observed_commit = _run(root, "git", "rev-parse", "HEAD")
         observed_branch = _run(root, "git", "branch", "--show-current")
-        clean = not bool(_run(root, "git", "status", "--porcelain"))
+        clean = not bool(_run(root, "git", "--no-optional-locks", "status", "--porcelain"))
     except (OSError, RuntimeError) as exc:
         return FEMBackendReceipt(
             "fem-backend-receipt/1", FEM_REPOSITORY, str(root), FEM_COMMIT, None,
@@ -86,11 +104,14 @@ def inspect_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
         problems.append("mapped theta0 entry file is absent")
     if not interpreter.is_file():
         problems.append(f"configured FEM interpreter is absent: {interpreter}")
-    elif entry.is_file():
+    elif entry.is_file() and probe_import:
+        environment = dict(os.environ)
+        environment.update({"PYTHONDONTWRITEBYTECODE": "1", "GIT_OPTIONAL_LOCKS": "0"})
         probe = subprocess.run(
             [str(interpreter), "-c",
              f"import {ENTRY_MODULE} as backend; assert callable(backend.main)"],
-            cwd=root, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            cwd=root, env=environment, text=True, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
         if probe.returncode:
             problems.append(f"FEM constructor import failed: {probe.stderr.strip()}")
@@ -103,10 +124,11 @@ def inspect_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
         "available and source-verified; not yet executed" if available else "; ".join(problems))
 
 def require_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
-    receipt = inspect_fem_backend(root)
+    receipt = inspect_fem_backend(root, probe_import=True)
     if not receipt.available:
         raise RuntimeError(f"full FEM/CZM backend unavailable: {receipt.reason}")
     return receipt
 
 __all__ = ["DEFAULT_FEM_ROOT", "DEFAULT_FEM_PYTHON", "ENTRY_MODULE", "ENTRY_RELATIVE",
-           "FEMBackendReceipt", "inspect_fem_backend", "require_fem_backend"]
+           "FEMBackendReceipt", "inspect_fem_backend", "require_fem_backend",
+           "resolve_fem_backend_metadata"]

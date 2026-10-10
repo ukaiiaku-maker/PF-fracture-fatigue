@@ -17,7 +17,7 @@ import subprocess
 import sys
 from typing import Any, Sequence
 
-from .fem_backend_adapter import ENTRY_MODULE, require_fem_backend
+from .fem_backend_adapter import ENTRY_MODULE, resolve_fem_backend_metadata
 from .shared_options import (
     CavityMode, CrackPathMode, IntegrationStrategy, KineticsStrategy,
     LoadingMode, MechanicsBackend, OutputProfile, PlasticityMode, SharedOptions,
@@ -53,7 +53,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
     """Compose independent roles and state an honest native execution boundary."""
     options.validate()
     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
-        receipt = require_fem_backend()
+        receipt = resolve_fem_backend_metadata()
         bindings = (_binding("mechanics", options.mechanics, ENTRY_MODULE, "main",
                              f"verified external entry {receipt.entry_file}"),)
         exact = (options == __import__("arrhenius_fracture.shared_options", fromlist=["PRESETS"]).PRESETS["fem_czm_theta0"])
@@ -122,7 +122,11 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
               and options.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL)
     if simple and options.crack_path is CrackPathMode.SINGLE_FRONT and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE:
         if options.loading is LoadingMode.MONOTONIC and options.kinetics in {KineticsStrategy.NATIVE_SIGNED, KineticsStrategy.REVERSIBLE_SIGNED}:
-            executor = "arrhenius_fracture.sharp_front_v10_2_27_audited"
+            executor = (
+                "arrhenius_fracture.sharp_front_v10_2_27_reversible_audited"
+                if options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED
+                else "arrhenius_fracture.sharp_front_v10_2_27_audited"
+            )
             restart = "single_front_outer_checkpoint"
         elif options.loading is LoadingMode.EXPLICIT_CYCLIC and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
             executor = "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue"
@@ -154,12 +158,15 @@ def _file_sha256(path: str | Path) -> str:
 
 def _git_identity(root: Path) -> dict[str, Any]:
     def run(*args: str) -> str:
-        result = subprocess.run(args, cwd=root, text=True, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE, check=True)
+        environment = dict(os.environ)
+        environment["GIT_OPTIONAL_LOCKS"] = "0"
+        result = subprocess.run(args, cwd=root, env=environment, text=True,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                check=True)
         return result.stdout.strip()
     return {"commit": run("git", "rev-parse", "HEAD"),
             "tree": run("git", "rev-parse", "HEAD^{tree}"),
-            "dirty": bool(run("git", "status", "--porcelain"))}
+            "dirty": bool(run("git", "--no-optional-locks", "status", "--porcelain"))}
 
 def construct_and_attest(plan: ExecutionPlan, options: SharedOptions) -> tuple[Any, dict[str, Any]]:
     if not plan.executable or not plan.executor_module:
@@ -196,8 +203,15 @@ def construct_and_attest(plan: ExecutionPlan, options: SharedOptions) -> tuple[A
                                            "mode": os.environ.get("CLEAVAGE_HAZARD_MODE", "native_default")}}
     return executor, receipt
 
-def execute_shared(options: SharedOptions, native_args: Sequence[str], output_dir: str | Path) -> dict[str, Any]:
-    """Execute one qualified native path and write pre/post in-process receipts."""
+def execute_shared(
+    options: SharedOptions,
+    native_args: Sequence[str],
+    output_dir: str | Path,
+    *,
+    source_policy: str = "qualified",
+    restart_from: str | Path | None = None,
+) -> dict[str, Any]:
+    """Execute one native path in a fresh interpreter and return its receipt."""
     if options.material_manifest or options.kernel_manifest:
         raise RuntimeError("shared manifest-to-native-argument mapping is not yet qualified")
     plan = build_execution_plan(options)
@@ -205,56 +219,65 @@ def execute_shared(options: SharedOptions, native_args: Sequence[str], output_di
     if any(arg == "--out" or arg.startswith("--out=") for arg in native_args):
         raise ValueError("--out is owned by execute_shared")
     output.mkdir(parents=True, exist_ok=True)
+    if source_policy not in {"qualified", "development_snapshot"}:
+        raise ValueError("source_policy must be 'qualified' or 'development_snapshot'")
+    request = {
+        "schema": "shared-execution-request/1",
+        "options": options.to_dict(),
+        "native_args": list(native_args),
+        "output_dir": str(output),
+        "source_policy": source_policy,
+        "restart_from": None if restart_from is None else str(Path(restart_from).resolve()),
+        "options_sha256": options.fingerprint,
+        "plan": plan.to_dict(),
+    }
+    request_path = output / "shared_execution_request.json"
+    request_path.write_text(json.dumps(request, indent=2, sort_keys=True) + "\n")
+    root = Path(__file__).resolve().parents[1]
+    environment = dict(os.environ)
+    environment.update({
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "CLEAVAGE_HAZARD_SEED": str(options.random_seed),
+    })
+    pythonpath = environment.get("PYTHONPATH", "")
+    environment["PYTHONPATH"] = str(root) + (os.pathsep + pythonpath if pythonpath else "")
+    if options.output is OutputProfile.PUBLICATION_RESTART:
+        environment["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = str(output / "checkpoint")
+        environment.setdefault("V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS", "0")
+        environment.setdefault("V10230_CHECKPOINT_GENERATIONS", "3")
+    if restart_from is not None:
+        environment["V10230_RESTART_CHECKPOINT_DIR"] = str(Path(restart_from).resolve())
+        environment["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = str(output / "checkpoint")
+    interpreter = sys.executable
+    cwd = root
+    worker_command = [str(interpreter), "-m", "arrhenius_fracture.shared_execution_worker",
+                      str(request_path)]
     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
+        from .fem_backend_adapter import require_fem_backend
         backend = require_fem_backend()
-        argv = [*native_args, "--out", str(output)]
-        wrapper = (
-            "import hashlib,json,pathlib,sys; "
-            f"import {ENTRY_MODULE} as backend; "
-            "out=pathlib.Path(sys.argv[2]); args=json.loads(sys.argv[1]); "
-            "p=pathlib.Path(backend.__file__).resolve(); "
-            "r={'schema':'shared-runtime-attestation/1','status':'constructed',"
-            "'execution_verified':False,'python':{'executable':sys.executable,'version':sys.version},"
-            "'executor':{'module':backend.__name__,'module_file':str(p),"
-            "'module_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),"
-            "'callable':backend.main.__qualname__},'native_argv':args}; "
-            "(out/'shared_runtime_attestation.pre.json').write_text(json.dumps(r,indent=2,sort_keys=True)+'\\n'); "
-            "value=backend.main(args); r.update(status='executed',execution_verified=True,return_value=value); "
-            "(out/'shared_runtime_attestation.post.json').write_text(json.dumps(r,indent=2,sort_keys=True,default=str)+'\\n')"
-        )
-        environment = dict(os.environ)
-        environment.update({"CLEAVAGE_HAZARD_SEED": str(options.random_seed),
-                            "CLEAVAGE_HAZARD_MODE": "exponential",
-                            "CLEAVAGE_EVENT_LENGTH_MODE": "threshold_scaled"})
-        result = subprocess.run([backend.interpreter, "-c", wrapper, json.dumps(argv), str(output)],
-                                cwd=backend.root, env=environment, text=True,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if result.returncode:
-            raise RuntimeError(f"external FEM/CZM execution failed: {result.stderr.strip()}")
-        return json.loads((output / "shared_runtime_attestation.post.json").read_text())
-    old_seed = os.environ.get("CLEAVAGE_HAZARD_SEED")
-    os.environ["CLEAVAGE_HAZARD_SEED"] = str(options.random_seed)
-    try:
-        executor, receipt = construct_and_attest(plan, options)
-        output_flags = {
-            OutputProfile.COMPACT_SMOKE: ["--save-snapshots", "0", "--no-plots"],
-            OutputProfile.SELECTED_FIELDS: ["--save-snapshots", "4"],
-            OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "4"],
-        }[options.output]
-        argv = [*native_args, "--out", str(output), *output_flags]
-        (output / "shared_runtime_attestation.pre.json").write_text(
-            json.dumps({**receipt, "native_argv": argv}, indent=2, sort_keys=True) + "\n")
-        result = executor(argv)
-        final = {**receipt, "status": "executed", "execution_verified": True,
-                 "native_argv": argv, "return_value": result}
-        (output / "shared_runtime_attestation.post.json").write_text(
-            json.dumps(final, indent=2, sort_keys=True, default=str) + "\n")
-        return final
-    finally:
-        if old_seed is None:
-            os.environ.pop("CLEAVAGE_HAZARD_SEED", None)
-        else:
-            os.environ["CLEAVAGE_HAZARD_SEED"] = old_seed
+        if source_policy != "qualified":
+            raise RuntimeError("external FEM execution requires source_policy='qualified'")
+        interpreter = backend.interpreter
+        cwd = Path(backend.root)
+        environment["PYTHONPATH"] = str(cwd)
+        request["fem_backend"] = backend.to_dict()
+        request_path.write_text(json.dumps(request, indent=2, sort_keys=True) + "\n")
+        worker = root / "arrhenius_fracture" / "shared_fem_execution_worker.py"
+        worker_command = [str(interpreter), str(worker), str(request_path)]
+    result = subprocess.run(
+        worker_command,
+        cwd=cwd, env=environment, text=True, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if result.returncode:
+        failure = output / "shared_runtime_attestation.failure.json"
+        detail = failure.read_text() if failure.is_file() else result.stderr.strip()
+        raise RuntimeError(f"shared native execution failed in isolated worker: {detail}")
+    final_path = output / "shared_runtime_attestation.post.json"
+    if not final_path.is_file():
+        raise RuntimeError("isolated worker returned without a post-execution receipt")
+    return json.loads(final_path.read_text())
 
 __all__ = ["RoleBinding", "ExecutionPlan", "build_execution_plan",
            "construct_and_attest", "execute_shared"]

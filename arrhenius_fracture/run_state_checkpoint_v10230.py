@@ -140,6 +140,20 @@ def write_combined_checkpoint(
             "files": files,
         }
         _atomic_json(root / MANIFEST, manifest)
+        # Only after the new generation is complete and visible may older,
+        # task-owned generations be retired.  Keeping at least two preserves a
+        # known-good predecessor across an interrupted future replacement.
+        retain = max(int(os.environ.get("V10230_CHECKPOINT_GENERATIONS", "3")), 2)
+        completed = sorted(
+            (item for item in generations.iterdir()
+             if item.is_dir() and not item.name.startswith(".pending-")),
+            key=lambda item: item.stat().st_mtime_ns,
+            reverse=True,
+        )
+        protected = {generation_id, *(item.name for item in completed[:retain])}
+        for old in completed:
+            if old.name not in protected:
+                shutil.rmtree(old)
         return manifest
     finally:
         if temporary.exists():

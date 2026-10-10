@@ -392,7 +392,39 @@ def _reversible_evolve_scalar(
     }
 
 
-def install_reversible_transport(mpz: Any) -> None:
+def reversible_binding_receipt(mpz: Any) -> dict[str, Any]:
+    """Describe the methods bound on the *actual* evolving MPZ object."""
+    expected = {
+        "evolve": _reversible_evolve_scalar,
+        "local_slip_count": _reversible_local_slip_count,
+        "blunted_radius": _reversible_blunted_radius,
+        "advance": _reversible_advance,
+        "diagnostics": _reversible_diagnostics,
+    }
+    observed = {}
+    matches = {}
+    for name, implementation in expected.items():
+        bound = getattr(mpz, name, None)
+        function = getattr(bound, "__func__", bound)
+        observed[name] = (
+            f"{getattr(function, '__module__', type(function).__module__)}."
+            f"{getattr(function, '__qualname__', type(function).__qualname__)}"
+        )
+        matches[name] = function is implementation
+    return {
+        "schema": "v10.2.30-reversible-runtime-binding/1",
+        "model_id": MODEL_ID,
+        "object_type": f"{type(mpz).__module__}.{type(mpz).__qualname__}",
+        "object_id": id(mpz),
+        "installed": bool(getattr(mpz, "_reversible_transport_installed", False)),
+        "installation_count": int(getattr(mpz, "_reversible_transport_installation_count", 0)),
+        "observed_methods": observed,
+        "expected_method_match": matches,
+        "all_expected_methods_bound": all(matches.values()),
+    }
+
+
+def install_reversible_transport(mpz: Any) -> dict[str, Any]:
     """Install reversible mobile evolution on an initialized v10 signed state."""
     if not all(
         hasattr(mpz, name)
@@ -401,6 +433,13 @@ def install_reversible_transport(mpz: Any) -> None:
         raise RuntimeError("v10 signed-Burgers state must be installed first")
     if str(getattr(mpz, "_signed_transport_mode", "")) != "validated_scalar":
         raise RuntimeError("initial reversible integration requires validated scalar transport")
+    if bool(getattr(mpz, "_reversible_transport_installed", False)):
+        receipt = reversible_binding_receipt(mpz)
+        if not receipt["all_expected_methods_bound"]:
+            raise RuntimeError(
+                "reversible transport marker is present but the bound methods differ"
+            )
+        return receipt
     _ensure_reversible_state(mpz)
     mpz.evolve = MethodType(_reversible_evolve_scalar, mpz)
     mpz.local_slip_count = MethodType(_reversible_local_slip_count, mpz)
@@ -410,9 +449,11 @@ def install_reversible_transport(mpz: Any) -> None:
     mpz._reversible_base_diagnostics = mpz.diagnostics
     mpz.diagnostics = MethodType(_reversible_diagnostics, mpz)
     mpz._reversible_transport_installed = True
+    mpz._reversible_transport_installation_count = 1
     mpz._reversible_mobile_internal_stress_model = (
         "zero_no_v10_local_signed_operator_shielding_kept_separate"
     )
+    return reversible_binding_receipt(mpz)
 
 
 __all__ = [
@@ -420,6 +461,7 @@ __all__ = [
     "advect_signed_mobile_populations",
     "install_reversible_transport",
     "net_source_slip",
+    "reversible_binding_receipt",
     "resolved_mobile_stress_profiles",
     "signed_arrhenius_rate",
     "signed_finite_tip_stress_Pa",

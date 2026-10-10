@@ -1,0 +1,441 @@
+diff --git a/arrhenius_fracture/fem_backend_adapter.py b/arrhenius_fracture/fem_backend_adapter.py
+index 43cdaf1..80247c5 100644
+--- a/arrhenius_fracture/fem_backend_adapter.py
++++ b/arrhenius_fracture/fem_backend_adapter.py
+@@ -25,8 +25,10 @@ DEFAULT_FEM_PYTHON = Path(
+ )
+ 
+ def _run(root: Path, *args: str) -> str:
++    environment = dict(os.environ)
++    environment["GIT_OPTIONAL_LOCKS"] = "0"
+     result = subprocess.run(args, cwd=root, text=True, stdout=subprocess.PIPE,
+-                            stderr=subprocess.PIPE)
++                            stderr=subprocess.PIPE, env=environment)
+     if result.returncode:
+         raise RuntimeError(result.stderr.strip() or "external command failed")
+     return result.stdout.strip()
+@@ -62,13 +64,29 @@ class FEMBackendReceipt:
+     def dump(self, path: str | Path) -> None:
+         Path(path).write_text(json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n")
+ 
+-def inspect_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
++def resolve_fem_backend_metadata(root: str | Path | None = None) -> FEMBackendReceipt:
++    """Resolve the configured dependency without Git or Python execution."""
++    root = Path(root or os.environ.get("FRACTURE_FEM_ROOT", DEFAULT_FEM_ROOT)).resolve()
++    entry = root / ENTRY_RELATIVE
++    interpreter = Path(os.environ.get("FRACTURE_FEM_PYTHON", DEFAULT_FEM_PYTHON)).resolve()
++    installed = root.is_dir()
++    return FEMBackendReceipt(
++        "fem-backend-receipt/2", FEM_REPOSITORY, str(root), FEM_COMMIT, None,
++        FEM_BRANCH, None, None, str(entry), None, f"{ENTRY_MODULE}:main",
++        str(interpreter), False, False,
++        "configured dependency present but uninspected" if installed
++        else "configured dependency is not installed")
++
++
++def inspect_fem_backend(
++    root: str | Path | None = None, *, probe_import: bool = False,
++) -> FEMBackendReceipt:
+     root = Path(root or os.environ.get("FRACTURE_FEM_ROOT", DEFAULT_FEM_ROOT)).resolve()
+     entry = root / ENTRY_RELATIVE
+     try:
+         observed_commit = _run(root, "git", "rev-parse", "HEAD")
+         observed_branch = _run(root, "git", "branch", "--show-current")
+-        clean = not bool(_run(root, "git", "status", "--porcelain"))
++        clean = not bool(_run(root, "git", "--no-optional-locks", "status", "--porcelain"))
+     except (OSError, RuntimeError) as exc:
+         return FEMBackendReceipt(
+             "fem-backend-receipt/1", FEM_REPOSITORY, str(root), FEM_COMMIT, None,
+@@ -86,11 +104,14 @@ def inspect_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
+         problems.append("mapped theta0 entry file is absent")
+     if not interpreter.is_file():
+         problems.append(f"configured FEM interpreter is absent: {interpreter}")
+-    elif entry.is_file():
++    elif entry.is_file() and probe_import:
++        environment = dict(os.environ)
++        environment.update({"PYTHONDONTWRITEBYTECODE": "1", "GIT_OPTIONAL_LOCKS": "0"})
+         probe = subprocess.run(
+             [str(interpreter), "-c",
+              f"import {ENTRY_MODULE} as backend; assert callable(backend.main)"],
+-            cwd=root, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++            cwd=root, env=environment, text=True, stdout=subprocess.PIPE,
++            stderr=subprocess.PIPE,
+         )
+         if probe.returncode:
+             problems.append(f"FEM constructor import failed: {probe.stderr.strip()}")
+@@ -103,10 +124,11 @@ def inspect_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
+         "available and source-verified; not yet executed" if available else "; ".join(problems))
+ 
+ def require_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
+-    receipt = inspect_fem_backend(root)
++    receipt = inspect_fem_backend(root, probe_import=True)
+     if not receipt.available:
+         raise RuntimeError(f"full FEM/CZM backend unavailable: {receipt.reason}")
+     return receipt
+ 
+ __all__ = ["DEFAULT_FEM_ROOT", "DEFAULT_FEM_PYTHON", "ENTRY_MODULE", "ENTRY_RELATIVE",
+-           "FEMBackendReceipt", "inspect_fem_backend", "require_fem_backend"]
++           "FEMBackendReceipt", "inspect_fem_backend", "require_fem_backend",
++           "resolve_fem_backend_metadata"]
+diff --git a/arrhenius_fracture/persistent_site_reversible_transport_v10230.py b/arrhenius_fracture/persistent_site_reversible_transport_v10230.py
+index 70c200b..e142e84 100644
+--- a/arrhenius_fracture/persistent_site_reversible_transport_v10230.py
++++ b/arrhenius_fracture/persistent_site_reversible_transport_v10230.py
+@@ -392,7 +392,39 @@ def _reversible_evolve_scalar(
+     }
+ 
+ 
+-def install_reversible_transport(mpz: Any) -> None:
++def reversible_binding_receipt(mpz: Any) -> dict[str, Any]:
++    """Describe the methods bound on the *actual* evolving MPZ object."""
++    expected = {
++        "evolve": _reversible_evolve_scalar,
++        "local_slip_count": _reversible_local_slip_count,
++        "blunted_radius": _reversible_blunted_radius,
++        "advance": _reversible_advance,
++        "diagnostics": _reversible_diagnostics,
++    }
++    observed = {}
++    matches = {}
++    for name, implementation in expected.items():
++        bound = getattr(mpz, name, None)
++        function = getattr(bound, "__func__", bound)
++        observed[name] = (
++            f"{getattr(function, '__module__', type(function).__module__)}."
++            f"{getattr(function, '__qualname__', type(function).__qualname__)}"
++        )
++        matches[name] = function is implementation
++    return {
++        "schema": "v10.2.30-reversible-runtime-binding/1",
++        "model_id": MODEL_ID,
++        "object_type": f"{type(mpz).__module__}.{type(mpz).__qualname__}",
++        "object_id": id(mpz),
++        "installed": bool(getattr(mpz, "_reversible_transport_installed", False)),
++        "installation_count": int(getattr(mpz, "_reversible_transport_installation_count", 0)),
++        "observed_methods": observed,
++        "expected_method_match": matches,
++        "all_expected_methods_bound": all(matches.values()),
++    }
++
++
++def install_reversible_transport(mpz: Any) -> dict[str, Any]:
+     """Install reversible mobile evolution on an initialized v10 signed state."""
+     if not all(
+         hasattr(mpz, name)
+@@ -401,6 +433,13 @@ def install_reversible_transport(mpz: Any) -> None:
+         raise RuntimeError("v10 signed-Burgers state must be installed first")
+     if str(getattr(mpz, "_signed_transport_mode", "")) != "validated_scalar":
+         raise RuntimeError("initial reversible integration requires validated scalar transport")
++    if bool(getattr(mpz, "_reversible_transport_installed", False)):
++        receipt = reversible_binding_receipt(mpz)
++        if not receipt["all_expected_methods_bound"]:
++            raise RuntimeError(
++                "reversible transport marker is present but the bound methods differ"
++            )
++        return receipt
+     _ensure_reversible_state(mpz)
+     mpz.evolve = MethodType(_reversible_evolve_scalar, mpz)
+     mpz.local_slip_count = MethodType(_reversible_local_slip_count, mpz)
+@@ -410,9 +449,11 @@ def install_reversible_transport(mpz: Any) -> None:
+     mpz._reversible_base_diagnostics = mpz.diagnostics
+     mpz.diagnostics = MethodType(_reversible_diagnostics, mpz)
+     mpz._reversible_transport_installed = True
++    mpz._reversible_transport_installation_count = 1
+     mpz._reversible_mobile_internal_stress_model = (
+         "zero_no_v10_local_signed_operator_shielding_kept_separate"
+     )
++    return reversible_binding_receipt(mpz)
+ 
+ 
+ __all__ = [
+@@ -420,6 +461,7 @@ __all__ = [
+     "advect_signed_mobile_populations",
+     "install_reversible_transport",
+     "net_source_slip",
++    "reversible_binding_receipt",
+     "resolved_mobile_stress_profiles",
+     "signed_arrhenius_rate",
+     "signed_finite_tip_stress_Pa",
+diff --git a/arrhenius_fracture/run_state_checkpoint_v10230.py b/arrhenius_fracture/run_state_checkpoint_v10230.py
+index b5ab85d..d992e97 100644
+--- a/arrhenius_fracture/run_state_checkpoint_v10230.py
++++ b/arrhenius_fracture/run_state_checkpoint_v10230.py
+@@ -140,6 +140,20 @@ def write_combined_checkpoint(
+             "files": files,
+         }
+         _atomic_json(root / MANIFEST, manifest)
++        # Only after the new generation is complete and visible may older,
++        # task-owned generations be retired.  Keeping at least two preserves a
++        # known-good predecessor across an interrupted future replacement.
++        retain = max(int(os.environ.get("V10230_CHECKPOINT_GENERATIONS", "3")), 2)
++        completed = sorted(
++            (item for item in generations.iterdir()
++             if item.is_dir() and not item.name.startswith(".pending-")),
++            key=lambda item: item.stat().st_mtime_ns,
++            reverse=True,
++        )
++        protected = {generation_id, *(item.name for item in completed[:retain])}
++        for old in completed:
++            if old.name not in protected:
++                shutil.rmtree(old)
+         return manifest
+     finally:
+         if temporary.exists():
+diff --git a/arrhenius_fracture/shared_execution.py b/arrhenius_fracture/shared_execution.py
+index b9f4e32..e37b3e5 100644
+--- a/arrhenius_fracture/shared_execution.py
++++ b/arrhenius_fracture/shared_execution.py
+@@ -17,7 +17,7 @@ import subprocess
+ import sys
+ from typing import Any, Sequence
+ 
+-from .fem_backend_adapter import ENTRY_MODULE, require_fem_backend
++from .fem_backend_adapter import ENTRY_MODULE, resolve_fem_backend_metadata
+ from .shared_options import (
+     CavityMode, CrackPathMode, IntegrationStrategy, KineticsStrategy,
+     LoadingMode, MechanicsBackend, OutputProfile, PlasticityMode, SharedOptions,
+@@ -53,7 +53,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+     """Compose independent roles and state an honest native execution boundary."""
+     options.validate()
+     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
+-        receipt = require_fem_backend()
++        receipt = resolve_fem_backend_metadata()
+         bindings = (_binding("mechanics", options.mechanics, ENTRY_MODULE, "main",
+                              f"verified external entry {receipt.entry_file}"),)
+         exact = (options == __import__("arrhenius_fracture.shared_options", fromlist=["PRESETS"]).PRESETS["fem_czm_theta0"])
+@@ -122,7 +122,11 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+               and options.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL)
+     if simple and options.crack_path is CrackPathMode.SINGLE_FRONT and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE:
+         if options.loading is LoadingMode.MONOTONIC and options.kinetics in {KineticsStrategy.NATIVE_SIGNED, KineticsStrategy.REVERSIBLE_SIGNED}:
+-            executor = "arrhenius_fracture.sharp_front_v10_2_27_audited"
++            executor = (
++                "arrhenius_fracture.sharp_front_v10_2_27_reversible_audited"
++                if options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED
++                else "arrhenius_fracture.sharp_front_v10_2_27_audited"
++            )
+             restart = "single_front_outer_checkpoint"
+         elif options.loading is LoadingMode.EXPLICIT_CYCLIC and options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED:
+             executor = "arrhenius_fracture.sharp_front_v10_2_30_energy_gated_fatigue"
+@@ -154,12 +158,15 @@ def _file_sha256(path: str | Path) -> str:
+ 
+ def _git_identity(root: Path) -> dict[str, Any]:
+     def run(*args: str) -> str:
+-        result = subprocess.run(args, cwd=root, text=True, stdout=subprocess.PIPE,
+-                                stderr=subprocess.PIPE, check=True)
++        environment = dict(os.environ)
++        environment["GIT_OPTIONAL_LOCKS"] = "0"
++        result = subprocess.run(args, cwd=root, env=environment, text=True,
++                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++                                check=True)
+         return result.stdout.strip()
+     return {"commit": run("git", "rev-parse", "HEAD"),
+             "tree": run("git", "rev-parse", "HEAD^{tree}"),
+-            "dirty": bool(run("git", "status", "--porcelain"))}
++            "dirty": bool(run("git", "--no-optional-locks", "status", "--porcelain"))}
+ 
+ def construct_and_attest(plan: ExecutionPlan, options: SharedOptions) -> tuple[Any, dict[str, Any]]:
+     if not plan.executable or not plan.executor_module:
+@@ -196,8 +203,15 @@ def construct_and_attest(plan: ExecutionPlan, options: SharedOptions) -> tuple[A
+                                            "mode": os.environ.get("CLEAVAGE_HAZARD_MODE", "native_default")}}
+     return executor, receipt
+ 
+-def execute_shared(options: SharedOptions, native_args: Sequence[str], output_dir: str | Path) -> dict[str, Any]:
+-    """Execute one qualified native path and write pre/post in-process receipts."""
++def execute_shared(
++    options: SharedOptions,
++    native_args: Sequence[str],
++    output_dir: str | Path,
++    *,
++    source_policy: str = "qualified",
++    restart_from: str | Path | None = None,
++) -> dict[str, Any]:
++    """Execute one native path in a fresh interpreter and return its receipt."""
+     if options.material_manifest or options.kernel_manifest:
+         raise RuntimeError("shared manifest-to-native-argument mapping is not yet qualified")
+     plan = build_execution_plan(options)
+@@ -205,56 +219,65 @@ def execute_shared(options: SharedOptions, native_args: Sequence[str], output_di
+     if any(arg == "--out" or arg.startswith("--out=") for arg in native_args):
+         raise ValueError("--out is owned by execute_shared")
+     output.mkdir(parents=True, exist_ok=True)
++    if source_policy not in {"qualified", "development_snapshot"}:
++        raise ValueError("source_policy must be 'qualified' or 'development_snapshot'")
++    request = {
++        "schema": "shared-execution-request/1",
++        "options": options.to_dict(),
++        "native_args": list(native_args),
++        "output_dir": str(output),
++        "source_policy": source_policy,
++        "restart_from": None if restart_from is None else str(Path(restart_from).resolve()),
++        "options_sha256": options.fingerprint,
++        "plan": plan.to_dict(),
++    }
++    request_path = output / "shared_execution_request.json"
++    request_path.write_text(json.dumps(request, indent=2, sort_keys=True) + "\n")
++    root = Path(__file__).resolve().parents[1]
++    environment = dict(os.environ)
++    environment.update({
++        "PYTHONDONTWRITEBYTECODE": "1",
++        "GIT_OPTIONAL_LOCKS": "0",
++        "CLEAVAGE_HAZARD_SEED": str(options.random_seed),
++    })
++    pythonpath = environment.get("PYTHONPATH", "")
++    environment["PYTHONPATH"] = str(root) + (os.pathsep + pythonpath if pythonpath else "")
++    if options.output is OutputProfile.PUBLICATION_RESTART:
++        environment["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = str(output / "checkpoint")
++        environment.setdefault("V10230_HIGH_CYCLE_CHECKPOINT_MIN_SECONDS", "0")
++        environment.setdefault("V10230_CHECKPOINT_GENERATIONS", "3")
++    if restart_from is not None:
++        environment["V10230_RESTART_CHECKPOINT_DIR"] = str(Path(restart_from).resolve())
++        environment["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = str(output / "checkpoint")
++    interpreter = sys.executable
++    cwd = root
++    worker_command = [str(interpreter), "-m", "arrhenius_fracture.shared_execution_worker",
++                      str(request_path)]
+     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
++        from .fem_backend_adapter import require_fem_backend
+         backend = require_fem_backend()
+-        argv = [*native_args, "--out", str(output)]
+-        wrapper = (
+-            "import hashlib,json,pathlib,sys; "
+-            f"import {ENTRY_MODULE} as backend; "
+-            "out=pathlib.Path(sys.argv[2]); args=json.loads(sys.argv[1]); "
+-            "p=pathlib.Path(backend.__file__).resolve(); "
+-            "r={'schema':'shared-runtime-attestation/1','status':'constructed',"
+-            "'execution_verified':False,'python':{'executable':sys.executable,'version':sys.version},"
+-            "'executor':{'module':backend.__name__,'module_file':str(p),"
+-            "'module_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),"
+-            "'callable':backend.main.__qualname__},'native_argv':args}; "
+-            "(out/'shared_runtime_attestation.pre.json').write_text(json.dumps(r,indent=2,sort_keys=True)+'\\n'); "
+-            "value=backend.main(args); r.update(status='executed',execution_verified=True,return_value=value); "
+-            "(out/'shared_runtime_attestation.post.json').write_text(json.dumps(r,indent=2,sort_keys=True,default=str)+'\\n')"
+-        )
+-        environment = dict(os.environ)
+-        environment.update({"CLEAVAGE_HAZARD_SEED": str(options.random_seed),
+-                            "CLEAVAGE_HAZARD_MODE": "exponential",
+-                            "CLEAVAGE_EVENT_LENGTH_MODE": "threshold_scaled"})
+-        result = subprocess.run([backend.interpreter, "-c", wrapper, json.dumps(argv), str(output)],
+-                                cwd=backend.root, env=environment, text=True,
+-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+-        if result.returncode:
+-            raise RuntimeError(f"external FEM/CZM execution failed: {result.stderr.strip()}")
+-        return json.loads((output / "shared_runtime_attestation.post.json").read_text())
+-    old_seed = os.environ.get("CLEAVAGE_HAZARD_SEED")
+-    os.environ["CLEAVAGE_HAZARD_SEED"] = str(options.random_seed)
+-    try:
+-        executor, receipt = construct_and_attest(plan, options)
+-        output_flags = {
+-            OutputProfile.COMPACT_SMOKE: ["--save-snapshots", "0", "--no-plots"],
+-            OutputProfile.SELECTED_FIELDS: ["--save-snapshots", "4"],
+-            OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "4"],
+-        }[options.output]
+-        argv = [*native_args, "--out", str(output), *output_flags]
+-        (output / "shared_runtime_attestation.pre.json").write_text(
+-            json.dumps({**receipt, "native_argv": argv}, indent=2, sort_keys=True) + "\n")
+-        result = executor(argv)
+-        final = {**receipt, "status": "executed", "execution_verified": True,
+-                 "native_argv": argv, "return_value": result}
+-        (output / "shared_runtime_attestation.post.json").write_text(
+-            json.dumps(final, indent=2, sort_keys=True, default=str) + "\n")
+-        return final
+-    finally:
+-        if old_seed is None:
+-            os.environ.pop("CLEAVAGE_HAZARD_SEED", None)
+-        else:
+-            os.environ["CLEAVAGE_HAZARD_SEED"] = old_seed
++        if source_policy != "qualified":
++            raise RuntimeError("external FEM execution requires source_policy='qualified'")
++        interpreter = backend.interpreter
++        cwd = Path(backend.root)
++        environment["PYTHONPATH"] = str(cwd)
++        request["fem_backend"] = backend.to_dict()
++        request_path.write_text(json.dumps(request, indent=2, sort_keys=True) + "\n")
++        worker = root / "arrhenius_fracture" / "shared_fem_execution_worker.py"
++        worker_command = [str(interpreter), str(worker), str(request_path)]
++    result = subprocess.run(
++        worker_command,
++        cwd=cwd, env=environment, text=True, stdout=subprocess.PIPE,
++        stderr=subprocess.PIPE,
++    )
++    if result.returncode:
++        failure = output / "shared_runtime_attestation.failure.json"
++        detail = failure.read_text() if failure.is_file() else result.stderr.strip()
++        raise RuntimeError(f"shared native execution failed in isolated worker: {detail}")
++    final_path = output / "shared_runtime_attestation.post.json"
++    if not final_path.is_file():
++        raise RuntimeError("isolated worker returned without a post-execution receipt")
++    return json.loads(final_path.read_text())
+ 
+ __all__ = ["RoleBinding", "ExecutionPlan", "build_execution_plan",
+            "construct_and_attest", "execute_shared"]
+diff --git a/scripts/run_shared_fracture_options.py b/scripts/run_shared_fracture_options.py
+index 0b7a0f9..362f5f7 100644
+--- a/scripts/run_shared_fracture_options.py
++++ b/scripts/run_shared_fracture_options.py
+@@ -15,6 +15,9 @@ def main(argv=None) -> int:
+     parser.add_argument("--plan-only", action="store_true")
+     parser.add_argument("--out", type=Path)
+     parser.add_argument("--native-args-json", default="[]")
++    parser.add_argument("--source-policy", choices=("qualified", "development_snapshot"),
++                        default="qualified")
++    parser.add_argument("--restart-from", type=Path)
+     args = parser.parse_args(argv)
+     options = PRESETS[args.preset] if args.preset else SharedOptions.load(args.options)
+     plan = build_execution_plan(options)
+@@ -26,7 +29,8 @@ def main(argv=None) -> int:
+     native_args = json.loads(args.native_args_json)
+     if not isinstance(native_args, list) or not all(isinstance(item, str) for item in native_args):
+         parser.error("--native-args-json must encode a list of strings")
+-    execute_shared(options, native_args, args.out)
++    execute_shared(options, native_args, args.out,
++                   source_policy=args.source_policy, restart_from=args.restart_from)
+     return 0
+ 
+ if __name__ == "__main__":
+diff --git a/tests/test_shared_execution.py b/tests/test_shared_execution.py
+index 9ea6efd..7a58d8e 100644
+--- a/tests/test_shared_execution.py
++++ b/tests/test_shared_execution.py
+@@ -66,6 +66,14 @@ def test_construct_attestation_measures_loaded_files_and_seed(monkeypatch):
+     assert receipt["source"]["commit"]
+ 
+ 
++def test_monotonic_reversible_uses_effective_native_executor():
++    options = SharedOptions(kinetics=KineticsStrategy.REVERSIBLE_SIGNED)
++    plan = build_execution_plan(options)
++    assert plan.executable
++    assert plan.executor_module.endswith("sharp_front_v10_2_27_reversible_audited")
++    assert by_role(plan)["kinetics"].attribute == "install_reversible_transport"
++
++
+ def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path):
+     receipt = inspect_fem_backend()
+     assert receipt.available
+diff --git a/tests/test_v10_2_30_reversible_transport.py b/tests/test_v10_2_30_reversible_transport.py
+index 11459df..1824465 100644
+--- a/tests/test_v10_2_30_reversible_transport.py
++++ b/tests/test_v10_2_30_reversible_transport.py
+@@ -7,6 +7,7 @@ from arrhenius_fracture.persistent_site_reversible_transport_v10230 import (
+     advect_signed_mobile_populations,
+     install_reversible_transport,
+     net_source_slip,
++    reversible_binding_receipt,
+     resolved_mobile_stress_profiles,
+     signed_arrhenius_rate,
+     signed_finite_tip_stress_Pa,
+@@ -172,6 +173,16 @@ def test_installed_actual_state_reverses_mobile_and_bounds_net_blunting():
+     assert state.blunted_radius(1.0e-6, 1.0e-10) <= before_radius
+ 
+ 
++def test_reversible_installation_is_exactly_once_and_attests_live_methods():
++    state = evolvable_actual_mpz()
++    first = reversible_binding_receipt(state)
++    second = install_reversible_transport(state)
++    assert first["all_expected_methods_bound"] is True
++    assert second["all_expected_methods_bound"] is True
++    assert second["installation_count"] == 1
++    assert state._reversible_base_advance is not state.advance
++
++
+ def test_return_does_not_cancel_retained_population():
+     state = evolvable_actual_mpz()
+     state.mobile_positive[0, 0] = 1.0
