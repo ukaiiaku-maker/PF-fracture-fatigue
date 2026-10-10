@@ -13,7 +13,9 @@ from .shared_execution import (
     _BUNDLED_V104_MANIFEST, _file_sha256, build_execution_plan,
     construct_and_attest,
 )
-from .shared_options import MechanicsBackend, OutputProfile, SharedOptions
+from .shared_options import (
+    MechanicsBackend, OutputProfile, SharedOptions, SourceLocation,
+)
 
 
 def _git(root: Path, *args: str) -> str:
@@ -143,12 +145,34 @@ def execute(request_path: str | Path) -> dict:
             "--cavity-enabled" if options.cavity.value == "full_order_v5"
             else "--cavity-disabled"
         )
+        if any(item == "--seed" or item.startswith("--seed=")
+               for item in native_args):
+            raise ValueError("--seed is owned by the shared V5 adapter")
+        native_args.extend(["--seed", str(options.random_seed)])
     if plan.executor_module == "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited":
         if any(item == "--material-manifest" or item.startswith("--material-manifest=")
                for item in native_args):
             raise ValueError("--material-manifest is owned by the shared v10.4 adapter")
         manifest = options.material_manifest or str(_BUNDLED_V104_MANIFEST)
         native_args.extend(["--material-manifest", str(Path(manifest).resolve())])
+        tip_toggles = {
+            token.split("=", 1)[0] for token in native_args
+            if token.split("=", 1)[0] in {"--tip-plasticity", "--no-tip-plasticity"}
+        }
+        if len(tip_toggles) > 1:
+            raise ValueError("conflicting native tip-plasticity controls")
+        required_tip_toggle = (
+            "--no-tip-plasticity"
+            if options.source_location is SourceLocation.BULK_UNIFORM
+            else "--tip-plasticity"
+        )
+        if tip_toggles and required_tip_toggle not in tip_toggles:
+            raise ValueError(
+                f"source geography {options.source_location.value} requires "
+                f"{required_tip_toggle}"
+            )
+        if not tip_toggles:
+            native_args.append(required_tip_toggle)
     restart_from = request.get("restart_from")
     if restart_from and plan.restart_family == "v12_accepted_multifront":
         restart_names = ("--v11-restart-checkpoint", "--v12-restart-checkpoint")
@@ -156,7 +180,7 @@ def execute(request_path: str | Path) -> dict:
                or item.startswith(restart_names[1] + "=") for item in native_args):
             raise ValueError("restart checkpoint was supplied twice")
         native_args.extend([_multifront_restart_flag(restart_from), restart_from])
-    elif restart_from and plan.restart_family == "v11_native_full_state_v5":
+    elif restart_from and plan.restart_family == "v11_native_full_state_v5_physical_pair":
         if any(item == "--restart-checkpoint" or item.startswith("--restart-checkpoint=")
                for item in native_args):
             raise ValueError("restart checkpoint was supplied twice")

@@ -57,6 +57,8 @@ class FractureObservation:
     K_probe_Pa_sqrt_m: float = math.nan
     K_applied_Pa_sqrt_m: float = math.nan
     J_J_per_m2: float = math.nan
+    J_signed_J_per_m2: float = math.nan
+    J_definition: str = ""
     G_J_per_m2: float = math.nan
     contour_valid: bool | None = None
     observer_valid: bool | None = None
@@ -69,6 +71,7 @@ class FractureObservation:
     path_arclength_m: float = math.nan
     topology_generation: int = 0
     aggregate_event_count: int = 0
+    event_multiplicity: int = 0
     source_file: str = ""
     source_row: int = -1
     schema: str = SCHEMA
@@ -126,17 +129,21 @@ class FractureObservation:
             values.setdefault("validity_reason", "migrated_schema_1_flags")
         defaults = {"K_J_Pa_sqrt_m": None, "K_probe_Pa_sqrt_m": None,
                     "K_applied_Pa_sqrt_m": None,
+                    "J_signed_J_per_m2": None, "J_definition": "",
                     "validity_status": "unknown", "validity_reason": "status_not_recorded",
                     "observer_id": "", "initial_length_m": 0.0,
                     "length_kind": "projected_extension", "path_arclength_m": None,
-                    "topology_generation": 0, "aggregate_event_count": 0}
+                    "topology_generation": 0, "aggregate_event_count": 0,
+                    "event_multiplicity": 0}
         for name, value in defaults.items():
             values.setdefault(name, value)
-        int_fields = {"sequence", "source_row", "topology_generation", "aggregate_event_count"}
+        int_fields = {"sequence", "source_row", "topology_generation",
+                      "aggregate_event_count", "event_multiplicity"}
         float_fields = {"time_s", "cycle", "pre_length_m", "committed_length_m",
                         "K_I_Pa_sqrt_m", "K_II_Pa_sqrt_m", "K_effective_Pa_sqrt_m",
                         "K_J_Pa_sqrt_m", "K_probe_Pa_sqrt_m", "K_applied_Pa_sqrt_m", "J_J_per_m2",
-                        "G_J_per_m2", "initial_length_m", "path_arclength_m"}
+                        "J_signed_J_per_m2", "G_J_per_m2", "initial_length_m",
+                        "path_arclength_m"}
         for name in int_fields:
             values[name] = int(values[name])
         for name in float_fields:
@@ -296,10 +303,14 @@ def from_legacy_steps_csv(path: str | Path, *, front_id: str = "primary",
             committed_length_m=committed, K_J_Pa_sqrt_m=_number(row, "KJ_Pa_sqrtm"),
             K_probe_Pa_sqrt_m=_number(row, "KJ_probe_Pa_sqrtm"),
             J_J_per_m2=_number(row, "J_effective_direct_J_per_m2"),
+            J_signed_J_per_m2=_number(row, "J_signed_direct_J_per_m2"),
+            J_definition=("accepted_direct_domain_J_effective_and_signed"
+                          if "J_effective_direct_J_per_m2" in row else ""),
             validity_status=ValidityStatus.UNKNOWN,
             validity_reason="legacy_steps_has_no_explicit_contour_or_observer_status",
             contour_id=str(row.get("J_contour_id", "")), observer_id="legacy_KJ",
             initial_length_m=float(initial_length_m), aggregate_event_count=n_fire,
+            event_multiplicity=n_fire,
             source_file=str(path), source_row=source_row))
     return ObservationHistory(rows)
 

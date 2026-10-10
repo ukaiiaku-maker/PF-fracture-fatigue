@@ -155,7 +155,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         return ExecutionPlan(
             "shared-execution-plan/1", options.fingerprint, bindings,
             "arrhenius_fracture.shared_v5_cavity_adapter", "main",
-            "v11_native_full_state_v5", True, None,
+            "v11_native_full_state_v5_physical_pair", True, None,
         )
 
     bindings = [
@@ -250,9 +250,14 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
             restart = "v11_native_multifront"
     elif (
         options.loading is LoadingMode.MONOTONIC
-        and options.source_location is SourceLocation.TIP_PLUS_BULK
+        and options.source_location in {
+            SourceLocation.BULK_UNIFORM, SourceLocation.TIP_PLUS_BULK,
+        }
         and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE
-        and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
+        and options.plasticity in {
+            PlasticityMode.FULL_FIELD_EVOLVING_RHO,
+            PlasticityMode.TIP_PLUS_FULL_FIELD,
+        }
         and options.crack_path is CrackPathMode.SINGLE_FRONT
         and options.cavity is CavityMode.DISABLED
         and options.kinetics is KineticsStrategy.NATIVE_SIGNED
@@ -260,7 +265,11 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         and options.output is not OutputProfile.PUBLICATION_RESTART
     ):
         executor = "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited"
-        restart = "v10_4_combined_full_field_no_public_restart"
+        restart = (
+            "v10_4_pure_bulk_full_field_no_public_restart"
+            if options.source_location is SourceLocation.BULK_UNIFORM else
+            "v10_4_combined_full_field_no_public_restart"
+        )
     if executor is None:
         limitation = ("accepted components resolve, but this composed combination has no qualified "
                       "shared native executor; use its preserved legacy launcher until an adapter is completed")

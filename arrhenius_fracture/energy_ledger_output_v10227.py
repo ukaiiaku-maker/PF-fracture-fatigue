@@ -150,6 +150,7 @@ def online_observation_history(
     header: str,
     j_effective: np.ndarray,
     *,
+    j_signed: np.ndarray | None = None,
     source_file: str,
 ) -> ObservationHistory:
     """Create stage-explicit records while the native accepted state is live.
@@ -174,13 +175,21 @@ def online_observation_history(
     records: list[FractureObservation] = []
     time_s = cycles = previous_u = 0.0
     sequence = event_count = 0
+    previous_direction: LoadDirection | None = None
+    segment_number = -1
+    if j_signed is None:
+        j_signed = np.full(len(steps), np.nan)
     for row_number, values in enumerate(steps, start=2):
         step = int(round(float(values[index["step"]])))
         u = float(values[index["Uapp_m"]])
-        direction = (LoadDirection.HOLD if u == previous_u else
+        scale = max(abs(u), abs(previous_u), 1.0e-30)
+        direction = (LoadDirection.HOLD if abs(u - previous_u) <= 1.0e-14 * scale else
                      LoadDirection.LOADING if u > previous_u else
                      LoadDirection.UNLOADING)
         previous_u = u
+        if direction is not previous_direction:
+            segment_number += 1
+            previous_direction = direction
         time_s += max(float(values[index["dt_cur_s"]]), 0.0)
         cycles += max(float(values[index["fatigue_cycles"]]), 0.0)
         extension = float(values[index["crack_extension_m"]])
@@ -189,9 +198,10 @@ def online_observation_history(
         fires = max(int(round(float(values[index["n_fire"]]))), 0)
         kj = float(values[index["KJ_Pa_sqrtm"]])
         j = float(j_effective[row_number - 2])
+        signed_j = float(j_signed[row_number - 2])
         common = dict(
             time_s=time_s, cycle=cycles,
-            segment_id=f"native-{direction.value}", front_id="primary",
+            segment_id=f"native-{segment_number:03d}-{direction.value}", front_id="primary",
             load_direction=direction, initial_length_m=initial_length,
             contour_valid=None, observer_valid=True,
             validity_status=ValidityStatus.UNKNOWN,
@@ -201,27 +211,34 @@ def online_observation_history(
             source_file=source_file, source_row=row_number,
         )
         if fires:
+            first_event = event_count + 1
             event_count += fires
-            event_id = f"step-{step}-event-{event_count}"
+            event_id = (f"step-{step}-event-{event_count}" if fires == 1 else
+                        f"step-{step}-events-{first_event}-{event_count}")
             records.append(FractureObservation(
                 sequence=sequence, stage=ObservationStage.PRE_EVENT,
                 event_id=event_id, pre_length_m=pre, committed_length_m=pre,
-                K_J_Pa_sqrt_m=kj, J_J_per_m2=j, G_J_per_m2=j,
+                K_J_Pa_sqrt_m=kj, J_J_per_m2=j,
+                J_signed_J_per_m2=signed_j,
+                J_definition="accepted_direct_domain_J_effective_and_signed",
                 aggregate_event_count=event_count - fires, **common,
+                event_multiplicity=fires,
             ))
             sequence += 1
             records.append(FractureObservation(
                 sequence=sequence, stage=ObservationStage.COMMITTED,
                 event_id=event_id, pre_length_m=pre,
                 committed_length_m=extension,
-                aggregate_event_count=event_count, **common,
+                aggregate_event_count=event_count, event_multiplicity=fires,
+                **common,
             ))
         else:
             records.append(FractureObservation(
                 sequence=sequence, stage=ObservationStage.REEQUILIBRATED,
                 event_id="", pre_length_m=extension,
                 committed_length_m=extension, K_J_Pa_sqrt_m=kj,
-                J_J_per_m2=j, G_J_per_m2=j,
+                J_J_per_m2=j, J_signed_J_per_m2=signed_j,
+                J_definition="accepted_direct_domain_J_effective_and_signed",
                 aggregate_event_count=event_count, **common,
             ))
         sequence += 1
@@ -282,6 +299,7 @@ def install_energy_ledger_output() -> None:
             values,
             header,
             augmented[:, -len(_EXTRA_COLUMNS)],
+            j_signed=augmented[:, -len(_EXTRA_COLUMNS) + 1],
             source_file=str(path.resolve()),
         )
         online_path = path.parent / "fracture_observations_online.jsonl"
@@ -291,6 +309,9 @@ def install_energy_ledger_output() -> None:
             {record.stage.value for record in online.rows}
         )
         audit["post_geometry_fixed_load_reequilibration_emitted"] = False
+        audit["independent_G_emitted"] = False
+        audit["G_policy"] = "absent: no independent native G observer is available"
+        audit["signed_J_preserved"] = True
         audit["post_geometry_policy"] = (
             "committed geometry carries no invented K/J; "
             "the next native solve is recorded separately"

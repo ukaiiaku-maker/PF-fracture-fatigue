@@ -105,6 +105,14 @@ def test_combined_tip_and_bulk_maps_to_native_v104_full_field_entry():
     assert by_role(plan)["plasticity"].requested == "tip_plus_full_field"
 
 
+def test_pure_bulk_maps_to_same_native_full_field_entry_with_distinct_restart_scope():
+    plan = build_execution_plan(PRESETS["pf_monotonic_bulk"])
+    assert plan.executable
+    assert plan.executor_module.endswith("sharp_front_v10_4_bulk_peierls_taylor_audited")
+    assert plan.restart_family == "v10_4_pure_bulk_full_field_no_public_restart"
+    assert by_role(plan)["source_location"].requested == "bulk_uniform"
+
+
 @pytest.mark.parametrize("name", [
     "pf_cavity_v5_single_front", "pf_cavity_v5_disabled_control",
 ])
@@ -112,7 +120,7 @@ def test_v5_cavity_and_matching_disabled_control_share_native_adapter(name):
     plan = build_execution_plan(PRESETS[name])
     assert plan.executable
     assert plan.executor_module.endswith("shared_v5_cavity_adapter")
-    assert plan.restart_family == "v11_native_full_state_v5"
+    assert plan.restart_family == "v11_native_full_state_v5_physical_pair"
     assert by_role(plan)["crack_path"].requested == "single_front"
 
 

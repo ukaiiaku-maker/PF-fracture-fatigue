@@ -136,7 +136,8 @@ def test_online_history_separates_pre_event_and_committed_geometry():
         [1, 2e-6, 12e6, 106e-6, 6e-6, 5e-6, 1, 3e-9, 0],
     ])
     history = online_observation_history(
-        steps, header, np.array([40.0, 90.0]), source_file="steps.csv"
+        steps, header, np.array([40.0, 90.0]),
+        j_signed=np.array([-40.0, 90.0]), source_file="steps.csv"
     )
 
     assert [record.stage for record in history.rows] == [
@@ -148,9 +149,41 @@ def test_online_history_separates_pre_event_and_committed_geometry():
     assert history.rows[1].committed_length_m == pytest.approx(1e-6)
     assert history.rows[1].K_J_Pa_sqrt_m == pytest.approx(12e6)
     assert history.rows[1].J_J_per_m2 == pytest.approx(90.0)
+    assert history.rows[1].J_signed_J_per_m2 == pytest.approx(90.0)
+    assert math.isnan(history.rows[1].G_J_per_m2)
     assert history.rows[2].committed_length_m == pytest.approx(6e-6)
     assert math.isnan(history.rows[2].K_J_Pa_sqrt_m)
     assert math.isnan(history.rows[2].J_J_per_m2)
     query = history.at_length(3e-6)
     assert query.status == "discrete_jump_bracket"
     assert query.interpolation_performed is False
+
+
+def test_online_history_distinguishes_reload_segments_and_event_multiplicity():
+    header = (
+        "step,Uapp_m,KJ_Pa_sqrtm,a_tip_m,crack_extension_m,"
+        "da_block_m,n_fire,dt_cur_s,fatigue_cycles"
+    )
+    # load/event, unload, hold, reload/event; the final accepted step aggregates
+    # two events without pretending that either has a separate post-event solve.
+    steps = np.array([
+        [0, 1e-6, 9e6, 101e-6, 1e-6, 0, 0, 1e-9, 0],
+        [1, 2e-6, 12e6, 106e-6, 6e-6, 5e-6, 1, 1e-9, 0],
+        [2, 1e-6, 7e6, 106e-6, 6e-6, 0, 0, 1e-9, 0],
+        [3, 1e-6, 7e6, 106e-6, 6e-6, 0, 0, 1e-9, 0],
+        [4, 3e-6, 14e6, 116e-6, 16e-6, 10e-6, 2, 1e-9, 0],
+    ])
+    history = online_observation_history(
+        steps, header, np.array([30., 50., 20., 20., 70.]),
+        j_signed=np.array([30., 50., -20., -20., 70.]),
+        source_file="steps.csv",
+    )
+    assert [row.segment_id for row in history.rows] == [
+        "native-000-loading", "native-000-loading", "native-000-loading",
+        "native-001-unloading", "native-002-hold",
+        "native-003-loading", "native-003-loading",
+    ]
+    assert history.rows[-2].event_id == "step-4-events-2-3"
+    assert history.rows[-2].event_multiplicity == 2
+    assert history.rows[-1].aggregate_event_count == 3
+    assert math.isnan(history.rows[-1].G_J_per_m2)

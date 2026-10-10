@@ -153,6 +153,7 @@ def _write_model_audit(args: list[str]) -> None:
     root = Path(out)
     base_path = root / "v10_2_30_hazard_energy_gate_audit.json"
     base = json.loads(base_path.read_text()) if base_path.is_file() else {}
+    tip_emission_enabled = "--no-tip-plasticity" not in args
     payload = {
         "schema": MODEL_ID,
         "experimental_model": True,
@@ -166,6 +167,17 @@ def _write_model_audit(args: list[str]) -> None:
         "bulk_plasticity_mode": "full_field",
         "bulk_model": BULK_MODEL_ID,
         "bulk_sources": "homogeneous_persistent_background",
+        "source_geography": (
+            "tip_plus_bulk" if tip_emission_enabled else "bulk_uniform"
+        ),
+        "tip_emission_enabled": tip_emission_enabled,
+        "tip_emission_control": (
+            "native_kinetic_tip_plasticity_enabled_flag"
+        ),
+        "tip_and_bulk_elementary_rate_laws": (
+            "native_tip_emission_law_plus_or_minus_same_manifest_mapped_"
+            "bulk_peierls_taylor_law"
+        ),
         "bulk_initial_density_from_exact_selected_row": True,
         "bulk_peierls_taylor_parameters_from_exact_selected_row": True,
         "bulk_tip_mechanical_interaction": "shared_FEM_stress_and_directional_J",
