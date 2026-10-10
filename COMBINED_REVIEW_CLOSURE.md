@@ -7,7 +7,7 @@ top-level composition is not yet qualified.
 | ID | Disposition | Evidence and scope |
 |---|---|---|
 | C01 | corrected for mapped paths | public `run` launches a fresh interpreter, measures actual module/callable hashes, source closure, inputs and seed, then records post-return execution status |
-| C02 | corrected construction; some execution pending | loading is an independent role and cannot be displaced by bulk/cavity scheduling; hold/bulk/cavity and fixed-range+branch shared executors remain explicit pending combinations |
+| C02 | corrected and executed for source geography | loading is independent of bulk/cavity scheduling; tip-only, genuine pure-uniform-bulk, and tip-plus-bulk paths execute and attest their active source populations; fixed-range branch execution remains bounded below |
 | C03 | corrected and executed | reversible signed kinetics is installed exactly once after live MPZ construction; the public monotonic run records all five observed bound methods and native eligible-return tests cover returned/source/net-slip ledgers |
 | C04 | corrected | exact clean FEM checkout and project interpreter are verified; 4 native theta0 adapter tests pass; only the exact mapped comparison preset is accepted |
 | C05 | corrected | Boolean, float and string seeds are rejected; the public PF run observed seed 1733 inside native startup |
@@ -22,8 +22,8 @@ top-level composition is not yet qualified.
 
 ## Executed results
 
-- Final clean-source PF suite: 757 tests passed in one qualified interpreter
-  at source `9507fce1`.
+- Final clean-source PF suite: 763 tests passed in one qualified interpreter
+  at source `348343f`.
 - External FEM theta0 adapter suite: 4 passed in `arrhenius-fem-czm`; the two
   formerly disk-blocked checks are included and the storage failure did not
   reproduce.
@@ -42,13 +42,15 @@ top-level composition is not yet qualified.
   `3.2505955739788827e-13 s^-1`, Taylor completion was active, density evolved,
   and accepted plastic work remained nonnegative. Detailed balance was exact at
   zero stress and introduced no fitted parameter.
-- V5 cavity pair: matching enabled/disabled native initial mechanical arrays
-  were verified. The enabled path reached a resolved body-fitted cavity through
-  eight accepted lifecycle states while physical branch births remained zero
-  and the sole active owner remained `b00000000`; the disabled control retained
-  no cavity state. Both wrote exact atomic full-state checkpoints. A fresh-worker
-  restored/re-equilibrated continuation was fingerprint- and observer-identical
-  to the uninterrupted continuation.
+- Physical V5 cavity pair: enabled and disabled arms start from exact common
+  native mechanical, vacancy, transport, fracture-RNG state and advance through
+  the same qualified directional provider. Both completed 20 µs without an
+  event. Paired checkpoint round trips and fresh-worker versus uninterrupted
+  terminal fingerprints are exact. The former extreme-reservoir lifecycle is
+  explicitly test-only and production-ineligible.
+- Source geography: matched 900 K two-step runs attest tip-only, genuine
+  pure-uniform-bulk (persistent tip disabled), and tip-plus-bulk execution.
+  Bulk work is zero only for tip-only; tip work is zero only for pure bulk.
 - Native hold/dwell path: a two-block run ramped once to `2e-7 m`, held that
   displacement exactly for the second block, and consumed 0.25 physical cycles
   per block. Restarting after block two in a fresh worker and continuing to
@@ -77,21 +79,23 @@ top-level composition is not yet qualified.
 - Long history: 2,085/2,085 rows retained; 201 event and 1,884 non-event
   rows; 1,883 repeated committed-length rows; `K_J` finite on every row and
   `K_I` deliberately absent.
+- Current developed-growth history: the qualified 300 K full-spatial run
+  reaches 1002.9028827375072 µm projected extension. Its 2,286 observation
+  rows preserve 2,085 signed direct-J evaluations, leave independently absent
+  G and path arclength null, and associate pre-event mechanics with the prior
+  accepted geometry. Exact-repeat and discrete-jump query modes are exercised.
 - Explicit cyclic accepted history: 5/5 rows retained with native probe K and
   Kmin/Kmax envelope columns. It does not contain within-cycle phase samples,
   so it is not promoted to a phase-resolved reload K(a) curve.
 
 ## Open release boundaries
 
-The branch now exposes the established persistent tip-plus-uniform-bulk v10.4.1
-composition. The pure uniform-bulk state-step evidence remains separate because
-the v10.4 crack driver also owns a persistent tip population; it is not falsely
-labeled bulk-only. The branch does not yet provide qualified shared top-level
-executors for pure bulk, fixed-range branching, or the combined
-branching-plus-cavity composition. V3.6 is now
-publicly executable but its bounded evidence is a no-event censor. Current-source
-V12 bootstrap is blocked specifically by the absent theta=40 `adb775...` kernel;
-the schema-2 checkpoint, current-source material registry, and V11/V12 argument
-dispatch are restored. Branching-family interruption continuation remains open. The
-corrected observer does not invent missing within-cycle phase samples in older
-CSVs.
+The branch now executes and distinguishes tip-only, pure-uniform-bulk, and
+tip-plus-uniform-bulk source geographies. V3.6 remains a bounded no-event
+censor. The exact theta=40 `adb775...` family and V11 checkpoint have been
+recovered; V12 enters the inherited two-front topology transaction and fails
+closed at `unreliable_tensor_probe_for_anisotropic_normalization` for both the
+historical and compact interval. No orientation or mechanics substitute was
+used. Consequently, successful branching-family interrupted continuation and
+the combined branching-plus-cavity calculation remain open. The corrected
+observer does not invent missing within-cycle phase samples in older CSVs.

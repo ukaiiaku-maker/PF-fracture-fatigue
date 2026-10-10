@@ -1,14 +1,14 @@
 {
-  "schema": "combined-review-test-receipt/2",
+  "schema": "combined-review-test-receipt/3",
   "date": "2026-10-09",
   "branch": "codex/shared-fracture-fatigue-options-v1",
-  "tested_commit": "9507fce1a1555dbf1d783be37f9bda758b82410a",
-  "tested_tree": "704972e0b92434be476420fc290fe7f79faf514b",
+  "tested_commit": "348343f76675d008e5370fb246158ac3db79fd17",
+  "tested_tree": "cfb1f199ec6a44864b1fbd770ef4c3ea427d8bdc",
   "working_tree_clean_before_execution": true,
   "resource_measurement": {
     "volume": "/Volumes/Data",
-    "available_after_tests_GiB": 28,
-    "temporary_volume_available_GiB": 93,
+    "available_after_tests_GiB": 29,
+    "temporary_volume_available_GiB": 92,
     "scientific_data_deleted": false
   },
   "pf_environment": {
@@ -21,10 +21,10 @@
     {
       "scope": "all repository tests from final frozen calculation source",
       "command": "PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 MPLCONFIGDIR=/private/tmp/fracture-mpl-final TMPDIR=/private/tmp/fracture-tests-final <qualified-pf-python> -m pytest -q tests",
-      "passed": 757,
+      "passed": 763,
       "failed": 0,
       "skipped": 0,
-      "seconds": 52.03
+      "seconds": 54.65
     },
     {
       "scope": "final observer/shared-execution targeted set",
@@ -99,11 +99,10 @@
     "status": "not collected by compact repository suite; not counted as passes",
     "manifest": "integration_evidence/omitted_artifact_tests_manifest.json"
   },
+  "targeted_completion_receipt": "TARGETED_COMPLETION_RECEIPT.json",
   "remaining_boundaries": [
-    "pure bulk top-level orchestration is not yet qualified",
-    "fixed-range branching is unsupported by the retained V11/V12 entries",
-    "combined branching plus cavity is not yet qualified",
-    "V12 theta=40 continuation requires absent signed-kernel fingerprint adb775...",
-    "branching-family interrupted continuation remains unqualified"
+    "exact theta=40 continuation fails closed at unreliable_tensor_probe_for_anisotropic_normalization in the inherited two-front topology transaction",
+    "branching-family interrupted continuation remains unqualified",
+    "combined branching plus cavity remains unqualified"
   ]
 }

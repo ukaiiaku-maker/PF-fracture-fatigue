@@ -12,6 +12,13 @@ identity, and source row. Absolute projected length is
 `initial_length + projected_extension`; it is never silently confused with
 extension or arclength.
 
+`J_signed_J_per_m2` is the native signed direct-J quantity; its definition is
+recorded in `J_definition`. `G_J_per_m2` is reserved for an independently
+computed energy-release rate and remains null when no such calculation exists.
+Neither field is reconstructed from K. Multiple events accepted during one
+native step share that step identifier, carry distinct chronological sequence
+numbers, and record `event_multiplicity`.
+
 ## Query rules
 
 1. Select front, loading segment, stage, coordinate and validity before length.
@@ -64,3 +71,21 @@ leave K/J null. This solver does not perform a fixed-load solve immediately
 after committing geometry, so the next native load step is the next separately
 recorded equilibration. Intermediate lengths inside either jump return
 `discrete_jump_bracket` and are never interpolated.
+
+## Current developed-growth calculation
+
+The current qualified full-spatial calculation under
+`integration_evidence/targeted_completion/current_single_front_1000um/`
+reaches 1002.9028827375072 µm projected extension in 2,085 accepted rows and
+201 events at 300 K. Its regenerated schema `/2` history contains 2,286
+chronological observations: 1,884 reequilibrated, 201 pre-event, and 201
+committed rows. Signed direct J is finite on all 2,085 mechanically evaluated
+rows; independently computed G is absent. The native steps table has no path
+arclength, so that coordinate remains unavailable rather than being inferred
+from projected advance.
+
+Exact repeated-length queries are demonstrated near 5 µm. Targets at 100,
+600, and 1,000 µm fall inside accepted geometry jumps and correctly return
+`discrete_jump_bracket`. This monotonic calculation supports a developed
+K-versus-projected-extension history; it is not presented as a phase-resolved
+cyclic reload R-curve.
