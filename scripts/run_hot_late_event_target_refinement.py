@@ -19,7 +19,7 @@ from scripts.run_hot_late_floor_refinement import (
 )
 
 
-TARGETS = (0.15, 0.075, 0.0375)
+TARGETS = (0.15, 0.075, 0.0375, 0.01875, 0.009375)
 DEFAULT_OUTPUT = (
     ROOT / "integration_evidence" / "active_fracture_comparisons_0a5d55e" /
     "hot_late_event_target_refinement"
@@ -28,7 +28,7 @@ DEFAULT_OUTPUT = (
 
 def native_args_for_target(source: list[str], target: float) -> list[str]:
     args = list(source)
-    replace_argument(args, "--steps", "1710")
+    replace_argument(args, "--steps", "1760")
     replace_argument(args, "--target-crack-extension-um", "1000")
     replace_argument(args, "--print-every", "1")
     replace_argument(args, "--adaptive-min-frac", "1e-10")
@@ -54,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
         "source_pending_mark": 1.4655725624469025,
         "event_targets": list(TARGETS),
         "adaptive_min_frac": 1e-10,
-        "common_endpoint": {"maximum_step": 1710, "target_crack_extension_um": 1000.0},
+        "common_endpoint": {"maximum_step": 1760, "target_crack_extension_um": 1000.0},
         "fixed_physics": {
             "nominal_dU_m": 2e-7,
             "nominal_dt_s": 8.4,
