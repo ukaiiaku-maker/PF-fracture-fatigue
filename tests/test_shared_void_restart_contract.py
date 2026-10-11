@@ -8,6 +8,7 @@ from arrhenius_fracture.voiding_production_v5 import (
 )
 from arrhenius_fracture.shared_v5_cavity_adapter import (
     TRANSPORT_BOUND_FAILURE, _advance_paired_with_refinement, _common_start_audit,
+    _parse_load_factors,
 )
 
 
@@ -64,6 +65,15 @@ def test_paired_transport_refinement_uses_same_accepted_partition_for_both_arms(
     assert terminal == pytest.approx({"disabled": 0.2, "enabled": 0.2})
     assert [duration for duration, _, _ in segments] == pytest.approx([0.1, 0.1])
     assert all(set(records) == {"disabled", "enabled"} for _, records, _ in segments)
+
+
+def test_explicit_cavity_load_history_supports_positive_R_and_reversal():
+    assert _parse_load_factors("1.0,0.2,1.0") == (1.0, 0.2, 1.0)
+    assert _parse_load_factors("1.0,-0.25,1.0") == (1.0, -0.25, 1.0)
+    with pytest.raises(SystemExit, match="finite"):
+        _parse_load_factors("1,nan")
+    with pytest.raises(SystemExit, match="normalized"):
+        _parse_load_factors("3")
 
 
 def test_directional_clock_identity_excludes_numerical_cache_diagnostics():

@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from collections.abc import Mapping
 import copy
+from dataclasses import replace
 import hashlib
 import json
 import math
@@ -37,6 +38,32 @@ LEGACY_PAIR_CHECKPOINT_SCHEMA = "shared-v5-physical-pair-checkpoint/1"
 DEFAULT_SITES_M = ((6.0e-4, 6.0e-5), (7.5e-4, -6.0e-5))
 DEFAULT_PARTITION = (0.50, 0.10, 0.40)
 TRANSPORT_BOUND_FAILURE = "vacancy transport solve exceeded fail-closed concentration bounds"
+
+
+def _parse_load_factors(raw: str) -> tuple[float, ...]:
+    try:
+        factors = tuple(float(item.strip()) for item in str(raw).split(","))
+    except ValueError as error:
+        raise SystemExit("--load-factors must be a comma-separated numeric history") from error
+    if not factors or any(not math.isfinite(item) for item in factors):
+        raise SystemExit("--load-factors must contain finite values")
+    if any(item == 0.0 for item in factors):
+        raise SystemExit("--load-factors must remain nonzero so restart rescaling is defined")
+    if any(abs(item) > 2.0 for item in factors):
+        raise SystemExit("--load-factors are normalized to the native opening and require |factor| <= 2")
+    return factors
+
+
+def _apply_load_factor_pair(states, target: float, current: float):
+    """Apply one shared structural-load state before a coupled time interval."""
+    if not math.isfinite(current) or current == 0.0:
+        raise RuntimeError("cannot rescale a zero-opening accepted state")
+    ratio = float(target) / float(current)
+    updated = {}
+    for arm, state in states.items():
+        trial = replace(state, displacement=ratio * np.asarray(state.displacement))
+        updated[arm] = equilibrate_fixed_load_with_production_fem(trial)
+    return updated
 
 
 def _finite(value):
@@ -315,6 +342,19 @@ def _physical_main(args):
         physical_time = 0.0
         interval_index = 0
 
+    load_factors = _parse_load_factors(args.load_factors)
+    if ancestry is not None:
+        prior_factors = tuple(float(item) for item in ancestry["configuration"].get(
+            "load_factors", (1.0,)
+        ))
+        if prior_factors != load_factors:
+            raise RuntimeError("restart load-factor history differs from its checkpoint")
+        requested_interval_offset = int(ancestry.get("requested_interval_count_total", 0))
+        current_load_factor = float(ancestry.get("current_load_factor", 1.0))
+    else:
+        requested_interval_offset = 0
+        current_load_factor = 1.0
+
     duration = float(args.duration_s)
     if not math.isfinite(duration) or duration <= 0.0:
         raise SystemExit("--duration-s must be finite and positive")
@@ -331,6 +371,14 @@ def _physical_main(args):
     requested_exposure = duration * intervals
     for _ in range(intervals):
         requested_interval_count += 1
+        load_factor = load_factors[
+            (requested_interval_offset + requested_interval_count - 1) % len(load_factors)
+        ]
+        if load_factor != current_load_factor:
+            states = _apply_load_factor_pair(
+                states, load_factor, current_load_factor
+            )
+            current_load_factor = load_factor
         starts = {
             arm: complete_accepted_state_fingerprint(state)
             for arm, state in states.items()
@@ -364,6 +412,7 @@ def _physical_main(args):
                     "physical_time_start_s": segment_start,
                     "physical_time_end_s": segment_end,
                     "duration_s": accepted_duration,
+                    "normalized_load_factor": load_factor,
                     "input_fingerprint": prior[arm],
                     "output_fingerprint": fingerprint,
                     "scheduler": schedulers[arm],
@@ -395,13 +444,21 @@ def _physical_main(args):
         {
             "physical_time_s": physical_time,
             "interval_count": interval_index,
+            "requested_interval_count_total": (
+                requested_interval_offset + requested_interval_count
+            ),
+            "current_load_factor": current_load_factor,
             "common_start": common_start,
             "configuration": {
                 "material_class": args.material_class,
                 "temperature_K": float(args.temperature_K),
                 "seed": int(args.seed),
                 "vacancy_energy_variant": args.vacancy_energy_variant,
-                "loading_history": "hold_at_native_opening",
+                "loading_history": (
+                    "hold_at_native_opening" if load_factors == (1.0,) else
+                    "explicit_normalized_displacement_history"
+                ),
+                "load_factors": list(load_factors),
                 "interval_duration_s": duration,
                 "transport_refinement_min_duration_s": minimum_duration,
                 "test_only_extreme_reservoir": False,
@@ -519,6 +576,11 @@ def main(argv=None):
     parser.add_argument("--temperature-K", type=float, default=1200.0)
     parser.add_argument("--seed", type=int, default=3621)
     parser.add_argument("--duration-s", type=float, default=1.0e-5)
+    parser.add_argument(
+        "--load-factors", default="1.0",
+        help=("comma-separated factors relative to the native accepted opening; "
+              "the sequence continues phase-exactly across paired restart"),
+    )
     parser.add_argument("--transport-refinement-min-duration-s", type=float, default=1.0e-8)
     parser.add_argument("--steps", type=int, default=1)
     parser.add_argument("--vacancy-energy-variant", default="reference")
