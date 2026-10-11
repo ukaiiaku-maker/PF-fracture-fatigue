@@ -47,10 +47,13 @@ def _parse_load_factors(raw: str) -> tuple[float, ...]:
         raise SystemExit("--load-factors must be a comma-separated numeric history") from error
     if not factors or any(not math.isfinite(item) for item in factors):
         raise SystemExit("--load-factors must contain finite values")
-    if any(item == 0.0 for item in factors):
-        raise SystemExit("--load-factors must remain nonzero so restart rescaling is defined")
-    if any(abs(item) > 2.0 for item in factors):
-        raise SystemExit("--load-factors are normalized to the native opening and require |factor| <= 2")
+    if any(item <= 0.0 for item in factors):
+        raise SystemExit(
+            "native V5 accepted equilibrium currently requires positive applied "
+            "opening; use the reversible signed reduced path for applied reversal"
+        )
+    if any(item > 2.0 for item in factors):
+        raise SystemExit("--load-factors are normalized to the native opening and require factor <= 2")
     return factors
 
 
