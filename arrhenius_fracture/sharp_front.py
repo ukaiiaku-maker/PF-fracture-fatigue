@@ -1115,6 +1115,24 @@ def run_2d(args):
     cfg.loading.n_steps = args.steps
     cfg.loading.dU_top = args.dU
     cfg.loading.dt = args.dt
+    prescribed_opening_history = None
+    prescribed_opening_raw = os.environ.get(
+        "ARRHENIUS_PRESCRIBED_OPENING_HISTORY_M", ""
+    ).strip()
+    if prescribed_opening_raw:
+        try:
+            prescribed_opening_history = tuple(
+                float(value) for value in prescribed_opening_raw.split(",")
+            )
+        except ValueError as exc:
+            raise ValueError(
+                "ARRHENIUS_PRESCRIBED_OPENING_HISTORY_M must be comma-separated metres"
+            ) from exc
+        if len(prescribed_opening_history) < int(args.steps):
+            raise ValueError("prescribed opening history is shorter than --steps")
+        if any(not np.isfinite(value) or value < 0.0
+               for value in prescribed_opening_history):
+            raise ValueError("prescribed opening history must be finite and nonnegative")
     # sources-only plasticity controls (default: legacy bulk multiplication)
     cfg.dislocations.bulk_mult_frac = getattr(args, 'bulk_mult_frac', 1.0)
     cfg.dislocations.tip_source_rho_per_emit = getattr(args, 'tip_source_rho_per_emit', 0.0)
@@ -2656,7 +2674,13 @@ def run_2d(args):
                 # This is a load-hold test harness, not a propagation cap: the
                 # existing v8 first-passage advance/branching laws still decide
                 # whether the front moves.
-                if fatigue_mode and bool(getattr(args, 'fatigue_hold_load', False)) and step > 0:
+                if prescribed_opening_history is not None:
+                    if adaptive_events and trial_frac != 1.0:
+                        raise RuntimeError(
+                            "prescribed opening history requires nonadaptive outer increments"
+                        )
+                    dU_step = prescribed_opening_history[step] - Uapp_saved
+                elif fatigue_mode and bool(getattr(args, 'fatigue_hold_load', False)) and step > 0:
                     dU_step = 0.0
                 else:
                     dU_step = cfg.loading.dU_top * trial_frac
