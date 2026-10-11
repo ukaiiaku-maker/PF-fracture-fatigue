@@ -1,0 +1,340 @@
+{
+  "developed_propagation": {
+    "accepted_geometry_events": 203,
+    "achieved_path_extension_um": 1008.5595119085253,
+    "achieved_projected_extension_um": 1004.9257634758525,
+    "first_event_K_I_MPa_sqrt_m": 23.233738831608207,
+    "queries": {
+      "100.0": {
+        "interpolation_performed": false,
+        "lower_extension_um": 99.48280354083036,
+        "status": "discrete_jump_bracket",
+        "target_um": 100.0,
+        "upper_K_I_MPa_sqrt_m": 44.971823839233316,
+        "upper_extension_um": 102.25457237297495
+      },
+      "1000.0": {
+        "interpolation_performed": false,
+        "lower_extension_um": 998.1919262543385,
+        "status": "discrete_jump_bracket",
+        "target_um": 1000.0,
+        "upper_K_I_MPa_sqrt_m": 49.038574502263344,
+        "upper_extension_um": 1004.9257634758525
+      },
+      "500.0": {
+        "interpolation_performed": false,
+        "lower_extension_um": 496.6208838218444,
+        "status": "discrete_jump_bracket",
+        "target_um": 500.0,
+        "upper_K_I_MPa_sqrt_m": 52.60203018594476,
+        "upper_extension_um": 505.4552066703682
+      }
+    },
+    "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current",
+    "source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+    "status": "PASSED"
+  },
+  "fem_czm_consistency": {
+    "accepted_solver_steps": 0,
+    "adapter_fix_commit": "6c129c2",
+    "backend_commit": "293491157063484bb10df6adc479f847a6a08ba6",
+    "estimated_kernel_bundle_storage_MiB": 10,
+    "failure": {
+      "exception_class": "SystemExit",
+      "exception_message": "PF reference kernel SHA-256 mismatch: expected a85b57ad9eee8331ef34ea222760ce7d4064f48ddef668f1e28a666d14946f3a, observed d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3",
+      "execution_verified": false,
+      "schema": "shared-runtime-failure/1",
+      "status": "failed",
+      "traceback": "Traceback (most recent call last):\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_fem_execution_worker.py\", line 130, in main\n    execute(request_path)\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_fem_execution_worker.py\", line 109, in execute\n    result = executor(argv)\n             ^^^^^^^^^^^^^^\n  File \"/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v10_0_5_17_paper7_self_contained/arrhenius_fracture/mode_i_first_passage_v10_0_5_18_4_0_theta0_pf_parity.py\", line 223, in main\n    raise SystemExit(\nSystemExit: PF reference kernel SHA-256 mismatch: expected a85b57ad9eee8331ef34ea222760ce7d4064f48ddef668f1e28a666d14946f3a, observed d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3\n"
+    },
+    "focused_tests": "17 passed",
+    "live_kernel_sha256": "d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3",
+    "preparation_required": "Recover the byte-identical a85b57 kernel family and referenced files from archive, or regenerate it from the locked historical mechanics configuration and verify the required hash before launch. Do not weaken the pinned FEM guard or substitute d41b08.",
+    "required_kernel_sha256": "a85b57ad9eee8331ef34ea222760ce7d4064f48ddef668f1e28a666d14946f3a",
+    "status": "ADAPTER_REPAIRED_EXACT_RUN_BLOCKED_BY_MISSING_IMMUTABLE_INPUT"
+  },
+  "opening_accommodation": {
+    "arm_details": [
+      {
+        "accepted_geometry_events": 2,
+        "achieved_extension_um": 10.564512816410554,
+        "arm": "accommodation_enabled",
+        "condition": "DBTT 300 K",
+        "first_event": {
+          "J_effective_J_per_m2": 1213.379953853418,
+          "K_I_MPa_sqrt_m": 23.233738831608207,
+          "backstress_GPa": 3.316323997547395e-08,
+          "emitted_population": 5.155799577726807e-13,
+          "extension_um": 2.2973400956249024,
+          "mobile_population": 3.4729718286093604e-13,
+          "opening_m": 1.367993427214501e-05,
+          "retained_population": 1.6828277491174467e-13,
+          "step": 83,
+          "tip_emission_work_J_per_m": 1.3975310576461367e-16
+        },
+        "post_event_endpoint": {
+          "J_effective_J_per_m2": 1268.8187651944204,
+          "K_I_MPa_sqrt_m": 23.7585806349323,
+          "backstress_GPa": 5.184112694710885e-09,
+          "emitted_population": 1.0403101600923755e-14,
+          "extension_um": 10.564512816410554,
+          "mobile_population": 5.969288171952815e-15,
+          "opening_m": 1.3794230926337321e-05,
+          "retained_population": 4.43381342897094e-15,
+          "step": 96,
+          "tip_emission_work_J_per_m": 1.4979703282337238e-16
+        },
+        "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/accommodation_enabled_run2",
+        "source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+        "terminal_emission_work_J_per_m": 1.4979703282337238e-16,
+        "terminal_emitted_population": 1.0403101600923755e-14
+      },
+      {
+        "accepted_geometry_events": 2,
+        "achieved_extension_um": 10.564512816410554,
+        "arm": "opening_only",
+        "condition": "DBTT 300 K",
+        "first_event": {
+          "J_effective_J_per_m2": 1213.379953853418,
+          "K_I_MPa_sqrt_m": 23.233738831608207,
+          "backstress_GPa": 0.0,
+          "emitted_population": 0.0,
+          "extension_um": 2.2973400956249024,
+          "mobile_population": 0.0,
+          "opening_m": 1.367993427214501e-05,
+          "retained_population": 0.0,
+          "step": 83,
+          "tip_emission_work_J_per_m": 0.0
+        },
+        "post_event_endpoint": {
+          "J_effective_J_per_m2": 1268.8187651944204,
+          "K_I_MPa_sqrt_m": 23.7585806349323,
+          "backstress_GPa": 0.0,
+          "emitted_population": 0.0,
+          "extension_um": 10.564512816410554,
+          "mobile_population": 0.0,
+          "opening_m": 1.3794230926337321e-05,
+          "retained_population": 0.0,
+          "step": 96,
+          "tip_emission_work_J_per_m": 0.0
+        },
+        "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/opening_only",
+        "source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+        "terminal_emission_work_J_per_m": 0.0,
+        "terminal_emitted_population": 0.0
+      },
+      {
+        "accepted_geometry_events": 2,
+        "achieved_extension_um": 10.564512816410554,
+        "arm": "accommodation_enabled",
+        "condition": "DBTT 1200 K",
+        "first_event": {
+          "J_effective_J_per_m2": 6166.219261717489,
+          "K_I_MPa_sqrt_m": 52.37574061089843,
+          "backstress_GPa": 7.775131507676294,
+          "emitted_population": 23764.755848217035,
+          "extension_um": 2.2973400956249024,
+          "mobile_population": 0.0,
+          "opening_m": 3.083863058825697e-05,
+          "retained_population": 23764.755848217035,
+          "step": 165,
+          "tip_emission_work_J_per_m": 4.788974959354533
+        },
+        "post_event_endpoint": {
+          "J_effective_J_per_m2": 6523.787533060185,
+          "K_I_MPa_sqrt_m": 53.872930408603125,
+          "backstress_GPa": 7.783189768789266,
+          "emitted_population": 23820.69774415921,
+          "extension_um": 10.564512816410554,
+          "mobile_population": 0.0,
+          "opening_m": 3.127862114970531e-05,
+          "retained_population": 23820.69774415921,
+          "step": 186,
+          "tip_emission_work_J_per_m": 18.792986800100167
+        },
+        "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/accommodation_enabled",
+        "source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+        "terminal_emission_work_J_per_m": 18.792986800100167,
+        "terminal_emitted_population": 23820.69774415921
+      },
+      {
+        "accepted_geometry_events": 2,
+        "achieved_extension_um": 10.564512816410554,
+        "arm": "opening_only",
+        "condition": "DBTT 1200 K",
+        "first_event": {
+          "J_effective_J_per_m2": 985.242805040003,
+          "K_I_MPa_sqrt_m": 20.93593355630776,
+          "backstress_GPa": 0.0,
+          "emitted_population": 0.0,
+          "extension_um": 2.2973400956249024,
+          "mobile_population": 0.0,
+          "opening_m": 1.23269955409265e-05,
+          "retained_population": 0.0,
+          "step": 79,
+          "tip_emission_work_J_per_m": 0.0
+        },
+        "post_event_endpoint": {
+          "J_effective_J_per_m2": 1025.8333699346156,
+          "K_I_MPa_sqrt_m": 21.36284583970697,
+          "backstress_GPa": 0.0,
+          "emitted_population": 0.0,
+          "extension_um": 10.564512816410554,
+          "mobile_population": 0.0,
+          "opening_m": 1.2403267404088443e-05,
+          "retained_population": 0.0,
+          "step": 92,
+          "tip_emission_work_J_per_m": 0.0
+        },
+        "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/opening_only",
+        "source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+        "terminal_emission_work_J_per_m": 0.0,
+        "terminal_emitted_population": 0.0
+      },
+      {
+        "accepted_geometry_events": 2,
+        "achieved_extension_um": 10.564512816410554,
+        "arm": "accommodation_enabled",
+        "condition": "Peak 900 K",
+        "first_event": {
+          "J_effective_J_per_m2": 6775.874305186048,
+          "K_I_MPa_sqrt_m": 54.90392161641079,
+          "backstress_GPa": 5.378067534436543,
+          "emitted_population": 9227.623863133815,
+          "extension_um": 2.2973400956249024,
+          "mobile_population": 9190.02346464446,
+          "opening_m": 3.232721364560128e-05,
+          "retained_population": 37.600398489354944,
+          "step": 163,
+          "tip_emission_work_J_per_m": 3.003939088954314
+        },
+        "post_event_endpoint": {
+          "J_effective_J_per_m2": 6968.529722737818,
+          "K_I_MPa_sqrt_m": 55.67898038476231,
+          "backstress_GPa": 0.05118325004621707,
+          "emitted_population": 0.9095188562356151,
+          "extension_um": 10.564512816410554,
+          "mobile_population": 0.20727301916251323,
+          "opening_m": 3.232721369058361e-05,
+          "retained_population": 0.702245837073102,
+          "step": 173,
+          "tip_emission_work_J_per_m": 3.0043727199028076
+        },
+        "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/Peak_900K/accommodation_enabled",
+        "source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+        "terminal_emission_work_J_per_m": 3.0043727199028076,
+        "terminal_emitted_population": 0.9095188562356151
+      },
+      {
+        "accepted_geometry_events": 2,
+        "achieved_extension_um": 10.564512816410554,
+        "arm": "opening_only",
+        "condition": "Peak 900 K",
+        "first_event": {
+          "J_effective_J_per_m2": 974.706745742793,
+          "K_I_MPa_sqrt_m": 20.823689584479204,
+          "backstress_GPa": 0.0,
+          "emitted_population": 0.0,
+          "extension_um": 2.2973400956249024,
+          "mobile_population": 0.0,
+          "opening_m": 1.2260906730675687e-05,
+          "retained_population": 0.0,
+          "step": 73,
+          "tip_emission_work_J_per_m": 0.0
+        },
+        "post_event_endpoint": {
+          "J_effective_J_per_m2": 1033.4287104165558,
+          "K_I_MPa_sqrt_m": 21.441785976002524,
+          "backstress_GPa": 0.0,
+          "emitted_population": 0.0,
+          "extension_um": 10.564512816410554,
+          "mobile_population": 0.0,
+          "opening_m": 1.2449100043931261e-05,
+          "retained_population": 0.0,
+          "step": 87,
+          "tip_emission_work_J_per_m": 0.0
+        },
+        "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/Peak_900K/opening_only",
+        "source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+        "terminal_emission_work_J_per_m": 0.0,
+        "terminal_emitted_population": 0.0
+      }
+    ],
+    "case_count": 6,
+    "paired_results": [
+      {
+        "common_achieved_extension_um": 10.564512816410554,
+        "condition": "DBTT 300 K",
+        "enabled_backstress_at_first_GPa": 3.316323997547395e-08,
+        "enabled_emitted_population_at_first": 5.155799577726807e-13,
+        "events_each_arm": 2,
+        "first_K_enabled_MPa_sqrt_m": 23.233738831608207,
+        "first_K_opening_only_MPa_sqrt_m": 23.233738831608207,
+        "first_delta_K_MPa_sqrt_m": 0.0,
+        "first_ratio_enabled_over_control": 1.0,
+        "post_K_enabled_MPa_sqrt_m": 23.7585806349323,
+        "post_K_opening_only_MPa_sqrt_m": 23.7585806349323,
+        "post_delta_K_MPa_sqrt_m": 0.0
+      },
+      {
+        "common_achieved_extension_um": 10.564512816410554,
+        "condition": "DBTT 1200 K",
+        "enabled_backstress_at_first_GPa": 7.775131507676294,
+        "enabled_emitted_population_at_first": 23764.755848217035,
+        "events_each_arm": 2,
+        "first_K_enabled_MPa_sqrt_m": 52.37574061089843,
+        "first_K_opening_only_MPa_sqrt_m": 20.93593355630776,
+        "first_delta_K_MPa_sqrt_m": 31.439807054590673,
+        "first_ratio_enabled_over_control": 2.501715076140859,
+        "post_K_enabled_MPa_sqrt_m": 53.872930408603125,
+        "post_K_opening_only_MPa_sqrt_m": 21.36284583970697,
+        "post_delta_K_MPa_sqrt_m": 32.510084568896154
+      },
+      {
+        "common_achieved_extension_um": 10.564512816410554,
+        "condition": "Peak 900 K",
+        "enabled_backstress_at_first_GPa": 5.378067534436543,
+        "enabled_emitted_population_at_first": 9227.623863133815,
+        "events_each_arm": 2,
+        "first_K_enabled_MPa_sqrt_m": 54.90392161641079,
+        "first_K_opening_only_MPa_sqrt_m": 20.823689584479204,
+        "first_delta_K_MPa_sqrt_m": 34.08023203193159,
+        "first_ratio_enabled_over_control": 2.636608723620864,
+        "post_K_enabled_MPa_sqrt_m": 55.67898038476231,
+        "post_K_opening_only_MPa_sqrt_m": 21.441785976002524,
+        "post_delta_K_MPa_sqrt_m": 34.23719440875979
+      }
+    ],
+    "status": "PASSED_SIX_OF_SIX"
+  },
+  "protocol": "PILOT_PROTOCOL.json",
+  "schema": "fracture-current-source-bounded-pilot-results/1",
+  "storage": {
+    "data_deleted": false,
+    "external_archive_modified": false,
+    "free_space_GiB_after": 13.708,
+    "raw_pilot_root_MiB": 63.551,
+    "rendered_step_sequences_created": false
+  },
+  "v11_current_source_suffix": {
+    "accepted_current_source_intervals": 0,
+    "estimated_new_preparation_storage_MiB": 800,
+    "failure": {
+      "exception_class": "RuntimeError",
+      "exception_message": "REQUIRED_FRACTURE_OBSERVATION_UNAVAILABLE_AFTER_BOUNDED_REFINEMENT",
+      "execution_verified": false,
+      "schema": "shared-runtime-failure/1",
+      "status": "failed",
+      "traceback": "Traceback (most recent call last):\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_execution_worker.py\", line 228, in main\n    execute(request_path)\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_execution_worker.py\", line 205, in execute\n    result = executor(argv)\n             ^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_v5_cavity_adapter.py\", line 534, in main\n    return _physical_main(args)\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_v5_cavity_adapter.py\", line 345, in _physical_main\n    states, accepted_segments = _advance_paired_with_refinement(\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_v5_cavity_adapter.py\", line 238, in _advance_paired_with_refinement\n    trial[arm], schedulers[arm] = advance(\n                                  ^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_v5_cavity_adapter.py\", line 339, in advance\n    return advance_event_aware_coupled_interval(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/global_physical_scheduler_v1.py\", line 2826, in advance_event_aware_coupled_interval\n    trial=evaluate(requested)\n          ^^^^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/global_physical_scheduler_v1.py\", line 2775, in evaluate\n    tensor,K,drive,rows=directional_observation_provider(mechanical)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/shared_v5_cavity_adapter.py\", line 125, in observe\n    raise RuntimeError(\nRuntimeError: REQUIRED_FRACTURE_OBSERVATION_UNAVAILABLE_AFTER_BOUNDED_REFINEMENT\n"
+    },
+    "interpretation": "Current source deserializes both immutable historical endpoints, but the current fracture observer cannot recover the required directional observation after bounded refinement. No corrected-transport suffix state was accepted.",
+    "preparation_required": "Create a new matched enabled/disabled V11 pair under current source from a pre-event accepted state whose current live-topology kernel registry covers the post-event tip and whose directional observation passes at the migration load; then write a native paired checkpoint and repeat the one-interval suffix.",
+    "status": "MIGRATION_INPUTS_LOADABLE_BUT_CONTINUATION_BLOCKED"
+  },
+  "validation": {
+    "focused_fem_adapter": "17 passed in 0.55 s",
+    "full_pf_suite": "780 passed in 74.13 s",
+    "pytest_plugin_autoload": false,
+    "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python"
+  }
+}

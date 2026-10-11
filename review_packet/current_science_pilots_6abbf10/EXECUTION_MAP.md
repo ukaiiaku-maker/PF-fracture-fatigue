@@ -17,3 +17,16 @@ as current-source execution evidence.
 
 The full numerical protocol, function identities, parameters, endpoints, and
 consumer mapping are machine readable in `PILOT_PROTOCOL.json`.
+
+## Post-execution disposition
+
+- The six PF first-passage cases and current-head 1 mm path passed.
+- The V11 migration inputs loaded, but zero current-source suffix intervals were
+  accepted because the required directional observation was unavailable after
+  bounded refinement.
+- The FEM adapter handoff was repaired at local commit `6c129c2`; the pinned
+  backend then correctly rejected the mutated live kernel because the required
+  immutable `a85b57…` family is not locally available.
+
+See `PILOT_RESULTS.json`, `CURRENT_SCIENCE_PILOT_REPORT.md`, and
+`NEXT_BATCH_PLAN.md` for quantitative results and exact preparation gates.
