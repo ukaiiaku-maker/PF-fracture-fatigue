@@ -64,9 +64,13 @@ recorded 2-D schedule, not independent shape validation: the full spatial
 sharp-front model uses an analytical local kinetic radius rather than a rounded
 FEM notch. The fixed-range-plus-branch composition also remains unmapped.
 
-The production negative-R run is recorded separately in the compact evidence
-and its terminal status governs whether it can count beyond a nonzero-state
-reversal check. These limitations prevent the full-restoration label.
+The fresh production fixed-range run at `R=-0.95` reached 273,958 cycles before
+its 600 s watchdog. It retained nonzero mobile/source state (`mobile_count`
+200.8569, gross source activity 200.4344) but no crack event and zero recorded
+gross physical return activity; its tip mesh was also coarser than the 1 um
+process zone. It is therefore a resource-censored applied-reversal attempt, not
+evidence for the required reversal/advance/reload sequence. These limitations
+prevent the full-restoration label.
 
 ## Preservation and provenance
 

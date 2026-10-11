@@ -28,5 +28,10 @@ reduced replay summary schema is `v10.2.3_shared_reduced_state_equivalence`.
 Known failed scientific/numerical attempts are retained under `runs/`: active
 reduced attempts with insufficient internal-step budgets, V5 negative applied
 opening (now rejected at the boundary), missing generated-registry launches,
-and the production negative-R run. None was overwritten or reclassified as a
-successful physical result.
+and the production negative-R run. The final negative-R run used
+`DeltaK=12.0677888 MPa sqrt(m)`, `R=-0.95`, 300 K, seed 2001726, a 10 um target,
+1,000,000-cycle cap and 600 s watchdog. It timed out at 273,958 cycles with no
+accepted advance, gross source activity 200.43442068988253, gross return
+activity zero, and an unresolved process-zone mesh (`hbar_tip=1.385e-6 m` versus
+`L_pz=1e-6 m`). None was overwritten or reclassified as a successful physical
+result.
