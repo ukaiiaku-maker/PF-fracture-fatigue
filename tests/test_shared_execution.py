@@ -6,7 +6,9 @@ from arrhenius_fracture.fem_backend_adapter import inspect_fem_backend, require_
 from arrhenius_fracture.shared_execution import (
     build_execution_plan, construct_and_attest, execute_shared,
 )
-from arrhenius_fracture.shared_execution_worker import _multifront_restart_flag
+from arrhenius_fracture.shared_execution_worker import (
+    _multifront_restart_flag, _require_cyclic_v5_history,
+)
 from arrhenius_fracture.shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
     PlasticityMode, SharedOptions, SourceLifecycle, SourceLocation,
@@ -119,7 +121,8 @@ def test_pure_bulk_maps_to_same_native_full_field_entry_with_distinct_restart_sc
 
 
 @pytest.mark.parametrize("name", [
-    "pf_cavity_v5_single_front", "pf_cavity_v5_disabled_control",
+    "pf_cavity_v5_single_front", "pf_cavity_v5_cyclic_single_front",
+    "pf_cavity_v5_disabled_control",
 ])
 def test_v5_cavity_and_matching_disabled_control_share_native_adapter(name):
     plan = build_execution_plan(PRESETS[name])
@@ -127,6 +130,18 @@ def test_v5_cavity_and_matching_disabled_control_share_native_adapter(name):
     assert plan.executor_module.endswith("shared_v5_cavity_adapter")
     assert plan.restart_family == "v11_native_full_state_v5_physical_pair"
     assert by_role(plan)["crack_path"].requested == "single_front"
+
+
+def test_cyclic_v5_requires_a_nontrivial_positive_accepted_state_history():
+    plan = build_execution_plan(PRESETS["pf_cavity_v5_cyclic_single_front"])
+    assert plan.executable
+    assert by_role(plan)["loading"].requested == "explicit_cyclic"
+    assert by_role(plan)["loading"].consumer.startswith("explicit positive-R")
+    _require_cyclic_v5_history(["--load-factors", "1.0,0.2,1.0"])
+    with pytest.raises(ValueError, match="requires --load-factors"):
+        _require_cyclic_v5_history([])
+    with pytest.raises(ValueError, match="two distinct"):
+        _require_cyclic_v5_history(["--load-factors=1.0,1.0"])
 
 
 def test_multifront_restart_dispatches_v11_without_discarding_owners(tmp_path):

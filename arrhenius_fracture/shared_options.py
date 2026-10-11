@@ -236,6 +236,16 @@ PRESETS: dict[str, SharedOptions] = {
         integration=IntegrationStrategy.EXPLICIT_EVENT,
         output=OutputProfile.PUBLICATION_RESTART,
     ),
+    "pf_cavity_v5_cyclic_single_front": SharedOptions(
+        loading=LoadingMode.EXPLICIT_CYCLIC,
+        source_lifecycle=SourceLifecycle.CURRENT_SOURCE,
+        crack_path=CrackPathMode.SINGLE_FRONT,
+        cavity=CavityMode.FULL_ORDER_V5,
+        plasticity=PlasticityMode.TIP_PLUS_FULL_FIELD,
+        source_location=SourceLocation.TIP_PLUS_BULK,
+        integration=IntegrationStrategy.EXPLICIT_EVENT,
+        output=OutputProfile.PUBLICATION_RESTART,
+    ),
     "pf_cavity_v5_disabled_control": SharedOptions(
         source_lifecycle=SourceLifecycle.CURRENT_SOURCE,
         crack_path=CrackPathMode.SINGLE_FRONT,

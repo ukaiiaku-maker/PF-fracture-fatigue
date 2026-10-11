@@ -109,7 +109,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         )
 
     v5_cavity_pair = (
-        options.loading is LoadingMode.MONOTONIC
+        options.loading in {LoadingMode.MONOTONIC, LoadingMode.EXPLICIT_CYCLIC}
         and options.source_location is SourceLocation.TIP_PLUS_BULK
         and options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE
         and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
@@ -124,9 +124,13 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
                      "arrhenius_fracture.topology_transaction_v11",
                      "equilibrate_fixed_load_with_production_fem",
                      "native full spatial fixed-load FEM equilibrium"),
-            _binding("loading", options.loading,
-                     "arrhenius_fracture.shared_v5_cavity_adapter", "main",
-                     "bounded accepted-state cavity lifecycle"),
+            _binding(
+                "loading", options.loading,
+                "arrhenius_fracture.shared_v5_cavity_adapter", "main",
+                ("explicit positive-R accepted-state history"
+                 if options.loading is LoadingMode.EXPLICIT_CYCLIC
+                 else "bounded accepted-state cavity lifecycle"),
+            ),
             _binding("source_location", options.source_location,
                      "arrhenius_fracture.voiding_production_v5",
                      "build_production_void_state", "tip plus distributed V5 state"),

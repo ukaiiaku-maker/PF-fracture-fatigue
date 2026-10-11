@@ -14,8 +14,37 @@ from .shared_execution import (
     construct_and_attest,
 )
 from .shared_options import (
-    MechanicsBackend, OutputProfile, SharedOptions, SourceLocation,
+    LoadingMode, MechanicsBackend, OutputProfile, SharedOptions, SourceLocation,
 )
+
+
+def _native_option_value(args: list[str], name: str) -> str | None:
+    """Return one native option value without otherwise interpreting argv."""
+    for index, token in enumerate(args):
+        if token.startswith(name + "="):
+            return token.split("=", 1)[1]
+        if token == name:
+            if index + 1 >= len(args):
+                raise ValueError(f"{name} requires a value")
+            return args[index + 1]
+    return None
+
+
+def _require_cyclic_v5_history(args: list[str]) -> None:
+    """Reject a cyclic identity that would silently execute a monotonic hold."""
+    raw = _native_option_value(args, "--load-factors")
+    if raw is None:
+        raise ValueError(
+            "explicit_cyclic V5 execution requires --load-factors with at least "
+            "two distinct positive accepted-state factors"
+        )
+    from .shared_v5_cavity_adapter import _parse_load_factors
+    factors = _parse_load_factors(raw)
+    if len(factors) < 2 or len(set(factors)) < 2:
+        raise ValueError(
+            "explicit_cyclic V5 execution requires at least two distinct "
+            "positive accepted-state factors"
+        )
 
 
 def _git(root: Path, *args: str) -> str:
@@ -141,6 +170,8 @@ def execute(request_path: str | Path) -> dict:
             if flag not in native_args:
                 native_args.append(flag)
     if plan.executor_module == "arrhenius_fracture.shared_v5_cavity_adapter":
+        if options.loading is LoadingMode.EXPLICIT_CYCLIC:
+            _require_cyclic_v5_history(native_args)
         native_args.append(
             "--cavity-enabled" if options.cavity.value == "full_order_v5"
             else "--cavity-disabled"
