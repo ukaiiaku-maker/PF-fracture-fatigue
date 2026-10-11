@@ -32,6 +32,7 @@ WAKE_N_BINS=${WAKE_N_BINS:-0}
 PACKET_LENGTH_M=${PACKET_LENGTH_M:-2.5e-10}
 KINETIC_MAX_ACTION_SUBSTEP=${KINETIC_MAX_ACTION_SUBSTEP:-0.01}
 KINETIC_MAX_TRANSLATION_SUBSTEP_M=${KINETIC_MAX_TRANSLATION_SUBSTEP_M:-5e-8}
+KINETIC_MAX_INTERNAL_STEPS=${KINETIC_MAX_INTERNAL_STEPS:-20000}
 
 MANIFEST="$REPO_ROOT/arrhenius_fracture/data/materials/fallback_dbtt/${CANDIDATE}.csv"
 TWO_D="$OUTROOT/two_d"
@@ -87,6 +88,7 @@ env \
     --kinetic-packet-length-m "$PACKET_LENGTH_M" \
     --kinetic-max-action-substep "$KINETIC_MAX_ACTION_SUBSTEP" \
     --kinetic-max-translation-substep-m "$KINETIC_MAX_TRANSLATION_SUBSTEP_M" \
+    --kinetic-max-internal-steps "$KINETIC_MAX_INTERNAL_STEPS" \
     --steps "$STEPS" \
     --nx "$NX" --ny "$NY" \
     --dU "$DU" --dt "$DT" --n-stagger "$N_STAGGER" \

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
 
 import numpy as np
 
@@ -137,3 +138,12 @@ def test_replay_is_deterministic_and_writes_spatial_final_state(tmp_path: Path):
     assert audit["constitutive_K_shield_clip_applied"] is False
     assert audit["legacy_manifest_cap_used_in_kinetics"] is False
     assert audit["spatial_final_state_saved"] is True
+
+
+def test_crossfidelity_gate_exposes_the_native_internal_step_budget():
+    root = Path(__file__).resolve().parents[1]
+    script = root / "scripts" / "run_v10_2_3_shared_state_equivalence_gate.sh"
+    text = script.read_text()
+    assert "KINETIC_MAX_INTERNAL_STEPS=${KINETIC_MAX_INTERNAL_STEPS:-20000}" in text
+    assert '--kinetic-max-internal-steps "$KINETIC_MAX_INTERNAL_STEPS"' in text
+    subprocess.run(["bash", "-n", str(script)], check=True)
