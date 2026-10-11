@@ -12,7 +12,7 @@ def test_native_suffix_has_common_physical_endpoint_and_selected_floor():
     ]
     refined = native_args_for_floor(original, 1e-10)
     assert refined[refined.index("--steps") + 1] == "1710"
-    assert refined[refined.index("--target-crack-extension-um") + 1] == "1020"
+    assert refined[refined.index("--target-crack-extension-um") + 1] == "1000"
     assert refined[refined.index("--print-every") + 1] == "1"
     assert refined[refined.index("--adaptive-min-frac") + 1] == "1e-10"
     assert original[-1] == "--adaptive-events"

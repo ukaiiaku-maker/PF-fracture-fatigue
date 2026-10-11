@@ -56,7 +56,9 @@ def replace_argument(args: list[str], flag: str, value: str) -> None:
 def native_args_for_floor(source: list[str], floor: float) -> list[str]:
     args = list(source)
     replace_argument(args, "--steps", "1710")
-    replace_argument(args, "--target-crack-extension-um", "1020")
+    # The accepted family is measured through 1030 um.  The resolver reserves
+    # one 30 um maximum stochastic event, making 1000 um the qualified target.
+    replace_argument(args, "--target-crack-extension-um", "1000")
     replace_argument(args, "--print-every", "1")
     replace_argument(args, "--adaptive-min-frac", f"{floor:.0e}")
     return args
@@ -102,7 +104,7 @@ def main(argv: list[str] | None = None) -> int:
         "source_events": 202,
         "source_crack_extension_um": 998.1919262543385,
         "floors": list(FLOORS),
-        "common_endpoint": {"maximum_step": 1710, "target_crack_extension_um": 1020.0},
+        "common_endpoint": {"maximum_step": 1710, "target_crack_extension_um": 1000.0},
         "invariants": {
             "nominal_dU_m": 2e-7,
             "nominal_dt_s": 8.4,
