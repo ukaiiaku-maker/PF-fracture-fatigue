@@ -7,9 +7,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .current_coupled_execution_r4 import complete_state
+from .current_coupled_execution_r4 import build_current_r4_engine, complete_state
 from .matched_persistent_execution_r3 import (
-    build_matched_reduced_engine, stress_contract,
+    stress_contract,
 )
 from .reduced_persistent_reference_r2 import (
     ReducedPersistentReversibleTipEngine, advance_signed, runtime_receipt,
@@ -41,7 +41,7 @@ def _build_spatial_event_law_engine():
             mode="threshold_scaled", minimum_factor=0.5,
             maximum_factor=4.0, geometry_subsegment_fraction=0.1,
         )
-        return build_matched_reduced_engine()
+        return build_current_r4_engine()
     finally:
         engine_type._hazard_config_default = old_hazard
         engine_type._avalanche_config_default = old_avalanche

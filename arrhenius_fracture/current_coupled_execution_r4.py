@@ -19,24 +19,43 @@ from typing import Any, Mapping
 import numpy as np
 
 from .matched_persistent_execution_r3 import (
-    build_matched_reduced_engine, spatial_rows, stress_contract,
+    SPATIAL_COHESIVE_STRENGTH_PA, SPATIAL_EVIDENCE, matched_config,
+    spatial_rows, stress_contract,
 )
 from .persistent_site_high_cycle_state_v10230 import (
     capture_ledgers, capture_stochastic_state, serialize_active_state,
 )
-from .reduced_persistent_reference_r2 import advance_signed, runtime_receipt
+from .reduced_persistent_reference_r2 import (
+    advance_signed, build_restored_engine, runtime_receipt,
+)
 from .stochastic_avalanche_tip import (
     clear_pending_geometry_events, pop_pending_geometry_event,
 )
 
 
 MODEL_ID = "r4.current-persistent-active-fixed-void-coupling/1"
-DEFAULT_MECHANICS_OBSERVATION = Path(
-    "/Volumes/Data/Data/Nanopillar_calculation/voiding/recovered-pr63/"
-    "artifacts/off_axis_prescribed_void_benchmark_v2/benchmark.json"
+R4_EVIDENCE = (
+    Path(__file__).resolve().parents[1]
+    / "integration_evidence" / "r4_same_engine_coupled_spatial"
 )
+DEFAULT_MECHANICS_OBSERVATION = (
+    R4_EVIDENCE / "dependencies" / "off_axis_prescribed_void_benchmark_v2.json"
+)
+R4_KERNEL_FAMILY = R4_EVIDENCE / "dependencies" / "signed_kernel_family.json"
 SELECTED_PLANE = "(100)"
 SELECTED_VOID_CASE = "above"
+
+
+def build_current_r4_engine(cfg=None, *, spatial_strength_contract: bool = True):
+    """Build the current backend exclusively from bundled R4 dependencies."""
+    return build_restored_engine(
+        matched_config() if cfg is None else cfg,
+        material_path=SPATIAL_EVIDENCE / "selected_material_manifest_v10_2_22.csv",
+        selection_path=SPATIAL_EVIDENCE / "v10_2_22_parameter_selection.json",
+        kernel_family_path=R4_KERNEL_FAMILY,
+        local_strength_Pa=(SPATIAL_COHESIVE_STRENGTH_PA
+                           if spatial_strength_contract else None),
+    )
 
 
 def _json_safe(value: Any) -> Any:
@@ -107,7 +126,7 @@ class CurrentPersistentFractureAdapter:
     """Private-clone/preview/commit owner for the actual current engine."""
 
     def __init__(self, engine: Any | None = None):
-        self.engine = build_matched_reduced_engine() if engine is None else engine
+        self.engine = build_current_r4_engine() if engine is None else engine
         self.generation = 0
 
     def preview(self, *, applied_K_Pa_sqrt_m: float, temperature_K: float,
@@ -210,7 +229,7 @@ def _parity_history() -> dict[str, Any]:
     # Both arms must descend from one constructed owner.  Constructing two
     # engines separately intentionally assigns different RNG substream ids,
     # even when the selected deterministic mark law never draws from them.
-    parent = build_matched_reduced_engine()
+    parent = build_current_r4_engine()
     direct = copy.deepcopy(parent)
     adapter = CurrentPersistentFractureAdapter(copy.deepcopy(parent))
     rows = spatial_rows()
@@ -334,7 +353,7 @@ def execute_current_coupled_r4(output_directory: str | Path) -> dict[str, Any]:
     destination.mkdir(parents=True)
     mechanics = _mechanics_binding()
     parity = _parity_history()
-    common_parent = build_matched_reduced_engine()
+    common_parent = build_current_r4_engine()
     no_void = _run_arm(
         mechanics_factor=1.0, partition_count=1, cavity_owned=False,
         engine=copy.deepcopy(common_parent),
@@ -405,5 +424,6 @@ def execute_current_coupled_r4(output_directory: str | Path) -> dict[str, Any]:
 
 __all__ = [
     "AdapterCheckpoint", "CurrentPersistentFractureAdapter", "FractureTrial",
-    "MODEL_ID", "complete_state", "execute_current_coupled_r4", "state_sha256",
+    "MODEL_ID", "build_current_r4_engine", "complete_state",
+    "execute_current_coupled_r4", "state_sha256",
 ]

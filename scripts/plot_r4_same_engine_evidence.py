@@ -15,10 +15,10 @@ def main():
     args = parser.parse_args()
     root = args.root.resolve()
     coupled = json.loads(
-        (root / "current_coupled_run2" / "current_coupled_r4.json").read_text()
+        (root / "current_coupled_run3" / "current_coupled_r4.json").read_text()
     )
     fatigue = json.loads(
-        (root / "resolved_stochastic_fatigue_run2" / "result.json").read_text()
+        (root / "resolved_stochastic_fatigue_run3" / "result.json").read_text()
     )
     spatial = list(csv.DictReader(
         (root / "current_law_spatial" / "steps_0900K.csv").open()

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import asdict, dataclass
+import hashlib
 import json
 import math
 import os
@@ -11,15 +12,18 @@ from typing import Any
 
 import numpy as np
 
-from .current_coupled_execution_r4 import complete_state
+from .current_coupled_execution_r4 import (
+    R4_KERNEL_FAMILY, build_current_r4_engine, complete_state,
+)
 from .developed_fatigue_r3 import (
-    _restore_geometry, advance_mean_cycle_complete, build_developed_engine,
+    _restore_geometry, advance_mean_cycle_complete,
 )
 from .fatigue_v1 import FatigueWaveform
 from .persistent_site_high_cycle_checkpoint_v10230 import (
     restore_checkpoint, write_checkpoint,
 )
 from .reduced_persistent_reference_r2 import ReducedPersistentReversibleTipEngine
+from .reduced_shared_state_v1023 import SharedReducedConfig
 from .stochastic_avalanche_tip import (
     clear_pending_geometry_events, pop_pending_geometry_event,
 )
@@ -45,7 +49,13 @@ def _build_stochastic_engine():
             mode="threshold_scaled", minimum_factor=0.5,
             maximum_factor=4.0, geometry_subsegment_fraction=0.1,
         )
-        return build_developed_engine()
+        return build_current_r4_engine(
+            SharedReducedConfig(
+                mpz_length_um=50.0, mpz_n_bins=80, wake_length_um=50.0,
+                max_internal_steps=100000,
+            ),
+            spatial_strength_contract=False,
+        )
     finally:
         engine_type._hazard_config_default = old_hazard
         engine_type._avalanche_config_default = old_avalanche
@@ -235,6 +245,12 @@ def execute_resolved_stochastic_fatigue_r4(
                 "frequency_Hz": waveform.frequency_Hz,
                 "phase_count": phase_count,
             },
+        },
+        "dependencies": {
+            "signed_kernel_family": str(R4_KERNEL_FAMILY.resolve()),
+            "signed_kernel_family_sha256": hashlib.sha256(
+                R4_KERNEL_FAMILY.read_bytes()
+            ).hexdigest(),
         },
         "prefix_rows": prefix_rows, "prefix_events": prefix_events,
         "restarted_rows": restarted_rows, "restarted_events": restarted_events,
