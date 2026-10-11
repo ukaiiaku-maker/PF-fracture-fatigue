@@ -1286,7 +1286,7 @@ def solve_transport_interval(
     accepted_mean_stress_Pa: np.ndarray,
     c_min: float = DEFAULT_C_MIN,
     c_max: float = DEFAULT_C_MAX,
-    maximum_picard_iterations: int = 60,
+    maximum_picard_iterations: int = 120,
     relative_tolerance: float = 1.0e-10,
     diagnostic_boundary_concentration_by_face: Mapping[str, float] | None = None,
     failure_injector=None, linear_solver_provider=None,
@@ -1360,6 +1360,9 @@ def solve_transport_interval(
     unknown_faces = None
     divergence_operator = None
     picard_residual = math.inf
+    previous_picard_residual = math.inf
+    picard_under_relaxation_steps = 0
+    picard_minimum_relaxation_factor = 1.0
     linear_equilibration_used = False
     unscaled_rejected_candidate = None
     unscaled_rejected_residual = None
@@ -1647,10 +1650,24 @@ def solve_transport_interval(
         capture_active_set_mismatch_count = int(np.count_nonzero(
             assembled_capture_active != (candidate > ceq_climb)
         )) if previous.site_states else 0
-        c = candidate
         if (picard_residual <= relative_tolerance
                 and capture_active_set_mismatch_count == 0):
+            c = candidate
             break
+        # Preserve the same fixed point while damping only a stalled or
+        # oscillating Picard sequence.  Full updates remain the default; no
+        # physical field is clipped and the undamped candidate must still meet
+        # the original acceptance tolerance before publication.
+        relaxation_factor = 1.0
+        if (math.isfinite(previous_picard_residual)
+                and picard_residual >= 0.9 * previous_picard_residual):
+            relaxation_factor = 0.5
+            picard_under_relaxation_steps += 1
+            picard_minimum_relaxation_factor = min(
+                picard_minimum_relaxation_factor, relaxation_factor
+            )
+        c = c + relaxation_factor * (candidate-c)
+        previous_picard_residual = picard_residual
     else:
         error = RuntimeError("vacancy transport Picard iteration did not converge")
         error.diagnostic = {
@@ -1672,6 +1689,10 @@ def solve_transport_interval(
             "positivity_line_search_steps": int(positivity_line_search_steps),
             "positivity_line_search_min_factor": float(
                 positivity_line_search_min_factor
+            ),
+            "picard_under_relaxation_steps": int(picard_under_relaxation_steps),
+            "picard_minimum_relaxation_factor": float(
+                picard_minimum_relaxation_factor
             ),
             "conservative_flux_correction_count": int(
                 len(conservative_flux_corrections)
@@ -1822,6 +1843,10 @@ def solve_transport_interval(
         "surface_registry_fingerprint": registry.fingerprint,
         "nonlinear_iteration_count": iteration,
         "nonlinear_relative_residual": picard_residual,
+        "picard_under_relaxation_steps": int(picard_under_relaxation_steps),
+        "picard_minimum_relaxation_factor": float(
+            picard_minimum_relaxation_factor
+        ),
         "linear_residual_inf": high_order_linear_residual_inf,
         "high_order_linear_residual_inf": high_order_linear_residual_inf,
         "accepted_corrected_mixed_residual_inf": float(

@@ -24,3 +24,5 @@ The unchanged paired dwell then accepted 78.125 ns in both arms, wrote a verifie
 
 The exact suffix diagnostic found no active-set mismatch, no positivity line search, no conservative positivity correction, and admissible concentrations. At the 30-iteration cap the relative fixed-point residual was 2.48924e-10 against the unchanged 1e-10 tolerance. The cap is increased to 60 so the same nonlinear map can meet its existing criterion; neither the residual tolerance nor physical timestep floor is relaxed.
 
+That repair accepted the exact 19.53125 ns suffix. The resumed dwell then accepted a further 618.896 ns before a later 19.3405 ns trial stagnated at a 5.35293e-10 residual after 60 iterations, again with stable active set and no positivity correction. The same Picard fixed point now uses a full update while residuals decrease and a 0.5 under-relaxation only on stall/oscillation, with an increased 120-iteration ceiling. Acceptance still requires the original undamped residual tolerance.
+
