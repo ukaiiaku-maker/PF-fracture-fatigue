@@ -3823,6 +3823,11 @@ def dispatch_cavity_intersecting_candidate_drives(
     candidates = tuple(state.competition.candidates)
     if len(rows) != len(candidates):
         raise ValueError("directional rows must align one-to-one with candidates")
+    void_state = getattr(state, "void_state", None)
+    if void_state is None or not getattr(void_state, "cavities", ()):
+        # The matched suppressed arm has no cavity geometry to dispatch.  Its
+        # ordinary candidate drives are already the authoritative native rows.
+        return rows
     limit = float(maximum_event_advance_m)
     if not math.isfinite(limit) or limit <= 0.0:
         raise ValueError("maximum event advance must be finite and positive")

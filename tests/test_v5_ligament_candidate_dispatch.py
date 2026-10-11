@@ -28,6 +28,7 @@ def test_only_intersecting_candidate_uses_complete_ligament_observation(monkeypa
         competition=SimpleNamespace(candidates=candidates),
         crack_network=SimpleNamespace(branch=lambda branch_id: branch),
         material=SimpleNamespace(Eprime=9.0),
+        void_state=SimpleNamespace(cavities=(object(),)),
     )
     monkeypatch.setattr(
         production,
@@ -61,6 +62,27 @@ def test_only_intersecting_candidate_uses_complete_ligament_observation(monkeypa
     assert rows[1] == source_rows[1]
 
 
+def test_suppressed_arm_without_cavity_preserves_native_rows(monkeypatch):
+    candidate = SimpleNamespace(candidate_id="solid", direction_xy=(1.0, 0.0))
+    state = SimpleNamespace(
+        competition=SimpleNamespace(candidates=(candidate,)),
+        void_state=None,
+    )
+    monkeypatch.setattr(
+        production,
+        "_first_ray_cavity_intersection",
+        lambda *args, **kwargs: pytest.fail("suppressed arm queried cavity geometry"),
+    )
+    source = ({"candidate_id": "solid", "directional_drive_status": "AVAILABLE"},)
+    rows = production.dispatch_cavity_intersecting_candidate_drives(
+        state,
+        branch_id="root",
+        directional_rows=source,
+        maximum_event_advance_m=3.0,
+    )
+    assert rows == source
+
+
 def test_unconverged_complete_ligament_observation_remains_fail_closed(monkeypatch):
     candidate = SimpleNamespace(candidate_id="contact", direction_xy=(1.0, 0.0))
     state = SimpleNamespace(
@@ -69,6 +91,7 @@ def test_unconverged_complete_ligament_observation_remains_fail_closed(monkeypat
             branch=lambda branch_id: SimpleNamespace(tip=(0.0, 0.0))
         ),
         material=SimpleNamespace(Eprime=9.0),
+        void_state=SimpleNamespace(cavities=(object(),)),
     )
     monkeypatch.setattr(
         production,
