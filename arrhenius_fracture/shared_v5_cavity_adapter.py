@@ -360,6 +360,7 @@ def _physical_main(args):
                 state, accepted_duration,
                 temperature_K=float(args.temperature_K),
                 directional_observation_provider=observer,
+                opening_rate_m_per_s=float(args.opening_rate_m_per_s),
             )
         try:
             states, accepted_segments = _advance_paired_with_refinement(
@@ -421,7 +422,10 @@ def _physical_main(args):
                 "temperature_K": float(args.temperature_K),
                 "seed": int(args.seed),
                 "vacancy_energy_variant": args.vacancy_energy_variant,
-                "loading_history": "hold_at_native_opening",
+                "loading_history": ("linear_total_opening_ramp" if
+                    float(args.opening_rate_m_per_s) > 0.0 else
+                    "hold_at_native_opening"),
+                "opening_rate_m_per_s": float(args.opening_rate_m_per_s),
                 "interval_duration_s": duration,
                 "transport_refinement_min_duration_s": minimum_duration,
                 "test_only_extreme_reservoir": False,
@@ -539,6 +543,7 @@ def main(argv=None):
     parser.add_argument("--temperature-K", type=float, default=1200.0)
     parser.add_argument("--seed", type=int, default=3621)
     parser.add_argument("--duration-s", type=float, default=1.0e-5)
+    parser.add_argument("--opening-rate-m-per-s", type=float, default=0.0)
     parser.add_argument("--transport-refinement-min-duration-s", type=float, default=1.0e-8)
     parser.add_argument("--steps", type=int, default=1)
     parser.add_argument("--vacancy-energy-variant", default="reference")

@@ -2739,6 +2739,7 @@ class EventAwareCapabilityStop(RuntimeError):
 def advance_event_aware_coupled_interval(
     accepted_state: Any, duration_s: float, *, temperature_K: float,
     directional_observation_provider,
+    opening_rate_m_per_s: float = 0.0,
     mechanical_equilibrium_provider=None,
     transport_linear_solver_provider=None,
     provider_transition_manager=None,
@@ -2763,13 +2764,25 @@ def advance_event_aware_coupled_interval(
     requested=float(duration_s)
     if not math.isfinite(requested) or requested <= 0.0:
         raise ValueError("event-aware interval duration must be positive")
+    opening_rate = float(opening_rate_m_per_s)
+    if not math.isfinite(opening_rate) or opening_rate < 0.0:
+        raise ValueError("opening rate must be finite and nonnegative")
     original_fingerprint=_accepted_fingerprint(accepted_state)
     tolerance=max(8*np.finfo(float).eps*requested,min(TIME_TOLERANCE_S,requested*1e-8))
 
     def evaluate(horizon):
+        from .topology_transaction_v11 import require_equilibrium_observables
+        opening = float(require_equilibrium_observables(
+            accepted_state)["latest_applied_opening_m"])
+        if not math.isfinite(opening) or opening <= 0.0:
+            raise EventAwareCapabilityStop(
+                "event-aware loading requires a positive accepted opening")
+        def load_factor(fraction):
+            return (opening + opening_rate*float(horizon)*float(fraction))/opening
         mechanical,plastic=accepted_bulk_load_step(
             accepted_state,scope=PlasticityScope.FULL_FIELD_PT_EVOLVING_RHO,
-            load_factor=1.0,duration_s=float(horizon),temperature_K=float(temperature_K),
+            load_factor=load_factor(1.0),duration_s=float(horizon),
+            temperature_K=float(temperature_K),
             maximum_stagger_iterations=int(maximum_stagger_iterations),
             equilibrium_provider=mechanical_equilibrium_provider)
         tensor,K,drive,rows=directional_observation_provider(mechanical)
@@ -2779,7 +2792,8 @@ def advance_event_aware_coupled_interval(
                 "event-aware interval requires at most one active front")
         front_id=None if not active else str(active[0])
         history={
-            "kind":"hold","temperature_K":float(temperature_K),
+            "kind":("ramp" if opening_rate > 0.0 else "hold"),
+            "temperature_K":float(temperature_K),
             "maximum_events":64,"maximum_transactions_per_call":1,
             "stress_tensor_Pa":np.asarray(tensor,float),
             "K_effective_by_front":({} if front_id is None else {front_id:float(K)}),
@@ -2789,6 +2803,21 @@ def advance_event_aware_coupled_interval(
             "test_only_functional_qualification":bool(
                 test_only_functional_qualification),
         }
+        if opening_rate > 0.0:
+            def mechanical_state_at_fraction(fraction):
+                value = float(fraction)
+                if value <= 0.0:
+                    return accepted_state
+                return accepted_bulk_load_step(
+                    accepted_state,
+                    scope=PlasticityScope.FULL_FIELD_PT_EVOLVING_RHO,
+                    load_factor=load_factor(value),
+                    duration_s=float(horizon)*value,
+                    temperature_K=float(temperature_K),
+                    maximum_stagger_iterations=int(maximum_stagger_iterations),
+                    equilibrium_provider=mechanical_equilibrium_provider,
+                )[0]
+            history["mechanical_state_at_fraction"]=mechanical_state_at_fraction
         if mechanical_equilibrium_provider is not None:
             history["mechanical_equilibrium_provider"]=mechanical_equilibrium_provider
         if transport_linear_solver_provider is not None:
@@ -2927,6 +2956,7 @@ def advance_event_aware_coupled_interval(
             final,remainder_audit=advance_event_aware_coupled_interval(
                 boundary,remaining,temperature_K=temperature_K,
                 directional_observation_provider=directional_observation_provider,
+                opening_rate_m_per_s=opening_rate,
                 mechanical_equilibrium_provider=mechanics,
                 transport_linear_solver_provider=transport,
                 provider_transition_manager=provider_transition_manager,

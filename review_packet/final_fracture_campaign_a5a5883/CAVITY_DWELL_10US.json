@@ -1,0 +1,107 @@
+{
+  "accepted_exposure_s": 1.0000000182586177e-05,
+  "all_checkpoint_round_trips_exact": true,
+  "all_suffix_handoffs_exact": true,
+  "exposure_closure_error_s": 1.8258617647058228e-13,
+  "exposure_complete_within_binary_time_tolerance": true,
+  "interpretation": "The migration dwell now exercises accepted coupled evolution through the repaired recovery and transport path. At fixed opening it produces no new crack or topology event and only sub-femtometre cavity-radius growth. It is a weak-response finite exposure, not the required interaction-relevant loading continuation.",
+  "material_class": "DBTT",
+  "observables": {
+    "disabled": {
+      "cavity_area_change_m2": null,
+      "cavity_radius_change_m": null,
+      "energy_change_J_per_m": -1.400070834822742e-06,
+      "graph_length_change_m": 0.0,
+      "opening_end_m": 6.299999999999997e-06,
+      "opening_start_m": 6.299999999999997e-06,
+      "reaction_change_N_per_m": -0.2588667329400778,
+      "reaction_end_N_per_m": 551869.0237884882,
+      "reaction_start_N_per_m": 551869.2826552212,
+      "terminal_crack_void_connection": null,
+      "terminal_site_phase": null,
+      "terminal_void_phase": null,
+      "vacancy_inventory_change_m2": 0.0,
+      "void_event_count_end": 0,
+      "void_event_count_start": 0
+    },
+    "enabled": {
+      "cavity_area_change_m2": 1.0884330270120076e-22,
+      "cavity_radius_change_m": 4.07833976246092e-16,
+      "energy_change_J_per_m": -1.4000954893234052e-06,
+      "graph_length_change_m": 0.0,
+      "opening_end_m": 6.299999999999998e-06,
+      "opening_start_m": 6.299999999999998e-06,
+      "reaction_change_N_per_m": -0.25887079862877727,
+      "reaction_end_N_per_m": 551869.9303517622,
+      "reaction_start_N_per_m": 551870.1892225608,
+      "terminal_crack_void_connection": null,
+      "terminal_site_phase": "STABLE_SUBGRID_VOID",
+      "terminal_void_phase": "RESOLVED_VOID",
+      "vacancy_inventory_change_m2": 0.0,
+      "void_event_count_end": 11,
+      "void_event_count_start": 11
+    }
+  },
+  "opening_m": 6.3e-06,
+  "paired_terminal_differences": {
+    "enabled_minus_disabled_energy_J_per_m": 5.044907900764173e-06,
+    "enabled_minus_disabled_reaction_N_per_m": 0.9065632739802822
+  },
+  "physical_time_end_s": 5.90001,
+  "physical_time_start_s": 5.899999999999817,
+  "protocol": "original_declared_post_ramp_fixed_opening_dwell",
+  "schema": "final-fracture-cavity-dwell-consolidation/1",
+  "seed": 3621,
+  "segment_chain": [
+    {
+      "accepted_exposure_s": 7.812499980275334e-08,
+      "native_checkpoint_round_trip_exact": true,
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_run4/shared_v5_cavity_audit.json",
+      "physical_time_end_s": 5.900000078124817,
+      "physical_time_start_s": 5.899999999999817,
+      "prior_terminal_to_input_fingerprint_exact": true,
+      "status": "transport_rejected_after_accepted_prefix"
+    },
+    {
+      "accepted_exposure_s": 1.9531250394777544e-08,
+      "native_checkpoint_round_trip_exact": true,
+      "path": "integration_evidence/final_fracture_campaign/cavity_picard_diagnostic_run2/shared_v5_cavity_audit.json",
+      "physical_time_end_s": 5.900000097656068,
+      "physical_time_start_s": 5.900000078124817,
+      "prior_terminal_to_input_fingerprint_exact": true,
+      "status": "requested_exposure_completed"
+    },
+    {
+      "accepted_exposure_s": 6.188964851716605e-07,
+      "native_checkpoint_round_trip_exact": true,
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_completion_run1/shared_v5_cavity_audit.json",
+      "physical_time_end_s": 5.900000716552553,
+      "physical_time_start_s": 5.900000097656068,
+      "prior_terminal_to_input_fingerprint_exact": true,
+      "status": "transport_rejected_after_accepted_prefix"
+    },
+    {
+      "accepted_exposure_s": 1.9340514967325362e-08,
+      "native_checkpoint_round_trip_exact": true,
+      "path": "integration_evidence/final_fracture_campaign/cavity_picard_diagnostic_run4/shared_v5_cavity_audit.json",
+      "physical_time_end_s": 5.900000735893068,
+      "physical_time_start_s": 5.900000716552553,
+      "prior_terminal_to_input_fingerprint_exact": true,
+      "status": "requested_exposure_completed"
+    },
+    {
+      "accepted_exposure_s": 9.26410693224966e-06,
+      "native_checkpoint_round_trip_exact": true,
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_completion_run2/shared_v5_cavity_audit.json",
+      "physical_time_end_s": 5.90001,
+      "physical_time_start_s": 5.900000735893068,
+      "prior_terminal_to_input_fingerprint_exact": true,
+      "status": "requested_exposure_completed"
+    }
+  ],
+  "target_exposure_s": 1e-05,
+  "temperature_K": 1200.0,
+  "terminal_status": "requested_exposure_completed",
+  "terminal_transport_rejection": null,
+  "terminal_unused_requested_duration_s": 0.0
+}

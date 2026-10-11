@@ -28,3 +28,9 @@ That repair accepted the exact 19.53125 ns suffix. The resumed dwell then accept
 
 On the exact later trial, adaptive damping reduced the residual to 1.50355e-10 after 120 iterations, still with zero active-set mismatch and admissible fields. The numerical ceiling is extended to 240; the fixed point and 1e-10 acceptance criterion remain unchanged.
 
+The same trial converged under the 240-iteration ceiling, after which the retained pair completed the entire original 10 microsecond dwell. All five accepted suffixes form an exact two-arm fingerprint chain, every native checkpoint round trip is exact, the final time is 5.90001 s, and the final suffix has zero unused duration and no transport rejection. At the fixed 6.3 micrometre opening there was no new crack or topology event. The enabled cavity radius increased by only 4.08e-16 m over the recorded dwell chain and the terminal enabled-minus-disabled reaction was about 0.907 N/m. This closes the migration check as a weak-response finite exposure; it does not close the separately required interaction-relevant loading continuation.
+
+## 2026-10-11 — Interaction continuation preserves the historical opening rate
+
+The terminal front is 7.36 micrometres from the near surface of the first resolved cavity. The new continuation therefore resumes the historical 1 micrometre/s total-opening rate from the exact 5.90001 s paired checkpoint. The event-aware operator evaluates every trial and localized prefix at its actual linearly ramped opening; accepted subintervals compose by absolute opening increment. This is an adapter extension of the established load-factor mechanics, not a new constitutive law. Fixed-opening behavior remains the zero-rate default.
+
