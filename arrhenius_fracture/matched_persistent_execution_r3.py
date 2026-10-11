@@ -13,14 +13,21 @@ import hashlib
 import inspect
 import json
 import math
+import os
 from pathlib import Path
 from typing import Any, Mapping
 
 import numpy as np
 
 from .reduced_persistent_reference_r2 import (
-    DEFAULT_KERNEL_FAMILY, advance_signed, build_restored_engine,
+    DEFAULT_KERNEL_FAMILY, advance_signed, build_restored_engine, runtime_receipt,
 )
+from .persistent_site_high_cycle_checkpoint_v10230 import (
+    restore_checkpoint, write_checkpoint,
+)
+from .persistent_site_high_cycle_state_v10230 import serialize_active_state
+from .persistent_site_source_v10221 import _source_geometry
+from .stochastic_avalanche_tip import clear_pending_geometry_events
 from .reduced_shared_state_v1023 import SharedReducedConfig
 from .signed_burgers_shared_v1025 import _active_K, _wake_K
 
@@ -304,11 +311,190 @@ def run_recorded_operator_replay(engine: Any) -> list[dict[str, Any]]:
     return result
 
 
+def _state_row(engine: Any) -> dict[str, Any]:
+    diagnostics = engine.mpz.diagnostics()
+    source = _source_geometry(engine.mpz)
+    return {
+        "time_s": float(engine.t),
+        "physical_crack_extension_m": float(engine.checkpoint_advance_total_m),
+        "continuous_micro_advance_m": float(engine.micro_advance_total_m),
+        "checkpoint_count": int(engine.n_adv),
+        "fractional_checkpoint_progress": float(engine.B),
+        "tip_radius_m": float(engine.r_eff()),
+        "front_width_m": float(source["front_width_m"]),
+        "source_area_m2": float(source.get("source_area_m2", 0.0)),
+        "source_multiplicity": float(source.get("multiplicity_per_system", 0.0)),
+        "gross_source_slip": float(engine.mpz.cumulative_gross_source_activity),
+        "gross_return_slip": float(engine.mpz.cumulative_gross_return_activity),
+        "net_source_slip": float(engine.mpz.local_slip_count()),
+        "active_shield_K_Pa_sqrt_m": float(_active_K(engine.mpz)),
+        "wake_shield_K_Pa_sqrt_m": float(_wake_K(engine.mpz)),
+        "diagnostics": diagnostics,
+    }
+
+
+def _restore_geometry(engine: Any, checkpoint: Path) -> None:
+    payload = json.loads((checkpoint / "high_cycle_live_checkpoint.json").read_text())
+    geometry = payload["geometry_signature"]
+    engine.n_adv = int(geometry[0])
+    engine.a_adv = float(geometry[1])
+    engine.micro_advance_total_m = float(geometry[2])
+    engine.checkpoint_advance_total_m = float(geometry[3])
+    engine.mpz.advance_total_m = float(geometry[4])
+
+
+def _same_active_state(left: Any, right: Any) -> bool:
+    return bool(
+        np.array_equal(left.vector, right.vector)
+        and left.fields == right.fields
+        and left.geometry_signature == right.geometry_signature
+    )
+
+
+def run_matched_campaign(output_directory: str | Path) -> dict[str, Any]:
+    """Run recorded replay plus an independent load/unload/reload history."""
+    root = Path(output_directory).resolve()
+    if root.exists():
+        raise FileExistsError(root)
+    root.mkdir(parents=True)
+    clear_pending_geometry_events()
+
+    replay_engine = build_matched_reduced_engine()
+    virgin_contract = stress_contract(
+        replay_engine, spatial_rows()[0]["KJ_Pa_sqrtm"]
+    )
+    replay = run_recorded_operator_replay(replay_engine)
+    active_contract = stress_contract(
+        replay_engine, spatial_rows()[-1]["KJ_Pa_sqrtm"]
+    )
+    checkpoint = root / "recorded_replay_checkpoint"
+    previous = os.environ.get("V10230_HIGH_CYCLE_CHECKPOINT_DIR")
+    os.environ["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = str(checkpoint)
+    try:
+        write_checkpoint(
+            replay_engine, temperature_K=900.0,
+            reason="r3_matched_recorded_replay",
+            metadata={"model": MODEL_ID, "stage": "post-recorded-replay"},
+        )
+    finally:
+        if previous is None:
+            os.environ.pop("V10230_HIGH_CYCLE_CHECKPOINT_DIR", None)
+        else:
+            os.environ["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = previous
+    before_restart = serialize_active_state(replay_engine)
+    restarted = build_matched_reduced_engine()
+    _restore_geometry(restarted, checkpoint)
+    restore_checkpoint(restarted, checkpoint)
+    restart_exact = _same_active_state(before_restart, serialize_active_state(restarted))
+    restart_contract = stress_contract(
+        restarted, spatial_rows()[-1]["KJ_Pa_sqrtm"]
+    )
+
+    autonomous = build_matched_reduced_engine()
+    rows = spatial_rows()
+    # External load only: the reduced implementation receives no recorded
+    # tensor state, event time, or future constitutive value.
+    load_history = [
+        ("load_10um", rows[0]["KJ_Pa_sqrtm"]),
+        ("load_20um", rows[1]["KJ_Pa_sqrtm"]),
+        ("load_30um", rows[2]["KJ_Pa_sqrtm"]),
+        ("unload_20um", rows[1]["KJ_Pa_sqrtm"]),
+        ("reload_30um", rows[2]["KJ_Pa_sqrtm"]),
+    ]
+    autonomous_rows = []
+    for stage, applied_K in load_history:
+        before = _state_row(autonomous)
+        contract_before = stress_contract(autonomous, applied_K)
+        step = advance_signed(
+            autonomous, K_Pa_sqrt_m=applied_K,
+            temperature_K=900.0, dt_s=rows[0]["dt_cur_s"],
+        )
+        autonomous_rows.append({
+            "stage": stage,
+            "applied_K_Pa_sqrt_m": applied_K,
+            "duration_s": rows[0]["dt_cur_s"],
+            "before": before,
+            "stress_contract_before": contract_before,
+            "step": step,
+            "after": _state_row(autonomous),
+        })
+
+    replay_comparison = []
+    for item in replay:
+        spatial = item["recorded_spatial"]
+        reduced = item["reduced_step"]
+        replay_comparison.append({
+            "step": item["step"],
+            "spatial_sigma_tip_Pa": spatial["sigma_tip_Pa"],
+            "reduced_sigma_tip_Pa": reduced["sigma_tip"],
+            "relative_sigma_difference": abs(
+                reduced["sigma_tip"] - spatial["sigma_tip_Pa"]
+            ) / max(abs(spatial["sigma_tip_Pa"]), 1.0),
+            "spatial_N_em": spatial["N_em"],
+            "reduced_N_em": reduced["N_em"],
+            "spatial_fired": bool(spatial["n_fire"] > 0.0),
+            "reduced_fired": bool(reduced["fired"]),
+            "post_event_taylor_consumer_divergence_retained": item["step"] >= 3,
+        })
+
+    payload = {
+        "schema": MODEL_ID,
+        "classification": "MATCHED_REPLAY_PLUS_AUTONOMOUS_REDUCED_HISTORY",
+        "spatial_identity": spatial_identity(),
+        "event_contract": event_contract(replay_engine),
+        "spatial_event_contract": spatial_event_contract(),
+        "stress_contracts": {
+            "virgin_reduced": virgin_contract,
+            "active_reduced": active_contract,
+            "after_restart_reduced": restart_contract,
+            "archived_spatial": [
+                archived_spatial_stress_contract(row) for row in rows
+            ],
+        },
+        "recorded_operator_replay": replay,
+        "recorded_replay_comparison": replay_comparison,
+        "restart": {
+            "exact": restart_exact,
+            "checkpoint": str(checkpoint),
+            "post_restart_runtime_receipt": runtime_receipt(
+                restarted, stage="post-r3-restart"
+            ),
+        },
+        "autonomous_reduced": {
+            "external_history_source": "archived displacement-to-K loading history only",
+            "future_spatial_state_injected": False,
+            "recorded_tensor_drive_injected": False,
+            "temperature_K": 900.0,
+            "rows": autonomous_rows,
+            "unload_reload_exercised": True,
+            "terminal": _state_row(autonomous),
+        },
+        "comparison_limits": [
+            "the archived spatial reference has three monotonic rows only",
+            "unload/reload is executed by the autonomous reduced provider, not relabelled as spatial evidence",
+            "step-three source population diverges under the restored named Taylor consumer and is retained",
+        ],
+        "passed": bool(
+            restart_exact
+            and [item["reduced_step"]["fired"] for item in replay]
+                == [False, True, True]
+            and all(item["relative_sigma_difference"] < 3.0e-4
+                    for item in replay_comparison[:2])
+            and autonomous_rows[-1]["stage"] == "reload_30um"
+        ),
+    }
+    (root / "matched_campaign.json").write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    )
+    return payload
+
+
 __all__ = [
     "AVAILABLE_STOCHASTIC_EVENT_LAW_ID", "MODEL_ID", "REDUCED_EVENT_LAW_ID",
     "SPATIAL_EVENT_LAW_ID",
     "SPATIAL_EVIDENCE", "archived_spatial_stress_contract",
     "build_matched_reduced_engine", "event_contract", "matched_config",
     "run_recorded_operator_replay", "spatial_identity", "spatial_rows",
-    "spatial_event_contract", "spatial_tensor_drives", "stress_contract",
+    "run_matched_campaign", "spatial_event_contract", "spatial_tensor_drives",
+    "stress_contract",
 ]

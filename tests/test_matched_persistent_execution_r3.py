@@ -6,6 +6,7 @@ from arrhenius_fracture.matched_persistent_execution_r3 import (
     archived_spatial_stress_contract,
     build_matched_reduced_engine,
     event_contract,
+    run_matched_campaign,
     run_recorded_operator_replay,
     spatial_event_contract,
     spatial_rows,
@@ -54,3 +55,13 @@ def test_recorded_operator_replay_matches_before_post_event_taylor_divergence():
     assert rows[-1]["reduced_step"]["N_em"] != pytest.approx(
         rows[-1]["recorded_spatial"]["N_em"], rel=0.1
     )
+
+
+def test_matched_campaign_restarts_and_executes_unload_reload(tmp_path):
+    result = run_matched_campaign(tmp_path / "matched")
+    assert result["passed"]
+    assert result["restart"]["exact"]
+    stages = [row["stage"] for row in result["autonomous_reduced"]["rows"]]
+    assert stages[-2:] == ["unload_20um", "reload_30um"]
+    assert not result["autonomous_reduced"]["future_spatial_state_injected"]
+    assert len(result["recorded_operator_replay"]) == 3
