@@ -36,6 +36,8 @@ MATERIAL_OPTIONS = {
 }
 BASELINE_TEMPERATURES = {300, 600, 800, 900, 950, 1000, 1050, 1100, 1150, 1200, 1250, 1300}
 ARMS = {"accommodation_enabled", "opening_only"}
+FOCUSED_ANCHORS = {("DBTT", 1200), ("Peak", 900)}
+FOCUSED_SEEDS = {1733, 91733, 2718, 31415, 42424, 65537, 104729, 130363}
 
 
 def rows() -> list[dict[str, str]]:
@@ -56,12 +58,25 @@ def validate_matrix(entries: list[dict[str, str]]) -> dict[str, object]:
     duplicate_count = len(baseline) - len(identities)
     missing = sorted(expected - identities)
     extra = sorted(identities - expected)
+    focused = [row for row in entries if row["case_id"].startswith("focused_seed_")]
+    focused_identities = {
+        (r["material_row"], int(r["temperature_K"]), int(r["seed"]), r["arm"])
+        for r in focused
+    }
+    expected_focused = {
+        (material, temperature, seed, arm)
+        for material, temperature in FOCUSED_ANCHORS
+        for seed in FOCUSED_SEEDS for arm in ARMS
+    }
+    focused_duplicate_count = len(focused) - len(focused_identities)
+    focused_missing = sorted(expected_focused - focused_identities)
+    focused_extra = sorted(focused_identities - expected_focused)
     bad_status = sorted({r["status"] for r in entries} - {
         "running", "repairing", "ready", "complete_validated",
         "complete_physical_censor", "blocked_new_physics", "blocked_external_access",
     })
     reuse = []
-    for row in baseline:
+    for row in baseline + focused:
         if row["reuse_evidence"]:
             path = ROOT / row["reuse_evidence"]
             reuse.append({
@@ -71,8 +86,12 @@ def validate_matrix(entries: list[dict[str, str]]) -> dict[str, object]:
                 "executed": (path / "shared_runtime_attestation.post.json").is_file(),
                 "summary": (path / "summary.json").is_file(),
             })
-    passed = not missing and not extra and not duplicate_count and not bad_status and all(
-        r["exists"] and r["executed"] and r["summary"] for r in reuse
+    passed = (
+        not missing and not extra and not duplicate_count
+        and not focused_missing and not focused_extra and not focused_duplicate_count
+        and not bad_status and all(
+            r["exists"] and r["executed"] and r["summary"] for r in reuse
+        )
     )
     return {
         "schema": "final-fracture-campaign-audit/1",
@@ -82,6 +101,11 @@ def validate_matrix(entries: list[dict[str, str]]) -> dict[str, object]:
         "duplicate_count": duplicate_count,
         "missing": missing,
         "extra": extra,
+        "focused_row_count": len(focused),
+        "unique_focused_identities": len(focused_identities),
+        "focused_duplicate_count": focused_duplicate_count,
+        "focused_missing": focused_missing,
+        "focused_extra": focused_extra,
         "bad_status": bad_status,
         "reuse_checks": reuse,
         "passed": passed,
@@ -162,13 +186,14 @@ def write_matrix(entries: list[dict[str, str]]) -> None:
     temporary.replace(MATRIX)
 
 
-def execute_baseline(entries: list[dict[str, str]], *, resume: bool, maximum: int | None,
-                     case_id: str | None) -> list[dict[str, object]]:
-    selected = [r for r in entries if r["case_id"].startswith("baseline_")]
+def execute_group(entries: list[dict[str, str]], *, group: str, resume: bool,
+                  maximum: int | None, case_id: str | None) -> list[dict[str, object]]:
+    prefix = "baseline_" if group == "baseline" else "focused_seed_"
+    selected = [r for r in entries if r["case_id"].startswith(prefix)]
     if case_id:
         selected = [r for r in selected if r["case_id"] == case_id]
         if not selected:
-            raise SystemExit(f"unknown baseline case: {case_id}")
+            raise SystemExit(f"unknown {group} case: {case_id}")
     completed = []
     for row in selected:
         if row["status"] in {"complete_validated", "complete_physical_censor"}:
@@ -214,9 +239,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if audit["passed"] else 2
     if not audit["passed"]:
         raise SystemExit("campaign matrix failed audit; refusing execution")
-    if args.group != "baseline":
+    if args.group == "sensitivities":
         raise SystemExit(f"{args.group} rows are not frozen in the matrix yet")
-    result = execute_baseline(entries, resume=args.resume, maximum=args.max_cases, case_id=args.case_id)
+    result = execute_group(
+        entries, group=args.group, resume=args.resume,
+        maximum=args.max_cases, case_id=args.case_id,
+    )
     print(json.dumps({"schema": "final-fracture-campaign-batch/1", "results": result}, indent=2))
     return 0
 
