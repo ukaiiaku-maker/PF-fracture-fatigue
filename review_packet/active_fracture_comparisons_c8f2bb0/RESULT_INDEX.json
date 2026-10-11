@@ -1,0 +1,46 @@
+{
+  "schema": "active-fracture-comparisons/1",
+  "date": "2026-10-11",
+  "main_producer_commit": "c8f2bb0",
+  "fem_czm_producer_commit": "8a86519",
+  "results": {
+    "hot_floor": {
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/hot_late_floor_refinement_run3",
+      "matrix_sha256": "fae79f99d8f9ee007b102df60c67b1e3881097104c6766470b8e104509e6914e",
+      "conclusion": "adaptive floor inactive over retained event window"
+    },
+    "hot_event_target": {
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/hot_late_event_target_refinement_run2",
+      "matrix_sha256": "0bb8b750fa306e8048215bd593d614cadcddc0cb4f91957f2ba32674d2fdb8dd",
+      "finest_target": 0.009375,
+      "finest_event_time_after_checkpoint_ns": 240.425152
+    },
+    "fem_czm": {
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/fem_czm_peak1000_theta0_seed8666_first_passage",
+      "summary_sha256": "1ae618994f723217fe7acebba2e72c80e954cb6c254e59aaad885d0800ab7d52",
+      "endpoint": "500-step finite no-event"
+    },
+    "pf_fem_anchor": {
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/pf_peak1000_theta0_seed8666_anchor",
+      "endpoint": "two accepted events, 10 micrometres"
+    },
+    "cavity_pair": {
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_run2",
+      "failure_receipt_sha256": "20ae97698b1242d329f9fbc590752c184528ac7146af9a735128d3c3c570210b",
+      "accepted_exposure_s": 0.0,
+      "capability_stop": "resolved cavity loop source recovery failed qualification"
+    },
+    "independent_seed": {
+      "path": "integration_evidence/active_fracture_comparisons_0a5d55e/independent_seed_91733",
+      "matrix_sha256": "e26e0464bcec15eee87396e6356e0cb14297f5af8fb97024b823fa1c7ece4155",
+      "seed": 91733,
+      "scope": "two-seed pilot variability only"
+    }
+  },
+  "remote": {
+    "name": "origin",
+    "url": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
+    "branch_upstream_configured": false,
+    "push_attempted": false
+  }
+}
