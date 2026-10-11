@@ -22,3 +22,5 @@ The exact retained enabled state failed only the declared interface-continuity a
 
 The unchanged paired dwell then accepted 78.125 ns in both arms, wrote a verified native restart, and reached the next distinct stop: enabled-arm vacancy Picard nonconvergence on a 19.53125 ns trial, whose half would cross the fixed 10 ns refinement floor. This is accepted evolving exposure but not completion of the 10 µs migration dwell. The floor remains unchanged; the next repair targets the nonlinear iteration and active-set residual at this exact checkpoint.
 
+The exact suffix diagnostic found no active-set mismatch, no positivity line search, no conservative positivity correction, and admissible concentrations. At the 30-iteration cap the relative fixed-point residual was 2.48924e-10 against the unchanged 1e-10 tolerance. The cap is increased to 60 so the same nonlinear map can meet its existing criterion; neither the residual tolerance nor physical timestep floor is relaxed.
+

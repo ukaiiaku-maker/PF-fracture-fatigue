@@ -1286,7 +1286,7 @@ def solve_transport_interval(
     accepted_mean_stress_Pa: np.ndarray,
     c_min: float = DEFAULT_C_MIN,
     c_max: float = DEFAULT_C_MAX,
-    maximum_picard_iterations: int = 30,
+    maximum_picard_iterations: int = 60,
     relative_tolerance: float = 1.0e-10,
     diagnostic_boundary_concentration_by_face: Mapping[str, float] | None = None,
     failure_injector=None, linear_solver_provider=None,
@@ -1508,7 +1508,8 @@ def solve_transport_interval(
                     )
                 ),
             })
-        picard_residual = float(np.linalg.norm(candidate-c, ord=np.inf) /
+        picard_delta_inf = float(np.linalg.norm(candidate-c, ord=np.inf))
+        picard_residual = float(picard_delta_inf /
                                 max(float(np.linalg.norm(candidate, ord=np.inf)), effective_c_min))
 
         # A Picard linearization is an iteration, not an accepted physical
@@ -1667,9 +1668,7 @@ def solve_transport_interval(
             "last_nonlinear_iterate_max": float(np.max(c)),
             "last_linear_candidate_min": float(np.min(candidate)),
             "last_linear_candidate_max": float(np.max(candidate)),
-            "last_candidate_iterate_inf_delta": float(
-                np.linalg.norm(candidate-c, ord=np.inf)
-            ),
+            "last_candidate_iterate_inf_delta": float(picard_delta_inf),
             "positivity_line_search_steps": int(positivity_line_search_steps),
             "positivity_line_search_min_factor": float(
                 positivity_line_search_min_factor
