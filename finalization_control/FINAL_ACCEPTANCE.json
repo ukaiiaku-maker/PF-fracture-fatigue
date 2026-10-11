@@ -1,0 +1,72 @@
+{
+  "schema": "fracture-final-acceptance/1",
+  "updated_at": "2026-10-11T00:00:00-07:00",
+  "overall_status": "running",
+  "criteria": [
+    {
+      "id": "source_configuration",
+      "status": "running",
+      "evidence": [
+        "finalization_control/TASKS.json",
+        "CAPABILITY_PRESERVATION_MATRIX.csv"
+      ]
+    },
+    {
+      "id": "scientific_dataset",
+      "status": "ready",
+      "evidence": [
+        "finalization_control/CAMPAIGN_MATRIX.csv"
+      ]
+    },
+    {
+      "id": "developed_fracture_response",
+      "status": "ready",
+      "evidence": [
+        "review_packet/current_science_pilots_6abbf10"
+      ]
+    },
+    {
+      "id": "original_fem_czm_comparison",
+      "status": "ready",
+      "evidence": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e"
+      ]
+    },
+    {
+      "id": "physical_cavity_comparison",
+      "status": "repairing",
+      "evidence": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_run2"
+      ]
+    },
+    {
+      "id": "shared_code_readiness",
+      "status": "ready",
+      "evidence": [
+        "CAPABILITY_PRESERVATION_MATRIX.csv"
+      ]
+    },
+    {
+      "id": "paper_package",
+      "status": "ready",
+      "evidence": [
+        "fracture_final_current"
+      ]
+    },
+    {
+      "id": "preservation_reproduction",
+      "status": "ready",
+      "evidence": [
+        "review_packet/active_fracture_comparisons_c8f2bb0/PRESERVATION.json"
+      ]
+    },
+    {
+      "id": "final_scientific_summary",
+      "status": "ready",
+      "evidence": [
+        "fracture_final_current/FINAL_SCIENTIFIC_REPORT.md"
+      ]
+    }
+  ]
+}
+

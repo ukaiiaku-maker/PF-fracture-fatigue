@@ -1043,6 +1043,14 @@ def mechanism_resolved_growth_rates(
     })
 
 
+class CavityLoopSourceRecoveryQualificationError(RuntimeError):
+    """State-bound failure with the complete recovery qualification record."""
+
+    def __init__(self, diagnostic: Mapping[str, Any]):
+        super().__init__("resolved cavity loop source recovery failed qualification")
+        self.diagnostic = dict(diagnostic)
+
+
 def source_local_fem_tensors(live_state: Any, growth: EmbryoGrowthState
                              ) -> tuple[np.ndarray, np.ndarray]:
     """Recover the accepted constitutive tensor at each physical source position."""
@@ -1099,19 +1107,53 @@ def source_local_fem_tensors(live_state: Any, growth: EmbryoGrowthState
                     solid_element_mask=solid)
             except PiecewiseEquilibratedStressUnavailable as exc:
                 raise RuntimeError("resolved cavity loop source recovery unavailable") from exc
-            predicates = (
-                recovered["condition"] <= recovered["condition_limit"],
-                recovered["stress_fit_residual"] <= recovered["stress_fit_residual_limit"],
-                recovered["normalized_boundary_traction"] <=
-                    recovered["constraint_limits"]["normalized_boundary_traction"],
-                recovered["interface_traction_jump_residual"] <=
-                    recovered["constraint_limits"]["interface_traction_jump"],
-                recovered["resultant_residual"] <=
-                    recovered["constraint_limits"]["resultant"],
-                recovered["moment_residual"] <= recovered["constraint_limits"]["moment"],
-            )
-            if not all(predicates):
-                raise RuntimeError("resolved cavity loop source recovery failed qualification")
+            checks = {
+                "condition": {
+                    "value": recovered["condition"],
+                    "limit": recovered["condition_limit"],
+                },
+                "stress_fit_residual": {
+                    "value": recovered["stress_fit_residual"],
+                    "limit": recovered["stress_fit_residual_limit"],
+                },
+                "normalized_boundary_traction": {
+                    "value": recovered["normalized_boundary_traction"],
+                    "limit": recovered["constraint_limits"]["normalized_boundary_traction"],
+                },
+                "interface_traction_jump_residual": {
+                    "value": recovered["interface_traction_jump_residual"],
+                    "limit": recovered["constraint_limits"]["interface_traction_jump"],
+                },
+                "resultant_residual": {
+                    "value": recovered["resultant_residual"],
+                    "limit": recovered["constraint_limits"]["resultant"],
+                },
+                "moment_residual": {
+                    "value": recovered["moment_residual"],
+                    "limit": recovered["constraint_limits"]["moment"],
+                },
+            }
+            failed = tuple(name for name, row in checks.items()
+                           if float(row["value"]) > float(row["limit"]))
+            if failed:
+                raise CavityLoopSourceRecoveryQualificationError({
+                    "schema": "resolved-cavity-loop-source-recovery-failure/1",
+                    "source_id": source.source_id,
+                    "source_orientation_rad": float(source.orientation_rad),
+                    "source_target_m": target.tolist(),
+                    "selected_boundary_node": node,
+                    "cavity_id": cavity.cavity_id,
+                    "cavity_center_m": list(map(float, cavity.center_m)),
+                    "cavity_radius_m": float(cavity.radius_m),
+                    "state_fingerprint": complete_accepted_state_fingerprint(live_state),
+                    "mesh_node_count": int(len(live_state.mesh.nodes)),
+                    "mesh_element_count": int(len(live_state.mesh.elems)),
+                    "owned_boundary_edge_count": int(len(boundary_edges)),
+                    "remote_traction_scale_Pa": float(remote),
+                    "failed_checks": failed,
+                    "checks": checks,
+                    "recovery": recovered,
+                })
             recovered_by_source[source.source_id] = recovered
     for source in growth.cavity_emission_state.sources:
         n = np.array((math.cos(source.orientation_rad), math.sin(source.orientation_rad)))
@@ -1985,5 +2027,6 @@ __all__ = [
     "make_cavity_loop_event_preview",
     "make_growth_radius_event_preview",
     "mechanism_resolved_growth_rates", "promote_representation",
-    "source_local_fem_tensors", "transport_flux_certificate",
+    "CavityLoopSourceRecoveryQualificationError", "source_local_fem_tensors",
+    "transport_flux_certificate",
 ]

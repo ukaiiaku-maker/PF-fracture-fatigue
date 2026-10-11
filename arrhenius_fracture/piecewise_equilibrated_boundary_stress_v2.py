@@ -225,7 +225,12 @@ def recover_piecewise_equilibrated_boundary_stress_v2(
     multiplier = np.zeros(con_row)
     flat_coefficients = np.zeros(unknowns)
     multiplier_iterations = 0
-    for multiplier_iterations in range(1, 13):
+    # The historical twelve-iteration cap was sufficient on the qualification
+    # meshes but stopped before the already-declared continuity tolerance on
+    # the retained production cavity patch.  Iterate the same constrained
+    # operator to its existing criterion; this changes solver convergence, not
+    # the stress space, patch, constitutive state, or scientific limits.
+    for multiplier_iterations in range(1, 2049):
         flat_coefficients = solve(fit_force - constraints.T @ multiplier)
         constraint_values = np.asarray(constraints @ flat_coefficients).ravel()
         multiplier += CONSTRAINT_WEIGHT * constraint_values

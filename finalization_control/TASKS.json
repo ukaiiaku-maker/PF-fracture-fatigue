@@ -1,0 +1,240 @@
+{
+  "schema": "fracture-finalization-tasks/1",
+  "updated_at": "2026-10-11T18:30:00-07:00",
+  "allowed_status": [
+    "running",
+    "repairing",
+    "ready",
+    "complete_validated",
+    "complete_physical_censor",
+    "blocked_new_physics",
+    "blocked_external_access"
+  ],
+  "tasks": [
+    {
+      "id": "control-ledger",
+      "dependencies": [],
+      "status": "complete_validated",
+      "owner": "integrator",
+      "current_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/run_final_fracture_campaign.py --audit-only",
+      "inputs": [
+        "finalization_control/MISSION.md"
+      ],
+      "checkpoint": null,
+      "evidence_paths": [
+        "finalization_control"
+      ],
+      "next_action": "retain and update as campaign evidence closes",
+      "completion_test": "ledger schema and 96 baseline rows validate"
+    },
+    {
+      "id": "cavity-recovery",
+      "dependencies": [
+        "control-ledger"
+      ],
+      "status": "repairing",
+      "owner": "integrator",
+      "current_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/run_current_cavity_post_ramp_pair.py --out integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_run4",
+      "inputs": [
+        "review_packet/current_science_pilots_6abbf10/v11_migration_pair.json"
+      ],
+      "checkpoint": "historical paired 5.9 s ramp endpoint",
+      "evidence_paths": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_run2"
+      ],
+      "next_action": "commit the validated reconstruction convergence repair and rerun the unchanged paired dwell",
+      "completion_test": "unchanged 10 us paired dwell accepts exposure and interaction-relevant matched pair evolves with qualified recovery"
+    },
+    {
+      "id": "pf-fem-common-specimen",
+      "dependencies": [
+        "control-ledger"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/audit_common_specimen_contract.py",
+      "inputs": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e/fem_czm_peak1000_theta0_seed8666_first_passage",
+        "integration_evidence/active_fracture_comparisons_0a5d55e/pf_peak1000_theta0_seed8666_anchor"
+      ],
+      "checkpoint": null,
+      "evidence_paths": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e"
+      ],
+      "next_action": "resolve geometry/boundary/thickness/observer contract before new paired runs",
+      "completion_test": "common unadvanced mechanics plus matched opening/accommodation histories and at least one native FEM cohesive event or explicit admissible model limit"
+    },
+    {
+      "id": "pf-baseline-96",
+      "dependencies": [
+        "pf-fem-common-specimen"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/run_final_fracture_campaign.py --group baseline --resume",
+      "inputs": [
+        "finalization_control/CAMPAIGN_MATRIX.csv"
+      ],
+      "checkpoint": "per-case immutable output/checkpoint",
+      "evidence_paths": [
+        "integration_evidence/final_fracture_campaign"
+      ],
+      "next_action": "verify reuse then run incomplete rows in bounded batches",
+      "completion_test": "all 96 entries validated or accepted physical censors under one endpoint contract"
+    },
+    {
+      "id": "pf-focused-seeds",
+      "dependencies": [
+        "pf-baseline-96"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/run_final_fracture_campaign.py --group focused-seeds --resume",
+      "inputs": [
+        "finalization_control/CAMPAIGN_MATRIX.csv"
+      ],
+      "checkpoint": "per-seed paired arms",
+      "evidence_paths": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e/independent_seed_91733"
+      ],
+      "next_action": "predeclare six additional seeds at each active anchor",
+      "completion_test": "eight paired seeds at selected anchors, individual/censored outcomes and empirical spread reported"
+    },
+    {
+      "id": "pf-rate-orientation-source",
+      "dependencies": [
+        "pf-baseline-96"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/run_final_fracture_campaign.py --group sensitivities --resume",
+      "inputs": [
+        "finalization_control/CAMPAIGN_MATRIX.csv"
+      ],
+      "checkpoint": "per-case immutable output/checkpoint",
+      "evidence_paths": [
+        "integration_evidence/final_fracture_campaign"
+      ],
+      "next_action": "freeze question-driven sensitivity rows after baseline transition review",
+      "completion_test": "rate, 0/45 degree, and selected source-geography claims resolved without Cartesian expansion"
+    },
+    {
+      "id": "developed-growth-rcurve",
+      "dependencies": [
+        "control-ledger"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/analyze_long_growth_observations.py --help",
+      "inputs": [
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3"
+      ],
+      "checkpoint": "accepted 203-event histories",
+      "evidence_paths": [
+        "review_packet/current_science_pilots_6abbf10"
+      ],
+      "next_action": "impact-check source changes and execute qualified resistance selector",
+      "completion_test": "driving history and distinct native resistance selection exported with tested K-at-length brackets"
+    },
+    {
+      "id": "v36-active-restart",
+      "dependencies": [
+        "control-ledger"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/audit_v3_6_operator_consistency_v10230.py --help",
+      "inputs": [
+        "integration_evidence/native_restart_transport_f766285"
+      ],
+      "checkpoint": null,
+      "evidence_paths": [
+        "review_packet/native_restart_transport_f766285"
+      ],
+      "next_action": "locate or generate populated admissible native history and fresh-process restart",
+      "completion_test": "nontrivial material-frame/slip/return ledgers agree across restart within declared tolerance"
+    },
+    {
+      "id": "combined-branch-cavity",
+      "dependencies": [
+        "cavity-recovery"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "pytest -q tests -k 'branch and cavity and restart'",
+      "inputs": [
+        "CAPABILITY_PRESERVATION_MATRIX.csv"
+      ],
+      "checkpoint": null,
+      "evidence_paths": [
+        "integration_evidence/targeted_completion"
+      ],
+      "next_action": "resolve shared adapter path and run bounded native compatibility case",
+      "completion_test": "shared fields, event ordering, switches, state transfer and restart execute under existing laws"
+    },
+    {
+      "id": "paper-package",
+      "dependencies": [
+        "pf-baseline-96",
+        "pf-focused-seeds",
+        "pf-rate-orientation-source",
+        "pf-fem-common-specimen",
+        "cavity-recovery",
+        "developed-growth-rcurve"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/build_final_fracture_package.py --resume",
+      "inputs": [
+        "finalization_control/FINAL_ACCEPTANCE.json"
+      ],
+      "checkpoint": null,
+      "evidence_paths": [
+        "fracture_final_current"
+      ],
+      "next_action": "assemble sections and figures incrementally as evidence closes",
+      "completion_test": "manuscript, SI, figures/data/commands, previews and validated editable DOCX are complete"
+    },
+    {
+      "id": "final-tests",
+      "dependencies": [
+        "v36-active-restart",
+        "combined-branch-cavity",
+        "paper-package"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "pytest -q",
+      "inputs": [
+        "tests"
+      ],
+      "checkpoint": null,
+      "evidence_paths": [
+        "fracture_final_current/reproducibility"
+      ],
+      "next_action": "run affected regressions after repairs and full suites at source freeze",
+      "completion_test": "qualified main and companion suites classified as pass/skip/fixture-unavailable/fail"
+    },
+    {
+      "id": "preservation-release",
+      "dependencies": [
+        "final-tests"
+      ],
+      "status": "ready",
+      "owner": "integrator",
+      "current_command": "python3 scripts/preserve_final_fracture_release.py --verify-restore",
+      "inputs": [
+        "fracture_final_current",
+        "integration_evidence/final_fracture_campaign"
+      ],
+      "checkpoint": null,
+      "evidence_paths": [
+        "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf"
+      ],
+      "next_action": "append closed generations only after evidence completes",
+      "completion_test": "independent hashes, representative restore, Git bundle and exact local/remote status recorded"
+    }
+  ]
+}
+
