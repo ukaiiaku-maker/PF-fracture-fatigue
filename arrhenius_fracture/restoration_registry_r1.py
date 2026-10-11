@@ -1,4 +1,4 @@
-"""R1 model identities and live geometry/source/void state contracts.
+"""R1/R2 model identities and live geometry/source/void state contracts.
 
 This module is deliberately an ownership/selection layer.  It does not copy a
 mechanics law, install a compatibility monkeypatch, or change any calibrated
@@ -19,6 +19,7 @@ from typing import Any, Mapping
 class RestorationModelIdentity(str, Enum):
     RESTORED_REDUCED_REFERENCE = "RESTORED_REDUCED_REFERENCE"
     HISTORICAL_FINITE_SOURCE_REPLAY_V10_2_3 = "HISTORICAL_FINITE_SOURCE_REPLAY_V10_2_3"
+    REDUCED_VOID_V3_REFERENCE = "REDUCED_VOID_V3_REFERENCE"
     FULL_SPATIAL_REFERENCE = "FULL_SPATIAL_REFERENCE"
     SEAM_DIAGNOSTIC_V4_10 = "SEAM_DIAGNOSTIC_V4_10"
 
@@ -58,6 +59,17 @@ BINDINGS: dict[RestorationModelIdentity, RestorationBinding] = {
         None,
         False,
         "same-law replay control only; not the persistent/reversible default",
+    ),
+    RestorationModelIdentity.REDUCED_VOID_V3_REFERENCE: RestorationBinding(
+        RestorationModelIdentity.REDUCED_VOID_V3_REFERENCE,
+        "exact clean-commit OneD V3 stateful voiding functional control",
+        "scripts.run_r2_reduced_void_reference:main",
+        "declared_analytic_monotonic_reduced_mechanics",
+        "OneD V3 line normalization and reduced site/cavity state",
+        "OneD V3 independent vacancy and direct-interaction owners",
+        "reduced_fracture_v3 physical cavity state",
+        False,
+        "autonomous aligned monotonic functional control; not calibrated 2-D transfer",
     ),
     RestorationModelIdentity.FULL_SPATIAL_REFERENCE: RestorationBinding(
         RestorationModelIdentity.FULL_SPATIAL_REFERENCE,

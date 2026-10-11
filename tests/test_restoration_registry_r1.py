@@ -20,6 +20,10 @@ def test_three_model_identities_are_explicit_and_reduced_is_the_only_default():
     assert seam.default is False
     assert seam.mechanics_strategy == "linear_elastic_circular_seam_cut"
     assert registry_payload()["no_mechanics_mixing"] is True
+    reduced_void = resolve_restoration_identity("REDUCED_VOID_V3_REFERENCE")
+    assert reduced_void.default is False
+    assert reduced_void.cavity_owner == "reduced_fracture_v3 physical cavity state"
+    assert "not calibrated 2-D transfer" in reduced_void.physical_scope
 
 
 def test_contract_reads_native_persistent_geometry_once_and_keeps_void_radius_distinct(monkeypatch):
