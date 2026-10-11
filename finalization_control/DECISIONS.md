@@ -42,11 +42,15 @@ The repaired callback exposed a second pre-existing ramp-integration inconsisten
 
 The first qualified 0.2 second suffix completed the paired physics and wrote an exact native checkpoint, then failed only while exporting an event-rich audit containing a native `ExpFloorBarrier` dataclass. The checkpoint records 6.6010101 micrometres total opening: the suppressed-cavity arm advanced 80 micrometres through four ordinary 20 micrometre topology increments, while the enabled arm retained its 592.599 micrometre front and grew its resolved cavity to 42.4879 nm radius. The generic audit normalizer now expands dataclasses, enums and paths without altering the checkpoint or calculation. This accepted pair is preserved under its actual audit-serialization failure provenance; it is not rerun merely to change its label.
 
-# 2026-10-11 — accept the controlled PF–FEM comparison, exclude mislabeled predecessors
+## 2026-10-11 — Accept the controlled PF–FEM comparison, exclude mislabeled predecessors
 
 The common 2 mm × 4 mm plane-strain specimen with a 0.5 mm initial notch gives bitwise-identical PF/FEM elastic results when run on the same mesh and damage field. This excludes a base geometry, boundary-condition, thickness/unit, stiffness, or operator mismatch.
 
 The earlier nominal full-field pair is excluded from scientific use. The PF adapter recorded but did not consume the selected direct Peierls/Taylor entropy and shape fields; the FEM overlay left the older explicit mobile/retained controller active. Both bindings were repaired without adding parameters or laws, and cross-repository rate fixtures now enforce the selected detailed-balance surface.
 
 The accepted tip-only first-event values are 53.878 MPa√m (PF) and 54.212 MPa√m (FEM/CZM), a 0.62% relative difference. The accepted full-field values are 51.110 and 54.407 MPa√m, a 6.06% relative difference. Production openings remain different because native meshes, J supports, topology backends, and random-stream ownership differ; opening is reported but not used as a parity metric. The long FEM full-field calculation completed four physical events and 20.827 µm extension; its final exception is classified as an audit-export failure because the persisted compact-mesh record verifies the requested 330 µm refinement radius and a fresh run completes with the persisted-record recovery.
+
+## 2026-10-11 — Close the 96-case original-PF baseline
+
+All 96 predeclared material/temperature/arm cases have verified runtime attestations and physical first-fracture observations under the common 100 µm opening ceiling; there are no finite no-event censors. The observer and summary first-event values agree in every case. The actual curves, rather than the historical family names, control the next design: DBTT rises sharply between 950 and 1000 K, Peak rises over 600–900 K, Weak-T has a broad accommodation-associated elevation, and Ceramic-like has a modest elevation centered near 950 K. Focused replication will target the active DBTT and Peak anchors and documented neighbors, without expanding the full atlas into an ensemble.
 

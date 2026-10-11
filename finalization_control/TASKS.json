@@ -1,6 +1,6 @@
 {
   "schema": "fracture-finalization-tasks/1",
-  "updated_at": "2026-10-11T16:16:00-07:00",
+  "updated_at": "2026-10-11T16:52:00-07:00",
   "allowed_status": [
     "running",
     "repairing",
@@ -77,17 +77,20 @@
       "dependencies": [
         "pf-fem-common-specimen"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
-      "current_command": "python3 scripts/run_final_fracture_campaign.py --group baseline --resume",
+      "current_command": "python3 scripts/analyze_final_baseline_campaign.py",
       "inputs": [
         "finalization_control/CAMPAIGN_MATRIX.csv"
       ],
       "checkpoint": "per-case immutable output/checkpoint",
       "evidence_paths": [
-        "integration_evidence/final_fracture_campaign"
+        "integration_evidence/final_fracture_campaign",
+        "review_packet/final_fracture_campaign_a5a5883/PF_BASELINE_96.json",
+        "review_packet/final_fracture_campaign_a5a5883/PF_BASELINE_96.md",
+        "review_packet/final_fracture_campaign_a5a5883/PF_BASELINE_96_FIRST_EVENT.png"
       ],
-      "next_action": "verify reuse then run incomplete rows in bounded batches",
+      "next_action": "use measured transition anchors for focused seeds and sensitivities; integrate validated curves into paper",
       "completion_test": "all 96 entries validated or accepted physical censors under one endpoint contract"
     },
     {

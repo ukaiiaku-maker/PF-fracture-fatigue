@@ -1,0 +1,108 @@
+{
+  "case_count": 96,
+  "decision": "COMPLETE_VALIDATED",
+  "design": {
+    "arms": [
+      "opening_only",
+      "accommodation_enabled"
+    ],
+    "material_rows": [
+      "DBTT",
+      "Peak",
+      "Weak-T",
+      "Ceramic-like"
+    ],
+    "orientation_deg": 0.0,
+    "rate_factor": 1.0,
+    "seed": 1733,
+    "source_geography": "tip_surface",
+    "temperatures_K": [
+      300,
+      600,
+      800,
+      900,
+      950,
+      1000,
+      1050,
+      1100,
+      1150,
+      1200,
+      1250,
+      1300
+    ]
+  },
+  "figure": {
+    "panel_mapping": {
+      "lower_left": "Weak-T",
+      "lower_right": "Ceramic-like",
+      "upper_left": "DBTT",
+      "upper_right": "Peak"
+    },
+    "pdf": "review_packet/final_fracture_campaign_a5a5883/PF_BASELINE_96_FIRST_EVENT.pdf",
+    "plot_data": "review_packet/final_fracture_campaign_a5a5883/PF_BASELINE_96_DATA.csv",
+    "png": "review_packet/final_fracture_campaign_a5a5883/PF_BASELINE_96_FIRST_EVENT.png",
+    "series": "arm",
+    "x": "temperature_K",
+    "y": "KJ_MPa_sqrt_m"
+  },
+  "finite_no_event_censor_count": 0,
+  "interpretation": [
+    "DBTT and Peak show abrupt accommodation-associated toughness upturns over the sampled transition range.",
+    "Weak-T shows a broad accommodation-associated elevation rather than a sharp transition.",
+    "Ceramic-like remains the lowest-toughness row and shows only a modest accommodation effect.",
+    "These are single-seed baseline curves; focused independent seeds quantify stochastic spread at selected active anchors."
+  ],
+  "material_summary": {
+    "Ceramic-like": {
+      "enabled_KJ_range_MPa_sqrt_m": [
+        9.081464356507745,
+        13.380490842897148
+      ],
+      "opening_only_KJ_range_MPa_sqrt_m": [
+        8.445861348497036,
+        13.380490842897148
+      ],
+      "peak_accommodation_K_change_percent": 11.699483336562144,
+      "peak_accommodation_effect_temperature_K": 950
+    },
+    "DBTT": {
+      "enabled_KJ_range_MPa_sqrt_m": [
+        22.078324151693135,
+        55.10513464057947
+      ],
+      "opening_only_KJ_range_MPa_sqrt_m": [
+        20.540139532677134,
+        23.233738831608203
+      ],
+      "peak_accommodation_K_change_percent": 156.14084813574203,
+      "peak_accommodation_effect_temperature_K": 1050
+    },
+    "Peak": {
+      "enabled_KJ_range_MPa_sqrt_m": [
+        22.166912015865318,
+        54.90392161641079
+      ],
+      "opening_only_KJ_range_MPa_sqrt_m": [
+        19.349310728463347,
+        23.326742697569102
+      ],
+      "peak_accommodation_K_change_percent": 163.6608723620864,
+      "peak_accommodation_effect_temperature_K": 900
+    },
+    "Weak-T": {
+      "enabled_KJ_range_MPa_sqrt_m": [
+        18.521049520156005,
+        20.136046729819796
+      ],
+      "opening_only_KJ_range_MPa_sqrt_m": [
+        12.706694720661472,
+        13.150030185620396
+      ],
+      "peak_accommodation_K_change_percent": 53.351475314457765,
+      "peak_accommodation_effect_temperature_K": 600
+    }
+  },
+  "paired_table": "review_packet/final_fracture_campaign_a5a5883/PF_BASELINE_96_PAIRED.csv",
+  "physical_first_event_count": 96,
+  "schema": "final-pf-baseline-96/1"
+}
