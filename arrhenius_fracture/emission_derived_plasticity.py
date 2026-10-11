@@ -73,6 +73,35 @@ def config_from_dislocation_config(config) -> EmissionDerivedPeierlsTaylorConfig
         Tref_K=float(config.pt_emit_Tref_K), attempt_frequency_s=1.0e11,
     )
     manifest = getattr(config, "_emission_derived_material_manifest", None)
+    direct = bool(getattr(config, "_v104_exact_direct_pt_surfaces", False))
+    peierls_surface = None
+    taylor_surface = None
+    if direct:
+        # v10.4 maps independently selected H0, entropy, and EXP-floor shape
+        # fields.  The earlier adapter recorded those fields but constructed
+        # fallback descendants that reused the emission shape and discarded
+        # negative activation-entropy slopes.  Stress fractions remain the
+        # resolved-stress multipliers applied in ``rates`` below.
+        def _direct_surface(prefix, attempt):
+            G00 = float(getattr(config, f"pt_{prefix}_G00_eV"))
+            return ExpFloorBarrier(
+                G00_eV=G00,
+                gT_eV_per_K=float(getattr(config, f"pt_{prefix}_gT_eV_per_K")),
+                sigc0_Pa=parent.sigc0_Pa,
+                sT_Pa_per_K=parent.sT_Pa_per_K,
+                alpha=float(getattr(config, f"pt_{prefix}_exp_a")),
+                exponent=float(getattr(config, f"pt_{prefix}_exp_n")),
+                floor_fraction=parent.floor_fraction,
+                floor_min_eV=parent.floor_min_eV * G00 / max(parent.G00_eV, 1e-30),
+                floor_max_fraction=parent.floor_max_fraction,
+                Tref_K=float(getattr(config, f"pt_{prefix}_Tref_K")),
+                attempt_frequency_s=float(attempt),
+            )
+        peierls_surface = _direct_surface("peierls", config.pt_peierls_nu0_s)
+        taylor_surface = _direct_surface("taylor", config.pt_taylor_nu0_s)
+    elif manifest is not None:
+        peierls_surface = manifest.peierls.as_surface(manifest.emission)
+        taylor_surface = manifest.taylor.as_surface(manifest.emission)
     return EmissionDerivedPeierlsTaylorConfig(
         parent=parent,
         peierls_energy_ratio=float(config.pt_peierls_energy_ratio),
@@ -95,8 +124,8 @@ def config_from_dislocation_config(config) -> EmissionDerivedPeierlsTaylorConfig
         jump_length_min_m=float(config.pt_jump_length_min_m),
         equivalent_strain_factor=float(config.pt_equivalent_strain_factor),
         taylor_phi_max=float(config.pt_taylor_phi_max),
-        peierls_surface=(None if manifest is None else manifest.peierls.as_surface(manifest.emission)),
-        taylor_surface=(None if manifest is None else manifest.taylor.as_surface(manifest.emission)),
+        peierls_surface=peierls_surface,
+        taylor_surface=taylor_surface,
     )
 
 

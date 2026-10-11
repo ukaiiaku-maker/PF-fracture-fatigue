@@ -165,6 +165,7 @@ class BulkManifestParameters:
     def configure(self, disl_cfg: Any) -> dict[str, Any]:
         """Map the exact selected row onto the existing production bulk model."""
         mapping = {
+            "_v104_exact_direct_pt_surfaces": True,
             "enable_plasticity": True,
             "bulk_kinetics_model": "emission_derived_peierls_taylor_multihit",
             "plastic_update_mode": "explicit_rate",

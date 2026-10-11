@@ -1,6 +1,6 @@
 {
   "schema": "fracture-finalization-tasks/1",
-  "updated_at": "2026-10-11T15:06:00-07:00",
+  "updated_at": "2026-10-11T16:16:00-07:00",
   "allowed_status": [
     "running",
     "repairing",
@@ -53,18 +53,23 @@
       "dependencies": [
         "control-ledger"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
-      "current_command": "python3 scripts/audit_common_specimen_contract.py",
+      "current_command": "python3 scripts/analyze_final_pf_fem_fracture_comparison.py",
       "inputs": [
         "integration_evidence/active_fracture_comparisons_0a5d55e/fem_czm_peak1000_theta0_seed8666_first_passage",
         "integration_evidence/active_fracture_comparisons_0a5d55e/pf_peak1000_theta0_seed8666_anchor"
       ],
       "checkpoint": null,
       "evidence_paths": [
-        "integration_evidence/active_fracture_comparisons_0a5d55e"
+        "review_packet/final_fracture_campaign_a5a5883/PF_FEM_COMMON_SPECIMEN.json",
+        "review_packet/final_fracture_campaign_a5a5883/PF_FEM_FINAL_FRACTURE_COMPARISON.json",
+        "integration_evidence/final_fracture_campaign/pf_peak1000_theta0_seed8666_tip_only_matched",
+        "integration_evidence/final_fracture_campaign/fem_czm_peak1000_theta0_seed8666_tip_only_matched_run5",
+        "integration_evidence/final_fracture_campaign/pf_peak1000_theta0_seed8666_full_field_exact_matched",
+        "integration_evidence/final_fracture_campaign/fem_czm_peak1000_theta0_seed8666_full_field_exact_matched"
       ],
-      "next_action": "resolve geometry/boundary/thickness/observer contract before new paired runs",
+      "next_action": "integrate accepted comparison and backend limitations into manuscript and SI",
       "completion_test": "common unadvanced mechanics plus matched opening/accommodation histories and at least one native FEM cohesive event or explicit admissible model limit"
     },
     {

@@ -69,6 +69,28 @@ def test_native_bulk_rates_are_finite_activated_and_zero_without_drive():
     assert np.all(high["series_rate_s"] <= high["peierls_rate_s"] * (1 + 1e-12))
 
 
+def test_exact_row_direct_shapes_and_entropy_are_used_by_runtime_model():
+    parameters = BulkManifestParameters.from_row(ROW)
+    cfg = SimpleNamespace(
+        pt_emit_floor_min_eV=1e-4, pt_emit_floor_max_frac=0.95,
+        pt_taylor_renewal_time_s=1e-9, pt_mobile_fraction=0.01,
+        pt_mobile_saturation_density_m2=1e14,
+        pt_mobile_density_floor_m2=5e12, pt_jump_fraction=1.0,
+        pt_jump_length_min_m=2.5e-10, pt_taylor_phi_max=20.0,
+        pt_equivalent_strain_factor=1.0,
+    )
+    parameters.configure(cfg)
+    model = EmissionDerivedPeierlsTaylorModel(config_from_dislocation_config(cfg))
+    assert model.peierls.G00_eV == pytest.approx(float(ROW["peierls_H0_eV"]))
+    assert model.peierls.gT_eV_per_K == pytest.approx(
+        -float(ROW["peierls_activation_entropy_kB"]) * KB_EV_PER_K
+    )
+    assert model.peierls.alpha == pytest.approx(float(ROW["peierls_exp_a"]))
+    assert model.peierls.exponent == pytest.approx(float(ROW["peierls_exp_n"]))
+    assert model.taylor.alpha == pytest.approx(float(ROW["taylor_exp_a"]))
+    assert model.taylor.exponent == pytest.approx(float(ROW["taylor_exp_n"]))
+
+
 def test_v104_contract_forces_full_field_and_rejects_finite_or_fatigue():
     args = ["--bulk-plasticity-mode", "tip_only", "--rho-transport-c", "3"]
     entry._prepare_v104_args(args)

@@ -1,0 +1,350 @@
+{
+  "bulk_constitutive_binding": {
+    "FEM_runtime_diagnostics": {
+      "bulk_accepted_dep_mean_acc": 9.96712751831586e-07,
+      "bulk_constitutive_model": "v10.4.1_bulk_peierls_taylor_detailed_balance_exact_port",
+      "bulk_dynamic_recovery_removed_mean_acc_m2": 0.0,
+      "bulk_exchange_released_mean_acc_m2": 0.0,
+      "bulk_exchange_trapped_mean_acc_m2": 0.0,
+      "bulk_explicit_mobile_retained_state": false,
+      "bulk_fixed_mobile_fraction_active": true,
+      "bulk_hardening_law": "PF_v10_4_1_Kocks_Mecking_total_density",
+      "bulk_initial_mobile_fraction_assumption": 0.01,
+      "bulk_max_time_cone_hazard": 0.009176810709066311,
+      "bulk_maximum_accepted_dep": 0.00012935050176595984,
+      "bulk_maximum_equivalent_plastic_rate_s": 0.01203022695822722,
+      "bulk_mesh_change_rejected": false,
+      "bulk_mobile_rho_max_m2": 5000000000000.0,
+      "bulk_mobile_rho_mean_m2": 5000000000000.0,
+      "bulk_model": "v10.4.1_bulk_peierls_taylor_detailed_balance_exact_port",
+      "bulk_plasticity_mode": "bulk_same_pt_km",
+      "bulk_pt_model_v9102_active": false,
+      "bulk_remesh_mobile_to_retained_ratio": null,
+      "bulk_remesh_transfer_count": 0,
+      "bulk_remesh_transfer_new_size": null,
+      "bulk_remesh_transfer_old_size": null,
+      "bulk_remesh_transfer_status": "total_density_transferred_by_existing_solver",
+      "bulk_retained_rho_max_m2": 29550202897080.066,
+      "bulk_retained_rho_mean_m2": 5701480989711.071,
+      "bulk_same_manifest_peierls_taylor": true,
+      "bulk_state_evolves_in_fem": true,
+      "bulk_state_reset_count": 0,
+      "bulk_state_semantics": "PF_v10_4_1_algebraic_mobile_density",
+      "bulk_state_update_calls": 360,
+      "bulk_static_recovery_removed_mean_acc_m2": 0.0,
+      "bulk_storage_added_mean_acc_m2": 0.0
+    },
+    "PF_runtime_diagnostics": {
+      "element_updates": 769612,
+      "final_mean_bulk_density_m2": 5576252951891.064,
+      "local_plastic_work_nonnegative": true,
+      "maximum_accepted_equivalent_strain_increment": 0.00025,
+      "maximum_bulk_density_m2": 57184976212835.43,
+      "maximum_equivalent_plastic_rate_s": 0.003800160292315336,
+      "maximum_peierls_rate_s": 568.3123879550254,
+      "maximum_series_rate_s": 0.11601940093779207,
+      "maximum_taylor_completion_rate_s": 0.11604309081357961,
+      "minimum_bulk_density_m2": 5000000000000.0,
+      "negative_accepted_plastic_work_count": 0,
+      "plastic_increment_limited_element_updates": 4,
+      "plasticity_update_calls": 362,
+      "thermodynamic_modes": [
+        "time_cone"
+      ]
+    },
+    "model": "v10.4.1 Peierls--Taylor detailed balance",
+    "old_FEM_explicit_mobile_retained_controller_used": false,
+    "same_algebraic_mobile_density_semantics": true,
+    "selected_direct_surfaces_active_in_PF": true
+  },
+  "common_elastic_reference": {
+    "conclusion": "The retained Peak/1000 K histories match geometry, nominal loading, mesh controls, elasticity, angle and seed, but do not match accommodation, process-zone scale or J support. The large first-step response difference is therefore not evidence of a PF-versus-CZM mechanical inconsistency. The accommodation-disabled common reference is authoritative for boundary, unit and elastic-operator parity.",
+    "elastic_common_problem": {
+      "comparisons": [
+        {
+          "metrics": {
+            "ahead_8_16um_sigma_yy_Pa": {
+              "fem": 39941041.975406714,
+              "pf": 39941041.975406714,
+              "relative_difference": 0.0
+            },
+            "common_domain_J_J_per_m2": {
+              "fem": 0.33155134835997113,
+              "pf": 0.33155134835997113,
+              "relative_difference": 0.0
+            },
+            "common_domain_KJ_Pa_sqrt_m": {
+              "fem": 384057.3620197922,
+              "pf": 384057.3620197922,
+              "relative_difference": 0.0
+            },
+            "stored_energy_J_per_m": {
+              "fem": 0.004356797178424078,
+              "pf": 0.004356797178424078,
+              "relative_difference": 0.0
+            },
+            "top_reaction_N_per_m": {
+              "fem": 43567.9717842403,
+              "pf": 43567.9717842403,
+              "relative_difference": 0.0
+            }
+          },
+          "total_opening_m": 2e-07
+        },
+        {
+          "metrics": {
+            "ahead_8_16um_sigma_yy_Pa": {
+              "fem": 1997052098.7703357,
+              "pf": 1997052098.7703357,
+              "relative_difference": 0.0
+            },
+            "common_domain_J_J_per_m2": {
+              "fem": 828.8783708999276,
+              "pf": 828.8783708999276,
+              "relative_difference": 0.0
+            },
+            "common_domain_KJ_Pa_sqrt_m": {
+              "fem": 19202868.10098961,
+              "pf": 19202868.10098961,
+              "relative_difference": 0.0
+            },
+            "stored_energy_J_per_m": {
+              "fem": 10.891992946060201,
+              "pf": 10.891992946060201,
+              "relative_difference": 0.0
+            },
+            "top_reaction_N_per_m": {
+              "fem": 2178398.5892120213,
+              "pf": 2178398.5892120213,
+              "relative_difference": 0.0
+            }
+          },
+          "total_opening_m": 1e-05
+        },
+        {
+          "metrics": {
+            "ahead_8_16um_sigma_yy_Pa": {
+              "fem": 5991156296.311015,
+              "pf": 5991156296.311015,
+              "relative_difference": 0.0
+            },
+            "common_domain_J_J_per_m2": {
+              "fem": 7459.905338099349,
+              "pf": 7459.905338099349,
+              "relative_difference": 0.0
+            },
+            "common_domain_KJ_Pa_sqrt_m": {
+              "fem": 57608604.30296883,
+              "pf": 57608604.30296883,
+              "relative_difference": 0.0
+            },
+            "stored_energy_J_per_m": {
+              "fem": 98.02793651454178,
+              "pf": 98.02793651454178,
+              "relative_difference": 0.0
+            },
+            "top_reaction_N_per_m": {
+              "fem": 6535195.767636029,
+              "pf": 6535195.767636029,
+              "relative_difference": 0.0
+            }
+          },
+          "total_opening_m": 3e-05
+        }
+      ],
+      "fem_result": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/final_fracture_campaign/common_specimen_elastic_reference/fem_czm_elastic.json",
+      "interpretation": "The two original spatial implementations agree on the matched unadvanced elastic problem. Differences in the prior histories therefore arise after constitutive/runtime choices, not from an intrinsic force-unit or boundary-opening mismatch.",
+      "maximum_relative_difference": 0.0,
+      "mesh_identity": {
+        "damage_sha256": true,
+        "elements_sha256": true,
+        "nodes_sha256": true
+      },
+      "pass_tolerance": 1e-10,
+      "passed": true,
+      "pf_result": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/final_fracture_campaign/common_specimen_elastic_reference/pf_elastic.json",
+      "schema": "common-specimen-elastic-comparison/1"
+    },
+    "inputs": {
+      "fem": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/active_fracture_comparisons_0a5d55e/fem_czm_peak1000_theta0_seed8666_first_passage",
+      "pf": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/active_fracture_comparisons_0a5d55e/pf_peak1000_theta0_seed8666_anchor"
+    },
+    "metadata_defect": {
+      "effect": "the retained pair cannot be interpreted as a backend-only PF/FEM comparison",
+      "executed_pf_native_mode": "tip_only",
+      "false_full_field_parity_claim": true,
+      "fem_contract_claim": "full_field",
+      "state_modified": false
+    },
+    "next_required_comparison": "Run matched tip-only first-passage histories first, then introduce the existing full-field Peierls-Taylor option in both original spatial models with identical process-zone and J supports.",
+    "prior_first_row": {
+      "fem_KJ_Pa_sqrtm": 203236.74416669027,
+      "fem_reaction_N_per_m": 2661.222410319888,
+      "opening_m": 2e-07,
+      "pf_KJ_Pa_sqrtm": 339676.1763529316,
+      "pf_over_fem_KJ_ratio": 1.6713325031143813,
+      "pf_over_fem_reaction_ratio": 16.371413232990093,
+      "pf_reaction_N_per_m": 43567.9717842408
+    },
+    "schema": "pf-fem-common-specimen-audit/1",
+    "source_contracts_preserved": {
+      "fem_companion": "FEM_CZM_current_PF_1447653_companion_v1",
+      "prior_parity_contract_modified": false
+    },
+    "specimen_contract": {
+      "geometry_from_shared_kernel": {
+        "initial_notch_length_m": 0.0005,
+        "length_x_m": 0.002,
+        "length_y_m": 0.004,
+        "notch_half_thickness_m": 8e-05,
+        "opening_semantics": "total opening; top +U/2 and bottom -U/2",
+        "out_of_plane_convention": "unit thickness; force columns are N/m despite legacy Ftop_N label",
+        "plane_condition": "plane_strain"
+      },
+      "matched_fields": {
+        "cubic_elasticity_and_orientation": true,
+        "first_recorded_total_opening": true,
+        "hazard_seed": true,
+        "mesh_counts_and_tip_resolution": true,
+        "nominal_opening_increment_m": true,
+        "nominal_time_increment_s": true,
+        "temperature_K": true,
+        "theta_deg": true
+      },
+      "unmatched_fields": {
+        "accommodation": {
+          "fem": "full_field",
+          "pf": "tip_only"
+        },
+        "cluster_J_outer_radius_m": {
+          "fem": 0.00024,
+          "pf": 7.999999999999999e-05
+        },
+        "crack_backend": {
+          "fem": "adaptive_czm",
+          "pf": "sharp_wake"
+        },
+        "local_J_outer_radius_m": {
+          "fem": 9.999999999999999e-05,
+          "pf": 1.5000000000000002e-05
+        },
+        "mobile_density_floor_m2": {
+          "fem": 5000000000000.0,
+          "pf": 1000000.0
+        },
+        "process_zone_length_m": {
+          "fem": 5e-05,
+          "pf": 1e-06
+        },
+        "source_state_representation": {
+          "fem": "moving tip state plus full-field local Peierls-Taylor accommodation",
+          "pf": "moving tip-process zone; no full-field bulk accommodation"
+        }
+      }
+    }
+  },
+  "decision": "ACCEPTED_WITH_DISCLOSED_BACKEND_DIFFERENCES",
+  "excluded_prior_evidence": [
+    {
+      "case": "pf_peak1000_theta0_seed8666_full_field_matched",
+      "reason": "runtime builder ignored selected direct PT entropy/shape fields"
+    },
+    {
+      "case": "fem_czm_peak1000_theta0_seed8666_first_passage",
+      "reason": "claimed exact overlay did not replace active v9.11 explicit mobile/retained controller"
+    }
+  ],
+  "full_field": {
+    "FEM_CZM": {
+      "case": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/final_fracture_campaign/fem_czm_peak1000_theta0_seed8666_full_field_exact_matched",
+      "final_KJ_MPa_sqrt_m": 54.3869427115506,
+      "final_extension_um": 20.82711912587416,
+      "final_total_opening_um": 12.492129751360833,
+      "first_event_KJ_MPa_sqrt_m": 54.40720347046784,
+      "first_event_extension_um": 3.939081633829258,
+      "first_event_reaction_N_per_m": 2491375.7753639966,
+      "first_event_step": 99,
+      "first_event_total_opening_um": 12.492129642285818,
+      "geometry_events": 4,
+      "hbar_tip_um_final": 2.321953088805393,
+      "mode": "brittle",
+      "nodes_final": 2033,
+      "rows": 118
+    },
+    "PF": {
+      "case": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/final_fracture_campaign/pf_peak1000_theta0_seed8666_full_field_exact_matched",
+      "final_KJ_MPa_sqrt_m": 51.58931016631197,
+      "final_extension_um": 14.507867693188759,
+      "final_total_opening_um": 26.609502582936862,
+      "first_event_KJ_MPa_sqrt_m": 51.10954269777489,
+      "first_event_extension_um": 2.2973400956249024,
+      "first_event_reaction_N_per_m": 5796439.778360784,
+      "first_event_step": 135,
+      "first_event_total_opening_um": 26.609502529998448,
+      "geometry_events": 5,
+      "hbar_tip_um_final": 1.384579911336366,
+      "mode": "brittle",
+      "nodes_final": 1124,
+      "rows": 157
+    },
+    "first_event_KJ_relative_difference": 0.060610738327745814,
+    "first_event_opening_relative_difference": 0.5305387754542683,
+    "interpretation": "First-event K is the cross-code fracture observable. Opening is not a parity observable because the retained production meshes and J supports differ; exact base-operator parity is established separately."
+  },
+  "full_field_FEM_completion": {
+    "original_runtime_error": "run returned without verified physical refinement metadata: {\"requested_radius_m\": 0.00033, \"requested_radius_um\": 330.0, \"actual_radius_m\": null, \"actual_radius_um\": null, \"policy\": null, \"centers_m\": null, \"actual_radius_verified\": false, \"metadata_lifecycle_model\": \"physical_refinement_metadata_lifecycle_v10_0_5_16_1\", \"runtime_mesh_pointer_missing\": false, \"runtime_mesh_metadata_verified\": false, \"captured_mesh_metadata_verified\": false, \"captured_mesh_used\": false, \"metadata_fallback_reason\": \"no_verified_refinement_metadata_available\", \"long_corridor_constructor_capture_active\": true}",
+    "persisted_refinement_metadata_verified": true,
+    "physics_complete": true,
+    "production_refinement_radius_um": 330.0,
+    "repair_qualification_case": "fem_full_field_exact_binding_audit_fix_smoke",
+    "status": "ACCEPTED_PHYSICS_AUDIT_EXPORT_FAILURE"
+  },
+  "schema": "final_pf_fem_fracture_comparison_v1",
+  "scientific_interpretation": [
+    "Identical-mesh elastic controls are numerically identical, excluding geometry, boundary-condition, unit, and base-operator mismatch.",
+    "With bulk accommodation disabled, first-event K differs by less than one percent.",
+    "With the selected detailed-balance bulk law genuinely active in both codes, first-event K remains within seven percent.",
+    "The larger opening and event-length differences are backend/mesh/hazard-stream differences and must not be described as constitutive parity."
+  ],
+  "tip_only": {
+    "FEM_CZM": {
+      "case": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/final_fracture_campaign/fem_czm_peak1000_theta0_seed8666_tip_only_matched_run5",
+      "final_KJ_MPa_sqrt_m": 54.55965562683799,
+      "final_extension_um": 20.82711912587416,
+      "final_total_opening_um": 18.71969220785507,
+      "first_event_KJ_MPa_sqrt_m": 54.212265295184146,
+      "first_event_extension_um": 3.939081633829258,
+      "first_event_reaction_N_per_m": 3733414.2309077187,
+      "first_event_step": 122,
+      "first_event_total_opening_um": 18.71969209878005,
+      "geometry_events": 4,
+      "hbar_tip_um_final": 2.321953088805393,
+      "mode": "brittle",
+      "nodes_final": 2033,
+      "rows": 141
+    },
+    "PF": {
+      "case": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/final_fracture_campaign/pf_peak1000_theta0_seed8666_tip_only_matched",
+      "final_KJ_MPa_sqrt_m": 57.66432835262989,
+      "final_extension_um": 14.507867693188759,
+      "final_total_opening_um": 31.723256215212622,
+      "first_event_KJ_MPa_sqrt_m": 53.87817177332942,
+      "first_event_extension_um": 2.2973400956249024,
+      "first_event_reaction_N_per_m": 6910589.646911037,
+      "first_event_step": 164,
+      "first_event_total_opening_um": 31.723256162274243,
+      "geometry_events": 5,
+      "hbar_tip_um_final": 1.384579911336366,
+      "mode": "brittle",
+      "nodes_final": 1124,
+      "rows": 186
+    },
+    "first_event_KJ_relative_difference": 0.006162692520513517,
+    "first_event_opening_relative_difference": 0.40990634747508103,
+    "interpretation": "First-event K is the cross-code fracture observable. Opening is not a parity observable because the retained production meshes and J supports differ; exact base-operator parity is established separately."
+  },
+  "within_code_full_field_effect": {
+    "FEM_first_event_K_change_relative_to_tip_only": 0.003595831574686237,
+    "PF_first_event_K_change_relative_to_tip_only": -0.05138684154322115
+  }
+}
