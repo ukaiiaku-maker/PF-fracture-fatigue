@@ -1240,6 +1240,20 @@ def _bind_ramp_owners(trial_mechanics: Any, current: Any) -> Any:
         junction["accepted_bulk_plasticity_v104"] = bulk
     else:
         junction.pop("accepted_bulk_plasticity_v104", None)
+    current_vacancy = np.asarray(current.vacancy_fraction_gp, float)
+    if (np.any(~np.isfinite(current_vacancy))
+            or np.any(current_vacancy < 0.0)):
+        transport_vacancy = np.asarray(
+            current.vacancy_transport_state_v2.vacancy_fraction_gp, float)
+        raise RuntimeError(
+            "ramp owner binding received inadmissible mechanics vacancy field: "
+            f"minimum={float(np.min(current_vacancy))!r} "
+            f"maximum={float(np.max(current_vacancy))!r} "
+            f"nonfinite={int(np.count_nonzero(~np.isfinite(current_vacancy)))} "
+            f"negative={int(np.count_nonzero(current_vacancy < 0.0))} "
+            f"transport_minimum={float(np.min(transport_vacancy))!r} "
+            f"transport_maximum={float(np.max(transport_vacancy))!r}"
+        )
     return replace(
         trial_mechanics,
         competition=current.competition,
@@ -1314,8 +1328,15 @@ def _advance_accumulated_ramp_interval(
                 "ramp_event_time_s": cursor,
             })
         annotated_audit = {**dict(audit), "events": tuple(annotated_events)}
-        return (_merge_ramp_mechanics(endpoint, midpoint, advanced),
-                annotated_audit)
+        # A state-coupled callback already starts its endpoint mechanics from
+        # ``advanced`` and therefore carries the accepted owner transaction on
+        # the current mesh.  The additive merge is only for a stateless
+        # callback whose endpoint was built from the interval's original
+        # state; applying it after a topology change both double-counts the
+        # constitutive increment and attempts to combine unlike meshes.
+        final_state = (endpoint if callable(coupled_callback) else
+                       _merge_ramp_mechanics(endpoint, midpoint, advanced))
+        return final_state, annotated_audit
 
     accepted_segments = 0
     trial_integrations = 0
@@ -2794,7 +2815,15 @@ def advance_event_aware_coupled_interval(
         history={
             "kind":("ramp" if opening_rate > 0.0 else "hold"),
             "temperature_K":float(temperature_K),
-            "maximum_events":64,"maximum_transactions_per_call":1,
+            "maximum_events":64,
+            # A ramp's full-versus-two-half replay must apply the same global
+            # event budget to both partitions.  A per-subcall budget of one
+            # lets two half steps consume two events while the full step stops
+            # after one, making convergence impossible.  The event-aware
+            # wrapper still localizes and reports the ordered accepted event
+            # sequence; holds retain the one-transaction boundary.
+            "maximum_transactions_per_call":(
+                0 if opening_rate > 0.0 else 1),
             "stress_tensor_Pa":np.asarray(tensor,float),
             "K_effective_by_front":({} if front_id is None else {front_id:float(K)}),
             "directional_load_rows_by_front":({} if front_id is None else {front_id:rows}),
@@ -2818,6 +2847,31 @@ def advance_event_aware_coupled_interval(
                     equilibrium_provider=mechanical_equilibrium_provider,
                 )[0]
             history["mechanical_state_at_fraction"]=mechanical_state_at_fraction
+            def state_coupled_mechanical_state_at_fraction(fraction, current):
+                value = float(fraction)
+                target_opening = opening + opening_rate*float(horizon)*value
+                current_opening = float(require_equilibrium_observables(
+                    current)["latest_applied_opening_m"])
+                remaining_opening = target_opening-current_opening
+                opening_scale = max(
+                    abs(target_opening), abs(current_opening),
+                    np.finfo(float).tiny,
+                )
+                if remaining_opening <= 64.0*np.finfo(float).eps*opening_scale:
+                    return current
+                remaining_duration = remaining_opening/opening_rate
+                return accepted_bulk_load_step(
+                    current,
+                    scope=PlasticityScope.FULL_FIELD_PT_EVOLVING_RHO,
+                    load_factor=target_opening/current_opening,
+                    duration_s=remaining_duration,
+                    temperature_K=float(temperature_K),
+                    maximum_stagger_iterations=int(maximum_stagger_iterations),
+                    equilibrium_provider=mechanical_equilibrium_provider,
+                )[0]
+            history["state_coupled_mechanical_state_at_fraction"] = (
+                state_coupled_mechanical_state_at_fraction
+            )
         if mechanical_equilibrium_provider is not None:
             history["mechanical_equilibrium_provider"]=mechanical_equilibrium_provider
         if transport_linear_solver_provider is not None:
