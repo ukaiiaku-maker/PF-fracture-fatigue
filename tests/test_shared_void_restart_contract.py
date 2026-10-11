@@ -7,7 +7,8 @@ from arrhenius_fracture.voiding_production_v5 import (
     _directional_rate_source_identity, build_production_void_state, observables,
 )
 from arrhenius_fracture.shared_v5_cavity_adapter import (
-    TRANSPORT_BOUND_FAILURE, _advance_paired_with_refinement, _common_start_audit,
+    TRANSPORT_BOUND_FAILURE, TRANSPORT_PICARD_FAILURE,
+    _advance_paired_with_refinement, _common_start_audit,
 )
 
 
@@ -64,6 +65,20 @@ def test_paired_transport_refinement_uses_same_accepted_partition_for_both_arms(
     assert terminal == pytest.approx({"disabled": 0.2, "enabled": 0.2})
     assert [duration for duration, _, _ in segments] == pytest.approx([0.1, 0.1])
     assert all(set(records) == {"disabled", "enabled"} for _, records, _ in segments)
+
+
+def test_paired_picard_failure_uses_same_rollback_and_refinement_policy():
+    def advance(state, duration, arm):
+        if duration > 0.1:
+            raise RuntimeError(TRANSPORT_PICARD_FAILURE)
+        return state + duration, {"arm": arm, "duration_s": duration}
+
+    terminal, segments = _advance_paired_with_refinement(
+        {"disabled": 0.0, "enabled": 0.0}, 0.2, advance,
+        minimum_duration_s=1.0e-6,
+    )
+    assert terminal == pytest.approx({"disabled": 0.2, "enabled": 0.2})
+    assert [duration for duration, _, _ in segments] == pytest.approx([0.1, 0.1])
 
 
 def test_directional_clock_identity_excludes_numerical_cache_diagnostics():

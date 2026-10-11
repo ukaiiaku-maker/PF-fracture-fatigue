@@ -38,6 +38,11 @@ LEGACY_PAIR_CHECKPOINT_SCHEMA = "shared-v5-physical-pair-checkpoint/1"
 DEFAULT_SITES_M = ((6.0e-4, 6.0e-5), (7.5e-4, -6.0e-5))
 DEFAULT_PARTITION = (0.50, 0.10, 0.40)
 TRANSPORT_BOUND_FAILURE = "vacancy transport solve exceeded fail-closed concentration bounds"
+TRANSPORT_PICARD_FAILURE = "vacancy transport Picard iteration did not converge"
+RETRIABLE_TRANSPORT_FAILURES = {
+    TRANSPORT_BOUND_FAILURE,
+    TRANSPORT_PICARD_FAILURE,
+}
 
 
 def _finite(value):
@@ -223,11 +228,12 @@ def _restore_pair(path: str | Path):
 
 
 class _PairedRefinementFailure(RuntimeError):
-    def __init__(self, states, segments, diagnostic):
-        super().__init__(TRANSPORT_BOUND_FAILURE)
+    def __init__(self, states, segments, diagnostic, reason=TRANSPORT_BOUND_FAILURE):
+        super().__init__(reason)
         self.states = states
         self.segments = segments
         self.diagnostic = diagnostic
+        self.reason = reason
 
 
 def _advance_paired_with_refinement(
@@ -252,7 +258,8 @@ def _advance_paired_with_refinement(
     except RuntimeError as error:
         if isinstance(error, _PairedRefinementFailure):
             raise
-        if str(error) != TRANSPORT_BOUND_FAILURE:
+        reason = str(error)
+        if reason not in RETRIABLE_TRANSPORT_FAILURES:
             raise
         diagnostic = dict(getattr(error, "diagnostic", {}))
         projected_raw = getattr(states[arm], "vacancy_fraction_gp", None)
@@ -267,6 +274,7 @@ def _advance_paired_with_refinement(
             for name, state in states.items()
         }
         diagnostic.update({
+            "transport_failure_reason": reason,
             "arm": arm,
             "requested_interval_s": float(requested_duration_s),
             "actual_subinterval_s": float(duration_s),
@@ -288,7 +296,9 @@ def _advance_paired_with_refinement(
         half = 0.5 * float(duration_s)
         if half < float(minimum_duration_s):
             diagnostic["minimum_duration_s"] = float(minimum_duration_s)
-            raise _PairedRefinementFailure(states, [], diagnostic) from error
+            raise _PairedRefinementFailure(
+                states, [], diagnostic, reason=reason,
+            ) from error
         midpoint, first = _advance_paired_with_refinement(
             states, half, advance, minimum_duration_s=minimum_duration_s,
             requested_duration_s=requested_duration_s, depth=depth+1,
@@ -303,7 +313,7 @@ def _advance_paired_with_refinement(
         except _PairedRefinementFailure as rejection:
             raise _PairedRefinementFailure(
                 rejection.states, [*first, *rejection.segments],
-                rejection.diagnostic,
+                rejection.diagnostic, reason=rejection.reason,
             ) from rejection
         return terminal, [*first, *second]
 
