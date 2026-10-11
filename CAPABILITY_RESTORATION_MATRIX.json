@@ -1,0 +1,133 @@
+{
+  "schema": "capability-restoration-matrix-r1/1",
+  "release_status": "PARTIAL_RESTORATION",
+  "complete_restoration": false,
+  "no_refit": true,
+  "no_deletion": true,
+  "tested_numerical_ancestor": "b927dac18c58f2fb896fe3520fb4c23ba950ec7e",
+  "tested_evidence_ancestor": "e167bbe520019dddf1383fd2bd60a7a770d6832e",
+  "r1_calculation_head": "b8adedc82503a2ff6698d35bf3d03af671ea9f24",
+  "capabilities": [
+    {
+      "id": "IDENTITY",
+      "required_feature": "three separate runnable model identities",
+      "original_implementation": "shared spatial family plus v10.2.3 reduced and V4.10 seam donors",
+      "active_restored_callable": "arrhenius_fracture.restoration_registry_r1",
+      "state_feedback": "explicit ownership and contribution ledger; reduced is default",
+      "unit_evidence": "tests/test_restoration_registry_r1.py",
+      "finite_activity_evidence": "r1_v1023_crossfidelity_reload",
+      "two_d_comparison": "same-contract spatial schedule replay",
+      "status": "PASS"
+    },
+    {
+      "id": "GEOMETRY_SOURCE",
+      "required_feature": "live evolving kinetic radius and geometry-dependent source area/multiplicity",
+      "original_implementation": "persistent_site_source_v10221._source_geometry and v10.2.3 FrontEngine",
+      "active_restored_callable": "live_geometry_source_void_contract; scripts.run_v10_2_3_shared_reduced",
+      "state_feedback": "r_eff, source capacity, mobile/retained/wake and post-event reload remain coupled",
+      "unit_evidence": "registry and persistent-source suites",
+      "finite_activity_evidence": "two 5 um events with reload at 1200 K",
+      "two_d_comparison": "39-row exact recorded full-spatial schedule",
+      "status": "PASS_SAME_CONTRACT"
+    },
+    {
+      "id": "SIGNED_STATE",
+      "required_feature": "signed mobile/retained return, storage, escape and permanent state",
+      "original_implementation": "signed_burgers_shared_v1025 and reversible descendants",
+      "active_restored_callable": "production moving MPZ state",
+      "state_feedback": "retained source and shielding affect subsequent emission and events",
+      "unit_evidence": "existing signed/reversible tests plus R1 registry tests",
+      "finite_activity_evidence": "active cross-fidelity event/reload trajectory",
+      "two_d_comparison": "array/state errors recorded in crossfidelity_summary.csv",
+      "status": "PASS"
+    },
+    {
+      "id": "VOID_NATIVE",
+      "required_feature": "vacancy transport, lifecycle, resolved cavity, remesh, FEM feedback and restart",
+      "original_implementation": "voiding_production_v5 and global_physical_scheduler_v1",
+      "active_restored_callable": "shared_v5_cavity_adapter; r1_seeded_v5_finite_activity",
+      "state_feedback": "native vacancy debit, boundary, cavity geometry generation, remesh and equilibrium",
+      "unit_evidence": "test_shared_void_restart_contract.py; test_r1_seeded_v5_finite_activity.py",
+      "finite_activity_evidence": "1 to 3 um resolved growth with zero conservation residual and exact restart",
+      "two_d_comparison": "native full spatial FEM, not a reduced substitute",
+      "status": "PASS_FUNCTIONAL_FIXTURE_ONLY"
+    },
+    {
+      "id": "VOID_PAIR_CYCLIC",
+      "required_feature": "matched void-on/off monotonic and cyclic/restart checks",
+      "original_implementation": "physical V5 paired adapter",
+      "active_restored_callable": "pf_cavity_v5_single_front; pf_cavity_v5_disabled_control; pf_cavity_v5_cyclic_single_front",
+      "state_feedback": "both arms share pre-divergence state and accepted positive-R history",
+      "unit_evidence": "shared execution and V5 restart tests",
+      "finite_activity_evidence": "public 1.0,0.2,1.0 run plus direct exact interrupted/uninterrupted comparison",
+      "two_d_comparison": "native full spatial pair",
+      "status": "PASS_NO_EVENT_NEUTRALITY"
+    },
+    {
+      "id": "LOADING",
+      "required_feature": "monotonic, local range, displacement, hold/dwell, unload/reload and reversal",
+      "original_implementation": "shared loading strategies and v10.2.30 fatigue drivers",
+      "active_restored_callable": "typed shared presets and native drivers",
+      "state_feedback": "load history remains independent of source/cavity selection",
+      "unit_evidence": "test_shared_execution.py and inherited fatigue suites",
+      "finite_activity_evidence": "positive-R V5 cycle; reduced event/reload; production negative-R attempt",
+      "two_d_comparison": "full spatial where supported",
+      "status": "PARTIAL_V5_APPLIED_REVERSAL_UNSUPPORTED"
+    },
+    {
+      "id": "SOURCE_GEOGRAPHY",
+      "required_feature": "tip-only, pure bulk, tip-plus-bulk and lifecycle independence",
+      "original_implementation": "persistent, finite and bulk v10.4 donors",
+      "active_restored_callable": "shared options and execution plans",
+      "state_feedback": "distinct tip and bulk work/population ownership",
+      "unit_evidence": "shared option/execution and bulk tests",
+      "finite_activity_evidence": "inherited matched 900 K executions",
+      "two_d_comparison": "native full spatial",
+      "status": "PASS_REUSED_EXACT_IDENTITY"
+    },
+    {
+      "id": "BRANCHING",
+      "required_feature": "branch-off neutrality and supported daughter continuation",
+      "original_implementation": "V11-V13 multifront ownership",
+      "active_restored_callable": "branching shared strategies",
+      "state_feedback": "owner graph, wake/remap and keyed clocks",
+      "unit_evidence": "inherited V11/V12 branch/provider suites",
+      "finite_activity_evidence": "inherited exact theta40 accepted event/restart",
+      "two_d_comparison": "native full spatial",
+      "status": "PASS_BOUNDED_BRANCH_ONLY"
+    },
+    {
+      "id": "BRANCH_VOID",
+      "required_feature": "common-order branch and cavity interaction",
+      "original_implementation": "infrastructure donors without qualified combined executor",
+      "active_restored_callable": null,
+      "state_feedback": "not jointly qualified",
+      "unit_evidence": "construction remains separated",
+      "finite_activity_evidence": null,
+      "two_d_comparison": null,
+      "status": "OPEN_BLOCKS_COMPLETE_RESTORATION"
+    },
+    {
+      "id": "LONG_GROWTH_OBSERVERS",
+      "required_feature": "approximately 1000 um growth and stage-aware K/J/work/restart analysis",
+      "original_implementation": "v10.2.27 qualified long-growth family",
+      "active_restored_callable": "preserved shared spatial and observation tools",
+      "state_feedback": "201 events, repeated lengths and stage validity retained",
+      "unit_evidence": "observation/restart/plot suites",
+      "finite_activity_evidence": "1002.9028827375072 um inherited qualified execution",
+      "two_d_comparison": "native full spatial plus reduced history where meaningful",
+      "status": "PASS_REUSED_EXACT_IDENTITY"
+    },
+    {
+      "id": "FEM_COMPARATOR",
+      "required_feature": "independent full FEM/CZM comparator",
+      "original_implementation": "Arrhenius_FEM_CZM_MPZ theta0 PF-parity pair",
+      "active_restored_callable": "fem_czm_theta0 adapter",
+      "state_feedback": "separate repository/interpreter and exact commit verification",
+      "unit_evidence": "four inherited native adapter tests",
+      "finite_activity_evidence": "retained tested pair",
+      "two_d_comparison": "independent comparator, not a PF replacement",
+      "status": "PASS_REUSED_EXACT_IDENTITY"
+    }
+  ]
+}
