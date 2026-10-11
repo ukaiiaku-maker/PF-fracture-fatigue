@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -19,9 +20,9 @@ SOURCE = (
     "pf" / "DBTT_1200K" / "accommodation_enabled" /
     "shared_execution_request.json"
 )
-OUTPUT = (
+DEFAULT_OUTPUT = (
     ROOT / "integration_evidence" / "current_science_pilots_6abbf10" /
-    "pf" / "DBTT_1200K" / "developed_1000um_current_v2_run2"
+    "pf" / "DBTT_1200K" / "developed_1000um_current_v2_run3"
 )
 
 
@@ -38,8 +39,11 @@ def main() -> int:
     replace_argument(native_args, "--print-every", "400")
     options = dict(pilot["options"])
     options["output"] = "selected_fields"
+    output = Path(os.environ.get(
+        "CURRENT_DBTT1200_OUTPUT", str(DEFAULT_OUTPUT)
+    )).resolve()
     execute_shared(
-        SharedOptions(**options), native_args, OUTPUT,
+        SharedOptions(**options), native_args, output,
         source_policy="qualified",
     )
     return 0
