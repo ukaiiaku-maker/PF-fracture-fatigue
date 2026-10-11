@@ -1,0 +1,26 @@
+Environment used for all commands:
+PYTHON_BIN=/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python
+PYTHONPATH=.
+PYTHONDONTWRITEBYTECODE=1
+MPLCONFIGDIR=/private/tmp/mpl-r4
+
+Current-backend coupled arms:
+$PYTHON_BIN scripts/run_r4_current_coupled.py --output integration_evidence/r4_same_engine_coupled_spatial/current_coupled_run3
+
+Fresh current-law spatial 10/20/30/20/30 um path:
+ARRHENIUS_PRESCRIBED_OPENING_HISTORY_M=1e-5,2e-5,3e-5,2e-5,3e-5 CLEAVAGE_HAZARD_MODE=exponential CLEAVAGE_HAZARD_SEED=1733 CLEAVAGE_EVENT_LENGTH_MODE=threshold_scaled ANISOTROPIC_TRANSPORT_MODE=validated_scalar ANISOTROPIC_USE_AVALANCHE_BACKEND=1 $PYTHON_BIN -u -m arrhenius_fracture.sharp_front_r4_current_law --signed-kernel-family integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json --mode 2d --parameter-option v913_paper_peak01_0242980_persistent_sites --temperatures 900 --steps 5 --nx 36 --ny 72 --dU 1e-5 --dt 8.4 --n-stagger 1 --tip-h-fine 1e-6 --tip-ratio 1.2 --da-phys 5e-6 --target-crack-extension-um 30 --front-state-model moving_pz --tip-source-model continuum --tip-kinetics-mode moving_velocity --bulk-plasticity-mode tip_only --directional-j-mode root_signed --tip-plasticity --active-shielding --signed-active-shielding --mobile-shield-fraction 0 --no-wake-shielding --crystal-aniso --crystal-compete --crystal-theta-deg 30 --crystal-material w --j-decomposition cluster --max-fronts 1 --crack-backend sharp_wake --save-snapshots 0 --snapshot-by-crack-extension-um 0 --snapshot-cols 4 --sigma-cap-GPa 30 --no-plots --out <fresh-spatial-output>
+
+Reduced/spatial comparison:
+$PYTHON_BIN scripts/run_r4_current_law_comparison.py --spatial <fresh-spatial-output> --output <comparison.json>
+
+Resolved stochastic fatigue through 20 um:
+$PYTHON_BIN scripts/run_r4_resolved_stochastic_fatigue.py --output <fatigue-output> --target-extension-um 20 --minimum-events 4 --phase-count 24
+
+Figure:
+$PYTHON_BIN scripts/plot_r4_same_engine_evidence.py --root integration_evidence/r4_same_engine_coupled_spatial
+
+Focused R3/R4 suite:
+$PYTHON_BIN -m pytest -q tests/test_current_coupled_execution_r4.py tests/test_current_law_spatial_comparison_r4.py tests/test_resolved_stochastic_fatigue_r4.py tests/test_matched_persistent_execution_r3.py tests/test_developed_fatigue_r3.py tests/test_connection_recovery_r3.py tests/test_coupled_void_execution_r3.py
+
+Authoritative exact-tree suite:
+$PYTHON_BIN -m pytest -q --junitxml=integration_evidence/r4_same_engine_coupled_spatial/final_full_suite_portable.xml
