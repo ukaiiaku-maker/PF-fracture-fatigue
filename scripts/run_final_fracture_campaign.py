@@ -114,6 +114,54 @@ def attempt_path(row: dict[str, str]) -> Path:
     return base.parent / f"{base.name}_run{index}"
 
 
+def successful_attempt(row: dict[str, str]) -> Path | None:
+    """Return the newest verified immutable attempt, including suffixed retries."""
+    base = ROOT / row["output_root"]
+    candidates = [base]
+    candidates.extend(sorted(
+        base.parent.glob(f"{base.name}_run*"),
+        key=lambda path: int(path.name.rsplit("_run", 1)[1])
+        if path.name.rsplit("_run", 1)[1].isdigit() else -1,
+    ))
+    verified = []
+    for candidate in candidates:
+        attestation = candidate / "shared_runtime_attestation.post.json"
+        summary = candidate / "summary.json"
+        if not attestation.is_file() or not summary.is_file():
+            continue
+        payload = json.loads(attestation.read_text())
+        if payload.get("execution_verified") is True:
+            verified.append(candidate)
+    return verified[-1] if verified else None
+
+
+def close_matrix_row(row: dict[str, str], result: Path) -> None:
+    summary = json.loads((result / "summary.json").read_text())
+    record = summary[0] if isinstance(summary, list) else summary
+    attestation = json.loads(
+        (result / "shared_runtime_attestation.post.json").read_text()
+    )
+    fractured = record.get("Kc_first_MPa_sqrt_m") is not None
+    row["status"] = "complete_validated" if fractured else "complete_physical_censor"
+    row["reuse_evidence"] = str(result.relative_to(ROOT))
+    row["producer_commit"] = str(attestation.get("source", {}).get("commit", ""))[:12]
+    row["notes"] = (
+        "matrix runner verified original spatial PF execution; physical first event"
+        if fractured else
+        "matrix runner verified original spatial PF execution; finite no-event censor"
+    )
+
+
+def write_matrix(entries: list[dict[str, str]]) -> None:
+    fieldnames = list(entries[0])
+    temporary = MATRIX.with_suffix(".csv.tmp")
+    with temporary.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(entries)
+    temporary.replace(MATRIX)
+
+
 def execute_baseline(entries: list[dict[str, str]], *, resume: bool, maximum: int | None,
                      case_id: str | None) -> list[dict[str, object]]:
     selected = [r for r in entries if r["case_id"].startswith("baseline_")]
@@ -126,9 +174,11 @@ def execute_baseline(entries: list[dict[str, str]], *, resume: bool, maximum: in
         if row["status"] in {"complete_validated", "complete_physical_censor"}:
             completed.append({"case_id": row["case_id"], "action": "reused", "path": row["reuse_evidence"]})
             continue
-        base = ROOT / row["output_root"]
-        if resume and (base / "shared_runtime_attestation.post.json").is_file():
-            completed.append({"case_id": row["case_id"], "action": "existing_success", "path": str(base)})
+        existing = successful_attempt(row) if resume else None
+        if existing is not None:
+            close_matrix_row(row, existing)
+            write_matrix(entries)
+            completed.append({"case_id": row["case_id"], "action": "existing_success", "path": str(existing)})
             continue
         if maximum is not None and sum(r["action"] == "executed" for r in completed) >= maximum:
             break
@@ -143,6 +193,8 @@ def execute_baseline(entries: list[dict[str, str]], *, resume: bool, maximum: in
             "CLEAVAGE_EVENT_MAX_FACTOR": "4.0",
         })
         execute_shared(options, native, target, source_policy="qualified")
+        close_matrix_row(row, target)
+        write_matrix(entries)
         completed.append({"case_id": row["case_id"], "action": "executed", "path": str(target)})
     return completed
 
