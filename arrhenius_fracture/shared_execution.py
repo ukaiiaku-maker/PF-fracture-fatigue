@@ -407,6 +407,19 @@ def execute_shared(
         backend = require_fem_backend()
         if source_policy != "qualified":
             raise RuntimeError("external FEM execution requires source_policy='qualified'")
+        request["executor_module"] = plan.executor_module
+        request["executor_attribute"] = plan.executor_attribute or "main"
+        fem_output_flags = {
+            OutputProfile.COMPACT_SMOKE: ["--save-snapshots", "0", "--no-plots"],
+            OutputProfile.SELECTED_FIELDS: ["--save-snapshots", "4"],
+            OutputProfile.PUBLICATION_RESTART: ["--save-snapshots", "0", "--no-plots"],
+        }[options.output]
+        if any(
+            token == "--save-snapshots" or token.startswith("--save-snapshots=")
+            for token in native_args
+        ):
+            raise ValueError("--save-snapshots is owned by the shared output profile")
+        request["native_args"] = [*native_args, *fem_output_flags]
         interpreter = backend.interpreter
         cwd = Path(backend.root)
         environment["PYTHONPATH"] = str(cwd)

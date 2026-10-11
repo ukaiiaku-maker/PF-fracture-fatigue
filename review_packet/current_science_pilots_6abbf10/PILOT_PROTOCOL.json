@@ -1,0 +1,103 @@
+{
+  "schema": "fracture-current-source-bounded-pilot-protocol/1",
+  "status": "predeclared_before_execution",
+  "source": {
+    "repository": "shared-fracture-fatigue-options-v1",
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+    "tree": "a8d028fcfb333ec927b03512d15b2ca38026bdb8",
+    "policy": "qualified committed calculation source",
+    "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python"
+  },
+  "global_guards": {
+    "external_archive": "read-only",
+    "deletion_authorized": false,
+    "parameter_fitting_authorized": false,
+    "rendered_step_images": false,
+    "minimum_free_space_GiB_before_each_launch": 10,
+    "observed_initial_free_space_GiB": 14,
+    "stop_if_space_gate_fails": true
+  },
+  "source_closure": {
+    "simulation": [
+      {"role": "PF executor", "module": "arrhenius_fracture.sharp_front_v10_2_27_audited", "callable": "main", "sha256": "15b3b8045f812a36a287ac93271b65e1033ab2d81bd6cc0458fe1e111c4ebdb1"},
+      {"role": "PF mechanics/loading", "module": "arrhenius_fracture.sharp_front", "callable": "run_2d", "sha256": "5b5b2dd1a07e71cccd8911d970974580068e4ca809cf0359d33d56262bba44b9"},
+      {"role": "PF finite elements", "module": "arrhenius_fracture.fem", "callable": "assemble_mechanics", "sha256": "e3694431927ffa1cba6a176747bd9e38a64050569c6dccacf909b30ce9d4c83d"},
+      {"role": "persistent source", "module": "arrhenius_fracture.persistent_site_source_v10221", "callable": "install_persistent_site_source", "sha256": "e35e3dbf2cb37d3501eea7af79f08fd2b0ef90befd0c9f8c93c491016a458df1"},
+      {"role": "positive conservative transport", "module": "arrhenius_fracture.vacancy_transport_phase_field_v2", "callable": "solve_transport_interval", "model_id": "MIXED_RT0_P0_CONSERVATIVE_POSITIVE_FLUX_CORRECTION", "sha256": "55735d7086a24f845f0f2fbae157758ac035916efddfe6d0a81db8a2302f0eb2"},
+      {"role": "paired cavity executor", "module": "arrhenius_fracture.shared_v5_cavity_adapter", "callable": "main", "sha256": "367c1c9d23c90fc9089da0a5385e4a44fb8f864ea6a0cf093e46f36375910fc4"}
+    ],
+    "observer": [
+      {"role": "PF accepted histories", "artifact": "steps_*.csv and crack_path_*.csv", "consumer": "new compact pilot summarizer"},
+      {"role": "cavity accepted histories", "artifact": "shared_v5_physical_pair_audit.json", "consumer": "new compact pilot summarizer"},
+      {"role": "FEM native audit", "artifact": "theta0_pf_parity_contract_v10_0_5_18_4_0.json", "consumer": "new compact pilot summarizer"}
+    ],
+    "report": [
+      {"artifact": "PILOT_RESULTS.json", "consumer": "reader-facing interpretation and next-batch decision"},
+      {"artifact": "opening_accommodation_first_passage.png", "consumer": "paired first-event/post-event comparison"},
+      {"artifact": "current_pf_1mm_K_history.png", "consumer": "developed current-source propagation evidence"}
+    ]
+  },
+  "pilots": {
+    "opening_accommodation_first_passage": {
+      "case_count": 6,
+      "mechanics": "original full spatial sharp-front PF/FEM",
+      "common": {
+        "theta_deg": 0,
+        "nx": 36,
+        "ny": 72,
+        "dU_m": 2e-7,
+        "dt_s": 8.4,
+        "n_stagger": 2,
+        "tip_h_fine_m": 1e-6,
+        "tip_ratio": 1.2,
+        "da_phys_m": 5e-6,
+        "target_projected_extension_um": 10,
+        "endpoint": "first accepted geometry event plus the next accepted geometry event or native terminal/domain limit",
+        "hazard_mode": "exponential first passage with the declared fixed seed",
+        "snapshots": 0,
+        "plots": false,
+        "mpz_state_output": false
+      },
+      "materials": [
+        {"label": "DBTT_300K", "option": "v913_paper_dbtt01_0202500_persistent_sites", "temperature_K": 300, "seed": 2001733},
+        {"label": "DBTT_1200K", "option": "v913_paper_dbtt01_0202500_persistent_sites", "temperature_K": 1200, "seed": 2001733},
+        {"label": "Peak_900K", "option": "v913_paper_peak01_0242980_persistent_sites", "temperature_K": 900, "seed": 1001733}
+      ],
+      "arms": {
+        "accommodation_enabled": ["--tip-plasticity", "--active-shielding", "--signed-active-shielding"],
+        "opening_only": ["--no-tip-plasticity", "--no-active-shielding", "--signed-active-shielding"]
+      },
+      "acceptance": ["at least one accepted fracture event or explicit native domain endpoint", "no reduced or prescribed-drive fallback", "post-event state retained when attainable", "same material, mesh, loading, and hazard identity within each pair"]
+    },
+    "developed_propagation": {
+      "launch_condition": "all three accommodation-enabled short cases accept a first event without physics fallback",
+      "case": "DBTT 300 K accommodation-enabled theta=0",
+      "target_projected_extension_um": 1000,
+      "retention": "numeric histories, audit JSON, native terminal plot only; no step images",
+      "reuse_rule": "historical 1.003 mm trajectory is reference-only because current sharp_front.py differs; current-head rerun required"
+    },
+    "v11_current_source_suffix": {
+      "historical_source_commit": "a2a90cd5b448dc7daf8e83711389e25da49d3757",
+      "migration_boundary": "historical accepted rolling endpoints at physical transport time 5.900 s become immutable inputs to commit 6abbf10",
+      "arm_map": {"cavitation_suppressed": "disabled", "void_permitted": "enabled"},
+      "current_duration_s": 1e-5,
+      "current_steps": 1,
+      "temperature_K": 1200,
+      "question": "Can both migrated arms accept one identical corrected-transport interval, retain nonnegative concentration and one-way active-cavity absorption, and what immediate mechanical/cavity divergence results?",
+      "endpoint": "one accepted matched interval or first fail-closed numerical/physical boundary"
+    },
+    "fem_czm_consistency": {
+      "repository": "ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ",
+      "commit": "293491157063484bb10df6adc479f847a6a08ba6",
+      "entry": "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_4_0_theta0_pf_parity:main",
+      "case": "Peak-0242980, 1000 K, theta=0, seed=8666",
+      "target_projected_extension_um": 10,
+      "scope": "selective original full FEM/adaptive-CZM consistency calculation; not constitutive parity and not portable-row substitution"
+    }
+  },
+  "independent_nonblockers": {
+    "operator_consistent_v3_6": "not run in this batch",
+    "combined_branching_cavity": "not run in this batch"
+  }
+}

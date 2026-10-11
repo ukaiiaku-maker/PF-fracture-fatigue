@@ -1,0 +1,40 @@
+{
+  "schema": "shared-v5-physical-pair-checkpoint/2",
+  "migration": {
+    "schema": "historical-v11-to-current-positive-transport-boundary/1",
+    "historical_source_commit": "a2a90cd5b448dc7daf8e83711389e25da49d3757",
+    "current_source_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+    "boundary_physical_time_s": 5.899999999999817,
+    "archive_mutated": false,
+    "purpose": "one matched 10 microsecond corrected-transport suffix"
+  },
+  "arms": {
+    "disabled": "/Volumes/Data/Data/Nanopillar_calculation/voiding/recovered-pr63/runs/paired_monotonic_fracture_v11_pre_event_fine_checkpoint/cavitation_suppressed/rolling_restart.json",
+    "enabled": "/Volumes/Data/Data/Nanopillar_calculation/voiding/recovered-pr63/runs/paired_monotonic_fracture_v11_pre_event_fine_checkpoint/void_permitted/rolling_restart.json"
+  },
+  "archive_manifest_sha256": {
+    "disabled": "5bf50c92e66ad4b24f14a25b2112667b1ddd559efbd10a18788bfa21e749320a",
+    "enabled": "b35e643b525bb032c462f982f813a53b2e7f898590e7b4306a042e1e255c0e65"
+  },
+  "fingerprints": {
+    "disabled": "135ff377ec17192c6acb1a768f23b489be54bed23bafde47320a98b0486df86d",
+    "enabled": "370eb538f0756c732803a09db412a09f5698c437cae881944251d392c2af4f7d"
+  },
+  "physical_time_s": 5.899999999999817,
+  "interval_count": 0,
+  "common_start": {
+    "disabled": true,
+    "enabled": true
+  },
+  "configuration": {
+    "material_class": "DBTT",
+    "temperature_K": 1200.0,
+    "seed": 3621,
+    "vacancy_energy_variant": "reference",
+    "loading_history": "historical ramp endpoint followed by current fixed-load suffix",
+    "interval_duration_s": 1e-5,
+    "transport_refinement_min_duration_s": 1e-8,
+    "full_field_plasticity": true,
+    "one_way_cavity_absorption_required": true
+  }
+}

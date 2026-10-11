@@ -1,5 +1,13 @@
 # Fracture calculation readiness and first storage-safe batch
 
+> Supersession note (2026-10-10): this file records the earlier readiness
+> assessment and mixes retained historical launchers with then-current paths.
+> The controlling current-source/historical separation for the bounded science
+> pilots is `review_packet/current_science_pilots_6abbf10/EXECUTION_MAP.md` and
+> its machine-readable `PILOT_PROTOCOL.json`. In particular, the old V10.2.28
+> and `ed53799f` rows below are retained provenance, not the current integrated
+> executors selected for the new calculations.
+
 This is an execution map, not campaign authorization. It preserves qualified
 paths and separates paper-ready calculations from cyclic and combined-mode
 development.

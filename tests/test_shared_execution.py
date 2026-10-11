@@ -1,4 +1,6 @@
 import json
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -145,6 +147,52 @@ def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path)
     assert receipt.execution_verified is False
     with pytest.raises(RuntimeError, match="backend unavailable"):
         require_fem_backend(tmp_path)
+
+
+def test_external_fem_worker_request_contains_executor_and_compact_output(
+    tmp_path, monkeypatch,
+):
+    class Backend:
+        root = str(tmp_path)
+        interpreter = "/qualified/fem/python"
+
+        def to_dict(self):
+            return {
+                "root": self.root,
+                "interpreter": self.interpreter,
+                "expected_commit": "293491157063484bb10df6adc479f847a6a08ba6",
+                "expected_branch": "v10.0.5.18.4.0-theta0-pf-parity",
+            }
+
+    monkeypatch.setattr(
+        "arrhenius_fracture.fem_backend_adapter.require_fem_backend",
+        lambda: Backend(),
+    )
+
+    def fake_run(command, **kwargs):
+        request_path = Path(command[-1])
+        request = json.loads(request_path.read_text())
+        assert request["executor_module"].endswith(
+            "mode_i_first_passage_v10_0_5_18_4_0_theta0_pf_parity"
+        )
+        assert request["executor_attribute"] == "main"
+        assert request["native_args"][-3:] == [
+            "--save-snapshots", "0", "--no-plots",
+        ]
+        output = Path(request["output_dir"])
+        (output / "shared_runtime_attestation.post.json").write_text(
+            json.dumps({"status": "executed", "execution_verified": True}) + "\n"
+        )
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(
+        "arrhenius_fracture.shared_execution.subprocess.run", fake_run,
+    )
+    result = execute_shared(
+        PRESETS["fem_czm_theta0"], ["--target-crack-extension-um", "10"],
+        tmp_path / "out",
+    )
+    assert result["execution_verified"] is True
 
 
 def test_plan_is_json_serializable():
