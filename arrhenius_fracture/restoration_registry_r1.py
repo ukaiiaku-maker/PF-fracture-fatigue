@@ -18,6 +18,7 @@ from typing import Any, Mapping
 
 class RestorationModelIdentity(str, Enum):
     RESTORED_REDUCED_REFERENCE = "RESTORED_REDUCED_REFERENCE"
+    HISTORICAL_FINITE_SOURCE_REPLAY_V10_2_3 = "HISTORICAL_FINITE_SOURCE_REPLAY_V10_2_3"
     FULL_SPATIAL_REFERENCE = "FULL_SPATIAL_REFERENCE"
     SEAM_DIAGNOSTIC_V4_10 = "SEAM_DIAGNOSTIC_V4_10"
 
@@ -38,14 +39,25 @@ class RestorationBinding:
 BINDINGS: dict[RestorationModelIdentity, RestorationBinding] = {
     RestorationModelIdentity.RESTORED_REDUCED_REFERENCE: RestorationBinding(
         RestorationModelIdentity.RESTORED_REDUCED_REFERENCE,
-        "v10.2.3/v10.2.5 shared reduced state with persistent-site and reversible descendants",
-        "scripts.run_v10_2_3_shared_reduced:main",
-        "qualified_reduced_response_operator",
+        "R2 persistent/reversible signed MPZ with corrected mean-rate Taylor consumer",
+        "scripts.run_r2_reduced_runtime_contract:main",
+        "prescribed_K_reduced_provider_with_production_state",
         "FrontEngine.r_eff plus material-frame signed MPZ moving window",
         "persistent_site_source_v10221",
         None,
         True,
         "reduced external mechanics with the production signed MPZ constitutive state",
+    ),
+    RestorationModelIdentity.HISTORICAL_FINITE_SOURCE_REPLAY_V10_2_3: RestorationBinding(
+        RestorationModelIdentity.HISTORICAL_FINITE_SOURCE_REPLAY_V10_2_3,
+        "unchanged v10.2.3 finite campaign source replay",
+        "scripts.run_v10_2_3_shared_reduced:main",
+        "recorded_2d_K_dt_temperature_and_channel_factor_schedule",
+        "historical FrontEngine.r_eff and finite moving MPZ window",
+        "campaign_calibrated_tip finite depletion/advance refresh",
+        None,
+        False,
+        "same-law replay control only; not the persistent/reversible default",
     ),
     RestorationModelIdentity.FULL_SPATIAL_REFERENCE: RestorationBinding(
         RestorationModelIdentity.FULL_SPATIAL_REFERENCE,
@@ -80,7 +92,7 @@ def resolve_restoration_identity(value: str | RestorationModelIdentity) -> Resto
 
 def registry_payload() -> dict[str, Any]:
     return {
-        "schema": "fracture-fatigue-restoration-registry-r1/1",
+        "schema": "fracture-fatigue-restoration-registry-r2/1",
         "default_identity": RestorationModelIdentity.RESTORED_REDUCED_REFERENCE.value,
         "models": {
             key.value: {**asdict(binding), "identity": binding.identity.value}
