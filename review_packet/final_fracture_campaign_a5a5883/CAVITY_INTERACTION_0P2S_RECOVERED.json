@@ -1,0 +1,125 @@
+{
+  "accepted_exposure_s": 0.20000000000000107,
+  "arms": {
+    "disabled": {
+      "cavity_radius_change_m": null,
+      "cavity_radius_end_m": null,
+      "cavity_radius_start_m": null,
+      "checkpoint_fingerprint_exact": true,
+      "graph_length_change_m": 8.000000000000021e-05,
+      "graph_length_end_m": 0.0006725993004046691,
+      "graph_length_start_m": 0.0005925993004046689,
+      "opening_end_m": 6.601010099999998e-06,
+      "opening_start_m": 6.4010101e-06,
+      "reaction_end_N_per_m": 501039.17257549625,
+      "reaction_start_N_per_m": 559462.7589429949,
+      "start_fingerprint": "b08b847c2db6dbd460ac0a35352611877a7da44606a2f88f140eedfd098832e5",
+      "terminal_branches": [
+        {
+          "branch_id": "b00000000",
+          "status": "active",
+          "tip_m": [
+            0.0006725993004046691,
+            1.5602085896855586e-20
+          ]
+        }
+      ],
+      "terminal_crack_void_connection": null,
+      "terminal_directional_rates": [
+        {
+          "G_kinetic_used_J_per_m2": 4155.2365979040105,
+          "K_effective_Pa_sqrt_m": 30966122.67240547,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "drive_source": "VALID_NESTED_LOCAL_J",
+          "effective_rate_s": 3.9957705996082025
+        }
+      ],
+      "terminal_effective_K_Pa_sqrt_m": 30966122.67240547,
+      "terminal_fingerprint": "624a9868fcd148bb660edbb2afe91771d02dd0f8713ef7446b664315d552cdcc",
+      "terminal_length_ledgers": {},
+      "topology_action_change": 4
+    },
+    "enabled": {
+      "cavity_radius_change_m": 8.220743417782271e-12,
+      "cavity_radius_end_m": 4.248786681099184e-08,
+      "cavity_radius_start_m": 4.247964606757406e-08,
+      "checkpoint_fingerprint_exact": true,
+      "graph_length_change_m": 0.0,
+      "graph_length_end_m": 0.0005925993004046689,
+      "graph_length_start_m": 0.0005925993004046689,
+      "opening_end_m": 6.601010099999998e-06,
+      "opening_start_m": 6.4010101e-06,
+      "reaction_end_N_per_m": 575712.1399100069,
+      "reaction_start_N_per_m": 559463.624206604,
+      "start_fingerprint": "c91c5805f135cda10ba7fbb4567912481abbba932df1e7ea9ccf43fa2a6899c7",
+      "terminal_branches": [
+        {
+          "branch_id": "b00000000",
+          "status": "active",
+          "tip_m": [
+            0.0005925993004046689,
+            1.5602085896855586e-20
+          ]
+        }
+      ],
+      "terminal_crack_void_connection": null,
+      "terminal_directional_rates": [
+        {
+          "G_kinetic_used_J_per_m2": 43.64722841367369,
+          "K_effective_Pa_sqrt_m": 3173710.34063167,
+          "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+          "drive_source": "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY",
+          "effective_rate_s": 5.390928548202657e-58
+        }
+      ],
+      "terminal_effective_K_Pa_sqrt_m": 3173710.34063167,
+      "terminal_fingerprint": "1b3add175778283bf3ff07774c8c3dde91c664506c1a9c0bc8edb2423bd5b3d1",
+      "terminal_length_ledgers": {
+        "active_front_coordinate_advance_m": 0.0,
+        "connected_free_surface_extent_m": 0.0,
+        "connected_void_free_span_m": 0.0,
+        "fractured_ligament_length_m": 0.0,
+        "ordinary_crack_fractured_length_m": 0.0,
+        "physical_active_front_travel_m": 0.0,
+        "preexisting_void_free_span_m": 0.0,
+        "projected_connected_void_free_span_m": 0.0,
+        "projected_fractured_length_m": 0.0,
+        "projected_free_span_m": 0.0,
+        "projected_front_advance_m": 0.0,
+        "traversed_void_free_span_m": 0.0
+      },
+      "topology_action_change": 0
+    }
+  },
+  "audit_limit": "The event-rich in-memory scheduler history was not published because the generic JSON normalizer could not serialize a native barrier dataclass. Terminal native states, exact fingerprints, topology counts and geometry were written and restored before that exporter failure. Event times inside the 0.2 s suffix are therefore not claimed.",
+  "classification": "ACCEPTED_PHYSICS_AUDIT_EXPORT_FAILURE",
+  "interpretation": "Over the matched 0.2 s, 1 um/s continuation, the cavity-suppressed arm accepted four ordinary 20 um advances (80 um total), whereas the cavity-enabled arm accepted no crack advance. Its native complete-ligament energy drive and effective cleavage rate remain far below the ordinary no-cavity front. This is a finite strong shielding result; no crack-void connection occurred in the window.",
+  "native_checkpoint_round_trip_exact": true,
+  "native_pair_checkpoint": "integration_evidence/final_fracture_campaign/cavity_interaction_ramp_0p2s_run1/checkpoint/accepted_v5_pair.json",
+  "native_pair_checkpoint_manifest_sha256": "17707ba179eea9cb65a901fbec860c9e9689f57cd576f68650558c02aadfd9aa",
+  "parent_audit": "integration_evidence/final_fracture_campaign/cavity_interaction_ramp_0p1s/shared_v5_cavity_audit.json",
+  "parent_terminal_to_run_start_exact": true,
+  "physical_time_end_s": 6.201020100000001,
+  "physical_time_start_s": 6.0010201,
+  "producer_failure": {
+    "exception_class": "TypeError",
+    "exception_message": "Object of type ExpFloorBarrier is not JSON serializable",
+    "execution_verified": false
+  },
+  "producer_request_sha256": "d1cd4e236cc2e1dfeb94ca0bf9f6ce55fa7e28abff7fdadfb3facad047c66420",
+  "producer_result": "integration_evidence/final_fracture_campaign/cavity_interaction_ramp_0p2s_run1",
+  "protocol": {
+    "earliest_event_and_remainder_scheduler": true,
+    "full_field_plasticity": true,
+    "interval_duration_s": 0.2,
+    "loading_history": "linear_total_opening_ramp",
+    "material_class": "DBTT",
+    "opening_rate_m_per_s": 1e-06,
+    "seed": 3621,
+    "temperature_K": 1200.0,
+    "test_only_extreme_reservoir": false,
+    "transport_refinement_min_duration_s": 1e-08,
+    "vacancy_energy_variant": "reference"
+  },
+  "schema": "final-fracture-cavity-interaction-recovered-checkpoint/1"
+}

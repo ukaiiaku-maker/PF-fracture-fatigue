@@ -9,6 +9,8 @@ from __future__ import annotations
 import argparse
 from collections.abc import Mapping
 import copy
+from dataclasses import asdict, is_dataclass
+from enum import Enum
 import hashlib
 import json
 import math
@@ -46,6 +48,12 @@ RETRIABLE_TRANSPORT_FAILURES = {
 
 
 def _finite(value):
+    if is_dataclass(value) and not isinstance(value, type):
+        return _finite(asdict(value))
+    if isinstance(value, Enum):
+        return _finite(value.value)
+    if isinstance(value, Path):
+        return str(value)
     if isinstance(value, Mapping):
         return {str(key): _finite(item) for key, item in value.items()}
     if isinstance(value, (tuple, list)):

@@ -1,6 +1,6 @@
 {
   "schema": "fracture-final-acceptance/1",
-  "updated_at": "2026-10-11T23:30:00-07:00",
+  "updated_at": "2026-10-11T15:06:00-07:00",
   "overall_status": "running",
   "criteria": [
     {
@@ -34,9 +34,11 @@
     },
     {
       "id": "physical_cavity_comparison",
-      "status": "repairing",
+      "status": "complete_validated",
       "evidence": [
         "review_packet/final_fracture_campaign_a5a5883/CAVITY_DWELL_10US.json",
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION.md",
         "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_completion_run2"
       ]
     },

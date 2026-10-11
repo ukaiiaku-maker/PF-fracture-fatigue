@@ -1,6 +1,6 @@
 {
   "schema": "fracture-finalization-tasks/1",
-  "updated_at": "2026-10-11T23:30:00-07:00",
+  "updated_at": "2026-10-11T15:06:00-07:00",
   "allowed_status": [
     "running",
     "repairing",
@@ -32,18 +32,20 @@
       "dependencies": [
         "control-ledger"
       ],
-      "status": "repairing",
+      "status": "complete_validated",
       "owner": "integrator",
-      "current_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/consolidate_cavity_dwell.py --out review_packet/final_fracture_campaign_a5a5883/CAVITY_DWELL_10US.json",
+      "current_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/recover_cavity_interaction_checkpoint.py --out review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
       "inputs": [
         "review_packet/current_science_pilots_6abbf10/v11_migration_pair.json"
       ],
-      "checkpoint": "exact paired 5.90001 s state after the complete original 10 us dwell",
+      "checkpoint": "exact paired 6.2010201 s interaction state at 6.6010101 um opening",
       "evidence_paths": [
         "review_packet/final_fracture_campaign_a5a5883/CAVITY_DWELL_10US.json",
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION.md",
         "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_completion_run2"
       ],
-      "next_action": "declare and execute a finite loading continuation from the exact 5.90001 s pair toward the first cavity neighborhood",
+      "next_action": "integrate the finite shielding result and audit limitation into the paper and SI",
       "completion_test": "unchanged 10 us paired dwell accepts exposure and interaction-relevant matched pair evolves with qualified recovery"
     },
     {

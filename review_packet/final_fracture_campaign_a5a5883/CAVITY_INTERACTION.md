@@ -1,0 +1,11 @@
+# Physical cavity interaction result
+
+The historical DBTT/1200 K/seed-3621 pair was first carried through its unchanged 10 microsecond fixed-opening migration dwell. It was then resumed from the exact paired checkpoint under the historical 1 micrometre/s total-opening rate. The enabled and suppressed arms retain common pre-divergence ancestry and independently evolved cavity ownership; the control was not made by deleting a cavity from a later state.
+
+The accepted loading sequence comprises qualified 100 ns, 10 microsecond, 1 millisecond, 0.1 second and 0.2 second immutable suffixes. At the end of the last suffix, both arms have 0.3010201 s of accepted ramp exposure beyond the dwell checkpoint and a total opening of 6.6010101 micrometres.
+
+Over the final matched 0.2 s window, the cavity-suppressed arm accepted four ordinary 20 micrometre crack advances, for 80 micrometres of total graph-length increase. The cavity-enabled arm accepted no crack advance. Its resolved cavity radius increased from 42.4796461 to 42.4878668 nm, and no crack–void connection was formed. At the terminal state, the ordinary no-cavity front has a native effective rate of 3.99577 s^-1, a valid nested-local-J drive of 4155.24 J/m^2, and an effective intensity of 30.9661 MPa sqrt(m). The enabled candidate uses the complete-ligament topology energy, 43.6472 J/m^2, with an effective intensity of 3.17371 MPa sqrt(m) and rate 5.39093e-58 s^-1.
+
+Within this declared finite window the resolved cavity therefore produces strong shielding of the approach candidate rather than acceleration, coalescence, or a negligible response. The result does not establish that connection can never occur at a later load, and it does not convert the pre-existing cavity calculation into a nucleation prediction.
+
+The calculation wrote and verified its paired native checkpoint before the event-rich JSON audit encountered an exporter-only `ExpFloorBarrier` serialization error. The restored fingerprints, geometry, topology counters, fields and terminal native drives are preserved in `CAVITY_INTERACTION_0P2S_RECOVERED.json`. The event times inside the final 0.2 s window are not recovered and are not claimed. The serializer now handles native dataclasses, enums and paths for future event-rich runs.
