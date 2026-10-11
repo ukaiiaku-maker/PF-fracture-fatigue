@@ -144,6 +144,7 @@ def build_restored_engine(
     material_path: str | Path = DEFAULT_MATERIAL,
     selection_path: str | Path = DEFAULT_SELECTION,
     kernel_family_path: str | Path = DEFAULT_KERNEL_FAMILY,
+    local_strength_Pa: float | None = None,
 ) -> ReducedPersistentReversibleTipEngine:
     """Build the production signed engine with a reduced mechanics provider."""
     cfg = cfg.validate()
@@ -160,9 +161,18 @@ def build_restored_engine(
     engine_type.configure_persistent_sites(load_persistent_config(selection_path))
     front = _front_config(cfg)
     # The state-resolved production kernel requires the serialized local
-    # strength coordinate.  This is the selected material's existing reference
-    # strength, not a new fit or a constitutive K cap.
-    front.sigma_cap = float(manifest.cleavage.sigc0_Pa)
+    # strength coordinate.  The R2 default is the selected material's existing
+    # reference strength.  R3's exact spatial-contract replay may instead pass
+    # the spatial driver's independently serialized cohesive ceiling (30 GPa in
+    # the qualified 900 K run); keeping that choice explicit prevents the two
+    # different strength sources from being silently conflated.
+    selected_strength = (
+        float(manifest.cleavage.sigc0_Pa)
+        if local_strength_Pa is None else float(local_strength_Pa)
+    )
+    if not math.isfinite(selected_strength) or selected_strength <= 0.0:
+        raise ValueError("local strength must be positive and finite")
+    front.sigma_cap = selected_strength
     engine = engine_type(
         front, manifest.cleavage, manifest.emission,
         float(cfg.G_Pa), float(cfg.poisson), float(cfg.b_m), manifest,
@@ -180,6 +190,11 @@ def build_restored_engine(
     engine._r2_kernel_family_path = str(kernel_path)
     engine._r2_kernel_family_sha256 = observed_kernel_hash
     engine._r2_numerical_options = asdict(cfg)
+    engine._r2_local_strength_source = (
+        "material_manifest.cleavage.sigc0_Pa"
+        if local_strength_Pa is None
+        else "explicit_spatial_driver_cohesive_ceiling"
+    )
     return engine
 
 
@@ -219,6 +234,10 @@ def runtime_receipt(engine: Any, *, stage: str) -> dict[str, Any]:
         "source_lifecycle": "persistent_reusable",
         "kinetics": "reversible_signed",
         "mechanics_provider": "prescribed_K_reduced_provider",
+        "local_strength": {
+            "value_Pa": float(engine.f.sigma_cap),
+            "source": engine._r2_local_strength_source,
+        },
         "engine_class": f"{type(engine).__module__}.{type(engine).__qualname__}",
         "state_class": f"{type(state).__module__}.{type(state).__qualname__}",
         "material": {
