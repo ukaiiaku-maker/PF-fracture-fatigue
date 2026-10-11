@@ -1,6 +1,6 @@
 {
   "schema": "fracture-finalization-tasks/1",
-  "updated_at": "2026-10-11T18:30:00-07:00",
+  "updated_at": "2026-10-11T19:15:00-07:00",
   "allowed_status": [
     "running",
     "repairing",
@@ -34,15 +34,15 @@
       ],
       "status": "repairing",
       "owner": "integrator",
-      "current_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/run_current_cavity_post_ramp_pair.py --out integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_run4",
+      "current_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/diagnose_current_cavity_transport_suffix.py --out integration_evidence/final_fracture_campaign/cavity_picard_diagnostic_run1",
       "inputs": [
         "review_packet/current_science_pilots_6abbf10/v11_migration_pair.json"
       ],
-      "checkpoint": "historical paired 5.9 s ramp endpoint",
+      "checkpoint": "accepted paired 5.900000078124817 s state after 78.125 ns common exposure",
       "evidence_paths": [
         "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_run2"
       ],
-      "next_action": "commit the validated reconstruction convergence repair and rerun the unchanged paired dwell",
+      "next_action": "capture the post-prefix Picard residual/active-set diagnostics and repair the transport iteration without changing the 10 ns floor",
       "completion_test": "unchanged 10 us paired dwell accepts exposure and interaction-relevant matched pair evolves with qualified recovery"
     },
     {

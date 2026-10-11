@@ -1651,7 +1651,42 @@ def solve_transport_interval(
                 and capture_active_set_mismatch_count == 0):
             break
     else:
-        raise RuntimeError("vacancy transport Picard iteration did not converge")
+        error = RuntimeError("vacancy transport Picard iteration did not converge")
+        error.diagnostic = {
+            "schema": "vacancy-transport-picard-nonconvergence/1",
+            "duration_s": float(dt),
+            "transport_time_start_s": float(previous.transport_time_s),
+            "transport_time_end_attempted_s": float(previous.transport_time_s) + float(dt),
+            "nonlinear_iterations": int(maximum_picard_iterations),
+            "nonlinear_relative_residual": float(picard_residual),
+            "relative_tolerance": float(relative_tolerance),
+            "capture_active_set_mismatch_count": int(capture_active_set_mismatch_count),
+            "concentration_input_min": float(np.min(c0)),
+            "concentration_input_max": float(np.max(c0)),
+            "last_nonlinear_iterate_min": float(np.min(c)),
+            "last_nonlinear_iterate_max": float(np.max(c)),
+            "last_linear_candidate_min": float(np.min(candidate)),
+            "last_linear_candidate_max": float(np.max(candidate)),
+            "last_candidate_iterate_inf_delta": float(
+                np.linalg.norm(candidate-c, ord=np.inf)
+            ),
+            "positivity_line_search_steps": int(positivity_line_search_steps),
+            "positivity_line_search_min_factor": float(
+                positivity_line_search_min_factor
+            ),
+            "conservative_flux_correction_count": int(
+                len(conservative_flux_corrections)
+            ),
+            "last_conservative_flux_correction": (
+                None if not conservative_flux_corrections
+                else conservative_flux_corrections[-1]
+            ),
+            "parameter_row_id": row.row_id,
+            "parameter_row_fingerprint": row.fingerprint,
+            "surface_registry_fingerprint": registry.fingerprint,
+            "transport_cell_count": int(len(candidate)),
+        }
+        raise error
     if failure_injector is not None:
         failure_injector("transport_solve", previous)
 
