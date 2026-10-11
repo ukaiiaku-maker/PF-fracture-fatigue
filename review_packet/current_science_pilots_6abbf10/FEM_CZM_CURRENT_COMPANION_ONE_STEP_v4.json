@@ -1,0 +1,71 @@
+{
+  "schema": "current-pf-full-order-fem-czm-companion-one-step/1",
+  "qualification": "current-input companion; not historical e239710 reconstruction",
+  "main_source_commit": "d1d15bfe421cf0dcfc0249388969360a6826966d",
+  "companion_commit": "fa24f7bac3786a0114b185094e935c0445ac520b",
+  "current_dependency": {
+    "sha256": "d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3",
+    "mechanical_configuration_fingerprint": "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5"
+  },
+  "historical_guard": {
+    "sha256": "a85b57ad9eee8331ef34ea222760ce7d4064f48ddef668f1e28a666d14946f3a",
+    "mechanical_configuration_fingerprint": "e23971019aca58e8e3319a207153c4faa3ead76417e1d537ec00c2ed2986e815",
+    "preserved": true
+  },
+  "result": {
+    "status": "COMPLETED_ONE_ACCEPTED_STEP_FINITE_NO_EVENT",
+    "temperature_K": 1000.0,
+    "accepted_steps": 1,
+    "mesh_nodes": 2020,
+    "tip_mesh_size_m": 1.5793688983536362e-6,
+    "opening_m": 2e-7,
+    "dt_s": 8.4,
+    "reaction_N": 2650.77767401693,
+    "J_J_per_m2": 0.08817064309316368,
+    "KJ_MPa_sqrt_m": 0.19805358111919483,
+    "tip_stress_Pa": 78993204.11377649,
+    "backstress_Pa": 69465860.10814399,
+    "cleavage_progress_B": 8.420474069205354e-101,
+    "crack_tip_initial_m": 0.0005,
+    "crack_tip_final_m": 0.0005,
+    "crack_advances": 0,
+    "cohesive_advance_log_entries": 0
+  },
+  "state": {
+    "bulk_state_points": 3900,
+    "bulk_state_update_calls": 2,
+    "mobile_density_min_m2": 6632113902.400391,
+    "mobile_density_max_m2": 4999994665664.921,
+    "retained_density_min_m2": 0.0,
+    "retained_density_max_m2": 4993367886097.6,
+    "bulk_density_transport": false,
+    "classification": "full-field local constitutive evolution without spatial density transport"
+  },
+  "orientation_metadata": {
+    "authoritative_theta_deg": 0.0,
+    "legacy_diagnostic_theta_deg": 45.0,
+    "normalization_metadata_only": true,
+    "physics_or_mesh_modified": false,
+    "hazard_or_event_geometry_modified": false
+  },
+  "raw_output": {
+    "relative_path": "integration_evidence/current_science_pilots_6abbf10/fem_czm_current_companion_one_step",
+    "size_MiB_approx": 2.8,
+    "file_count": 39,
+    "selected_sha256": {
+      "current_pf_companion_contract_v1.json": "61496bd97ac7cd34107d3eddc2ecfa238666ad70ec4b01c83884ffefd46c159e",
+      "steps_1000K.csv": "9069e6b3b1520e10f9f2aee4cde1e88da84ba6ccdbfe5786b8a813a6163d1659",
+      "bulk_state_v9_11_final.npz": "6b632cc148883472aac95a83c4b2020d96a5f8fbdefd71d63dd19a8e55373862",
+      "summary.json": "2c42eb7f6d96674f57fa57f2789d07f271b5780da6b78e0988ebd5c42f4c5f6d"
+    }
+  },
+  "backup": {
+    "destination_device": "/dev/disk3s5",
+    "destination_root": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf",
+    "initial_manifest_verified": true,
+    "postrun_files_verified": 39,
+    "postrun_manifest_sha256": "74ed2f6eed4fa050c4780f8dd2263feb48aad4d002fdebbb7207ddeda23dbd9c",
+    "postrun_completion_sha256": "c206371481aa9fe61606b897f764d692cf1e68e3dd23b23b5542213b3d542bbb",
+    "data_deleted": false
+  }
+}

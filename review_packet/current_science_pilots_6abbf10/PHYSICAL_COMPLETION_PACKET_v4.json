@@ -29,7 +29,21 @@
     "current_mechanical_configuration_fingerprint": "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5",
     "historical_mechanical_configuration_fingerprint": "e23971019aca58e8e3319a207153c4faa3ead76417e1d537ec00c2ed2986e815",
     "focused_tests_passed": 10,
-    "execution_status": "GATED_PENDING_DURABLE_INDEPENDENT_BACKUP_DESTINATION"
+    "execution_status": "COMPLETED_ONE_ACCEPTED_STEP_FINITE_NO_EVENT",
+    "temperature_K": 1000.0,
+    "accepted_steps": 1,
+    "mesh_nodes": 2020,
+    "opening_m": 2e-7,
+    "reaction_N": 2650.77767401693,
+    "J_J_per_m2": 0.08817064309316368,
+    "KJ_MPa_sqrt_m": 0.19805358111919483,
+    "crack_tip_m": 0.0005,
+    "crack_advances": 0,
+    "cleavage_progress_B": 8.420474069205354e-101,
+    "bulk_state_points": 3900,
+    "bulk_state_update_calls": 2,
+    "bulk_density_transport": false,
+    "compact_evidence": "FEM_CZM_CURRENT_COMPANION_ONE_STEP_v4.json"
   },
   "verification": {
     "main_tests_passed": 787,
@@ -41,6 +55,13 @@
     "estimated_payload_MiB": 190,
     "same_device_refused": true,
     "ephemeral_private_tmp_rejected_as_durable": true,
-    "script": "scripts/create_physical_completion_backup.sh"
+    "script": "scripts/create_physical_completion_backup.sh",
+    "status": "COMPLETE_AND_SHA256_VERIFIED",
+    "destination_device": "/dev/disk3s5",
+    "destination_root": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf",
+    "initial_completion_sha256": "c5d6443151575aa16ffa089c83b18ad873dc02c7c0ebc8f7ca2d3b0092edb582",
+    "postrun_fem_files_verified": 39,
+    "postrun_manifest_sha256": "74ed2f6eed4fa050c4780f8dd2263feb48aad4d002fdebbb7207ddeda23dbd9c",
+    "postrun_completion_sha256": "c206371481aa9fe61606b897f764d692cf1e68e3dd23b23b5542213b3d542bbb"
   }
 }

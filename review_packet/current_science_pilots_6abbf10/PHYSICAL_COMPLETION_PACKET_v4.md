@@ -69,7 +69,7 @@ a practical bounded window—not a general coalescence law.
 Evidence: `CAVITY_LIGAMENT_QUALIFICATION_v4.json` and the hashed raw operator
 record under `integration_evidence/current_science_pilots_6abbf10/cavity_ligament/`.
 
-## FEM/CZM companion and execution gate
+## FEM/CZM companion execution
 
 The historical checkout remains clean at `293491157063...`; its `a85b57...`
 guard is unchanged. A separate companion worktree/branch,
@@ -79,30 +79,28 @@ adaptive-CZM builder to the available immutable `d41b08...` family and
 recreate historical `e239710...`. Its focused suite passes 10 tests; the main
 repository passes 787 tests.
 
-The new one-step trajectory has not been launched because no durable,
-independently mounted writable backup destination is currently authorized.
-`/private/tmp` is on a separate internal device with ample space but is
-ephemeral, so it is not accepted as the second copy. The prepared backup is
-about 190 MiB; the gate script requires at least 512 MiB, refuses a same-device
-or nonempty destination, copies source/configuration/manifests/checkpoints and
-irreplaceable outputs, and verifies a SHA-256 manifest. No data are deleted.
+A durable independent backup was completed first on `/dev/disk3s5`. Its source
+archive is pinned to main commit `d1d15bf` and companion commit `fa24f7b`; every
+copied file passed its SHA-256 manifest. No data were deleted.
 
-Once a durable destination parent is supplied, run:
+The gated full-order companion then completed one accepted step at 1000 K on a
+2,020-node graded mesh. At 0.2 µm prescribed opening it gives reaction
+2650.777674 N, native J = 0.0881706431 J/m², and native
+K_J = 0.198053581 MPa√m. The crack remains at 0.500 mm with zero advance and an
+empty cohesive advance log. The cleavage progress over the accepted step is
+`8.42047e-101`, so this is a finite supported no-event result, not a forced
+event or evidence of crack resistance at a developed load.
 
-```bash
-/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/scripts/create_physical_completion_backup.sh \
-  /durable/independent/parent/fracture-completion-20261010
-```
+The run saved the solver step, crack/front coordinates, native traction and
+J/K diagnostics, cohesive-element state, MPZ state, and full 3,900-point mobile
+and retained bulk-density arrays. The local full-field constitutive state was
+updated twice; spatial bulk-density transport is explicitly absent. The
+authoritative theta-zero normalization records the requested 0° orientation;
+some inherited detailed diagnostic summaries retain a legacy 45° label and
+must not override that contract.
 
-Only after that succeeds, run the bounded full-order companion:
-
-```bash
-env \
-  OUT=/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/current_science_pilots_6abbf10/fem_czm_current_companion_one_step \
-  /Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion/run_current_pf_companion_one_step.sh
-```
-
-This is a one-accepted-step full-order calculation. It may legitimately end
-with no fracture event; actual solver steps and fields, not a forced event,
-are the qualification target. No push was attempted because no explicit
-remote/destination was provided.
+The complete 2.8 MiB output was copied after the run to the same independent
+backup and all 39 files again passed SHA-256 verification. Compact evidence is
+in `FEM_CZM_CURRENT_COMPANION_ONE_STEP_v4.md` and `.json`; raw output remains
+under `integration_evidence/current_science_pilots_6abbf10/`. No push was
+attempted because no explicit remote/destination was provided.
