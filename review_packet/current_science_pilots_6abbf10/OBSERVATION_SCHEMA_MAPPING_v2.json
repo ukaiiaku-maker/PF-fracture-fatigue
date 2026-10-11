@@ -1,0 +1,15 @@
+{
+  "KJ_Pa_sqrtm": "K_J_Pa_sqrt_m: J-derived equivalent stress intensity; never relabeled K_I",
+  "K_I_Pa_sqrt_m": "absent/NaN in these PF pilot observations; no modal K_I claim",
+  "N_em": "active_mobile_plus_retained_count; current active process-zone state, not cumulative emission",
+  "committed_K_policy": "absent: committed geometry has no invented post-event K/J; next native solve is a distinct reequilibrated row",
+  "geometry_authority": "stochastic_avalanche_geometry_events.json joined chronologically to committed native observation rows",
+  "mpz_mobile_count": "active_mobile_count",
+  "mpz_retained_count": "active_retained_count",
+  "schema": "current-science-pilot-export-mapping/2",
+  "sigma_back_Pa": "persistent source-law Taylor backstress (mean unsigned mobile-plus-retained density channel)",
+  "sigma_tip_Pa": "local crack-tip opening stress after shielding/blunting, not source backstress",
+  "stage_authority": "fracture_observations_online.jsonl; no steps-based event inference",
+  "state_join": "steps CSV is joined only through native observation source_row",
+  "validity_policy": "unknown where the online observer is finite but no independent contour-validity certificate was emitted"
+}
