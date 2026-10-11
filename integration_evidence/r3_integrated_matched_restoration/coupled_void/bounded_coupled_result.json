@@ -1,0 +1,3320 @@
+{
+  "closure_dataset_sha256": "6c627aed0c221fe79d78c88b1bb110968f2f8fa47520f695e2df473e6ffbb5b9",
+  "external_inputs": {
+    "initial_time_s": 1.89999,
+    "material": "DBTT",
+    "opening_m": 4e-07,
+    "site_population": "TWO_SITES_STOP_BEFORE_SECOND_CAVITY_PUBLICATION",
+    "temperature_K": 1200.0,
+    "terminal_time_s": 2.59999
+  },
+  "fracture_backend_execution": {
+    "accepted_fracture_events": 0,
+    "full_FEM_calls": 0,
+    "native_backend_calls": 4662,
+    "no_void_accepted_intervals": 7,
+    "outcome": "NO_FRACTURE_EVENT_AT_MEASURED_FIXED_LOAD",
+    "runtime_s": 9.279726832988672,
+    "void_enabled_accepted_intervals": 367
+  },
+  "matched_terminal_comparison": {
+    "far_field_void_delta_G_J_per_m2": 0.0,
+    "loop_count_relative_error": 8.347641380819139e-05,
+    "oneD_growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+    "oneD_loop_count": 150.0857518289694,
+    "oneD_radius_m": 4.220640863151855e-08,
+    "oneD_third_hit_bracket_s": [
+      1.9999900000000002,
+      2.0999899999999996
+    ],
+    "radius_relative_error": 0.0022434698960797543,
+    "residual_classification_match": true,
+    "third_hit_macro_interval_match": false,
+    "twoD_growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+    "twoD_loop_count": 150.0732242544,
+    "twoD_radius_m": 4.2301310347848674e-08,
+    "twoD_third_hit_bracket_s": [
+      2.09999,
+      2.19999
+    ]
+  },
+  "outcomes": {
+    "no_void": {
+      "accumulated_plastic_exposure": 0.00010051528645792625,
+      "direct_birth_first_passage_s": {
+        "site-1": null,
+        "site-2": null
+      },
+      "events": [],
+      "fracture_adapter_intervals": 7,
+      "last_mechanics_binding": {
+        "native_K_scale": 0.99439088298629,
+        "source_identity": "BOUNDED_ALIGNED_HISTORY:6c627aed0c221fe79d78c88b1bb110968f2f8fa47520f695e2df473e6ffbb5b9"
+      },
+      "native_backend_calls": 7,
+      "reporting_cadence_s": 0.1,
+      "terminal": {
+        "direct_action": 0.0,
+        "direct_hits": 0,
+        "fracture_event_count": 0,
+        "fracture_extension_m": 0.0,
+        "growth_representation": null,
+        "loop_count": 0.0,
+        "phase": "HEALED_SITE",
+        "radius_m": null,
+        "site2_direct_action": 0.0,
+        "site2_direct_hits": 0,
+        "site2_loop_count": 0.0,
+        "site2_phase": "HEALED_SITE",
+        "site2_radius_m": null,
+        "time_s": 2.59999
+      },
+      "trace": [
+        {
+          "direct_action": 0.0,
+          "direct_hits": 0,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "HEALED_SITE",
+          "radius_m": null,
+          "site2_direct_action": 0.0,
+          "site2_direct_hits": 0,
+          "site2_loop_count": 0.0,
+          "site2_phase": "HEALED_SITE",
+          "site2_radius_m": null,
+          "time_s": 1.9999900000000002
+        },
+        {
+          "direct_action": 0.0,
+          "direct_hits": 0,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "HEALED_SITE",
+          "radius_m": null,
+          "site2_direct_action": 0.0,
+          "site2_direct_hits": 0,
+          "site2_loop_count": 0.0,
+          "site2_phase": "HEALED_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.09999
+        },
+        {
+          "direct_action": 0.0,
+          "direct_hits": 0,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "HEALED_SITE",
+          "radius_m": null,
+          "site2_direct_action": 0.0,
+          "site2_direct_hits": 0,
+          "site2_loop_count": 0.0,
+          "site2_phase": "HEALED_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.19999
+        },
+        {
+          "direct_action": 0.0,
+          "direct_hits": 0,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "HEALED_SITE",
+          "radius_m": null,
+          "site2_direct_action": 0.0,
+          "site2_direct_hits": 0,
+          "site2_loop_count": 0.0,
+          "site2_phase": "HEALED_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.29999
+        },
+        {
+          "direct_action": 0.0,
+          "direct_hits": 0,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "HEALED_SITE",
+          "radius_m": null,
+          "site2_direct_action": 0.0,
+          "site2_direct_hits": 0,
+          "site2_loop_count": 0.0,
+          "site2_phase": "HEALED_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.3999900000000003
+        },
+        {
+          "direct_action": 0.0,
+          "direct_hits": 0,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "HEALED_SITE",
+          "radius_m": null,
+          "site2_direct_action": 0.0,
+          "site2_direct_hits": 0,
+          "site2_loop_count": 0.0,
+          "site2_phase": "HEALED_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.4999900000000004
+        },
+        {
+          "direct_action": 0.0,
+          "direct_hits": 0,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "HEALED_SITE",
+          "radius_m": null,
+          "site2_direct_action": 0.0,
+          "site2_direct_hits": 0,
+          "site2_loop_count": 0.0,
+          "site2_phase": "HEALED_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.59999
+        }
+      ]
+    },
+    "void_enabled": {
+      "accumulated_plastic_exposure": 0.00010051528645792647,
+      "direct_birth_first_passage_s": {
+        "site-1": 2.0283088612224,
+        "site-2": 1.9174682213865177
+      },
+      "events": [
+        {
+          "event": "DIRECT_BIRTH_HIT",
+          "physical_time_s": 1.9174682213865177,
+          "site_id": "site-2"
+        },
+        {
+          "event": "DIRECT_BIRTH_HIT",
+          "physical_time_s": 2.0283088612224,
+          "site_id": "site-1"
+        },
+        {
+          "event": "EMBRYO",
+          "physical_time_s": 2.0283088612224,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.00027944733356893153,
+          "effective_loop_count": 0.00027944733356893153,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283088612526265,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "event": "HEALING_PROHIBITED_RESIDUAL_DEFECT",
+          "physical_time_s": 2.0283088612526265,
+          "retained_emitted_loops": 0.00027944733356893153,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.04679073211370989,
+          "effective_loop_count": 0.04679073211370989,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308866314279,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.04725617508163243,
+          "effective_loop_count": 0.04725617508163243,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308871377511,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.04772624640799822,
+          "effective_loop_count": 0.04772624640799822,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308876442339,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.048200992084506566,
+          "effective_loop_count": 0.048200992084506566,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830888150878,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.04868045855914155,
+          "effective_loop_count": 0.04868045855914155,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283088865768515,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.049164692740742255,
+          "effective_loop_count": 0.049164692740742255,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830889164657,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0496537420035324,
+          "effective_loop_count": 0.0496537420035324,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283088967179532,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.050147654191722846,
+          "effective_loop_count": 0.050147654191722846,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308901791019,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05064647762411717,
+          "effective_loop_count": 0.05064647762411717,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089068657856,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05115026109891707,
+          "effective_loop_count": 0.05115026109891707,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089119422706,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.051659053898291896,
+          "effective_loop_count": 0.051659053898291896,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308917020492,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05217290579334066,
+          "effective_loop_count": 0.05217290579334066,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308922100469,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.052691867048779595,
+          "effective_loop_count": 0.052691867048779595,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089271822194,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.053215988427913974,
+          "effective_loop_count": 0.053215988427913974,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089322657633,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05374532119749609,
+          "effective_loop_count": 0.05374532119749609,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308937351119,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05427991713274383,
+          "effective_loop_count": 0.05427991713274383,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089424383056,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.054819828522370107,
+          "effective_loop_count": 0.054819828522370107,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089475273433,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05536510817361784,
+          "effective_loop_count": 0.05536510817361784,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089526182514,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05591580941739582,
+          "effective_loop_count": 0.05591580941739582,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089577110505,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05647198611346338,
+          "effective_loop_count": 0.05647198611346338,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089628057605,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0570336926556243,
+          "effective_loop_count": 0.0570336926556243,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089679024013,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.057600983977044606,
+          "effective_loop_count": 0.057600983977044606,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089730009944,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05817391555553808,
+          "effective_loop_count": 0.05817391555553808,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089781015606,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05875254341894909,
+          "effective_loop_count": 0.05875254341894909,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028308983204121,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.059336924150596326,
+          "effective_loop_count": 0.059336924150596326,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089883086967,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.05992711489476932,
+          "effective_loop_count": 0.05992711489476932,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089934153096,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06052317336219404,
+          "effective_loop_count": 0.06052317336219404,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283089985239817,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0611251578357086,
+          "effective_loop_count": 0.0611251578357086,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309003634735,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06173312717588009,
+          "effective_loop_count": 0.06173312717588009,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309008747592,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06234714082664028,
+          "effective_loop_count": 0.06234714082664028,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090138625757,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06296725882114984,
+          "effective_loop_count": 0.06296725882114984,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090189797086,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06359354178752152,
+          "effective_loop_count": 0.06359354178752152,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309024099014,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06422605095476142,
+          "effective_loop_count": 0.06422605095476142,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090292205155,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06486484815859073,
+          "effective_loop_count": 0.06486484815859073,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090343442365,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06550999584754047,
+          "effective_loop_count": 0.06550999584754047,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090394702015,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06616155708893134,
+          "effective_loop_count": 0.06616155708893134,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090445984344,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0668195955749824,
+          "effective_loop_count": 0.0668195955749824,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830904972896,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06748417562895748,
+          "effective_loop_count": 0.06748417562895748,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090548618037,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0681553622114115,
+          "effective_loop_count": 0.0681553622114115,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090599969897,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06883322092647637,
+          "effective_loop_count": 0.06883322092647637,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309065134544,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.06951781802817036,
+          "effective_loop_count": 0.06951781802817036,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090702744926,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07020922042678057,
+          "effective_loop_count": 0.07020922042678057,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090754168613,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07090749569540256,
+          "effective_loop_count": 0.07090749569540256,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090805616766,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07161271207639386,
+          "effective_loop_count": 0.07161271207639386,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309085708965,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07232493848802912,
+          "effective_loop_count": 0.07232493848802912,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090908587535,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07304424453107794,
+          "effective_loop_count": 0.07304424453107794,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283090960110695,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07377070049559586,
+          "effective_loop_count": 0.07377070049559586,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091011659407,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07450437736765636,
+          "effective_loop_count": 0.07450437736765636,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309106323395,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07524534683624884,
+          "effective_loop_count": 0.07524534683624884,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091114834613,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07599368130013007,
+          "effective_loop_count": 0.07599368130013007,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091166461675,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07674945387487453,
+          "effective_loop_count": 0.07674945387487453,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091218115428,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0775127383998786,
+          "effective_loop_count": 0.0775127383998786,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091269796167,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07828360944550994,
+          "effective_loop_count": 0.07828360944550994,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091321504187,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.07906214232025643,
+          "effective_loop_count": 0.07906214232025643,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309137323979,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0798484130780559,
+          "effective_loop_count": 0.0798484130780559,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091425003277,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08064249852549876,
+          "effective_loop_count": 0.08064249852549876,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309147679496,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.081444476229378,
+          "effective_loop_count": 0.081444476229378,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091528615147,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08225442452405529,
+          "effective_loop_count": 0.08225442452405529,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091580464157,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0830724225189865,
+          "effective_loop_count": 0.0830724225189865,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091632342307,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08389855010645597,
+          "effective_loop_count": 0.08389855010645597,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091684249923,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08473288796911671,
+          "effective_loop_count": 0.08473288796911671,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309173618733,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08557551758786142,
+          "effective_loop_count": 0.08557551758786142,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091788154857,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08642652124960737,
+          "effective_loop_count": 0.08642652124960737,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309184015284,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08728598205522609,
+          "effective_loop_count": 0.08728598205522609,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309189218162,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08815398392752183,
+          "effective_loop_count": 0.08815398392752183,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283091944241542,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.08903061161926473,
+          "effective_loop_count": 0.08903061161926473,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309199633295,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.089915950721422,
+          "effective_loop_count": 0.089915950721422,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092048456197,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09081008767127052,
+          "effective_loop_count": 0.09081008767127052,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092100611637,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09171310976078306,
+          "effective_loop_count": 0.09171310976078306,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092152799633,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0926251051449718,
+          "effective_loop_count": 0.0926251051449718,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309220502055,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09354616285029671,
+          "effective_loop_count": 0.09354616285029671,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092257274755,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09447637278331467,
+          "effective_loop_count": 0.09447637278331467,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092309562627,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.0954158257391775,
+          "effective_loop_count": 0.0954158257391775,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309236188454,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09636461341045521,
+          "effective_loop_count": 0.09636461341045521,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309241424088,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09732282839583917,
+          "effective_loop_count": 0.09732282839583917,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092466632033,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09829056420903104,
+          "effective_loop_count": 0.09829056420903104,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092519058394,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.09926791528769208,
+          "effective_loop_count": 0.09926791528769208,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092571520362,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1002549770025487,
+          "effective_loop_count": 0.1002549770025487,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309262401834,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10125184566642265,
+          "effective_loop_count": 0.10125184566642265,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092676552736,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1022586185434875,
+          "effective_loop_count": 0.1022586185434875,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092729123964,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10327539385858842,
+          "effective_loop_count": 0.10327539385858842,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092781732437,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10430227080663634,
+          "effective_loop_count": 0.10430227080663634,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283092834378587,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10533934956198987,
+          "effective_loop_count": 0.10533934956198987,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309288706284,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10638673128818432,
+          "effective_loop_count": 0.10638673128818432,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309293978563,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10744451814746991,
+          "effective_loop_count": 0.10744451814746991,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830929925474,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10851281331055773,
+          "effective_loop_count": 0.10851281331055773,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309304534859,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.10959172096657799,
+          "effective_loop_count": 0.10959172096657799,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093098189657,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1106813463328784,
+          "effective_loop_count": 0.1106813463328784,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309315107106,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.11178179566515034,
+          "effective_loop_count": 0.11178179566515034,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309320399326,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.11289317626749362,
+          "effective_loop_count": 0.11289317626749362,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093256956723,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.11401559650270965,
+          "effective_loop_count": 0.11401559650270965,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093309961933,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1151491658024888,
+          "effective_loop_count": 0.1151491658024888,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093363009366,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.11629399467797974,
+          "effective_loop_count": 0.11629399467797974,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309341609951,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.11745019473018914,
+          "effective_loop_count": 0.11745019473018914,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093469232867,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.11861787866062912,
+          "effective_loop_count": 0.11861787866062912,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309352240993,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1197971602819985,
+          "effective_loop_count": 0.1197971602819985,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093575631206,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.12098815452908251,
+          "effective_loop_count": 0.12098815452908251,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093628897215,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.12219097746952201,
+          "effective_loop_count": 0.12219097746952201,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093682208473,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.12340574631493872,
+          "effective_loop_count": 0.12340574631493872,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309373556551,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.12463257943200468,
+          "effective_loop_count": 0.12463257943200468,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093788968865,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.12587159635366518,
+          "effective_loop_count": 0.12587159635366518,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093842419073,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.12712291779044094,
+          "effective_loop_count": 0.12712291779044094,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309389591669,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.12838666564191925,
+          "effective_loop_count": 0.12838666564191925,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283093949462265,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.129662963008208,
+          "effective_loop_count": 0.129662963008208,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309400305637,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.13095193420161166,
+          "effective_loop_count": 0.13095193420161166,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309405669957,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.13225370475841203,
+          "effective_loop_count": 0.13225370475841203,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094110392446,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1335684014506544,
+          "effective_loop_count": 0.1335684014506544,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309416413559,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.13489615229817353,
+          "effective_loop_count": 0.13489615229817353,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094217929594,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.13623708658065148,
+          "effective_loop_count": 0.13623708658065148,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309427177506,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1375913348497857,
+          "effective_loop_count": 0.1375913348497857,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830943256726,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1389590289416045,
+          "effective_loop_count": 0.1389590289416045,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094379622835,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1403403019888554,
+          "effective_loop_count": 0.1403403019888554,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094433626396,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1417352884336136,
+          "effective_loop_count": 0.1417352884336136,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309448768392,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.14314412403976995,
+          "effective_loop_count": 0.14314412403976995,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094541796047,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.14456694590594132,
+          "effective_loop_count": 0.14456694590594132,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309459596344,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.14600389247823564,
+          "effective_loop_count": 0.14600389247823564,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094650186753,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.14745510356326896,
+          "effective_loop_count": 0.14745510356326896,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094704466667,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.14892072034128212,
+          "effective_loop_count": 0.14892072034128212,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094758803863,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.15040088537937635,
+          "effective_loop_count": 0.15040088537937635,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309481319903,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.151895742644804,
+          "effective_loop_count": 0.151895742644804,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094867652878,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.15340543751845637,
+          "effective_loop_count": 0.15340543751845637,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283094922166107,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1549301168084618,
+          "effective_loop_count": 0.1549301168084618,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309497673945,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1564699287638618,
+          "effective_loop_count": 0.1564699287638618,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309503137363,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.158025023088479,
+          "effective_loop_count": 0.158025023088479,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095086069394,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1595955509547835,
+          "effective_loop_count": 0.1595955509547835,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095140827494,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.16118166501806463,
+          "effective_loop_count": 0.16118166501806463,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095195648695,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.16278351943057778,
+          "effective_loop_count": 0.16278351943057778,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095250533774,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.16440126985584413,
+          "effective_loop_count": 0.16440126985584413,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095305483516,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.16603507348314928,
+          "effective_loop_count": 0.16603507348314928,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095360498717,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.16768508904209867,
+          "effective_loop_count": 0.16768508904209867,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095415580186,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1693514768173099,
+          "effective_loop_count": 0.1693514768173099,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095470728743,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1710343986632452,
+          "effective_loop_count": 0.1710343986632452,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095525945223,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.17273401801918986,
+          "effective_loop_count": 0.17273401801918986,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309558123047,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.17445049992433503,
+          "effective_loop_count": 0.17445049992433503,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309563658534,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.17618401103297998,
+          "effective_loop_count": 0.17618401103297998,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095692010704,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.17793471962990637,
+          "effective_loop_count": 0.17793471962990637,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095747507445,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.17970279564585745,
+          "effective_loop_count": 0.17970279564585745,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309580307646,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.18148841067311317,
+          "effective_loop_count": 0.18148841067311317,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309585871866,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.18329173798130327,
+          "effective_loop_count": 0.18329173798130327,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309591443496,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.18511295253324178,
+          "effective_loop_count": 0.18511295253324178,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283095970226306,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.18695223100095681,
+          "effective_loop_count": 0.18695223100095681,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096026093648,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.188809751781843,
+          "effective_loop_count": 0.188809751781843,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096082037946,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.19068569501493826,
+          "effective_loop_count": 0.19068569501493826,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096138060186,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1925802425973071,
+          "effective_loop_count": 0.1925802425973071,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309619416136,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.1944935782006727,
+          "effective_loop_count": 0.1944935782006727,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096250342476,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.19642588728804178,
+          "effective_loop_count": 0.19642588728804178,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096306604564,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.19837735713057825,
+          "effective_loop_count": 0.19837735713057825,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096362948667,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.20034817682451944,
+          "effective_loop_count": 0.20034817682451944,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309641937584,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.20233853730830553,
+          "effective_loop_count": 0.20233853730830553,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096475887157,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2043486313798173,
+          "effective_loop_count": 0.2043486313798173,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309653248371,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.20637865371373465,
+          "effective_loop_count": 0.20637865371373465,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309658916661,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.20842880087910132,
+          "effective_loop_count": 0.20842880087910132,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096645936975,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.21049927135688407,
+          "effective_loop_count": 0.21049927135688407,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096702795955,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.21259026555787486,
+          "effective_loop_count": 0.21259026555787486,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096759744708,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.21470198584049172,
+          "effective_loop_count": 0.21470198584049172,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096816784414,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.21683463652897927,
+          "effective_loop_count": 0.21683463652897927,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283096873916273,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.21898842393148854,
+          "effective_loop_count": 0.21898842393148854,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830969311415,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2211635563585297,
+          "effective_loop_count": 0.2211635563585297,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309698846134,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2233602441413325,
+          "effective_loop_count": 0.2233602441413325,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097045877043,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2255786996505904,
+          "effective_loop_count": 0.2255786996505904,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097103389895,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.22781913731510173,
+          "effective_loop_count": 0.22781913731510173,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309716100119,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.23008177364072324,
+          "effective_loop_count": 0.23008177364072324,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097218712247,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.23236682722936663,
+          "effective_loop_count": 0.23236682722936663,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309727652441,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2346745187982009,
+          "effective_loop_count": 0.2346745187982009,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097334439044,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2370050711988867,
+          "effective_loop_count": 0.2370050711988867,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097392457536,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2393587094370382,
+          "effective_loop_count": 0.2393587094370382,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097450581296,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.24173566069180552,
+          "effective_loop_count": 0.24173566069180552,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097508811756,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.24413615433554625,
+          "effective_loop_count": 0.24413615433554625,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097567150374,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.24656042195365657,
+          "effective_loop_count": 0.24656042195365657,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309762559864,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2490086973645056,
+          "effective_loop_count": 0.2490086973645056,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309768415805,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2514812166395508,
+          "effective_loop_count": 0.2514812166395508,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097742830143,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.25397821812357435,
+          "effective_loop_count": 0.25397821812357435,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097801616483,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.25649994245493346,
+          "effective_loop_count": 0.25649994245493346,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309786051865,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.25904663258613425,
+          "effective_loop_count": 0.25904663258613425,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097919538267,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2616185338043131,
+          "effective_loop_count": 0.2616185338043131,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283097978676965,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2642158937520094,
+          "effective_loop_count": 0.2642158937520094,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283098037936425,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2668389624479701,
+          "effective_loop_count": 0.2668389624479701,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309809731834,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2694879923080613,
+          "effective_loop_count": 0.2694879923080613,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309815682445,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2721632381663639,
+          "effective_loop_count": 0.2721632381663639,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283098216456503,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.27486495729632665,
+          "effective_loop_count": 0.27486495729632665,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830982762163,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.27759340943198296,
+          "effective_loop_count": 0.27759340943198296,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283098336105665,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.28034885678938437,
+          "effective_loop_count": 0.28034885678938437,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283098396126453,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2831315640880874,
+          "effective_loop_count": 0.2831315640880874,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309845628056,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.285941798572626,
+          "effective_loop_count": 0.285941798572626,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309851656991,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2887798300343185,
+          "effective_loop_count": 0.2887798300343185,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309857699646,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2916459308328889,
+          "effective_loop_count": 0.2916459308328889,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283098637562214,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.2945403759184231,
+          "effective_loop_count": 0.2945403759184231,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830986982692,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.29746344285317505,
+          "effective_loop_count": 0.29746344285317505,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309875911949,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.30041541183367215,
+          "effective_loop_count": 0.30041541183367215,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283098820115195,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3033965657127169,
+          "effective_loop_count": 0.3033965657127169,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309888125847,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.30640719002151684,
+          "effective_loop_count": 0.30640719002151684,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283098942551496,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3094475729919104,
+          "effective_loop_count": 0.3094475729919104,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099003996514,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.312518005578557,
+          "effective_loop_count": 0.312518005578557,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02830990655958,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.31561878148127676,
+          "effective_loop_count": 0.31561878148127676,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099127351667,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.31875019716732567,
+          "effective_loop_count": 0.31875019716732567,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099189266482,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.32191255189380286,
+          "effective_loop_count": 0.32191255189380286,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099251342653,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.32510614772994373,
+          "effective_loop_count": 0.32510614772994373,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309931358264,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3283312895795909,
+          "effective_loop_count": 0.3283312895795909,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309937598894,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3315882852035301,
+          "effective_loop_count": 0.3315882852035301,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309943856412,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3348774452418901,
+          "effective_loop_count": 0.3348774452418901,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099501310775,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3381990832365176,
+          "effective_loop_count": 0.3381990832365176,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028309956423157,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3415535156533096,
+          "effective_loop_count": 0.3415535156533096,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099627329206,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.34494106190451745,
+          "effective_loop_count": 0.34494106190451745,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099690606456,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.34836204437097607,
+          "effective_loop_count": 0.34836204437097607,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099754066143,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.35181678842430486,
+          "effective_loop_count": 0.35181678842430486,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099817711143,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3553056224489737,
+          "effective_loop_count": 0.3553056224489737,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099881544397,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3588288778643758,
+          "effective_loop_count": 0.3588288778643758,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283099945568908,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.36238688914663797,
+          "effective_loop_count": 0.36238688914663797,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283100009787733,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3659799938504307,
+          "effective_loop_count": 0.3659799938504307,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283100074204006,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.36960853263061466,
+          "effective_loop_count": 0.36960853263061466,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283100138820918,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.37327284926360704,
+          "effective_loop_count": 0.37327284926360704,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283100203641733,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.37697329066874374,
+          "effective_loop_count": 0.37697329066874374,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310026866978,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3807102069293009,
+          "effective_loop_count": 0.3807102069293009,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310033390846,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3844839513132854,
+          "effective_loop_count": 0.3844839513132854,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310039936126,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3882948802940831,
+          "effective_loop_count": 0.3882948802940831,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283100465031723,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3921433535706953,
+          "effective_loop_count": 0.3921433535706953,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283100530923486,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.3960297340878043,
+          "effective_loop_count": 0.3960297340878043,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310059704026,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.39995438805527783,
+          "effective_loop_count": 0.39995438805527783,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283100663385842,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.40391768496765224,
+          "effective_loop_count": 0.40391768496765224,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310072996411,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4079199976228409,
+          "effective_loop_count": 0.4079199976228409,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310079677903,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4119617021406654,
+          "effective_loop_count": 0.4119617021406654,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310086383467,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4160431779808391,
+          "effective_loop_count": 0.4160431779808391,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310093113517,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4201648079603899,
+          "effective_loop_count": 0.4201648079603899,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310099868479,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.42432697827056387,
+          "effective_loop_count": 0.42432697827056387,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310106648787,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.42853007849318914,
+          "effective_loop_count": 0.42853007849318914,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101134548853,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4327745016163078,
+          "effective_loop_count": 0.4327745016163078,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101202872302,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4370606440491116,
+          "effective_loop_count": 0.4370606440491116,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101271462876,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.44138890563620947,
+          "effective_loop_count": 0.44138890563620947,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101340325347,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4457596896709859,
+          "effective_loop_count": 0.4457596896709859,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101409464606,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.45017340290819163,
+          "effective_loop_count": 0.45017340290819163,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101478885657,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4546304555754972,
+          "effective_loop_count": 0.4546304555754972,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101548593634,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4591312613841083,
+          "effective_loop_count": 0.4591312613841083,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101618593795,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4636762375382588,
+          "effective_loop_count": 0.4636762375382588,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310168889153,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.46826580474363055,
+          "effective_loop_count": 0.46826580474363055,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310175949237,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4729003872144446,
+          "effective_loop_count": 0.4729003872144446,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101830401966,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4775804126791954,
+          "effective_loop_count": 0.4775804126791954,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101901626135,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4823063123850915,
+          "effective_loop_count": 0.4823063123850915,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283101973170834,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4870785211007984,
+          "effective_loop_count": 0.4870785211007984,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283102045042174,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.4918974771177105,
+          "effective_loop_count": 0.4918974771177105,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310211724643,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.49676362224930415,
+          "effective_loop_count": 0.49676362224930415,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310218979004,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5016774018287009,
+          "effective_loop_count": 0.5016774018287009,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310226267962,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5066392647041624,
+          "effective_loop_count": 0.5066392647041624,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283102335921948,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.511649663232518,
+          "effective_loop_count": 0.511649663232518,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283102409524,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5167090532700556,
+          "effective_loop_count": 0.5167090532700556,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310248349294,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5218178941612237,
+          "effective_loop_count": 0.5218178941612237,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310255783612,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5269766487244141,
+          "effective_loop_count": 0.5269766487244141,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283102632561105,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5321857832349721,
+          "effective_loop_count": 0.5321857832349721,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283102707675673,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5374457674052593,
+          "effective_loop_count": 0.5374457674052593,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283102783187816,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5427570743612193,
+          "effective_loop_count": 0.5427570743612193,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283102859105764,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.548120180615598,
+          "effective_loop_count": 0.548120180615598,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310293543797,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5535355660373327,
+          "effective_loop_count": 0.5535355660373327,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103012193147,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5590037138168356,
+          "effective_loop_count": 0.5590037138168356,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103089380257,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5645251104270415,
+          "effective_loop_count": 0.5645251104270415,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103167008525,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.570100245579674,
+          "effective_loop_count": 0.570100245579674,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310324508746,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5757296121765805,
+          "effective_loop_count": 0.5757296121765805,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310332362685,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5814137062556313,
+          "effective_loop_count": 0.5814137062556313,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103402636793,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5871530269308991,
+          "effective_loop_count": 0.5871530269308991,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103482127687,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.5929480763265005,
+          "effective_loop_count": 0.5929480763265005,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310356211026,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.598799359503893,
+          "effective_loop_count": 0.598799359503893,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103642595575,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6047073843818325,
+          "effective_loop_count": 0.6047073843818325,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310372359505,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6106726616486853,
+          "effective_loop_count": 0.6106726616486853,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103805120466,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6166957046663484,
+          "effective_loop_count": 0.6166957046663484,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310388718399,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6227770293651247,
+          "effective_loop_count": 0.6227770293651247,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283103969798186,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6289171541289917,
+          "effective_loop_count": 0.6289171541289917,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283104052976033,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6351165996702761,
+          "effective_loop_count": 0.6351165996702761,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310413673095,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6413758888931298,
+          "effective_loop_count": 0.6413758888931298,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310422107681,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6476955467447567,
+          "effective_loop_count": 0.6476955467447567,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310430602796,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6540761000534019,
+          "effective_loop_count": 0.6540761000534019,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283104391599243,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6605180773520445,
+          "effective_loop_count": 0.6605180773520445,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283104477806027,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6670220086867573,
+          "effective_loop_count": 0.6670220086867573,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310456466422,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6735884254080844,
+          "effective_loop_count": 0.6735884254080844,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283104652190302,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6802178599444773,
+          "effective_loop_count": 0.6802178599444773,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310474040136,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.6869108455558859,
+          "effective_loop_count": 0.6869108455558859,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283104829315093,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.693667916065948,
+          "effective_loop_count": 0.693667916065948,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283104918949872,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7004896055709509,
+          "effective_loop_count": 0.7004896055709509,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310500932476,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7073764481234974,
+          "effective_loop_count": 0.7073764481234974,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283105100459533,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7143289773885044,
+          "effective_loop_count": 0.7143289773885044,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283105192374746,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7213477262693004,
+          "effective_loop_count": 0.7213477262693004,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283105285091754,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7284332265007976,
+          "effective_loop_count": 0.7284332265007976,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283105378632755,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7355860082069938,
+          "effective_loop_count": 0.7355860082069938,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310547302084,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7428065994192679,
+          "effective_loop_count": 0.7428065994192679,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283105568280035,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7500955255518988,
+          "effective_loop_count": 0.7500955255518988,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310566443537,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7574533088306197,
+          "effective_loop_count": 0.7574533088306197,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02831057615129,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7648804676697267,
+          "effective_loop_count": 0.7648804676697267,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283105859539807,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7723775159927584,
+          "effective_loop_count": 0.7723775159927584,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310595854443,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7799449624908448,
+          "effective_loop_count": 0.7799449624908448,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310605855634,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.7875833098128169,
+          "effective_loop_count": 0.7875833098128169,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283106159606423,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.795293053679913,
+          "effective_loop_count": 0.795293053679913,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310626172695,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8030746819171384,
+          "effective_loop_count": 0.8030746819171384,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283106364951657,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8109286733927235,
+          "effective_loop_count": 0.8109286733927235,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310646931585,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8188554968557611,
+          "effective_loop_count": 0.8188554968557611,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283106574856484,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8268556096608535,
+          "effective_loop_count": 0.8268556096608535,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310668161229,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.834929456367604,
+          "effective_loop_count": 0.834929456367604,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283106789623857,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8430774672006152,
+          "effective_loop_count": 0.8430774672006152,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310689893379,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8513000563543613,
+          "effective_loop_count": 0.8513000563543613,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283107009586825,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8595976201247879,
+          "effective_loop_count": 0.8595976201247879,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283107121629964,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8679705348475721,
+          "effective_loop_count": 0.8679705348475721,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283107235112654,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8764191546194979,
+          "effective_loop_count": 0.8764191546194979,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283107350086946,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8849438087768817,
+          "effective_loop_count": 0.8849438087768817,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283107466607677,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.8935447991008942,
+          "effective_loop_count": 0.8935447991008942,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310758473268,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9022223967151746,
+          "effective_loop_count": 0.9022223967151746,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283107704523,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9109768386363584,
+          "effective_loop_count": 0.9109768386363584,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310782604314,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9198083239321164,
+          "effective_loop_count": 0.9198083239321164,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283107949361323,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9287170094341946,
+          "effective_loop_count": 0.9287170094341946,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283108074549783,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9377030049461865,
+          "effective_loop_count": 0.9377030049461865,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310820168509,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9467663678756253,
+          "effective_loop_count": 0.9467663678756253,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310833084849,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9559070972092059,
+          "effective_loop_count": 0.9559070972092059,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283108462126305,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9651251267360266,
+          "effective_loop_count": 0.9651251267360266,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310859561037,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9744203174078621,
+          "effective_loop_count": 0.9744203174078621,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283108731398483,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9837924487065663,
+          "effective_loop_count": 0.9837924487065663,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310886959496,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.9932412088650722,
+          "effective_loop_count": 0.9932412088650722,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310901031121,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0027661837617927,
+          "effective_loop_count": 1.0027661837617927,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283109153666405,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0123668442739273,
+          "effective_loop_count": 1.0123668442739273,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310929978819,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0220425318352966,
+          "effective_loop_count": 1.0220425318352966,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283109448813534,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.031792441894865,
+          "effective_loop_count": 1.031792441894865,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283109600889633,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0416156049118541,
+          "effective_loop_count": 1.0416156049118541,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283109756174964,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0515108644489857,
+          "effective_loop_count": 1.0515108644489857,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028310991484046,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0614768518342999,
+          "effective_loop_count": 1.0614768518342999,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311007707084,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0715119567479547,
+          "effective_loop_count": 1.0715119567479547,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283110243066136,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0816142929489132,
+          "effective_loop_count": 1.0816142929489132,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311041304343,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.0917816581779647,
+          "effective_loop_count": 1.0917816581779647,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311058723883,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1020114870494524,
+          "effective_loop_count": 1.1020114870494524,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311076590975,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1123007954581539,
+          "effective_loop_count": 1.1123007954581539,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311094933755,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.122646114662686,
+          "effective_loop_count": 1.122646114662686,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311113783059,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1330434127374502,
+          "effective_loop_count": 1.1330434127374502,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283111331727777,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1434880004747896,
+          "effective_loop_count": 1.1434880004747896,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283111531402715,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1539744180230684,
+          "effective_loop_count": 1.1539744180230684,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283111737268595,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1644962974961857,
+          "effective_loop_count": 1.1644962974961857,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311194978396,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1750461953946996,
+          "effective_loop_count": 1.1750461953946996,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283112169459567,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1856153868061767,
+          "effective_loop_count": 1.1856153868061767,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283112396866567,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1961936108154987,
+          "effective_loop_count": 1.1961936108154987,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311263264638,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2067687530811213,
+          "effective_loop_count": 1.2067687530811213,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283112877522647,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2173264467212306,
+          "effective_loop_count": 1.2173264467212306,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283113132315806,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2278495659066948,
+          "effective_loop_count": 1.2278495659066948,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283113397961077,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.238317576973941,
+          "effective_loop_count": 1.238317576973941,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283113675530746,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2487056980627926,
+          "effective_loop_count": 1.2487056980627926,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283113966262154,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2589837980826957,
+          "effective_loop_count": 1.2589837980826957,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283114271593132,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2691149357598306,
+          "effective_loop_count": 1.2691149357598306,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311459320746,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.279053393992001,
+          "effective_loop_count": 1.279053393992001,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283114933093835,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2887419943877205,
+          "effective_loop_count": 1.2887419943877205,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283115293623593,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.298108365741001,
+          "effective_loop_count": 1.298108365741001,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283115677654577,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3070596603709816,
+          "effective_loop_count": 1.3070596603709816,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283116088672606,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3154749133361179,
+          "effective_loop_count": 1.3154749133361179,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311653098783,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3231937275067764,
+          "effective_loop_count": 1.3231937275067764,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283117010013574,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3299990603258323,
+          "effective_loop_count": 1.3299990603258323,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311753267261,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.335590218332527,
+          "effective_loop_count": 1.335590218332527,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283118108006986,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3395389552571544,
+          "effective_loop_count": 1.3395389552571544,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283118748125912,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3412150801985092,
+          "effective_loop_count": 1.3412150801985092,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028311946974136,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3396540785185493,
+          "effective_loop_count": 1.3396540785185493,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028312029678309,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3333073526990518,
+          "effective_loop_count": 1.3333073526990518,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283121265133888,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.3195363640615483,
+          "effective_loop_count": 1.3195363640615483,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028312243189385,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2934947666003893,
+          "effective_loop_count": 1.2934947666003893,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.02831238954253,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.2453770098278483,
+          "effective_loop_count": 1.2453770098278483,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283125845072942,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 1.1527119045577763,
+          "effective_loop_count": 1.1527119045577763,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283128711345566,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.956123903397696,
+          "effective_loop_count": 0.956123903397696,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0283133785890177,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.508529762012472,
+          "effective_loop_count": 0.508529762012472,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028314784438135,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.03153652866063794,
+          "effective_loop_count": 0.03153652866063794,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.028338862282467,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.010747670667484499,
+          "effective_loop_count": 0.010747670667484499,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.0999899999999996,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.014999999997769464,
+          "effective_loop_count": 0.014999999997769464,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.1999899999999997,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.014999999999815827,
+          "effective_loop_count": 0.014999999999815827,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.2999899999999998,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.014999999999815827,
+          "effective_loop_count": 0.014999999999815827,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.39999,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.014999999999815827,
+          "effective_loop_count": 0.014999999999815827,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.49999,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        },
+        {
+          "continuum_moment_loop_count": 0.014999999999815827,
+          "effective_loop_count": 0.014999999999815827,
+          "event": "CAVITY_CONTINUUM_GROWTH_PACKET",
+          "physical_time_s": 2.59999,
+          "realized_loop_count": 0,
+          "site_id": "site-1"
+        }
+      ],
+      "fracture_adapter_intervals": 367,
+      "last_mechanics_binding": {
+        "native_K_scale": 0.99439088298629,
+        "source_identity": "BOUNDED_ALIGNED_HISTORY:6c627aed0c221fe79d78c88b1bb110968f2f8fa47520f695e2df473e6ffbb5b9"
+      },
+      "native_backend_calls": 367,
+      "reporting_cadence_s": 0.1,
+      "terminal": {
+        "direct_action": 5.49103389229482,
+        "direct_hits": 3,
+        "fracture_event_count": 0,
+        "fracture_extension_m": 0.0,
+        "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+        "loop_count": 150.0857518289694,
+        "phase": "STABLE_SUBGRID_VOID",
+        "radius_m": 4.220640863151855e-08,
+        "site2_direct_action": 5.514279211573227,
+        "site2_direct_hits": 2,
+        "site2_loop_count": 0.0,
+        "site2_phase": "AVAILABLE_SITE",
+        "site2_radius_m": null,
+        "time_s": 2.59999
+      },
+      "trace": [
+        {
+          "direct_action": 5.413187837271229,
+          "direct_hits": 2,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": null,
+          "loop_count": 0.0,
+          "phase": "AVAILABLE_SITE",
+          "radius_m": null,
+          "site2_direct_action": 4.317063269089041,
+          "site2_direct_hits": 2,
+          "site2_loop_count": 0.0,
+          "site2_phase": "AVAILABLE_SITE",
+          "site2_radius_m": null,
+          "time_s": 1.9999900000000002
+        },
+        {
+          "direct_action": 5.49103389229482,
+          "direct_hits": 3,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+          "loop_count": 150.01075182897236,
+          "phase": "STABLE_SUBGRID_VOID",
+          "radius_m": 4.218585921598673e-08,
+          "site2_direct_action": 4.521781115396797,
+          "site2_direct_hits": 2,
+          "site2_loop_count": 0.0,
+          "site2_phase": "AVAILABLE_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.0999899999999996
+        },
+        {
+          "direct_action": 5.49103389229482,
+          "direct_hits": 3,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+          "loop_count": 150.02575182897013,
+          "phase": "STABLE_SUBGRID_VOID",
+          "radius_m": 4.218996910391442e-08,
+          "site2_direct_action": 4.724783298994655,
+          "site2_direct_hits": 2,
+          "site2_loop_count": 0.0,
+          "site2_phase": "AVAILABLE_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.1999899999999997
+        },
+        {
+          "direct_action": 5.49103389229482,
+          "direct_hits": 3,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+          "loop_count": 150.04075182896995,
+          "phase": "STABLE_SUBGRID_VOID",
+          "radius_m": 4.219407898939067e-08,
+          "site2_direct_action": 4.925540253730673,
+          "site2_direct_hits": 2,
+          "site2_loop_count": 0.0,
+          "site2_phase": "AVAILABLE_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.2999899999999998
+        },
+        {
+          "direct_action": 5.49103389229482,
+          "direct_hits": 3,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+          "loop_count": 150.05575182896976,
+          "phase": "STABLE_SUBGRID_VOID",
+          "radius_m": 4.2198188872456613e-08,
+          "site2_direct_action": 5.124041100043559,
+          "site2_direct_hits": 2,
+          "site2_loop_count": 0.0,
+          "site2_phase": "AVAILABLE_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.39999
+        },
+        {
+          "direct_action": 5.49103389229482,
+          "direct_hits": 3,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+          "loop_count": 150.07075182896958,
+          "phase": "STABLE_SUBGRID_VOID",
+          "radius_m": 4.220229875315276e-08,
+          "site2_direct_action": 5.320287024094496,
+          "site2_direct_hits": 2,
+          "site2_loop_count": 0.0,
+          "site2_phase": "AVAILABLE_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.49999
+        },
+        {
+          "direct_action": 5.49103389229482,
+          "direct_hits": 3,
+          "fracture_event_count": 0,
+          "fracture_extension_m": 0.0,
+          "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+          "loop_count": 150.0857518289694,
+          "phase": "STABLE_SUBGRID_VOID",
+          "radius_m": 4.220640863151855e-08,
+          "site2_direct_action": 5.514279211573227,
+          "site2_direct_hits": 2,
+          "site2_loop_count": 0.0,
+          "site2_phase": "AVAILABLE_SITE",
+          "site2_radius_m": null,
+          "time_s": 2.59999
+        }
+      ]
+    }
+  },
+  "partition_convergence": {
+    "0.01": {
+      "accumulated_plastic_exposure": 0.00010051528645792647,
+      "direct_birth_first_passage_s": {
+        "site-1": 2.028486877256039,
+        "site-2": 1.9174760028856535
+      }
+    },
+    "0.05": {
+      "accumulated_plastic_exposure": 0.00010051528645792658,
+      "direct_birth_first_passage_s": {
+        "site-1": 2.0283953745281633,
+        "site-2": 1.9174682213865177
+      }
+    },
+    "0.1": {
+      "accumulated_plastic_exposure": 0.00010051528645792647,
+      "direct_birth_first_passage_s": {
+        "site-1": 2.0283088612224,
+        "site-2": 1.9174682213865177
+      }
+    },
+    "ownership": "ONE_ACCEPTED_INCREMENT_SLICED_EXACTLY_ONCE"
+  },
+  "prospective_out_of_training_hold_prediction": {
+    "accumulated_plastic_exposure": 0.00010051528645792658,
+    "direct_birth_first_passage_s": {
+      "site-1": 2.0283953745281633,
+      "site-2": 1.9174682213865177
+    },
+    "end_time_s": 2.69999,
+    "history": "FIXED_OPENING_ZERO_NEW_ACCEPTED_PLASTIC_INCREMENT",
+    "start_time_s": 2.59999,
+    "status": "PREDICTION_FROZEN_BEFORE_INDEPENDENT_2D_HOLD",
+    "terminal": {
+      "direct_action": 5.49103389229482,
+      "direct_hits": 3,
+      "fracture_event_count": 0,
+      "fracture_extension_m": 0.0,
+      "growth_representation": "RESIDUAL_LOOP_BEARING_DEFECT",
+      "loop_count": 150.1007388519768,
+      "phase": "STABLE_SUBGRID_VOID",
+      "radius_m": 4.221051550481013e-08,
+      "site2_direct_action": 5.51088286613784,
+      "site2_direct_hits": 2,
+      "site2_loop_count": 0.0,
+      "site2_phase": "AVAILABLE_SITE",
+      "site2_radius_m": null,
+      "time_s": 2.699989999999998
+    }
+  },
+  "schema": "oneD.v3.bounded-autonomous-aligned/1",
+  "scope_stop": "RESOLVED_CAVITY_UNQUALIFIED_FAIL_CLOSED"
+}

@@ -391,6 +391,7 @@ def run_matched_campaign(output_directory: str | Path) -> dict[str, Any]:
     )
 
     autonomous = build_matched_reduced_engine()
+    clear_pending_geometry_events()
     rows = spatial_rows()
     # External load only: the reduced implementation receives no recorded
     # tensor state, event time, or future constitutive value.
@@ -402,7 +403,9 @@ def run_matched_campaign(output_directory: str | Path) -> dict[str, Any]:
         ("reload_30um", rows[2]["KJ_Pa_sqrtm"]),
     ]
     autonomous_rows = []
+    outer_schedule_time = 0.0
     for stage, applied_K in load_history:
+        outer_schedule_time += float(rows[0]["dt_cur_s"])
         before = _state_row(autonomous)
         contract_before = stress_contract(autonomous, applied_K)
         step = advance_signed(
@@ -413,6 +416,7 @@ def run_matched_campaign(output_directory: str | Path) -> dict[str, Any]:
             "stage": stage,
             "applied_K_Pa_sqrt_m": applied_K,
             "duration_s": rows[0]["dt_cur_s"],
+            "outer_schedule_time_s": outer_schedule_time,
             "before": before,
             "stress_contract_before": contract_before,
             "step": step,
@@ -462,16 +466,23 @@ def run_matched_campaign(output_directory: str | Path) -> dict[str, Any]:
         },
         "autonomous_reduced": {
             "external_history_source": "archived displacement-to-K loading history only",
+            "controller_policy": (
+                "ONE_NATIVE_KINETIC_CALL_PER_OUTER_DISPLACEMENT_INCREMENT; "
+                "A_CHECKPOINT_ENDS_THAT_OUTER_INCREMENT"
+            ),
             "future_spatial_state_injected": False,
             "recorded_tensor_drive_injected": False,
             "temperature_K": 900.0,
             "rows": autonomous_rows,
             "unload_reload_exercised": True,
+            "outer_schedule_terminal_time_s": outer_schedule_time,
+            "kinetic_terminal_time_s": float(autonomous.t),
             "terminal": _state_row(autonomous),
         },
         "comparison_limits": [
             "the archived spatial reference has three monotonic rows only",
             "unload/reload is executed by the autonomous reduced provider, not relabelled as spatial evidence",
+            "as in the selected monotonic spatial controller, a checkpoint terminates the current outer displacement increment; reported unused inner time is not a hold",
             "step-three source population diverges under the restored named Taylor consumer and is retained",
         ],
         "passed": bool(

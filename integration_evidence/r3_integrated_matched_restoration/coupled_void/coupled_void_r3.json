@@ -1,0 +1,273 @@
+{
+  "active_cavity": {
+    "cavity_dependent_mechanics_binding": {
+      "native_K_scale": 0.99439088298629,
+      "source_identity": "BOUNDED_ALIGNED_HISTORY:6c627aed0c221fe79d78c88b1bb110968f2f8fa47520f695e2df473e6ffbb5b9"
+    },
+    "direct_birth_hits": 3,
+    "event_count": 368,
+    "event_types": [
+      "CAVITY_CONTINUUM_GROWTH_PACKET",
+      "DIRECT_BIRTH_HIT",
+      "EMBRYO",
+      "HEALING_PROHIBITED_RESIDUAL_DEFECT"
+    ],
+    "mechanical_response_source": "BOUNDED_ALIGNED_HISTORY_CAVITY_RADIUS_MAP",
+    "post_birth_fracture_intervals": 367,
+    "terminal_loop_count": 150.0857518289694,
+    "terminal_phase": "STABLE_SUBGRID_VOID",
+    "terminal_radius_m": 4.220640863151855e-08
+  },
+  "artifact_sha256": {
+    "bounded_coupled_result.json": "8de97b4ec33c4d2c1987d949310e44741a3d0b8ff4ef46a628b136e583c7bfcf",
+    "complete_adapter_parity.json": "d8bb5867b379dfbed29f3208ab9aabe4d1ae6d551550b043dce2a8437e056a07"
+  },
+  "common_state_sequence": {
+    "divergence_is_native_cavity_history": true,
+    "initial_time_s": 1.89999,
+    "no_void_fracture_intervals": 7,
+    "no_void_terminal_extension_m": 0.0,
+    "same_external_opening_m": 4e-07,
+    "same_material": "DBTT",
+    "same_temperature_K": 1200.0,
+    "terminal_time_s": 2.59999,
+    "void_enabled_fracture_intervals": 367,
+    "void_enabled_terminal_extension_m": 0.0
+  },
+  "donor": {
+    "birth_pathways": {
+      "cavity_surface_emission": "separate post-birth growth process",
+      "direct_dislocation_interaction": "independent direct action/hits/free-volume",
+      "vacancy_diffusion": "independent vacancy action/hits/inventory"
+    },
+    "commit": "47a5a4bae048e5a8b1c6178efb6406325005f7ef",
+    "entry": "reduced_fracture_v3.autonomous_cli",
+    "entry_sha256": "65b342ab336cd04fdecc5543991cc559daea74186984159e6afd0a84c3d4e32d",
+    "execution_source": "clean git archive of exact commit",
+    "model_id": "r2.recovered_oneD_v3_stateful_voiding/1",
+    "repository": "/Volumes/Data/Data/Nanopillar_calculation/voiding/oneD-v3-stateful-voiding-reduction",
+    "schema": "r2-reduced-void-donor-receipt/1",
+    "scope": "aligned monotonic functional control; not calibrated 2-D transfer",
+    "source_worktree_dirty_ignored": true,
+    "tree": "bbd9a4b5432ab0c262a94fe8201bb810e6a9ecc3"
+  },
+  "executions": {
+    "bounded_coupled": {
+      "command": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/run_oneD_v3_bounded_autonomous.py"
+      ],
+      "stderr": [],
+      "stdout": [
+        "/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/r3_coupled_v3_vgp75djz/source/analysis_outputs/oneD_v3_bounded_autonomous/result.json",
+        "{\"far_field_void_delta_G_J_per_m2\": 0.0, \"loop_count_relative_error\": 8.347641380819139e-05, \"oneD_growth_representation\": \"RESIDUAL_LOOP_BEARING_DEFECT\", \"oneD_loop_count\": 150.0857518289694, \"oneD_radius_m\": 4.220640863151855e-08, \"oneD_third_hit_bracket_s\": [1.9999900000000002, 2.0999899999999996], \"radius_relative_error\": 0.0022434698960797543, \"residual_classification_match\": true, \"third_hit_macro_interval_match\": false, \"twoD_growth_representation\": \"RESIDUAL_LOOP_BEARING_DEFECT\", \"twoD_loop_count\": 150.0732242544, \"twoD_radius_m\": 4.2301310347848674e-08, \"twoD_third_hit_bracket_s\": [2.09999, 2.19999]}",
+        "VOID_EVENTS 368",
+        "FRACTURE_INTERVALS 367"
+      ]
+    },
+    "complete_adapter_parity": {
+      "command": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/compare_complete_v2_fracture_adapter_v1.py"
+      ],
+      "stderr": [],
+      "stdout": [
+        "/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/r3_coupled_v3_vgp75djz/source/analysis_outputs/oneD_v3_complete_fracture_adapter/parity.json",
+        "{\"actual_renewals\": 1, \"all_complete_states_equal\": true, \"signed_waveform_exercised\": true, \"status\": \"PASS\"}"
+      ]
+    }
+  },
+  "fracture_adapter": {
+    "actual_renewals": 1,
+    "candidate_id": "v913_zeroD_sobol_0202500",
+    "complete_state_parity": true,
+    "history": [
+      {
+        "complete_closure_sha256": "4287ffaaaac9052644a6d71a813ebe642ade5bdcd335243accc2447dfe34704a",
+        "complete_state_equal": true,
+        "duration_s": 1e-09,
+        "fired": true,
+        "geometry_commits": 1,
+        "opening_m": 4e-07,
+        "post_event_renewals": 1,
+        "post_state": {
+          "backstress_Pa": 0.0,
+          "cleavage_action": 0.0,
+          "cleavage_threshold": 1.0,
+          "effective_K_Pa_sqrt_m": 0.0,
+          "event_count": 1,
+          "extension_m": 5e-06,
+          "front_width_m": 4.9999999999999996e-05,
+          "last_committed_geometry_fingerprint": "09e508260d17546242e4aa802b97f831aaa934d2bff0d401aeb4cbaacf342f5e",
+          "mobile_count": 0.0,
+          "native_J_J_m2": 1.398267521285027,
+          "native_KJ_Pa_sqrt_m": 788707.2451976314,
+          "opening_m": 4e-07,
+          "physical_avalanche_index": 0,
+          "process_zone_fingerprint": "d6bbdd856052471219501bd0e09b51c972394b2d092bfd650eb20f1435185462",
+          "retained_count": 0.0,
+          "signed_shielding_Pa_sqrt_m": 3285845.8930877727,
+          "source_area_m2": 4.9999999999999995e-11,
+          "source_multiplicity": 1.0,
+          "terminal_veto_state": null,
+          "threshold_identity": "8ecc956fdac9388670420ece630e3190b20b878ea53b91dfecb343a86197c1dd",
+          "time_s": 1e-09,
+          "tip_radius_m": 1e-06,
+          "tip_stress_Pa": 0.0
+        }
+      },
+      {
+        "complete_closure_sha256": "8d7fe8c775f8db2ad79466ba244a72f38d4bfa6fe2518586b80df92c2447eec0",
+        "complete_state_equal": true,
+        "duration_s": 0.001,
+        "fired": false,
+        "geometry_commits": 0,
+        "opening_m": 4e-07,
+        "post_event_renewals": 0,
+        "post_state": {
+          "backstress_Pa": 0.0,
+          "cleavage_action": 5.390928548202657e-61,
+          "cleavage_threshold": 1.0,
+          "effective_K_Pa_sqrt_m": 0.0,
+          "event_count": 1,
+          "extension_m": 5e-06,
+          "front_width_m": 4.9999999999999996e-05,
+          "last_committed_geometry_fingerprint": "09e508260d17546242e4aa802b97f831aaa934d2bff0d401aeb4cbaacf342f5e",
+          "mobile_count": 0.0,
+          "native_J_J_m2": 1.398267521285027,
+          "native_KJ_Pa_sqrt_m": 788707.2451976314,
+          "opening_m": 4e-07,
+          "physical_avalanche_index": 0,
+          "process_zone_fingerprint": "7932bbec1976061258bd162e4073cca80b535ad8504a99ed2161790805d92f46",
+          "retained_count": 0.0,
+          "signed_shielding_Pa_sqrt_m": 3282561.689570128,
+          "source_area_m2": 4.9999999999999995e-11,
+          "source_multiplicity": 1.0,
+          "terminal_veto_state": null,
+          "threshold_identity": "8ecc956fdac9388670420ece630e3190b20b878ea53b91dfecb343a86197c1dd",
+          "time_s": 0.001000001,
+          "tip_radius_m": 1e-06,
+          "tip_stress_Pa": 0.0
+        }
+      },
+      {
+        "complete_closure_sha256": "32177379bfc7167c0b0df4c5ea4874a44b7b0477a17de357b7d5e4633ed931cf",
+        "complete_state_equal": true,
+        "duration_s": 0.0001,
+        "fired": false,
+        "geometry_commits": 0,
+        "opening_m": -2e-07,
+        "post_event_renewals": 0,
+        "post_state": {
+          "backstress_Pa": 0.0,
+          "cleavage_action": 5.930021403022923e-61,
+          "cleavage_threshold": 1.0,
+          "effective_K_Pa_sqrt_m": 0.0,
+          "event_count": 1,
+          "extension_m": 5e-06,
+          "front_width_m": 4.9999999999999996e-05,
+          "last_committed_geometry_fingerprint": "09e508260d17546242e4aa802b97f831aaa934d2bff0d401aeb4cbaacf342f5e",
+          "mobile_count": 0.0,
+          "native_J_J_m2": 0.34956688032125677,
+          "native_KJ_Pa_sqrt_m": -394353.6225988157,
+          "opening_m": -2e-07,
+          "physical_avalanche_index": 0,
+          "process_zone_fingerprint": "e996f7fb3787b9d60e874d0cf5024b87567289a7994193fdb91bd03629d07f56",
+          "retained_count": 0.0,
+          "signed_shielding_Pa_sqrt_m": 3282233.449813433,
+          "source_area_m2": 4.9999999999999995e-11,
+          "source_multiplicity": 1.0,
+          "terminal_veto_state": null,
+          "threshold_identity": "8ecc956fdac9388670420ece630e3190b20b878ea53b91dfecb343a86197c1dd",
+          "time_s": 0.001100001,
+          "tip_radius_m": 1e-06,
+          "tip_stress_Pa": 0.0
+        }
+      },
+      {
+        "complete_closure_sha256": "251943c6f9c50a77944caecce272011640dec39e1a608171adf79203b53f447e",
+        "complete_state_equal": true,
+        "duration_s": 0.0001,
+        "fired": false,
+        "geometry_commits": 0,
+        "opening_m": 4e-07,
+        "post_event_renewals": 0,
+        "post_state": {
+          "backstress_Pa": 0.0,
+          "cleavage_action": 6.469114257843188e-61,
+          "cleavage_threshold": 1.0,
+          "effective_K_Pa_sqrt_m": 0.0,
+          "event_count": 1,
+          "extension_m": 5e-06,
+          "front_width_m": 4.9999999999999996e-05,
+          "last_committed_geometry_fingerprint": "09e508260d17546242e4aa802b97f831aaa934d2bff0d401aeb4cbaacf342f5e",
+          "mobile_count": 0.0,
+          "native_J_J_m2": 1.398267521285027,
+          "native_KJ_Pa_sqrt_m": 788707.2451976314,
+          "opening_m": 4e-07,
+          "physical_avalanche_index": 0,
+          "process_zone_fingerprint": "b81198ec886060f9a239bcfea89cebd87b847f7e560530497f51df0c07de30e9",
+          "retained_count": 0.0,
+          "signed_shielding_Pa_sqrt_m": 3281905.2428790713,
+          "source_area_m2": 4.9999999999999995e-11,
+          "source_multiplicity": 1.0,
+          "terminal_veto_state": null,
+          "threshold_identity": "8ecc956fdac9388670420ece630e3190b20b878ea53b91dfecb343a86197c1dd",
+          "time_s": 0.001200001,
+          "tip_radius_m": 1e-06,
+          "tip_stress_Pa": 0.0
+        }
+      }
+    ],
+    "schema": "oneD.v3.complete-v2-fracture-adapter-parity/1",
+    "signed_waveform_exercised": true
+  },
+  "passed": true,
+  "passive_scheduler_control": {
+    "accumulated_plastic_exposure": {
+      "0.01": 0.00010051528645792647,
+      "0.05": 0.00010051528645792658,
+      "0.1": 0.00010051528645792647
+    },
+    "direct_birth_first_passage_s": {
+      "0.01": {
+        "site-1": 2.028486877256039,
+        "site-2": 1.9174760028856535
+      },
+      "0.05": {
+        "site-1": 2.0283953745281633,
+        "site-2": 1.9174682213865177
+      },
+      "0.1": {
+        "site-1": 2.0283088612224,
+        "site-2": 1.9174682213865177
+      }
+    },
+    "ownership": "ONE_ACCEPTED_INCREMENT_SLICED_EXACTLY_ONCE",
+    "reporting_cadences_s": [
+      "0.01",
+      "0.05",
+      "0.1"
+    ]
+  },
+  "qualification": {
+    "accepted_fracture_advance_is_separately_exercised_through_same_adapter": true,
+    "aligned_bounded_map_only": true,
+    "both_birth_clocks_owned": true,
+    "combined_run_fracture_event_count": 0,
+    "combined_run_is_executable": true,
+    "global_status": "PARTIAL_RESTORATION",
+    "natural_nucleation_claim": false,
+    "one_global_event_scheduler": true,
+    "remaining_interval_rebuilt_after_event": true,
+    "second_fracture_clock_in_void_adapter": false
+  },
+  "schema": "r3.clean-v3-bounded-coupled-fracture-void/1",
+  "source_contract": {
+    "bounded_driver": "scripts/run_oneD_v3_bounded_autonomous.py",
+    "bounded_driver_sha256": "a89c6d3314d966ec61fa764923d379d4e29663c1569ab0b4353ed998277bbd4e",
+    "commit": "47a5a4bae048e5a8b1c6178efb6406325005f7ef",
+    "execution": "CLEAN_GIT_ARCHIVE",
+    "tree": "bbd9a4b5432ab0c262a94fe8201bb810e6a9ecc3"
+  }
+}

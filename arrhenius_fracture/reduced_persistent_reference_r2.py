@@ -55,6 +55,26 @@ DEFAULT_KERNEL_FAMILY = Path(
 DEFAULT_KERNEL_SHA256 = "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
 
 
+def _restore_protected_continuum_alias() -> None:
+    """Undo a legacy entry-module import side effect after class resolution.
+
+    Importing the v10.2.14 engine also imports the historical v10.1.7.3 entry,
+    which intentionally rebinds the protected continuum-engine module global.
+    The persistent engine class has already been resolved above and does not
+    require that process-global alias.  Restoring the package's protected
+    default keeps this library adapter import-order neutral for other studies.
+    """
+    from . import continuum_source_tip
+    from .separated_source_tip import SeparatedSourceKineticTipEngine
+
+    continuum_source_tip.ContinuumSourceKineticTipEngine = (
+        SeparatedSourceKineticTipEngine
+    )
+
+
+_restore_protected_continuum_alias()
+
+
 class ReducedPersistentReversibleTipEngine(
     MonotonicReversiblePersistentSiteTipEngine
 ):
@@ -202,6 +222,7 @@ def build_restored_engine(
         if local_strength_Pa is None
         else "explicit_spatial_driver_cohesive_ceiling"
     )
+    _restore_protected_continuum_alias()
     return engine
 
 

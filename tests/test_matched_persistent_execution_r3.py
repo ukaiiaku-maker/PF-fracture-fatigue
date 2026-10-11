@@ -64,4 +64,18 @@ def test_matched_campaign_restarts_and_executes_unload_reload(tmp_path):
     stages = [row["stage"] for row in result["autonomous_reduced"]["rows"]]
     assert stages[-2:] == ["unload_20um", "reload_30um"]
     assert not result["autonomous_reduced"]["future_spatial_state_injected"]
+    assert result["autonomous_reduced"]["outer_schedule_terminal_time_s"] == 42.0
+    assert result["autonomous_reduced"]["kinetic_terminal_time_s"] <= 42.0
     assert len(result["recorded_operator_replay"]) == 3
+
+
+def test_reduced_adapter_does_not_leak_legacy_entry_alias():
+    from arrhenius_fracture import continuum_source_tip
+    from arrhenius_fracture.separated_source_tip import (
+        SeparatedSourceKineticTipEngine,
+    )
+
+    build_matched_reduced_engine()
+    assert continuum_source_tip.ContinuumSourceKineticTipEngine is (
+        SeparatedSourceKineticTipEngine
+    )
