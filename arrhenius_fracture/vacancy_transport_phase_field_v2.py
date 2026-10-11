@@ -1286,7 +1286,7 @@ def solve_transport_interval(
     accepted_mean_stress_Pa: np.ndarray,
     c_min: float = DEFAULT_C_MIN,
     c_max: float = DEFAULT_C_MAX,
-    maximum_picard_iterations: int = 120,
+    maximum_picard_iterations: int = 240,
     relative_tolerance: float = 1.0e-10,
     diagnostic_boundary_concentration_by_face: Mapping[str, float] | None = None,
     failure_injector=None, linear_solver_provider=None,

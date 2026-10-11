@@ -26,3 +26,5 @@ The exact suffix diagnostic found no active-set mismatch, no positivity line sea
 
 That repair accepted the exact 19.53125 ns suffix. The resumed dwell then accepted a further 618.896 ns before a later 19.3405 ns trial stagnated at a 5.35293e-10 residual after 60 iterations, again with stable active set and no positivity correction. The same Picard fixed point now uses a full update while residuals decrease and a 0.5 under-relaxation only on stall/oscillation, with an increased 120-iteration ceiling. Acceptance still requires the original undamped residual tolerance.
 
+On the exact later trial, adaptive damping reduced the residual to 1.50355e-10 after 120 iterations, still with zero active-set mismatch and admissible fields. The numerical ceiling is extended to 240; the fixed point and 1e-10 acceptance criterion remain unchanged.
+
