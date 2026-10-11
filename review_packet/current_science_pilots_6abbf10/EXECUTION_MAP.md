@@ -1,32 +1,31 @@
-# Current-source pilot execution map
+# Current capability and claim-to-evidence map
 
-This map separates historical retained evidence from calculations executable on
-the current integrated source. A named provider or old report is not presented
-as current-source execution evidence.
+This map distinguishes executable current-source capabilities, retained
+historical evidence, and the bounded claims completed in the physical fracture
+packet. `PHYSICAL_COMPLETION_PACKET_v4` is the controlling compact report.
 
-| Scientific item | Simulation source | Observer/report source | Decision |
+| Scientific item | Executed source/state | Evidence and supported claim | Disposition |
 |---|---|---|---|
-| Opening–accommodation first passage | Current commit `6abbf10`; `sharp_front_v10_2_27_audited.main` over full spatial mechanics | Native accepted `steps`/`crack_path` histories; compact results assembled in this packet | Execute six bounded paired cases |
-| Developed propagation near 1 mm | Current commit `6abbf10`; same executor and DBTT-300 K accommodation arm | Native accepted history and discrete event brackets | Rerun current head after short-case pass; prior `baedb06` trajectory is sizing/reference evidence only |
-| V11 cavity comparison | Historical finite result at `a2a90cd`; immutable archive | Historical K(a), cavity and field products | Retain as historical evidence; do not relabel |
-| V11 corrected-transport suffix | Historical accepted 5.900 s endpoints migrated once into current commit `6abbf10`; `shared_v5_cavity_adapter.main` | Current paired audit and native new checkpoints | Execute one 10 microsecond matched interval with explicit boundary |
-| Corrected vacancy transport qualification | Current qualification commits through `610f033` | `TRANSPORT_RESULTS.json` and equation-to-code audit | Preserve; do not rerun as a paper trajectory |
-| Original full FEM/CZM | Separate clean checkout at exact commit `2934911`; theta=0 parity entry | Native FEM/CZM audit and histories | Execute one selective 10 micrometre consistency case |
-| Theta-40 two-front | Current retained exact restart evidence | Targeted-completion receipt | Preserve; outside this pilot batch |
-| V3.6 and branching+cavity composition | Current independent development paths | Their own receipts | Not blockers and not part of this batch |
+| Opening–accommodation first passage | Current full-spatial PF/FEM path; six paired cases | `OPENING_ACCOMMODATION_RESULTS_v2.csv`, native histories | Preserve the paired first-event comparison; it is not a fitted temperature law |
+| Developed cold/hot propagation | Current threshold-scaled PF path; 203 events in each retained trajectory | `PHYSICAL_HISTORY_HOT_COLD_v4.csv`, native brackets and figures | Temperature changes clock/load/K history; identical seeded mark/length sequence explains common geometry |
+| K-at-length selection | Native pre-event observation plus distinct committed upper geometry | `LENGTH_QUERY_BRACKETS_HOT_COLD_v4.csv` | Report K_J only at its measured stage; never interpolate it onto committed geometry |
+| Cavity neighborhood | Current candidate-specific provider and original complete-ligament operator | `CAVITY_LIGAMENT_QUALIFICATION_v4.json`; hashed raw operator record | Local isolated-tip J remains invalid; finite-ligament operation is qualified, with no practical-window event at retained load |
+| Full FEM/CZM companion | Separate branch `codex/current-pf-companion` at `fa24f7b`; immutable current PF family | `FEM_CZM_CURRENT_COMPANION_ONE_STEP_v4.*`; native 39-file raw output | One accepted full-order 1000 K step, finite no-event; not a historical `e239710...` reconstruction |
+| Historical FEM/CZM parity | Clean checkout `293491157...`; immutable `a85b57...` guard | Historical repository and retained output | Preserve as historical evidence; exact missing input remains unavailable and was not relabeled |
+| Corrected vacancy transport | Current positive conservative flux implementation and retained qualifications | Prior transport receipts/tests | Preserve numerical-method identity separately from continuum/material identity; no generic rerun |
+| V3.6 restart | Demonstrated low-activity native state only | Retained V3.6 receipt/checkpoint | Preserve claim at its demonstrated scope; do not imply populated-state equivalence |
+| Theta-40 two-front continuation | Separately qualified retained run | Targeted-completion receipt | Preserve; independent of this monotonic packet |
+| Branching-plus-cavity composition | Independent development path | Its own source/tests/receipts | Not silently substituted into the present single-front result |
 
-The full numerical protocol, function identities, parameters, endpoints, and
-consumer mapping are machine readable in `PILOT_PROTOCOL.json`.
+## Verification and storage identity
 
-## Post-execution disposition
-
-- The six PF first-passage cases and current-head 1 mm path passed.
-- The V11 migration inputs loaded, but zero current-source suffix intervals were
-  accepted because the required directional observation was unavailable after
-  bounded refinement.
-- The FEM adapter handoff was repaired at local commit `6c129c2`; the pinned
-  backend then correctly rejected the mutated live kernel because the required
-  immutable `a85b57…` family is not locally available.
-
-See `PILOT_RESULTS.json`, `CURRENT_SCIENCE_PILOT_REPORT.md`, and
-`NEXT_BATCH_PLAN.md` for quantitative results and exact preparation gates.
+- Main branch: `codex/shared-fracture-fatigue-options-v1`; source/mechanics
+  commit `d1d15bf`, compact completion commit `a099ec7`.
+- FEM companion: `codex/current-pf-companion` at `fa24f7b`; focused suite:
+  10 passed.
+- Main integrated suite at the mechanics commit: 787 passed.
+- Independent backup: `/dev/disk3s5`, root
+  `/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf`.
+  Initial and post-run manifests passed SHA-256 verification.
+- Raw trajectory/checkpoint/field archives remain outside Git. No data were
+  deleted and no remote push was attempted.

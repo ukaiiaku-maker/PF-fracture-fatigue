@@ -1,25 +1,39 @@
-# Next bounded batch
+# Next bounded study gate
 
-The successful PF results are sufficient for the present opening–accommodation
-comparison and developed-path evidence. Do not expand them into a temperature
-atlas yet.
+No further temperature/rate/orientation campaign is released by this packet.
+The completed work establishes one seeded cold/hot geometry sequence and one
+low-load full-order FEM/CZM step; it does not establish replicate uncertainty,
+rate sensitivity, or the storage cost of a multi-orientation field campaign.
+Issuing production commands before those quantities are measured would violate
+the controlling accuracy/storage condition.
 
-1. **Cavity preparation, estimated 800 MiB.** Generate one matched
-   enabled/suppressed V11 pair under the current source from a pre-event
-   accepted topology. Before propagation, require the current live-topology
-   kernel registry and directional observer to cover both the current and
-   prospective post-event tips. Write and round-trip a native paired checkpoint,
-   then repeat only the declared 10 microsecond suffix. Preserve the historical
-   `a2a90cd` pair unchanged.
-2. **FEM/CZM input recovery, estimated 10 MiB.** Recover the immutable kernel
-   family whose SHA-256 is
-   `a85b57ad9eee8331ef34ea222760ce7d4064f48ddef668f1e28a666d14946f3a`,
-   including every referenced response/audit file. If it must be regenerated,
-   use the locked historical mechanics configuration and accept it only if the
-   required hash is reproduced. Then rerun the repaired exact-commit adapter.
-3. **Only after both gates pass**, consider one replicate seed for each of the
-   two accommodation-active PF conditions. Do not fit parameters or start a
-   broad sweep from the present three-condition result.
+## Required pre-launch measurements
 
-V3.6 activation and the combined branching–cavity adapter remain independent
-development tasks and are not prerequisites for these reader-facing results.
+1. Run one additional seed only for each of the two accommodation-active PF
+   conditions, stopping at the same short accepted-event endpoint. Estimate
+   first-event and early-growth seed variability before selecting a temperature
+   grid.
+2. Measure bytes per accepted event and checkpoint from those bounded runs.
+   Require an independently verified backup with projected campaign size plus
+   25% margin before any developed trajectory.
+3. For loading-rate work, predeclare whether rate is varied through `dU`, `dt`,
+   or both. Do not conflate controller resolution with physical loading rate.
+4. For orientation work, require the authoritative theta field to agree in run
+   arguments, normalized summary, and native diagnostics; inherited legacy
+   labels are not sufficient.
+
+## Command-release rule
+
+After those four items are recorded, add a source-bound campaign launcher that
+accepts only explicit temperature, `dU`, `dt`, theta, seed, endpoint, and a new
+output directory; validates branch/head and free space; preserves
+`threshold_scaled` events and all current signed/reversible physics; and refuses
+overwrites. Its exact commands and output roots must then be committed with the
+predeclared campaign matrix.
+
+Until that launcher and matrix exist, the only exact executable continuation
+retained here is the already completed bounded FEM companion command in its
+source branch, `run_current_pf_companion_one_step.sh`. Re-running it is neither
+needed nor authorized as a substitute for the missing accuracy/rate/orientation
+design. The cavity operator similarly requires no forced continuation: its
+present hazard predicts no connection event in a practical bounded window.

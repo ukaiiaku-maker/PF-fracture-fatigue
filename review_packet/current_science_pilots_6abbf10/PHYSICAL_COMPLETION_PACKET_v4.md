@@ -104,3 +104,8 @@ backup and all 39 files again passed SHA-256 verification. Compact evidence is
 in `FEM_CZM_CURRENT_COMPANION_ONE_STEP_v4.md` and `.json`; raw output remains
 under `integration_evidence/current_science_pilots_6abbf10/`. No push was
 attempted because no explicit remote/destination was provided.
+
+The reconciled capability/claim map is `EXECUTION_MAP.md`. `NEXT_BATCH_PLAN.md`
+records why a broader temperature/rate/orientation command set is not yet
+scientifically releasable and the exact measurements required before creating
+that campaign launcher.
