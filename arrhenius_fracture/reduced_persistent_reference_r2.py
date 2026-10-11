@@ -27,6 +27,9 @@ from .persistent_site_reversible_transport_v10230 import (
     install_reversible_transport, reversible_binding_receipt,
 )
 from .persistent_site_source_v10221 import PersistentSiteConfig, _source_geometry
+from .persistent_site_bracket_fix_v10221 import (
+    install_backstress_complementarity_fix,
+)
 from .reduced_shared_state_v1023 import (
     SharedReducedConfig, _front_config, _mpz_config, _tip_config,
 )
@@ -157,6 +160,10 @@ def build_restored_engine(
             f"expected {DEFAULT_KERNEL_SHA256}, observed {observed_kernel_hash}"
         )
     engine_type = ReducedPersistentReversibleTipEngine
+    # This is the already qualified v10.2.21 numerical interpretation used by
+    # the audited spatial entry: reaching the mechanical blocking state is a
+    # complementarity solution, not a failed root bracket or a source cap.
+    install_backstress_complementarity_fix()
     engine_type.configure_state_resolved_physics(kernel_path, "validated_scalar")
     engine_type.configure_persistent_sites(load_persistent_config(selection_path))
     front = _front_config(cfg)
