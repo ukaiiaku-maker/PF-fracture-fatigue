@@ -1,0 +1,29 @@
+{
+  "schema": "active-fracture-comparison-preservation/1",
+  "date": "2026-10-11",
+  "backup_root": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf",
+  "independent_device_verified": true,
+  "source_device_id": 16777237,
+  "backup_device_id": 16777234,
+  "local_raw_data_deleted": false,
+  "archives": [
+    {
+      "name": "active-fracture-comparisons-b3fcba4.tar",
+      "sha256": "5e0df87a7ddfdbc89108d46534a061b0b87755c4b35a15eb02bcfbed16563531",
+      "verification": "OK",
+      "contents": "complete active_fracture_comparisons_0a5d55e raw tree, including accepted outputs and rejected receipts"
+    },
+    {
+      "name": "shared-fracture-fatigue-options-v1-b3fcba4.tar",
+      "sha256": "78db7a98c0f40fc421f20ba2870b14a8792d815503b2b98d412579108e1d488f",
+      "verification": "OK",
+      "contents": "exact Git archive of compact source and report commit b3fcba4"
+    },
+    {
+      "name": "fem-czm-peak1000-theta0-seed8666-first-passage-8a86519.tar",
+      "sha256": "121fe0f7cd284948bb802cd59de065b6b95e5770d7bddd368aeae8b7298cacee",
+      "verification": "OK",
+      "contents": "corrected full FEM/CZM finite no-event run"
+    }
+  ]
+}
