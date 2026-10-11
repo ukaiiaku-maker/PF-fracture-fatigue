@@ -1886,6 +1886,55 @@ def _convex_polygon_interior_overlaps_triangle(polygon, triangle, tolerance=1.0e
     return True
 
 
+def _segment_intersects_convex_polygon_open_interior(
+    first, second, polygon, tolerance=1.0e-14,
+):
+    """Return whether a segment enters the actual polygon's open interior.
+
+    Boundary contact alone is deliberately excluded.  In particular, a crack
+    arm terminating at an exact polygonal cavity intersection must not be
+    rejected merely because the polygon's equivalent circular radius lies
+    outside that faceted boundary point.
+    """
+    polygon = np.asarray(polygon, dtype=float)
+    first = np.asarray(first, dtype=float)
+    second = np.asarray(second, dtype=float)
+    signed_area_twice = float(np.sum(
+        polygon[:, 0] * np.roll(polygon[:, 1], -1)
+        - polygon[:, 1] * np.roll(polygon[:, 0], -1)
+    ))
+    if abs(signed_area_twice) <= tolerance:
+        raise ValueError("open-interior test requires a nondegenerate polygon")
+    orientation = 1.0 if signed_area_twice > 0.0 else -1.0
+    delta = second - first
+    def cross2(left, right):
+        return float(left[0] * right[1] - left[1] * right[0])
+    lower, upper = 0.0, 1.0
+    for edge_start, edge_end in zip(polygon, np.roll(polygon, -1, axis=0)):
+        edge = edge_end - edge_start
+        c0 = orientation * cross2(edge, first - edge_start)
+        dc = orientation * cross2(edge, delta)
+        if abs(dc) <= tolerance:
+            if c0 < -tolerance:
+                return False
+            continue
+        crossing = -c0 / dc
+        if dc > 0.0:
+            lower = max(lower, crossing)
+        else:
+            upper = min(upper, crossing)
+        if lower > upper + tolerance:
+            return False
+    if upper - lower <= tolerance:
+        return False
+    midpoint = first + 0.5 * (lower + upper) * delta
+    return all(
+        orientation * cross2(edge_end - edge_start, midpoint - edge_start)
+        > tolerance
+        for edge_start, edge_end in zip(polygon, np.roll(polygon, -1, axis=0))
+    )
+
+
 def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
                                       intended_intersection) -> dict[str, Any]:
     """Certify combined graph/cavity incidence, clearance, and free boundary."""
@@ -1904,12 +1953,6 @@ def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
         a = np.asarray(first); b = np.asarray(second); delta = b - a
         fraction = float(np.clip((center - a) @ delta / max(delta @ delta, 1.0e-300), 0.0, 1.0))
         return float(np.linalg.norm(a + fraction * delta - center))
-    segment_rows = [{"branch_id": item.branch_id, "segment_index": index,
-                     "minimum_center_distance_m": segment_open_disk_distance(first, second),
-                     "intersects_cavity_open_disk": segment_open_disk_distance(first, second) < cavity.radius_m * (1.0 - 1.0e-10)}
-                    for item in state.crack_network.branches
-                    for index, (first, second) in enumerate(zip(item.path, item.path[1:]))]
-    graph_outside = not any(row["intersects_cavity_open_disk"] for row in segment_rows)
     support = state.v12_support_state
     support_ids = () if support is None else support.selected_support_elements
     centroids = np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)].mean(axis=1)
@@ -1917,6 +1960,25 @@ def crack_void_connection_certificate(state, *, branch_id: str, cavity_id: str,
         np.asarray(state.mesh.nodes)[np.asarray(state.mesh.elems)[int(element)]], center, cavity.radius_m,
     )]
     cavity_polygon = _ordered_cavity_polygon(state, cycle)
+    segment_rows = [{
+        "branch_id": item.branch_id,
+        "segment_index": index,
+        "minimum_center_distance_m": segment_open_disk_distance(first, second),
+        "intersects_equivalent_cavity_open_disk": (
+            segment_open_disk_distance(first, second)
+            < cavity.radius_m * (1.0 - 1.0e-10)
+        ),
+        "intersects_actual_cavity_polygon_open_interior": (
+            _segment_intersects_convex_polygon_open_interior(
+                first, second, cavity_polygon,
+            )
+        ),
+    } for item in state.crack_network.branches
+      for index, (first, second) in enumerate(zip(item.path, item.path[1:]))]
+    graph_outside = not any(
+        row["intersects_actual_cavity_polygon_open_interior"]
+        for row in segment_rows
+    )
     polygon_overlap_ids = [int(element) for element in support_ids
                            if _convex_polygon_interior_overlaps_triangle(
                                cavity_polygon,
@@ -3743,6 +3805,69 @@ def matched_ligament_energy_observation(
         "physical_time_advanced": False,
         "transport_solve_performed": False,
     }
+
+
+def dispatch_cavity_intersecting_candidate_drives(
+    state, *, branch_id, directional_rows, maximum_event_advance_m,
+    refinement_levels=(3, 4),
+):
+    """Replace only cavity-intersecting candidates by the finite ligament drive.
+
+    Ordinary local-J or finite-advance rows are preserved verbatim.  A
+    candidate is dispatched only when its own ray reaches the current cavity
+    within the physical event-length support supplied by the caller.  The
+    replacement is the existing matched, fixed-load, complete-ligament energy
+    observation; it is never relabeled as local J.
+    """
+    rows = tuple(dict(row) for row in directional_rows)
+    candidates = tuple(state.competition.candidates)
+    if len(rows) != len(candidates):
+        raise ValueError("directional rows must align one-to-one with candidates")
+    limit = float(maximum_event_advance_m)
+    if not math.isfinite(limit) or limit <= 0.0:
+        raise ValueError("maximum event advance must be finite and positive")
+    start = state.crack_network.branch(str(branch_id)).tip
+    dispatched = []
+    for candidate, row in zip(candidates, rows):
+        entry = _first_ray_cavity_intersection(
+            state, start, candidate.direction_xy,
+        )
+        if entry is None or math.dist(start, entry) > limit * (1.0 + 1.0e-12):
+            dispatched.append(row)
+            continue
+        observation = matched_ligament_energy_observation(
+            state, branch_id=str(branch_id), candidate=candidate,
+            refinement_levels=refinement_levels,
+        )
+        if observation["status"] != "AVAILABLE":
+            dispatched.append({
+                **row,
+                "directional_drive_status": "DIRECTIONAL_DRIVE_UNAVAILABLE",
+                "directional_drive_unavailable_reason": (
+                    "MATCHED_COMPLETE_LIGAMENT_ENERGY_NOT_MESH_CONVERGED"
+                ),
+                "ligament_energy_observation": observation,
+            })
+            continue
+        G = max(float(observation["G_ligament_J_per_m2"]), 0.0)
+        K = math.sqrt(float(state.material.Eprime) * G)
+        dispatched.append({
+            **row,
+            "directional_drive_status": "AVAILABLE",
+            "directional_drive_unavailable_reason": None,
+            "G_marginal_J_per_m2": G,
+            "G_marginal": G,
+            "G_kinetic_used_J_per_m2": G,
+            "G_kinetic_used": G,
+            "positive_J_J_per_m2": G,
+            "drive_source": "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY",
+            "K_energy_equivalent_Pa_sqrt_m": K,
+            "K_energy_equivalent": K,
+            "K_directional_Pa_sqrt_m": K,
+            "ligament_energy_observation": observation,
+            "local_J_substituted": False,
+        })
+    return tuple(dispatched)
 
 
 def ligament_transaction(state, *, failure_stage=None, operation_log=None,

@@ -72,18 +72,24 @@ def main() -> int:
             "queries": "DBTT_1200K_LENGTH_QUERIES_v3.json",
         },
         "cavity": {
-            "status": "NARROW_PHYSICAL_DEFINITION_BOUNDARY",
+            "status": "QUALIFIED_COMPLETE_LIGAMENT_OPERATION",
             "failed_arm": "cavity_enabled",
             "crack_tip_x_um": 592.5993004046689,
             "nearest_cavity_center_x_um": 600.0,
-            "ligament_um": 7.4006995953311,
+            "center_separation_um": 7.4006995953311,
+            "solid_ligament_um": 7.358229034070524,
             "local_J_J_per_m2": 3932.2698590937002,
             "local_J_valid": False,
             "invalid_reason": "cavity_free_surface_intersects_contour",
             "supported_contour_radii_um": [26.591927524494184, 37.5, 50.0],
             "marginal_trial_advances_um": [20.0, 30.0],
             "marginal_trial_count_observed": 0,
-            "interpretation": "isolated-tip J and forward marginal-G cease to be defined at crack-cavity coalescence; earlier initialization does not define the missing coalescence criterion",
+            "complete_ligament_G_J_per_m2": 40.4943938223355,
+            "complete_ligament_mesh_relative_error": 0.08771391032970505,
+            "complete_ligament_mesh_relative_limit": 0.1,
+            "candidate_effective_rate_s": 5.390928548202657e-58,
+            "candidate_crossing_time_s": 2.233929559967089e56,
+            "interpretation": "local J remains invalid, but the distinct original complete-ligament topology operation is qualified; its current hazard rate predicts no event in a practical bounded window",
         },
         "fem_czm": {
             "status": "EXACT_HISTORICAL_INPUT_UNAVAILABLE_AFTER_TARGETED_ROUTE",
@@ -98,7 +104,9 @@ def main() -> int:
             "live_cache_family_sha256": "d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3",
             "accepted_full_FEM_steps": 0,
             "guard_weakened": False,
-            "new_companion_run": "not launched: a new pin requires a separately reviewed external-backend companion configuration; the clean pinned checkout was not modified",
+            "companion_branch": "codex/current-pf-companion",
+            "companion_commit": "fa24f7b",
+            "new_companion_run": "prepared and tested but not launched: the required durable independent backup destination is not yet available; the clean pinned checkout was not modified",
         },
         "storage": {"raw_hot_path_MiB": round(sum(p.stat().st_size for p in HOT.rglob('*') if p.is_file()) / 2**20, 3),
                     "free_space_GiB": round(shutil.disk_usage('/Volumes/Data').free / 2**30, 3),
@@ -114,11 +122,11 @@ The mechanism history uses the native chronological stage ledger. `N_em` is repo
 
 ## Cavity boundary
 
-The retained enabled snapshot places the crack tip at 592.599 µm and the first cavity at 600 µm. The 7.401 µm ligament is smaller than every supported J contour and both requested marginal advances. Consequently the cavity free surface intersects every contour and zero marginal trials are certifiable. The unresolved item is now narrow: a crack–cavity coalescence criterion is required; restarting earlier cannot make isolated-tip J well-defined at this state.
+The retained enabled snapshot places the crack tip at 592.599 µm and the first cavity center at 600 µm. Their 7.401 µm center separation is not the solid ligament. The actual polygonal ray intersection gives 7.358229 µm of intact solid. Local isolated-tip $J$ remains invalid because every supported contour crosses the cavity, but the distinct original complete-ligament topology operation is available: 40.494394 J m$^{{-2}}$ with an 8.771% level-3/4 difference, below the existing 10% limit. The accepted state and physical time are unchanged. At this load its original hazard route gives a $5.39\times10^{{-58}}$ s$^{{-1}}$ rate, so no practical finite-window connection event is claimed.
 
 ## FEM/CZM boundary
 
-The exact historical `a85b57…` family is absent from its documented resolution path, the live cache, and all present local Git `family.json` blobs. Git retains a same-configuration canonical family at `a15ead…`, while the live cache is `d41b08…`; neither has the required `e239710…` mechanical fingerprint. The pinned backend guard remains intact and accepted zero full-FEM steps. A new full-FEM comparison now requires a separately reviewed companion pin/configuration in the clean external backend; it was not silently substituted here.
+The exact historical `a85b57…` family remains unavailable and the pinned backend guard remains intact. The separate `codex/current-pf-companion` branch at `fa24f7b` binds the native full-order builder to the present `d41b08…` family and its `1447653…` mechanical configuration, explicitly distinct from historical `e239710…`. Its focused contract suite passes, but the one-step execution remains gated on a durable independent backup destination; the clean historical checkout was not modified.
 """)
     return 0
 

@@ -1,10 +1,15 @@
 {
   "cavity": {
+    "candidate_crossing_time_s": 2.233929559967089e+56,
+    "candidate_effective_rate_s": 5.390928548202657e-58,
+    "center_separation_um": 7.4006995953311,
+    "complete_ligament_G_J_per_m2": 40.4943938223355,
+    "complete_ligament_mesh_relative_error": 0.08771391032970505,
+    "complete_ligament_mesh_relative_limit": 0.1,
     "crack_tip_x_um": 592.599300404669,
     "failed_arm": "cavity_enabled",
-    "interpretation": "isolated-tip J and forward marginal-G cease to be defined at crack-cavity coalescence; earlier initialization does not define the missing coalescence criterion",
+    "interpretation": "local J remains invalid, but the distinct original complete-ligament topology operation is qualified; its current hazard rate predicts no event in a practical bounded window",
     "invalid_reason": "cavity_free_surface_intersects_contour",
-    "ligament_um": 7.4006995953311,
     "local_J_J_per_m2": 3932.2698590937002,
     "local_J_valid": false,
     "marginal_trial_advances_um": [
@@ -13,7 +18,8 @@
     ],
     "marginal_trial_count_observed": 0,
     "nearest_cavity_center_x_um": 600.0,
-    "status": "NARROW_PHYSICAL_DEFINITION_BOUNDARY",
+    "solid_ligament_um": 7.358229034070524,
+    "status": "QUALIFIED_COMPLETE_LIGAMENT_OPERATION",
     "supported_contour_radii_um": [
       26.591927524494185,
       37.5,
@@ -23,12 +29,14 @@
   "fem_czm": {
     "accepted_full_FEM_steps": 0,
     "backend_commit": "293491157063484bb10df6adc479f847a6a08ba6",
+    "companion_branch": "codex/current-pf-companion",
+    "companion_commit": "fa24f7b",
     "configuration_fingerprint": "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5",
     "documented_resolution_path_exists": false,
     "exact_hash_in_present_local_git_family_blobs": false,
     "guard_weakened": false,
     "live_cache_family_sha256": "d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3",
-    "new_companion_run": "not launched: a new pin requires a separately reviewed external-backend companion configuration; the clean pinned checkout was not modified",
+    "new_companion_run": "prepared and tested but not launched: the required durable independent backup destination is not yet available; the clean pinned checkout was not modified",
     "present_canonical_family_sha256": "a15eada6a3d86a8f52e3ba6a921c5cf6c98d7f9bae082f2e09f1ad8c14307c24",
     "present_canonical_git_blob": "ccd4ef6b2b05ddaac1a1733b960f6f9a17ed4322",
     "required_family_sha256": "a85b57ad9eee8331ef34ea222760ce7d4064f48ddef668f1e28a666d14946f3a",
@@ -66,7 +74,7 @@
   "storage": {
     "data_deleted": false,
     "external_data_modified": false,
-    "free_space_GiB": 12.655,
+    "free_space_GiB": 17.955,
     "raw_hot_path_MiB": 74.671
   }
 }

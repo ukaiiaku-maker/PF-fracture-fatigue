@@ -27,7 +27,8 @@ from .topology_transaction_v11 import (
 from .unified_fracture_material_v5 import material_bundle
 from .voiding_production_v5 import (
     build_production_void_state, crack_tip_tensor, deterministic_trajectory,
-    directional_sharp_front_rates, observables, sharp_front_load_provider,
+    directional_sharp_front_rates, dispatch_cavity_intersecting_candidate_drives,
+    observables, sharp_front_load_provider,
 )
 
 MODEL_ID = "shared.native_v5_physical_paired_cavity/2"
@@ -115,6 +116,15 @@ def _directional_provider(temperature_K: float):
                 virtual_mechanical_trial_transport="deferred_read_only",
                 mechanical_refinement_policy="legacy_accumulated_generations",
             )
+        provider["directional"] = list(
+            dispatch_cavity_intersecting_candidate_drives(
+                state,
+                branch_id=ROOT_BRANCH_ID,
+                directional_rows=provider["directional"],
+                maximum_event_advance_m=3.0e-5,
+                refinement_levels=(3, 4),
+            )
+        )
         rates = directional_sharp_front_rates(
             state, provider["directional"], branch_id=ROOT_BRANCH_ID,
             temperature_K=float(temperature_K),

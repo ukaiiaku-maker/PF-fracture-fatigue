@@ -1,0 +1,33 @@
+{
+  "controller": {
+    "B_decrease_count": 189,
+    "B_semantic": "resettable within-event progress clock; not cumulative hazard history",
+    "minimum_adaptive_fraction": 1e-08,
+    "opening_continued_to_increase": true,
+    "prescribed_hold_detected": false
+  },
+  "files": {
+    "accepted_steps": "ACCEPTED_STEP_DIAGNOSTICS_HOT_COLD_v4.csv",
+    "event_comparison": "HOT_COLD_SAME_GEOMETRY_EVENTS_v4.csv",
+    "history": "PHYSICAL_HISTORY_HOT_COLD_v4.csv",
+    "queries": "LENGTH_QUERY_BRACKETS_HOT_COLD_v4.csv"
+  },
+  "hot_100_to_1000_lower_brackets": {
+    "elapsed_model_time_s": 0.00019069196719101456,
+    "extension_change_um": 898.7091227135081,
+    "interpretation": "event-localized adaptive model sequence, not physical crack velocity"
+  },
+  "model_time_semantic": "accepted loading/controller clock from native observation history",
+  "same_geometry_comparison": {
+    "all_event_brackets_identical": true,
+    "event_count_each": 203,
+    "geometry_event_files_byte_identical": true,
+    "geometry_event_files_sha256": {
+      "cold_300K": "8d52d31c513e62659167efacdf40c16b0b70ce26b5907c2bcbb2992026cdd165",
+      "hot_1200K": "8d52d31c513e62659167efacdf40c16b0b70ce26b5907c2bcbb2992026cdd165"
+    },
+    "interpretation": "temperature changes the time/load/K history, while the seeded event-length and mark sequence fixes the common final geometry"
+  },
+  "schema": "physical-growth-comparison/4",
+  "velocity_claimed": false
+}

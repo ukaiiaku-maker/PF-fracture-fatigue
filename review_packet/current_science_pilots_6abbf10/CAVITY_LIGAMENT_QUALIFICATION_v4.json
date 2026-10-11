@@ -1,0 +1,46 @@
+{
+  "G_ligament_J_per_m2": 40.4943938223355,
+  "K_energy_equivalent_MPa_sqrt_m": 3.056936393326929,
+  "accepted_state_preserved": true,
+  "candidate_crossing_time_s": 2.233929559967089e+56,
+  "candidate_effective_rate_s": 5.390928548202657e-58,
+  "candidate_id": "cleave:cleavage:(100):5d54146b8dbcda7a568e",
+  "center_separation_um": 7.400699595331065,
+  "directional_drive_status": "AVAILABLE",
+  "drive_source": "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY",
+  "interpretation": "finite complete-ligament topology energy under the original candidate hazard route; distinct from and not substituted for local J",
+  "levels": [
+    {
+      "G_ligament_J_per_m2": 44.38782338221379,
+      "Pi_connected_J_per_m": 1.5014333310207246,
+      "Pi_unextended_J_per_m": 1.5017599467914948,
+      "connection_certificate_passed": true,
+      "crack_graph_outside_actual_cavity_polygon": true,
+      "exact_no_intact_node_or_element_path": true,
+      "mesh_elements": 4134,
+      "mesh_nodes": 2148,
+      "refinement_level": 3
+    },
+    {
+      "G_ligament_J_per_m2": 40.4943938223355,
+      "Pi_connected_J_per_m": 1.5014333309109806,
+      "Pi_unextended_J_per_m": 1.5017312979353212,
+      "connection_certificate_passed": true,
+      "crack_graph_outside_actual_cavity_polygon": true,
+      "exact_no_intact_node_or_element_path": true,
+      "mesh_elements": 5258,
+      "mesh_nodes": 2710,
+      "refinement_level": 4
+    }
+  ],
+  "local_J_substituted": false,
+  "mesh_relative_error": 0.08771391032970505,
+  "mesh_relative_limit": 0.1,
+  "physical_time_advanced": false,
+  "raw_evidence": "integration_evidence/current_science_pilots_6abbf10/cavity_ligament/candidate_specific_complete_ligament_observation.json",
+  "raw_evidence_sha256": "d87ba2b83366ff0c722d91e580f6ba43832378962265e8011fcec950b8b064a9",
+  "schema": "retained-current-cavity-ligament-summary/1",
+  "solid_ligament_um": 7.358229034070524,
+  "status": "QUALIFIED_COMPLETE_LIGAMENT_OPERATION",
+  "transport_solve_performed": false
+}

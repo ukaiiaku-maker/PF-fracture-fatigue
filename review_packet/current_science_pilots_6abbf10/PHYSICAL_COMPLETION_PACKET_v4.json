@@ -1,0 +1,46 @@
+{
+  "schema": "physical-fracture-completion-packet/4",
+  "manuscript_modified": false,
+  "pf": {
+    "hot_accepted_events": 203,
+    "hot_terminal_projected_extension_um": 1004.9257634758525,
+    "hot_terminal_path_arclength_um": 1008.5595119085253,
+    "velocity_claimed": false,
+    "physical_comparison": "PHYSICAL_GROWTH_COMPARISON_v4.json",
+    "cold_hot_geometry_event_sequence_byte_identical": true
+  },
+  "cavity": {
+    "status": "QUALIFIED_COMPLETE_LIGAMENT_OPERATION_NO_PRACTICAL_WINDOW_EVENT",
+    "center_separation_um": 7.400699595331065,
+    "solid_ligament_um": 7.358229034070524,
+    "local_J_valid": false,
+    "complete_ligament_G_J_per_m2": 40.4943938223355,
+    "mesh_relative_error": 0.08771391032970505,
+    "candidate_effective_rate_s": 5.390928548202657e-58,
+    "candidate_crossing_time_s": 2.233929559967089e+56,
+    "qualification": "CAVITY_LIGAMENT_QUALIFICATION_v4.json"
+  },
+  "fem_czm": {
+    "historical_checkout_commit": "293491157063484bb10df6adc479f847a6a08ba6",
+    "historical_guard_preserved": true,
+    "companion_branch": "codex/current-pf-companion",
+    "companion_commit": "fa24f7b",
+    "current_kernel_sha256": "d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3",
+    "current_mechanical_configuration_fingerprint": "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5",
+    "historical_mechanical_configuration_fingerprint": "e23971019aca58e8e3319a207153c4faa3ead76417e1d537ec00c2ed2986e815",
+    "focused_tests_passed": 10,
+    "execution_status": "GATED_PENDING_DURABLE_INDEPENDENT_BACKUP_DESTINATION"
+  },
+  "verification": {
+    "main_tests_passed": 787,
+    "data_deleted": false,
+    "push_attempted": false
+  },
+  "backup": {
+    "minimum_free_space_MiB": 512,
+    "estimated_payload_MiB": 190,
+    "same_device_refused": true,
+    "ephemeral_private_tmp_rejected_as_durable": true,
+    "script": "scripts/create_physical_completion_backup.sh"
+  }
+}
