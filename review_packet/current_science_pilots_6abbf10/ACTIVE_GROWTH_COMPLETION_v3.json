@@ -1,0 +1,72 @@
+{
+  "cavity": {
+    "crack_tip_x_um": 592.599300404669,
+    "failed_arm": "cavity_enabled",
+    "interpretation": "isolated-tip J and forward marginal-G cease to be defined at crack-cavity coalescence; earlier initialization does not define the missing coalescence criterion",
+    "invalid_reason": "cavity_free_surface_intersects_contour",
+    "ligament_um": 7.4006995953311,
+    "local_J_J_per_m2": 3932.2698590937002,
+    "local_J_valid": false,
+    "marginal_trial_advances_um": [
+      20.0,
+      30.0
+    ],
+    "marginal_trial_count_observed": 0,
+    "nearest_cavity_center_x_um": 600.0,
+    "status": "NARROW_PHYSICAL_DEFINITION_BOUNDARY",
+    "supported_contour_radii_um": [
+      26.591927524494185,
+      37.5,
+      50.0
+    ]
+  },
+  "fem_czm": {
+    "accepted_full_FEM_steps": 0,
+    "backend_commit": "293491157063484bb10df6adc479f847a6a08ba6",
+    "configuration_fingerprint": "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5",
+    "documented_resolution_path_exists": false,
+    "exact_hash_in_present_local_git_family_blobs": false,
+    "guard_weakened": false,
+    "live_cache_family_sha256": "d41b08f69ae773009f65f4c0094ef5436ba7f0f290a94172e5b894d09a41f7c3",
+    "new_companion_run": "not launched: a new pin requires a separately reviewed external-backend companion configuration; the clean pinned checkout was not modified",
+    "present_canonical_family_sha256": "a15eada6a3d86a8f52e3ba6a921c5cf6c98d7f9bae082f2e09f1ad8c14307c24",
+    "present_canonical_git_blob": "ccd4ef6b2b05ddaac1a1733b960f6f9a17ed4322",
+    "required_family_sha256": "a85b57ad9eee8331ef34ea222760ce7d4064f48ddef668f1e28a666d14946f3a",
+    "required_mechanical_fingerprint": "e23971019aca58e8e3319a207153c4faa3ead76417e1d537ec00c2ed2986e815",
+    "status": "EXACT_HISTORICAL_INPUT_UNAVAILABLE_AFTER_TARGETED_ROUTE"
+  },
+  "hot_path": {
+    "accepted_events": 203,
+    "native_combined_checkpoint": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/checkpoint/run_state_checkpoint.json",
+    "pilot_prefix": [
+      [
+        165,
+        52.37574061089843,
+        2.2973400956249024
+      ],
+      [
+        186,
+        53.872930408603125,
+        10.564512816410554
+      ]
+    ],
+    "pilot_prefix_exact": true,
+    "queries": "DBTT_1200K_LENGTH_QUERIES_v3.json",
+    "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3",
+    "status": "COMPLETED_PHYSICAL_TARGET",
+    "temperature_K": 1200.0,
+    "terminal_K_J_MPa_sqrt_m": null,
+    "terminal_active_mobile_plus_retained_count": 40623.55464354475,
+    "terminal_path_arclength_um": 1008.5595119085253,
+    "terminal_projected_extension_um": 1004.9257634758525,
+    "terminal_source_backstress_GPa": 10.092732930000162,
+    "terminal_stage": "committed"
+  },
+  "schema": "active-growth-pilot-completion/3",
+  "storage": {
+    "data_deleted": false,
+    "external_data_modified": false,
+    "free_space_GiB": 12.655,
+    "raw_hot_path_MiB": 74.671
+  }
+}
