@@ -1393,31 +1393,12 @@ def solve_transport_interval(
             boundary_concentration=ceq_surface,
             boundary_concentration_by_face=diagnostic_boundary_concentration_by_face,
         )
-        mixed_solution = np.asarray(
-            spsolve(matrix, rhs) if linear_solver_provider is None else
-            linear_solver_provider.solve(
-                matrix, rhs, len(unknown_faces), dependency_identity={
-                    "transport_mesh_nodes_sha256": hashlib.sha256(
-                        np.ascontiguousarray(mesh.nodes).tobytes()).hexdigest(),
-                    "transport_mesh_elements_sha256": hashlib.sha256(
-                        np.ascontiguousarray(mesh.elems).tobytes()).hexdigest(),
-                    "surface_registry_fingerprint": registry.fingerprint,
-                    "unknown_face_order": tuple(repr(face) for face in unknown_faces),
-                }),
-            dtype=float)
-        candidate = mixed_solution[len(unknown_faces):]
-        if np.any(~np.isfinite(candidate)):
-            raise RuntimeError("singular vacancy transport solve")
-        if ((np.any(candidate < effective_c_min) or np.any(candidate > c_max))
-                and linear_solver_provider is None):
-            # The mixed matrix couples flux unknowns O(1e-20) to atomic
-            # fractions O(1e-15).  SuperLU on the raw units can lose enough
-            # digits to create a small negative P0 value.  Symmetric diagonal
-            # equilibration solves the identical assembled equations; it is
-            # neither a concentration projection nor a modified flux law.
-            unscaled_rejected_candidate = candidate.copy()
-            unscaled_rejected_residual = float(
-                np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf))
+        if linear_solver_provider is None:
+            # Flux unknowns and atomic fractions occupy very different native
+            # scales.  Solve the identical assembled saddle equations after a
+            # symmetric diagonal change of variables on every iteration; using
+            # this only as a bounds-triggered retry leaves an admissible solve
+            # vulnerable to roundoff-level Picard stagnation.
             diagonal_scale = np.abs(np.asarray(matrix.diagonal(), float))
             positive_diagonal = diagonal_scale[diagonal_scale > 0.0]
             floor = (float(np.min(positive_diagonal))*np.finfo(float).eps
@@ -1428,8 +1409,20 @@ def solve_transport_interval(
             equilibrated_rhs = scaling*rhs
             solved = np.asarray(spsolve(equilibrated, equilibrated_rhs), float)
             mixed_solution = scaling*solved
-            candidate = mixed_solution[len(unknown_faces):]
             linear_equilibration_used = True
+        else:
+            mixed_solution = np.asarray(linear_solver_provider.solve(
+                matrix, rhs, len(unknown_faces), dependency_identity={
+                    "transport_mesh_nodes_sha256": hashlib.sha256(
+                        np.ascontiguousarray(mesh.nodes).tobytes()).hexdigest(),
+                    "transport_mesh_elements_sha256": hashlib.sha256(
+                        np.ascontiguousarray(mesh.elems).tobytes()).hexdigest(),
+                    "surface_registry_fingerprint": registry.fingerprint,
+                    "unknown_face_order": tuple(repr(face) for face in unknown_faces),
+                }), dtype=float)
+        candidate = mixed_solution[len(unknown_faces):]
+        if np.any(~np.isfinite(candidate)):
+            raise RuntimeError("singular vacancy transport solve")
         high_order_linear_residual_inf = float(
             np.linalg.norm(matrix@mixed_solution-rhs, ord=np.inf)
         )
