@@ -1,0 +1,59 @@
+{
+  "schema": "fracture-publication-acceptance-backup/1",
+  "date": "2026-10-11",
+  "status": "PASS",
+  "append_only": true,
+  "local_raw_data_deleted": false,
+  "source_device_id": 16777237,
+  "backup_device_id": 16777234,
+  "independent_device_verified": true,
+  "release_commit": "1d8695c0c34f6db47d51ca9ebc7aa32f1dcdde50",
+  "producer_analysis_commit": "b1ad7055bcf1b3f18b23ba9139946d510a2b072e",
+  "backup_root": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/publication_acceptance_1d8695c0",
+  "archives": [
+    {
+      "name": "fracture-publication-acceptance-1d8695c0.tar",
+      "bytes": 22199296,
+      "member_file_count": 104,
+      "sha256": "7edb1a735d13c7a1616de4d93c88de053cb7157fa730d53d08cddb00c7ce5c27",
+      "contents": "final reader package, publication-acceptance analysis packet, acceptance/test/decision records, deterministic builders, and release tests",
+      "tar_listing": "PASS"
+    },
+    {
+      "name": "publication-acceptance-1d8695c0.incremental.bundle",
+      "bytes": 11543334,
+      "sha256": "9bb25961c668dbd87e1d35fe50d1fef425abd54738d6c22d3f0f31fc960ee4fc",
+      "requires_commit": "0c72ca2b371b3a41f41e380f93cde6a3371d22d6",
+      "contains_ref": "1d8695c0c34f6db47d51ca9ebc7aa32f1dcdde50",
+      "git_bundle_verify": "PASS"
+    }
+  ],
+  "release_artifacts": {
+    "docx_sha256": "048c54f74ba48dfdad635f68415e98a4317bafdf8004086e4756e5ff3e3d0859",
+    "portable_zip_sha256": "c273f156b62e7f9356ed65bf6ea39690721cbad395155358776dbacc0e902537",
+    "manifest_sha256": "d2a7589f7f74f4bf58e3d2bb146741e4af432d3f490ccef4327800a5405735c0",
+    "acceptance_ledger_sha256": "4d712e2c8eef15d209352d570cdb5dbf664c97e421f1d71021bfde4cb7126bde"
+  },
+  "representative_restore": [
+    {
+      "path": "fracture_final_current/manuscript_and_SI.docx",
+      "original_sha256": "048c54f74ba48dfdad635f68415e98a4317bafdf8004086e4756e5ff3e3d0859",
+      "restored_sha256": "048c54f74ba48dfdad635f68415e98a4317bafdf8004086e4756e5ff3e3d0859",
+      "match": true
+    },
+    {
+      "path": "fracture_final_current/reproducibility.zip",
+      "original_sha256": "c273f156b62e7f9356ed65bf6ea39690721cbad395155358776dbacc0e902537",
+      "restored_sha256": "c273f156b62e7f9356ed65bf6ea39690721cbad395155358776dbacc0e902537",
+      "match": true
+    },
+    {
+      "path": "review_packet/publication_acceptance_0c72ca2b/METHOD_TO_RESULT_MAP.json",
+      "original_sha256": "040cfb5e54e6b96a6ae51c871c0f29b4b7e73f089127ffafc2b74252ca303657",
+      "restored_sha256": "040cfb5e54e6b96a6ae51c871c0f29b4b7e73f089127ffafc2b74252ca303657",
+      "match": true
+    }
+  ],
+  "restore_directory": "/private/tmp/fracture-publication-restore-1d8695c0",
+  "remote_push_performed": false
+}
