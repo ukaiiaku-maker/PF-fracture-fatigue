@@ -78,7 +78,7 @@ def qualification_jobs() -> tuple[QualificationJob, ...]:
                          "Do original PF and FEM backends trend to the same pre-event observables on independent meshes?",
                          "scripts/run_pf_fem_readiness_qualification.py", ("--levels", "3", "--opening-only"),
                          "three fixed pre-event common loads and one short accepted/restart event",
-                         ("one worker", "capacity preflight", "wall cap 6 h"),
+                         ("one worker", "capacity preflight", "checkpoint/resume same physics; no model-selection wall cap"),
                          ("reaction", "stored energy", "stress", "displacement", "J/support", "restart"), 18.0, compact,
                          "UNRESOLVED_GENERIC_FEM_ADAPTER"),
         QualificationJob("Q-CAVITY-LOCAL", ("FG-13", "FG-16"),
@@ -90,7 +90,7 @@ def qualification_jobs() -> tuple[QualificationJob, ...]:
                          "Can native birth, daughter continuation and a second-generation birth survive restart?",
                          "scripts/run_recursive_branch_readiness.py", ("--second-generation",),
                          "second-generation native birth followed by one accepted continuation",
-                         ("one worker", "capacity preflight", "wall cap 8 h"),
+                         ("one worker", "capacity preflight", "checkpoint/resume same physics; no model-selection wall cap"),
                          ("birth", "owner", "cluster/local", "inherited clock", "restart"), 24.0, compact,
                          "UNRESOLVED_SECOND_GENERATION_NATIVE_ADAPTER"),
     )

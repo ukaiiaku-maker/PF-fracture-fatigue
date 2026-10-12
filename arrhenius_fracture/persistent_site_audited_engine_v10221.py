@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from .persistent_site_source_v10221 import PersistentSiteStateResolvedTipEngine
+from .persistent_runtime_contract import require_persistent_binding
 
 
 class AuditedPersistentSiteStateResolvedTipEngine(
@@ -9,8 +10,23 @@ class AuditedPersistentSiteStateResolvedTipEngine(
 ):
     """Expose the real source backstress and aggregate hazard in standard outputs."""
 
+    persistent_runtime_binding_records = []
+
+    @classmethod
+    def reset_runtime_binding_records(cls):
+        cls.persistent_runtime_binding_records = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        type(self).persistent_runtime_binding_records.append(
+            require_persistent_binding(self.mpz, stage="post_construction")
+        )
+
     def step(self, K, T, dt):
+        require_persistent_binding(self.mpz, stage="pre_step")
         result = super().step(K, T, dt)
+        receipt = require_persistent_binding(self.mpz, stage="post_accepted_step")
+        type(self).persistent_runtime_binding_records.append(receipt)
         sigma_back = float(
             getattr(self.mpz, "continuum_source_last_sigma_back_Pa", 0.0)
         )
@@ -35,6 +51,7 @@ class AuditedPersistentSiteStateResolvedTipEngine(
             geometry.get("tip_radius_m", self.r_eff())
         )
         result["persistent_source_inventory_active"] = False
+        result["persistent_native_runtime_contract"] = receipt["schema"]
         if type(self)._audit_records:
             type(self)._audit_records[-1].update(
                 {

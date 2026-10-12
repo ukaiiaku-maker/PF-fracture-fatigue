@@ -46,4 +46,15 @@ python -m scripts.resolve_shared_options --preset pf_branching_void_v5 --output 
 - The pinned full FEM/CZM pair does not claim the PF V5 cavity adapter or the PF V3.6 fixed-support projection.
 - Unsupported or misspelled options fail before solver execution. There is no silent fallback or import-order switch.
 
+## Runtime is not a physics selector
+
+Elapsed time, an agent-session duration, output profile, checkpoint cadence, or
+scheduler time slice must never select a different source lifecycle, transport
+operator, state resolution, mechanics provider, barrier, completion law, or
+event model. An interruption leaves the requested calculation incomplete and
+restartable under the same physics. It is not a no-event physical result and it
+does not authorize a finite-source, split-update, reduced, or historical
+substitute. Numerical residual, conservation, admissibility, event ordering,
+accuracy, storage-reserve, and genuine scheduler safeguards remain mandatory.
+
 The option layer wraps existing versioned providers. It does not rename a reduced or prescribed-field diagnostic as a full spatial calculation.

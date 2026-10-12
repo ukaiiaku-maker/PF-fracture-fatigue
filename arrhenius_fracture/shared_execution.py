@@ -480,11 +480,17 @@ def execute_shared(
         request_path.write_text(json.dumps(request, indent=2, sort_keys=True) + "\n")
         worker = root / "arrhenius_fracture" / "shared_fem_execution_worker.py"
         worker_command = [str(interpreter), str(worker), str(request_path)]
-    result = subprocess.run(
-        worker_command,
-        cwd=cwd, env=environment, text=True, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
+    try:
+        result = subprocess.run(
+            worker_command,
+            cwd=cwd, env=environment, text=True, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+    except subprocess.TimeoutExpired as error:
+        raise RuntimeError(
+            "shared native execution was interrupted by the scheduler time limit; "
+            "the same requested physics remains incomplete and no substitute was started"
+        ) from error
     if result.returncode:
         failure = output / "shared_runtime_attestation.failure.json"
         detail = failure.read_text() if failure.is_file() else result.stderr.strip()

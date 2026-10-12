@@ -14,7 +14,7 @@ from .shared_execution import (
     construct_and_attest,
 )
 from .shared_options import (
-    MechanicsBackend, OutputProfile, SharedOptions, SourceLocation,
+    MechanicsBackend, OutputProfile, SharedOptions, SourceLifecycle, SourceLocation,
 )
 
 
@@ -108,6 +108,30 @@ def _verify_loaded_files(receipt: dict) -> None:
         expected = row.get("module_sha256")
         if raw and expected and _file_sha256(raw) != expected:
             raise RuntimeError(f"loaded calculation source changed during execution: {raw}")
+
+
+def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict | None:
+    """Compare the constructed tip-persistent object with the request.
+
+    Absence or mismatch is fatal.  This function never selects a replacement
+    executor, irrespective of elapsed time or output profile.
+    """
+    if (options.mechanics is not MechanicsBackend.SPATIAL_PF
+            or options.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE
+            or options.source_location is not SourceLocation.TIP_SURFACE):
+        return None
+    path = output / "persistent_native_runtime_binding.json"
+    if not path.is_file():
+        raise RuntimeError(
+            "requested persistent-source execution produced no native binding receipt; "
+            "no finite-source or reduced substitute will be started"
+        )
+    payload = json.loads(path.read_text())
+    if not payload.get("all_expected_methods_bound", False):
+        raise RuntimeError("executed persistent-source binding does not match the request")
+    if payload.get("finite_inventory_substitute_started") is not False:
+        raise RuntimeError("finite-inventory substitution detected for persistent request")
+    return payload
 
 
 def _multifront_restart_flag(path: str | Path) -> str:
@@ -212,6 +236,7 @@ def execute(request_path: str | Path) -> dict:
         json.dumps(receipt, indent=2, sort_keys=True, default=str) + "\n"
     )
     result = executor(argv)
+    executed_physics = _verify_executed_physics(output, options, plan)
     source_after = _verify_source_unchanged(root, source)
     _verify_loaded_files(receipt)
     binding_path = output / "monotonic_reversible_runtime_binding.json"
@@ -219,6 +244,7 @@ def execute(request_path: str | Path) -> dict:
     final = {
         **receipt, "status": "executed", "execution_verified": True,
         "return_value": result, "runtime_strategy_bindings": runtime_bindings,
+        "executed_physics_binding": executed_physics,
         "source_policy_post": source_after,
     }
     (output / "shared_runtime_attestation.post.json").write_text(

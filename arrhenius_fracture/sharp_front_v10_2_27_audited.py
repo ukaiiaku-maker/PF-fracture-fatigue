@@ -1,6 +1,7 @@
 """Audited executable wrapper for the v10.2.27 four-class campaign."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import sys
 
@@ -44,6 +45,7 @@ def main(argv=None):
     install_geometry_override()
     install_energy_ledger_output()
     original = _entry.PersistentSiteStateResolvedTipEngine
+    AuditedPersistentSiteStateResolvedTipEngine.reset_runtime_binding_records()
     _entry.PersistentSiteStateResolvedTipEngine = (
         AuditedPersistentSiteStateResolvedTipEngine
     )
@@ -52,6 +54,17 @@ def main(argv=None):
         out = _option_value(args, "--out")
         if out:
             write_energy_ledger_audit(Path(out))
+            records = AuditedPersistentSiteStateResolvedTipEngine.persistent_runtime_binding_records
+            (Path(out) / "persistent_native_runtime_binding.json").write_text(
+                json.dumps({
+                    "schema": "persistent-native-execution-binding/1",
+                    "requested_lifecycle": "persistent_reusable",
+                    "finite_inventory_substitute_started": False,
+                    "all_expected_methods_bound": bool(records) and all(
+                        row["all_expected_methods_bound"] for row in records),
+                    "records": records,
+                }, indent=2, sort_keys=True) + "\n"
+            )
         return result
     finally:
         restore_energy_ledger_output()

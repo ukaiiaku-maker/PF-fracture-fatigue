@@ -1,7 +1,7 @@
 {
   "capacity": {
     "admitted": true,
-    "free_GiB": 47.57196044921875,
+    "free_GiB": 45.368038177490234,
     "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1",
     "peak_GiB": 24.0,
     "reason": "capacity admitted",
@@ -82,7 +82,7 @@
       "numerical_guards": [
         "one worker",
         "capacity preflight",
-        "wall cap 6 h"
+        "checkpoint/resume same physics; no model-selection wall cap"
       ],
       "physical_endpoint": "three fixed pre-event common loads and one short accepted/restart event",
       "production_job": false,
@@ -140,7 +140,7 @@
       "numerical_guards": [
         "one worker",
         "capacity preflight",
-        "wall cap 8 h"
+        "checkpoint/resume same physics; no model-selection wall cap"
       ],
       "physical_endpoint": "second-generation native birth followed by one accepted continuation",
       "production_job": false,
