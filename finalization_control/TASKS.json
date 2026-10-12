@@ -119,17 +119,21 @@
       "dependencies": [
         "pf-baseline-96"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
-      "current_command": "python3 scripts/run_final_fracture_campaign.py --group sensitivities --resume",
+      "current_command": "python3 scripts/analyze_final_pf_sensitivities.py",
       "inputs": [
         "finalization_control/CAMPAIGN_MATRIX.csv"
       ],
       "checkpoint": "per-case immutable output/checkpoint",
       "evidence_paths": [
-        "integration_evidence/final_fracture_campaign"
+        "integration_evidence/final_fracture_campaign",
+        "review_packet/final_fracture_campaign_a5a5883/PF_SENSITIVITIES.json",
+        "review_packet/final_fracture_campaign_a5a5883/PF_RATE_SENSITIVITY.png",
+        "review_packet/final_fracture_campaign_a5a5883/PF_ORIENTATION_SENSITIVITY.png",
+        "review_packet/final_fracture_campaign_a5a5883/PF_SOURCE_GEOGRAPHY.png"
       ],
-      "next_action": "freeze question-driven sensitivity rows after baseline transition review",
+      "next_action": "integrate the bounded local sensitivities and their scope limits into the manuscript and SI",
       "completion_test": "rate, 0/45 degree, and selected source-geography claims resolved without Cartesian expansion"
     },
     {
