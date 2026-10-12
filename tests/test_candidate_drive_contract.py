@@ -2,7 +2,7 @@ import pytest
 
 from arrhenius_fracture.candidate_drive_contract import (
     CandidateClass, FiniteSeparationOperation, LigamentKineticInterpretation,
-    finite_difference_energy_release,
+    LocalIncrementalFrontState, finite_difference_energy_release,
 )
 
 
@@ -57,3 +57,28 @@ def test_geometry_accounting_fails_closed():
             cavity_free_span_m=3e-6,
             total_geometric_span_m=9e-6,
         )
+
+
+def test_option_a_transaction_preserves_owner_mark_and_full_rollback():
+    state = LocalIncrementalFrontState("front-7", "site-12", 0.75)
+    trial = state.trial(duration_s=0.2, rate_s=2.0, new_solid_advance_m=1e-7)
+    assert trial.rollback() is state
+    accepted = trial.accept()
+    assert accepted.owner_id == state.owner_id
+    assert accepted.physical_site_id == state.physical_site_id
+    assert accepted.exponential_mark == state.exponential_mark
+    assert accepted.physical_time_s == pytest.approx(0.2)
+    assert accepted.cumulative_action == pytest.approx(0.4)
+
+
+def test_refinement_does_not_create_clocks_or_change_action_and_advance():
+    state = LocalIncrementalFrontState("front", "physical-site", 1.25)
+    coarse = state.trial(duration_s=1.0, rate_s=0.8, new_solid_advance_m=2e-7).accept()
+    fine = state
+    for _ in range(10):
+        fine = fine.trial(duration_s=0.1, rate_s=0.8,
+                          new_solid_advance_m=2e-8).accept()
+    assert fine.cumulative_action == pytest.approx(coarse.cumulative_action)
+    assert fine.accepted_solid_advance_m == pytest.approx(coarse.accepted_solid_advance_m)
+    assert fine.exponential_mark == coarse.exponential_mark
+    assert fine.physical_site_id == coarse.physical_site_id

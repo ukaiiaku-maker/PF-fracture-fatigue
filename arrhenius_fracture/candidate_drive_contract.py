@@ -82,6 +82,66 @@ class FiniteSeparationOperation:
         }
 
 
+@dataclass(frozen=True)
+class LocalIncrementalFrontState:
+    """Opt-in Option-A clock/ownership state for one physical front site.
+
+    Trial subdivision is numerical: every subtrial retains the same physical
+    mark and site identifier.  Only an accepted transaction commits elapsed
+    time and cumulative action.
+    """
+    owner_id: str
+    physical_site_id: str
+    exponential_mark: float
+    cumulative_action: float = 0.0
+    physical_time_s: float = 0.0
+    accepted_solid_advance_m: float = 0.0
+
+    def __post_init__(self) -> None:
+        if not self.owner_id or not self.physical_site_id:
+            raise ValueError("candidate owner and physical site are required")
+        if not math.isfinite(self.exponential_mark) or self.exponential_mark <= 0.0:
+            raise ValueError("exponential_mark must be finite and positive")
+        if min(self.cumulative_action, self.physical_time_s,
+               self.accepted_solid_advance_m) < 0.0:
+            raise ValueError("accepted state cannot be negative")
+
+    def trial(self, *, duration_s: float, rate_s: float,
+              new_solid_advance_m: float) -> "LocalIncrementalFrontTrial":
+        if duration_s <= 0.0 or rate_s < 0.0 or new_solid_advance_m < 0.0:
+            raise ValueError("trial duration must be positive and rate/advance nonnegative")
+        return LocalIncrementalFrontTrial(self, float(duration_s), float(rate_s),
+                                          float(new_solid_advance_m))
+
+
+@dataclass(frozen=True)
+class LocalIncrementalFrontTrial:
+    parent: LocalIncrementalFrontState
+    duration_s: float
+    rate_s: float
+    new_solid_advance_m: float
+
+    @property
+    def trial_action(self) -> float:
+        return self.rate_s * self.duration_s
+
+    @property
+    def event_reached(self) -> bool:
+        return self.parent.cumulative_action + self.trial_action >= self.parent.exponential_mark
+
+    def accept(self) -> LocalIncrementalFrontState:
+        return LocalIncrementalFrontState(
+            self.parent.owner_id, self.parent.physical_site_id,
+            self.parent.exponential_mark,
+            self.parent.cumulative_action + self.trial_action,
+            self.parent.physical_time_s + self.duration_s,
+            self.parent.accepted_solid_advance_m + self.new_solid_advance_m,
+        )
+
+    def rollback(self) -> LocalIncrementalFrontState:
+        return self.parent
+
+
 def finite_difference_energy_release(
     energy_before_J_per_m: float,
     energy_after_J_per_m: float,
@@ -98,5 +158,5 @@ def finite_difference_energy_release(
 
 __all__ = [
     "CandidateClass", "FiniteSeparationOperation", "LigamentKineticInterpretation",
-    "finite_difference_energy_release",
+    "LocalIncrementalFrontState", "LocalIncrementalFrontTrial", "finite_difference_energy_release",
 ]

@@ -29,12 +29,31 @@ def plane_strain_D(mat: ElasticProperties) -> np.ndarray:
     ])
 
 
+def plane_stress_D(mat: ElasticProperties) -> np.ndarray:
+    """Plane-stress elasticity matrix; sigma_zz is identically zero."""
+    E, nu = mat.E, mat.nu
+    c = E / (1.0 - nu**2)
+    return c * np.array([[1.0, nu, 0.0],
+                         [nu, 1.0, 0.0],
+                         [0.0, 0.0, (1.0 - nu) / 2.0]])
+
+
+def transverse_stress(sig: np.ndarray, mat: ElasticProperties,
+                      plane_state: str = "plane_strain") -> np.ndarray:
+    if plane_state == "plane_strain":
+        return mat.nu * (sig[:, 0] + sig[:, 1])
+    if plane_state == "plane_stress":
+        return np.zeros(sig.shape[0], dtype=float)
+    raise ValueError("plane_state must be 'plane_strain' or 'plane_stress'")
+
+
 def assemble_mechanics(
     mesh: TriMesh, u: np.ndarray, ep_gp: np.ndarray,
     rho_gp: np.ndarray, d: np.ndarray,
     D: np.ndarray, mat: ElasticProperties,
     kappa: float = 1e-6,
     cohesive_network=None,
+    plane_state: str = "plane_strain",
 ) -> Tuple[sparse.csr_matrix, np.ndarray, np.ndarray,
            np.ndarray, np.ndarray, np.ndarray]:
     """
@@ -91,7 +110,7 @@ def assemble_mechanics(
     sx = sig[:, 0]
     sy = sig[:, 1]
     txy = sig[:, 2]
-    szz = nu * (sx + sy)
+    szz = transverse_stress(sig, mat, plane_state)
 
     sigma_eq_gp = np.sqrt(0.5 * ((sx-sy)**2 + (sy-szz)**2 + (szz-sx)**2)
                           + 3 * txy**2)
@@ -148,7 +167,7 @@ def assemble_mechanics(
 
 def stress_state(mesh: TriMesh, u: np.ndarray, ep_gp: np.ndarray,
                  d: np.ndarray, D: np.ndarray, mat: ElasticProperties,
-                 kappa: float = 1e-6):
+                 kappa: float = 1e-6, *, plane_state: str = "plane_strain"):
     """Recompute (sigma_gp, sigma_eq_gp, sigma1_gp, psi_e_gp) at the CURRENT
     displacement without assembling K.  Used after the mechanics solve so the
     plastic update, event drive, and equilibrium solve all see the
@@ -169,7 +188,7 @@ def stress_state(mesh: TriMesh, u: np.ndarray, ep_gp: np.ndarray,
     g_d = (1 - dgp)**2 + kappa
     sig = g_d[:, None] * (eps_e @ D.T)
     sx, sy, txy = sig[:, 0], sig[:, 1], sig[:, 2]
-    szz = mat.nu * (sx + sy)
+    szz = transverse_stress(sig, mat, plane_state)
     sigma_eq = np.sqrt(0.5*((sx-sy)**2 + (sy-szz)**2 + (szz-sx)**2) + 3*txy**2)
     s_avg = 0.5*(sx+sy); R = np.sqrt((0.5*(sx-sy))**2 + txy**2)
     sigma1 = s_avg + R
