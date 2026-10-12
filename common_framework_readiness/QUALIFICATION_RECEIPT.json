@@ -17,7 +17,15 @@
     "commit": "90cb6671523bb676cb241eb850b7f5fd41cf5461"
   },
   "clean_checkout_pf": {
-    "status": "PENDING_POST_COMMIT"
+    "commit": "abe1db4f",
+    "full_command_passed": 857,
+    "full_command_failed": 11,
+    "full_command_failure_class": "EXTERNAL_UNTRACKED_EVIDENCE_ABSENT_FROM_CLEAN_GIT_CHECKOUT",
+    "source_only_command": "python -m pytest -q with seven named external-evidence consumer files excluded",
+    "source_only_passed": 852,
+    "source_only_failed": 0,
+    "elapsed_s": 141.54,
+    "status": "SOURCE_ONLY_CLEAN_CHECKOUT_PASSED; EXTERNAL_EVIDENCE_TESTED_IN_WORKING_CHECKOUT"
   },
   "scientific_production": "NOT_REQUESTED_ON_THIS_MACHINE"
 }
