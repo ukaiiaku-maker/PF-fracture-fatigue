@@ -1,0 +1,47 @@
+{
+  "configuration": {
+    "declared_inputs_sha256": "9208f3622a1a3732d04da8593544495efa448b2c33e1e2dfee2a01ed66f902d0",
+    "donor_archive_sha256": "78324fb1d44d533e334b9d41406c636e981092edd569454e993bb39995f6b4e2",
+    "donor_commit": "47a5a4bae048e5a8b1c6178efb6406325005f7ef",
+    "model_id": "r5.dynamic-v3-void-current-fracture/1",
+    "observations_sha256": "8b839854704b4020dc2c0cde17e2d74443867b79cf4aae2085fab93204927142",
+    "source_update": "R7_EVENT_AWARE_ACCEPTED_UPDATE",
+    "temperature_K": 1200.0
+  },
+  "native_checkpoint": {
+    "files": [
+      {
+        "path": "high_cycle_live_checkpoint.json",
+        "sha256": "ee36a71936e0cb454c772a2d4052bc649409f6d56aa996b7242d5d1c74c10cb0"
+      },
+      {
+        "path": "high_cycle_live_history.jsonl",
+        "sha256": "75ee0685132908cf21605029cd889cb4b1f0ccca73307d7e700bef1a233eec98"
+      },
+      {
+        "path": "high_cycle_live_state.npz",
+        "sha256": "af0871d70e35c2855925558b508cd5dc4f06ad205f2fc5798f78dd16b7d18164"
+      }
+    ],
+    "path": "current_engine_checkpoint"
+  },
+  "owner": {
+    "accepted_intervals": 361,
+    "backend": "CURRENT_PERSISTENT_REVERSIBLE",
+    "generation": 361,
+    "last_geometry_events": [],
+    "last_mechanics_binding": {
+      "consumed_K_Pa_sqrt_m": 4994207.4043750325,
+      "native_K_scale": 0.24971037021875164,
+      "source_identity": "R5_DYNAMIC_FULL_IDENTITY:c317b7b21f37cedf09d3f679e2847687eab7dd238a25cfc2b46c057b0ad67094"
+    },
+    "native_backend_calls": 361,
+    "native_event_count": 0
+  },
+  "payload": {
+    "path": "accepted_before_pulse.a45c712cd751c736df322ca32315c792c906859aaa9e824dfc8b16572864bec6.pkl",
+    "sha256": "a45c712cd751c736df322ca32315c792c906859aaa9e824dfc8b16572864bec6"
+  },
+  "pending_scheduler": null,
+  "schema": "r7.coupled-accepted-dynamic-checkpoint/2"
+}

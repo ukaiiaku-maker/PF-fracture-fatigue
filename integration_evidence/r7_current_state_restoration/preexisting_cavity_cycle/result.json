@@ -1,0 +1,257 @@
+{
+  "active_cavity": true,
+  "classification": "INITIAL_CONDITION_DRIVEN_FULL_ORDER_FUNCTIONAL_FIXTURE",
+  "duration_s_per_factor": 1e-08,
+  "field_feedback_exercised": true,
+  "history": [
+    {
+      "input_fingerprint": "7057a3150abe82ebb7dc45009ee9e5f34b108fe81c44e37f898f82ba42c554f2",
+      "mechanical_field_hash_after": "9aea86d53875b0a8e019e7f35737dda50c749ac45255df4ec50ed60169b73a75",
+      "mechanical_field_hash_before": "357bcae2ee87eaebccb11f4adfcaf754b3f2627149757f77c1e2c51b8425d2aa",
+      "normalized_load_factor": 1.0,
+      "observables": {
+        "active_crack_branch_ids": [
+          "b00000000"
+        ],
+        "applied_opening_m": 4e-07,
+        "bottom_reaction_N_per_m": -36725.26138375807,
+        "cavity_area_m2": 2.8274333882308142e-11,
+        "cavity_radius_m": 3e-06,
+        "compliance_m2_per_N": 1.0923578955938915e-11,
+        "energy_J_per_m": 0.007192548174606883,
+        "event_counters": {
+          "accepted_steps": 0,
+          "mesh_generation": 2,
+          "refinement_operation_index": 2,
+          "topology_actions": 0
+        },
+        "fingerprint": "1ff6603a2c5a3d4d796ff98f337a932ea6997ab8e118a7d78ca912feacb92d1b",
+        "operation": "active_cycle_1",
+        "top_reaction_N_per_m": 36510.809250862745,
+        "vacancy_conservation_residual_m2": 0.0,
+        "vacancy_fraction_max": 0.00968819676984814,
+        "vacancy_fraction_min": null,
+        "void_phase": "RESOLVED_VOID"
+      },
+      "output_fingerprint": "1ff6603a2c5a3d4d796ff98f337a932ea6997ab8e118a7d78ca912feacb92d1b",
+      "scheduler": {
+        "accepted_event_segment_count": 0,
+        "localization_replays": 0,
+        "native_topology_transition_count": 0,
+        "nonlinear_radius_replay_total": null,
+        "outcome": "COMPLETED_NO_EVENT",
+        "requested_duration_s": 1e-08,
+        "schema": "unified-2d.event-aware-coupled-interval/1",
+        "total_consumed_duration_s": 1e-08,
+        "total_unconsumed_duration_s": 0.0,
+        "trial_evaluations": 1
+      }
+    },
+    {
+      "input_fingerprint": "a7d2f862556f526a494d871b09f3e28400f82f53eb90fd81d3d5bd326a590bd4",
+      "mechanical_field_hash_after": "4311b223b3c832365a895abd64afb458ba0cd92c2e4d41d1636214ac39d9cde1",
+      "mechanical_field_hash_before": "d58182bf6f9b4cbacddca9d3ab9253c2b3364a355000be177eaa74814ec8c2e4",
+      "normalized_load_factor": 0.2,
+      "observables": {
+        "active_crack_branch_ids": [
+          "b00000000"
+        ],
+        "applied_opening_m": 7.999999999999999e-08,
+        "bottom_reaction_N_per_m": -6913.805862365223,
+        "cavity_area_m2": 2.8274333882308142e-11,
+        "cavity_radius_m": 3e-06,
+        "compliance_m2_per_N": 1.1722115511488358e-11,
+        "energy_J_per_m": 0.0002731214958023637,
+        "event_counters": {
+          "accepted_steps": 0,
+          "mesh_generation": 2,
+          "refinement_operation_index": 2,
+          "topology_actions": 0
+        },
+        "fingerprint": "8bc1c8a42a8838de9597b15b8ce9c6518264eea4de1bd8380db9c99af681638f",
+        "operation": "active_cycle_0.2",
+        "top_reaction_N_per_m": 6735.607491665509,
+        "vacancy_conservation_residual_m2": 0.0,
+        "vacancy_fraction_max": 0.00968819676984814,
+        "vacancy_fraction_min": null,
+        "void_phase": "RESOLVED_VOID"
+      },
+      "output_fingerprint": "8bc1c8a42a8838de9597b15b8ce9c6518264eea4de1bd8380db9c99af681638f",
+      "scheduler": {
+        "accepted_event_segment_count": 0,
+        "localization_replays": 0,
+        "native_topology_transition_count": 0,
+        "nonlinear_radius_replay_total": null,
+        "outcome": "COMPLETED_NO_EVENT",
+        "requested_duration_s": 1e-08,
+        "schema": "unified-2d.event-aware-coupled-interval/1",
+        "total_consumed_duration_s": 1e-08,
+        "total_unconsumed_duration_s": 0.0,
+        "trial_evaluations": 1
+      }
+    },
+    {
+      "input_fingerprint": "24a01a1a8ecd379d325f4e9ce38415ce9821671d604cd8374bdd72e0448e87c2",
+      "mechanical_field_hash_after": "46ab91fe5ebf2d3a62984b2fc87464a29c4e4900e7a0ad822308b437e05341af",
+      "mechanical_field_hash_before": "64e6eb887660a1b37b44471075f0f6b0558e7318682748f4f1b826570e5a44fe",
+      "normalized_load_factor": 1.0,
+      "observables": {
+        "active_crack_branch_ids": [
+          "b00000000"
+        ],
+        "applied_opening_m": 3.9999999999999993e-07,
+        "bottom_reaction_N_per_m": -36725.25667624949,
+        "cavity_area_m2": 2.8274333882308142e-11,
+        "cavity_radius_m": 3e-06,
+        "compliance_m2_per_N": 1.0923580379787808e-11,
+        "energy_J_per_m": 0.007192546578769341,
+        "event_counters": {
+          "accepted_steps": 0,
+          "mesh_generation": 2,
+          "refinement_operation_index": 2,
+          "topology_actions": 0
+        },
+        "fingerprint": "ac27232b4fd6d152b1fe452664ef772dad63c9b0d1198ab93b80c2635562c196",
+        "operation": "active_cycle_1",
+        "top_reaction_N_per_m": 36510.80441231643,
+        "vacancy_conservation_residual_m2": 0.0,
+        "vacancy_fraction_max": 0.00968819676984814,
+        "vacancy_fraction_min": null,
+        "void_phase": "RESOLVED_VOID"
+      },
+      "output_fingerprint": "ac27232b4fd6d152b1fe452664ef772dad63c9b0d1198ab93b80c2635562c196",
+      "scheduler": {
+        "accepted_event_segment_count": 0,
+        "localization_replays": 0,
+        "native_topology_transition_count": 0,
+        "nonlinear_radius_replay_total": null,
+        "outcome": "COMPLETED_NO_EVENT",
+        "requested_duration_s": 1e-08,
+        "schema": "unified-2d.event-aware-coupled-interval/1",
+        "total_consumed_duration_s": 1e-08,
+        "total_unconsumed_duration_s": 0.0,
+        "trial_evaluations": 1
+      }
+    }
+  ],
+  "initial_vacancy_fraction": 0.01,
+  "lifecycle_operations": [
+    "available_site",
+    "plastic_vacancy_production",
+    "multi_hit_1",
+    "multi_hit_2",
+    "stabilization",
+    "subgrid_void",
+    "subgrid_growth",
+    "geometric_promotion",
+    "resolved_plastic_vacancy_production",
+    "resolved_growth"
+  ],
+  "limits": [
+    "positive-R piecewise load history, not a continuous sinusoid",
+    "no cavity-radius change was forced during the short cycle",
+    "fixture proves active-state coupling and restart, not material nucleation"
+  ],
+  "load_factors": [
+    1.0,
+    0.2,
+    1.0
+  ],
+  "midcycle_checkpoint": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r7_current_state_restoration/preexisting_cavity_cycle/active_midcycle_checkpoint.json",
+  "midpoint_restart_exact": true,
+  "native_positive_equilibrium_only": true,
+  "natural_nucleation_claim": false,
+  "nonpositive_structural_load_status": "FAIL_CLOSED_UNSUPPORTED_CONTACT_COHESIVE_COMBINATION",
+  "production_eligible_material_evidence": false,
+  "restart_continuation_exact": true,
+  "restarted_final_stage": {
+    "input_fingerprint": "24a01a1a8ecd379d325f4e9ce38415ce9821671d604cd8374bdd72e0448e87c2",
+    "mechanical_field_hash_after": "46ab91fe5ebf2d3a62984b2fc87464a29c4e4900e7a0ad822308b437e05341af",
+    "mechanical_field_hash_before": "64e6eb887660a1b37b44471075f0f6b0558e7318682748f4f1b826570e5a44fe",
+    "normalized_load_factor": 1.0,
+    "observables": {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 3.9999999999999993e-07,
+      "bottom_reaction_N_per_m": -36725.25667624949,
+      "cavity_area_m2": 2.8274333882308142e-11,
+      "cavity_radius_m": 3e-06,
+      "compliance_m2_per_N": 1.0923580379787808e-11,
+      "energy_J_per_m": 0.007192546578769341,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 2,
+        "refinement_operation_index": 2,
+        "topology_actions": 0
+      },
+      "fingerprint": "ac27232b4fd6d152b1fe452664ef772dad63c9b0d1198ab93b80c2635562c196",
+      "operation": "active_cycle_1",
+      "top_reaction_N_per_m": 36510.80441231643,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_fraction_max": 0.00968819676984814,
+      "vacancy_fraction_min": null,
+      "void_phase": "RESOLVED_VOID"
+    },
+    "output_fingerprint": "ac27232b4fd6d152b1fe452664ef772dad63c9b0d1198ab93b80c2635562c196",
+    "scheduler": {
+      "accepted_event_segment_count": 0,
+      "localization_replays": 0,
+      "native_topology_transition_count": 0,
+      "nonlinear_radius_replay_total": null,
+      "outcome": "COMPLETED_NO_EVENT",
+      "requested_duration_s": 1e-08,
+      "schema": "unified-2d.event-aware-coupled-interval/1",
+      "total_consumed_duration_s": 1e-08,
+      "total_unconsumed_duration_s": 0.0,
+      "trial_evaluations": 1
+    }
+  },
+  "schema": "r2.active-cavity-positive-R-native-v5/1",
+  "terminal_cavity_phase": "RESOLVED_VOID",
+  "terminal_cavity_radius_m": 3e-06,
+  "terminal_fingerprint": "ac27232b4fd6d152b1fe452664ef772dad63c9b0d1198ab93b80c2635562c196",
+  "uninterrupted_final_stage": {
+    "input_fingerprint": "24a01a1a8ecd379d325f4e9ce38415ce9821671d604cd8374bdd72e0448e87c2",
+    "mechanical_field_hash_after": "46ab91fe5ebf2d3a62984b2fc87464a29c4e4900e7a0ad822308b437e05341af",
+    "mechanical_field_hash_before": "64e6eb887660a1b37b44471075f0f6b0558e7318682748f4f1b826570e5a44fe",
+    "normalized_load_factor": 1.0,
+    "observables": {
+      "active_crack_branch_ids": [
+        "b00000000"
+      ],
+      "applied_opening_m": 3.9999999999999993e-07,
+      "bottom_reaction_N_per_m": -36725.25667624949,
+      "cavity_area_m2": 2.8274333882308142e-11,
+      "cavity_radius_m": 3e-06,
+      "compliance_m2_per_N": 1.0923580379787808e-11,
+      "energy_J_per_m": 0.007192546578769341,
+      "event_counters": {
+        "accepted_steps": 0,
+        "mesh_generation": 2,
+        "refinement_operation_index": 2,
+        "topology_actions": 0
+      },
+      "fingerprint": "ac27232b4fd6d152b1fe452664ef772dad63c9b0d1198ab93b80c2635562c196",
+      "operation": "active_cycle_1",
+      "top_reaction_N_per_m": 36510.80441231643,
+      "vacancy_conservation_residual_m2": 0.0,
+      "vacancy_fraction_max": 0.00968819676984814,
+      "vacancy_fraction_min": null,
+      "void_phase": "RESOLVED_VOID"
+    },
+    "output_fingerprint": "ac27232b4fd6d152b1fe452664ef772dad63c9b0d1198ab93b80c2635562c196",
+    "scheduler": {
+      "accepted_event_segment_count": 0,
+      "localization_replays": 0,
+      "native_topology_transition_count": 0,
+      "nonlinear_radius_replay_total": null,
+      "outcome": "COMPLETED_NO_EVENT",
+      "requested_duration_s": 1e-08,
+      "schema": "unified-2d.event-aware-coupled-interval/1",
+      "total_consumed_duration_s": 1e-08,
+      "total_unconsumed_duration_s": 0.0,
+      "trial_evaluations": 1
+    }
+  }
+}

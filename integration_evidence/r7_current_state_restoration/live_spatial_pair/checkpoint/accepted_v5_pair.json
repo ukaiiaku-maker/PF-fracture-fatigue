@@ -1,0 +1,39 @@
+{
+  "arms": {
+    "disabled": "accepted_v5_6a006cafbf380d83_disabled.json",
+    "enabled": "accepted_v5_6a006cafbf380d83_enabled.json"
+  },
+  "common_start": {
+    "enabled_cavity_rng_owned_independently": true,
+    "fracture_rng_state_exact": true,
+    "mechanical_and_transport_arrays_exact": true,
+    "suppressed_arm_has_no_cavity_owner": true,
+    "transport_parameter_row_exact": true,
+    "vacancy_transport_field_exact": true
+  },
+  "configuration": {
+    "earliest_event_and_remainder_scheduler": true,
+    "full_field_plasticity": true,
+    "interval_duration_s": 1e-08,
+    "load_factors": [
+      1.0
+    ],
+    "loading_history": "hold_at_native_opening",
+    "material_class": "DBTT",
+    "seed": 3621,
+    "temperature_K": 1200.0,
+    "test_only_extreme_reservoir": false,
+    "transport_refinement_min_duration_s": 1e-10,
+    "vacancy_energy_variant": "reference"
+  },
+  "current_load_factor": 1.0,
+  "fingerprints": {
+    "disabled": "b4ea27434bb1eef3dde1e1823a69db41444c7c07a5967e78facf02bb4d0d3944",
+    "enabled": "ef41ee14d04d5e8d39106beeb78449d10d2a792cb9ab680ee9f0e1e3fb4ea649"
+  },
+  "generation": "6a006cafbf380d83",
+  "interval_count": 1,
+  "physical_time_s": 1e-08,
+  "requested_interval_count_total": 1,
+  "schema": "shared-v5-physical-pair-checkpoint/2"
+}
