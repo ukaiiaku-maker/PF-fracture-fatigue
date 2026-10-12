@@ -1,0 +1,21 @@
+{
+  "independent_fem_czm": {
+    "branch": "codex/current-pf-companion",
+    "commit": "f7c36ef4313e42965444c0a39e41328be581a0f1",
+    "identity": "original independent adaptive-CZM finite-element realization",
+    "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion"
+  },
+  "manuscript_package": {
+    "modified_by_builder": false,
+    "status": "frozen_intermediate_record"
+  },
+  "pf": {
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "generation_parent_commit": "e274b28c9c41053c250e843d4bcee08e986a2ed4",
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1"
+  },
+  "schema": "common-fracture-source-identities/1",
+  "stateful_kitagawa": {
+    "included": false
+  }
+}

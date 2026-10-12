@@ -1,0 +1,305 @@
+{
+  "items": [
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__final_fracture_campaign",
+      "fingerprint": {
+        "bytes": 665312487,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 4440,
+        "kind": "directory",
+        "sha256": "d148b1a1c3c2e9cb48faf81bc92863e6f8f30b5e314800e1460a23dbb3899c6e"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/final_fracture_campaign",
+      "permitted_locations": [
+        "integration_evidence/final_fracture_campaign",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/final_fracture_campaign"
+      ],
+      "producer": "retained original PF/FEM-CZM campaign or qualification producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar -C <clean-checkout-parent> integration_evidence/final_fracture_campaign"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__current_science_pilots_6abbf10",
+      "fingerprint": {
+        "bytes": 156715732,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 302,
+        "kind": "directory",
+        "sha256": "b990c13009f7793b99899eb16315eaa72ada3af402e0db0aba0f5e46cc003ba6"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/current_science_pilots_6abbf10",
+      "permitted_locations": [
+        "integration_evidence/current_science_pilots_6abbf10",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/current_science_pilots_6abbf10"
+      ],
+      "producer": "retained original PF/FEM-CZM campaign or qualification producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar -C <clean-checkout-parent> integration_evidence/current_science_pilots_6abbf10"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__branch_cavity_bb0c21d9",
+      "fingerprint": {
+        "bytes": 2185396,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 14,
+        "kind": "directory",
+        "sha256": "5f149d1e87d9059090945298edf15adfade538a16262502f66535e95f9b629f1"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/branch_cavity_bb0c21d9",
+      "permitted_locations": [
+        "integration_evidence/branch_cavity_bb0c21d9",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/branch_cavity_bb0c21d9"
+      ],
+      "producer": "retained original PF/FEM-CZM campaign or qualification producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar -C <clean-checkout-parent> integration_evidence/branch_cavity_bb0c21d9"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__v36_active_restart_340727f7",
+      "fingerprint": {
+        "bytes": 13396981,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 60,
+        "kind": "directory",
+        "sha256": "399310c64ed8109e439101461cef28af2f97c33c22740111b4a7ff609c381bf2"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/v36_active_restart_340727f7",
+      "permitted_locations": [
+        "integration_evidence/v36_active_restart_340727f7",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/v36_active_restart_340727f7"
+      ],
+      "producer": "retained original PF/FEM-CZM campaign or qualification producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar -C <clean-checkout-parent> integration_evidence/v36_active_restart_340727f7"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__active_fracture_comparisons_0a5d55e",
+      "fingerprint": {
+        "bytes": 410921038,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 738,
+        "kind": "directory",
+        "sha256": "f1f16e454fa1b63d37c2ab49453339aed54b04d7fcae7c6b7a8d6e129119df73"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/active_fracture_comparisons_0a5d55e",
+      "permitted_locations": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/active_fracture_comparisons_0a5d55e"
+      ],
+      "producer": "post-release native integration/active-state producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar -C <clean-checkout-parent> integration_evidence/active_fracture_comparisons_0a5d55e"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__native_restart_transport_a30a78c",
+      "fingerprint": {
+        "bytes": 26626929,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 401,
+        "kind": "directory",
+        "sha256": "e238d3b9e5f4fc57f3d3d4724ca8ea6c708f916c62b3d6efecc12673eacb2ac1"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/native_restart_transport_a30a78c",
+      "permitted_locations": [
+        "integration_evidence/native_restart_transport_a30a78c",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_restart_transport_a30a78c"
+      ],
+      "producer": "post-release native integration/active-state producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar -C <clean-checkout-parent> integration_evidence/native_restart_transport_a30a78c"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__native_restart_transport_f4ba118",
+      "fingerprint": {
+        "bytes": 1972289,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 94,
+        "kind": "directory",
+        "sha256": "6a7040d9d487ac3b3fe238f40958dc0a95811115faa69cfe846c3227b081429b"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/native_restart_transport_f4ba118",
+      "permitted_locations": [
+        "integration_evidence/native_restart_transport_f4ba118",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_restart_transport_f4ba118"
+      ],
+      "producer": "post-release native integration/active-state producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar -C <clean-checkout-parent> integration_evidence/native_restart_transport_f4ba118"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__native_restart_transport_f766285",
+      "fingerprint": {
+        "bytes": 72769489,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 371,
+        "kind": "directory",
+        "sha256": "a0fc20cc63ccc5af8a1610a172a445a9538e31b9648c40ea81780d742d36add4"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/native_restart_transport_f766285",
+      "permitted_locations": [
+        "integration_evidence/native_restart_transport_f766285",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_restart_transport_f766285"
+      ],
+      "producer": "post-release native integration/active-state producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar -C <clean-checkout-parent> integration_evidence/native_restart_transport_f766285"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__positive_transport_854d32d",
+      "fingerprint": {
+        "bytes": 76537075,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 58,
+        "kind": "directory",
+        "sha256": "664f011db057de220fca9ec21c897cd72d9f5b92ac307bd68d8bc888c0382760"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/positive_transport_854d32d",
+      "permitted_locations": [
+        "integration_evidence/positive_transport_854d32d",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/positive_transport_854d32d"
+      ],
+      "producer": "post-release native integration/active-state producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar -C <clean-checkout-parent> integration_evidence/positive_transport_854d32d"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__targeted_completion",
+      "fingerprint": {
+        "bytes": 345206648,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 816,
+        "kind": "directory",
+        "sha256": "aec3c14b942c0ea2a773ef0e72a9b264d143a12f1213351e6445c4407373a98b"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/targeted_completion",
+      "permitted_locations": [
+        "integration_evidence/targeted_completion",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion"
+      ],
+      "producer": "post-release native integration/active-state producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar -C <clean-checkout-parent> integration_evidence/targeted_completion"
+    },
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "dependencies": [
+        "qualified Python environment",
+        "matching committed source identity"
+      ],
+      "evidence_id": "integration_evidence__option_completion_v2",
+      "fingerprint": {
+        "bytes": 14313505,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 909,
+        "kind": "directory",
+        "sha256": "613327ccbc4cdce051e507f7db1211fe60d51e4d4434ab1e1c6a580c76aaefbc"
+      },
+      "mandatory": true,
+      "path": "../integration_evidence/option_completion_v2",
+      "permitted_locations": [
+        "integration_evidence/option_completion_v2",
+        "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/option_completion_v2"
+      ],
+      "producer": "post-release native integration/active-state producer",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar -C <clean-checkout-parent> integration_evidence/option_completion_v2"
+    },
+    {
+      "dependencies": [
+        "POSIX tar"
+      ],
+      "evidence_id": "independent_primary_archive",
+      "fingerprint": {
+        "bytes": 845691904,
+        "digest_algorithm": "sha256(file-bytes)",
+        "file_count": 1,
+        "kind": "file",
+        "sha256": "f0e57d81f8cd94dfe10a2fc0b0c458ce9cfdf5d16063aa1e578200dbc36ef63c"
+      },
+      "mandatory": true,
+      "path": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar",
+      "permitted_locations": [
+        "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar"
+      ],
+      "producer": "append-only independent-device backup",
+      "restore_command": "tar -tf /Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar"
+    },
+    {
+      "dependencies": [
+        "POSIX tar"
+      ],
+      "evidence_id": "independent_supplement_archive",
+      "fingerprint": {
+        "bytes": 951398912,
+        "digest_algorithm": "sha256(file-bytes)",
+        "file_count": 1,
+        "kind": "file",
+        "sha256": "0195e5e2c04e65b550fac9a96c0791aba5ca218f7d738ec0a3f037e3b08fae1e"
+      },
+      "mandatory": true,
+      "path": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+      "permitted_locations": [
+        "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar"
+      ],
+      "producer": "append-only independent-device backup",
+      "restore_command": "tar -tf /Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar"
+    }
+  ],
+  "policy": {
+    "full_qualification_requires_all_mandatory_items": true,
+    "local_raw_data_deleted": false,
+    "missing_mandatory_status": "INCOMPLETE",
+    "portable_suite_requires_items": false,
+    "raw_evidence_tracked_in_git": false
+  },
+  "schema": "common-framework-external-evidence-manifest/1"
+}
