@@ -1,0 +1,11 @@
+{
+  "schema": "v10.1.7.5_anisotropic_transport_comparison",
+  "transport_mode": "validated_scalar",
+  "anisotropic_emission_identical_between_transport_modes": true,
+  "campaign_source_budget_preserved": true,
+  "campaign_geometry_refresh_preserved": true,
+  "campaign_active_shielding_cap_preserved": true,
+  "temporal_source_recycling": false,
+  "channel_resolved_transport": false,
+  "validated_common_transport_operator": true
+}

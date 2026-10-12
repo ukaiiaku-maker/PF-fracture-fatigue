@@ -81,9 +81,16 @@ class ReducedPersistentReversibleTipEngine(
     """Production constitutive engine with an explicit reduced drive provider."""
 
     def _plastic_half_step(self, dt, temperature_K, opening_stress_Pa):
-        factors = np.asarray(self.mpz._anisotropic_drive_factors, dtype=float)
-        self.mpz._anisotropic_tau_signed_Pa = np.where(factors > 0.0, 1.0, 0.0)
-        self.mpz._anisotropic_drive_reliable = True
+        # The reduced K-only closure has no resolved tensor and therefore owns
+        # this explicit positive-drive placeholder.  Spatial subclasses and
+        # complete-input replay set the policy false and preserve the signed
+        # tensor supplied by their mechanics operator.
+        if getattr(self, "_r2_synthetic_drive_setup", True):
+            factors = np.asarray(self.mpz._anisotropic_drive_factors, dtype=float)
+            self.mpz._anisotropic_tau_signed_Pa = np.where(
+                factors > 0.0, 1.0, 0.0
+            )
+            self.mpz._anisotropic_drive_reliable = True
         return KineticMovingTipFrontEngine._plastic_half_step(
             self, dt, temperature_K, opening_stress_Pa
         )
@@ -212,6 +219,7 @@ def build_restored_engine(
     engine.mpz._anisotropic_drive_serial = 0
     install_mean_rate_taylor(engine.mpz)
     engine._r2_model_id = MODEL_ID
+    engine._r2_synthetic_drive_setup = True
     engine._r2_material_path = str(Path(material_path).resolve())
     engine._r2_selection_path = str(Path(selection_path).resolve())
     engine._r2_kernel_family_path = str(kernel_path)

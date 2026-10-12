@@ -29,7 +29,8 @@ from .reduced_persistent_reference_r2 import (
     advance_signed, build_restored_engine, runtime_receipt,
 )
 from .stochastic_avalanche_tip import (
-    clear_pending_geometry_events, pop_pending_geometry_event,
+    clear_pending_geometry_events, pending_geometry_event_scope,
+    pop_pending_geometry_event,
 )
 
 
@@ -133,13 +134,12 @@ class CurrentPersistentFractureAdapter:
                 duration_s: float) -> FractureTrial:
         parent = state_sha256(self.engine)
         trial_engine = copy.deepcopy(self.engine)
-        clear_pending_geometry_events()
-        result = advance_signed(
-            trial_engine, K_Pa_sqrt_m=float(applied_K_Pa_sqrt_m),
-            temperature_K=float(temperature_K), dt_s=float(duration_s),
-        )
-        events = _pending_events()
-        clear_pending_geometry_events()
+        with pending_geometry_event_scope():
+            result = advance_signed(
+                trial_engine, K_Pa_sqrt_m=float(applied_K_Pa_sqrt_m),
+                temperature_K=float(temperature_K), dt_s=float(duration_s),
+            )
+            events = _pending_events()
         if state_sha256(self.engine) != parent:
             raise RuntimeError("fracture preview mutated the accepted engine")
         return FractureTrial(

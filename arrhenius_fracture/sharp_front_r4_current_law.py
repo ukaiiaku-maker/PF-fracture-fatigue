@@ -21,6 +21,7 @@ MODEL_ID = "r4.spatial-current-persistent-reversible-taylor/1"
 class CurrentLawSpatialTipEngine(ReducedPersistentReversibleTipEngine):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._r2_synthetic_drive_setup = False
         install_mean_rate_taylor(self.mpz)
 
 

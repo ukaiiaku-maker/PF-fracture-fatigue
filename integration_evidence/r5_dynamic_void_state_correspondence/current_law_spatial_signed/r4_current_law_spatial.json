@@ -1,0 +1,8 @@
+{
+  "engine": "__main__.CurrentLawSpatialTipEngine",
+  "prescribed_opening_history_m": "1e-5,2e-5,3e-5,2e-5,3e-5",
+  "schema": "r4.spatial-current-persistent-reversible-taylor/1",
+  "source_lifecycle": "persistent_reusable",
+  "taylor_law_id": "MEAN_FORWARD_MINUS_ZERO_RATE_OVER_DENSITY_ORDER",
+  "transport": "reversible_signed"
+}

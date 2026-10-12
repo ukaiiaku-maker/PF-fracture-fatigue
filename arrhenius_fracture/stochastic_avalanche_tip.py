@@ -19,6 +19,8 @@ from __future__ import annotations
 import copy
 import math
 from collections import deque
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass
 from typing import Any
 
@@ -73,7 +75,68 @@ def threshold_event_length_factor(
     return clipped / clipped_exponential_mean(a, b)
 
 
-_PENDING_GEOMETRY_EVENTS: deque[dict[str, Any]] = deque()
+_DEFAULT_PENDING_GEOMETRY_EVENTS: deque[dict[str, Any]] = deque()
+_PENDING_GEOMETRY_EVENT_OWNER: ContextVar[deque[dict[str, Any]]] = ContextVar(
+    "arrhenius_pending_geometry_event_owner",
+    default=_DEFAULT_PENDING_GEOMETRY_EVENTS,
+)
+
+
+class _PendingGeometryEventProxy:
+    """Deque-compatible access to the current transaction's event owner.
+
+    Historical consumers import ``_PENDING_GEOMETRY_EVENTS`` directly, so a
+    proxy preserves that interface while allowing a preview to install a
+    private queue.  The default context retains the legacy process queue.
+    """
+
+    @staticmethod
+    def _queue() -> deque[dict[str, Any]]:
+        return _PENDING_GEOMETRY_EVENT_OWNER.get()
+
+    def __bool__(self) -> bool:
+        return bool(self._queue())
+
+    def __len__(self) -> int:
+        return len(self._queue())
+
+    def __iter__(self):
+        return iter(self._queue())
+
+    def __getitem__(self, index):
+        return self._queue()[index]
+
+    def __reversed__(self):
+        return reversed(self._queue())
+
+    def append(self, value: dict[str, Any]) -> None:
+        self._queue().append(value)
+
+    def appendleft(self, value: dict[str, Any]) -> None:
+        self._queue().appendleft(value)
+
+    def clear(self) -> None:
+        self._queue().clear()
+
+    def popleft(self) -> dict[str, Any]:
+        return self._queue().popleft()
+
+    def extend(self, values) -> None:
+        self._queue().extend(values)
+
+
+_PENDING_GEOMETRY_EVENTS = _PendingGeometryEventProxy()
+
+
+@contextmanager
+def pending_geometry_event_scope():
+    """Own a private pending-event queue for one transactional operation."""
+    owned: deque[dict[str, Any]] = deque()
+    token = _PENDING_GEOMETRY_EVENT_OWNER.set(owned)
+    try:
+        yield owned
+    finally:
+        _PENDING_GEOMETRY_EVENT_OWNER.reset(token)
 
 
 def clear_pending_geometry_events() -> None:
@@ -337,6 +400,7 @@ __all__ = [
     "StochasticAvalancheDiagnosticTipEngine",
     "clear_pending_geometry_events",
     "clipped_exponential_mean",
+    "pending_geometry_event_scope",
     "pop_pending_geometry_event",
     "threshold_event_length_factor",
 ]

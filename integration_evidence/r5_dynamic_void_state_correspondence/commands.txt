@@ -1,0 +1,28 @@
+Environment:
+PYTHON_BIN=/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python
+PYTHONPATH=.
+PYTHONDONTWRITEBYTECODE=1
+MPLCONFIGDIR=/private/tmp/mpl-r5
+
+Fresh corrected signed spatial path:
+See the inherited R4 command in ../r4_same_engine_coupled_spatial/commands.txt,
+with MECHANICAL_CONFIG=dependencies/mechanical_configuration.json and output
+current_law_spatial_signed.
+
+No-event outer source-coupling qualification:
+$PYTHON_BIN scripts/run_r5_state_correspondence.py --output integration_evidence/r5_dynamic_void_state_correspondence/no_event_partition.json
+
+Complete mechanical-input replay:
+$PYTHON_BIN scripts/run_r5_mechanical_correspondence.py --spatial integration_evidence/r5_dynamic_void_state_correspondence/current_law_spatial_signed --output integration_evidence/r5_dynamic_void_state_correspondence/mechanical_correspondence.json
+
+Recovered dynamic void/current-backend execution:
+$PYTHON_BIN scripts/run_r5_dynamic_void.py --output integration_evidence/r5_dynamic_void_state_correspondence/dynamic_void_run
+
+Fatigue convergence:
+$PYTHON_BIN scripts/run_r5_fatigue_convergence.py --output integration_evidence/r5_dynamic_void_state_correspondence/fatigue_convergence.json
+
+Focused suite:
+$PYTHON_BIN -m pytest -q --junitxml=integration_evidence/r5_dynamic_void_state_correspondence/focused_suite.xml tests/test_state_correspondence_r5.py tests/test_mechanical_correspondence_r5.py tests/test_dynamic_void_execution_r5.py tests/test_fatigue_convergence_r5.py tests/test_current_coupled_execution_r4.py tests/test_current_law_spatial_comparison_r4.py tests/test_resolved_stochastic_fatigue_r4.py tests/test_matched_persistent_execution_r3.py tests/test_developed_fatigue_r3.py tests/test_connection_recovery_r3.py tests/test_coupled_void_execution_r3.py
+
+Full suite:
+$PYTHON_BIN -m pytest -q --junitxml=integration_evidence/r5_dynamic_void_state_correspondence/final_full_suite.xml
