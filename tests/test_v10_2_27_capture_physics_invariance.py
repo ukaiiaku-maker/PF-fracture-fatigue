@@ -15,6 +15,7 @@ from arrhenius_fracture.frozen_measurement_reconstruction_v10227 import (
 from arrhenius_fracture.physical_fem_capture_v10212 import (
     _accepted_crack_extension,
     _coerce_crack_path,
+    _measurement_provenance,
 )
 from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
@@ -40,6 +41,12 @@ def test_capture_uses_geometry_owner_arclength_before_kinetic_counters():
         mpz = SimpleNamespace(advance_total_m=35.0e-6)
 
     assert _accepted_crack_extension(Engine()) == 31.0e-6
+
+
+def test_measurement_audit_cannot_overwrite_serialized_snapshot_schema():
+    result = _measurement_provenance({"schema": "reconstruction/3", "passed": True})
+    assert "schema" not in result
+    assert result["measurement_reconstruction_schema"] == "reconstruction/3"
 
 
 def test_capture_reconstruction_has_no_front_or_mpz_kinetic_entry_points():

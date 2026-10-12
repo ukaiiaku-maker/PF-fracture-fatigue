@@ -188,6 +188,15 @@ def _accepted_crack_extension(engine: Any) -> float:
     )
 
 
+def _measurement_provenance(audit: dict[str, Any]) -> dict[str, Any]:
+    """Namespace the reconstruction schema so it cannot replace snapshot schema."""
+    result = dict(audit)
+    schema = result.pop("schema", None)
+    if schema is not None:
+        result["measurement_reconstruction_schema"] = schema
+    return result
+
+
 def _digest_array(hasher, name: str, value: Any) -> None:
     array = np.ascontiguousarray(np.asarray(value))
     hasher.update(name.encode("utf-8"))
@@ -464,7 +473,7 @@ class PhysicalFEMCapture:
             D=state["D"],
         )
         provenance = {
-            **dict(state["audit"]),
+            **_measurement_provenance(state["audit"]),
             "production_engine_state_sha256_before": kinetic_digest_before,
             "production_engine_state_sha256_after": kinetic_digest_after,
             "production_engine_state_bitwise_unchanged": True,
