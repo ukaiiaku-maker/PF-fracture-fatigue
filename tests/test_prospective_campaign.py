@@ -55,5 +55,17 @@ def test_primary_branch_and_void_cases_remain_gated_by_physics_not_fixtures():
     void = [case for case in cases if case.block == "P7" and case.cavity_mode != "disabled"]
     assert branch and void
     assert {case.gate for case in branch} == {"recursive_branch_birth_and_daughter_qualification"}
+    assert all(case.command_status == "UNRESOLVED_ADAPTER_GATE" and not case.native_args for case in branch)
     assert "candidate_rate_map_author_decision" in {case.gate for case in void}
     assert all(case.target_extension_um >= 250 for case in branch + void)
+
+
+def test_only_resolved_native_rows_carry_commands():
+    cases = build_cases(".")
+    unresolved = [case for case in cases if case.command_status == "UNRESOLVED_ADAPTER_GATE"]
+    assert unresolved and all(not case.native_args for case in unresolved)
+    resolved = [case for case in cases if case.command_status == "RESOLVED"]
+    assert resolved and all(case.native_args for case in resolved)
+    fem = [case for case in cases if case.backend == "full_fem_czm"]
+    assert fem and all(case.command_status == "UNRESOLVED_ADAPTER_GATE" for case in fem)
+    assert all("mode_i_first_passage" in case.native_entrypoint for case in fem)

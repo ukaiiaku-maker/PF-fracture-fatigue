@@ -34,6 +34,10 @@ In particular:
   the primary P7 comparison is gated on the candidate-rate interpretation;
 - identical-mesh PF/FEM elasticity is exact, but production mesh/support
   sequences must converge before cross-representation science is released;
+- the prospective matrix emits native arguments only for resolved adapters;
+  gated P3/P4/P6/P7/P8 configurations have an empty argument vector and an
+  explicit `UNRESOLVED_ADAPTER_GATE` status rather than inheriting a nearby PF
+  command line;
 - the cohesive landscape module is a verified constitutive analysis interface;
   it does not silently change the current FEM/CZM degradation law.
 

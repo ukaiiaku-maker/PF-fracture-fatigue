@@ -85,6 +85,8 @@ class CampaignCase:
     output_profile: str
     eligibility: str
     gate: str
+    native_entrypoint: str
+    command_status: str
     native_args: tuple[str, ...]
     estimand: str
     storage_estimate_GiB: float
@@ -154,6 +156,12 @@ def _pf_case(block: str, study: str, row: MaterialRow, T: float, rate: float,
              cavity: str = "disabled", estimand: str = "first-event initiation") -> CampaignCase:
     domain = row.domain(T)
     eligibility = domain["domain_status"]
+    requested_gate = gate
+    command_status = (
+        "RESOLVED" if requested_gate == "framework_release" and eligibility == "ELIGIBLE"
+        else "RESOLVED_BLOCKED_PHYSICAL_DOMAIN" if requested_gate == "framework_release"
+        else "UNRESOLVED_ADAPTER_GATE"
+    )
     return CampaignCase(
         case_id=_case_id(block, study, row.family, f"T{T:g}", f"r{rate:g}", arm,
                          f"s{seed}", f"th{theta:g}", f"a{a0_m*1e6:g}",
@@ -167,7 +175,10 @@ def _pf_case(block: str, study: str, row: MaterialRow, T: float, rate: float,
         crack_path=crack_path, cavity_mode=cavity, loading_mode="monotonic",
         output_profile="publication_restart" if target_um >= 1000 or crack_path != "single_front" or cavity != "disabled" else "selected_fields",
         eligibility=eligibility, gate=gate if eligibility == "ELIGIBLE" else eligibility,
-        native_args=_base_args(row, T, rate, arm, target_um=target_um, theta=theta, a0_m=a0_m),
+        native_entrypoint="arrhenius_fracture.sharp_front_v10_2_27_audited",
+        command_status=command_status,
+        native_args=(_base_args(row, T, rate, arm, target_um=target_um, theta=theta, a0_m=a0_m)
+                     if requested_gate == "framework_release" else ()),
         estimand=estimand, storage_estimate_GiB=0.35 if target_um >= 1000 else 0.025,
     )
 
@@ -280,7 +291,8 @@ def build_cases(root: str | Path) -> list[CampaignCase]:
                 base = _pf_case("P8", "fem_czm_common", rows[family], T, 1.0, arm,
                                 gate="production_mesh_support_convergence",
                                 estimand="common-load PF/FEM-CZM mechanics and initiation")
-                cases.append(CampaignCase(**{**asdict(base), "backend": "full_fem_czm", "native_args": base.native_args,
+                cases.append(CampaignCase(**{**asdict(base), "backend": "full_fem_czm",
+                                             "native_entrypoint": "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_four_class_stochastic_emission",
                                              "storage_estimate_GiB": 0.06}))
     for family, T in (("DBTT", 950), ("peak", 900)):
         for rate in (0.01, 100.0):
@@ -288,13 +300,15 @@ def build_cases(root: str | Path) -> list[CampaignCase]:
                 base = _pf_case("P8", "fem_czm_rate", rows[family], T, rate, arm,
                                 gate="production_mesh_support_convergence",
                                 estimand="FEM/CZM rate comparison")
-                cases.append(CampaignCase(**{**asdict(base), "backend": "full_fem_czm", "native_args": base.native_args,
+                cases.append(CampaignCase(**{**asdict(base), "backend": "full_fem_czm",
+                                             "native_entrypoint": "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_four_class_stochastic_emission",
                                              "storage_estimate_GiB": 0.06}))
     for family, T in (("DBTT", 950), ("peak", 900)):
         base = _pf_case("P8", "fem_czm_developed", rows[family], T, 1.0, "accommodation", target_um=1000.0,
                         gate="production_mesh_support_convergence",
                         estimand="developed native cohesive growth")
-        cases.append(CampaignCase(**{**asdict(base), "backend": "full_fem_czm", "native_args": base.native_args,
+        cases.append(CampaignCase(**{**asdict(base), "backend": "full_fem_czm",
+                                     "native_entrypoint": "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_four_class_stochastic_emission",
                                      "storage_estimate_GiB": 0.6}))
 
     ids = [case.case_id for case in cases]
