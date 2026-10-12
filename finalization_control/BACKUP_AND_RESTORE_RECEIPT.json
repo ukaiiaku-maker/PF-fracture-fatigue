@@ -53,5 +53,22 @@
     }
   ],
   "restore_directory": "/tmp/fracture-restore-verify.9hapbE",
+  "git_bundle": {
+    "path": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/shared-fracture-fatigue-options-v1-2b87a3bf.bundle",
+    "release_commit": "2b87a3bfb5625c435f06369ef22d7579a1fdc9cc",
+    "ref_count": 119,
+    "size_display": "9.6 GiB",
+    "sha256": "29342f5e2e47db8d739d0f0074a59aef1e0c06bf7f9c9350944467d657a04917",
+    "git_bundle_verify": "PASS",
+    "scope": "all retained local and remote-tracking refs"
+  },
+  "repository_status": {
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "release_commit": "2b87a3bfb5625c435f06369ef22d7579a1fdc9cc",
+    "remote": "origin https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
+    "remote_push_performed": false,
+    "raw_evidence_tracked_in_git": false,
+    "local_raw_data_deleted": false
+  },
   "note": "The restore directory is temporary verification scratch. The independent archives are the durable copies."
 }
