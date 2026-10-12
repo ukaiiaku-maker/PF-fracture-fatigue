@@ -141,18 +141,21 @@
       "dependencies": [
         "control-ledger"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
-      "current_command": "python3 scripts/analyze_long_growth_observations.py --help",
+      "current_command": "python3 scripts/analyze_final_developed_growth.py",
       "inputs": [
         "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current",
         "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3"
       ],
       "checkpoint": "accepted 203-event histories",
       "evidence_paths": [
-        "review_packet/current_science_pilots_6abbf10"
+        "review_packet/current_science_pilots_6abbf10",
+        "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_GROWTH_RESISTANCE.json",
+        "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_DRIVING_HISTORY.png",
+        "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_RESISTANCE.png"
       ],
-      "next_action": "impact-check source changes and execute qualified resistance selector",
+      "next_action": "integrate the stage-faithful driving and event-resistance views into the manuscript and SI",
       "completion_test": "driving history and distinct native resistance selection exported with tested K-at-length brackets"
     },
     {

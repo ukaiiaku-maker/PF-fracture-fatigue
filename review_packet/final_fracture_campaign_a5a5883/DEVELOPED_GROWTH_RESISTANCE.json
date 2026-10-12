@@ -1,0 +1,119 @@
+{
+  "cases": {
+    "cold_300K": {
+      "accepted_event_count": 203,
+      "geometry_sha256": "8d52d31c513e62659167efacdf40c16b0b70ce26b5907c2bcbb2992026cdd165",
+      "independent_reload_resistance_points": 0,
+      "initial_resistance_MPa_sqrt_m": 23.233738831608203,
+      "observation_sha256": "0da5a9072dd1089f0e7a2b4edb1672b810f4da2f32efdd9c2b93723768594055",
+      "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current",
+      "resistance_range_MPa_sqrt_m": [
+        23.233738831608203,
+        67.80694319024923
+      ],
+      "temperature_K": 300,
+      "terminal_event_resistance_MPa_sqrt_m": 49.038574502263344,
+      "terminal_path_arclength_um": 1008.5595119085253,
+      "terminal_projected_extension_um": 1004.9257634758525,
+      "unique_load_segments": [
+        "native-000-loading"
+      ]
+    },
+    "hot_1200K": {
+      "accepted_event_count": 203,
+      "geometry_sha256": "8d52d31c513e62659167efacdf40c16b0b70ce26b5907c2bcbb2992026cdd165",
+      "independent_reload_resistance_points": 0,
+      "initial_resistance_MPa_sqrt_m": 52.37574061089843,
+      "observation_sha256": "8b5c81979b9c2c6bedfd8cb886f8ae87f29699aeedea64e8a2cca0ab5e703798",
+      "raw_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3",
+      "resistance_range_MPa_sqrt_m": [
+        52.37574061089843,
+        153.30675683198817
+      ],
+      "temperature_K": 1200,
+      "terminal_event_resistance_MPa_sqrt_m": 110.87278369912416,
+      "terminal_path_arclength_um": 1008.5595119085253,
+      "terminal_projected_extension_um": 1004.9257634758525,
+      "unique_load_segments": [
+        "native-000-loading"
+      ]
+    }
+  },
+  "commands": [
+    "python3 scripts/export_physical_growth_packet.py",
+    "python3 scripts/analyze_final_developed_growth.py"
+  ],
+  "decision": "COMPLETE_VALIDATED",
+  "driving_history": {
+    "data": "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_DRIVING_HISTORY.csv",
+    "definition": "complete chronological accepted native observation history, retaining reequilibrated, exact pre-event and committed stages and the joined source-row state channels",
+    "figure_pdf": "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_DRIVING_HISTORY.pdf",
+    "figure_png": "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_DRIVING_HISTORY.png",
+    "row_count": 3695
+  },
+  "impact_checks": [
+    {
+      "condition": "cold_300K",
+      "current_relevant_changed_paths": [
+        "arrhenius_fracture/sharp_front.py"
+      ],
+      "execution_verified": true,
+      "impact_classification": "compatible_saved evidence: the only relevant committed delta records accepted crack-path/arclength mirrors for later kernel measurement; it does not alter the saved theta-zero event or mechanics history",
+      "producer_commit": "6abbf10b8cb49b12b8e3d6cc4ad323f27a4b578b",
+      "producer_dirty_recorded": true,
+      "producer_tree": "a8d028fcfb333ec927b03512d15b2ca38026bdb8",
+      "run_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current"
+    },
+    {
+      "condition": "hot_1200K",
+      "current_relevant_changed_paths": [
+        "arrhenius_fracture/sharp_front.py"
+      ],
+      "execution_verified": true,
+      "impact_classification": "compatible_saved evidence: the only relevant committed delta records accepted crack-path/arclength mirrors for later kernel measurement; it does not alter the saved theta-zero event or mechanics history",
+      "producer_commit": "d77abff138f9a7f23bbabba7b3ba582cde35ce68",
+      "producer_dirty_recorded": true,
+      "producer_tree": "cfb9f72af490f5343075c97a745a158d2535faa5",
+      "run_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3"
+    }
+  ],
+  "length_queries": {
+    "data": "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_LENGTH_QUERIES.csv",
+    "interpolation_performed": false,
+    "policy": "uncomputed lengths retain measured lower pre-event and upper committed jump coordinates; no K value is shifted to the requested coordinate",
+    "targets_um": [
+      100,
+      500,
+      1000
+    ]
+  },
+  "resistance_view": {
+    "data": "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_RESISTANCE_EVENTS.csv",
+    "definition": "native J-derived K_J measured at each exact pre-event state and associated only with that event's realized committed projected jump",
+    "event_row_count": 406,
+    "figure_pdf": "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_RESISTANCE.pdf",
+    "figure_png": "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_RESISTANCE.png",
+    "scope": "event-sampled monotonic resistance history; the single loading segment does not provide multiple independent unload/reload resistance points"
+  },
+  "same_seed_geometry": {
+    "byte_identical_geometry_event_files": true,
+    "interpretation": "controlled common-mark geometry: temperature changes load, time and mechanism state; this is not independent morphology invariance"
+  },
+  "schema": "final-developed-growth-resistance/1",
+  "selected_native_field_source": {
+    "channels": [
+      "damage",
+      "log10 density",
+      "sigma_1 FEM",
+      "equivalent plastic strain"
+    ],
+    "note": "original native renderer output; no reconstructed bulk field from tip bins",
+    "path": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/field_snapshots_1200K.png",
+    "stored_states": [
+      1,
+      1600,
+      1672,
+      1703
+    ]
+  }
+}
