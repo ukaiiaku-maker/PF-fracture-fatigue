@@ -41,3 +41,18 @@ def test_close_matrix_row_distinguishes_event_and_physical_censor(tmp_path, monk
         campaign.close_matrix_row(row, result)
         assert row["status"] == expected
         assert row["producer_commit"] == "abcdef123456"
+
+
+def test_nonzero_orientation_does_not_reuse_theta_zero_kernel():
+    row = {
+        "arm": "accommodation_enabled",
+        "material_row": "DBTT",
+        "temperature_K": "300",
+        "orientation_deg": "45",
+        "rate_factor": "1.0",
+        "seed": "1733",
+        "source_geography": "tip_surface",
+    }
+    _, native = campaign.configured_case(row)
+    assert "--signed-kernel-family" not in native
+    assert native[native.index("--crystal-theta-deg") + 1] == "45"

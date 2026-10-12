@@ -57,6 +57,14 @@ def replace_argument(args: list[str], flag: str, value: str) -> None:
     args[args.index(flag) + 1] = value
 
 
+def remove_argument(args: list[str], flag: str) -> None:
+    """Remove one two-token option without disturbing unrelated native flags."""
+    if flag not in args:
+        return
+    index = args.index(flag)
+    del args[index:index + 2]
+
+
 def validate_matrix(entries: list[dict[str, str]]) -> dict[str, object]:
     baseline = [row for row in entries if row["case_id"].startswith("baseline_")]
     identities = {(r["material_row"], int(r["temperature_K"]), r["arm"]) for r in baseline}
@@ -156,6 +164,10 @@ def configured_case(row: dict[str, str]) -> tuple[SharedOptions, list[str]]:
     replace_argument(native, "--target-crack-extension-um", "10")
     replace_argument(native, "--crystal-theta-deg", row["orientation_deg"])
     replace_argument(native, "--dt", str(8.4 / float(row["rate_factor"])))
+    if float(row["orientation_deg"]) != 0.0:
+        # The baseline's explicit family is mechanically certified at theta=0.
+        # Let the existing resolver build/reuse the exact nonzero-angle family.
+        remove_argument(native, "--signed-kernel-family")
     configured = dict(template["options"])
     configured["random_seed"] = int(row["seed"])
     configured["output"] = "compact_smoke"
