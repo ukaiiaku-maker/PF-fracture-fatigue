@@ -1,0 +1,22 @@
+{
+  "controlling_continuation": {
+    "date": "2026-10-12",
+    "sha256": "4b7f26abe18811c7ac20dac3395866f6d1c76d62a10cf4fa5e767912306beeb0"
+  },
+  "external_evidence_manifest": {
+    "path": "../common_framework_release/EXTERNAL_EVIDENCE_MANIFEST.json",
+    "sha256": "58d2a3d1c5bfb10ec5788c162edeae50d17810055c706a20acbb6660c52974aa"
+  },
+  "fem": {
+    "branch": "codex/current-pf-companion",
+    "commit": "90cb6671523bb676cb241eb850b7f5fd41cf5461",
+    "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion"
+  },
+  "generated_utc": "2026-10-12T21:05:54.485140+00:00",
+  "pf": {
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "commit": "a6f5b18206b7810e198817895240a5a8632e1c9e",
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1"
+  },
+  "schema": "common-fracture-readiness-source-identities/1"
+}

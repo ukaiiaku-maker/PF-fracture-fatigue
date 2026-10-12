@@ -1,0 +1,23 @@
+{
+  "schema": "common-fracture-readiness-qualification-receipt/1",
+  "production_execution_authorized": false,
+  "manuscript_modified": false,
+  "pf_working_checkout": {
+    "command": "python -m pytest -q",
+    "passed": 868,
+    "failed": 0,
+    "elapsed_s": 168.64
+  },
+  "fem_independent_checkout": {
+    "command": "python -m pytest -q",
+    "passed": 686,
+    "subtests_passed": 16,
+    "failed": 0,
+    "elapsed_s": 260.89,
+    "commit": "90cb6671523bb676cb241eb850b7f5fd41cf5461"
+  },
+  "clean_checkout_pf": {
+    "status": "PENDING_POST_COMMIT"
+  },
+  "scientific_production": "NOT_REQUESTED_ON_THIS_MACHINE"
+}

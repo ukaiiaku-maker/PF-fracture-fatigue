@@ -1,0 +1,161 @@
+{
+  "capacity": {
+    "admitted": true,
+    "free_GiB": 47.57196044921875,
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1",
+    "peak_GiB": 24.0,
+    "reason": "capacity admitted",
+    "reserve_GiB": 12.0
+  },
+  "jobs": [
+    {
+      "engineering_question": "Do plane stress, plane strain and specified transverse constraint deliver the declared full tensor?",
+      "evidence_status": "PARTIAL_CONTRACT_QUALIFIED_SPATIAL_PENDING",
+      "expected_peak_GiB": 0.05,
+      "goal_ids": [
+        "FG-08",
+        "FG-09",
+        "FG-10"
+      ],
+      "job_id": "Q-MECH-PATCH",
+      "native_args": [],
+      "native_entrypoint": "pytest:tests/test_readiness_mechanics_state.py",
+      "numerical_guards": [
+        "300 s wall",
+        "2 GiB memory"
+      ],
+      "physical_endpoint": "material-point and patch assertions pass",
+      "production_job": false,
+      "required_observables": [
+        "sigma_zz",
+        "tensor rotation",
+        "work",
+        "derivative"
+      ],
+      "retained_output_policy": "retain config/source identity, scalar history, residual table, accepted state and restart input; no movie/dense sequence",
+      "substantial_worker_slots": 1
+    },
+    {
+      "engineering_question": "Are all four parent rows valid for every active mechanism over their requested domain?",
+      "evidence_status": "QUALIFIED_COMPACT",
+      "expected_peak_GiB": 0.05,
+      "goal_ids": [
+        "FG-02",
+        "FG-03",
+        "FG-05",
+        "FG-15"
+      ],
+      "job_id": "Q-PARAM-DOSSIER",
+      "native_args": [
+        "--parameter-dossier"
+      ],
+      "native_entrypoint": "scripts/build_common_readiness_handoff.py",
+      "numerical_guards": [
+        "no solver"
+      ],
+      "physical_endpoint": "complete declared temperature grid",
+      "production_job": false,
+      "required_observables": [
+        "barriers",
+        "slopes",
+        "curvatures",
+        "rates",
+        "domains"
+      ],
+      "retained_output_policy": "retain config/source identity, scalar history, residual table, accepted state and restart input; no movie/dense sequence",
+      "substantial_worker_slots": 1
+    },
+    {
+      "engineering_question": "Do original PF and FEM backends trend to the same pre-event observables on independent meshes?",
+      "evidence_status": "UNRESOLVED_GENERIC_FEM_ADAPTER",
+      "expected_peak_GiB": 18.0,
+      "goal_ids": [
+        "FG-12"
+      ],
+      "job_id": "Q-PF-FEM-3LEVEL",
+      "native_args": [
+        "--levels",
+        "3",
+        "--opening-only"
+      ],
+      "native_entrypoint": "scripts/run_pf_fem_readiness_qualification.py",
+      "numerical_guards": [
+        "one worker",
+        "capacity preflight",
+        "wall cap 6 h"
+      ],
+      "physical_endpoint": "three fixed pre-event common loads and one short accepted/restart event",
+      "production_job": false,
+      "required_observables": [
+        "reaction",
+        "stored energy",
+        "stress",
+        "displacement",
+        "J/support",
+        "restart"
+      ],
+      "retained_output_policy": "retain config/source identity, scalar history, residual table, accepted state and restart input; no movie/dense sequence",
+      "substantial_worker_slots": 1
+    },
+    {
+      "engineering_question": "Does opt-in local_incremental_front preserve solid-area accounting, marks, clocks and rollback?",
+      "evidence_status": "PARTIAL_CONTRACT_QUALIFIED_SPATIAL_PENDING",
+      "expected_peak_GiB": 0.1,
+      "goal_ids": [
+        "FG-13",
+        "FG-16"
+      ],
+      "job_id": "Q-CAVITY-LOCAL",
+      "native_args": [],
+      "native_entrypoint": "pytest:tests/test_candidate_drive_contract.py",
+      "numerical_guards": [
+        "no production exposure"
+      ],
+      "physical_endpoint": "ordinary/distant/near/contact/downstream contract checks",
+      "production_job": false,
+      "required_observables": [
+        "released work",
+        "new solid area",
+        "clock",
+        "ownership",
+        "restart"
+      ],
+      "retained_output_policy": "retain config/source identity, scalar history, residual table, accepted state and restart input; no movie/dense sequence",
+      "substantial_worker_slots": 1
+    },
+    {
+      "engineering_question": "Can native birth, daughter continuation and a second-generation birth survive restart?",
+      "evidence_status": "UNRESOLVED_SECOND_GENERATION_NATIVE_ADAPTER",
+      "expected_peak_GiB": 24.0,
+      "goal_ids": [
+        "FG-13",
+        "FG-14",
+        "FG-16"
+      ],
+      "job_id": "Q-BRANCH-RECURSIVE",
+      "native_args": [
+        "--second-generation"
+      ],
+      "native_entrypoint": "scripts/run_recursive_branch_readiness.py",
+      "numerical_guards": [
+        "one worker",
+        "capacity preflight",
+        "wall cap 8 h"
+      ],
+      "physical_endpoint": "second-generation native birth followed by one accepted continuation",
+      "production_job": false,
+      "required_observables": [
+        "birth",
+        "owner",
+        "cluster/local",
+        "inherited clock",
+        "restart"
+      ],
+      "retained_output_policy": "retain config/source identity, scalar history, residual table, accepted state and restart input; no movie/dense sequence",
+      "substantial_worker_slots": 1
+    }
+  ],
+  "maximum_substantial_workers": 1,
+  "production_execution_authorized": false,
+  "schema": "common-fracture-qualification-only/1"
+}

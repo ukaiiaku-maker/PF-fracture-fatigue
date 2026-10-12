@@ -1,0 +1,24 @@
+{
+  "by_command_status": {
+    "RESOLVED_DISABLED": 388,
+    "UNRESOLVED_DEPENDENCIES": 256
+  },
+  "canonical_semantic_sha256": "845457a31424ffdb7b27c927a0fa6f4daccdbc7e1cd3d9bd4b5c16314d0b4a1e",
+  "canonicalization": "SHA-256 of sorted-key compact-JSON serialization of the entire record list",
+  "case_count": 644,
+  "production_execution_authorized": false,
+  "raw_jsonl_sha256": "49db5b677e444a499608e9ac9077f39868c5278236f51bc4e9826a6bc22bba7e",
+  "schema": "prospective-common-fracture-campaign/2",
+  "validation": {
+    "construction_check": "typed v2 construction only; native parser execution remains source-family qualification",
+    "distinct_resolved_families": [
+      [
+        "spatial_pf",
+        "tip_surface",
+        "monotonic"
+      ]
+    ],
+    "errors": [],
+    "valid": true
+  }
+}
