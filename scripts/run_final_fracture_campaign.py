@@ -31,6 +31,15 @@ BASE_KERNEL_CONFIGURATION = Path(
     "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/"
     "mechanical_configuration.json"
 )
+ORIENTATION_KERNEL_BOOTSTRAP = Path(
+    "/Volumes/Data/Data/Nanopillar_calculation/"
+    "PF-fracture-fatigue_theta40_signed_kernel_append_only_"
+    "v5_3_20260901T120000Z_repro/family.json"
+)
+PYTHON_BIN = Path(
+    "/opt/homebrew/Caskroom/miniconda/base/envs/"
+    "arrhenius-sharp-front-v10-codex/bin/python"
+)
 TEMPLATES = {
     "accommodation_enabled": TEMPLATE_ROOT / "DBTT_1200K" / "accommodation_enabled" / "shared_execution_request.json",
     "opening_only": TEMPLATE_ROOT / "DBTT_1200K" / "opening_only" / "shared_execution_request.json",
@@ -286,9 +295,18 @@ def execute_group(entries: list[dict[str, str]], *, group: str, resume: bool,
             "CLEAVAGE_EVENT_MAX_FACTOR": "4.0",
         })
         if float(row["orientation_deg"]) != 0.0:
-            if not BASE_KERNEL_CONFIGURATION.is_file():
-                raise FileNotFoundError(BASE_KERNEL_CONFIGURATION)
-            os.environ["MECHANICAL_CONFIG"] = str(BASE_KERNEL_CONFIGURATION)
+            for required in (BASE_KERNEL_CONFIGURATION, ORIENTATION_KERNEL_BOOTSTRAP, PYTHON_BIN):
+                if not required.is_file():
+                    raise FileNotFoundError(required)
+            os.environ.update({
+                "MECHANICAL_CONFIG": str(BASE_KERNEL_CONFIGURATION),
+                "PYTHON_BIN": str(PYTHON_BIN),
+                "CONDA_ENV": "arrhenius-sharp-front-v10-codex",
+                "CONDA_DEFAULT_ENV": "arrhenius-sharp-front-v10-codex",
+                "KERNEL_CAPTURE_SEED_FAMILY": str(ORIENTATION_KERNEL_BOOTSTRAP),
+                "KERNEL_CAPTURE_PARAMETER_OPTION": MATERIAL_OPTIONS["DBTT"],
+                "KERNEL_CAPTURE_HAZARD_SEED": "1733",
+            })
         execute_shared(options, native, target, source_policy="qualified")
         close_matrix_row(row, target)
         write_matrix(entries)
