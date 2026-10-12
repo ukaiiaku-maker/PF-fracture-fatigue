@@ -5,9 +5,7 @@ import csv
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-
-from .material_manifest import ExpFloorBarrier, KB_EV_PER_K, TransportBarrier
+from .material_manifest import ExpFloorBarrier, TransportBarrier
 from .prospective_campaign import REGISTRY
 
 
@@ -30,21 +28,50 @@ def _mechanism(name: str, barrier: ExpFloorBarrier, T: float, stress_fraction: f
                 "barrier_eV": None, "dG_dsigma_eV_Pa": None, "d2G_dsigma2_eV_Pa2": None,
                 "dG_dT_eV_K": barrier.gT_eV_per_K, "rate_s": None, "timescale_s": None}
     sigma = stress_fraction * raw_sigc
-    h = max(raw_sigc * 1e-5, 1.0)
-    gm = float(barrier.values_eV(sigma - h, T)); g0 = float(barrier.values_eV(sigma, T)); gp = float(barrier.values_eV(sigma + h, T))
+    native = barrier.diagnostic(sigma, T)
+    g0 = native["barrier_eV"]
     rate = float(barrier.rate(sigma, T))
-    floor = min(barrier.floor_max_fraction * max(raw_G0, 1e-12),
-                max(barrier.floor_min_eV, barrier.floor_fraction * max(raw_G0, 1e-12)))
+    semantics = {
+        "cleavage": {
+            "elementary_rate_meaning": "local Arrhenius cleavage attempt rate",
+            "effective_quantity": "aggregate physical-support hazard requires geometry/site support and state",
+            "completion_law": "candidate hazard compared with its owned stochastic mark",
+        },
+        "emission": {
+            "elementary_rate_meaning": "per persistent source/channel injection propensity",
+            "effective_quantity": "simultaneous injection depends on active persistent source state and physical support",
+            "completion_law": "coupled source-population update; not a generic one-mark mechanism",
+        },
+        "peierls_completion": {
+            "elementary_rate_meaning": "signed mobile transport/mobility coefficient",
+            "effective_quantity": "advance depends on mobile population, direction, slip distance and local state",
+            "completion_law": "transported population/velocity update in physical seconds",
+        },
+        "taylor_release": {
+            "elementary_rate_meaning": "single-hit retained-to-mobile release coefficient",
+            "effective_quantity": "cooperative completion depends on retained population and Taylor correlation state",
+            "completion_law": "native cooperative release mapping; not an independent exponential event mark",
+        },
+    }[name]
     return {"mechanism": name, "T_K": T, "stress_fraction": stress_fraction,
             "stress_Pa": sigma, "raw_G0_eV": raw_G0, "raw_sigc_Pa": raw_sigc,
-            "barrier_eV": g0, "floor_eV": floor,
-            "dG_dsigma_eV_Pa": (gp-gm)/(2*h),
-            "d2G_dsigma2_eV_Pa2": (gp-2*g0+gm)/(h*h),
-            "dG_dT_eV_K": barrier.gT_eV_per_K, "attempt_frequency_s": barrier.attempt_frequency_s,
+            "barrier_eV": g0, "floor_eV": native["floor_eV"],
+            "floor_branch": native["floor_branch"],
+            "stress_gate_branch": native["stress_gate_branch"],
+            "dG0_dT_eV_K": native["dG0_dT_eV_K"],
+            "partial_G_partial_T_fixed_stress_state_eV_K": native["partial_G_partial_T_fixed_stress_state_eV_K"],
+            "partial_G_partial_T_fixed_sigma_over_sigc_eV_K": native["partial_G_partial_T_fixed_sigma_over_sigc_eV_K"],
+            "activation_entropy_fixed_stress_state_eV_K": native["activation_entropy_fixed_stress_state_eV_K"],
+            "dG_dsigma_eV_Pa": native["partial_G_partial_sigma_eV_Pa"],
+            "d2G_dsigma2_eV_Pa2": native["partial2_G_partial_sigma2_eV_Pa2"],
+            "activation_volume_m3": native["activation_volume_m3"],
+            "derivative_convention": native["derivative_convention"],
+            "temperature_kink": native["temperature_kink"],
+            "native_callable": "arrhenius_fracture.material_manifest.ExpFloorBarrier.values_eV/rate/diagnostic",
+            "attempt_frequency_s": barrier.attempt_frequency_s,
             "rate_s": rate, "timescale_s": 1.0/rate if rate > 0 else None,
-            "activation_support": "physical mechanism support; supplied by native spatial consumer",
-            "completion_law": "integrated rate reaches dimensionless exponential mark",
-            "time_unit": "s", "domain_status": "ADMISSIBLE_PARENT_EXAMPLE"}
+            "activation_support": "state/geometry dependent; no effective multiplicity fabricated in frozen scalar diagnostic",
+            **semantics, "time_unit": "s", "domain_status": "ADMISSIBLE_PARENT_EXAMPLE"}
 
 
 def build_parameter_dossier(root: str | Path, temperatures=(300.0, 600.0, 800.0, 950.0, 1000.0, 1050.0, 1300.0),
@@ -79,7 +106,8 @@ def build_parameter_dossier(root: str | Path, temperatures=(300.0, 600.0, 800.0,
                                          "retained_recovery_rate_s": float(row["retained_recovery_rate_s"])},
                         "domain_status": "UNSUPPORTED_POINTS_PRESENT" if invalid else "GRID_ADMISSIBLE",
                         "mechanisms": mechanisms})
-    return {"schema": "common-fracture-parameter-dossier/1",
+    return {"schema": "common-fracture-parameter-dossier/2",
+            "supersedes_diagnostic": "common_framework_readiness/PARAMETER_PARENT_DOSSIER.json (historical v1 retained)",
             "selection_status": "parent examples only; no candidate promoted",
             "temperature_law_changes": "PHYSICAL_DECISION_REQUIRED",
             "parents": parents}

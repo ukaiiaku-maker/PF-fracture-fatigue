@@ -63,6 +63,104 @@ class ExpFloorBarrier:
             np.clip(-G / max(KB_EV_PER_K * float(T_K), 1.0e-30), -700.0, 0.0)
         )
 
+    def diagnostic(self, stress_Pa: float, T_K: float) -> dict[str, Any]:
+        """Evaluate the executed surface and its local piecewise derivatives.
+
+        Thermal derivatives hold physical stress and all external state fixed.
+        A separate fixed-normalized-stress derivative is reported because it
+        is not the same thermodynamic quantity when ``sigc`` varies with T.
+        At executed max/min kinks the corresponding derivative is ``None``;
+        no fictitious smooth value is supplied.
+        """
+        sigma_input = float(stress_Pa)
+        T = float(T_K)
+        if not math.isfinite(sigma_input) or not math.isfinite(T) or T <= 0.0:
+            raise ValueError("stress and positive temperature must be finite")
+        sigma = max(sigma_input, 0.0)
+        raw_G0 = self.G00_eV + self.gT_eV_per_K * (T - self.Tref_K)
+        raw_sigc = self.sigc0_Pa + self.sT_Pa_per_K * (T - self.Tref_K)
+        G0 = max(raw_G0, 1.0e-12)
+        sigc = max(raw_sigc, 1.0)
+        kink_G0 = math.isclose(raw_G0, 1.0e-12, rel_tol=0.0, abs_tol=1.0e-14)
+        kink_sigc = math.isclose(raw_sigc, 1.0, rel_tol=0.0, abs_tol=1.0e-9)
+        dG0 = None if kink_G0 else (self.gT_eV_per_K if raw_G0 > 1.0e-12 else 0.0)
+        dsigc = None if kink_sigc else (self.sT_Pa_per_K if raw_sigc > 1.0 else 0.0)
+
+        fractional = self.floor_fraction * G0
+        lower_kink = math.isclose(fractional, self.floor_min_eV, rel_tol=1e-12, abs_tol=1e-15)
+        lower = max(self.floor_min_eV, fractional)
+        upper = self.floor_max_fraction * G0
+        upper_kink = math.isclose(lower, upper, rel_tol=1e-12, abs_tol=1e-15)
+        floor = min(upper, lower)
+        if lower_kink or upper_kink or dG0 is None:
+            dfloor = None
+            floor_branch = "kink"
+        elif upper < lower:
+            dfloor = self.floor_max_fraction * dG0
+            floor_branch = "maximum_fraction_cap"
+        elif fractional > self.floor_min_eV:
+            dfloor = self.floor_fraction * dG0
+            floor_branch = "fractional_floor"
+        else:
+            dfloor = 0.0
+            floor_branch = "absolute_floor"
+
+        alpha = max(self.alpha, 0.0)
+        n = max(self.exponent, 1.0e-9)
+        q = (sigma / sigc) ** n
+        attenuation = math.exp(-alpha * q)
+        barrier = floor + (G0 - floor) * attenuation
+        if dG0 is None or dsigc is None or dfloor is None:
+            dT_fixed_stress = None
+            dT_fixed_normalized = None
+        else:
+            d_attenuation = attenuation * alpha * n * q * dsigc / sigc
+            dT_fixed_stress = (dfloor + (dG0 - dfloor) * attenuation
+                               + (G0 - floor) * d_attenuation)
+            dT_fixed_normalized = dfloor + (dG0 - dfloor) * attenuation
+
+        if sigma_input < 0.0:
+            dsigma = 0.0
+            d2sigma = 0.0
+            stress_branch = "negative_stress_gate"
+        elif sigma == 0.0:
+            stress_branch = "zero_stress_one_sided"
+            if n > 2.0:
+                dsigma, d2sigma = 0.0, 0.0
+            elif math.isclose(n, 2.0):
+                dsigma = 0.0
+                d2sigma = -(G0 - floor) * alpha * n / sigc**2
+            elif n > 1.0:
+                dsigma, d2sigma = 0.0, None
+            elif math.isclose(n, 1.0):
+                dsigma = -(G0 - floor) * alpha / sigc
+                d2sigma = (G0 - floor) * alpha**2 / sigc**2
+            else:
+                dsigma, d2sigma = None, None
+        else:
+            stress_branch = "positive_stress_smooth"
+            c = alpha / sigc**n
+            slope_factor = c * n * sigma ** (n - 1.0)
+            dsigma = -(G0 - floor) * attenuation * slope_factor
+            d2sigma = ((G0 - floor) * attenuation
+                       * (slope_factor**2 - c*n*(n-1.0)*sigma**(n-2.0)))
+        return {
+            "barrier_eV": barrier, "raw_G0_eV": raw_G0, "executed_G0_eV": G0,
+            "raw_sigc_Pa": raw_sigc, "executed_sigc_Pa": sigc,
+            "floor_eV": floor, "floor_branch": floor_branch,
+            "stress_gate_branch": stress_branch, "attenuation": attenuation,
+            "dG0_dT_eV_K": self.gT_eV_per_K,
+            "partial_G_partial_T_fixed_stress_state_eV_K": dT_fixed_stress,
+            "partial_G_partial_T_fixed_sigma_over_sigc_eV_K": dT_fixed_normalized,
+            "activation_entropy_fixed_stress_state_eV_K": (
+                None if dT_fixed_stress is None else -dT_fixed_stress),
+            "partial_G_partial_sigma_eV_Pa": dsigma,
+            "partial2_G_partial_sigma2_eV_Pa2": d2sigma,
+            "activation_volume_m3": None if dsigma is None else -dsigma * 1.602176634e-19,
+            "derivative_convention": "partial derivative at fixed physical stress and frozen external state",
+            "temperature_kink": bool(kink_G0 or kink_sigc or lower_kink or upper_kink),
+        }
+
 
 @dataclass(frozen=True)
 class TransportBarrier:

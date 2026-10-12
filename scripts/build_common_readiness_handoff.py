@@ -42,7 +42,7 @@ def build() -> None:
     (OUT / "PROSPECTIVE_CAMPAIGN_V2.jsonl").write_bytes(raw)
     _write_json(OUT / "CAMPAIGN_V2_SUMMARY.json", summary(cases, raw))
     _write_json(OUT / "QUALIFICATION_ONLY_MANIFEST.json", manifest_payload(ROOT))
-    _write_json(OUT / "PARAMETER_PARENT_DOSSIER.json", build_parameter_dossier(ROOT))
+    _write_json(OUT / "PARAMETER_PARENT_DOSSIER_V2_NATIVE.json", build_parameter_dossier(ROOT))
     _write_json(OUT / "CURRENT_FEM_COMPANION_BINDING.json", inspect_current_companion().to_dict())
 
     companion = ROOT.parent / "fem-czm-current-pf-companion"
