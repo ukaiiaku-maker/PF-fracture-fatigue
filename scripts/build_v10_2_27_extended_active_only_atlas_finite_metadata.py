@@ -88,6 +88,11 @@ def _validate_exact_endpoint_unavailable_cross_validation(payload: dict[str, Any
     for row in checks:
         if not isinstance(row, dict):
             raise ValueError("invalid exact-endpoint projection check")
+        # Forced-zero wake rows carry finite zero diagnostics and have no
+        # measured active-station endpoints.  They are not the source of the
+        # unavailable leave-one-out values being canonicalized here.
+        if not _contains_nonfinite(row):
+            continue
         bins = row.get("measured_bins", [])
         full_count = int(row.get("full_grid_count", 0) or 0)
         if (
@@ -111,6 +116,14 @@ def _validate_exact_endpoint_unavailable_cross_validation(payload: dict[str, Any
                 raise ValueError(
                     f"{mode_name} is not explicitly unavailable for two endpoints"
                 )
+
+
+def _contains_nonfinite(value: Any) -> bool:
+    if isinstance(value, dict):
+        return any(_contains_nonfinite(child) for child in value.values())
+    if isinstance(value, list):
+        return any(_contains_nonfinite(child) for child in value)
+    return isinstance(value, float) and not math.isfinite(value)
 
 
 def _sanitize(

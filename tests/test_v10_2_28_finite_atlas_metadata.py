@@ -64,6 +64,16 @@ def _endpoint_payload() -> dict:
 
 def test_only_explicit_unavailable_review_diagnostics_become_json_null():
     payload = _endpoint_payload()
+    payload["measured_station_projection"]["projection_checks"].append(
+        {
+            "cross_validation_available": False,
+            "cross_validation_required": False,
+            "full_grid_count": 160,
+            "measured_bins": [],
+            "maximum_relative_cross_validation_error": 0.0,
+            "wake_kernel_forced_zero": True,
+        }
+    )
     MODULE._validate_exact_endpoint_unavailable_cross_validation(payload)
     sanitized, replacements = MODULE._sanitize(payload)
 
