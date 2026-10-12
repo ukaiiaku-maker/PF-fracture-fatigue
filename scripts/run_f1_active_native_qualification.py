@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
         _run(initial, INITIAL_STEPS)
     if values.phase in {"resume", "all"}:
         checkpoint = initial / "checkpoint"
-        if not (checkpoint / "run_state_manifest.json").is_file():
+        if not (checkpoint / "run_state_checkpoint.json").is_file():
             raise SystemExit(f"complete outer checkpoint is missing: {checkpoint}")
         _run(resumed, FINAL_STEPS, checkpoint)
     return 0
