@@ -4,15 +4,20 @@ import numpy as np
 import pytest
 
 from arrhenius_fracture.continuum_source_tip import (
-    ContinuumSourceKineticTipEngine,
     SOURCE_MODEL,
     _local_emission_backstress_Pa,
     _local_tip_density_m2,
 )
 from arrhenius_fracture.kinetic_tip_cell import KineticTipConfig
 from arrhenius_fracture.material_manifest import MaterialManifest, default_manifest_path
+from arrhenius_fracture.separated_source_tip import SeparatedSourceKineticTipEngine
 from arrhenius_fracture.sharp_front_v10_1 import _prepare_args_v1011
 from arrhenius_fracture.unified_mpz import MPZConfig
+
+
+# Bind the concrete v10.1.1 subject, not the mutable compatibility slot in
+# continuum_source_tip that later historical entry modules replace on import.
+ContinuumSourceKineticTipEngine = SeparatedSourceKineticTipEngine
 
 
 def _engine() -> ContinuumSourceKineticTipEngine:
