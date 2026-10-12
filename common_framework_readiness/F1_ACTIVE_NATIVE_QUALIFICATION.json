@@ -1,0 +1,101 @@
+{
+  "schema": "f1-active-native-qualification/1",
+  "date": "2026-10-12",
+  "status": "PASSED",
+  "production_execution_authorized": false,
+  "case": {
+    "candidate_id": "v913_zeroD_sobol_0202500",
+    "option_key": "v913_paper_dbtt01_0202500_persistent_sites",
+    "material_class": "DBTT",
+    "temperature_K": 950.0,
+    "temperature_domain_status": "ADMISSIBLE_PARENT_EXAMPLE",
+    "hazard_seed": 1733,
+    "kernel_family": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/family.json"
+  },
+  "execution": {
+    "public_entry": "arrhenius_fracture.shared_execution.execute_shared",
+    "initial_output": "../integration_evidence/f1_active_native_qualification/initial_to_step48",
+    "restart_output": "../integration_evidence/f1_active_native_qualification/fresh_process_restart_to_step64",
+    "initial_source_commit": "93a1e17dd87d08251d342b88c29d4ff4288eec70",
+    "restart_source_commit": "7939aa9adbd7957cde3d32feb6f7044e6010f055",
+    "source_commit_difference": "launcher-only checkpoint filename guard; all observed calculation bindings, executor hash, and live method source hashes are identical",
+    "initial_worker_pid": 88194,
+    "restart_worker_pid": 88353,
+    "fresh_process_restart": true,
+    "checkpoint_schema": "v10.2.30_combined_outer_kinetic_run_state_v2",
+    "checkpoint_generation_restored": "37ec180d7937285d56663005",
+    "initial_accepted_steps": 48,
+    "final_accepted_steps": 64,
+    "accepted_history_prefix_text_identical_through_step_48": true,
+    "observed_role_bindings_identical_across_processes": true,
+    "executor_module_sha256_identical_across_processes": true,
+    "executor_module_sha256": "be472bd20402691d1fddb6d510962d94c0b0f87ef5b98eb022500bc83470ac2b",
+    "fracture_event_forced": false,
+    "accepted_geometry_events": 0,
+    "physical_endpoint": "accepted monotonic step 64 at 537.6 s"
+  },
+  "runtime_contract": {
+    "all_expected_methods_bound_initial": true,
+    "all_expected_methods_bound_after_restart": true,
+    "finite_inventory_substitute_started": false,
+    "source_model": "persistent_areal_sites_backstress_limited_no_inventory",
+    "transport_mode": "validated_scalar",
+    "bindings": {
+      "injection": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+      "transport_signed_state": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_scalar",
+      "exchange_release": "arrhenius_fracture.unified_mpz.UnifiedMPZState._exchange",
+      "wake_advance": "arrhenius_fracture.persistent_site_source_v10221._persistent_advance",
+      "native_rate": "arrhenius_fracture.unified_mpz.UnifiedMPZState.emission_rate_per_site"
+    }
+  },
+  "raw_evidence_sha256": {
+    "initial_steps_0950K.csv": "4eaa8eb753a1efa066eed5a86f0040c2ba8c40d5f1ead3f6bfb98d7404615b7a",
+    "restart_steps_0950K.csv": "98df1001f46ab343b9079492e7c7da7e293354beecb4fa2482e9f9922aa76452",
+    "initial_checkpoint_manifest": "1b4b1c477fd327596333f9fce8c0515afc14d1def7f2afcb76c88988d97a70ff",
+    "initial_runtime_attestation": "6fec04319a3ced7e66cde3cb68489de71cb33a69506b333b019f866d8ede5fe6",
+    "restart_runtime_attestation": "e28106bb38573b414b5cee437e41c46e5082301e230a53824266bac9c4dd579e",
+    "restart_kinetic_audit": "b2c012c424da2cfa0f8fdeee668e4920daa8ce9c6c4e808db87bf5b6d219776a",
+    "retained_import_failure": "d85eec6a074bce0c8ddfb8be80394c74cdd3ea3dc145f05185fb4810a2f368e1"
+  },
+  "active_suffix_step_49_to_64": {
+    "physical_time_start_s": 411.5999999999997,
+    "physical_time_end_s": 537.5999999999993,
+    "kinetic_dt_each_accepted_step_s": 8.4,
+    "emission_rate_start_s-1": 1.0958442749066233,
+    "emission_rate_end_s-1": 5.138004107871815,
+    "cumulative_emitted_end": 398.721600255879,
+    "retained_population_start": 48.7088429289239,
+    "retained_population_end": 398.721600255879,
+    "cumulative_escaped_end": 2.5874334080620346e-09,
+    "backstress_start_Pa": 284575439.96130383,
+    "backstress_end_Pa": 830455761.8455346,
+    "signed_active_shielding_end_Pa_sqrt_m": -66410.98271877022,
+    "tip_radius_start_m": 1.0084342818024683e-06,
+    "tip_radius_end_m": 1.0718253377821212e-06,
+    "signed_slip_stress_end_Pa": [
+      1256882792.540042,
+      -1253517296.9938064
+    ],
+    "last_step_injected": 39.69719147370465,
+    "last_step_trapped": 39.697191473384684,
+    "last_step_taylor_released": 3.1412311248321626e-23,
+    "last_step_escaped": 3.1997160476751975e-10,
+    "last_step_transport_velocity_by_system_m_s": [0.0, 0.0],
+    "cleavage_clock_action_end": 0.0003896745285551526,
+    "micro_advance_total_end_m": 1.9483726427757635e-09,
+    "interpretation": "The selected native operator was active and state evolving. At this state Peierls velocity was zero, while simultaneous injection, trapping, Taylor release, escape, backstress, signed shielding, slip, radius feedback, mechanics, and the cleavage clock were all evaluated and recorded."
+  },
+  "repeat": {
+    "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "complete_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/run_f1_active_native_qualification.py all --root integration_evidence/f1_active_native_qualification_repeat",
+    "resume_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/run_f1_active_native_qualification.py resume --root integration_evidence/f1_active_native_qualification_repeat",
+    "resume_requirement": "The selected root must already contain initial_to_step48/checkpoint/run_state_checkpoint.json."
+  },
+  "retained_failure": {
+    "path": "../integration_evidence/f1_active_native_qualification/failed_base_python_import_20261012",
+    "classification": "environment import failure before native construction",
+    "cause": "base Python 3.13 SciPy could not import _spropack",
+    "physics_started": false,
+    "fallback_started": false
+  }
+}

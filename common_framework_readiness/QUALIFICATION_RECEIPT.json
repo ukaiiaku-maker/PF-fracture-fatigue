@@ -3,10 +3,17 @@
   "production_execution_authorized": false,
   "manuscript_modified": false,
   "pf_working_checkout": {
-    "command": "python -m pytest -q",
-    "passed": 868,
+    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+    "tested_content_commit": "327abde972c20166b94067905456d82f4cf19da9",
+    "passed": 879,
     "failed": 0,
-    "elapsed_s": 168.64
+    "elapsed_s": 156.87
+  },
+  "f1_f4_targeted": {
+    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_f1_no_physics_fallback.py tests/test_parameter_dossier_native_derivatives.py tests/test_shared_entry_v1025.py tests/test_signed_burgers_shared_v1025.py tests/test_v10221_backstress_complementarity.py tests/test_v10221_no_source_inventory.py tests/test_v10221_persistent_site_source.py tests/test_v10_2_30_high_cycle_engine.py tests/test_v10_integrated_baseline.py",
+    "passed": 50,
+    "failed": 0,
+    "elapsed_s": 1.33
   },
   "fem_independent_checkout": {
     "command": "python -m pytest -q",

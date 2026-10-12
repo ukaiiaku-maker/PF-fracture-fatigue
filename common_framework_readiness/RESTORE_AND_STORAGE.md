@@ -1,8 +1,8 @@
 # Restore and storage boundary
 
-Generated 2026-10-12T21:05:54.485140+00:00. Production execution is not authorized.
+Updated 2026-10-12T23:32:48.939068+00:00. Production execution is not authorized.
 
-- PF checkout: `/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1` at `a6f5b18206b7810e198817895240a5a8632e1c9e` (recorded parent identity; apply the readiness commits listed in the final receipt).
+- PF checkout: `/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1` at tested calculation/test head `327abde972c20166b94067905456d82f4cf19da9` (apply the final compact-record commit after restoring this identity).
 - Independent FEM/CZM checkout: `/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion` at `90cb6671523bb676cb241eb850b7f5fd41cf5461`.
 - Python environments: `arrhenius-sharp-front-v10-codex` and `arrhenius-fem-czm`.
 - External evidence remains referenced by the release manifest and is not duplicated here. Restore only the dependency subset required by a qualification.

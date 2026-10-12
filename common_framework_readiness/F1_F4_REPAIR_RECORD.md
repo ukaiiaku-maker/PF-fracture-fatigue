@@ -51,9 +51,16 @@ simulated scheduler timeout fail closed; none dispatches v10.1 or another
 physics family. Output profile does not enter the physics contract.
 
 Active DBTT 950 K native qualification and fresh-process restart results are
-recorded in `F1_ACTIVE_NATIVE_QUALIFICATION.json`. If interrupted, use the exact
-command in that receipt and retain the same option, kernel, seed, marks, state
-and physical time.
+recorded in `F1_ACTIVE_NATIVE_QUALIFICATION.json`. The public execution path ran
+48 accepted steps, committed a complete outer-plus-kinetic checkpoint, then a
+second interpreter restored it and advanced through step 64. The first 48 CSV
+rows are text-identical across the boundary. Injection, retained state,
+backstress, signed shielding, slip, radius feedback, escape, accepted mechanics
+and cleavage-clock evolution are appreciable; the selected transport and
+exchange/release paths were evaluated and their actual zero/tiny increments are
+reported rather than inflated. No fracture event was forced and no finite-source
+substitute was started. If interrupted, use the exact command in that receipt
+and retain the same option, kernel, seed, marks, state and physical time.
 
 ## F4 repair
 
@@ -70,10 +77,19 @@ thermal derivative near -0.0031065770305 eV/K, distinct from
 `dG0/dT=+0.0061668124636635 eV/K`. The corrected native-backed output is
 `PARAMETER_PARENT_DOSSIER_V2_NATIVE.json`.
 
-## Unfinished work
+## Impact and unfinished work
 
 - No production campaign or broad material search is authorized.
-- A genuinely interrupted active qualification remains incomplete; it is not
-  converted to a censor or cheaper-model result.
+- Historical C16 v10.1.7.4 finite-inventory results remain preserved and are
+  ineligible substitutes for the persistent-source baseline.
+- Present persistent-source campaign outputs whose runtime receipts identify
+  the intended bindings remain valid; the repair did not alter their equations.
+- The v1 parameter dossier remains a historical erroneous diagnostic. Selection
+  coefficients and numerical arrays were not changed; current consumers use the
+  versioned native-backed v2 dossier.
+- No current specimen result was found to depend on the abbreviated dossier
+  derivative, so no production specimen array is queued for rerun. Future
+  production work must use the enforced persistent path and is still unauthorized
+  on this computer.
 - Parameter coefficients and temperature laws remain unchanged. The known
   DBTT upper-temperature domain problem remains a material-input decision.
