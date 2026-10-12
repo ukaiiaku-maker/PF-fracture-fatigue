@@ -1,0 +1,38 @@
+{
+  "schema": "fracture-claim-index/1",
+  "claims": {
+    "baseline_96": {
+      "claim": "all 96 cases fractured; reported row ranges",
+      "evidence": "methods/model_and_observer_contracts/PF_BASELINE_96.json",
+      "plot": "figures/Figure_2_PF_baseline_96.png"
+    },
+    "paired_seeds": {
+      "claim": "eight paired seeds per active anchor and reported intervals",
+      "evidence": "methods/model_and_observer_contracts/PF_FOCUSED_SEEDS.json",
+      "plot": "figures/Figure_3_PF_focused_seeds.png"
+    },
+    "sensitivities": {
+      "claim": "40 rate/orientation/source cases",
+      "evidence": "methods/model_and_observer_contracts/PF_SENSITIVITIES.json"
+    },
+    "developed_growth": {
+      "claim": "203 events and 1004.926 \u00b5m projected extension per path",
+      "evidence": "methods/model_and_observer_contracts/DEVELOPED_GROWTH_RESISTANCE.json"
+    },
+    "pf_fem": {
+      "claim": "exact elastic control; 0.62% and 6.06% first-event differences",
+      "evidence": "methods/model_and_observer_contracts/PF_FEM_FINAL_FRACTURE_COMPARISON.json"
+    },
+    "cavity": {
+      "claim": "80 \u00b5m suppressed-arm advance versus zero enabled-arm advance over 0.2 s",
+      "evidence": "methods/model_and_observer_contracts/CAVITY_INTERACTION_0P2S_RECOVERED.json"
+    },
+    "restart_options": {
+      "claim": "exact populated V3.6 and combined branch-cavity restart",
+      "evidence": [
+        "methods/model_and_observer_contracts/V36_ACTIVE_RESTART.json",
+        "methods/model_and_observer_contracts/BRANCH_CAVITY_COMPATIBILITY.json"
+      ]
+    }
+  }
+}

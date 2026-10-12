@@ -1,0 +1,7 @@
+# Final scientific report
+
+The completed study supports a forward fracture interpretation based on conditional opening action competing with inherited accommodation. The current 96-case PF campaign replaces the older response magnitudes: DBTT and Peak reach approximately 55 MPa√m, with selected accommodation effects above 150%, while Weak-T is broadly elevated and Ceramic-like remains comparatively modest. Eight-seed paired results resolve the active-anchor effect relative to observed stochastic spread.
+
+Developed DBTT paths reach 1.005 mm projected extension and are reported through separate chronological driving and exact pre-event resistance views. The common-specimen study closes the base-mechanics discrepancy: PF and FEM/CZM are identical on the elastic control and give first-event K within 0.62% (tip-only) and 6.06% (full field). The repaired cavity continuation changes the physical conclusion from the historical small timing offset: during the qualified final 0.2 s, the resolved cavity strongly shields the approach path, while the suppressed arm advances 80 µm. This does not establish permanent arrest or nucleation.
+
+No irreducible constitutive decision remains for the stated paper scope. Main limitations are constructed material rows, coarse-grained accommodation, two eight-seed anchors, local sensitivity matrices, backend-specific openings, a single paired cavity realization, and unavailable inner event times after the cavity exporter-only failure.

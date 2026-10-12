@@ -1,0 +1,353 @@
+{
+  "schema": "fracture-release-manifest/1",
+  "generated_utc": "2026-10-12T01:14:56.212050+00:00",
+  "source_head": "6ef6115d1b6c9bcd068d016a4ec48a72ffed0776",
+  "files": [
+    {
+      "path": "FINAL_ACCEPTANCE.json",
+      "bytes": 2053,
+      "sha256": "18b7ea736334e1ce593ae79795307b4be22b31fb365ad167e20b0de5693c9fb2"
+    },
+    {
+      "path": "FINAL_SCIENTIFIC_REPORT.md",
+      "bytes": 1485,
+      "sha256": "deb9ecc22fefa7b03771a05458b2c9768f9fa6cdc111177b4ca7d5609ab5e3ed"
+    },
+    {
+      "path": "MANUSCRIPT.md",
+      "bytes": 36329,
+      "sha256": "cea983feac41b8a73305e992b09bf1ff15596cebf72c310d586b25a402c76733"
+    },
+    {
+      "path": "README.md",
+      "bytes": 855,
+      "sha256": "586f74583ffa2a87a71cf6039a1798fa8354ce01f3cecfa08a8d31538ba8a65b"
+    },
+    {
+      "path": "SUPPORTING_INFORMATION.md",
+      "bytes": 17440,
+      "sha256": "e25036349f366bde5fc3bca3f6ee76153916cf2e994237913abf954d40d113f9"
+    },
+    {
+      "path": "author_record/DECISIONS.md",
+      "bytes": 14328,
+      "sha256": "1eb3cdffd7194a31a3a7d869b0abe5c4df545e232bc8470340970103b63c520f"
+    },
+    {
+      "path": "campaign/CAMPAIGN_MATRIX.csv",
+      "bytes": 66147,
+      "sha256": "8deb4babbbde83bdb90ec0b03a8c783b783c2cfc18e4d595a515391165621ff8"
+    },
+    {
+      "path": "campaign/run_or_resume.py",
+      "bytes": 15883,
+      "sha256": "acfbcab94ee87f426081e2aed38cf7c29e3dd6f44a55be3ce57569b2a4b77dce"
+    },
+    {
+      "path": "figure_data/DEVELOPED_DRIVING_HISTORY.csv",
+      "bytes": 2288116,
+      "sha256": "0aa2dc3c68abbe2d23cdb0bb373857283e95d6b53be35537926160ffe1fd3172"
+    },
+    {
+      "path": "figure_data/DEVELOPED_LENGTH_QUERIES.csv",
+      "bytes": 1508,
+      "sha256": "90ee5240d3b78739cf165e4f01363592605dcbfcf0f28b6f96d681b22b3a8b9a"
+    },
+    {
+      "path": "figure_data/DEVELOPED_RESISTANCE_EVENTS.csv",
+      "bytes": 206907,
+      "sha256": "13c77699823d1e16c28585caadf2d8c8e7a17351bff88b52b7d5bdbf7f8d4c9c"
+    },
+    {
+      "path": "figure_data/PF_BASELINE_96_DATA.csv",
+      "bytes": 68160,
+      "sha256": "5ff82cb6d5cf4aeabc85d006a05273f38fd59fed43781805f1d20fe9c3957708"
+    },
+    {
+      "path": "figure_data/PF_BASELINE_96_PAIRED.csv",
+      "bytes": 5223,
+      "sha256": "009986292ef3a025246dadb691e7449bd33b977745be1f9ba3b0e67e6715567c"
+    },
+    {
+      "path": "figure_data/PF_FOCUSED_SEEDS_DATA.csv",
+      "bytes": 7771,
+      "sha256": "576cf2d56a526d1cb4b68486ea9553e816ad378e402efe5dd02c0979772cb2a6"
+    },
+    {
+      "path": "figure_data/PF_FOCUSED_SEEDS_PAIRED.csv",
+      "bytes": 5289,
+      "sha256": "6a63e1c075a60780d10f00729104cb522628be9fc5a185e4c0a1f55264e5b1e3"
+    },
+    {
+      "path": "figure_data/PF_ORIENTATION_SENSITIVITY.csv",
+      "bytes": 2298,
+      "sha256": "87001cf596f38be684ff703008ec354898e4b5b0e130fd56d6fb4269561f51b1"
+    },
+    {
+      "path": "figure_data/PF_RATE_SENSITIVITY.csv",
+      "bytes": 12958,
+      "sha256": "d6f29f88592b27a48e7f8d388fdfbcaab5c7072860df5a191d92e97fa9d73d8b"
+    },
+    {
+      "path": "figure_data/PF_SENSITIVITIES_DATA.csv",
+      "bytes": 16225,
+      "sha256": "55c22cac435d10471e94e08638565dec84f2bf9b2289963f8f134d4accb1eacb"
+    },
+    {
+      "path": "figure_data/PF_SOURCE_GEOGRAPHY.csv",
+      "bytes": 1481,
+      "sha256": "364a110c7f8cc4665a3cfebea4574eb4524af49d730b5a2cc56148a1994aaabb"
+    },
+    {
+      "path": "figure_data/eligible_original_fem_propagation.csv",
+      "bytes": 89677,
+      "sha256": "737a148454796cd457e7336f27802b9349e60efd4a2556a64b0ecd882c952b29"
+    },
+    {
+      "path": "figure_data/eligible_original_fem_rate_response.csv",
+      "bytes": 59241,
+      "sha256": "dc1de67ae319f08e52d4c13266c370b81f1c00832e68241bd3a538c6dea5c281"
+    },
+    {
+      "path": "figure_data/eligible_original_pf_fem_first_passage.csv",
+      "bytes": 27798,
+      "sha256": "fa753b2d4277df1e45033611d5b87cfbf6d1a962ad14c08aa260ad31a9da6aea"
+    },
+    {
+      "path": "figure_data/full_pf_case_summary.csv",
+      "bytes": 30032,
+      "sha256": "f6b52e7c189f6be4015fd69b470fdfb3ad2ac9c24b1e759d6109bc254a85cb0f"
+    },
+    {
+      "path": "figure_data/full_pf_mechanism_stage_summary.csv",
+      "bytes": 4203,
+      "sha256": "28a22803e0cbd747a34f05096832b6ea1a06bfdadc71b04321c1f514d7122b96"
+    },
+    {
+      "path": "figure_data/full_pf_native_field_snapshots.csv",
+      "bytes": 1061,
+      "sha256": "83cd07cec4fe9fa8096ea3ec075011165530253f38fb8120bbb38440565b7e39"
+    },
+    {
+      "path": "figure_data/full_pf_numerical_qualification.csv",
+      "bytes": 2951,
+      "sha256": "4ed16850a8c4f5bca646f0b8470ac20180c7019db5d199400cefee18144f9bc1"
+    },
+    {
+      "path": "figure_data/full_pf_orientation_comparison.csv",
+      "bytes": 411,
+      "sha256": "4d9548ea5ee55be12fbe607b60428732bd6ddf11e5246fc390c28d54c591688e"
+    },
+    {
+      "path": "figure_data/full_pf_process_zone_profiles.csv",
+      "bytes": 19756,
+      "sha256": "03c71e4289ab249e0692d0b951f84da62a9eccb6d78677874c83ae22aeeea75d"
+    },
+    {
+      "path": "figure_data/full_pf_propagation_events.csv",
+      "bytes": 7250,
+      "sha256": "04003071938647354136c45aa759b52b05232d01ce9e8c47673e765dff54edbd"
+    },
+    {
+      "path": "figure_data/full_pf_rate_bracket.csv",
+      "bytes": 598,
+      "sha256": "462e093dcb7ef6dec3b078c40b07ba1b83a50b238be91dfb0342d3f4afc1344d"
+    },
+    {
+      "path": "figure_data/full_pf_selected_material_parameters.csv",
+      "bytes": 3714,
+      "sha256": "6a92a8e3b4f1e42587f11fe932a59c2d339e0e22dea0b063b1c7d18e79f1fe27"
+    },
+    {
+      "path": "figure_data/full_pf_source_state_summary.csv",
+      "bytes": 6604,
+      "sha256": "a2c85f4060f9c9d0ef0ebd0b073bffd1c4ed310cf9dd9665da1ecb05f1ac546a"
+    },
+    {
+      "path": "figure_data/full_pf_temperature_response.csv",
+      "bytes": 21926,
+      "sha256": "6b009eddfaed11c7b6ea95c82032e2adf84e7db5b415b8d4bd7331d232050f4b"
+    },
+    {
+      "path": "figure_data/full_spatial_opening_only_comparison.csv",
+      "bytes": 325,
+      "sha256": "578acb004a6852fc142f279a6981696856a4bd9e261cafdec3404405c9270600"
+    },
+    {
+      "path": "figure_data/v11_full_order_common_exposure_differences.csv",
+      "bytes": 27729,
+      "sha256": "6025ca7f9de1246d4d489479a4546a05057d10845ebc491853c34764840918ff"
+    },
+    {
+      "path": "figure_data/v11_full_order_field_snapshots.csv",
+      "bytes": 848,
+      "sha256": "3b2a0224e74d7e7252a05f62d9bf757937bfee24c7d2abe27e0522e05720d1ea"
+    },
+    {
+      "path": "figure_data/v11_full_order_history.csv",
+      "bytes": 175942,
+      "sha256": "17d64b761e27effb89d5949193978f9b78b4f1911983ce7fb0a95a9f4504d925"
+    },
+    {
+      "path": "figures/Figure_10_branching.png",
+      "bytes": 944955,
+      "sha256": "2fdc574da0f710e0f1c2cea413838a5d02735edb5f6b47fa87507c669da4766e"
+    },
+    {
+      "path": "figures/Figure_1_experimental.png",
+      "bytes": 361149,
+      "sha256": "51865013bd86f77e5021e83b6335eeb4a7f2865fc576cb1b8f8c6a22d60c3492"
+    },
+    {
+      "path": "figures/Figure_2_PF_baseline_96.png",
+      "bytes": 201147,
+      "sha256": "a04274e5f524fa47b8da744c4e0f948f093bf72b4bab5fb6f335a660201e283b"
+    },
+    {
+      "path": "figures/Figure_3_PF_focused_seeds.png",
+      "bytes": 146015,
+      "sha256": "79a056e4ef00a5147173a40c50f9ca97bcb27939bdf3b12263299a79480d696d"
+    },
+    {
+      "path": "figures/Figure_4a_PF_rate.png",
+      "bytes": 162683,
+      "sha256": "b4eb6d3c15a70283aadbe762ec35383c1c0530b2e22e5ffa0474fcfd9e30d500"
+    },
+    {
+      "path": "figures/Figure_4b_PF_orientation.png",
+      "bytes": 145808,
+      "sha256": "c1696899ac6d77b487df529e2e9db99d9eb05754ae17c4256c65e21acbb61c1f"
+    },
+    {
+      "path": "figures/Figure_4c_PF_source.png",
+      "bytes": 63839,
+      "sha256": "b4f8e89f3062a7b7f7a001c7d68c8c8b1968d341ac68dd9a1ec69b79b0a8c037"
+    },
+    {
+      "path": "figures/Figure_5_developed_driving.png",
+      "bytes": 224768,
+      "sha256": "e3acb2a43ea7cd8711af2c8263cdef7346bd86c7b43541a2580a298a35e86308"
+    },
+    {
+      "path": "figures/Figure_6_developed_resistance.png",
+      "bytes": 148680,
+      "sha256": "92c02cbf9f533795ef80a4aaca491c0d7fa7b97daae53423364bb5d13bdb98ab"
+    },
+    {
+      "path": "figures/Figure_7_native_fields.png",
+      "bytes": 331054,
+      "sha256": "d7b3aa4f4d765a8cb8668b56102f961b4c3bf6749a96bf8ed67167b5503c988e"
+    },
+    {
+      "path": "figures/Figure_8_PF_FEM.pdf",
+      "bytes": 17944,
+      "sha256": "8cc24208c8a07332d4f03cfd317c0dca2ca72c73d583e52f9034f1d11dee5e87"
+    },
+    {
+      "path": "figures/Figure_8_PF_FEM.png",
+      "bytes": 56677,
+      "sha256": "0dc25243ff93c14182f6727330c3eb6ca1c912560f328ac88fc842af4c8778a2"
+    },
+    {
+      "path": "figures/Figure_9_cavity_fields.pdf",
+      "bytes": 35381,
+      "sha256": "34679f7f2f89077fd4f35043189e04a0c9a7be3612d4760b8fca9412a203b31f"
+    },
+    {
+      "path": "figures/Figure_9_cavity_fields.png",
+      "bytes": 380115,
+      "sha256": "e8940247b58d87be61a8f39608eaa1948bac013c03ad97ad1da7d17c4094eea6"
+    },
+    {
+      "path": "figures/Figure_S1_experimental_companion.png",
+      "bytes": 423482,
+      "sha256": "b3bfeb60fc3b9d013db8b069201abecdfdfb81d110bb1bac10e5bcf07b2d9d21"
+    },
+    {
+      "path": "manuscript_and_SI.docx",
+      "bytes": 4213541,
+      "sha256": "717c37f02d3df50c9694d374fd98847af212c45c3160d5d84c044156e9011b74"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/BRANCH_CAVITY_COMPATIBILITY.json",
+      "bytes": 3830,
+      "sha256": "61b6c4a6acf4115cd4975c170b2da3e8eb7a3ac33667de5cd7a777f83cfc2e45"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/CAPABILITY_PRESERVATION_MATRIX.csv",
+      "bytes": 7772,
+      "sha256": "f038e83b121d7ed41ee6da94ac2bb4f5096d905491a56f0645c52bce45857da3"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/CAVITY_INTERACTION_0P2S_RECOVERED.json",
+      "bytes": 5882,
+      "sha256": "94effeb83462217a70125bb1e1cdb8471c736c41687c1b3551f770abaa4141df"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/DEVELOPED_GROWTH_RESISTANCE.json",
+      "bytes": 5607,
+      "sha256": "8ff063e9b6f16d4b9fde4494c712ec8a7a73639e90eebeb5cdd4f491c164db2c"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/PF_BASELINE_96.json",
+      "bytes": 3135,
+      "sha256": "0469018e9f43b4c41893ba48511431ddfbc0774092b6cea9fbca657fb5be0341"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/PF_FEM_FINAL_FRACTURE_COMPARISON.json",
+      "bytes": 16286,
+      "sha256": "de51cba95491df23c382ca218ad19ac36a227d47f26eb94d399182531fd18c6c"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/PF_FOCUSED_SEEDS.json",
+      "bytes": 2874,
+      "sha256": "2acf97ce9a0bbbe6186dae3b1741978f19cda8f4f502d57887946cd45d558e0c"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/PF_SENSITIVITIES.json",
+      "bytes": 2675,
+      "sha256": "8aba9457b14ec431182d301fcb87c8b7274f0446ddf14219b81374a1c13a7202"
+    },
+    {
+      "path": "methods/model_and_observer_contracts/V36_ACTIVE_RESTART.json",
+      "bytes": 3759,
+      "sha256": "bc7ad8dec54f449d1fd8553a0da7d47c8501ad462d4a5be2e0d0bd84d28f6fad"
+    },
+    {
+      "path": "previews/MANUSCRIPT.html",
+      "bytes": 38252,
+      "sha256": "4137d0e23d8ac89189c73c93ceea25a18385424de8118dbca284ab6b775acae1"
+    },
+    {
+      "path": "previews/SUPPORTING_INFORMATION.html",
+      "bytes": 20548,
+      "sha256": "b31e8f0e19c0f4d07041fd8b724e8222f8b158cf10838d3f0961452ce94429aa"
+    },
+    {
+      "path": "reproducibility/BACKUP_AND_RESTORE_RECEIPT.json",
+      "bytes": 2888,
+      "sha256": "f7b13d453c056cc94aa5ebb81176a8b137ae946967a06141ba78bd067b4f77f8"
+    },
+    {
+      "path": "reproducibility/CLAIM_TO_EVIDENCE_INDEX.json",
+      "bytes": 1581,
+      "sha256": "72ff37ad551e24ffcbe697745f4d0fa4cedea8a4ee98f77befaec437248bd31a"
+    },
+    {
+      "path": "reproducibility/DOCX_VALIDATION.json",
+      "bytes": 462,
+      "sha256": "4431c041bfb00335b6c96e0382f5005b10ed465a4715836de3dcb6bad88331f3"
+    },
+    {
+      "path": "reproducibility/TEST_RECEIPT.json",
+      "bytes": 2019,
+      "sha256": "bb1da3d6998d263556c35df75a8e30fdf1959173114351cb07c3f8d8886c2c5f"
+    }
+  ],
+  "raw_roots": [
+    "integration_evidence/final_fracture_campaign",
+    "integration_evidence/current_science_pilots_6abbf10",
+    "integration_evidence/branch_cavity_bb0c21d9",
+    "integration_evidence/v36_active_restart_340727f7"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "all_case_data": "review_packet/final_fracture_campaign_a5a5883/PF_SENSITIVITIES_DATA.csv",
+  "analysis_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/analyze_final_pf_sensitivities.py",
+  "decision": "COMPLETE_VALIDATED",
+  "orientation": {
+    "change_percent_range": [
+      -61.909397540400214,
+      4.440892098500626e-14
+    ],
+    "data": "review_packet/final_fracture_campaign_a5a5883/PF_ORIENTATION_SENSITIVITY.csv",
+    "figure_pdf": "review_packet/final_fracture_campaign_a5a5883/PF_ORIENTATION_SENSITIVITY.pdf",
+    "figure_png": "review_packet/final_fracture_campaign_a5a5883/PF_ORIENTATION_SENSITIVITY.png",
+    "maximum_absolute_change_case": {
+      "arm": "accommodation_enabled",
+      "material_row": "Peak",
+      "orientation_KJ_change_percent": -61.909397540400214,
+      "temperature_K": 900
+    },
+    "paired_comparison_count": 8
+  },
+  "rate": {
+    "data": "review_packet/final_fracture_campaign_a5a5883/PF_RATE_SENSITIVITY.csv",
+    "figure_pdf": "review_packet/final_fracture_campaign_a5a5883/PF_RATE_SENSITIVITY.pdf",
+    "figure_png": "review_packet/final_fracture_campaign_a5a5883/PF_RATE_SENSITIVITY.png",
+    "maximum_absolute_change_from_1x_percent": 52.121407883138346,
+    "maximum_change_case": {
+      "KJ_change_from_1x_percent": -52.121407883138346,
+      "arm": "accommodation_enabled",
+      "material_row": "Peak",
+      "rate_factor": 100.0,
+      "temperature_K": 900
+    },
+    "row_count": 30
+  },
+  "schema": "final-pf-rate-orientation-source/1",
+  "scope_note": "These are question-driven local sensitivities at predeclared anchors, not a Cartesian parameter atlas. The 45-degree operator is the original FEM-measured, two-pass self-consistent signed-kernel family.",
+  "sensitivity_matrix_row_count": 40,
+  "source_geography": {
+    "condition": "DBTT, 1200 K, accommodation enabled, seed 1733",
+    "data": "review_packet/final_fracture_campaign_a5a5883/PF_SOURCE_GEOGRAPHY.csv",
+    "figure_pdf": "review_packet/final_fracture_campaign_a5a5883/PF_SOURCE_GEOGRAPHY.pdf",
+    "figure_png": "review_packet/final_fracture_campaign_a5a5883/PF_SOURCE_GEOGRAPHY.png",
+    "rows": [
+      {
+        "KJ_MPa_sqrt_m": 52.37574061089843,
+        "KJ_change_from_tip_percent": 0.0,
+        "source_geography": "tip_surface"
+      },
+      {
+        "KJ_MPa_sqrt_m": 20.934126064797404,
+        "KJ_change_from_tip_percent": -60.030873414625475,
+        "source_geography": "bulk_uniform"
+      },
+      {
+        "KJ_MPa_sqrt_m": 52.41436468399189,
+        "KJ_change_from_tip_percent": 0.07374420417345373,
+        "source_geography": "tip_plus_bulk"
+      }
+    ]
+  }
+}

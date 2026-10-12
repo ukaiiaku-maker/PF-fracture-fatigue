@@ -1,6 +1,6 @@
 {
   "schema": "fracture-finalization-tasks/1",
-  "updated_at": "2026-10-11T17:04:00-07:00",
+  "updated_at": "2026-10-11T18:12:00-07:00",
   "allowed_status": [
     "running",
     "repairing",
@@ -163,7 +163,7 @@
       "dependencies": [
         "control-ledger"
       ],
-      "status": "complete",
+      "status": "complete_validated",
       "owner": "integrator",
       "current_command": "python3 scripts/analyze_v36_active_restart.py --interruption integration_evidence/v36_active_restart_340727f7/restarted_phase4/checkpoint --uninterrupted integration_evidence/v36_active_restart_340727f7/uninterrupted_phase8/checkpoint --restarted integration_evidence/v36_active_restart_340727f7/restarted_phase8/checkpoint --out review_packet/final_fracture_campaign_a5a5883/V36_ACTIVE_RESTART.json",
       "inputs": [
@@ -183,7 +183,7 @@
       "dependencies": [
         "cavity-recovery"
       ],
-      "status": "complete",
+      "status": "complete_validated",
       "owner": "integrator",
       "current_command": "python3 scripts/analyze_branch_cavity_compatibility.py --uninterrupted integration_evidence/branch_cavity_bb0c21d9/uninterrupted/shared_branch_cavity_audit.json --restarted integration_evidence/branch_cavity_bb0c21d9/restarted/shared_branch_cavity_audit.json --out review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
       "inputs": [
@@ -208,7 +208,7 @@
         "cavity-recovery",
         "developed-growth-rcurve"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
       "current_command": "python3 scripts/build_final_fracture_package.py --resume",
       "inputs": [
@@ -218,7 +218,7 @@
       "evidence_paths": [
         "fracture_final_current"
       ],
-      "next_action": "assemble sections and figures incrementally as evidence closes",
+      "next_action": "retain the built package and rebuild only from accepted evidence",
       "completion_test": "manuscript, SI, figures/data/commands, previews and validated editable DOCX are complete"
     },
     {
@@ -228,7 +228,7 @@
         "combined-branch-cavity",
         "paper-package"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
       "current_command": "pytest -q",
       "inputs": [
@@ -238,7 +238,7 @@
       "evidence_paths": [
         "fracture_final_current/reproducibility"
       ],
-      "next_action": "run affected regressions after repairs and full suites at source freeze",
+      "next_action": "retain classified full-suite and release-relevant receipts",
       "completion_test": "qualified main and companion suites classified as pass/skip/fixture-unavailable/fail"
     },
     {
@@ -246,7 +246,7 @@
       "dependencies": [
         "final-tests"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
       "current_command": "python3 scripts/preserve_final_fracture_release.py --verify-restore",
       "inputs": [
@@ -257,7 +257,7 @@
       "evidence_paths": [
         "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf"
       ],
-      "next_action": "append closed generations only after evidence completes",
+      "next_action": "retain verified independent archives and append the final Git bundle after release commit",
       "completion_test": "independent hashes, representative restore, Git bundle and exact local/remote status recorded"
     }
   ]

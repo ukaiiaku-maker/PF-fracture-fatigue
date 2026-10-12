@@ -1,0 +1,74 @@
+{
+  "schema": "fracture-final-acceptance/1",
+  "updated_at": "2026-10-11T18:12:00-07:00",
+  "overall_status": "complete_validated",
+  "criteria": [
+    {
+      "id": "source_configuration",
+      "status": "complete_validated",
+      "evidence": [
+        "finalization_control/TASKS.json",
+        "CAPABILITY_PRESERVATION_MATRIX.csv"
+      ]
+    },
+    {
+      "id": "scientific_dataset",
+      "status": "complete_validated",
+      "evidence": [
+        "finalization_control/CAMPAIGN_MATRIX.csv"
+      ]
+    },
+    {
+      "id": "developed_fracture_response",
+      "status": "complete_validated",
+      "evidence": [
+        "review_packet/current_science_pilots_6abbf10"
+      ]
+    },
+    {
+      "id": "original_fem_czm_comparison",
+      "status": "complete_validated",
+      "evidence": [
+        "integration_evidence/active_fracture_comparisons_0a5d55e"
+      ]
+    },
+    {
+      "id": "physical_cavity_comparison",
+      "status": "complete_validated",
+      "evidence": [
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_DWELL_10US.json",
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION.md",
+        "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_completion_run2"
+      ]
+    },
+    {
+      "id": "shared_code_readiness",
+      "status": "complete_validated",
+      "evidence": [
+        "CAPABILITY_PRESERVATION_MATRIX.csv"
+      ]
+    },
+    {
+      "id": "paper_package",
+      "status": "complete_validated",
+      "evidence": [
+        "fracture_final_current"
+      ]
+    },
+    {
+      "id": "preservation_reproduction",
+      "status": "complete_validated",
+      "evidence": [
+        "review_packet/active_fracture_comparisons_c8f2bb0/PRESERVATION.json"
+      ]
+    },
+    {
+      "id": "final_scientific_summary",
+      "status": "complete_validated",
+      "evidence": [
+        "fracture_final_current/FINAL_SCIENTIFIC_REPORT.md"
+      ]
+    }
+  ]
+}

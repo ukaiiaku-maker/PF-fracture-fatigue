@@ -1,0 +1,82 @@
+{
+  "anchor_summary": {
+    "DBTT_1200K": {
+      "n_paired_seeds": 8,
+      "paired_gap_empirical_range_MPa_sqrt_m": [
+        31.235259896928522,
+        33.50373538038851
+      ],
+      "paired_gap_mean_95_percent_t_interval_MPa_sqrt_m": [
+        31.707268335552637,
+        33.18642752769038
+      ],
+      "paired_gap_mean_MPa_sqrt_m": 32.446847931621505,
+      "paired_gap_sample_sd_MPa_sqrt_m": 0.8846424498714225,
+      "paired_relative_change_empirical_range_percent": [
+        149.62778840438315,
+        157.34335349670056
+      ],
+      "paired_relative_change_mean_percent": 153.59108117469415
+    },
+    "Peak_900K": {
+      "n_paired_seeds": 8,
+      "paired_gap_empirical_range_MPa_sqrt_m": [
+        33.62686528581545,
+        35.21564337255202
+      ],
+      "paired_gap_mean_95_percent_t_interval_MPa_sqrt_m": [
+        34.253911764063105,
+        35.23281326596813
+      ],
+      "paired_gap_mean_MPa_sqrt_m": 34.74336251501562,
+      "paired_gap_sample_sd_MPa_sqrt_m": 0.5854527541261745,
+      "paired_relative_change_empirical_range_percent": [
+        162.1102547617204,
+        166.34219251540202
+      ],
+      "paired_relative_change_mean_percent": 164.49355199399562
+    }
+  },
+  "decision": "COMPLETE_VALIDATED",
+  "design": {
+    "anchors": [
+      {
+        "material_row": "DBTT",
+        "temperature_K": 1200
+      },
+      {
+        "material_row": "Peak",
+        "temperature_K": 900
+      }
+    ],
+    "paired_arms": [
+      "opening_only",
+      "accommodation_enabled"
+    ],
+    "seeds": [
+      1733,
+      2718,
+      31415,
+      42424,
+      65537,
+      91733,
+      104729,
+      130363
+    ],
+    "selection_rule": "retain the two established active anchors and two pilot seeds; add the six seeds predeclared before new outcomes were inspected"
+  },
+  "figure": {
+    "panel_mapping": {
+      "left": "DBTT_1200K",
+      "right": "Peak_900K"
+    },
+    "pdf": "review_packet/final_fracture_campaign_a5a5883/PF_FOCUSED_SEEDS.pdf",
+    "plot_data": "review_packet/final_fracture_campaign_a5a5883/PF_FOCUSED_SEEDS_PAIRED.csv",
+    "png": "review_packet/final_fracture_campaign_a5a5883/PF_FOCUSED_SEEDS.png"
+  },
+  "individual_data": "review_packet/final_fracture_campaign_a5a5883/PF_FOCUSED_SEEDS_DATA.csv",
+  "interpretation": "At both active anchors, the accommodation-associated toughness gap is large relative to the observed eight-seed spread; no second replicate tranche is required for that bounded claim.",
+  "interval_assumption": "Two-sided 95% Student-t interval for the mean paired gap, treating the eight predeclared random seeds as independent and the paired-gap sampling distribution as approximately normal (df=7). This is not a tail bound or population tolerance interval.",
+  "paired_data": "review_packet/final_fracture_campaign_a5a5883/PF_FOCUSED_SEEDS_PAIRED.csv",
+  "schema": "final-pf-focused-seeds/1"
+}

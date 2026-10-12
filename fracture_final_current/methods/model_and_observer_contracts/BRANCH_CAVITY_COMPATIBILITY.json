@@ -1,0 +1,110 @@
+{
+  "cavity_switch": {
+    "branch_permission_changed_by_toggle": false,
+    "enabled_path_executed": true,
+    "suppressed_route": "pf_branching_current remains the distinct cavity-disabled V12 route"
+  },
+  "event_order_restarted": [
+    "restore_combined_owner_state",
+    "sharp_front_child_continuation"
+  ],
+  "event_order_uninterrupted": [
+    "source_conforming_resolved_cavity",
+    "documented_positive_opening_continuation",
+    "crack_to_cavity_ligament",
+    "cavity_surface_downstream_child",
+    "sharp_front_child_continuation"
+  ],
+  "field_transfer": {
+    "active_capture_region_inventory": [
+      {
+        "capture_inventory_change_area_m2": 8.36328282618069e-13,
+        "capture_radius_m": 4.9999999999999996e-05,
+        "owner_id": "site-1",
+        "projected_capture_inventory_area_m2": 6.461335704889155e-12,
+        "source_capture_inventory_area_m2": 5.625007422271086e-12
+      },
+      {
+        "capture_inventory_change_area_m2": 4.68806584802651e-10,
+        "capture_radius_m": 0.000105,
+        "owner_id": "void:site-1",
+        "projected_capture_inventory_area_m2": 3.468645397529554e-08,
+        "source_capture_inventory_area_m2": 3.421764739049289e-08
+      }
+    ],
+    "density_integral_error": 5.960464477539063e-08,
+    "plastic_integral_error": 0.0,
+    "projected_density_l2_m2": 2.9343490881252216e+16,
+    "projected_displacement_l2_m": 4.781564266286319e-06,
+    "projected_fields_nonzero": true,
+    "projected_plastic_history_l2": 0.0006416120849057176,
+    "projected_vacancy_inventory_area_m2": 9.978927413029308e-07,
+    "source_density_l2_m2": 2.9294567040381492e+16,
+    "source_displacement_l2_m": 4.7642195895216654e-06,
+    "source_plastic_history_l2": 0.0006405423373535413,
+    "source_vacancy_inventory_area_m2": 9.978927413029308e-07,
+    "vacancy_transfer": {
+      "locally_redistributed_area_m2": 2.2048434156488595e-09,
+      "method": "ELEMENT_OVERLAP_CONSERVATIVE_P0",
+      "minimum_new_element_overlap_fraction": 0.9999999999996375,
+      "pre_redistribution_inventory_area_m2": 9.95687897887282e-07,
+      "roundoff_budget_m2": 1.4180908768010607e-20,
+      "roundoff_correction_m2": 0.0,
+      "source_inventory_area_m2": 9.978927413029308e-07
+    },
+    "vacancy_transport_v2_transfer": null
+  },
+  "native_checkpoint_round_trips_exact": true,
+  "owner_registry_exact": true,
+  "owners": {
+    "active_tip_ids": [
+      "void-front-1"
+    ],
+    "branch_ids": [
+      "b00000000",
+      "void-front-1"
+    ],
+    "branch_status": {
+      "b00000000": "arrested",
+      "void-front-1": "active"
+    },
+    "cavity_ids": [
+      "void:site-1"
+    ],
+    "competition_candidate_ids": [
+      "cleave:cleavage:(100):5d54146b8dbcda7a568e"
+    ],
+    "tip_process_owner_ids": [
+      "void-front-1"
+    ]
+  },
+  "public_preset": "pf_branching_void_v5",
+  "public_restart_family": "v11_branch_cavity_compatibility",
+  "schema": "branch-cavity-compatibility-summary/1",
+  "scientific_scope": {
+    "interpretation": "Compatibility qualification of existing full-field, topology, cavity, event-order, transfer, and restart laws; not a new branch-kinetics calibration.",
+    "production_eligible": false,
+    "recursive_branching_calibrated": false,
+    "spontaneous_joint_birth_required": false
+  },
+  "shared_fields_exact": true,
+  "source_commit": "bb0c21d9",
+  "status": "PASS",
+  "terminal": {
+    "active_crack_branch_ids": [
+      "void-front-1"
+    ],
+    "cavity_radius_m": 5.5e-05,
+    "energy_J_per_m": 0.012059997974594472,
+    "event_counters": {
+      "accepted_steps": 0,
+      "mesh_generation": 7,
+      "refinement_operation_index": 7,
+      "topology_actions": 3
+    },
+    "graph_length_m": 0.0007949999999999999,
+    "reaction_N_per_m": 29958.521916992544,
+    "void_phase": "DOWNSTREAM_FRONT_ACTIVE"
+  },
+  "terminal_payload_exact": true
+}

@@ -26,12 +26,21 @@ def test_removed_model_labels_are_absent_from_repository_text():
         ".pyc", ".tar", ".tif", ".tiff", ".webp", ".xz", ".zip",
     }
     findings = []
+    # The publication must distinguish the sharp-wake implementation from the
+    # established variational formulations by name.  Permit that scientific
+    # comparison in the release and its deterministic builder while retaining
+    # the repository-wide reintroduction guard for executable/configuration code.
+    publication_paths = {
+        Path("scripts/build_final_fracture_package.py"),
+    }
     for path in ROOT.rglob("*"):
         if not path.is_file() or ".git" in path.parts:
             continue
         if path.suffix.lower() in binary_suffixes or path.stat().st_size > 2_000_000:
             continue
         relative = path.relative_to(ROOT)
+        if relative.parts[:1] == ("fracture_final_current",) or relative in publication_paths:
+            continue
         if pattern.search(relative.as_posix()):
             findings.append(f"path:{relative}")
         try:

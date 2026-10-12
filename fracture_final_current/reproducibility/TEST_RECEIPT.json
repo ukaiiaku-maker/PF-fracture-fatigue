@@ -1,0 +1,50 @@
+{
+  "schema": "fracture-final-test-receipt/1",
+  "date": "2026-10-11",
+  "main_repository": {
+    "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "command": "python -m pytest -q",
+    "passed": 827,
+    "failed": 0,
+    "skipped": 0,
+    "duration_s": 55.81,
+    "status": "PASS"
+  },
+  "fem_czm_companion_full_suite": {
+    "repository": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
+    "commit": "f7c36ef4313e42965444c0a39e41328be581a0f1",
+    "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+    "command": "python -m pytest -q",
+    "passed": 674,
+    "failed": 8,
+    "subtests_passed": 16,
+    "duration_s": 53.85,
+    "status": "KNOWN_LEGACY_TEST_CONFLICTS",
+    "failure_classification": {
+      "mutually_incompatible_historical_package_version_assertions": 7,
+      "stale_v10_0_5_3_fatigue_source_transform_anchor": 1,
+      "fracture_comparison_or_current_companion_failures": 0
+    },
+    "note": "The seven version tests demand seven different historical versions from the one current pyproject. The fatigue transform is outside this fracture production scope. Neither class is hidden or counted as a current fracture pass."
+  },
+  "fem_czm_release_relevant_set": {
+    "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+    "scope": [
+      "current PF full-field and tip-only companions",
+      "theta-zero parity and metadata",
+      "active kernel family",
+      "corridor refinement/compaction",
+      "bulk Peierls-Taylor state and remesh transfer"
+    ],
+    "passed": 37,
+    "failed": 0,
+    "skipped": 0,
+    "duration_s": 31.60,
+    "status": "PASS"
+  },
+  "wrong_environment_attempt": {
+    "environment": "arrhenius-sharp-front-v10-codex",
+    "result": "collection stopped with six missing-triangle import errors; zero companion tests executed",
+    "classification": "fixture_environment_unavailable_not_model_failure"
+  }
+}
