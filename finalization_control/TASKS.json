@@ -183,17 +183,19 @@
       "dependencies": [
         "cavity-recovery"
       ],
-      "status": "ready",
+      "status": "complete",
       "owner": "integrator",
-      "current_command": "pytest -q tests -k 'branch and cavity and restart'",
+      "current_command": "python3 scripts/analyze_branch_cavity_compatibility.py --uninterrupted integration_evidence/branch_cavity_bb0c21d9/uninterrupted/shared_branch_cavity_audit.json --restarted integration_evidence/branch_cavity_bb0c21d9/restarted/shared_branch_cavity_audit.json --out review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
       "inputs": [
         "CAPABILITY_PRESERVATION_MATRIX.csv"
       ],
-      "checkpoint": null,
+      "checkpoint": "integration_evidence/branch_cavity_bb0c21d9/uninterrupted/combined_source_checkpoint.json",
       "evidence_paths": [
-        "integration_evidence/targeted_completion"
+        "integration_evidence/targeted_completion",
+        "integration_evidence/branch_cavity_bb0c21d9",
+        "review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json"
       ],
-      "next_action": "resolve shared adapter path and run bounded native compatibility case",
+      "next_action": "retain the compatibility scope and recursive-branch calibration caveat in SI",
       "completion_test": "shared fields, event ordering, switches, state transfer and restart execute under existing laws"
     },
     {
