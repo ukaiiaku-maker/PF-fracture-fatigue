@@ -24,6 +24,13 @@ from arrhenius_fracture.shared_options import SharedOptions
 
 MATRIX = ROOT / "finalization_control" / "CAMPAIGN_MATRIX.csv"
 TEMPLATE_ROOT = ROOT / "integration_evidence" / "current_science_pilots_6abbf10" / "pf"
+BASE_KERNEL_CONFIGURATION = Path(
+    "/Volumes/Data/Data/Nanopillar_calculation/"
+    "PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/"
+    "v10_2_28_kernel_cache/"
+    "1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/"
+    "mechanical_configuration.json"
+)
 TEMPLATES = {
     "accommodation_enabled": TEMPLATE_ROOT / "DBTT_1200K" / "accommodation_enabled" / "shared_execution_request.json",
     "opening_only": TEMPLATE_ROOT / "DBTT_1200K" / "opening_only" / "shared_execution_request.json",
@@ -278,6 +285,10 @@ def execute_group(entries: list[dict[str, str]], *, group: str, resume: bool,
             "CLEAVAGE_EVENT_MIN_FACTOR": "0.5",
             "CLEAVAGE_EVENT_MAX_FACTOR": "4.0",
         })
+        if float(row["orientation_deg"]) != 0.0:
+            if not BASE_KERNEL_CONFIGURATION.is_file():
+                raise FileNotFoundError(BASE_KERNEL_CONFIGURATION)
+            os.environ["MECHANICAL_CONFIG"] = str(BASE_KERNEL_CONFIGURATION)
         execute_shared(options, native, target, source_policy="qualified")
         close_matrix_row(row, target)
         write_matrix(entries)
