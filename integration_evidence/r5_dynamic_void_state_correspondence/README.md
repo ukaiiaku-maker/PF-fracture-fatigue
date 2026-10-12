@@ -108,3 +108,7 @@ interchangeable.
 queue-compatibility addition, `final_full_suite.xml` records 810 tests passing
 in 687.52 s on the complete repository. Commands are recorded in `commands.txt`
 and primary artifact hashes in `PACKAGE_SHA256.txt`.
+
+`r5_against_r4.bundle` is a verified incremental Git bundle whose head is
+`9d967e84ccb41b4a8d0f3ba2fef1ef167b985da4` and whose required parent is the
+R4 packaging commit `2f689a98f1dae7734de5f8b9bec02ee596738aa1`.
