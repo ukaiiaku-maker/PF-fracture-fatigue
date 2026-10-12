@@ -54,3 +54,7 @@ The accepted tip-only first-event values are 53.878 MPa√m (PF) and 54.212 MPa�
 
 All 96 predeclared material/temperature/arm cases have verified runtime attestations and physical first-fracture observations under the common 100 µm opening ceiling; there are no finite no-event censors. The observer and summary first-event values agree in every case. The actual curves, rather than the historical family names, control the next design: DBTT rises sharply between 950 and 1000 K, Peak rises over 600–900 K, Weak-T has a broad accommodation-associated elevation, and Ceramic-like has a modest elevation centered near 950 K. Focused replication will target the active DBTT and Peak anchors and documented neighbors, without expanding the full atlas into an ensemble.
 
+## 2026-10-11 — Close focused stochastic replication after eight paired seeds
+
+The predeclared eight-seed paired ensembles completed at DBTT/1200 K and Peak/900 K. The accommodation-minus-opening first-event gap is 32.45 MPa√m with sample SD 0.88 for DBTT and 34.74 MPa√m with sample SD 0.59 for Peak; all 32 arm-level cases fractured. The observed gap is therefore large relative to the empirical seed spread at these two anchors. No second replicate tranche is needed for this bounded claim. The reported Student-t intervals are intervals for the mean paired gap under independent-seed and approximate-normality assumptions, not tail bounds or population tolerance intervals.
+

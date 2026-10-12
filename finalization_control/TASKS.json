@@ -1,6 +1,6 @@
 {
   "schema": "fracture-finalization-tasks/1",
-  "updated_at": "2026-10-11T16:52:00-07:00",
+  "updated_at": "2026-10-11T17:04:00-07:00",
   "allowed_status": [
     "running",
     "repairing",
@@ -98,17 +98,20 @@
       "dependencies": [
         "pf-baseline-96"
       ],
-      "status": "ready",
+      "status": "complete_validated",
       "owner": "integrator",
-      "current_command": "python3 scripts/run_final_fracture_campaign.py --group focused-seeds --resume",
+      "current_command": "python3 scripts/analyze_final_focused_seeds.py",
       "inputs": [
         "finalization_control/CAMPAIGN_MATRIX.csv"
       ],
       "checkpoint": "per-seed paired arms",
       "evidence_paths": [
-        "integration_evidence/active_fracture_comparisons_0a5d55e/independent_seed_91733"
+        "integration_evidence/active_fracture_comparisons_0a5d55e/independent_seed_91733",
+        "integration_evidence/final_fracture_campaign",
+        "review_packet/final_fracture_campaign_a5a5883/PF_FOCUSED_SEEDS.json",
+        "review_packet/final_fracture_campaign_a5a5883/PF_FOCUSED_SEEDS.png"
       ],
-      "next_action": "predeclare six additional seeds at each active anchor",
+      "next_action": "integrate bounded paired-seed uncertainty into manuscript and SI; no second tranche required",
       "completion_test": "eight paired seeds at selected anchors, individual/censored outcomes and empirical spread reported"
     },
     {
