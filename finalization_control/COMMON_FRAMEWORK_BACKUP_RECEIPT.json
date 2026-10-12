@@ -1,0 +1,33 @@
+{
+  "schema": "common-framework-supplemental-backup/1",
+  "date": "2026-10-12",
+  "status": "PASS",
+  "append_only": true,
+  "local_raw_data_deleted": false,
+  "source_device_id": 16777237,
+  "backup_device_id": 16777234,
+  "independent_device_verified": true,
+  "archive": {
+    "path": "/Users/shen/Fracture_Backups/common-framework-20261012/common-framework-supplemental-evidence-20261012.tar",
+    "bytes_display": "907 MiB",
+    "member_count": 3986,
+    "sha256": "0195e5e2c04e65b550fac9a96c0791aba5ca218f7d738ec0a3f037e3b08fae1e",
+    "contents": [
+      "integration_evidence/active_fracture_comparisons_0a5d55e",
+      "integration_evidence/native_restart_transport_a30a78c",
+      "integration_evidence/native_restart_transport_f4ba118",
+      "integration_evidence/native_restart_transport_f766285",
+      "integration_evidence/positive_transport_854d32d",
+      "integration_evidence/targeted_completion",
+      "integration_evidence/option_completion_v2"
+    ],
+    "tar_listing": "PASS"
+  },
+  "representative_restore": {
+    "path": "integration_evidence/active_fracture_comparisons_0a5d55e/pf_peak1000_theta0_seed8666_anchor/summary.json",
+    "original_sha256": "0efe1c27d4e1c67fbb01549dc738fb9c8e7a4f8657aea4759a1b29c22b80b3b2",
+    "restored_sha256": "0efe1c27d4e1c67fbb01549dc738fb9c8e7a4f8657aea4759a1b29c22b80b3b2",
+    "match": true
+  },
+  "remote_push_performed": false
+}
