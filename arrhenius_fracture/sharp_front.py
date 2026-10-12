@@ -1577,6 +1577,7 @@ def run_2d(args):
             def _new_front(xy, fwd, engine, plane, parent=-1, spawn_step=0,
                            spawn_w=1.0, ratio=0.0, fid=0):
                 xy = np.array(xy, float); fwd = np.array(fwd, float)
+                engine._accepted_crack_path_xy_m = (tuple(float(v) for v in xy),)
                 return {'xy': xy.copy(), 'fwd': fwd.copy(), 'eng': engine,
                         'path': [xy.copy()], 'last_plane': plane, 'active': True,
                         'id': fid, 'parent': parent, 'N_em_prev': 0.0,
@@ -2020,6 +2021,9 @@ def run_2d(args):
                 front['xy'] = p1_actual
                 front['fwd'] = (p1_actual - p0) / max(moved, 1e-300)
                 front['path'].append(p1_actual.copy())
+                front['eng']._accepted_crack_path_xy_m = tuple(
+                    tuple(float(v) for v in point) for point in front['path']
+                )
                 front['last_advance_m'] = moved
                 front['adv_since_branch'] = front.get('adv_since_branch', 0.0) + moved
                 front['n_geom_adv'] = front.get('n_geom_adv', 0.0) + moved / max(da_phys, 1e-300)

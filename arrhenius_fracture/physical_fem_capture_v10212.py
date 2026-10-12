@@ -159,9 +159,11 @@ def _engine_payload(engine) -> dict[str, Any]:
 
 
 def _coerce_crack_path(
-    drive: dict[str, Any], tip_xy: tuple[float, float]
+    drive: dict[str, Any], tip_xy: tuple[float, float], engine: Any | None = None
 ) -> tuple[tuple[float, float], ...]:
     raw = drive.get("crack_path_xy_m", ())
+    if not raw and engine is not None:
+        raw = getattr(engine, "_accepted_crack_path_xy_m", ())
     try:
         path = tuple(tuple(float(v) for v in row) for row in raw)
     except Exception:
@@ -356,7 +358,7 @@ class PhysicalFEMCapture:
         normals = tuple(tuple(row) for row in drive["trace_normals"])
         tip_xy = tuple(float(value) for value in drive["tip_xy_m"])
         front_direction = tuple(float(value) for value in drive["front_direction"])
-        supplied_crack_path = _coerce_crack_path(drive, tip_xy)
+        supplied_crack_path = _coerce_crack_path(drive, tip_xy, engine)
         material = assembly["mat"]
 
         kinetic_digest_before = _engine_kinetic_state_digest(engine)
