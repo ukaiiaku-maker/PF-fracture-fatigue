@@ -10,141 +10,36 @@ The two experimental composites contain selected transmission-electron-microscop
 
 **Figure S1.** Selected frames from the companion Ag sequence with limited visible plastic contrast. Visibility depends on thickness, diffraction condition, orientation, and temporal resolution; limited contrast is not proof of absent plasticity.
 
-## S2. Mechanical problem and loading
+## S2. Mechanical, stochastic, and state definitions
 
-The principal calculation is plane strain in a 2 mm by 4 mm body with a 0.5 mm left-edge notch. Symmetric prescribed displacement on the upper and lower boundaries produces nominal mode-I opening. A graded triangular mesh resolves the stress field. Cubic constants are \(C_{11}=523\), \(C_{12}=203\), and \(C_{44}=160\) GPa. Their Zener ratio is one, so the elastic stiffness is invariant to the rotation test, while local opening and source/slip projections change.
+The common specimen, loading convention, and \(K_J\) sign convention are defined by Eqs. (1)--(5) of the main text. Force is reported per unit out-of-plane thickness. \(J_{\rm signed}\) is the native signed domain integral and \(\varsigma\) selects positive forward mode-I release. The common-domain observer used for the elastic cross-code control is evaluated on identical nodes, elements, damage, elastic tensor, and supports.
 
-The field-derived coordinate is
+The opening mark is sampled once per renewal as \(\Xi=-\ln R\). The survival sum contains the represented discrete cleavage candidates. Persistent source population evolution is deterministic conditional on the current state and does not add another sampled point process. Event length is threshold-correlated by the native geometry law and is committed only after its opening clock crosses.
 
-\[
-K_J=\sqrt{E'\max(\varsigma J_{\rm signed},0)}.
-\]
+## S3. Executed activation surfaces and bounds
 
-Accepted opening commits an explicit sharp-wake increment through the model’s stiffness-degradation representation. The primary calculations stop at the first accepted increment or 100 μm applied opening. Representative propagation paths continue to at least 50 μm projected extension or a 150 μm opening ceiling.
-
-## S3. Conditional hazards and activation surfaces
-
-For mechanism \(i\),
+The EXP-floor surface is Eq. (4). The implementation uses \(T_{\rm ref}=481.33\) K, \(G_0\ge10^{-9}\) eV, \(\sigma_c\ge1\) Pa, and
 
 \[
-\lambda_i(t)=\mathcal M_i(t)\nu_i
-\exp\!\left[-\frac{\Delta G_i^\ddagger(q_i(t),T,z(t))}{k_BT}\right],
+G_f=\min[0.95G_0,\max(10^{-4}\ {\rm eV},fG_0)] . \qquad (S1)
 \]
 
-and, on a no-event interval,
+Only \(\max(\sigma,0)\) enters this surface, and the exponent is clipped to \([-700,0]\). The DBTT emission stress scale reaches its 1 Pa lower bound near 1001 K. Consequently, the high-temperature branch samples a strongly softened, bounded emission surface; it is not a named-material DBTT prediction.
 
-\[
-f_i(t)=\lambda_i(t)
-\exp\!\left[-\int_{t_0}^{t}\sum_j\lambda_j(s)\,ds\right].
-\]
+## S4. Persistent source and signed process-zone operator
 
-Emission is nonabsorbing and changes subsequent rates. Opening uses a three-hit renewal rate over \(10^{-6}\) s and an exponential threshold:
+The front state has two reduced slip systems and 80 bins over 50 µm. The executed source model is persistent_areal_sites_backstress_limited_no_inventory. Its multiplicity, implicit mean-population update, and complementarity gate are Eqs. (6) and (7). The source/channel value 141.0591 in Table S4 is a legacy-compatible parameter-field value and is not a finite consumable inventory in these runs. Runtime diagnostics require persistent_source_inventory_active=false and persistent_source_refresh_active=false.
 
-\[
-A_c(t)=\int_{t_0}^{t}\Lambda_c[s;z(s)]\,ds,\qquad
-A_c(t_c)=\Xi,\qquad \Xi=-\ln R,\quad R\sim U(0,1).
-\]
+Activation-to-line-content factors come from the selected two-dimensional signed unit-perturbation kernel. Positive and negative mobile, retained, accumulated-slip, and wake arrays remain separate. The exact exchange in Eq. (8) is followed by physical mobile advection; escape, wake transfer, and discarded wake content have separate ledgers. The selected monotonic rows set explicit temporal mobile and retained recovery to zero. The vacancy-transport positivity operator used by the cavity calculation is a different conservative field operator and is not this dislocation exchange step.
 
-Opening and emission have EXP-floor surfaces
+The selected Peierls and Taylor surfaces use the direct row parameters in Tables S3--S5, including their temperature/entropy terms and runtime bounds. Taylor completion supplies the retained-to-mobile release rate used in Eq. (8). Local adaptive integration accepts a full interval only when the full-step versus two-half-step state error is within the declared tolerance; the outer mechanics/event transaction then accepts or retries without partially committing geometry.
 
-\[
-G_i(\sigma,T)=G_{f,i}+[G_{0,i}(T)-G_{f,i}]
-\exp\!\left\{-\alpha_i
-\left[\frac{\max(\sigma,0)}{\sigma_{c,i}(T)}\right]^{n_i}\right\},
-\]
+## S5. Moving coordinate, geometry commitment, and observers
 
-\[
-G_{0,i}=G_{00,i}+g_{T,i}(T-T_{\rm ref}),\qquad
-\sigma_{c,i}=\sigma_{c0,i}+s_{T,i}(T-T_{\rm ref}),\qquad
-\lambda_i=\nu_i e^{-G_i/(k_BT)}.
-\]
+The hazard-linear translation \(d\xi=L_c dB\) is an executed coarse-graining assumption. It translates signed state and accumulated slip into the wake but does not renew persistent sites. The sharp-wake geometry changes only at clock completion. \(J\), \(K_J\), reaction, and stress belong to their equilibrated or exact pre-event state; length belongs to the paired committed geometry. No post-commit \(K_J\) is assigned unless a new equilibrium was actually observed.
 
-In the executed PF routine, \(G_0\) is clamped below at \(10^{-9}\) eV, \(\sigma_c\) at 1 Pa, and
+The cavity family uses current-front ownership, positive conservative vacancy transport, and topology-specific candidates. A local nested \(J\) and a finite complete-ligament operation are different observables. Their ratio is not reported as a shielding factor.
 
-\[
-G_f=\min[0.95G_0,\max(10^{-4}\ {\rm eV},fG_0)].
-\]
-
-Only the tensile part \(\max(\sigma,0)\) enters the surface. The Arrhenius exponent is clipped to \([-700,0]\) before exponentiation. These are runtime definitions, not plotting conventions. A consequential domain feature is that the affine DBTT emission stress scale reaches zero near 1001 K and is thereafter held at the 1 Pa numerical lower bound; thus essentially any positive resolved emission stress places that surface at its bounded floor above this temperature. The upper-branch calculation is reported with this constitutive limitation rather than cosmetically extending the affine law.
-
-## S4. Mean finite-source and process-zone update
-
-The original spatial PF solver carries a native coarse-grained moving state with two slip-trace channels and 80 bins over 50 μm, giving \(\Delta x=0.625\) μm. Each channel initially contains
-
-\[
-C_s=141.0590567476921
-\]
-
-continuum source-opportunity units. The total instantaneous local capacity is 282.1181134953842. These are integration weights in a mean population law rather than counts of individually sampled atomic sources.
-
-For channel \(s\),
-
-\[
-\sigma_{e,s}=\max(f_s\sigma_{\rm open}-\sigma_{{\rm back},s},0),\qquad
-\lambda_{e,s}=\nu_e e^{-G_e(\sigma_{e,s},T)/(k_BT)},
-\]
-
-\[
-\Delta N_s=S_s[1-e^{-\lambda_{e,s}\Delta t}],\qquad
-S_s\leftarrow S_s-\Delta N_s.
-\]
-
-New content enters the first two bins as mobile population. With mobile \(M_s(x)\), retained \(R_s(x)\), forest spacing \(\ell\), velocity \(v\), and encounter rate \(k_{\rm enc}\),
-
-\[
-\ell=(2\sqrt{\rho})^{-1},\qquad
-v=\ell\lambda_p,\qquad
-k_{\rm enc}=\eta v\sqrt{\rho},
-\]
-
-\[
-\dot M_s=-k_{\rm enc}M_s+k_{\rm rel}R_s,\qquad
-\dot R_s=k_{\rm enc}M_s-k_{\rm rel}R_s.
-\]
-
-The local two-state exchange is integrated exactly over each subinterval. Mobile content is then transported forward by \(v\Delta t\). Explicit mobile and retained recovery are zero. Taylor completion is mapped to release through
-
-\[
-k_{\rm rel}=
-\frac{P[m,\min(\lambda_t,10^{12}\ {\rm s}^{-1})t_0]}{t_0},
-\qquad t_0=1\ {\rm s}.
-\]
-
-Only signed retained content contributes to shielding:
-
-\[
-r_{\rm eff}=r_0+c_{\rm blunt}b\sum_{s,j}w_j\Gamma_{s,j},
-\qquad
-K_{\rm sh}=\sum_{s,j}\kappa_{s,j}R_{s,j}^{\rm signed},
-\]
-
-\[
-\sigma_c=\frac{\max(K_J-K_{\rm sh},0)}
-{\sqrt{2\pi r_{\rm eff}}}.
-\]
-
-Mobile and wake shielding are disabled. Emission uses the unshielded opening stress and subtracts Taylor back stress only in its own channel.
-
-## S5. Partial opening progress and moving-coordinate closure
-
-Let \(B\) be fractional progress toward an accepted sharp-wake increment of length \(L_c\). Within an outer mechanical interval,
-
-\[
-d\xi=L_c\,dB.
-\]
-
-The active mobile, retained, and slip fields translate toward the moving origin by \(d\xi\). Content crossing that origin enters the wake. The local source opportunity renews as
-
-\[
-S_s\leftarrow S_s+(C_s-S_s)
-\min(d\xi/L_{\rm ref},1),
-\qquad
-L_{\rm ref}=\max(L_{\rm manifest},\Delta x)=0.625\ \mu{\rm m}.
-\]
-
-The sharp-wake geometry remains unchanged until \(B=1\), when \(L_c\) is committed. The continuous coordinate is therefore an expected subgrid opening-progress displacement used to evolve front-local state, not an independently resolved crack surface. It allows shielding, radius, transport, and source exposure to influence mechanics during partial progress. This continuous-state/discrete-geometry relation is a constitutive closure and an important physical limitation.
-
-Current capacity, current mobile-plus-retained content, and cumulative emission are different quantities. Crack motion exposes fresh local opportunity, so the finite current capacity does not globally bound cumulative emission.
 
 ## S6. Material parameters
 
@@ -240,12 +135,14 @@ The paths have one monotonic loading segment and zero independent reload-resista
 
 The shared specimen is plane strain, 2 mm × 4 mm, with a 0.5 mm initial notch and total opening imposed as +U/2 and −U/2. Force is per unit out-of-plane thickness. Identical-mesh elastic calculations match reaction, stored energy, ahead-tip stress, common-domain J, and K at total openings 0.2, 10, and 30 µm with maximum relative difference zero at stored precision.
 
-| Scope | PF first-event K | FEM/CZM first-event K | relative difference | PF / FEM opening |
-|---|---:|---:|---:|---:|
-| Tip-only | 53.878 | 54.212 | 0.62% | 31.723 / 18.720 µm |
-| Full-field | 51.110 | 54.407 | 6.06% | 26.610 / 12.492 µm |
+The production histories were additionally compared at common pre-event openings of 0.2, 2, 5, 10, and 12 µm. Across these points, the PF/FEM reaction ratio is 1.09227. The native PF/FEM \(K_J\) ratio is 0.58646 for tip-only and 0.44091 for full-field states, reflecting different production observer supports. The differences exist before fracture and cannot be inferred from event endpoints at different openings.
 
-K values are MPa√m. Openings are native observations, not parity metrics. The original PF uses a sharp-wake increment, while FEM/CZM uses adaptive cohesive topology; production meshes and J supports differ.
+| Scope | PF first-event K | FEM/CZM first-event K | PF / FEM event opening |
+|---|---:|---:|---:|
+| Tip-only | 53.878 | 54.212 | 31.723 / 18.720 µm |
+| Full-field | 51.110 | 54.407 | 26.610 / 12.492 µm |
+
+K values are MPa√m. The event values are reported as native first-passage observations, not parity metrics. The retained production data do not contain a two-level mesh sequence for each backend, so no production convergence rate is claimed. The FEM/CZM accepted state contains four physical events, 26 fully separated numerical cohesive subsegments, and 20.828 µm total cohesive length.
 
 ## S11. Recovered physical cavity continuation
 

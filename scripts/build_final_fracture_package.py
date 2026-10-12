@@ -758,9 +758,12 @@ def main() -> int:
     copy(ROOT / "CAPABILITY_PRESERVATION_MATRIX.csv", OUT / "methods/model_and_observer_contracts/CAPABILITY_PRESERVATION_MATRIX.csv")
     copy(ROOT / "finalization_control/TEST_RECEIPT.json", OUT / "reproducibility/TEST_RECEIPT.json")
     copy(ROOT / "finalization_control/FINAL_ACCEPTANCE.json", OUT / "FINAL_ACCEPTANCE.json")
-    backup_receipt = ROOT / "finalization_control/BACKUP_AND_RESTORE_RECEIPT.json"
-    if backup_receipt.exists():
-        copy(backup_receipt, OUT / "reproducibility/BACKUP_AND_RESTORE_RECEIPT.json")
+    # Backup receipts are written after the immutable release bytes are archived.
+    # Do not embed an older receipt whose document/archive hashes describe a prior
+    # generation, and avoid a self-referential package-hash cycle.
+    stale_backup_receipt = OUT / "reproducibility/BACKUP_AND_RESTORE_RECEIPT.json"
+    if stale_backup_receipt.exists():
+        stale_backup_receipt.unlink()
     for src in [REVIEW / "PF_BASELINE_96.json", REVIEW / "PF_FOCUSED_SEEDS.json", REVIEW / "PF_SENSITIVITIES.json", REVIEW / "DEVELOPED_GROWTH_RESISTANCE.json", REVIEW / "PF_FEM_FINAL_FRACTURE_COMPARISON.json", REVIEW / "CAVITY_INTERACTION_0P2S_RECOVERED.json", REVIEW / "V36_ACTIVE_RESTART.json", REVIEW / "BRANCH_CAVITY_COMPATIBILITY.json"]: copy(src, OUT / "methods/model_and_observer_contracts" / src.name)
     for src in [ACCEPTANCE / "METHOD_TO_RESULT_MAP.json", ACCEPTANCE / "METHOD_TO_RESULT_MAP.md", ACCEPTANCE / "PF_FEM_PRODUCTION_COMMON_LOAD.json", ACCEPTANCE / "FIGURE_3_ESTIMATOR_CHECK.json"]:
         copy(src, OUT / "methods/model_and_observer_contracts" / src.name)

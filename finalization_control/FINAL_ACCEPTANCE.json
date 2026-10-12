@@ -53,9 +53,9 @@
     },
     {
       "id": "preservation_reproduction",
-      "status": "PENDING_APPEND_ONLY_BACKUP",
-      "finding": "The package manifest is byte-synchronized and the portable archive includes reader artifacts, figure data, methods contracts, campaign protocol, test receipt, and regeneration dependencies. Final append-only independent backup remains to be written and restored-verified.",
-      "evidence": ["fracture_final_current/reproducibility/SOURCE_AND_INPUT_MANIFEST.json", "fracture_final_current/reproducibility.zip.sha256"]
+      "status": "PASS_APPEND_ONLY_BACKUP",
+      "finding": "The package manifest is byte-synchronized and the portable archive includes reader artifacts, figure data, methods contracts, campaign protocol, test receipt, and regeneration dependencies. The final generation is stored append-only under the existing independent backup root and restore-verified by hash.",
+      "evidence": ["fracture_final_current/reproducibility/SOURCE_AND_INPUT_MANIFEST.json", "fracture_final_current/reproducibility.zip.sha256", "finalization_control/PUBLICATION_ACCEPTANCE_BACKUP_RECEIPT.json"]
     },
     {
       "id": "final_scientific_summary",

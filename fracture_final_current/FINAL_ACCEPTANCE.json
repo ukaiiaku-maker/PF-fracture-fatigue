@@ -1,74 +1,66 @@
 {
-  "schema": "fracture-final-acceptance/1",
-  "updated_at": "2026-10-11T18:12:00-07:00",
-  "overall_status": "complete_validated",
+  "schema": "fracture-final-acceptance/2",
+  "updated_at": "2026-10-11T19:30:00-07:00",
+  "overall_status": "complete_with_scoped_limitations",
   "criteria": [
     {
       "id": "source_configuration",
-      "status": "complete_validated",
-      "evidence": [
-        "finalization_control/TASKS.json",
-        "CAPABILITY_PRESERVATION_MATRIX.csv"
-      ]
+      "status": "PASS_TEXT_ONLY_CORRECTION",
+      "finding": "The baseline, focused-seed, sensitivity, source-support, developed-growth, and PF companion families execute the persistent reusable source operator. The cavity family intentionally uses the current-source topology owner. Earlier finite-inventory and advance-refresh prose was stale; no trajectory required rerun.",
+      "evidence": ["review_packet/publication_acceptance_0c72ca2b/METHOD_TO_RESULT_MAP.json", "review_packet/publication_acceptance_0c72ca2b/METHOD_TO_RESULT_MAP.md"]
     },
     {
       "id": "scientific_dataset",
-      "status": "complete_validated",
-      "evidence": [
-        "finalization_control/CAMPAIGN_MATRIX.csv"
-      ]
+      "status": "PASS_REUSED_NATIVE_EVIDENCE",
+      "finding": "The 96 baseline identities, 32 focused arm-level cases, 40 sensitivity rows with declared reuse, two developed trajectories, cohesive events, cavity suffix, and restart qualifications are retained without double-counting overlapping runs.",
+      "evidence": ["finalization_control/CAMPAIGN_MATRIX.csv", "fracture_final_current/reproducibility/CLAIM_TO_EVIDENCE_INDEX.json"]
     },
     {
       "id": "developed_fracture_response",
-      "status": "complete_validated",
-      "evidence": [
-        "review_packet/current_science_pilots_6abbf10"
-      ]
+      "status": "PASS_EVENT_CONDITIONED_MONOTONIC_SCOPE",
+      "finding": "The two 1.005 mm trajectories support chronological driving and event-conditioned monotonic resistance observations. They are not presented as protocol-independent unload/reload R-curves.",
+      "evidence": ["fracture_final_current/figures/Figure_5_developed_driving.png", "fracture_final_current/figures/Figure_6_developed_resistance.png"]
     },
     {
       "id": "original_fem_czm_comparison",
-      "status": "complete_validated",
-      "evidence": [
-        "integration_evidence/active_fracture_comparisons_0a5d55e"
-      ]
+      "status": "SUPPORTED_WITH_PRODUCTION_REPRESENTATION_LIMIT",
+      "finding": "The identical-mesh elastic reference is exact. At shared production openings, the PF/FEM reaction ratio is about 1.0923 and native K ratios depend on support and accommodation scope before fracture. The cause is narrowed to differing production discretizations/native J support rather than a boundary, unit, or elastic-law mismatch. No production mesh-convergence rate is claimed because retained histories lack matched two-level sequences. Four physical cohesive events and 26 fully separated numerical subsegments survive; traction-separation histories do not.",
+      "evidence": ["review_packet/publication_acceptance_0c72ca2b/PF_FEM_PRODUCTION_COMMON_LOAD.json", "review_packet/publication_acceptance_0c72ca2b/PF_FEM_COMMON_LOAD.csv"]
     },
     {
       "id": "physical_cavity_comparison",
-      "status": "complete_validated",
-      "evidence": [
-        "review_packet/final_fracture_campaign_a5a5883/CAVITY_DWELL_10US.json",
-        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
-        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION.md",
-        "integration_evidence/active_fracture_comparisons_0a5d55e/cavity_post_ramp_dwell_10us_completion_run2"
-      ]
+      "status": "PASS_FINITE_WINDOW_INHIBITION_SCOPE",
+      "finding": "Exact accepted checkpoints establish 80 micrometres of suppressed-arm advance and zero enabled-arm advance over 0.2 s. Native fields and an actual-scale ligament inset are supplied. Unlike terminal local-J and complete-ligament observables are not ratioed; permanent arrest, universal toughening, and nucleation are not claimed.",
+      "evidence": ["fracture_final_current/figures/Figure_9_cavity_fields.png", "fracture_final_current/figure_data/CAVITY_CURRENT_FIELD_SIDECAR.csv"]
     },
     {
       "id": "shared_code_readiness",
-      "status": "complete_validated",
-      "evidence": [
-        "CAPABILITY_PRESERVATION_MATRIX.csv"
-      ]
+      "status": "PASS_WITH_DISCLOSED_SUPERSEDED_TEST",
+      "finding": "The main repository passes 832 tests. The companion's 37 release-relevant tests pass. A targeted fatigue set passes 21 functional/current-adapter tests; its one failure is the disclosed obsolete original source-text transform, while the preserved audited successor compiles and exercises the current wrapper chain.",
+      "evidence": ["finalization_control/TEST_RECEIPT.json", "CAPABILITY_PRESERVATION_MATRIX.csv"]
     },
     {
       "id": "paper_package",
-      "status": "complete_validated",
-      "evidence": [
-        "fracture_final_current"
-      ]
+      "status": "PASS_CONTENT_AND_OPENXML",
+      "finding": "The external-reader manuscript/SI, corrected figures, numerical sidecars, structured native OMML equations, editable tables, methods contracts, and portable archive are synchronized.",
+      "evidence": ["fracture_final_current", "fracture_final_current/reproducibility/DOCX_VALIDATION.json"]
+    },
+    {
+      "id": "rendered_document_usability",
+      "status": "STRUCTURAL_PASS_GUI_RENDER_LIMITATION",
+      "finding": "ZIP/XML/relationships, embedded figures, 143 native math objects, required structured equation constructs, zero unresolved TeX tokens, and a textutil HTML parse pass. The installed Microsoft Word session did not open either the release or a known control DOCX, so Microsoft Word open success and page-by-page visual inspection are not claimed.",
+      "evidence": ["fracture_final_current/reproducibility/DOCX_VALIDATION.json"]
     },
     {
       "id": "preservation_reproduction",
-      "status": "complete_validated",
-      "evidence": [
-        "review_packet/active_fracture_comparisons_c8f2bb0/PRESERVATION.json"
-      ]
+      "status": "PASS_APPEND_ONLY_BACKUP",
+      "finding": "The package manifest is byte-synchronized and the portable archive includes reader artifacts, figure data, methods contracts, campaign protocol, test receipt, and regeneration dependencies. The final generation is stored append-only under the existing independent backup root and restore-verified by hash.",
+      "evidence": ["fracture_final_current/reproducibility/SOURCE_AND_INPUT_MANIFEST.json", "fracture_final_current/reproducibility.zip.sha256", "finalization_control/PUBLICATION_ACCEPTANCE_BACKUP_RECEIPT.json"]
     },
     {
       "id": "final_scientific_summary",
-      "status": "complete_validated",
-      "evidence": [
-        "fracture_final_current/FINAL_SCIENTIFIC_REPORT.md"
-      ]
+      "status": "PASS",
+      "evidence": ["fracture_final_current/FINAL_SCIENTIFIC_REPORT.md"]
     }
   ]
 }

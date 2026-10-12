@@ -71,3 +71,17 @@ The accepted DBTT 300 K and 1200 K trajectories remain compatible after source-i
 The full 3695-row chronological driving history retains reequilibrated, pre-event and committed stages, accepted loading time, opening/reaction, K/J semantics, source state, active and wake content, shielding/backstress and work channels. The distinct resistance view carries the native pre-event J-derived K_J only across its realized committed jump. The 300 K event resistance spans 23.234–67.807 MPa√m and the 1200 K response spans 52.376–153.307 MPa√m. Because each path has one monotonic loading segment and no independent unload/reload measurements, the paper will call this an event-sampled resistance history rather than imply multiple independent reload R-curve points or force a rising slope.
 
 Queries at 100, 500 and 1000 µm remain discrete-jump brackets: the lower pre-event coordinate retains its measured K_J, the upper committed geometry has no invented post-event K/J, and interpolation is false. Projected extension and path arclength remain separate, and active mobile-plus-retained line content remains a current state rather than cumulative emission.
+
+## 2026-10-11 — Bind the publication to persistent sources and narrow cross-backend claims
+
+Runtime attestations and installed-method inspection show that the baseline, focused-seed, rate, orientation, source-support, developed-growth and PF companion families execute the persistent reusable source operator. The earlier finite-inventory and advance-refresh paper description was stale prose, so correct trajectories are retained. The cavity family remains separately identified as the current-source topology owner.
+
+At common pre-event openings, production PF and FEM/CZM histories differ systematically before fracture: PF/FEM reaction is about 1.0923, while native K ratios depend on the observer support and accommodation scope. The exact identical-mesh elastic control excludes a base boundary, unit, thickness, or elasticity mismatch. The retained production histories do not contain matched two-level sequences, so no production convergence rate is claimed. Close event K at different openings is not presented as general mechanical validation.
+
+The cavity endpoints support 80 µm suppressed-arm advance versus zero enabled-arm advance over 0.2 s. The enabled complete-ligament energy and suppressed local J are unlike observables at different terminal geometries and are not ratioed. The paper therefore claims finite-window inhibition under the executed topology-aware candidate law, not permanent arrest or a universal shielding factor.
+
+## 2026-10-11 — Publication and executable acceptance
+
+The Word export now contains structured OMML fractions, radicals, indices and n-ary operators rather than literal TeX strings. Package/XML/relationship checks and a system text conversion pass; Microsoft Word open success and page-by-page inspection are not claimed because the installed Word session opened neither the release nor a known control DOCX.
+
+The main suite passes 832 tests. A correct-environment companion fatigue target passes 21 current functional/audited-adapter tests and retains one disclosed failure in the superseded original source-text transform. The audited successor compiles the current wrapper chain and is the preserved executable path; current physics is not reverted to satisfy the obsolete text anchor.

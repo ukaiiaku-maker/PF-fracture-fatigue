@@ -1,16 +1,28 @@
 {
   "schema": "fracture-docx-validation/1",
   "file": "manuscript_and_SI.docx",
-  "sha256": "717c37f02d3df50c9694d374fd98847af212c45c3160d5d84c044156e9011b74",
-  "size_bytes": 4213541,
+  "sha256": "048c54f74ba48dfdad635f68415e98a4317bafdf8004086e4756e5ff3e3d0859",
+  "size_bytes": 4247667,
   "package_zip_valid": true,
   "xml_and_relationships_valid": true,
   "microsoft_word_open_test_performed": false,
+  "renderer_checks": {
+    "textutil_html_parse": "PASS",
+    "microsoft_word_session": "UNAVAILABLE; the installed application did not open either this file or a known control DOCX in the current GUI session",
+    "page_by_page_visual_review": "NOT_CLAIMED"
+  },
   "stats": {
-    "paragraphs": 453,
+    "paragraphs": 434,
     "embedded_images": 14,
-    "native_math_objects": 39,
-    "editable_tables": 10
+    "native_display_math_objects": 14,
+    "native_math_objects": 143,
+    "structured_fractions": 4,
+    "structured_radicals": 7,
+    "structured_subscripts": 153,
+    "structured_superscripts": 28,
+    "structured_nary": 7,
+    "editable_tables": 10,
+    "unresolved_tex_tokens": []
   },
   "errors": [],
   "status": "PASS"

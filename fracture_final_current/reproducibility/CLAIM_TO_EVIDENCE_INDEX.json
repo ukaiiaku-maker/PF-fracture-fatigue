@@ -19,13 +19,19 @@
       "claim": "203 events and 1004.926 \u00b5m projected extension per path",
       "evidence": "methods/model_and_observer_contracts/DEVELOPED_GROWTH_RESISTANCE.json"
     },
+    "method_binding": {
+      "claim": "paper PF families execute persistent reusable sources; cavity intentionally uses current-source topology ownership",
+      "evidence": "methods/model_and_observer_contracts/METHOD_TO_RESULT_MAP.json"
+    },
     "pf_fem": {
-      "claim": "exact elastic control; 0.62% and 6.06% first-event differences",
-      "evidence": "methods/model_and_observer_contracts/PF_FEM_FINAL_FRACTURE_COMPARISON.json"
+      "claim": "exact identical-mesh elastic control; systematic production common-opening response differences; accepted cohesive topology events",
+      "evidence": "methods/model_and_observer_contracts/PF_FEM_PRODUCTION_COMMON_LOAD.json",
+      "data": "figure_data/PF_FEM_COMMON_LOAD.csv"
     },
     "cavity": {
-      "claim": "80 \u00b5m suppressed-arm advance versus zero enabled-arm advance over 0.2 s",
-      "evidence": "methods/model_and_observer_contracts/CAVITY_INTERACTION_0P2S_RECOVERED.json"
+      "claim": "80 \u00b5m suppressed-arm advance versus zero enabled-arm advance over 0.2 s; unlike terminal drives are not ratioed",
+      "evidence": "methods/model_and_observer_contracts/CAVITY_INTERACTION_0P2S_RECOVERED.json",
+      "field_data": "figure_data/CAVITY_CURRENT_FIELD_SIDECAR.csv"
     },
     "restart_options": {
       "claim": "exact populated V3.6 and combined branch-cavity restart",

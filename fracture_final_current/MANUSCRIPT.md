@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Temperature and loading rate affect fracture through the competition between crack opening and crack-tip accommodation. We formulate both as conditional transition-state processes coupled to evolving two-dimensional mechanics and a front-local mobile/retained state. In 96 original spatial sharp-wake PF calculations, four fixed parameter rows produce abrupt transition-like elevation, broad accommodation-associated elevation, and predominantly softening responses without prescribing toughness curves. Matched opening-only controls show accommodation effects up to 156% for the DBTT row and 164% for the Peak row. Eight paired seeds at DBTT/1200 K and Peak/900 K give mean accommodation-associated first-event gaps of 32.45 and 34.74 MPa√m, respectively, much larger than their observed seed spreads. Rate, orientation, and source-geography tests show that these responses are state-path effects rather than universal temperature shifts. Developed DBTT trajectories reach 1.005 mm projected extension; their native pre-event J-derived coordinates form event-sampled resistance histories, not independent unload/reload R-curves. On a controlled common specimen, original PF and FEM/CZM calculations agree exactly in the elastic reference and differ by 0.62% in tip-only and 6.06% in full-field first-event K. A matched cavity continuation shows strong finite-window shielding: over 0.2 s the cavity-suppressed arm advances 80 µm while the cavity-enabled arm does not connect or advance. These results connect thermally activated separation, inherited accommodation, cohesive fracture, and evolving topology while retaining their distinct numerical representations and limits.
+Temperature and loading rate affect fracture through competition between crack opening and crack-tip accommodation. We formulate opening as a stochastic first-passage process coupled to persistent, reusable dislocation-source populations and evolving two-dimensional mechanics. In 96 original spatial sharp-wake calculations, four fixed constructed parameter rows produce transition-like elevation, broad accommodation-associated elevation, and predominantly softening responses without prescribing toughness curves. Matched opening-only controls show changes up to 156% for the DBTT row and 164% for the Peak row. Eight paired seeds at DBTT/1200 K and Peak/900 K give mean first-event gaps of 32.45 and 34.74 MPa√m, well above their observed seed spreads. Rate, orientation, and source-support tests show that the response is path dependent rather than a universal temperature shift. Developed trajectories reach 1.005 mm and provide event-conditioned resistance observations under monotonic loading. A common-specimen audit separates exact identical-mesh elastic agreement from systematic production differences in reaction and native J support. In a matched 0.2 s cavity continuation, the suppressed arm advances 80 µm whereas the enabled arm does not connect or advance; current native fields establish finite-window inhibition under the topology-aware candidate law, without equating unlike local and finite-ligament drives. The study therefore links thermally activated opening, inherited accommodation, cohesive topology, and cavities while stating the limits of each comparison.
 
 ## 1. Introduction
 
@@ -28,173 +28,104 @@ The observations establish the physical motivation but do not quantitatively cal
 
 ## 3. Competing-kinetics framework
 
-### 3.1 Conditional transition-state rates
+### 3.1 Conditional first passage and activation surfaces
 
-For a mechanism \(i\) with local drive \(q_i\), state history \(z(t)\), multiplicity \(\mathcal M_i\), and attempt frequency \(\nu_i\),
-
-\[
-\lambda_i(t)=\mathcal M_i(t)\nu_i
-\exp\!\left[-\frac{\Delta G_i^\ddagger(q_i(t),T,z(t))}{k_BT}\right].
-\]
-
-Conditional on no intervening event, the next-event density is
+For a discrete event channel \(i\), with drive \(q_i\), state \(z\), multiplicity \(\mathcal M_i\), and attempt frequency \(\nu_i\), the executed conditional rate is
 
 \[
-f_i(t)=\lambda_i(t)
-\exp\!\left[-\int_{t_0}^{t}\sum_j\lambda_j(s)\,ds\right].
+\lambda_i(t)=\mathcal M_i(t)\nu_i\exp\!\left[-\frac{\Delta G_i^\ddagger(q_i,T,z)}{k_BT}\right]. \qquad (1)
 \]
 
-This expression is used locally, not as a frozen race over an entire loading path. Dislocation emission is nonabsorbing: after emission changes the process-zone state, the rates and mechanical feedback are updated. Crack opening is absorbing at the current geometry and is represented by a renewal action
+Here \(k_B\) is Boltzmann's constant and \(T\) is absolute temperature. Conditional on no intervening event, the next-event density contains only the channels represented as discrete events,
 
 \[
-A_c(t)=\int_{t_0}^{t}\Lambda_c[s;z(s)]\,ds,
-\qquad A_c(t_c)=\Xi,\qquad \Xi=-\ln R ,
+f_i(t)=\lambda_i(t)\exp\!\left[-\int_{t_0}^{t}\sum_j\lambda_j(s)\,ds\right]. \qquad (2)
 \]
 
-where \(R\) is uniform on \((0,1)\). Writing \(\Lambda_c[s;z(s)]\) emphasizes that the action depends on the full state history, not only the state at the event.
-
-Opening and emission use stress-biased activation surfaces
+The deterministic mean source-population update below changes the conditional rates but is not counted as another sampled event. Crack opening uses an exponential mark \(\Xi=-\ln R\), with \(R\sim U(0,1)\), and accumulated action
 
 \[
-G_i(\sigma,T)=G_{f,i}+[G_{0,i}(T)-G_{f,i}]
-\exp\!\left\{-\alpha_i
-\left[\frac{\max(\sigma,0)}{\sigma_{c,i}(T)}\right]^{n_i}\right\},
+A_c(t)=\int_{t_0}^{t}\Lambda_c[s;z(s)]\,ds,\qquad A_c(t_c)=\Xi . \qquad (3)
 \]
+
+Opening and emission use the executed EXP-floor activation surface
 
 \[
-G_{0,i}=G_{00,i}+g_{T,i}(T-T_{\rm ref}),\qquad
-\sigma_{c,i}=\sigma_{c0,i}+s_{T,i}(T-T_{\rm ref}),
+G_i(\sigma,T)=G_{f,i}+[G_{0,i}(T)-G_{f,i}]\exp\!\left\{-\alpha_i\left[\frac{\max(\sigma,0)}{\sigma_{c,i}(T)}\right]^{n_i}\right\}. \qquad (4)
 \]
+
+Here \(G_{0,i}=G_{00,i}+g_{T,i}(T-T_{\rm ref})\) and \(\sigma_{c,i}=\sigma_{c0,i}+s_{T,i}(T-T_{\rm ref})\). The reference temperature is \(T_{\rm ref}=481.33\) K. The implementation floors \(G_0\) at \(10^{-9}\) eV and \(\sigma_c\) at 1 Pa, bounds \(G_f\) as given in the SI, and clips the Arrhenius exponent to \([-700,0]\). In the DBTT emission row, the affine stress scale reaches the 1 Pa floor near 1001 K; this bounded-stress assumption contributes materially to the calculated upper branch.
+
+### 3.2 Mechanics, sign convention, and committed crack geometry
+
+The principal calculation is plane strain in a 2 mm by 4 mm body with a 0.5 mm left-edge notch and symmetric total opening. The graded triangular discretization carries piecewise-constant plastic strain and density. With plane-strain modulus \(E'=E/(1-\nu^2)\), signed domain integral \(J_{\rm signed}\), and orientation sign \(\varsigma\), the reported coordinate is
 
 \[
-\lambda_i=\nu_i\exp[-G_i/(k_BT)].
+K_J=\sqrt{E'\max(\varsigma J_{\rm signed},0)} . \qquad (5)
 \]
 
-The parameterized landscapes allow opening and accommodation to have distinct energy scales, stress sensitivities, and temperature derivatives. No toughness–temperature curve is supplied.
+The sign makes forward mode-I energy release positive. \(K_J\) is a model observer, not a standardized experimental toughness. An accepted event commits a sampled sharp-wake increment; the calculation is not an AT1 or AT2 variational damage evolution.
 
-### 3.2 Two-dimensional mechanics and crack representation
+### 3.3 Persistent source population and signed transport
 
-The principal spatial model is a plane-strain finite-element calculation of a 2 mm by 4 mm body containing a 0.5 mm left-edge notch. Symmetric top and bottom displacement imposes mode-I opening. A graded triangular mesh supplies the stress field and a signed \(J\)-based coordinate
+The executed PF families use persistent reusable source sites, not a finite depleted inventory. For reduced slip system \(s\), the state-dependent multiplicity is
 
 \[
-K_J=\sqrt{E'\max(\varsigma J_{\rm signed},0)}.
+\mathcal M_s=\rho_{\rm site}c_{\rm arc}r_{\rm tip}w_{\rm eff},\qquad
+w_{\rm eff}=w_{\rm ref}\sqrt{\rho_{\rm ref}/\max(\rho,\rho_{\rm ref})}. \qquad (6)
 \]
 
-\(K_J\) is the model’s field-derived loading coordinate and is used consistently below; it is not presented as a standardized experimental toughness measurement.
-
-When the opening action reaches its threshold, an explicit sharp-wake increment is committed and the stiffness-degraded crack geometry is updated. The spatial formulation couples finite-element stress and \(J\) fields to this tracked wake; it does not solve an AT1 or AT2 variational damage-evolution law. A separate branching example in the Supporting Information illustrates the broader morphology capability but is not part of the single-front response calculations.
-
-### 3.3 Spatial accommodation state
-
-The original spatial PF solver carries a native coarse-grained front state comprising two slip-trace channels and 80 bins over 50 μm. Each channel begins with a finite local source opportunity \(C_s\). For source \(s\),
+Here \(\rho_{\rm site}\) is persistent areal site density, \(c_{\rm arc}r_{\rm tip}w_{\rm eff}\) is active source area, \(r_{\rm tip}\) is the blunted radius, and \(w_{\rm eff}\) is bounded by the process-grid and domain widths. Sites are neither consumed nor replenished by crack advance. For a time interval \(\Delta t\), the mean activation increment is the nonnegative implicit root
 
 \[
-\sigma_{e,s}=\max(f_s\sigma_{\rm open}-\sigma_{{\rm back},s},0),
-\qquad
-\Delta N_s=S_s[1-\exp(-\lambda_{e,s}\Delta t)],
+\Delta N_s=\mathcal M_s\lambda_e\!\left(\max[\sigma_{{\rm drive},s}-k_{\rm back}\sqrt{\rho_s+a_s\Delta N_s},0],T\right)\Delta t . \qquad (7)
 \]
+
+Here \(\sigma_{{\rm drive},s}\) is the tensor-resolved projected drive, \(k_{\rm back}\sqrt{\rho}\) is Taylor back stress, and \(a_s\) converts an activation to local density. Equation (7) is solved by a bracketed backward-Euler complementarity condition and is bounded by the density at which back stress blocks the resolved drive. The mean increment is converted to signed line content using a mechanically derived two-dimensional unit-perturbation normalization; its sign follows resolved shear.
+
+Positive and negative mobile \(M_s^\pm\), retained \(R_s^\pm\), accumulated-slip, and wake populations are stored separately. For each sign, exact local exchange obeys
 
 \[
-S_s\leftarrow S_s-\Delta N_s .
+\dot M_s^\pm=-k_{\rm enc}M_s^\pm+k_{\rm rel}R_s^\pm,\qquad
+\dot R_s^\pm=k_{\rm enc}M_s^\pm-k_{\rm rel}R_s^\pm. \qquad (8)
 \]
 
-This is a mean population update. Individual emitted lines are not sampled one by one. Activated content is deposited into the leading bins as mobile content \(M_s(x)\). Mobile and retained content \(R_s(x)\) exchange according to
+The exchange is followed by forward mobile transport \(v\Delta t\), with forest spacing \(\ell=(2\sqrt{\rho})^{-1}\), velocity \(v=\ell\lambda_p\), and \(k_{\rm enc}=\eta v\sqrt{\rho}\). The selected Taylor completion mapping defines \(k_{\rm rel}\) in the implementation; explicit mobile and retained temporal recovery are zero for these monotonic rows. Escape at the active-domain boundary and moving-frame transfer to the wake remain active and are separately ledgered.
+
+Signed retained content acts through two-dimensional unit-response kernels,
 
 \[
-\dot M_s=-k_{\rm enc}M_s+k_{\rm rel}R_s,\qquad
-\dot R_s=k_{\rm enc}M_s-k_{\rm rel}R_s,
+K_{\rm sh}=\sum_{s,j}\kappa_{s,j}(R_{s,j}^+-R_{s,j}^-),\qquad
+r_{\rm eff}=r_0+c_{\rm blunt}b\sum_{s,j}w_j\Gamma_{s,j}. \qquad (9)
 \]
+
+The reported runs set the mobile shielding fraction and wake shielding to zero. Thus population, plastic work, back stress, blunting, and mechanical shielding are distinct observables.
+
+### 3.4 Partial progress and state translation
+
+If \(B\) is hazard-linear progress toward the current sampled event length \(L_c\), the executed moving-coordinate closure is
 
 \[
-\ell=(2\sqrt{\rho})^{-1},\qquad
-v=\ell\lambda_p,\qquad
-k_{\rm enc}=\eta v\sqrt{\rho}.
+d\xi=L_c\,dB . \qquad (10)
 \]
 
-The exchange equations are solved exactly over each local interval and the mobile field is then transported by \(v\Delta t\). The selected release closure maps Taylor completion to
+Equation (10) is a constitutive coarse graining, not a probability expectation or a resolved crack surface. Mobile, retained, and slip fields translate toward the moving origin, and crossed content enters the wake. Persistent sources remain available; only their multiplicity changes through radius and local density. Geometry is committed only at \(B=1\).
 
-\[
-k_{\rm rel}=
-\frac{P[m,\min(\lambda_t,10^{12}\ {\rm s}^{-1})t_0]}{t_0},
-\qquad t_0=1\ {\rm s},
-\]
+### 3.5 Source support, bulk accommodation, and cavity family
 
-where \(P\) is the regularized lower incomplete gamma function. The reference time is a phenomenological constitutive parameter. Explicit temporal recovery is zero in the selected parameterizations.
-
-The accumulated slip expands an effective opening radius, while signed retained content changes the opening drive:
-
-\[
-r_{\rm eff}=r_0+c_{\rm blunt}b\sum_{s,j}w_j\Gamma_{s,j},
-\qquad
-K_{\rm sh}=\sum_{s,j}\kappa_{s,j}R_{s,j}^{\rm signed},
-\]
-
-\[
-\sigma_c=
-\frac{\max(K_J-K_{\rm sh},0)}
-{\sqrt{2\pi r_{\rm eff}}}.
-\]
-
-Mobile and wake shielding are zero in these calculations. Plastic activity is therefore not synonymous with mechanical shielding: rapidly transported mobile content can be large while the retained, signed contribution to \(K_{\rm sh}\) remains small.
-
-### 3.4 Moving process-zone coordinate and committed geometry
-
-Opening progress also defines a subgrid moving-coordinate increment. If \(B\) is normalized progress toward the next sharp-wake increment of length \(L_c\), then a local action increment \(dB\) translates the process-zone coordinate by
-
-\[
-d\xi=L_c\,dB .
-\]
-
-The binned mobile, retained, and slip fields are shifted toward the moving origin; content crossing the origin enters the wake. The swept local source opportunity is renewed according to
-
-\[
-S_s\leftarrow S_s+(C_s-S_s)
-\min(d\xi/L_{\rm ref},1).
-\]
-
-The mechanical crack geometry is not advanced by \(d\xi\) at every substep. It remains at the last committed sharp wake until \(B=1\), when the complete increment \(L_c\) is added. Thus \(d\xi\) is a constitutive expected subgrid advance used to evolve the front-local material state during partial opening progress; it is not a separately resolved or measured sharp-crack extension. Mechanics feels the accompanying shielding and radius changes before the outer geometry is committed. This closure preserves a continuous mean opening velocity within a discrete geometry update and is treated as a model assumption when interpreting transient state loss and source exposure.
-
-The source budget is consequently local rather than global. It limits the opportunity available at the current front, but cumulative emission can exceed the instantaneous capacity as the moving coordinate samples fresh material.
-
-### 3.5 Thermal sensitivity
-
-For a fixed stochastic threshold and a specified path, the first-event condition may be written \(A_c(K_*,T)=\Xi\). Its derivative is
-
-\[
-\frac{dK_*}{dT}=
--\frac{\partial_T A_c+\delta_z A_c[dz(\cdot)/dT]}
-{\partial_K A_c}.
-\]
-
-The first numerator term describes the direct temperature sensitivity of opening at fixed state history. The functional term \(\delta_z A_c\) represents changes to the entire history of emission, exchange, transport, shielding, source exposure, and radius. It is useful for separating direct from state-mediated trends, but it does not provide a unique percentage allocation among coupled state variables.
+Tip-surface calculations use the persistent front state above. The pure-bulk intervention activates the full-field Peierls--Taylor update and explicitly disables tip plasticity, so it replaces rather than adds the tip contribution. Tip-plus-bulk composes both owners. The cavity calculation is intentionally different: it uses the declared current-source full-topology owner, positive conservative vacancy transport, full-field accommodation, and an explicit global event scheduler. Results from these families are compared as controlled interventions, not described by one lifecycle equation.
 
 ### 3.6 Cohesive energetic connection
 
-The opening barrier can be related to a cohesive separation landscape. For cohesive free energy per area \(\phi(\delta)\), applied normal traction \(t_n\), and physical activation-patch area \(A_*\),
+For cohesive free energy per area \(\phi(\delta)\), normal traction \(t_n\), and activation-patch area \(A_*\), a theoretical activation landscape is
 
 \[
-\mathcal F(\delta)=A_*[\phi(\delta)-t_n\delta].
+\mathcal F(\delta)=A_*[\phi(\delta)-t_n\delta],\qquad
+\Delta G_c^\ddagger=A_*\int_{\delta_m}^{\delta_s}[t_{\rm coh}(\delta)-t_n]\,d\delta . \qquad (11)
 \]
 
-Between a metastable minimum and saddle,
+This identity assumes a metastable minimum \(\delta_m\), saddle \(\delta_s\), and prescribed traction during the local activation. It motivates the barrier interpretation but is not substituted for the native numerical barrier. The FEM/CZM calculation uses hazard-triggered cohesive/topological insertion; its exported accepted state contains separated cohesive segments and physical-event grouping. It is not autonomous rate-independent cohesive failure.
 
-\[
-\Delta G_c^\ddagger=A_*\int_{\delta_m}^{\delta_s}
-[t_{\rm coh}(\delta)-t_n]\,d\delta,
-\qquad
-V_c^\ddagger=-\frac{\partial\Delta G_c^\ddagger}{\partial t_n}
-=A_*(\delta_s-\delta_m).
-\]
-
-For a triangular bilinear law with peak traction \(t_c\) and work of separation \(\Gamma_0\),
-
-\[
-\Delta G_c^\ddagger=A_*\Gamma_0(1-t_n/t_c)^2,
-\qquad
-V_c^\ddagger=2A_*\Gamma_0(1-t_n/t_c)/t_c.
-\]
-
-This identity supplies an energetic interpretation, not a separately calculated response curve. The numerical barriers reported below are evaluated by the constitutive routines used by the original PF and FEM/CZM trajectories; no independently drawn cohesive shape or analytical first-passage prediction is used as evidence.
 
 ## 4. Calculation program
 
@@ -218,7 +149,7 @@ Full parameters, numerical procedures, refinement results, and additional figure
 
 **Figure 2.** Original spatial-PF first-event \(K_J\) for four fixed parameter rows, each evaluated at twelve temperatures with accommodation enabled and with the matched opening-only control. Every one of the 96 predeclared cases reached a physical first event under the common endpoint contract. Curves connect sampled temperatures within a fixed row and arm; they are not fits.
 
-The current calculation produces response magnitudes and shapes that supersede the historical draft curves. DBTT spans 22.08–55.11 MPa√m with accommodation enabled, compared with 20.54–23.23 MPa√m in the opening-only arm. Peak spans 22.17–54.90 MPa√m versus 19.35–23.33 MPa√m. Their largest paired elevations are 156.1% at DBTT/1050 K and 163.7% at Peak/900 K. Weak-T shows a broad elevation: 18.52–20.14 MPa√m enabled versus 12.71–13.15 MPa√m opening-only, with a maximum 53.4% effect at 600 K. Ceramic-like remains the lowest response and has a smaller maximum effect of 11.7% at 950 K.
+The four constructed rows produce distinct response magnitudes and shapes. DBTT spans 22.08–55.11 MPa√m with accommodation enabled, compared with 20.54–23.23 MPa√m in the opening-only arm. Peak spans 22.17–54.90 MPa√m versus 19.35–23.33 MPa√m. Their largest paired elevations are 156.1% at DBTT/1050 K and 163.7% at Peak/900 K. Weak-T shows a broad elevation: 18.52–20.14 MPa√m enabled versus 12.71–13.15 MPa√m opening-only, with a maximum 53.4% effect at 600 K. Ceramic-like remains the lowest response and has a smaller maximum effect of 11.7% at 950 K.
 
 The family names identify fixed constructed parameter rows, not calibrated materials. The comparison supports the mechanistic statement that inherited accommodation can overwhelm direct opening softening over parts of the temperature domain. It does not uniquely apportion the change among shielding, blunting, transport, and renewed source exposure.
 
@@ -256,27 +187,27 @@ Both trajectories contain 203 exact pre-event/committed pairs and reach 1004.926
 
 ![Selected native developed-growth fields.](figures/Figure_7_native_fields.png)
 
-**Figure 7.** Native original-PF field snapshots from the 1200 K developed trajectory at stored states 1, 1600, 1672, and 1703. Rows retain the original renderer's damage, log10 density, maximum-principal-stress, and equivalent-plastic-strain channels. The front-local population is not spread into a reconstructed two-dimensional density map.
+**Figure 7.** Native maximum-principal-stress and damage arrays from the DBTT/1200 K propagation calculation at a pre-event state, the first committed advance, and late propagation. The numerical sidecar gives each exact stored step, crack-tip coordinate, and the \(K_J\) associated with that stored equilibrium. No front-local population is spread into a reconstructed two-dimensional field.
 
 ### 5.5 A controlled PF–FEM/CZM comparison
 
 ![Common-specimen PF and FEM/CZM comparison.](figures/Figure_8_PF_FEM.png)
 
-**Figure 8.** First-event \(K_J\) for the matched Peak/1000 K, 0°, seed-8666 specimen with tip-only accommodation and with the selected full-field Peierls–Taylor bulk law. Bars are native first-event observations, not a fitted mapping. The identical-mesh accommodation-disabled elastic reference agrees exactly at all three imposed openings.
+**Figure 8.** Production-history reaction and native \(K_J\) at five common pre-event total openings for the Peak/1000 K, 0°, seed-8666 specimen. Tip-only and full-field states are shown separately. These are common-input comparisons, not a fitted mapping.
 
-The common plane-strain body is 2 mm by 4 mm with a 0.5 mm initial notch and symmetric total opening. On the same mesh and damage field, PF and FEM/CZM give bitwise-coincident reaction, stored energy, ahead-tip stress, common-domain \(J\), and \(K_J\). With tip-only accommodation, first-event \(K_J\) is 53.878 MPa√m for PF and 54.212 MPa√m for FEM/CZM, a 0.62% relative difference. With the exact selected bulk law active, the values are 51.110 and 54.407 MPa√m, a 6.06% difference. Within PF, the bulk law changes the first-event coordinate by −5.14%; within FEM/CZM it changes it by 0.36%.
+On an identical mesh and damage field, the accommodation-disabled reference gives coincident reaction, stored energy, ahead-tip stress, common-domain \(J\), and \(K_J\). The retained production histories do not retain that parity: from 0.2 to 12 µm opening, PF reaction is 1.0923 times FEM/CZM reaction. Native \(K_J^{\rm PF}/K_J^{\rm FEM}\) is 0.5865 for tip-only and approximately 0.4409 for full-field because the production observers use different supports. These differences are present before fracture and, in the tip-only case, before substantial population evolution. They therefore cannot be attributed to the bulk law alone.
 
-The agreement is in the selected fracture coordinate, not every native observable. Production meshes, J supports, topology backends, event lengths, and random-stream ownership differ, so total opening is reported in the SI but is not treated as a parity metric. The full-field FEM/CZM path completed four physical events and 20.827 µm projected extension. A later in-memory refinement-pointer audit failed after the physics completed; the persisted compact-mesh record verifies the 330 µm refinement radius and a fresh one-step run verifies the recovery. This is disclosed as an audit-export limitation rather than recast as a physical failure.
+The near agreement of the two native first-event coordinates at different openings is not used as mechanical validation. It is consistent with both hazards being driven by their own \(K_J\) coordinate. The supported comparison is narrower: the common operator reference is exact, while production discretization and observer support produce a systematic response difference that the retained runs do not supply a two-level backend-specific convergence sequence to eliminate. The FEM/CZM histories nevertheless contain four accepted physical events, 26 fully separated cohesive subsegments grouped by physical event, and 20.828 µm total cohesive length.
 
 ### 5.6 A resolved cavity shields the approach path over the matched window
 
 ![Native cavity and crack fields at the paired starting exposure.](figures/Figure_9_cavity_fields.png)
 
-**Figure 9.** Native accepted stress fields, crack graphs, and actual-radius cavity outlines from the qualified full-order DBTT/1200 K/seed-3621 ancestry used to establish the paired cavity calculation. Columns (a,e), (b,f), and (c,g) are the pre-event, both-advanced, and historical endpoint states; (d,h) show the endpoint ligament at actual scale. Panels (i–l) give the paired historical load/geometry histories. The plate documents resolved geometry and field provenance; the continued 0.2 s endpoint comparison is quantified from exact restored native checkpoints and Table S11.
+**Figure 9.** Current native maximum-principal-stress fields and crack graphs at the exact start and end checkpoints of the 0.2 s paired continuation. The enabled panels include actual-scale insets spanning the 7.4 µm solid ligament and resolved 42 nm cavity. The suppressed arm advances 80 µm; the enabled arm retains its starting front. Values and mesh sizes are supplied in the numerical sidecar.
 
 The enabled and suppressed arms were resumed from their exact paired checkpoint and loaded for 0.2 s at 1 µm s−1. Both end at 6.6010101 µm total opening. The suppressed arm accepts four ordinary 20 µm advances, increasing graph length by 80 µm. The enabled arm accepts no crack advance; its resolved cavity radius changes only from 42.4796461 to 42.4878668 nm and no crack–void connection forms. At the endpoint, the ordinary front has a valid nested-local-J drive of 4155.24 J m−2, \(K_{\rm eff}=30.9661\) MPa√m, and an effective rate of 3.996 s−1. The cavity approach candidate uses the qualified complete-ligament topology energy, 43.6472 J m−2, \(K_{\rm eff}=3.17371\) MPa√m, and a rate of \(5.39\times10^{-58}\) s−1.
 
-This is strong shielding over the declared finite exposure, not proof of permanent arrest or a general cavity-toughening law. The cavity predates the continuation, so the result does not predict nucleation. The exact terminal native states and topology counts were restored before an event-history JSON exporter failed on a barrier dataclass; therefore individual event times inside the final window are not claimed.
+The two quoted endpoint drives are unlike observables at already different geometries: nested local \(J\) for the ordinary front and a finite complete-ligament topology operation for the cavity approach. Their ratio is therefore not a shielding factor. The matched history establishes finite-window inhibition under the executed candidate and kinetic formulation, not permanent arrest, a universal toughening law, or an isolated geometry-only reduction. The cavity predates the continuation, so the result does not predict nucleation. Exact terminal states and topology counts survive; individual event times inside the final window are not reconstructed.
 
 ### 5.7 Branching and option-preserving restart scope
 
@@ -298,17 +229,17 @@ Loading rate changes time available to both opening and accommodation. Crystal r
 
 ### 6.3 Initiation, driving, and resistance require different stage associations
 
-The developed histories show why an initiation coordinate cannot be carried forward as a material resistance curve. \(J\) and \(K_J\) belong to exact equilibrated or pre-event mechanical states, whereas extension belongs to the subsequently committed geometry. Assigning a terminal K to an unobserved post-event state or interpolating across a discrete jump would invent data. The event-sampled resistance view retains the measured pre-event value across only its realized jump. Its broad range documents evolving mechanical conversion and inherited state, but a single monotonic segment cannot provide multiple independent unload/reload resistance points.
+The developed histories contain physically meaningful resistance information without requiring unload/reload compliance points. \(J\) and \(K_J\) belong to exact equilibrated or pre-event mechanical states, whereas extension belongs to the subsequently committed geometry. Assigning a terminal K to an unobserved post-event state or interpolating across a discrete jump would invent data. The event-conditioned view retains each measured pre-event value across only its realized jump and resolves chronological opening, reaction, extension, and a final-time zoom. Because the histories use one monotonic loading protocol with burst-like advances, they are path- and rate-conditioned resistance histories rather than protocol-independent material R-curves.
 
 ### 6.4 Cohesive and sharp-wake implementations share mechanics without being identical
 
-The identical-mesh elastic reference closes the geometry, boundary, unit, stiffness, and base-operator questions. The sub-percent tip-only and six-percent full-field first-event differences then quantify behavior after distinct crack and accommodation representations are activated. The sharp-wake PF implementation is not a variational AT1 or AT2 phase-field model: it carries a stiffness-degraded wake and commits explicit increments when an accumulated kinetic action reaches its mark. The FEM/CZM implementation represents separation through cohesive/topological events. Their agreement in \(K_J\) supports a common competing-kinetics organization, not equality of openings, event sizes, or internal states.
+The identical-mesh elastic reference closes the geometry, boundary, unit, stiffness, and base-operator questions. Production histories then show systematic reaction and native-observer differences at common openings. Near equality of first-event \(K_J\) at different openings is expected to be less discriminating because each hazard is driven by its own coordinate; it does not validate production mechanics. The sharp-wake PF implementation is not a variational AT1 or AT2 phase-field model: it carries a stiffness-degraded wake and commits explicit increments when an accumulated kinetic action reaches its mark. FEM/CZM represents hazard-triggered separation through cohesive/topological events. The accepted cohesive state verifies actual separation events, while the remaining production-mesh/support difference limits a stronger cross-code claim.
 
 Baseline AT2 uses \(w(d)=d^2\) and has no finite elastic onset because \(w'(0)=0\); AT1 uses \(w(d)=d\) and has a finite onset. Both can be extended with thermal, viscous, or plastic physics. The present distinction is the explicit physical-time first-passage law coupled to inherited accommodation, not a claim that thermal activation is unavailable to conventional phase field or cohesive fracture.
 
 ### 6.5 Cavities change the admissible drive and event competition
 
-The cavity result is qualitative and large over its finite window: the ordinary front advances while the cavity approach candidate remains effectively inactive. The important coupling is not cavity span alone but the topology-aware mechanical observer. A contour intersecting a free cavity cannot be used as an ordinary local crack-tip derivative. The qualified complete-ligament operation supplies the admissible approach drive without counting cavity free span as fractured solid. Because the continuation begins with a pre-existing resolved cavity and ends without connection, it establishes finite-window shielding, not nucleation, coalescence, or permanent arrest.
+The cavity result is qualitative and large over its finite window: the suppressed ordinary front advances while the enabled cavity-approach candidate remains inactive. The important coupling is not cavity span alone but the topology-aware mechanical observer. A contour intersecting a free cavity cannot be used as an ordinary local crack-tip derivative. The qualified complete-ligament operation supplies an admissible approach drive without counting cavity free span as fractured solid, but it is not commensurate with the suppressed arm's terminal local \(J\). The calculation therefore establishes finite-window inhibition under the selected candidate law, with field redistribution and candidate-definition effects not independently decomposed.
 
 ### 6.6 Limitations
 
@@ -320,8 +251,8 @@ The parameter rows are constructed and uncalibrated. The accommodation variables
 2. At DBTT/1200 K and Peak/900 K, the accommodation-associated gaps are much larger than the observed spread across eight paired seeds, although distribution tails and other temperatures remain unresolved.
 3. Rate, orientation, and source geography act through the evolving state path. Their effects cannot be represented by a universal horizontal shift or additive source-density correction.
 4. Developed 1 mm trajectories require stage-faithful reporting: the native pre-event coordinates form an event-sampled monotonic resistance history, not independent unload/reload R-curve points.
-5. Original PF and FEM/CZM calculations share exact elastic mechanics on the common reference and give first-event \(K_J\) within 0.62% for tip-only and 6.06% for full-field accommodation, while retaining distinct openings and topology.
-6. In the matched finite cavity continuation, the suppressed arm advances 80 µm and the enabled arm does not advance or connect; the resolved cavity strongly shields the approach candidate over 0.2 s but does not establish permanent arrest.
+5. Original PF and FEM/CZM calculations share exact elastic mechanics on the identical-mesh reference, but production histories differ systematically in reaction and native \(J\) support at common openings; close event coordinates alone do not validate production mechanics.
+6. In the matched finite cavity continuation, the suppressed arm advances 80 µm and the enabled arm does not advance or connect; this establishes finite-window inhibition under the executed topology-aware candidate law, not a ratio-based shielding factor or permanent arrest.
 
 ## Data and code availability
 
