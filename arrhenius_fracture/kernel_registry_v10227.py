@@ -31,12 +31,15 @@ _VOLATILE_KEYS = {
     "load_invariance_root",
     "mechanics_normalization",
     "normalization",
+    "normalization_artifact",
     "out",
+    "path",
     "response",
     "responses",
     "snapshot",
     "snapshot_root",
     "source_path",
+    "unit_response_table",
 }
 
 

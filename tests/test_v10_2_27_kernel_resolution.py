@@ -143,8 +143,22 @@ def test_path_independent_family_physics_fingerprint(tmp_path: Path):
         ],
         "active_kernel_mechanically_measured": True,
     }
-    first = dict(common, response="/old/run/E0.csv", source_path="/old/family.json")
-    second = dict(common, response="/new/run/E0.csv", source_path="/new/family.json")
+    first = dict(
+        common,
+        response="/old/run/E0.csv",
+        source_path="/old/family.json",
+        normalization_artifact="/old/normalization.json",
+        unit_response_table="/tmp/old/responses.csv",
+        frozen_geometry_load_invariance_inputs=[{"path": "/old/load.json"}],
+    )
+    second = dict(
+        common,
+        response="/new/run/E0.csv",
+        source_path="/new/family.json",
+        normalization_artifact="/new/normalization.json",
+        unit_response_table="/tmp/new/responses.csv",
+        frozen_geometry_load_invariance_inputs=[{"path": "/new/load.json"}],
+    )
     first_path = tmp_path / "first.json"
     second_path = tmp_path / "second.json"
     first_path.write_text(json.dumps(first))
