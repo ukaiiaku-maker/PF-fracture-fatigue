@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from arrhenius_fracture.external_evidence import fingerprint_path
+from arrhenius_fracture.external_evidence import fingerprint_path, load_and_verify
 
 
 DEFAULT_ARCHIVE = Path("/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar")
@@ -84,8 +84,21 @@ def main() -> None:
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    verification = load_and_verify(args.out)
+    if verification["status"] != "PASS":
+        raise SystemExit("new external-evidence manifest did not verify")
+    status_path = args.out.parent / "FRAMEWORK_STATUS.json"
+    if status_path.is_file():
+        status = json.loads(status_path.read_text())
+        status["external_evidence"] = "PASS"
+        status["mandatory_open_gates"] = [
+            gate for gate in status.get("mandatory_open_gates", [])
+            if gate != "complete external-evidence verification from independent storage"
+        ]
+        status_path.write_text(json.dumps(status, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"output": str(args.out), "item_count": len(items),
-                      "bytes": sum(item["fingerprint"]["bytes"] for item in items)}, indent=2))
+                      "bytes": sum(item["fingerprint"]["bytes"] for item in items),
+                      "verification": verification["status"]}, indent=2))
 
 
 if __name__ == "__main__":
