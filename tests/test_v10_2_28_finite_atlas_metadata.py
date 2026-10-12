@@ -135,6 +135,14 @@ def test_direct_builder_routes_mechanics_child_through_v10228_adapter():
     assert "subprocess.run = _run_with_v10228_mechanics_adapter" in source
 
 
+def test_current_mechanics_builder_routes_child_through_v10228_adapter():
+    source = (
+        ROOT / "scripts" / "build_v10_2_27_kernel_from_current_mechanics.py"
+    ).read_text()
+    assert "build_v10_2_27_kernel_from_mechanics_artifacts_v10228.py" in source
+    assert "str(FINITE_METADATA_BUILD_PATH)" in source
+
+
 def test_child_adapter_routes_extended_assembler_through_metadata_wrapper():
     source = MECHANICS_WRAPPER.read_text()
     assert "build_v10_2_27_extended_active_only_atlas_finite_metadata.py" in source

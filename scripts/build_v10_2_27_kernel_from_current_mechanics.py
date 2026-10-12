@@ -23,6 +23,9 @@ from arrhenius_fracture.kernel_configuration_v10227 import (
 from arrhenius_fracture.kernel_registry_v10227 import validate_family
 
 BASE_PATH = ROOT / "scripts" / "build_v10_2_27_kernel_from_mechanics_artifacts.py"
+FINITE_METADATA_BUILD_PATH = (
+    ROOT / "scripts" / "build_v10_2_27_kernel_from_mechanics_artifacts_v10228.py"
+)
 SPEC = importlib.util.spec_from_file_location("v10227_portable_builder", BASE_PATH)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError(f"cannot load mechanics builder from {BASE_PATH}")
@@ -363,7 +366,7 @@ def main() -> int:
 
         command = [
             sys.executable,
-            str(BASE_PATH),
+            str(FINITE_METADATA_BUILD_PATH),
             "--snapshot-root",
             str(snapshot_root),
             "--load-invariance-root",
