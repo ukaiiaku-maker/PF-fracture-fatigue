@@ -38,6 +38,12 @@ BASELINE_TEMPERATURES = {300, 600, 800, 900, 950, 1000, 1050, 1100, 1150, 1200, 
 ARMS = {"accommodation_enabled", "opening_only"}
 FOCUSED_ANCHORS = {("DBTT", 1200), ("Peak", 900)}
 FOCUSED_SEEDS = {1733, 91733, 2718, 31415, 42424, 65537, 104729, 130363}
+RATE_CONDITIONS = {("DBTT", 950), ("DBTT", 1000), ("DBTT", 1200),
+                   ("Peak", 800), ("Peak", 900)}
+RATE_FACTORS = {0.01, 1.0, 100.0}
+ORIENTATION_45_CONDITIONS = {("DBTT", 300), ("DBTT", 1200),
+                             ("Peak", 300), ("Peak", 900)}
+SOURCE_GEOGRAPHIES = {"bulk_uniform", "tip_plus_bulk"}
 
 
 def rows() -> list[dict[str, str]]:
@@ -71,12 +77,34 @@ def validate_matrix(entries: list[dict[str, str]]) -> dict[str, object]:
     focused_duplicate_count = len(focused) - len(focused_identities)
     focused_missing = sorted(expected_focused - focused_identities)
     focused_extra = sorted(focused_identities - expected_focused)
+    sensitivities = [
+        row for row in entries if row["case_id"].startswith("sensitivity_")
+    ]
+    sensitivity_identities = {
+        (r["material_row"], int(r["temperature_K"]), r["arm"], int(r["seed"]),
+         float(r["orientation_deg"]), float(r["rate_factor"]), r["source_geography"])
+        for r in sensitivities
+    }
+    expected_sensitivities = {
+        (material, temperature, arm, 1733, 0.0, rate, "tip_surface")
+        for material, temperature in RATE_CONDITIONS
+        for arm in ARMS for rate in RATE_FACTORS
+    } | {
+        (material, temperature, arm, 1733, 45.0, 1.0, "tip_surface")
+        for material, temperature in ORIENTATION_45_CONDITIONS for arm in ARMS
+    } | {
+        ("DBTT", 1200, "accommodation_enabled", 1733, 0.0, 1.0, geography)
+        for geography in SOURCE_GEOGRAPHIES
+    }
+    sensitivity_duplicate_count = len(sensitivities) - len(sensitivity_identities)
+    sensitivity_missing = sorted(expected_sensitivities - sensitivity_identities)
+    sensitivity_extra = sorted(sensitivity_identities - expected_sensitivities)
     bad_status = sorted({r["status"] for r in entries} - {
         "running", "repairing", "ready", "complete_validated",
         "complete_physical_censor", "blocked_new_physics", "blocked_external_access",
     })
     reuse = []
-    for row in baseline + focused:
+    for row in baseline + focused + sensitivities:
         if row["reuse_evidence"]:
             path = ROOT / row["reuse_evidence"]
             reuse.append({
@@ -89,6 +117,8 @@ def validate_matrix(entries: list[dict[str, str]]) -> dict[str, object]:
     passed = (
         not missing and not extra and not duplicate_count
         and not focused_missing and not focused_extra and not focused_duplicate_count
+        and not sensitivity_missing and not sensitivity_extra
+        and not sensitivity_duplicate_count
         and not bad_status and all(
             r["exists"] and r["executed"] and r["summary"] for r in reuse
         )
@@ -106,6 +136,11 @@ def validate_matrix(entries: list[dict[str, str]]) -> dict[str, object]:
         "focused_duplicate_count": focused_duplicate_count,
         "focused_missing": focused_missing,
         "focused_extra": focused_extra,
+        "sensitivity_row_count": len(sensitivities),
+        "unique_sensitivity_identities": len(sensitivity_identities),
+        "sensitivity_duplicate_count": sensitivity_duplicate_count,
+        "sensitivity_missing": sensitivity_missing,
+        "sensitivity_extra": sensitivity_extra,
         "bad_status": bad_status,
         "reuse_checks": reuse,
         "passed": passed,
@@ -120,11 +155,21 @@ def configured_case(row: dict[str, str]) -> tuple[SharedOptions, list[str]]:
     replace_argument(native, "--steps", "500")
     replace_argument(native, "--target-crack-extension-um", "10")
     replace_argument(native, "--crystal-theta-deg", row["orientation_deg"])
+    replace_argument(native, "--dt", str(8.4 / float(row["rate_factor"])))
     configured = dict(template["options"])
     configured["random_seed"] = int(row["seed"])
     configured["output"] = "compact_smoke"
-    if row["source_geography"] != "tip_surface":
-        raise ValueError("baseline runner currently accepts only the frozen tip_surface production geography")
+    geography = row["source_geography"]
+    configured["source_location"] = geography
+    if geography == "bulk_uniform":
+        configured["plasticity"] = "full_field_evolving_rho"
+        native = [token for token in native if token != "--tip-plasticity"]
+        if "--no-tip-plasticity" not in native:
+            native.append("--no-tip-plasticity")
+    elif geography == "tip_plus_bulk":
+        configured["plasticity"] = "tip_plus_full_field"
+    elif geography != "tip_surface":
+        raise ValueError(f"unsupported source geography: {geography}")
     return SharedOptions(**configured), native
 
 
@@ -188,7 +233,11 @@ def write_matrix(entries: list[dict[str, str]]) -> None:
 
 def execute_group(entries: list[dict[str, str]], *, group: str, resume: bool,
                   maximum: int | None, case_id: str | None) -> list[dict[str, object]]:
-    prefix = "baseline_" if group == "baseline" else "focused_seed_"
+    prefix = {
+        "baseline": "baseline_",
+        "focused-seeds": "focused_seed_",
+        "sensitivities": "sensitivity_",
+    }[group]
     selected = [r for r in entries if r["case_id"].startswith(prefix)]
     if case_id:
         selected = [r for r in selected if r["case_id"] == case_id]
@@ -239,8 +288,6 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if audit["passed"] else 2
     if not audit["passed"]:
         raise SystemExit("campaign matrix failed audit; refusing execution")
-    if args.group == "sensitivities":
-        raise SystemExit(f"{args.group} rows are not frozen in the matrix yet")
     result = execute_group(
         entries, group=args.group, resume=args.resume,
         maximum=args.max_cases, case_id=args.case_id,
