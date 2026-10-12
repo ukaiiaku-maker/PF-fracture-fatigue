@@ -158,6 +158,59 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
             "v11_native_full_state_v5_physical_pair", True, None,
         )
 
+    branch_cavity_exact = (
+        options.mechanics is MechanicsBackend.SPATIAL_PF
+        and options.loading is LoadingMode.MONOTONIC
+        and options.source_location is SourceLocation.TIP_PLUS_BULK
+        and options.source_lifecycle is SourceLifecycle.CURRENT_SOURCE
+        and options.plasticity is PlasticityMode.TIP_PLUS_FULL_FIELD
+        and options.crack_path is CrackPathMode.BRANCHING_MULTIFRONT
+        and options.cavity is CavityMode.FULL_ORDER_V5
+        and options.kinetics is KineticsStrategy.NATIVE_SIGNED
+        and options.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
+        and options.output is OutputProfile.PUBLICATION_RESTART
+    )
+    if branch_cavity_exact:
+        bindings = (
+            _binding("mechanics", options.mechanics,
+                     "arrhenius_fracture.topology_transaction_v11",
+                     "equilibrate_fixed_load_with_production_fem",
+                     "shared accepted full-FEM state"),
+            _binding("loading", options.loading,
+                     "arrhenius_fracture.shared_branch_cavity_adapter", "main",
+                     "retained positive-opening compatibility continuation"),
+            _binding("source_location", options.source_location,
+                     "arrhenius_fracture.voiding_production_v5",
+                     "downstream_front_transaction",
+                     "cavity-surface and sharp-front native sources"),
+            _binding("source_lifecycle", options.source_lifecycle,
+                     "arrhenius_fracture.current_source_runtime_bindings", "MODEL_ID",
+                     "current-source topology owner"),
+            _binding("plasticity", options.plasticity,
+                     "arrhenius_fracture.topology_transaction_v11", "LiveFEMTopologyState",
+                     "shared full-field accepted arrays"),
+            _binding("kinetics", options.kinetics,
+                     "arrhenius_fracture.voiding_production_v5",
+                     "downstream_front_transaction", "native directional clocks"),
+            _binding("crack_path", options.crack_path,
+                     "arrhenius_fracture.crack_network_v11", "CrackNetworkState",
+                     "retained root and downstream child owners"),
+            _binding("cavity", options.cavity,
+                     "arrhenius_fracture.voiding_production_v5",
+                     "build_production_void_state", "retained full-order cavity owner"),
+            _binding("integration", options.integration,
+                     "arrhenius_fracture.topology_transaction_v11",
+                     "execute_topology_trial", "transactional event ordering"),
+            _binding("output", options.output,
+                     "arrhenius_fracture.checkpoint_v11", "write_checkpoint",
+                     "complete combined-owner checkpoint"),
+        )
+        return ExecutionPlan(
+            "shared-execution-plan/1", options.fingerprint, bindings,
+            "arrhenius_fracture.shared_branch_cavity_adapter", "main",
+            "v11_branch_cavity_compatibility", True, None,
+        )
+
     bindings = [
         _binding("mechanics", options.mechanics, "arrhenius_fracture.fem", "assemble_mechanics",
                  "full spatial finite-element mechanics assembly"),

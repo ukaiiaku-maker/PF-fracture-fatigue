@@ -96,6 +96,27 @@ def test_operator_consistent_preset_maps_to_developed_native_campaign():
     assert plan.restart_family == "v3_6_material_frame_native"
 
 
+def test_branch_cavity_preset_maps_to_combined_native_adapter():
+    plan = build_execution_plan(PRESETS["pf_branching_void_v5"])
+    assert plan.executable
+    assert plan.executor_module.endswith("shared_branch_cavity_adapter")
+    assert plan.restart_family == "v11_branch_cavity_compatibility"
+    roles = by_role(plan)
+    assert roles["crack_path"].requested == "branching_multifront"
+    assert roles["cavity"].requested == "full_order_v5"
+    assert roles["crack_path"].module.endswith("crack_network_v11")
+
+
+def test_branch_cavity_and_cavity_suppressed_routes_remain_distinct():
+    enabled = build_execution_plan(PRESETS["pf_branching_void_v5"])
+    suppressed = build_execution_plan(PRESETS["pf_branching_current"])
+    assert enabled.executor_module.endswith("shared_branch_cavity_adapter")
+    assert suppressed.executor_module.endswith(
+        "sharp_front_current_source_multifront_physical_v12"
+    )
+    assert enabled.options_sha256 != suppressed.options_sha256
+
+
 def test_hold_dwell_maps_to_native_ramp_then_hold_fatigue_entry():
     plan = build_execution_plan(PRESETS["pf_hold_dwell_tip_persistent"])
     assert plan.executable

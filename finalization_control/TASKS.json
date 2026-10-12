@@ -163,18 +163,20 @@
       "dependencies": [
         "control-ledger"
       ],
-      "status": "ready",
+      "status": "complete",
       "owner": "integrator",
-      "current_command": "python3 scripts/audit_v3_6_operator_consistency_v10230.py --help",
+      "current_command": "python3 scripts/analyze_v36_active_restart.py --interruption integration_evidence/v36_active_restart_340727f7/restarted_phase4/checkpoint --uninterrupted integration_evidence/v36_active_restart_340727f7/uninterrupted_phase8/checkpoint --restarted integration_evidence/v36_active_restart_340727f7/restarted_phase8/checkpoint --out review_packet/final_fracture_campaign_a5a5883/V36_ACTIVE_RESTART.json",
       "inputs": [
         "integration_evidence/native_restart_transport_f766285"
       ],
       "checkpoint": null,
       "evidence_paths": [
-        "review_packet/native_restart_transport_f766285"
+        "review_packet/native_restart_transport_f766285",
+        "review_packet/final_fracture_campaign_a5a5883/V36_ACTIVE_RESTART.json",
+        "integration_evidence/v36_active_restart_340727f7"
       ],
-      "next_action": "locate or generate populated admissible native history and fresh-process restart",
-      "completion_test": "nontrivial material-frame/slip/return ledgers agree across restart within declared tolerance"
+      "next_action": "integrate bounded restart scope and positive-R no-reversal caveat into SI",
+      "completion_test": "populated native state plus material-frame and cumulative swept ledgers agree exactly across a fresh-process restart"
     },
     {
       "id": "combined-branch-cavity",

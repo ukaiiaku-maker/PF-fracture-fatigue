@@ -140,11 +140,15 @@ def execute(request_path: str | Path) -> dict:
         for flag in ("--fatigue-cycles", "--fatigue-hold-load"):
             if flag not in native_args:
                 native_args.append(flag)
-    if plan.executor_module == "arrhenius_fracture.shared_v5_cavity_adapter":
+    if plan.executor_module in {
+        "arrhenius_fracture.shared_v5_cavity_adapter",
+        "arrhenius_fracture.shared_branch_cavity_adapter",
+    }:
         native_args.append(
             "--cavity-enabled" if options.cavity.value == "full_order_v5"
             else "--cavity-disabled"
         )
+    if plan.executor_module == "arrhenius_fracture.shared_v5_cavity_adapter":
         if any(item == "--seed" or item.startswith("--seed=")
                for item in native_args):
             raise ValueError("--seed is owned by the shared V5 adapter")
@@ -181,6 +185,11 @@ def execute(request_path: str | Path) -> dict:
             raise ValueError("restart checkpoint was supplied twice")
         native_args.extend([_multifront_restart_flag(restart_from), restart_from])
     elif restart_from and plan.restart_family == "v11_native_full_state_v5_physical_pair":
+        if any(item == "--restart-checkpoint" or item.startswith("--restart-checkpoint=")
+               for item in native_args):
+            raise ValueError("restart checkpoint was supplied twice")
+        native_args.extend(["--restart-checkpoint", restart_from])
+    elif restart_from and plan.restart_family == "v11_branch_cavity_compatibility":
         if any(item == "--restart-checkpoint" or item.startswith("--restart-checkpoint=")
                for item in native_args):
             raise ValueError("restart checkpoint was supplied twice")
