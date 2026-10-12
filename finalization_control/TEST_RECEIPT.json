@@ -4,10 +4,10 @@
   "main_repository": {
     "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
     "command": "python -m pytest -q",
-    "passed": 827,
+    "passed": 832,
     "failed": 0,
     "skipped": 0,
-    "duration_s": 55.81,
+    "duration_s": 69.77,
     "status": "PASS"
   },
   "fem_czm_companion_full_suite": {
@@ -41,6 +41,16 @@
     "skipped": 0,
     "duration_s": 31.60,
     "status": "PASS"
+  },
+  "preserved_fatigue_executable_targeted_set": {
+    "repository": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
+    "commit": "f7c36ef4313e42965444c0a39e41328be581a0f1",
+    "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+    "command": "python -m pytest -q tests/test_v10053_fatigue_source_transform.py tests/test_v10053_audited_source_preflight.py tests/test_kinetic_fatigue_v10053.py tests/test_v10054_vhcf_first_passage.py tests/test_moving_process_zone.py",
+    "passed": 21,
+    "failed": 1,
+    "status": "AUDITED_SUCCESSOR_FUNCTIONAL; STALE_ORIGINAL_TRANSFORM_DISCLOSED",
+    "disposition": "The preserved audited v10.0.5.3 wrapper compiles the exact current run_2d/v10.0.3/v10.0.2 chain; cyclic interval accounting, tensor-weight predictor dispatch, monotonic/fatigue barrier identity, and VHCF cycle-horizon semantics pass. The one failure is the already disclosed superseded original adapter test: it source-rewrites an older v10.0.2 builder text and its one-fatigue-commit anchor no longer exists. Production successors import and invoke the audited adapter. No constitutive physics was changed to satisfy the stale text anchor."
   },
   "wrong_environment_attempt": {
     "environment": "arrhenius-sharp-front-v10-codex",

@@ -1,0 +1,24 @@
+{
+  "estimator": "paired enabled-minus-opening-only gap; diamond is mean and bar is two-sided Student-t 95% CI",
+  "groups": {
+    "DBTT, 1200 K": {
+      "ci95": [
+        31.707268335552637,
+        33.18642752769038
+      ],
+      "mean": 32.446847931621505,
+      "n": 8,
+      "sample_sd": 0.8846424498714225
+    },
+    "Peak, 900 K": {
+      "ci95": [
+        34.253911764063105,
+        35.23281326596813
+      ],
+      "mean": 34.74336251501562,
+      "n": 8,
+      "sample_sd": 0.5854527541261745
+    }
+  },
+  "schema": "paired-gap-figure-check/1"
+}

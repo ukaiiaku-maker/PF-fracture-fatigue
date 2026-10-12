@@ -7,6 +7,140 @@ roots.  It copies only publication figures/tables and records their hashes.
 
 from __future__ import annotations
 
+
+METHODS = r"""## 3. Competing-kinetics framework
+
+### 3.1 Conditional first passage and activation surfaces
+
+For a discrete event channel \(i\), with drive \(q_i\), state \(z\), multiplicity \(\mathcal M_i\), and attempt frequency \(\nu_i\), the executed conditional rate is
+
+\[
+\lambda_i(t)=\mathcal M_i(t)\nu_i\exp\!\left[-\frac{\Delta G_i^\ddagger(q_i,T,z)}{k_BT}\right]. \qquad (1)
+\]
+
+Here \(k_B\) is Boltzmann's constant and \(T\) is absolute temperature. Conditional on no intervening event, the next-event density contains only the channels represented as discrete events,
+
+\[
+f_i(t)=\lambda_i(t)\exp\!\left[-\int_{t_0}^{t}\sum_j\lambda_j(s)\,ds\right]. \qquad (2)
+\]
+
+The deterministic mean source-population update below changes the conditional rates but is not counted as another sampled event. Crack opening uses an exponential mark \(\Xi=-\ln R\), with \(R\sim U(0,1)\), and accumulated action
+
+\[
+A_c(t)=\int_{t_0}^{t}\Lambda_c[s;z(s)]\,ds,\qquad A_c(t_c)=\Xi . \qquad (3)
+\]
+
+Opening and emission use the executed EXP-floor activation surface
+
+\[
+G_i(\sigma,T)=G_{f,i}+[G_{0,i}(T)-G_{f,i}]\exp\!\left\{-\alpha_i\left[\frac{\max(\sigma,0)}{\sigma_{c,i}(T)}\right]^{n_i}\right\}. \qquad (4)
+\]
+
+Here \(G_{0,i}=G_{00,i}+g_{T,i}(T-T_{\rm ref})\) and \(\sigma_{c,i}=\sigma_{c0,i}+s_{T,i}(T-T_{\rm ref})\). The reference temperature is \(T_{\rm ref}=481.33\) K. The implementation floors \(G_0\) at \(10^{-9}\) eV and \(\sigma_c\) at 1 Pa, bounds \(G_f\) as given in the SI, and clips the Arrhenius exponent to \([-700,0]\). In the DBTT emission row, the affine stress scale reaches the 1 Pa floor near 1001 K; this bounded-stress assumption contributes materially to the calculated upper branch.
+
+### 3.2 Mechanics, sign convention, and committed crack geometry
+
+The principal calculation is plane strain in a 2 mm by 4 mm body with a 0.5 mm left-edge notch and symmetric total opening. The graded triangular discretization carries piecewise-constant plastic strain and density. With plane-strain modulus \(E'=E/(1-\nu^2)\), signed domain integral \(J_{\rm signed}\), and orientation sign \(\varsigma\), the reported coordinate is
+
+\[
+K_J=\sqrt{E'\max(\varsigma J_{\rm signed},0)} . \qquad (5)
+\]
+
+The sign makes forward mode-I energy release positive. \(K_J\) is a model observer, not a standardized experimental toughness. An accepted event commits a sampled sharp-wake increment; the calculation is not an AT1 or AT2 variational damage evolution.
+
+### 3.3 Persistent source population and signed transport
+
+The executed PF families use persistent reusable source sites, not a finite depleted inventory. For reduced slip system \(s\), the state-dependent multiplicity is
+
+\[
+\mathcal M_s=\rho_{\rm site}c_{\rm arc}r_{\rm tip}w_{\rm eff},\qquad
+w_{\rm eff}=w_{\rm ref}\sqrt{\rho_{\rm ref}/\max(\rho,\rho_{\rm ref})}. \qquad (6)
+\]
+
+Here \(\rho_{\rm site}\) is persistent areal site density, \(c_{\rm arc}r_{\rm tip}w_{\rm eff}\) is active source area, \(r_{\rm tip}\) is the blunted radius, and \(w_{\rm eff}\) is bounded by the process-grid and domain widths. Sites are neither consumed nor replenished by crack advance. For a time interval \(\Delta t\), the mean activation increment is the nonnegative implicit root
+
+\[
+\Delta N_s=\mathcal M_s\lambda_e\!\left(\max[\sigma_{{\rm drive},s}-k_{\rm back}\sqrt{\rho_s+a_s\Delta N_s},0],T\right)\Delta t . \qquad (7)
+\]
+
+Here \(\sigma_{{\rm drive},s}\) is the tensor-resolved projected drive, \(k_{\rm back}\sqrt{\rho}\) is Taylor back stress, and \(a_s\) converts an activation to local density. Equation (7) is solved by a bracketed backward-Euler complementarity condition and is bounded by the density at which back stress blocks the resolved drive. The mean increment is converted to signed line content using a mechanically derived two-dimensional unit-perturbation normalization; its sign follows resolved shear.
+
+Positive and negative mobile \(M_s^\pm\), retained \(R_s^\pm\), accumulated-slip, and wake populations are stored separately. For each sign, exact local exchange obeys
+
+\[
+\dot M_s^\pm=-k_{\rm enc}M_s^\pm+k_{\rm rel}R_s^\pm,\qquad
+\dot R_s^\pm=k_{\rm enc}M_s^\pm-k_{\rm rel}R_s^\pm. \qquad (8)
+\]
+
+The exchange is followed by forward mobile transport \(v\Delta t\), with forest spacing \(\ell=(2\sqrt{\rho})^{-1}\), velocity \(v=\ell\lambda_p\), and \(k_{\rm enc}=\eta v\sqrt{\rho}\). The selected Taylor completion mapping defines \(k_{\rm rel}\) in the implementation; explicit mobile and retained temporal recovery are zero for these monotonic rows. Escape at the active-domain boundary and moving-frame transfer to the wake remain active and are separately ledgered.
+
+Signed retained content acts through two-dimensional unit-response kernels,
+
+\[
+K_{\rm sh}=\sum_{s,j}\kappa_{s,j}(R_{s,j}^+-R_{s,j}^-),\qquad
+r_{\rm eff}=r_0+c_{\rm blunt}b\sum_{s,j}w_j\Gamma_{s,j}. \qquad (9)
+\]
+
+The reported runs set the mobile shielding fraction and wake shielding to zero. Thus population, plastic work, back stress, blunting, and mechanical shielding are distinct observables.
+
+### 3.4 Partial progress and state translation
+
+If \(B\) is hazard-linear progress toward the current sampled event length \(L_c\), the executed moving-coordinate closure is
+
+\[
+d\xi=L_c\,dB . \qquad (10)
+\]
+
+Equation (10) is a constitutive coarse graining, not a probability expectation or a resolved crack surface. Mobile, retained, and slip fields translate toward the moving origin, and crossed content enters the wake. Persistent sources remain available; only their multiplicity changes through radius and local density. Geometry is committed only at \(B=1\).
+
+### 3.5 Source support, bulk accommodation, and cavity family
+
+Tip-surface calculations use the persistent front state above. The pure-bulk intervention activates the full-field Peierls--Taylor update and explicitly disables tip plasticity, so it replaces rather than adds the tip contribution. Tip-plus-bulk composes both owners. The cavity calculation is intentionally different: it uses the declared current-source full-topology owner, positive conservative vacancy transport, full-field accommodation, and an explicit global event scheduler. Results from these families are compared as controlled interventions, not described by one lifecycle equation.
+
+### 3.6 Cohesive energetic connection
+
+For cohesive free energy per area \(\phi(\delta)\), normal traction \(t_n\), and activation-patch area \(A_*\), a theoretical activation landscape is
+
+\[
+\mathcal F(\delta)=A_*[\phi(\delta)-t_n\delta],\qquad
+\Delta G_c^\ddagger=A_*\int_{\delta_m}^{\delta_s}[t_{\rm coh}(\delta)-t_n]\,d\delta . \qquad (11)
+\]
+
+This identity assumes a metastable minimum \(\delta_m\), saddle \(\delta_s\), and prescribed traction during the local activation. It motivates the barrier interpretation but is not substituted for the native numerical barrier. The FEM/CZM calculation uses hazard-triggered cohesive/topological insertion; its exported accepted state contains separated cohesive segments and physical-event grouping. It is not autonomous rate-independent cohesive failure.
+"""
+
+
+SI_METHODS = r"""## S2. Mechanical, stochastic, and state definitions
+
+The common specimen, loading convention, and \(K_J\) sign convention are defined by Eqs. (1)--(5) of the main text. Force is reported per unit out-of-plane thickness. \(J_{\rm signed}\) is the native signed domain integral and \(\varsigma\) selects positive forward mode-I release. The common-domain observer used for the elastic cross-code control is evaluated on identical nodes, elements, damage, elastic tensor, and supports.
+
+The opening mark is sampled once per renewal as \(\Xi=-\ln R\). The survival sum contains the represented discrete cleavage candidates. Persistent source population evolution is deterministic conditional on the current state and does not add another sampled point process. Event length is threshold-correlated by the native geometry law and is committed only after its opening clock crosses.
+
+## S3. Executed activation surfaces and bounds
+
+The EXP-floor surface is Eq. (4). The implementation uses \(T_{\rm ref}=481.33\) K, \(G_0\ge10^{-9}\) eV, \(\sigma_c\ge1\) Pa, and
+
+\[
+G_f=\min[0.95G_0,\max(10^{-4}\ {\rm eV},fG_0)] . \qquad (S1)
+\]
+
+Only \(\max(\sigma,0)\) enters this surface, and the exponent is clipped to \([-700,0]\). The DBTT emission stress scale reaches its 1 Pa lower bound near 1001 K. Consequently, the high-temperature branch samples a strongly softened, bounded emission surface; it is not a named-material DBTT prediction.
+
+## S4. Persistent source and signed process-zone operator
+
+The front state has two reduced slip systems and 80 bins over 50 µm. The executed source model is persistent_areal_sites_backstress_limited_no_inventory. Its multiplicity, implicit mean-population update, and complementarity gate are Eqs. (6) and (7). The source/channel value 141.0591 in Table S4 is a legacy-compatible parameter-field value and is not a finite consumable inventory in these runs. Runtime diagnostics require persistent_source_inventory_active=false and persistent_source_refresh_active=false.
+
+Activation-to-line-content factors come from the selected two-dimensional signed unit-perturbation kernel. Positive and negative mobile, retained, accumulated-slip, and wake arrays remain separate. The exact exchange in Eq. (8) is followed by physical mobile advection; escape, wake transfer, and discarded wake content have separate ledgers. The selected monotonic rows set explicit temporal mobile and retained recovery to zero. The vacancy-transport positivity operator used by the cavity calculation is a different conservative field operator and is not this dislocation exchange step.
+
+The selected Peierls and Taylor surfaces use the direct row parameters in Tables S3--S5, including their temperature/entropy terms and runtime bounds. Taylor completion supplies the retained-to-mobile release rate used in Eq. (8). Local adaptive integration accepts a full interval only when the full-step versus two-half-step state error is within the declared tolerance; the outer mechanics/event transaction then accepts or retries without partially committing geometry.
+
+## S5. Moving coordinate, geometry commitment, and observers
+
+The hazard-linear translation \(d\xi=L_c dB\) is an executed coarse-graining assumption. It translates signed state and accumulated slip into the wake but does not renew persistent sites. The sharp-wake geometry changes only at clock completion. \(J\), \(K_J\), reaction, and stress belong to their equilibrated or exact pre-event state; length belongs to the paired committed geometry. No post-commit \(K_J\) is assigned unless a new equilibrium was actually observed.
+
+The cavity family uses current-front ownership, positive conservative vacancy transport, and topology-specific candidates. A local nested \(J\) and a finite complete-ligament operation are different observables. Their ratio is not reported as a shielding factor.
+"""
+
 import argparse
 import csv
 import hashlib
@@ -17,6 +151,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -25,6 +160,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "fracture_final_current"
 REVIEW = ROOT / "review_packet/final_fracture_campaign_a5a5883"
+ACCEPTANCE = ROOT / "review_packet/publication_acceptance_0c72ca2b"
 PAPER = ROOT.parent / "fracture_only_arrhenius_paper"
 C19 = PAPER / "manuscript/c19"
 C19_ANALYSIS = PAPER / "analysis/c19_original_models_voiding_v1"
@@ -45,7 +181,7 @@ def copy(src: Path, dst: Path) -> None:
 
 ABSTRACT = """## Abstract
 
-Temperature and loading rate affect fracture through the competition between crack opening and crack-tip accommodation. We formulate both as conditional transition-state processes coupled to evolving two-dimensional mechanics and a front-local mobile/retained state. In 96 original spatial sharp-wake PF calculations, four fixed parameter rows produce abrupt transition-like elevation, broad accommodation-associated elevation, and predominantly softening responses without prescribing toughness curves. Matched opening-only controls show accommodation effects up to 156% for the DBTT row and 164% for the Peak row. Eight paired seeds at DBTT/1200 K and Peak/900 K give mean accommodation-associated first-event gaps of 32.45 and 34.74 MPa√m, respectively, much larger than their observed seed spreads. Rate, orientation, and source-geography tests show that these responses are state-path effects rather than universal temperature shifts. Developed DBTT trajectories reach 1.005 mm projected extension; their native pre-event J-derived coordinates form event-sampled resistance histories, not independent unload/reload R-curves. On a controlled common specimen, original PF and FEM/CZM calculations agree exactly in the elastic reference and differ by 0.62% in tip-only and 6.06% in full-field first-event K. A matched cavity continuation shows strong finite-window shielding: over 0.2 s the cavity-suppressed arm advances 80 µm while the cavity-enabled arm does not connect or advance. These results connect thermally activated separation, inherited accommodation, cohesive fracture, and evolving topology while retaining their distinct numerical representations and limits.
+Temperature and loading rate affect fracture through competition between crack opening and crack-tip accommodation. We formulate opening as a stochastic first-passage process coupled to persistent, reusable dislocation-source populations and evolving two-dimensional mechanics. In 96 original spatial sharp-wake calculations, four fixed constructed parameter rows produce transition-like elevation, broad accommodation-associated elevation, and predominantly softening responses without prescribing toughness curves. Matched opening-only controls show changes up to 156% for the DBTT row and 164% for the Peak row. Eight paired seeds at DBTT/1200 K and Peak/900 K give mean first-event gaps of 32.45 and 34.74 MPa√m, well above their observed seed spreads. Rate, orientation, and source-support tests show that the response is path dependent rather than a universal temperature shift. Developed trajectories reach 1.005 mm and provide event-conditioned resistance observations under monotonic loading. A common-specimen audit separates exact identical-mesh elastic agreement from systematic production differences in reaction and native J support. In a matched 0.2 s cavity continuation, the suppressed arm advances 80 µm whereas the enabled arm does not connect or advance; current native fields establish finite-window inhibition under the topology-aware candidate law, without equating unlike local and finite-ligament drives. The study therefore links thermally activated opening, inherited accommodation, cohesive topology, and cavities while stating the limits of each comparison.
 """
 
 
@@ -57,7 +193,7 @@ RESULTS = r"""## 5. Results
 
 **Figure 2.** Original spatial-PF first-event \(K_J\) for four fixed parameter rows, each evaluated at twelve temperatures with accommodation enabled and with the matched opening-only control. Every one of the 96 predeclared cases reached a physical first event under the common endpoint contract. Curves connect sampled temperatures within a fixed row and arm; they are not fits.
 
-The current calculation produces response magnitudes and shapes that supersede the historical draft curves. DBTT spans 22.08–55.11 MPa√m with accommodation enabled, compared with 20.54–23.23 MPa√m in the opening-only arm. Peak spans 22.17–54.90 MPa√m versus 19.35–23.33 MPa√m. Their largest paired elevations are 156.1% at DBTT/1050 K and 163.7% at Peak/900 K. Weak-T shows a broad elevation: 18.52–20.14 MPa√m enabled versus 12.71–13.15 MPa√m opening-only, with a maximum 53.4% effect at 600 K. Ceramic-like remains the lowest response and has a smaller maximum effect of 11.7% at 950 K.
+The four constructed rows produce distinct response magnitudes and shapes. DBTT spans 22.08–55.11 MPa√m with accommodation enabled, compared with 20.54–23.23 MPa√m in the opening-only arm. Peak spans 22.17–54.90 MPa√m versus 19.35–23.33 MPa√m. Their largest paired elevations are 156.1% at DBTT/1050 K and 163.7% at Peak/900 K. Weak-T shows a broad elevation: 18.52–20.14 MPa√m enabled versus 12.71–13.15 MPa√m opening-only, with a maximum 53.4% effect at 600 K. Ceramic-like remains the lowest response and has a smaller maximum effect of 11.7% at 950 K.
 
 The family names identify fixed constructed parameter rows, not calibrated materials. The comparison supports the mechanistic statement that inherited accommodation can overwhelm direct opening softening over parts of the temperature domain. It does not uniquely apportion the change among shielding, blunting, transport, and renewed source exposure.
 
@@ -95,27 +231,27 @@ Both trajectories contain 203 exact pre-event/committed pairs and reach 1004.926
 
 ![Selected native developed-growth fields.](figures/Figure_7_native_fields.png)
 
-**Figure 7.** Native original-PF field snapshots from the 1200 K developed trajectory at stored states 1, 1600, 1672, and 1703. Rows retain the original renderer's damage, log10 density, maximum-principal-stress, and equivalent-plastic-strain channels. The front-local population is not spread into a reconstructed two-dimensional density map.
+**Figure 7.** Native maximum-principal-stress and damage arrays from the DBTT/1200 K propagation calculation at a pre-event state, the first committed advance, and late propagation. The numerical sidecar gives each exact stored step, crack-tip coordinate, and the \(K_J\) associated with that stored equilibrium. No front-local population is spread into a reconstructed two-dimensional field.
 
 ### 5.5 A controlled PF–FEM/CZM comparison
 
 ![Common-specimen PF and FEM/CZM comparison.](figures/Figure_8_PF_FEM.png)
 
-**Figure 8.** First-event \(K_J\) for the matched Peak/1000 K, 0°, seed-8666 specimen with tip-only accommodation and with the selected full-field Peierls–Taylor bulk law. Bars are native first-event observations, not a fitted mapping. The identical-mesh accommodation-disabled elastic reference agrees exactly at all three imposed openings.
+**Figure 8.** Production-history reaction and native \(K_J\) at five common pre-event total openings for the Peak/1000 K, 0°, seed-8666 specimen. Tip-only and full-field states are shown separately. These are common-input comparisons, not a fitted mapping.
 
-The common plane-strain body is 2 mm by 4 mm with a 0.5 mm initial notch and symmetric total opening. On the same mesh and damage field, PF and FEM/CZM give bitwise-coincident reaction, stored energy, ahead-tip stress, common-domain \(J\), and \(K_J\). With tip-only accommodation, first-event \(K_J\) is 53.878 MPa√m for PF and 54.212 MPa√m for FEM/CZM, a 0.62% relative difference. With the exact selected bulk law active, the values are 51.110 and 54.407 MPa√m, a 6.06% difference. Within PF, the bulk law changes the first-event coordinate by −5.14%; within FEM/CZM it changes it by 0.36%.
+On an identical mesh and damage field, the accommodation-disabled reference gives coincident reaction, stored energy, ahead-tip stress, common-domain \(J\), and \(K_J\). The retained production histories do not retain that parity: from 0.2 to 12 µm opening, PF reaction is 1.0923 times FEM/CZM reaction. Native \(K_J^{\rm PF}/K_J^{\rm FEM}\) is 0.5865 for tip-only and approximately 0.4409 for full-field because the production observers use different supports. These differences are present before fracture and, in the tip-only case, before substantial population evolution. They therefore cannot be attributed to the bulk law alone.
 
-The agreement is in the selected fracture coordinate, not every native observable. Production meshes, J supports, topology backends, event lengths, and random-stream ownership differ, so total opening is reported in the SI but is not treated as a parity metric. The full-field FEM/CZM path completed four physical events and 20.827 µm projected extension. A later in-memory refinement-pointer audit failed after the physics completed; the persisted compact-mesh record verifies the 330 µm refinement radius and a fresh one-step run verifies the recovery. This is disclosed as an audit-export limitation rather than recast as a physical failure.
+The near agreement of the two native first-event coordinates at different openings is not used as mechanical validation. It is consistent with both hazards being driven by their own \(K_J\) coordinate. The supported comparison is narrower: the common operator reference is exact, while production discretization and observer support produce a systematic response difference that the retained runs do not supply a two-level backend-specific convergence sequence to eliminate. The FEM/CZM histories nevertheless contain four accepted physical events, 26 fully separated cohesive subsegments grouped by physical event, and 20.828 µm total cohesive length.
 
 ### 5.6 A resolved cavity shields the approach path over the matched window
 
 ![Native cavity and crack fields at the paired starting exposure.](figures/Figure_9_cavity_fields.png)
 
-**Figure 9.** Native accepted stress fields, crack graphs, and actual-radius cavity outlines from the qualified full-order DBTT/1200 K/seed-3621 ancestry used to establish the paired cavity calculation. Columns (a,e), (b,f), and (c,g) are the pre-event, both-advanced, and historical endpoint states; (d,h) show the endpoint ligament at actual scale. Panels (i–l) give the paired historical load/geometry histories. The plate documents resolved geometry and field provenance; the continued 0.2 s endpoint comparison is quantified from exact restored native checkpoints and Table S11.
+**Figure 9.** Current native maximum-principal-stress fields and crack graphs at the exact start and end checkpoints of the 0.2 s paired continuation. The enabled panels include actual-scale insets spanning the 7.4 µm solid ligament and resolved 42 nm cavity. The suppressed arm advances 80 µm; the enabled arm retains its starting front. Values and mesh sizes are supplied in the numerical sidecar.
 
 The enabled and suppressed arms were resumed from their exact paired checkpoint and loaded for 0.2 s at 1 µm s−1. Both end at 6.6010101 µm total opening. The suppressed arm accepts four ordinary 20 µm advances, increasing graph length by 80 µm. The enabled arm accepts no crack advance; its resolved cavity radius changes only from 42.4796461 to 42.4878668 nm and no crack–void connection forms. At the endpoint, the ordinary front has a valid nested-local-J drive of 4155.24 J m−2, \(K_{\rm eff}=30.9661\) MPa√m, and an effective rate of 3.996 s−1. The cavity approach candidate uses the qualified complete-ligament topology energy, 43.6472 J m−2, \(K_{\rm eff}=3.17371\) MPa√m, and a rate of \(5.39\times10^{-58}\) s−1.
 
-This is strong shielding over the declared finite exposure, not proof of permanent arrest or a general cavity-toughening law. The cavity predates the continuation, so the result does not predict nucleation. The exact terminal native states and topology counts were restored before an event-history JSON exporter failed on a barrier dataclass; therefore individual event times inside the final window are not claimed.
+The two quoted endpoint drives are unlike observables at already different geometries: nested local \(J\) for the ordinary front and a finite complete-ligament topology operation for the cavity approach. Their ratio is therefore not a shielding factor. The matched history establishes finite-window inhibition under the executed candidate and kinetic formulation, not permanent arrest, a universal toughening law, or an isolated geometry-only reduction. The cavity predates the continuation, so the result does not predict nucleation. Exact terminal states and topology counts survive; individual event times inside the final window are not reconstructed.
 
 ### 5.7 Branching and option-preserving restart scope
 
@@ -137,17 +273,17 @@ Loading rate changes time available to both opening and accommodation. Crystal r
 
 ### 6.3 Initiation, driving, and resistance require different stage associations
 
-The developed histories show why an initiation coordinate cannot be carried forward as a material resistance curve. \(J\) and \(K_J\) belong to exact equilibrated or pre-event mechanical states, whereas extension belongs to the subsequently committed geometry. Assigning a terminal K to an unobserved post-event state or interpolating across a discrete jump would invent data. The event-sampled resistance view retains the measured pre-event value across only its realized jump. Its broad range documents evolving mechanical conversion and inherited state, but a single monotonic segment cannot provide multiple independent unload/reload resistance points.
+The developed histories contain physically meaningful resistance information without requiring unload/reload compliance points. \(J\) and \(K_J\) belong to exact equilibrated or pre-event mechanical states, whereas extension belongs to the subsequently committed geometry. Assigning a terminal K to an unobserved post-event state or interpolating across a discrete jump would invent data. The event-conditioned view retains each measured pre-event value across only its realized jump and resolves chronological opening, reaction, extension, and a final-time zoom. Because the histories use one monotonic loading protocol with burst-like advances, they are path- and rate-conditioned resistance histories rather than protocol-independent material R-curves.
 
 ### 6.4 Cohesive and sharp-wake implementations share mechanics without being identical
 
-The identical-mesh elastic reference closes the geometry, boundary, unit, stiffness, and base-operator questions. The sub-percent tip-only and six-percent full-field first-event differences then quantify behavior after distinct crack and accommodation representations are activated. The sharp-wake PF implementation is not a variational AT1 or AT2 phase-field model: it carries a stiffness-degraded wake and commits explicit increments when an accumulated kinetic action reaches its mark. The FEM/CZM implementation represents separation through cohesive/topological events. Their agreement in \(K_J\) supports a common competing-kinetics organization, not equality of openings, event sizes, or internal states.
+The identical-mesh elastic reference closes the geometry, boundary, unit, stiffness, and base-operator questions. Production histories then show systematic reaction and native-observer differences at common openings. Near equality of first-event \(K_J\) at different openings is expected to be less discriminating because each hazard is driven by its own coordinate; it does not validate production mechanics. The sharp-wake PF implementation is not a variational AT1 or AT2 phase-field model: it carries a stiffness-degraded wake and commits explicit increments when an accumulated kinetic action reaches its mark. FEM/CZM represents hazard-triggered separation through cohesive/topological events. The accepted cohesive state verifies actual separation events, while the remaining production-mesh/support difference limits a stronger cross-code claim.
 
 Baseline AT2 uses \(w(d)=d^2\) and has no finite elastic onset because \(w'(0)=0\); AT1 uses \(w(d)=d\) and has a finite onset. Both can be extended with thermal, viscous, or plastic physics. The present distinction is the explicit physical-time first-passage law coupled to inherited accommodation, not a claim that thermal activation is unavailable to conventional phase field or cohesive fracture.
 
 ### 6.5 Cavities change the admissible drive and event competition
 
-The cavity result is qualitative and large over its finite window: the ordinary front advances while the cavity approach candidate remains effectively inactive. The important coupling is not cavity span alone but the topology-aware mechanical observer. A contour intersecting a free cavity cannot be used as an ordinary local crack-tip derivative. The qualified complete-ligament operation supplies the admissible approach drive without counting cavity free span as fractured solid. Because the continuation begins with a pre-existing resolved cavity and ends without connection, it establishes finite-window shielding, not nucleation, coalescence, or permanent arrest.
+The cavity result is qualitative and large over its finite window: the suppressed ordinary front advances while the enabled cavity-approach candidate remains inactive. The important coupling is not cavity span alone but the topology-aware mechanical observer. A contour intersecting a free cavity cannot be used as an ordinary local crack-tip derivative. The qualified complete-ligament operation supplies an admissible approach drive without counting cavity free span as fractured solid, but it is not commensurate with the suppressed arm's terminal local \(J\). The calculation therefore establishes finite-window inhibition under the selected candidate law, with field redistribution and candidate-definition effects not independently decomposed.
 
 ### 6.6 Limitations
 
@@ -159,8 +295,8 @@ The parameter rows are constructed and uncalibrated. The accommodation variables
 2. At DBTT/1200 K and Peak/900 K, the accommodation-associated gaps are much larger than the observed spread across eight paired seeds, although distribution tails and other temperatures remain unresolved.
 3. Rate, orientation, and source geography act through the evolving state path. Their effects cannot be represented by a universal horizontal shift or additive source-density correction.
 4. Developed 1 mm trajectories require stage-faithful reporting: the native pre-event coordinates form an event-sampled monotonic resistance history, not independent unload/reload R-curve points.
-5. Original PF and FEM/CZM calculations share exact elastic mechanics on the common reference and give first-event \(K_J\) within 0.62% for tip-only and 6.06% for full-field accommodation, while retaining distinct openings and topology.
-6. In the matched finite cavity continuation, the suppressed arm advances 80 µm and the enabled arm does not advance or connect; the resolved cavity strongly shields the approach candidate over 0.2 s but does not establish permanent arrest.
+5. Original PF and FEM/CZM calculations share exact elastic mechanics on the identical-mesh reference, but production histories differ systematically in reaction and native \(J\) support at common openings; close event coordinates alone do not validate production mechanics.
+6. In the matched finite cavity continuation, the suppressed arm advances 80 µm and the enabled arm does not advance or connect; this establishes finite-window inhibition under the executed topology-aware candidate law, not a ratio-based shielding factor or permanent arrest.
 
 ## Data and code availability
 
@@ -209,12 +345,14 @@ The paths have one monotonic loading segment and zero independent reload-resista
 
 The shared specimen is plane strain, 2 mm × 4 mm, with a 0.5 mm initial notch and total opening imposed as +U/2 and −U/2. Force is per unit out-of-plane thickness. Identical-mesh elastic calculations match reaction, stored energy, ahead-tip stress, common-domain J, and K at total openings 0.2, 10, and 30 µm with maximum relative difference zero at stored precision.
 
-| Scope | PF first-event K | FEM/CZM first-event K | relative difference | PF / FEM opening |
-|---|---:|---:|---:|---:|
-| Tip-only | 53.878 | 54.212 | 0.62% | 31.723 / 18.720 µm |
-| Full-field | 51.110 | 54.407 | 6.06% | 26.610 / 12.492 µm |
+The production histories were additionally compared at common pre-event openings of 0.2, 2, 5, 10, and 12 µm. Across these points, the PF/FEM reaction ratio is 1.09227. The native PF/FEM \(K_J\) ratio is 0.58646 for tip-only and 0.44091 for full-field states, reflecting different production observer supports. The differences exist before fracture and cannot be inferred from event endpoints at different openings.
 
-K values are MPa√m. Openings are native observations, not parity metrics. The original PF uses a sharp-wake increment, while FEM/CZM uses adaptive cohesive topology; production meshes and J supports differ.
+| Scope | PF first-event K | FEM/CZM first-event K | PF / FEM event opening |
+|---|---:|---:|---:|
+| Tip-only | 53.878 | 54.212 | 31.723 / 18.720 µm |
+| Full-field | 51.110 | 54.407 | 26.610 / 12.492 µm |
+
+K values are MPa√m. The event values are reported as native first-passage observations, not parity metrics. The retained production data do not contain a two-level mesh sequence for each backend, so no production convergence rate is claimed. The FEM/CZM accepted state contains four physical events, 26 fully separated numerical cohesive subsegments, and 20.828 µm total cohesive length.
 
 ## S11. Recovered physical cavity continuation
 
@@ -247,6 +385,11 @@ def build_manuscript() -> str:
     title = old.split("## Abstract", 1)[0]
     intro_methods = old.split("## 1. Introduction", 1)[1].split("## 5. Results", 1)[0]
     intro_methods = "## 1. Introduction" + intro_methods
+    intro_methods = (
+        intro_methods.split("## 3. Competing-kinetics framework", 1)[0]
+        + METHODS + "\n\n## 4. Calculation program"
+        + intro_methods.split("## 4. Calculation program", 1)[1]
+    )
     intro_methods = intro_methods.replace("../../figures/experimental/", "figures/")
     intro_methods = intro_methods.replace("Figure_1A_Ag_plastic_sequence.png", "Figure_1_experimental.png")
     intro_methods = intro_methods.replace(
@@ -269,6 +412,11 @@ def build_si() -> str:
     # and parameter definitions.  Historical C19 response tables S7--S12 are
     # deliberately excluded rather than silently pooled with the current campaign.
     methods = old.split("## S7. State measurements", 1)[0].rstrip()
+    methods = (
+        methods.split("## S2. Mechanical problem and loading", 1)[0]
+        + SI_METHODS + "\n\n## S6. Material parameters"
+        + methods.split("## S6. Material parameters", 1)[1]
+    )
     energetic = old.split("## S13. Cohesive and energetic comparison", 1)[1].split("## S14. Data and reproduction statement", 1)[0]
     energetic = "## S13. Cohesive and energetic comparison" + energetic
     energetic = energetic.replace("../../analysis/branching_fields/Figure_8_accepted_branching_full_fields_v2.png", "figures/Figure_10_branching.png")
@@ -393,11 +541,46 @@ def add_run(p, text: str, bold=False, italic=False, size=None):
     t = ET.SubElement(r, q(W, "t")); t.set("{http://www.w3.org/XML/1998/namespace}space", "preserve"); t.text = text
 
 
+def latex_to_omml(expression: str) -> ET.Element:
+    """Convert LaTeX through MathML and Microsoft's MathML-to-OMML XSLT."""
+    try:
+        from latex2mathml.converter import convert
+    except ImportError as exc:
+        raise RuntimeError(
+            "DOCX math conversion requires latex2mathml (pip install latex2mathml)"
+        ) from exc
+    mathml = convert(expression.strip())
+    stylesheets = [
+        Path("/Applications/Microsoft Word.app/Contents/Resources/mathml2omml.xsl"),
+        ROOT / "tools" / "mathml2omml.xsl",
+    ]
+    stylesheet = next((path for path in stylesheets if path.is_file()), None)
+    if stylesheet is None:
+        raise RuntimeError("Microsoft mathml2omml.xsl was not found")
+    completed = subprocess.run(
+        ["xsltproc", str(stylesheet), "-"], input=mathml,
+        text=True, capture_output=True, check=True,
+    )
+    return ET.fromstring(completed.stdout)
+
+
+def add_rich_text(p, text: str, *, bold=False, italic=False, size=None):
+    """Emit ordinary text and every inline ``\\(...\\)`` span as real OMML."""
+    cursor = 0
+    for match in re.finditer(r"\\\((.+?)\\\)", text):
+        if match.start() > cursor:
+            add_run(p, text[cursor:match.start()], bold=bold, italic=italic, size=size)
+        p.append(latex_to_omml(match.group(1)))
+        cursor = match.end()
+    if cursor < len(text):
+        add_run(p, text[cursor:], bold=bold, italic=italic, size=size)
+
+
 def para(parent, text="", style=None, bold=False, italic=False):
     p = ET.SubElement(parent, q(W, "p"))
     if style:
         pp = ET.SubElement(p, q(W, "pPr")); ET.SubElement(pp, q(W, "pStyle"), {q(W, "val"): style})
-    add_run(p, text, bold=bold, italic=italic)
+    add_rich_text(p, text, bold=bold, italic=italic)
     return p
 
 
@@ -422,7 +605,8 @@ def add_picture(body, rid: str, path: Path, docpr_id: int):
 
 
 def add_math(body, expression: str):
-    omp = ET.SubElement(body, q(M, "oMathPara")); om = ET.SubElement(omp, q(M, "oMath")); mr = ET.SubElement(om, q(M, "r")); mt = ET.SubElement(mr, q(M, "t")); mt.text = expression
+    omp = ET.SubElement(body, q(M, "oMathPara"))
+    omp.append(latex_to_omml(expression))
 
 
 def add_table(body, rows: list[list[str]]):
@@ -479,7 +663,7 @@ def build_docx(manuscript: str, si: str, out: Path) -> dict:
             z.writestr(info, payload)
         zput("[Content_Types].xml", ET.tostring(types, encoding="utf-8", xml_declaration=True)); zput("_rels/.rels", pkg_rels); zput("word/document.xml", ET.tostring(document, encoding="utf-8", xml_declaration=True)); zput("word/styles.xml", styles); zput("word/_rels/document.xml.rels", ET.tostring(rel_root, encoding="utf-8", xml_declaration=True))
         for idx, (_, path) in enumerate(relationships, 1): zput(f"word/media/image{idx}.png", path.read_bytes())
-    return {"embedded_images": len(relationships), "native_math_objects": eq_count, "editable_tables": table_count}
+    return {"embedded_images": len(relationships), "native_display_math_objects": eq_count, "editable_tables": table_count}
 
 
 def validate_docx(path: Path, expected: dict) -> dict:
@@ -494,10 +678,46 @@ def validate_docx(path: Path, expected: dict) -> dict:
         targets = [r.attrib["Target"] for r in rels if r.attrib.get("Type", "").endswith("/image")]
         for target in targets:
             if "word/" + target not in names: errors.append(f"missing image target {target}")
-        stats = {"paragraphs": len(doc.findall(".//" + q(W, "p"))), "embedded_images": len(doc.findall(".//" + q(A, "blip"))), "native_math_objects": len(doc.findall(".//" + q(M, "oMathPara"))), "editable_tables": len(doc.findall(".//" + q(W, "tbl")))}
+        ordinary_text = "".join(node.text or "" for node in doc.findall(".//" + q(W, "t")))
+        math_text = "".join(node.text or "" for node in doc.findall(".//" + q(M, "t")))
+        unresolved = sorted(set(re.findall(r"\\(?:frac|sqrt|int|sum|max|exp|left|right|rm|mathrm|mathcal|qquad)|\\\(|\\\)", ordinary_text + math_text)))
+        stats = {
+            "paragraphs": len(doc.findall(".//" + q(W, "p"))),
+            "embedded_images": len(doc.findall(".//" + q(A, "blip"))),
+            "native_display_math_objects": len(doc.findall(".//" + q(M, "oMathPara"))),
+            "native_math_objects": len(doc.findall(".//" + q(M, "oMath"))),
+            "structured_fractions": len(doc.findall(".//" + q(M, "f"))),
+            "structured_radicals": len(doc.findall(".//" + q(M, "rad"))),
+            "structured_subscripts": len(doc.findall(".//" + q(M, "sSub"))),
+            "structured_superscripts": len(doc.findall(".//" + q(M, "sSup"))),
+            "structured_nary": len(doc.findall(".//" + q(M, "nary"))),
+            "editable_tables": len(doc.findall(".//" + q(W, "tbl"))),
+            "unresolved_tex_tokens": unresolved,
+        }
+        if unresolved:
+            errors.append(f"unresolved TeX tokens: {unresolved}")
+        for required in ("structured_fractions", "structured_radicals", "structured_subscripts", "structured_nary"):
+            if stats[required] <= 0:
+                errors.append(f"missing {required}")
         for key, value in expected.items():
             if stats.get(key) != value: errors.append(f"{key}: expected {value}, found {stats.get(key)}")
-    return {"schema": "fracture-docx-validation/1", "file": path.name, "sha256": sha256(path), "size_bytes": path.stat().st_size, "package_zip_valid": not errors, "xml_and_relationships_valid": not errors, "microsoft_word_open_test_performed": False, "stats": stats, "errors": errors, "status": "PASS" if not errors else "FAIL"}
+    return {
+        "schema": "fracture-docx-validation/1",
+        "file": path.name,
+        "sha256": sha256(path),
+        "size_bytes": path.stat().st_size,
+        "package_zip_valid": not errors,
+        "xml_and_relationships_valid": not errors,
+        "microsoft_word_open_test_performed": False,
+        "renderer_checks": {
+            "textutil_html_parse": "PASS",
+            "microsoft_word_session": "UNAVAILABLE; the installed application did not open either this file or a known control DOCX in the current GUI session",
+            "page_by_page_visual_review": "NOT_CLAIMED",
+        },
+        "stats": stats,
+        "errors": errors,
+        "status": "PASS" if not errors else "FAIL",
+    }
 
 
 def write_json(path: Path, data) -> None: path.parent.mkdir(parents=True, exist_ok=True); path.write_text(json.dumps(data, indent=2) + "\n")
@@ -510,21 +730,23 @@ def main() -> int:
         if stale.exists(): stale.unlink()
     figure_map = {
         PAPER / "figures/experimental/Figure_1A_Ag_plastic_sequence.png": "Figure_1_experimental.png",
-        REVIEW / "PF_BASELINE_96_FIRST_EVENT.png": "Figure_2_PF_baseline_96.png",
-        REVIEW / "PF_FOCUSED_SEEDS.png": "Figure_3_PF_focused_seeds.png",
+        ACCEPTANCE / "Figure_2_PF_baseline_96.png": "Figure_2_PF_baseline_96.png",
+        ACCEPTANCE / "Figure_3_PF_focused_gaps.png": "Figure_3_PF_focused_seeds.png",
         REVIEW / "PF_RATE_SENSITIVITY.png": "Figure_4a_PF_rate.png",
         REVIEW / "PF_ORIENTATION_SENSITIVITY.png": "Figure_4b_PF_orientation.png",
         REVIEW / "PF_SOURCE_GEOGRAPHY.png": "Figure_4c_PF_source.png",
-        REVIEW / "DEVELOPED_DRIVING_HISTORY.png": "Figure_5_developed_driving.png",
+        ACCEPTANCE / "Figure_5_developed_physical_history.png": "Figure_5_developed_driving.png",
         REVIEW / "DEVELOPED_RESISTANCE.png": "Figure_6_developed_resistance.png",
-        ROOT / "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/field_snapshots_1200K.png": "Figure_7_native_fields.png",
+        ACCEPTANCE / "Figure_7_native_fields.png": "Figure_7_native_fields.png",
         PAPER / "analysis/branching_fields/Figure_8_accepted_branching_full_fields_v2.png": "Figure_10_branching.png",
         PAPER / "figures/experimental/Figure_1B_Ag_limited_plasticity_sequence.png": "Figure_S1_experimental_companion.png",
     }
     for src, name in figure_map.items(): copy(src, OUT / "figures" / name)
-    generate_cavity_figure(OUT / "figures/Figure_9_cavity_fields.png")
-    generate_comparison_figure(OUT / "figures/Figure_8_PF_FEM.png")
-    data_files = list(REVIEW.glob("*.csv")) + list((C19_ANALYSIS / "data").glob("*.csv"))
+    copy(ACCEPTANCE / "Figure_9_current_cavity_fields.png", OUT / "figures/Figure_9_cavity_fields.png")
+    copy(ACCEPTANCE / "Figure_9_current_cavity_fields.pdf", OUT / "figures/Figure_9_cavity_fields.pdf")
+    copy(ACCEPTANCE / "Figure_8_PF_FEM_production.png", OUT / "figures/Figure_8_PF_FEM.png")
+    copy(ACCEPTANCE / "Figure_8_PF_FEM_production.pdf", OUT / "figures/Figure_8_PF_FEM.pdf")
+    data_files = list(REVIEW.glob("*.csv")) + list(ACCEPTANCE.glob("*.csv")) + list((C19_ANALYSIS / "data").glob("*.csv"))
     for src in data_files:
         dst = OUT / "figure_data" / src.name
         dst.write_bytes(src.read_bytes().replace(b"\r\n", b"\n"))
@@ -540,15 +762,19 @@ def main() -> int:
     if backup_receipt.exists():
         copy(backup_receipt, OUT / "reproducibility/BACKUP_AND_RESTORE_RECEIPT.json")
     for src in [REVIEW / "PF_BASELINE_96.json", REVIEW / "PF_FOCUSED_SEEDS.json", REVIEW / "PF_SENSITIVITIES.json", REVIEW / "DEVELOPED_GROWTH_RESISTANCE.json", REVIEW / "PF_FEM_FINAL_FRACTURE_COMPARISON.json", REVIEW / "CAVITY_INTERACTION_0P2S_RECOVERED.json", REVIEW / "V36_ACTIVE_RESTART.json", REVIEW / "BRANCH_CAVITY_COMPATIBILITY.json"]: copy(src, OUT / "methods/model_and_observer_contracts" / src.name)
+    for src in [ACCEPTANCE / "METHOD_TO_RESULT_MAP.json", ACCEPTANCE / "METHOD_TO_RESULT_MAP.md", ACCEPTANCE / "PF_FEM_PRODUCTION_COMMON_LOAD.json", ACCEPTANCE / "FIGURE_3_ESTIMATOR_CHECK.json"]:
+        copy(src, OUT / "methods/model_and_observer_contracts" / src.name)
     doc_stats = build_docx(manuscript, si, OUT / "manuscript_and_SI.docx")
     validation = validate_docx(OUT / "manuscript_and_SI.docx", doc_stats); write_json(OUT / "reproducibility/DOCX_VALIDATION.json", validation)
+    (OUT / "reproducibility/requirements-docx.txt").write_text("latex2mathml==3.81.1\n")
     claims = {
         "baseline_96": {"claim": "all 96 cases fractured; reported row ranges", "evidence": "methods/model_and_observer_contracts/PF_BASELINE_96.json", "plot": "figures/Figure_2_PF_baseline_96.png"},
         "paired_seeds": {"claim": "eight paired seeds per active anchor and reported intervals", "evidence": "methods/model_and_observer_contracts/PF_FOCUSED_SEEDS.json", "plot": "figures/Figure_3_PF_focused_seeds.png"},
         "sensitivities": {"claim": "40 rate/orientation/source cases", "evidence": "methods/model_and_observer_contracts/PF_SENSITIVITIES.json"},
         "developed_growth": {"claim": "203 events and 1004.926 µm projected extension per path", "evidence": "methods/model_and_observer_contracts/DEVELOPED_GROWTH_RESISTANCE.json"},
-        "pf_fem": {"claim": "exact elastic control; 0.62% and 6.06% first-event differences", "evidence": "methods/model_and_observer_contracts/PF_FEM_FINAL_FRACTURE_COMPARISON.json"},
-        "cavity": {"claim": "80 µm suppressed-arm advance versus zero enabled-arm advance over 0.2 s", "evidence": "methods/model_and_observer_contracts/CAVITY_INTERACTION_0P2S_RECOVERED.json"},
+        "method_binding": {"claim": "paper PF families execute persistent reusable sources; cavity intentionally uses current-source topology ownership", "evidence": "methods/model_and_observer_contracts/METHOD_TO_RESULT_MAP.json"},
+        "pf_fem": {"claim": "exact identical-mesh elastic control; systematic production common-opening response differences; accepted cohesive topology events", "evidence": "methods/model_and_observer_contracts/PF_FEM_PRODUCTION_COMMON_LOAD.json", "data": "figure_data/PF_FEM_COMMON_LOAD.csv"},
+        "cavity": {"claim": "80 µm suppressed-arm advance versus zero enabled-arm advance over 0.2 s; unlike terminal drives are not ratioed", "evidence": "methods/model_and_observer_contracts/CAVITY_INTERACTION_0P2S_RECOVERED.json", "field_data": "figure_data/CAVITY_CURRENT_FIELD_SIDECAR.csv"},
         "restart_options": {"claim": "exact populated V3.6 and combined branch-cavity restart", "evidence": ["methods/model_and_observer_contracts/V36_ACTIVE_RESTART.json", "methods/model_and_observer_contracts/BRANCH_CAVITY_COMPATIBILITY.json"]},
     }
     write_json(OUT / "reproducibility/CLAIM_TO_EVIDENCE_INDEX.json", {"schema": "fracture-claim-index/1", "claims": claims})
@@ -556,13 +782,35 @@ def main() -> int:
     for path in sorted(p for p in OUT.rglob("*") if p.is_file() and p.name != "SOURCE_AND_INPUT_MANIFEST.json"):
         manifest.append({"path": str(path.relative_to(OUT)), "bytes": path.stat().st_size, "sha256": sha256(path)})
     write_json(OUT / "reproducibility/SOURCE_AND_INPUT_MANIFEST.json", {"schema": "fracture-release-manifest/1", "generated_utc": datetime.now(timezone.utc).isoformat(), "source_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), "files": manifest, "raw_roots": ["integration_evidence/final_fracture_campaign", "integration_evidence/current_science_pilots_6abbf10", "integration_evidence/branch_cavity_bb0c21d9", "integration_evidence/v36_active_restart_340727f7"]})
-    readme = """# Final fracture study package\n\nThis compact release contains the external-reader manuscript, Supporting Information, figures and numerical figure data. The Word file is self-contained and has embedded PNG figures, editable Word tables, and native OOXML math objects. Its package and relationships are validated in `reproducibility/DOCX_VALIDATION.json`; Microsoft Word itself was not invoked.\n\nFull native meshes, histories, and checkpoints remain in the hashed evidence roots listed by the manifest. Run `campaign/run_or_resume.py --audit-only` from the repository root to audit campaign status. HTML previews are in `previews/`.\n\nThe paper uses only original full spatial PF or original FEM/CZM numerical evidence. Historical field plates retained for geometry/provenance are labeled explicitly and are not pooled with the current quantitative curves.\n"""
+    readme = """# Final fracture study package\n\nThis compact release contains the external-reader manuscript, Supporting Information, figures and numerical figure data. The Word file is self-contained and has embedded PNG figures, editable Word tables, and native structured OOXML equations. Its package and relationships are validated in `reproducibility/DOCX_VALIDATION.json`; a `textutil` parse passed, but a page-by-page Microsoft Word render is not claimed because the installed Word session did not open either the release or a known control DOCX.\n\nFull native meshes, histories, and checkpoints remain in the hashed evidence roots listed by the manifest. Run `campaign/run_or_resume.py --audit-only` from the repository root to audit campaign status. HTML previews are in `previews/`. Regenerating the structured equations requires `latex2mathml` (pinned in `reproducibility/requirements-docx.txt`), `xsltproc`, and Microsoft Word's installed `mathml2omml.xsl`; the generated DOCX itself has no runtime dependency.\n\nThe paper uses only original full spatial PF or original FEM/CZM numerical evidence. Historical field plates retained for geometry/provenance are labeled explicitly and are not pooled with the current quantitative curves.\n"""
     (OUT / "README.md").write_text(readme)
-    report = """# Final scientific report\n\nThe completed study supports a forward fracture interpretation based on conditional opening action competing with inherited accommodation. The current 96-case PF campaign replaces the older response magnitudes: DBTT and Peak reach approximately 55 MPa√m, with selected accommodation effects above 150%, while Weak-T is broadly elevated and Ceramic-like remains comparatively modest. Eight-seed paired results resolve the active-anchor effect relative to observed stochastic spread.\n\nDeveloped DBTT paths reach 1.005 mm projected extension and are reported through separate chronological driving and exact pre-event resistance views. The common-specimen study closes the base-mechanics discrepancy: PF and FEM/CZM are identical on the elastic control and give first-event K within 0.62% (tip-only) and 6.06% (full field). The repaired cavity continuation changes the physical conclusion from the historical small timing offset: during the qualified final 0.2 s, the resolved cavity strongly shields the approach path, while the suppressed arm advances 80 µm. This does not establish permanent arrest or nucleation.\n\nNo irreducible constitutive decision remains for the stated paper scope. Main limitations are constructed material rows, coarse-grained accommodation, two eight-seed anchors, local sensitivity matrices, backend-specific openings, a single paired cavity realization, and unavailable inner event times after the cavity exporter-only failure.\n"""
+    report = """# Final scientific report\n\nThe equation audit establishes that the retained baseline, seed, rate, orientation, source-support, developed-growth, and PF companion families execute the persistent reusable source law. Earlier finite-inventory and advance-refresh prose was stale; no trajectory was rerun. The cavity family intentionally uses the separate current-source topology owner.\n\nThe 96-case campaign remains the principal result: DBTT and Peak reach approximately 55 MPa√m, with selected accommodation effects above 150%, while Weak-T is broadly elevated and Ceramic-like remains comparatively modest. Eight paired seeds resolve the active-anchor effect relative to observed stochastic spread. Developed paths reach 1.005 mm and are reported as chronological and event-conditioned monotonic resistance histories.\n\nThe common-specimen comparison is narrower than the prior release claimed. Identical-mesh elastic mechanics is exact, but production histories show a 1.0923 PF/FEM reaction ratio and support-dependent native K ratios at common openings. Close first-event coordinates at different openings are not mechanical validation. The FEM/CZM paths do contain four accepted physical events and 26 fully separated cohesive subsegments.\n\nThe exact cavity checkpoints establish 80 µm suppressed-arm advance versus zero enabled-arm advance over 0.2 s. Current stress fields show the evolved geometry. Because the terminal local-J and complete-ligament drives are unlike observables at different geometries, their ratio is not a shielding factor; the supported claim is finite-window inhibition under the executed topology-aware candidate law.\n"""
     (OUT / "FINAL_SCIENTIFIC_REPORT.md").write_text(report)
     copy(ROOT / "finalization_control/DECISIONS.md", OUT / "author_record/DECISIONS.md")
     for clean_text in [OUT / "FINAL_ACCEPTANCE.json", OUT / "author_record/DECISIONS.md"]:
         clean_text.write_text(clean_text.read_text().rstrip() + "\n")
+    # Synchronize only after every reader-facing byte is fixed.  The manifest
+    # deliberately excludes itself and the archive that contains it.
+    portable = OUT / "reproducibility.zip"
+    if portable.exists():
+        portable.unlink()
+    manifest = []
+    for path in sorted(p for p in OUT.rglob("*") if p.is_file() and p.name not in {"SOURCE_AND_INPUT_MANIFEST.json", "reproducibility.zip", "reproducibility.zip.sha256"}):
+        manifest.append({"path": str(path.relative_to(OUT)), "bytes": path.stat().st_size, "sha256": sha256(path)})
+    write_json(OUT / "reproducibility/SOURCE_AND_INPUT_MANIFEST.json", {
+        "schema": "fracture-release-manifest/2",
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "producer_source_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+        "analysis_source": "scripts/build_publication_acceptance_evidence.py",
+        "report_source": "scripts/build_final_fracture_package.py",
+        "excluded_self_referential_files": ["reproducibility/SOURCE_AND_INPUT_MANIFEST.json", "reproducibility.zip", "reproducibility.zip.sha256"],
+        "files": manifest,
+        "raw_roots": ["integration_evidence/final_fracture_campaign", "integration_evidence/current_science_pilots_6abbf10", "integration_evidence/branch_cavity_bb0c21d9", "integration_evidence/v36_active_restart_340727f7"],
+    })
+    with ZipFile(portable, "w", ZIP_DEFLATED) as archive:
+        for path in sorted(p for p in OUT.rglob("*") if p.is_file() and p not in {portable, OUT / "reproducibility.zip.sha256"}):
+            archive.write(path, Path("fracture_final_current") / path.relative_to(OUT))
+    (OUT / "reproducibility.zip.sha256").write_text(f"{sha256(portable)}  reproducibility.zip\n")
     if validation["status"] != "PASS": raise RuntimeError(validation)
     print(json.dumps({"output": str(OUT), "docx": validation, "manifest_files": len(manifest)}, indent=2))
     return 0
