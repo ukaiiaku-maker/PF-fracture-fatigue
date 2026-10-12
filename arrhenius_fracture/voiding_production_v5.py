@@ -2459,8 +2459,10 @@ def _source_identity(state, tensor, *, source_kind, source_front_id=None,
         "source_probe_identity": source_probe_identity,
     }
     if source_load_payload is not None:
+        physical_load_identity = _directional_rate_source_identity(source_load_payload)
         identity["source_load_fingerprint"] = hashlib.sha256(
-            json.dumps(source_load_payload, sort_keys=True, separators=(",", ":"), default=str).encode()
+            json.dumps(physical_load_identity, sort_keys=True,
+                       separators=(",", ":"), default=str).encode()
         ).hexdigest()
     return identity
 

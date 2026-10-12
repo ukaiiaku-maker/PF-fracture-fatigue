@@ -1,10 +1,12 @@
 import pytest
+from types import SimpleNamespace
 
 from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
 from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
 from arrhenius_fracture.unified_fracture_material_v5 import material_bundle
 from arrhenius_fracture.voiding_production_v5 import (
-    _directional_rate_source_identity, build_production_void_state, observables,
+    _directional_rate_source_identity, _source_identity,
+    build_production_void_state, observables,
 )
 from arrhenius_fracture.shared_v5_cavity_adapter import (
     TRANSPORT_BOUND_FAILURE, TRANSPORT_PICARD_FAILURE,
@@ -96,6 +98,12 @@ def test_directional_clock_identity_excludes_numerical_cache_diagnostics():
     assert _directional_rate_source_identity([first]) == (
         _directional_rate_source_identity([second])
     )
+    state = SimpleNamespace(crack_network=SimpleNamespace(geometry_generation=3))
+    assert _source_identity(
+        state, None, source_kind="sharp_front", source_load_payload=[first],
+    )["source_load_fingerprint"] == _source_identity(
+        state, None, source_kind="sharp_front", source_load_payload=[second],
+    )["source_load_fingerprint"]
 
 
 @pytest.mark.parametrize("field,replacement", [
