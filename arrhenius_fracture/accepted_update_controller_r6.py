@@ -6,7 +6,11 @@ from dataclasses import dataclass
 import math
 from typing import Any
 
+import numpy as np
+
+from .reduced_persistent_reference_r2 import advance_signed
 from .state_correspondence_r5 import advance_fixed_horizon
+from .stochastic_avalanche_tip import pending_geometry_event_scope
 
 
 MODEL_ID = "r6.transactional-current-source-refresh/1"
@@ -21,6 +25,15 @@ class SourceRefreshTolerance:
     action_absolute: float = 1.0e-8
     event_time_relative: float = 1.0e-5
     maximum_depth: int = 12
+
+
+@dataclass(frozen=True)
+class EventAwareAcceptedUpdate:
+    engine: Any
+    result: dict[str, Any]
+    geometry_events: tuple[dict[str, Any], ...]
+    consumed_s: float
+    audit: dict[str, Any]
 
 
 def _observables(engine: Any, parent: Any, duration: float,
@@ -164,6 +177,162 @@ def advance_current_source_adaptive(
     }
 
 
+def _resolved_state(engine: Any, result: dict[str, Any]) -> dict[str, Any]:
+    """Mechanically relevant state, retaining signed and bin resolution."""
+    arrays = {}
+    for name, value in vars(engine.mpz).items():
+        if isinstance(value, np.ndarray) and any(token in name for token in (
+            "mobile", "retained", "slip", "wake", "source", "backstress",
+        )):
+            arrays[name] = np.asarray(value, float).copy()
+    scalars = {
+        "gross_source": float(engine.mpz.cumulative_gross_source_activity),
+        "gross_return": float(engine.mpz.cumulative_gross_return_activity),
+        "permanent_slip": float(engine.mpz.local_slip_count()),
+        "radius_m": float(engine.r_eff()),
+        "hazard_action": float(result["hazard_action_current"]),
+        "gross_rate_s": float(result.get("gross_source_rate_s", 0.0)),
+        "returned_rate_s": float(result.get("gross_return_rate_s", 0.0)),
+        "sigma_tip_Pa": float(result.get("sigma_tip", 0.0)),
+    }
+    return {"arrays": arrays, "scalars": scalars}
+
+
+def advance_current_source_to_earliest_event(
+    engine: Any, *, applied_K_Pa_sqrt_m: float, temperature_K: float,
+    duration_s: float, tolerance: SourceRefreshTolerance = SourceRefreshTolerance(),
+) -> EventAwareAcceptedUpdate:
+    """Accepted source update that never consumes beyond its earliest event.
+
+    This is the production-preview counterpart of the fixed-horizon R6
+    controller.  Rejected full and split trials own independent random and
+    descriptor state.  The accepted split path stops at its first native event;
+    it never advances an event remainder that belongs to the coupled scheduler.
+    """
+    requested = float(duration_s)
+    if not math.isfinite(requested) or requested <= 0.0:
+        raise ValueError("duration must be positive and finite")
+    records: list[dict[str, Any]] = []
+    trial_count = 0
+
+    def one(parent: Any, dt: float):
+        nonlocal trial_count
+        trial_count += 1
+        trial = copy.deepcopy(parent)
+        with pending_geometry_event_scope() as pending:
+            result = advance_signed(
+                trial, K_Pa_sqrt_m=float(applied_K_Pa_sqrt_m),
+                temperature_K=float(temperature_K), dt_s=float(dt),
+            )
+            events = tuple(copy.deepcopy(item) for item in pending)
+        return trial, result, events, float(result["kinetic_dt_consumed_s"])
+
+    def composed_half(parent: Any, dt: float):
+        first = one(parent, 0.5*dt)
+        if bool(first[1]["fired"]):
+            return first
+        second = one(first[0], 0.5*dt)
+        return second[0], second[1], first[2]+second[2], 0.5*dt+second[3]
+
+    def compare(full, half, dt: float):
+        left = _resolved_state(full[0], full[1])
+        right = _resolved_state(half[0], half[1])
+        errors: dict[str, float] = {}
+        array_error = 0.0
+        names = sorted(set(left["arrays"]) | set(right["arrays"]))
+        for name in names:
+            a = left["arrays"].get(name)
+            b = right["arrays"].get(name)
+            if a is None or b is None or a.shape != b.shape:
+                array_error = math.inf
+                break
+            array_error = max(array_error, float(np.max(np.abs(a-b))) /
+                              max(float(np.max(np.abs(a))),
+                                  float(np.max(np.abs(b))), 100.0))
+        errors["signed_bin_resolved_population_slip"] = array_error
+        for key in ("gross_source", "gross_return", "permanent_slip"):
+            a, b = left["scalars"][key], right["scalars"][key]
+            errors[key] = abs(a-b) / max(abs(a), abs(b), 100.0)
+        for key in ("radius_m",):
+            a, b = left["scalars"][key], right["scalars"][key]
+            errors[key] = abs(a-b) / max(abs(a), abs(b), 1.0e-30)
+        for key in ("gross_rate_s", "returned_rate_s", "sigma_tip_Pa"):
+            a, b = left["scalars"][key], right["scalars"][key]
+            errors[key] = abs(a-b) / max(abs(a), abs(b), 1.0)
+        errors["hazard_action_absolute"] = abs(
+            left["scalars"]["hazard_action"]-right["scalars"]["hazard_action"])
+        full_event = bool(full[1]["fired"])
+        half_event = bool(half[1]["fired"])
+        same_identity = (
+            full_event == half_event
+            and tuple(item.get("hazard_event_index") for item in full[2])
+            == tuple(item.get("hazard_event_index") for item in half[2])
+        )
+        event_time_error = (
+            abs(full[3]-half[3]) / max(abs(full[3]), abs(half[3]), 1.0e-15)
+            if full_event and half_event else (0.0 if same_identity else math.inf)
+        )
+        errors["event_time"] = event_time_error
+        errors["event_identity_mismatch"] = 0.0 if same_identity else 1.0
+        passed = (
+            array_error <= tolerance.population_relative
+            and max(errors[key] for key in
+                    ("gross_source", "gross_return", "permanent_slip"))
+                <= tolerance.slip_relative
+            and errors["radius_m"] <= tolerance.radius_relative
+            and max(errors[key] for key in
+                    ("gross_rate_s", "returned_rate_s", "sigma_tip_Pa"))
+                <= tolerance.rate_relative
+            and errors["hazard_action_absolute"] <= tolerance.action_absolute
+            and event_time_error <= tolerance.event_time_relative
+            and same_identity
+        )
+        return passed, errors
+
+    def integrate(parent: Any, dt: float, depth: int):
+        full = one(parent, dt)
+        half = composed_half(parent, dt)
+        passed, errors = compare(full, half, dt)
+        records.append({"depth": depth, "duration_s": dt,
+                        "accepted": passed, "errors": errors})
+        if passed:
+            return half
+        if depth >= tolerance.maximum_depth:
+            raise RuntimeError(
+                "event-aware current source update failed convergence: "
+                f"duration={dt!r}, errors={errors!r}"
+            )
+        left = integrate(parent, 0.5*dt, depth+1)
+        if bool(left[1]["fired"]):
+            return left
+        right = integrate(left[0], 0.5*dt, depth+1)
+        return right[0], right[1], left[2]+right[2], 0.5*dt+right[3]
+
+    accepted = integrate(engine, requested, 0)
+    return EventAwareAcceptedUpdate(
+        engine=accepted[0], result=accepted[1], geometry_events=accepted[2],
+        consumed_s=accepted[3], audit={
+            "schema": "r7.event-aware-current-source-update/1",
+            "requested_duration_s": requested,
+            "consumed_duration_s": accepted[3],
+            "event_fired": bool(accepted[1]["fired"]),
+            "trial_integrations": trial_count,
+            "maximum_depth_used": max(row["depth"] for row in records),
+            "records": records,
+            "accepted_path": "TWO_HALF_EARLIEST_EVENT",
+            "remainder_owner": "CALLING_COUPLED_SCHEDULER",
+            "absolute_floors": {
+                "population_and_slip": 100.0,
+                "rate_and_stress": 1.0,
+                "radius_m": 1.0e-30,
+            },
+            "material_packet_law_claimed": False,
+            "input_owner_mutated": False,
+        },
+    )
+
+
 __all__ = [
-    "MODEL_ID", "SourceRefreshTolerance", "advance_current_source_adaptive",
+    "MODEL_ID", "SourceRefreshTolerance", "EventAwareAcceptedUpdate",
+    "advance_current_source_adaptive", "advance_current_source_to_earliest_event",
 ]

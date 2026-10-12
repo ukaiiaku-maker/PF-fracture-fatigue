@@ -82,10 +82,18 @@ def _run_through_event_and_reload(engine: Any, waveform: FatigueWaveform,
 
 
 def execute_fatigue_convergence_r5(
-    output: str | Path, *, phase_counts: Iterable[int] = (12, 24, 48),
+    output: str | Path, *, phase_counts: Iterable[int] = (12, 24, 48, 96),
     native_action_limits: Iterable[float] = (0.02, 0.01, 0.005),
     maximum_cycles: int = 60,
 ) -> dict[str, Any]:
+    # Prospective output tolerances are fixed before any arm is evaluated.
+    output_tolerances = {
+        "first_event_elapsed_cycles_relative": 5.0e-3,
+        "terminal_continuous_micro_advance_relative": 1.0e-2,
+        "terminal_population_relative": 1.0e-3,
+        "native_action_first_event_relative": 1.0e-4,
+        "outer_refresh_first_event_relative": 1.0e-4,
+    }
     waveform = FatigueWaveform(Kmax=20.0e6, R=0.1, frequency_Hz=10.0)
     parent = _build_stochastic_engine()
     parent_state = complete_state(parent)
@@ -112,6 +120,45 @@ def execute_fatigue_convergence_r5(
             outer_refreshes_per_phase=refreshes,
         ))
     phase24 = next(row for row in phase_rows if row["phase_count"] == 24)
+    phase_by_count = {row["phase_count"]: row for row in phase_rows}
+    phase_pair = None
+    if 48 in phase_by_count and 96 in phase_by_count:
+        coarse, fine = phase_by_count[48], phase_by_count[96]
+        def relative(a, b):
+            return abs(float(a)-float(b)) / max(abs(float(b)), 1.0e-300)
+        phase_pair = {
+            "coarse_phase_count": 48, "fine_phase_count": 96,
+            "first_event_elapsed_cycles_relative": relative(
+                coarse["first_event_elapsed_cycles"],
+                fine["first_event_elapsed_cycles"],
+            ),
+            "terminal_continuous_micro_advance_relative": relative(
+                coarse["rows"][-1]["continuous_micro_advance_m"],
+                fine["rows"][-1]["continuous_micro_advance_m"],
+            ),
+            "terminal_population_relative": relative(
+                coarse["terminal"]["ledgers"]["engine.N_em"],
+                fine["terminal"]["ledgers"]["engine.N_em"],
+            ),
+        }
+    def spread(rows):
+        values = [float(row["first_event_elapsed_cycles"]) for row in rows]
+        return (max(values)-min(values)) / max(abs(values[-1]), 1.0e-300)
+    native_error = spread(native_rows)
+    outer_error = spread(outer_rows)
+    accuracy_qualified = bool(
+        phase_pair is not None
+        and phase_pair["first_event_elapsed_cycles_relative"]
+            <= output_tolerances["first_event_elapsed_cycles_relative"]
+        and phase_pair["terminal_continuous_micro_advance_relative"]
+            <= output_tolerances["terminal_continuous_micro_advance_relative"]
+        and phase_pair["terminal_population_relative"]
+            <= output_tolerances["terminal_population_relative"]
+        and native_error
+            <= output_tolerances["native_action_first_event_relative"]
+        and outer_error
+            <= output_tolerances["outer_refresh_first_event_relative"]
+    )
     result = {
         "schema": MODEL_ID,
         "common_owner": {
@@ -135,12 +182,17 @@ def execute_fatigue_convergence_r5(
             "dimensions_varied_separately": True,
         },
         "qualification": {
-            "status": "REFINEMENT_EXECUTED",
-            "accuracy_qualified": False,
-            "reason": (
-                "phase refinement remains outside a declared prospective "
-                "first-event tolerance"
-            ),
+            "status": ("ACCURACY_QUALIFIED" if accuracy_qualified
+                       else "REFINEMENT_EXECUTED"),
+            "accuracy_qualified": accuracy_qualified,
+            "prospective_output_tolerances": output_tolerances,
+            "phase_48_to_96": phase_pair,
+            "native_action_first_event_spread_relative": native_error,
+            "outer_refresh_first_event_spread_relative": outer_error,
+            "quantitative_scope": "THREE_CYCLE_ONE_EVENT_TRANSIENT",
+            "developed_recurrent_rate_qualified": False,
+            "reason": (None if accuracy_qualified else
+                "required 48/96 phase pair or a prospective output tolerance failed"),
             "common_physical_endpoint_cycles": 3.0,
         },
         "time_conventions": {

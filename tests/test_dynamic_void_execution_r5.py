@@ -4,6 +4,7 @@ import pytest
 
 from arrhenius_fracture import dynamic_void_execution_r5 as dynamic
 from arrhenius_fracture.dynamic_void_execution_r5 import execute_dynamic_void_r5
+from arrhenius_fracture.current_coupled_execution_r4 import build_current_r4_engine
 
 
 @pytest.mark.parametrize(
@@ -72,6 +73,26 @@ def test_nearly_spent_low_k_mark_is_not_skipped(monkeypatch):
             native_K_scale=0.5, source_identity="nearly-spent"
         ),
     ) == pytest.approx(0.25)
+
+
+def test_actual_successor_preview_publishes_interval_relative_consumed_time():
+    owner = dynamic.CurrentFractureOwner(build_current_r4_engine())
+    preview = dynamic._preview(
+        owner, opening_m=0.0, temperature_K=900.0,
+        duration_s=1.0e-6,
+        mechanics_binding=SimpleNamespace(
+            native_K_scale=51.10046751415974e6 / 20.0e6,
+            source_identity="actual-successor-import",
+        ),
+    )
+    audit = preview.interval_result.accepted_update_audit
+    assert preview.fired
+    assert preview.interval_result.result["kinetic_dt_consumed_s"] == pytest.approx(
+        audit["consumed_duration_s"]
+    )
+    assert preview.interval_result.result["kinetic_dt_unused_s"] == pytest.approx(
+        1.0e-6 - audit["consumed_duration_s"]
+    )
 
 
 def test_recovered_dynamic_void_owner_uses_current_backend(tmp_path):

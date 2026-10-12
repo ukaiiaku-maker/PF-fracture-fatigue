@@ -1,7 +1,7 @@
 import copy
 
 from arrhenius_fracture.accepted_update_controller_r6 import (
-    advance_current_source_adaptive,
+    advance_current_source_adaptive, advance_current_source_to_earliest_event,
 )
 from arrhenius_fracture.current_coupled_execution_r4 import (
     build_current_r4_engine, complete_state,
@@ -45,3 +45,19 @@ def test_adaptive_event_interval_carries_later_time():
     assert later_state.t > event_state.t
     assert first["input_owner_mutated"] is False
     assert later["input_owner_mutated"] is False
+
+
+def test_event_aware_accepted_update_stops_at_native_event_and_is_private():
+    parent = build_current_r4_engine()
+    before = complete_state(parent)
+    accepted = advance_current_source_to_earliest_event(
+        parent, applied_K_Pa_sqrt_m=51.10046751415974e6,
+        temperature_K=900.0, duration_s=1.0e-6,
+    )
+    assert complete_state(parent) == before
+    assert accepted.result["fired"]
+    assert accepted.consumed_s <= 1.0e-6
+    assert accepted.audit["remainder_owner"] == "CALLING_COUPLED_SCHEDULER"
+    assert accepted.audit["accepted_path"] == "TWO_HALF_EARLIEST_EVENT"
+    assert accepted.audit["absolute_floors"]["population_and_slip"] == 100.0
+    assert accepted.engine.n_adv == 1

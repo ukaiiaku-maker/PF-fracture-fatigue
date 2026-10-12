@@ -15,6 +15,7 @@ import math
 import os
 from pathlib import Path
 import pickle
+import subprocess
 from types import SimpleNamespace
 import sys
 import tarfile
@@ -26,8 +27,10 @@ import numpy as np
 from .current_coupled_execution_r4 import (
     build_current_r4_engine, complete_state, state_sha256,
 )
+from .accepted_update_controller_r6 import (
+    advance_current_source_to_earliest_event,
+)
 from .reduced_persistent_reference_r2 import advance_signed
-from .state_correspondence_r5 import advance_fixed_horizon
 from .stochastic_avalanche_tip import pending_geometry_event_scope
 from .developed_fatigue_r3 import _restore_geometry
 from .persistent_site_high_cycle_checkpoint_v10230 import (
@@ -37,6 +40,7 @@ from .persistent_site_high_cycle_checkpoint_v10230 import (
 
 
 MODEL_ID = "r5.dynamic-v3-void-current-fracture/1"
+COMPOSITE_MANIFEST_SCHEMA = "r7.coupled-accepted-dynamic-checkpoint/2"
 DONOR_COMMIT = "47a5a4bae048e5a8b1c6178efb6406325005f7ef"
 DONOR_ARCHIVE = (
     Path(__file__).resolve().parents[1]
@@ -50,6 +54,7 @@ R6_DEPENDENCIES = (
 OBSERVATIONS = R6_DEPENDENCIES / "observations.json"
 DECLARED_INPUTS = R6_DEPENDENCIES / "declared_inputs.json"
 _LOCATED_EVENT_PREVIEWS: dict[tuple[Any, ...], CurrentFracturePreview] = {}
+QUALIFIED_SOURCE_REFRESH_CAP_S = 1.0e-6
 
 
 @dataclass(frozen=True)
@@ -239,6 +244,98 @@ class CoupledAcceptedState:
     generation: int = 0
 
 
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _checkpoint_files(root: Path) -> list[dict[str, str]]:
+    return [
+        {"path": str(path.relative_to(root)), "sha256": _file_sha256(path)}
+        for path in sorted(root.rglob("*")) if path.is_file()
+    ]
+
+
+def _write_composite_manifest(
+    path: Path, *, payload_path: Path, native_checkpoint: Path,
+    owner: CurrentFractureOwner, temperature_K: float,
+) -> Path:
+    payload = {
+        "schema": COMPOSITE_MANIFEST_SCHEMA,
+        "payload": {
+            "path": payload_path.name,
+            "sha256": _file_sha256(payload_path),
+        },
+        "native_checkpoint": {
+            "path": native_checkpoint.name,
+            "files": _checkpoint_files(native_checkpoint),
+        },
+        "owner": {
+            "generation": int(owner.generation),
+            "accepted_intervals": int(owner.accepted_intervals),
+            "native_backend_calls": int(owner.native_backend_calls),
+            "last_mechanics_binding": owner.last_mechanics_binding,
+            "last_geometry_events": list(owner.last_geometry_events),
+            "backend": owner.backend,
+            "native_event_count": int(owner.engine.n_adv),
+        },
+        "configuration": {
+            "temperature_K": float(temperature_K),
+            "model_id": MODEL_ID,
+            "donor_commit": DONOR_COMMIT,
+            "donor_archive_sha256": _file_sha256(DONOR_ARCHIVE),
+            "observations_sha256": _file_sha256(OBSERVATIONS),
+            "declared_inputs_sha256": _file_sha256(DECLARED_INPUTS),
+            "source_update": "R7_EVENT_AWARE_ACCEPTED_UPDATE",
+        },
+        "pending_scheduler": None,
+    }
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    os.replace(temporary, path)
+    return path
+
+
+def _restore_composite_manifest(path: str | Path):
+    """Restore without access to the pre-checkpoint in-memory owner."""
+    manifest_path = Path(path).resolve()
+    manifest = json.loads(manifest_path.read_text())
+    if manifest.get("schema") != COMPOSITE_MANIFEST_SCHEMA:
+        raise RuntimeError("unsupported coupled checkpoint manifest")
+    config = manifest["configuration"]
+    expected = {
+        "donor_archive_sha256": _file_sha256(DONOR_ARCHIVE),
+        "observations_sha256": _file_sha256(OBSERVATIONS),
+        "declared_inputs_sha256": _file_sha256(DECLARED_INPUTS),
+    }
+    for key, observed in expected.items():
+        if config.get(key) != observed:
+            raise RuntimeError(f"composite checkpoint dependency changed: {key}")
+    payload_path = manifest_path.parent / manifest["payload"]["path"]
+    if _file_sha256(payload_path) != manifest["payload"]["sha256"]:
+        raise RuntimeError("composite checkpoint donor payload hash changed")
+    native_root = manifest_path.parent / manifest["native_checkpoint"]["path"]
+    for record in manifest["native_checkpoint"]["files"]:
+        candidate = native_root / record["path"]
+        if not candidate.is_file() or _file_sha256(candidate) != record["sha256"]:
+            raise RuntimeError("composite checkpoint native payload hash changed")
+    restored = pickle.loads(payload_path.read_bytes())
+    engine = build_current_r4_engine()
+    _restore_geometry(engine, native_root)
+    restore_current_checkpoint(engine, native_root)
+    metadata = manifest["owner"]
+    owner = CurrentFractureOwner(
+        engine=engine,
+        generation=int(metadata["generation"]),
+        accepted_intervals=int(metadata["accepted_intervals"]),
+        native_backend_calls=int(metadata["native_backend_calls"]),
+        last_mechanics_binding=metadata["last_mechanics_binding"],
+        last_geometry_events=tuple(metadata["last_geometry_events"]),
+        backend=str(metadata["backend"]),
+    )
+    restored.physical = replace(restored.physical, fracture_adapter_state=owner)
+    return restored, manifest
+
+
 def _preview_cache_key(owner: CurrentFractureOwner, *, opening_m: float,
                        temperature_K: float, duration_s: float,
                        mechanics_binding: Any = None) -> tuple[Any, ...]:
@@ -260,22 +357,55 @@ def _preview(owner: CurrentFractureOwner, *, opening_m: float,
     cached = _LOCATED_EVENT_PREVIEWS.pop(key, None)
     if cached is not None:
         return cached
-    engine = copy.deepcopy(owner.engine)
     scale = 1.0 if mechanics_binding is None else float(mechanics_binding.native_K_scale)
     identity = ("UNCHANGED_NATIVE_MECHANICS" if mechanics_binding is None
                 else str(mechanics_binding.source_identity))
     K = 20.0e6 * scale
-    with pending_geometry_event_scope() as pending:
-        result = advance_signed(
-            engine, K_Pa_sqrt_m=K, temperature_K=float(temperature_K),
-            dt_s=float(duration_s),
+    if float(duration_s) <= QUALIFIED_SOURCE_REFRESH_CAP_S:
+        engine = copy.deepcopy(owner.engine)
+        with pending_geometry_event_scope() as pending:
+            native_result = advance_signed(
+                engine, K_Pa_sqrt_m=K, temperature_K=float(temperature_K),
+                dt_s=float(duration_s),
+            )
+            events = tuple(copy.deepcopy(item) for item in pending)
+        consumed = float(native_result["kinetic_dt_consumed_s"])
+        accepted_audit = {
+            "schema": "r7.qualified-fixed-cap-current-source-update/1",
+            "requested_duration_s": float(duration_s),
+            "consumed_duration_s": consumed,
+            "event_fired": bool(native_result["fired"]),
+            "qualified_maximum_cap_s": QUALIFIED_SOURCE_REFRESH_CAP_S,
+            "qualification": (
+                "advance_current_source_to_earliest_event real-engine "
+                "full-versus-two-half event regression"
+            ),
+            "remainder_owner": "CALLING_COUPLED_SCHEDULER",
+            "input_owner_mutated": False,
+        }
+        result = dict(native_result)
+    else:
+        accepted = advance_current_source_to_earliest_event(
+            owner.engine, applied_K_Pa_sqrt_m=K,
+            temperature_K=float(temperature_K), duration_s=float(duration_s),
         )
-        events = tuple(copy.deepcopy(item) for item in pending)
+        engine = accepted.engine
+        result = dict(accepted.result)
+        events = accepted.geometry_events
+        consumed = float(accepted.consumed_s)
+        accepted_audit = accepted.audit
+    # The accepted two-half result is native to its final subinterval.  The
+    # enclosing physical scheduler owns the original preview interval and must
+    # receive time relative to that boundary, not a half-local clock.
+    result["kinetic_dt_consumed_s"] = consumed
+    result["kinetic_dt_unused_s"] = max(
+        float(duration_s)-consumed, 0.0
+    )
     interval = SimpleNamespace(
         fired=bool(result["fired"]),
         event_length_m=sum(float(item["event_advance_m"]) for item in events),
         geometry_commits=len(events), post_event_renewals=len(events),
-        result=result,
+        result=result, accepted_update_audit=accepted_audit,
     )
     proposed = CurrentFractureOwner(
         engine=engine, generation=owner.generation + 1,
@@ -471,6 +601,71 @@ def _load_donor(source: Path):
     return module, physical
 
 
+def _donor_owned_signature(value: CoupledAcceptedState, donor_checkpoint: Any):
+    stripped_physical = replace(value.physical, fracture_adapter_state=None)
+    cache = value.mechanics.cache or {}
+    return {
+        "physical_fingerprint": donor_checkpoint.physical_fingerprint(
+            stripped_physical
+        ),
+        "mechanics_receipt": value.mechanics.receipt(),
+        "mechanics_cache": [
+            (repr(key), hashlib.sha256(json.dumps(
+                donor_checkpoint._encode(item), sort_keys=True,
+                separators=(",", ":"), allow_nan=False,
+            ).encode()).hexdigest())
+            for key, item in sorted(cache.items(), key=lambda pair: repr(pair[0]))
+        ],
+        "loading_cursor": value.loading_cursor,
+        "generation": value.generation,
+    }
+
+
+def _resume_composite_to_file(manifest_path: str | Path, output: str | Path) -> None:
+    """Fresh-process qualification entry point for the R7 disk-only restart."""
+    with tempfile.TemporaryDirectory(prefix="r7_restart_v3_") as raw:
+        source = Path(raw)
+        with tarfile.open(DONOR_ARCHIVE) as archive:
+            archive.extractall(source, filter="data")
+        module, physical = _load_donor(source)
+        module.DATA = OBSERVATIONS
+        module.JOB = R6_DEPENDENCIES
+        donor_checkpoint = importlib.import_module("reduced_fracture_v3.checkpoint")
+        restored, manifest = _restore_composite_manifest(manifest_path)
+        restored = _advance_composite(
+            restored, physical, K_Pa_sqrt_m=51.10046751415974e6,
+            duration_s=1.0e-6, cadence_s=1.0e-6,
+        )
+        restored = _advance_composite(
+            restored, physical, K_Pa_sqrt_m=5.0e6,
+            duration_s=0.05, cadence_s=0.05,
+        )
+        owner = restored.physical.fracture_adapter_state
+        result = {
+            "schema": "r7.fresh-process-continuation/1",
+            "manifest_schema": manifest["schema"],
+            "donor_owned_signature": _donor_owned_signature(
+                restored, donor_checkpoint
+            ),
+            "current_owned_state": complete_state(owner.engine),
+            "owner_metadata": {
+                "generation": owner.generation,
+                "accepted_intervals": owner.accepted_intervals,
+                "native_backend_calls": owner.native_backend_calls,
+                "last_mechanics_binding": owner.last_mechanics_binding,
+                "last_geometry_events": list(owner.last_geometry_events),
+                "backend": owner.backend,
+            },
+            "native_event_after_restart": (
+                owner.engine.n_adv
+                > int(manifest["owner"]["native_event_count"])
+            ),
+        }
+        Path(output).write_text(
+            json.dumps(result, indent=2, sort_keys=True, default=str) + "\n"
+        )
+
+
 def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
     destination = Path(output_directory).resolve()
     if destination.exists():
@@ -528,10 +723,13 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
                 no_void, physical, K_Pa_sqrt_m=K, duration_s=dt, cadence_s=0.10)
             consumed_K = float(no_void.physical.fracture_adapter_state.
                                last_mechanics_binding["consumed_K_Pa_sqrt_m"])
-            advance_fixed_horizon(
-                direct, applied_K_Pa_sqrt_m=consumed_K, temperature_K=1200.0,
-                duration_s=dt, maximum_outer_substep_s=0.10,
+            direct_update = advance_current_source_to_earliest_event(
+                direct, applied_K_Pa_sqrt_m=consumed_K,
+                temperature_K=1200.0, duration_s=dt,
             )
+            if direct_update.result["fired"]:
+                raise RuntimeError("low-load no-void parity control fired unexpectedly")
+            direct = direct_update.engine
         no_void_parity = (
             complete_state(direct)
             == complete_state(no_void.physical.fracture_adapter_state.engine)
@@ -583,6 +781,11 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
                 os.environ["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = (
                     previous_checkpoint_root
                 )
+        manifest_path = _write_composite_manifest(
+            destination / "coupled_checkpoint_manifest.json",
+            payload_path=checkpoint_path, native_checkpoint=current_checkpoint,
+            owner=checkpoint_owner, temperature_K=1200.0,
+        )
         active = _advance_composite(
             active, physical, K_Pa_sqrt_m=51.10046751415974e6,
             duration_s=1.0e-6, cadence_s=1.0e-6,
@@ -597,25 +800,7 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
         direct_terminal_payload = pickle.dumps(replace(
             active, physical=replace(active.physical, fracture_adapter_state=None)
         ), protocol=5)
-        restored = pickle.loads(checkpoint_path.read_bytes())
-        restored_engine = build_current_r4_engine()
-        _restore_geometry(restored_engine, current_checkpoint)
-        restore_current_checkpoint(restored_engine, current_checkpoint)
-        restored_owner = CurrentFractureOwner(
-            engine=restored_engine,
-            generation=checkpoint_owner.generation,
-            accepted_intervals=checkpoint_owner.accepted_intervals,
-            native_backend_calls=checkpoint_owner.native_backend_calls,
-            last_mechanics_binding=copy.deepcopy(
-                checkpoint_owner.last_mechanics_binding
-            ),
-            last_geometry_events=copy.deepcopy(
-                checkpoint_owner.last_geometry_events
-            ),
-        )
-        restored.physical = replace(
-            restored.physical, fracture_adapter_state=restored_owner
-        )
+        restored, _ = _restore_composite_manifest(manifest_path)
         restored = _advance_composite(
             restored, physical, K_Pa_sqrt_m=51.10046751415974e6,
             duration_s=1.0e-6, cadence_s=1.0e-6,
@@ -645,28 +830,34 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
             and direct_owner.last_geometry_events
                 == restored_terminal_owner.last_geometry_events
         )
-        def donor_owned_signature(value: CoupledAcceptedState):
-            stripped_physical = replace(
-                value.physical, fracture_adapter_state=None
-            )
-            cache = value.mechanics.cache or {}
-            return {
-                "physical_fingerprint": donor_checkpoint.physical_fingerprint(
-                    stripped_physical
-                ),
-                "mechanics_receipt": value.mechanics.receipt(),
-                "mechanics_cache": [
-                    (repr(key), hashlib.sha256(json.dumps(
-                        donor_checkpoint._encode(item), sort_keys=True,
-                        separators=(",", ":"), allow_nan=False,
-                    ).encode()).hexdigest())
-                    for key, item in sorted(cache.items(), key=lambda pair: repr(pair[0]))
-                ],
-                "loading_cursor": value.loading_cursor,
-                "generation": value.generation,
-            }
         donor_owned_state_exact = (
-            donor_owned_signature(active) == donor_owned_signature(restored)
+            _donor_owned_signature(active, donor_checkpoint)
+            == _donor_owned_signature(restored, donor_checkpoint)
+        )
+
+        fresh_result_path = destination / "fresh_process_continuation.json"
+        subprocess.run(
+            [sys.executable, "-m", "arrhenius_fracture.dynamic_void_execution_r5",
+             "--resume-manifest", str(manifest_path),
+             "--resume-output", str(fresh_result_path)],
+            check=True, cwd=Path(__file__).resolve().parents[1],
+        )
+        fresh_result = json.loads(fresh_result_path.read_text())
+        def json_identity(value: Any) -> str:
+            return json.dumps(value, sort_keys=True, separators=(",", ":"),
+                              default=str)
+        fresh_process_exact = (
+            json_identity(fresh_result["donor_owned_signature"])
+            == json_identity(_donor_owned_signature(active, donor_checkpoint))
+            and json_identity(fresh_result["current_owned_state"])
+            == json_identity(direct_current_state)
+            and fresh_result["owner_metadata"]["generation"]
+                == direct_owner.generation
+            and fresh_result["owner_metadata"]["accepted_intervals"]
+                == direct_owner.accepted_intervals
+            and fresh_result["owner_metadata"]["native_backend_calls"]
+                == direct_owner.native_backend_calls
+            and fresh_result["native_event_after_restart"]
         )
 
         # D: identical physical exposure and partition, feedback disabled by
@@ -786,7 +977,8 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
             "single_global_scheduler_order_preserved": True,
         },
         "complete_dynamic_checkpoint": {
-            "schema": "r6.coupled-accepted-dynamic-checkpoint/1",
+            "schema": COMPOSITE_MANIFEST_SCHEMA,
+            "manifest_path": manifest_path.name,
             "path": checkpoint_path.name,
             "payload_sha256": checkpoint_sha256,
             "contains": [
@@ -814,6 +1006,8 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
             "current_including_recomputable_diagnostics_exact": (
                 direct_current_state == restored_current_state
             ),
+            "fresh_process_files_only_continuation_exact": fresh_process_exact,
+            "fresh_process_result": fresh_result_path.name,
         },
         "fixed_R4_observation": {
             "retained_name": "FROZEN_PREEXISTING_FIXED_OFF_AXIS_VOID_FUNCTIONAL_TEST",
@@ -836,6 +1030,9 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
         and result["C_active_dynamic"]["native_fracture_events"] >= 1
         and result["C_active_dynamic"]["continued_after_fracture"]
         and result["complete_dynamic_checkpoint"]["terminal_complete_state_exact"]
+        and result["complete_dynamic_checkpoint"][
+            "fresh_process_files_only_continuation_exact"
+        ]
         and zero_control_G_exact
     )
     (destination / "dynamic_void_r5.json").write_text(
@@ -844,4 +1041,16 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
     return result
 
 
-__all__ = ["MODEL_ID", "execute_dynamic_void_r5"]
+__all__ = [
+    "MODEL_ID", "COMPOSITE_MANIFEST_SCHEMA", "execute_dynamic_void_r5",
+    "_restore_composite_manifest",
+]
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 5 or sys.argv[1] != "--resume-manifest" or sys.argv[3] != "--resume-output":
+        raise SystemExit(
+            "usage: python -m arrhenius_fracture.dynamic_void_execution_r5 "
+            "--resume-manifest MANIFEST --resume-output OUTPUT"
+        )
+    _resume_composite_to_file(sys.argv[2], sys.argv[4])

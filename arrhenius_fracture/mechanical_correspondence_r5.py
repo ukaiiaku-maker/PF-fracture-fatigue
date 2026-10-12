@@ -39,8 +39,46 @@ def _run(
     engine: Any, steps: list[Mapping[str, Any]], *, complete_inputs: bool,
 ) -> dict[str, Any]:
     rows = []
+    operation_trace = []
+    current_stage = {"value": None}
+    original_advance = engine.mpz.advance
+
+    def state_signature():
+        fields = {}
+        for name, value in vars(engine.mpz).items():
+            if isinstance(value, np.ndarray) and any(token in name for token in (
+                "mobile", "retained", "slip", "wake", "available",
+            )):
+                array = np.ascontiguousarray(value)
+                fields[name] = {
+                    "shape": list(array.shape), "sum": float(np.sum(array)),
+                    "sha256": hashlib.sha256(array.tobytes()).hexdigest(),
+                }
+        return {
+            "fields": fields,
+            "active_path_length_m": float(engine.mpz.advance_total_m),
+            "gross_source": float(engine.mpz.cumulative_gross_source_activity),
+            "gross_return": float(engine.mpz.cumulative_gross_return_activity),
+            "permanent_slip": float(engine.mpz.local_slip_count()),
+        }
+
+    def traced_advance(distance_m):
+        before = state_signature()
+        receipt = original_advance(distance_m)
+        after = state_signature()
+        operation_trace.append({
+            "stage": current_stage["value"],
+            "operation": "ORIGINAL_MPZ_CONTINUOUS_TRANSLATION_AND_WAKE_REMAP",
+            "distance_m": float(distance_m),
+            "before": before, "receipt": dict(receipt), "after": after,
+        })
+        return receipt
+
+    engine.mpz.advance = traced_advance
     with pending_geometry_event_scope() as pending:
         for index, step in enumerate(steps):
+            current_stage["value"] = step["stage"]
+            accepted_before = state_signature()
             if complete_inputs:
                 engine._r2_synthetic_drive_setup = False
                 engine.mpz._anisotropic_drive_factors = np.asarray(
@@ -73,9 +111,15 @@ def _run(
                 "negative_transport_velocity_present": bool(
                     result["reversible_mobile_velocity_min_m_s"] < 0.0
                 ),
+                "accepted_state_before": accepted_before,
+                "accepted_state_after": state_signature(),
             })
         events = [copy.deepcopy(item) for item in pending]
-    return {"rows": rows, "geometry_events": events, "terminal": complete_state(engine)}
+    return {
+        "rows": rows, "geometry_events": events,
+        "accepted_operation_trace": operation_trace,
+        "terminal": complete_state(engine),
+    }
 
 
 def signed_consumer_probe() -> dict[str, Any]:
@@ -223,6 +267,20 @@ def execute_mechanical_correspondence_r5(
         },
         "future_population_imported": False,
         "future_event_time_imposed": False,
+        "actual_low_level_trace": complete["accepted_operation_trace"],
+        "trace_interpretation": (
+            "source/transport state immediately before and after the original "
+            "accepted moving-frame translation; hashes retain bin resolution"
+        ),
+        "common_imposed_geometry_contract": {
+            "path_length_m": float(first_event["event_advance_m"]),
+            "projected_endpoint_m": [first_event["x1"], first_event["y1"]],
+            "local_tangent_xy": [math.cos(math.radians(first_spatial_angle)),
+                                 math.sin(math.radians(first_spatial_angle))],
+            "material_fixed_wake_not_rotated": True,
+            "scalar_populations_not_rotated": True,
+            "future_population_imported": False,
+        },
     }
     result = {
         "schema": MODEL_ID,
