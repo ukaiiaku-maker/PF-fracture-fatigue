@@ -66,7 +66,7 @@ def qualification_jobs() -> tuple[QualificationJob, ...]:
     return (
         QualificationJob("Q-MECH-PATCH", ("FG-08", "FG-09", "FG-10"),
                          "Do plane stress, plane strain and specified transverse constraint deliver the declared full tensor?",
-                         "pytest:tests/test_readiness_mechanics_state.py", (), "material-point and patch assertions pass",
+                         "pytest:tests/test_readiness_mechanics_state.py", (), "material-point assertions pass; spatial patch remains open",
                          ("300 s wall", "2 GiB memory"), ("sigma_zz", "tensor rotation", "work", "derivative"), 0.05, compact,
                          "PARTIAL_CONTRACT_QUALIFIED_SPATIAL_PENDING"),
         QualificationJob("Q-PARAM-DOSSIER", ("FG-02", "FG-03", "FG-05", "FG-15"),
@@ -83,7 +83,7 @@ def qualification_jobs() -> tuple[QualificationJob, ...]:
                          "UNRESOLVED_GENERIC_FEM_ADAPTER"),
         QualificationJob("Q-CAVITY-LOCAL", ("FG-13", "FG-16"),
                          "Does opt-in local_incremental_front preserve solid-area accounting, marks, clocks and rollback?",
-                         "pytest:tests/test_candidate_drive_contract.py", (), "ordinary/distant/near/contact/downstream contract checks",
+                         "pytest:tests/test_candidate_drive_contract.py", (), "solid-area and transaction/refinement contract checks; spatial geometry cases remain open",
                          ("no production exposure",), ("released work", "new solid area", "clock", "ownership", "restart"), 0.1, compact,
                          "PARTIAL_CONTRACT_QUALIFIED_SPATIAL_PENDING"),
         QualificationJob("Q-BRANCH-RECURSIVE", ("FG-13", "FG-14", "FG-16"),

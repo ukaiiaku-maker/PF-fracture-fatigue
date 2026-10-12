@@ -24,7 +24,7 @@
         "300 s wall",
         "2 GiB memory"
       ],
-      "physical_endpoint": "material-point and patch assertions pass",
+      "physical_endpoint": "material-point assertions pass; spatial patch remains open",
       "production_job": false,
       "required_observables": [
         "sigma_zz",
@@ -111,7 +111,7 @@
       "numerical_guards": [
         "no production exposure"
       ],
-      "physical_endpoint": "ordinary/distant/near/contact/downstream contract checks",
+      "physical_endpoint": "solid-area and transaction/refinement contract checks; spatial geometry cases remain open",
       "production_job": false,
       "required_observables": [
         "released work",
