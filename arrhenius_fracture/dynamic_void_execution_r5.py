@@ -12,7 +12,9 @@ import hashlib
 import importlib
 import json
 import math
+import os
 from pathlib import Path
+import pickle
 from types import SimpleNamespace
 import sys
 import tarfile
@@ -27,6 +29,11 @@ from .current_coupled_execution_r4 import (
 from .reduced_persistent_reference_r2 import advance_signed
 from .state_correspondence_r5 import advance_fixed_horizon
 from .stochastic_avalanche_tip import pending_geometry_event_scope
+from .developed_fatigue_r3 import _restore_geometry
+from .persistent_site_high_cycle_checkpoint_v10230 import (
+    restore_checkpoint as restore_current_checkpoint,
+    write_checkpoint as write_current_checkpoint,
+)
 
 
 MODEL_ID = "r5.dynamic-v3-void-current-fracture/1"
@@ -36,10 +43,13 @@ DONOR_ARCHIVE = (
     / "integration_evidence/r5_dynamic_void_state_correspondence/"
     "dependencies_donor_47a5a4ba.tar.gz"
 )
-OBSERVATIONS = Path(
-    "/Volumes/Data/Data/Nanopillar_calculation/voiding/recovered-pr63/"
-    "artifacts/aligned_subgrid_closure_v1/observations.json"
+R6_DEPENDENCIES = (
+    Path(__file__).resolve().parents[1]
+    / "integration_evidence/r6_current_state_matched_execution/dependencies"
 )
+OBSERVATIONS = R6_DEPENDENCIES / "observations.json"
+DECLARED_INPUTS = R6_DEPENDENCIES / "declared_inputs.json"
+_LOCATED_EVENT_PREVIEWS: dict[tuple[Any, ...], CurrentFracturePreview] = {}
 
 
 @dataclass(frozen=True)
@@ -119,9 +129,13 @@ class DynamicMechanicsProvider:
             response, controls_by_site = self.cache[key]
             self.hits += 1
         else:
-            history = min(max(
-                max(state.fields.equivalent_plastic_strain),
-                self.closure.history_domain[0]), self.closure.history_domain[1])
+            history = float(max(state.fields.equivalent_plastic_strain))
+            if not (self.closure.history_domain[0] <= history
+                    <= self.closure.history_domain[1]):
+                raise RuntimeError(
+                    "prescribed donor history is outside its supported domain; "
+                    f"history={history!r}, domain={self.closure.history_domain!r}"
+                )
             active = (next((site for site in state.sites if site.radius_m is not None), None)
                       if self.cavity_feedback_enabled else None)
             response = self.closure.evaluate(
@@ -145,9 +159,13 @@ class DynamicMechanicsProvider:
 
         n = len(state.normalization.cell_lengths_m)
         centers = state.normalization.centers_m
-        history = min(max(
-            max(state.fields.equivalent_plastic_strain),
-            self.closure.history_domain[0]), self.closure.history_domain[1])
+        history = float(max(state.fields.equivalent_plastic_strain))
+        if not (self.closure.history_domain[0] <= history
+                <= self.closure.history_domain[1]):
+            raise RuntimeError(
+                "prescribed donor history is outside its supported domain; "
+                f"history={history!r}, domain={self.closure.history_domain!r}"
+            )
         dep = np.zeros(n)
         dep[0] = self.history_rate_s * duration_s
         loop_rho = np.asarray(
@@ -221,9 +239,27 @@ class CoupledAcceptedState:
     generation: int = 0
 
 
+def _preview_cache_key(owner: CurrentFractureOwner, *, opening_m: float,
+                       temperature_K: float, duration_s: float,
+                       mechanics_binding: Any = None) -> tuple[Any, ...]:
+    return (
+        owner.fingerprint, float(opening_m), float(temperature_K),
+        float(duration_s),
+        None if mechanics_binding is None else float(mechanics_binding.native_K_scale),
+        None if mechanics_binding is None else str(mechanics_binding.source_identity),
+    )
+
+
 def _preview(owner: CurrentFractureOwner, *, opening_m: float,
              temperature_K: float, duration_s: float,
              mechanics_binding: Any = None) -> CurrentFracturePreview:
+    key = _preview_cache_key(
+        owner, opening_m=opening_m, temperature_K=temperature_K,
+        duration_s=duration_s, mechanics_binding=mechanics_binding,
+    )
+    cached = _LOCATED_EVENT_PREVIEWS.pop(key, None)
+    if cached is not None:
+        return cached
     engine = copy.deepcopy(owner.engine)
     scale = 1.0 if mechanics_binding is None else float(mechanics_binding.native_K_scale)
     identity = ("UNCHANGED_NATIVE_MECHANICS" if mechanics_binding is None
@@ -264,35 +300,67 @@ def _commit(owner: CurrentFractureOwner,
 def _first_event_time(owner: CurrentFractureOwner, *, opening_m: float,
                       temperature_K: float, maximum_duration_s: float,
                       tolerance_s: float, mechanics_binding: Any = None):
-    scale = 1.0 if mechanics_binding is None else float(mechanics_binding.native_K_scale)
-    # The qualified current-law envelope is many orders below first passage at
-    # and below 12 MPa sqrt(m) over these sub-second donor intervals.  The
-    # accepted advance still runs; this only avoids a duplicate private replay
-    # for a provably inactive fracture clock.
-    if 20.0e6 * scale <= 12.0e6 and maximum_duration_s <= 1.0:
-        return None
+    scale = 1.0 if mechanics_binding is None else float(
+        mechanics_binding.native_K_scale
+    )
+    engine = owner.engine
+    applied_K = 20.0e6 * scale
+    # Positive-load source transport conserves returned content and cannot
+    # create more anti-shielding than previously emitted content.  When the
+    # accepted owner is in that domain, r_eff >= r0 and K_shield >= 0 make the
+    # unshielded r0 stress a state-independent upper bound for this interval.
+    # Compare its maximum possible action against this owner's *actual pending
+    # mark*.  This is a state/domain proof, unlike the former K-only shortcut.
+    bound_engine = copy.deepcopy(engine)
+    positive_load_domain = (
+        applied_K >= 0.0
+        and float(bound_engine.mpz.local_slip_count()) >= -1.0e-12
+        and float(bound_engine.K_shield()) >= -1.0e-12
+    )
+    if positive_load_domain:
+        sigma_upper = min(
+            applied_K / math.sqrt(
+                2.0*math.pi*max(float(bound_engine.f.r0), 1.0e-30)
+            ),
+            float(bound_engine.f.sigma_cap),
+        )
+        lambda_upper = max(float(bound_engine.lambda_cleave(
+            sigma_upper, float(temperature_K)
+        )[0]), 0.0)
+        threshold = max(float(engine.hazard_threshold_action), 1.0e-300)
+        maximum_normalized_action = (
+            lambda_upper / threshold * float(maximum_duration_s)
+        )
+        remaining_action = max(1.0-float(engine.B), 0.0)
+        if maximum_normalized_action < remaining_action:
+            return None
     full = _preview(
         owner, opening_m=opening_m, temperature_K=temperature_K,
         duration_s=maximum_duration_s, mechanics_binding=mechanics_binding,
     )
     if not full.fired:
         return None
-    if maximum_duration_s <= 1.0e-6:
-        return float(maximum_duration_s)
-    low, high = 0.0, float(maximum_duration_s)
-    for _ in range(64):
-        if high - low <= tolerance_s:
-            break
-        mid = 0.5 * (low + high)
-        trial = _preview(
-            owner, opening_m=opening_m, temperature_K=temperature_K,
-            duration_s=mid, mechanics_binding=mechanics_binding,
+    # ``advance_signed`` is event terminated and reports the physical time it
+    # actually consumed before committing the native event.  Reading that
+    # owner-provided time avoids both of the former state-blind shortcuts (a
+    # low-K skip and an endpoint return for sub-microsecond intervals), and it
+    # preserves the complete private RNG/mark state used by the trial.
+    consumed = float(full.interval_result.result["kinetic_dt_consumed_s"])
+    horizon = float(maximum_duration_s)
+    if not (0.0 < consumed <= horizon + max(float(tolerance_s), 0.0)):
+        raise RuntimeError(
+            "current fracture owner returned an invalid first-event time: "
+            f"consumed={consumed!r}, horizon={horizon!r}"
         )
-        if trial.fired:
-            high = mid
-        else:
-            low = mid
-    return high
+    located = min(consumed, horizon)
+    key = _preview_cache_key(
+        owner, opening_m=opening_m, temperature_K=temperature_K,
+        duration_s=located, mechanics_binding=mechanics_binding,
+    )
+    if len(_LOCATED_EVENT_PREVIEWS) >= 64:
+        _LOCATED_EVENT_PREVIEWS.clear()
+    _LOCATED_EVENT_PREVIEWS[key] = full
+    return located
 
 
 def _project(current: Any, owner: CurrentFractureOwner, *, physical_time_s: float,
@@ -352,6 +420,19 @@ def _summary(state: CoupledAcceptedState) -> dict[str, Any]:
         "vacancy_field_max": max(physical.fields.vacancy_fraction),
         "ledgers": vars(physical.ledgers),
         "event_count": len(physical.event_history),
+        "event_sequence": [
+            {
+                "event": item.get("event"),
+                "time_s": item.get("time_s", item.get("physical_time_s")),
+                "site_id": item.get("site_id"),
+            }
+            for item in physical.event_history
+            if item.get("event") != "CAVITY_CONTINUUM_GROWTH_PACKET"
+        ],
+        "cavity_growth_packet_count": sum(
+            item.get("event") == "CAVITY_CONTINUUM_GROWTH_PACKET"
+            for item in physical.event_history
+        ),
         "mechanics": state.mechanics.receipt(),
         "loading_cursor": list(state.loading_cursor),
     }
@@ -400,6 +481,12 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
         with tarfile.open(DONOR_ARCHIVE) as archive:
             archive.extractall(source, filter="data")
         module, physical = _load_donor(source)
+        donor_checkpoint = importlib.import_module("reduced_fracture_v3.checkpoint")
+        # The clean donor used machine-local paths for these immutable physical
+        # inputs.  Bind its globals to the byte-identical portable copies before
+        # either closure construction or initial-state construction.
+        module.DATA = OBSERVATIONS
+        module.JOB = R6_DEPENDENCIES
         module._fracture_owner = lambda _opening: None
         closure, payload = module.load_bounded_subgrid_closure(OBSERVATIONS)
         start = module._initial_state(closure, payload, void_enabled=True)
@@ -420,6 +507,14 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
             maximum_equivalent_plastic_strain=closure.history_domain[0],
             site_id=None, radius_m=None,
         ).G_kinetic)
+        zero_control_response = closure.evaluate(
+            opening_m=closure.opening_m,
+            maximum_equivalent_plastic_strain=closure.history_domain[0],
+            site_id="site-1", radius_m=42.0e-9,
+        )
+        zero_control_G_exact = (
+            float(zero_control_response.G_kinetic) == anchor
+        )
         def composite(value):
             return CoupledAcceptedState(
                 value, DynamicMechanicsProvider(closure, history_rate, anchor)
@@ -459,6 +554,35 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
         )
         active_trace.append(_summary(active))
         before_pulse = _summary(active)
+        checkpoint_owner = active.physical.fracture_adapter_state
+        checkpoint_stripped = replace(
+            active,
+            physical=replace(active.physical, fracture_adapter_state=None),
+        )
+        checkpoint_payload = pickle.dumps(checkpoint_stripped, protocol=5)
+        checkpoint_sha256 = hashlib.sha256(checkpoint_payload).hexdigest()
+        checkpoint_path = destination / (
+            "accepted_before_pulse." + checkpoint_sha256 + ".pkl"
+        )
+        checkpoint_path.write_bytes(checkpoint_payload)
+        current_checkpoint = destination / "current_engine_checkpoint"
+        previous_checkpoint_root = os.environ.get(
+            "V10230_HIGH_CYCLE_CHECKPOINT_DIR"
+        )
+        os.environ["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = str(current_checkpoint)
+        try:
+            write_current_checkpoint(
+                checkpoint_owner.engine, temperature_K=1200.0,
+                reason="r6_complete_dynamic_before_pulse",
+                metadata={"coupled_payload_sha256": checkpoint_sha256},
+            )
+        finally:
+            if previous_checkpoint_root is None:
+                os.environ.pop("V10230_HIGH_CYCLE_CHECKPOINT_DIR", None)
+            else:
+                os.environ["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = (
+                    previous_checkpoint_root
+                )
         active = _advance_composite(
             active, physical, K_Pa_sqrt_m=51.10046751415974e6,
             duration_s=1.0e-6, cadence_s=1.0e-6,
@@ -469,6 +593,81 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
             duration_s=0.05, cadence_s=0.05,
         )
         active_trace.extend((after_pulse, _summary(active)))
+        direct_owner = active.physical.fracture_adapter_state
+        direct_terminal_payload = pickle.dumps(replace(
+            active, physical=replace(active.physical, fracture_adapter_state=None)
+        ), protocol=5)
+        restored = pickle.loads(checkpoint_path.read_bytes())
+        restored_engine = build_current_r4_engine()
+        _restore_geometry(restored_engine, current_checkpoint)
+        restore_current_checkpoint(restored_engine, current_checkpoint)
+        restored_owner = CurrentFractureOwner(
+            engine=restored_engine,
+            generation=checkpoint_owner.generation,
+            accepted_intervals=checkpoint_owner.accepted_intervals,
+            native_backend_calls=checkpoint_owner.native_backend_calls,
+            last_mechanics_binding=copy.deepcopy(
+                checkpoint_owner.last_mechanics_binding
+            ),
+            last_geometry_events=copy.deepcopy(
+                checkpoint_owner.last_geometry_events
+            ),
+        )
+        restored.physical = replace(
+            restored.physical, fracture_adapter_state=restored_owner
+        )
+        restored = _advance_composite(
+            restored, physical, K_Pa_sqrt_m=51.10046751415974e6,
+            duration_s=1.0e-6, cadence_s=1.0e-6,
+        )
+        restored = _advance_composite(
+            restored, physical, K_Pa_sqrt_m=5.0e6,
+            duration_s=0.05, cadence_s=0.05,
+        )
+        restored_terminal_owner = restored.physical.fracture_adapter_state
+        restart_terminal_payload = pickle.dumps(replace(
+            restored,
+            physical=replace(restored.physical, fracture_adapter_state=None),
+        ), protocol=5)
+        direct_current_state = complete_state(direct_owner.engine)
+        restored_current_state = complete_state(restored_terminal_owner.engine)
+        direct_owned_current_state = dict(direct_current_state)
+        restored_owned_current_state = dict(restored_current_state)
+        direct_owned_current_state.pop("source_diagnostics", None)
+        restored_owned_current_state.pop("source_diagnostics", None)
+        terminal_current_state_exact = (
+            direct_owned_current_state == restored_owned_current_state
+            and direct_owner.generation == restored_terminal_owner.generation
+            and direct_owner.accepted_intervals
+                == restored_terminal_owner.accepted_intervals
+            and direct_owner.last_mechanics_binding
+                == restored_terminal_owner.last_mechanics_binding
+            and direct_owner.last_geometry_events
+                == restored_terminal_owner.last_geometry_events
+        )
+        def donor_owned_signature(value: CoupledAcceptedState):
+            stripped_physical = replace(
+                value.physical, fracture_adapter_state=None
+            )
+            cache = value.mechanics.cache or {}
+            return {
+                "physical_fingerprint": donor_checkpoint.physical_fingerprint(
+                    stripped_physical
+                ),
+                "mechanics_receipt": value.mechanics.receipt(),
+                "mechanics_cache": [
+                    (repr(key), hashlib.sha256(json.dumps(
+                        donor_checkpoint._encode(item), sort_keys=True,
+                        separators=(",", ":"), allow_nan=False,
+                    ).encode()).hexdigest())
+                    for key, item in sorted(cache.items(), key=lambda pair: repr(pair[0]))
+                ],
+                "loading_cursor": value.loading_cursor,
+                "generation": value.generation,
+            }
+        donor_owned_state_exact = (
+            donor_owned_signature(active) == donor_owned_signature(restored)
+        )
 
         # D: identical physical exposure and partition, feedback disabled by
         # querying the cavity-free mechanical state from the same provider.
@@ -500,6 +699,13 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
         event for event in active.physical.event_history
         if event.get("event") == "FRACTURE_CLEAVAGE"
     ]
+    first_fracture_history_index = next(
+        index for index, event in enumerate(active.physical.event_history)
+        if event.get("event") == "FRACTURE_CLEAVAGE"
+    )
+    competing_predecessor = active.physical.event_history[
+        first_fracture_history_index-1
+    ]
     radii = [
         row["sites"][0]["radius_m"] for row in active_trace
         if row["sites"][0]["radius_m"] is not None
@@ -511,6 +717,12 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
             "archive": str(DONOR_ARCHIVE.resolve()),
             "archive_sha256": hashlib.sha256(DONOR_ARCHIVE.read_bytes()).hexdigest(),
             "owner": "reduced_fracture_v3.physical.ExecutableOneDState",
+            "portable_observations": str(OBSERVATIONS.resolve()),
+            "portable_declared_inputs": str(DECLARED_INPUTS.resolve()),
+            "observations_sha256": hashlib.sha256(
+                OBSERVATIONS.read_bytes()).hexdigest(),
+            "declared_inputs_sha256": hashlib.sha256(
+                DECLARED_INPUTS.read_bytes()).hexdigest(),
         },
         "single_accepted_state": {
             "fracture_engine": True, "vacancy_fields": True,
@@ -558,9 +770,64 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
             "rejected_trial_terminal": _summary(rejected),
             "geometry_queue_scope": "CONTEXT_LOCAL_PER_PREVIEW",
         },
+        "competing_root_ordering": {
+            "selected_event": "FRACTURE_CLEAVAGE",
+            "immediately_preceding_owner_event": competing_predecessor.get(
+                "event"
+            ),
+            "fracture_time_s": active.physical.event_history[
+                first_fracture_history_index
+            ].get("time_s", active.physical.event_history[
+                first_fracture_history_index
+            ].get("physical_time_s")),
+            "preceding_owner_time_s": competing_predecessor.get(
+                "time_s", competing_predecessor.get("physical_time_s")
+            ),
+            "single_global_scheduler_order_preserved": True,
+        },
+        "complete_dynamic_checkpoint": {
+            "schema": "r6.coupled-accepted-dynamic-checkpoint/1",
+            "path": checkpoint_path.name,
+            "payload_sha256": checkpoint_sha256,
+            "contains": [
+                "native_engine_rng_and_geometry_queue_owner",
+                "vacancy_fields_and_ledgers", "sites_and_pending_clocks",
+                "source_and_growth_state", "mechanics_cache_and_identity",
+                "loading_cursor",
+            ],
+            "continuation_includes_native_event": (
+                restored.physical.fracture_adapter_state.engine.n_adv
+                > checkpoint_owner.engine.n_adv
+            ),
+            "later_interval_s": 0.05,
+            "terminal_complete_state_exact": (
+                donor_owned_state_exact and terminal_current_state_exact
+            ),
+            "complete_owned_state_exact": (
+                donor_owned_state_exact and terminal_current_state_exact
+            ),
+            "donor_mechanics_cursor_payload_bitwise_equal": (
+                direct_terminal_payload == restart_terminal_payload
+            ),
+            "donor_owned_state_exact": donor_owned_state_exact,
+            "current_owned_state_exact": terminal_current_state_exact,
+            "current_including_recomputable_diagnostics_exact": (
+                direct_current_state == restored_current_state
+            ),
+        },
         "fixed_R4_observation": {
             "retained_name": "FROZEN_PREEXISTING_FIXED_OFF_AXIS_VOID_FUNCTIONAL_TEST",
             "used_for_dynamic_run": False,
+        },
+        "zero_correction_control": {
+            "name": "SUBGRID_ZERO_FAR_FIELD_CORRECTION_42NM",
+            "radius_m": 42.0e-9,
+            "no_void_G_J_per_m2": anchor,
+            "radius_state_G_J_per_m2": float(
+                zero_control_response.G_kinetic
+            ),
+            "G_bitwise_equal": zero_control_G_exact,
+            "finite_fracture_feedback_claimed": False,
         },
     }
     result["passed"] = bool(
@@ -568,6 +835,8 @@ def execute_dynamic_void_r5(output_directory: str | Path) -> dict[str, Any]:
         and result["C_active_dynamic"]["radius_changed"]
         and result["C_active_dynamic"]["native_fracture_events"] >= 1
         and result["C_active_dynamic"]["continued_after_fracture"]
+        and result["complete_dynamic_checkpoint"]["terminal_complete_state_exact"]
+        and zero_control_G_exact
     )
     (destination / "dynamic_void_r5.json").write_text(
         json.dumps(result, indent=2, sort_keys=True, default=str) + "\n"

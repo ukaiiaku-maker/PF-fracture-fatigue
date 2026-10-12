@@ -19,20 +19,33 @@ MODEL_ID = "r5.phase-and-native-step-convergence/1"
 
 
 def _run_through_event_and_reload(engine: Any, waveform: FatigueWaveform,
-                                  phase_count: int, maximum_cycles: int):
+                                  phase_count: int, maximum_cycles: int,
+                                  endpoint_cycles: float = 3.0,
+                                  outer_refreshes_per_phase: int = 1):
     cursor = PhaseCursor()
     rows = []
     events = []
     first_event_elapsed_cycles = None
-    stop_cycle = None
+    elapsed_s = 0.0
+    endpoint_s = float(endpoint_cycles) * waveform.period_s
+    endpoint_tolerance_s = max(64.0*math.ulp(endpoint_s), 1.0e-15)
     with pending_geometry_event_scope():
         while cursor.cycle < maximum_cycles:
-            before_cycle = cursor.cycle
-            before_phase = cursor.phase_index
-            row = _advance_one_subcall(engine, cursor, waveform, phase_count)
-            phase_duration = waveform.period_s / phase_count
-            fraction = row["consumed_s"] / phase_duration
-            elapsed = before_cycle + (before_phase + fraction) / phase_count
+            if (first_event_elapsed_cycles is not None
+                    and endpoint_s-elapsed_s <= endpoint_tolerance_s):
+                break
+            refresh_cap = (
+                waveform.period_s / phase_count
+                / int(outer_refreshes_per_phase)
+            )
+            if first_event_elapsed_cycles is not None:
+                refresh_cap = min(refresh_cap, endpoint_s-elapsed_s)
+            row = _advance_one_subcall(
+                engine, cursor, waveform, phase_count,
+                maximum_subcall_s=refresh_cap,
+            )
+            elapsed_s += float(row["consumed_s"])
+            elapsed = elapsed_s / waveform.period_s
             row["physical_elapsed_cycles"] = elapsed
             row["continuous_micro_advance_m"] = float(engine.micro_advance_total_m)
             row["checkpoint_reward_advance_m"] = float(
@@ -43,21 +56,27 @@ def _run_through_event_and_reload(engine: Any, waveform: FatigueWaveform,
                 events.append(copy.deepcopy(row))
                 if first_event_elapsed_cycles is None:
                     first_event_elapsed_cycles = elapsed
-                    stop_cycle = math.floor(elapsed) + 2
-            if stop_cycle is not None and cursor.cycle >= stop_cycle:
+            if (first_event_elapsed_cycles is not None
+                    and endpoint_s-elapsed_s <= endpoint_tolerance_s):
                 break
     if first_event_elapsed_cycles is None:
         raise RuntimeError("fatigue convergence arm did not reach a native advance")
     return {
         "phase_count": phase_count,
+        "outer_refreshes_per_phase": int(outer_refreshes_per_phase),
         "rows": rows, "events": events,
         "first_event_elapsed_cycles": first_event_elapsed_cycles,
         "completed_cycles": cursor.cycle,
-        "fractional_elapsed_cycles": (
-            cursor.cycle + cursor.phase_index / phase_count
-            + cursor.remaining_phase_s / waveform.period_s
+        "fractional_elapsed_cycles": elapsed_s / waveform.period_s,
+        "common_endpoint_cycles": endpoint_cycles,
+        "reload_after_first_event_completed": (
+            endpoint_s-elapsed_s <= endpoint_tolerance_s
         ),
-        "reload_after_first_event_completed": cursor.cycle >= stop_cycle,
+        "elapsed_time_monotone": all(
+            rows[index]["physical_elapsed_cycles"]
+            > rows[index-1]["physical_elapsed_cycles"]
+            for index in range(1, len(rows))
+        ),
         "terminal": complete_state(engine),
     }
 
@@ -85,6 +104,13 @@ def execute_fatigue_convergence_r5(
         )
         row["max_action_substep"] = float(limit)
         native_rows.append(row)
+    outer_rows = []
+    for refreshes in (1, 2):
+        engine = copy.deepcopy(parent)
+        outer_rows.append(_run_through_event_and_reload(
+            engine, waveform, 24, maximum_cycles,
+            outer_refreshes_per_phase=refreshes,
+        ))
     phase24 = next(row for row in phase_rows if row["phase_count"] == 24)
     result = {
         "schema": MODEL_ID,
@@ -101,10 +127,21 @@ def execute_fatigue_convergence_r5(
         },
         "phase_drive_refinement": phase_rows,
         "native_state_step_refinement_at_24_phases": native_rows,
+        "outer_source_refresh_refinement_at_24_phases": outer_rows,
         "separation": {
             "phase_count_changes_applied_drive_quadrature": True,
             "native_action_limit_changes_internal_state_resolution": True,
+            "outer_refresh_changes_source_state_refresh_at_fixed_phase_drive": True,
             "dimensions_varied_separately": True,
+        },
+        "qualification": {
+            "status": "REFINEMENT_EXECUTED",
+            "accuracy_qualified": False,
+            "reason": (
+                "phase refinement remains outside a declared prospective "
+                "first-event tolerance"
+            ),
+            "common_physical_endpoint_cycles": 3.0,
         },
         "time_conventions": {
             "r4_reported_completed_cycle_count": 23,
@@ -121,7 +158,10 @@ def execute_fatigue_convergence_r5(
     }
     result["passed"] = bool(
         all(row["events"] and row["reload_after_first_event_completed"]
-            for row in phase_rows + native_rows)
+            and row["elapsed_time_monotone"]
+            and math.isclose(row["fractional_elapsed_cycles"], 3.0,
+                             rel_tol=0.0, abs_tol=2.0e-12)
+            for row in phase_rows + native_rows + outer_rows)
     )
     target = Path(output).resolve()
     target.parent.mkdir(parents=True, exist_ok=True)

@@ -1,3 +1,5 @@
+import pytest
+
 from arrhenius_fracture.mechanical_correspondence_r5 import (
     execute_mechanical_correspondence_r5, signed_consumer_probe,
 )
@@ -19,3 +21,9 @@ def test_complete_mechanical_input_replay(tmp_path):
     assert result["passed"]
     assert result["common_random_owner"]["forked_complete_initial_owner"]
     assert result["positive_loading_result_changed_after_sign_fix"]
+    causal = result["causal_localization"]
+    assert causal["first_divergent_accepted_update"] == "load_20um_geometry_commit"
+    assert causal["common_event_owner"]["spatial_event_advance_m"] == pytest.approx(
+        causal["common_event_owner"]["reduced_event_advance_m"]
+    )
+    assert causal["first_different_state_coordinate"]["spatial_path_angle_deg"] != 0.0

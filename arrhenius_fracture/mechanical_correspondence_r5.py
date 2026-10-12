@@ -5,6 +5,7 @@ import copy
 import csv
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -18,6 +19,16 @@ from .stochastic_avalanche_tip import pending_geometry_event_scope
 
 
 MODEL_ID = "r5.complete-mechanical-input-correspondence/1"
+
+
+def _install_recorded_random_owner(engine: Any) -> Any:
+    """Install the spatial trace's declared seed/substream on a virgin owner."""
+    engine._hazard_rng = np.random.default_rng(np.random.SeedSequence([1733, 1]))
+    engine.hazard_threshold_action = engine._draw_threshold()
+    engine.hazard_action_current = 0.0
+    engine.hazard_event_index = 0
+    engine.hazard_threshold_history = []
+    return engine
 
 
 def _sha256(path: Path) -> str:
@@ -68,7 +79,7 @@ def _run(
 
 
 def signed_consumer_probe() -> dict[str, Any]:
-    parent = _build_spatial_event_law_engine()
+    parent = _install_recorded_random_owner(_build_spatial_event_law_engine())
     rows = []
     for label, tau in (
         ("mixed_signed", (-2.0e8, 3.0e8)),
@@ -119,26 +130,38 @@ def execute_mechanical_correspondence_r5(
     audit_path = root / "anisotropic_emission_audit_v10174.json"
     steps_path = root / "steps_0900K.csv"
     audit = json.loads(audit_path.read_text())
+    geometry_events_path = root / "stochastic_avalanche_geometry_events.json"
+    spatial_geometry_events = json.loads(geometry_events_path.read_text())
     spatial_csv = list(csv.DictReader(steps_path.open()))
     records = audit["records"]
     if len(records) != 5 or len(spatial_csv) != 5:
         raise RuntimeError("R5 correspondence requires the five-stage spatial run")
     labels = ["load_10um", "load_20um", "load_30um", "unload_20um", "reload_30um"]
+    prior_path_angles = [0.0, 0.0]
+    prior_path_angles.extend(
+        math.degrees(math.atan2(
+            float(item["y1"])-float(item["y0"]),
+            float(item["x1"])-float(item["x0"]),
+        ))
+        for item in spatial_geometry_events[:3]
+    )
     steps = [{
         "stage": label,
         "K_Pa_sqrt_m": float(csv_row["KJ_Pa_sqrtm"]),
         "duration_s": float(csv_row["dt_cur_s"]),
         "opening_m": float(csv_row["Uapp_m"]),
         "projected_tip_m": float(csv_row["a_tip_m"]),
-        "path_angle_deg": 0.0,
+        "path_angle_deg": prior_path_angles[index],
         "drive_factors": tuple(float(x) for x in record["anisotropic_drive_factors"]),
         "tau_signed_Pa": tuple(float(x) for x in record["anisotropic_tau_signed_Pa"]),
         "spatial_N_em": float(csv_row["N_em"]),
         "spatial_r_eff_m": float(record["persistent_tip_radius_m"]),
         "spatial_fired": bool(float(csv_row["n_fire"]) > 0.0),
-    } for label, csv_row, record in zip(labels, spatial_csv, records, strict=True)]
+    } for index, (label, csv_row, record) in enumerate(
+        zip(labels, spatial_csv, records, strict=True)
+    )]
 
-    parent = _build_spatial_event_law_engine()
+    parent = _install_recorded_random_owner(_build_spatial_event_law_engine())
     initial = complete_state(parent)
     k_only = _run(copy.deepcopy(parent), steps, complete_inputs=False)
     complete = _run(copy.deepcopy(parent), steps, complete_inputs=True)
@@ -161,6 +184,46 @@ def execute_mechanical_correspondence_r5(
             "complete_input_fired": full["fired"],
         })
     probe = signed_consumer_probe()
+    first_event = spatial_geometry_events[0]
+    first_spatial_angle = math.degrees(math.atan2(
+        float(first_event["y1"])-float(first_event["y0"]),
+        float(first_event["x1"])-float(first_event["x0"]),
+    ))
+    reduced_first_event = complete["geometry_events"][0]
+    causal_localization = {
+        "aligned_through_stage": "load_20um_pre_geometry_commit",
+        "first_divergent_accepted_update": "load_20um_geometry_commit",
+        "stage_index": 1,
+        "common_event_owner": {
+            "hazard_seed": int(first_event["hazard_seed"]),
+            "hazard_event_index": int(first_event["hazard_event_index"]),
+            "threshold_action": float(first_event["threshold_action"]),
+            "spatial_event_advance_m": float(first_event["event_advance_m"]),
+            "reduced_event_advance_m": float(
+                reduced_first_event["event_advance_m"]),
+        },
+        "first_different_state_coordinate": {
+            "name": "new_path_tangent_and_material_frame",
+            "spatial_path_angle_deg": first_spatial_angle,
+            "reduced_path_angle_deg": 0.0,
+            "spatial_endpoint_m": [first_event["x1"], first_event["y1"]],
+            "reduced_representation": "ONE_DIMENSIONAL_PATH_LENGTH_ONLY",
+        },
+        "downstream_consequence": {
+            "next_stage": "load_30um",
+            "spatial_N_em": steps[2]["spatial_N_em"],
+            "reduced_N_em": complete["rows"][2]["N_em"],
+            "relative_population_error": comparisons[2][
+                "complete_input_relative_population_error"
+            ],
+            "mechanism": (
+                "spatial tangent/crystal-frame remap and re-equilibration are "
+                "not representable by the one-dimensional replay"
+            ),
+        },
+        "future_population_imported": False,
+        "future_event_time_imposed": False,
+    }
     result = {
         "schema": MODEL_ID,
         "spatial_source": str(root),
@@ -189,6 +252,7 @@ def execute_mechanical_correspondence_r5(
         "complete_input_replay": complete,
         "comparisons": comparisons,
         "signed_consumer_probe": probe,
+        "causal_localization": causal_localization,
         "positive_loading_result_changed_after_sign_fix": any(
             abs(float(a["active_mobile"]) - float(b["active_mobile"])) > 1.0e-6
             for a, b in zip(

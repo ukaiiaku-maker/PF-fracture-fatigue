@@ -1,0 +1,80 @@
+{
+  "cavity_emission_parameter_row": {
+    "attempt_frequency_s": 100000000000.0,
+    "barrier_critical_stress_Pa": 3000000000.0,
+    "barrier_exp_a": 1.0,
+    "barrier_exp_n": 1.0,
+    "barrier_floor_fraction": 0.05,
+    "barrier_floor_min_J": 1e-23,
+    "barrier_kind": "exp_floor",
+    "burgers_m": 2.74e-10,
+    "calibration_status": "REFERENCE_UNCALIBRATED",
+    "chi_loop": 1.0,
+    "continuum_mu_min": 25.0,
+    "depletion_per_loop": 0.02,
+    "escaped_loop_fraction": 0.2,
+    "loop_projection": "REDUCED_CYLINDRICAL_2D",
+    "loop_swept_area_m2": 6.283185307179587e-09,
+    "low_count_mu_max": 0.25,
+    "maximum_packet_area_fraction": 0.02,
+    "minimum_stable_radius_m": 5e-10,
+    "model_thickness_m": 1.0,
+    "recovery_rate_s": 0.001,
+    "retained_loop_fraction": 0.8,
+    "row_id": "hypothesis.elevated-emission-v1:G0-J=1.8e-19",
+    "schema": "unified-2d.embryo-growth/1",
+    "source_orientations_rad": [
+      0.0,
+      1.0471975511965976,
+      2.0943951023931953
+    ],
+    "surface_energy_J_m2": 2.5,
+    "surface_source_density_per_m": 200000000.0,
+    "zero_stress_barrier_J": 1.8e-19
+  },
+  "classification": "PROSPECTIVE_UNCALIBRATED_PARAMETER_HYPOTHESIS",
+  "direct_parameter_row": {
+    "burgers_m": 2.74e-10,
+    "calibration_status": "REFERENCE_UNCALIBRATED",
+    "chi_loop": 1.0,
+    "embryo_reference_radius_m": 1e-09,
+    "interaction_attempt_law": "C_dd*rho_forest*M*abs(epdot_eq)/b",
+    "interaction_barrier_eV": 0.25,
+    "interaction_geometry_factor_C_dd": 1e-08,
+    "loop_projection": "REDUCED_CYLINDRICAL_2D",
+    "loop_swept_area_m2": 6.283185307179587e-09,
+    "required_interaction_hits": 3,
+    "row_id": "hypothesis.elevated-mixed-v1:Cdd=1e-08:barrier-eV=0.25",
+    "schema": "unified-2d.dislocation-interaction-voiding/1",
+    "stress_activation_volume_m3": 1.6e-29,
+    "successful_direct_outcome_fraction": 0.1,
+    "taylor_factor_M": 3.06,
+    "unit_thickness_m": 1.0
+  },
+  "initial_load_factor": 1.5,
+  "maximum_equivalent_plastic_strain": 0.05,
+  "maximum_physical_time_s": 20.0,
+  "parameters_fixed_during_run": true,
+  "population_partition": [
+    0.5,
+    0.1,
+    0.4
+  ],
+  "schema": "unified-2d.natural-void-hypothesis-run/1",
+  "site_centers_m": [
+    [
+      0.0006,
+      0.0
+    ],
+    [
+      0.00075,
+      0.0
+    ]
+  ],
+  "source_scout": "/Volumes/Data/Data/Nanopillar_calculation/voiding/recovered-pr63/runs/managed_natural_void_v1_20260919/source/artifacts/natural_void_hypothesis_scout_v1/scout.json",
+  "source_scout_sha256": "f1dff5a9251d936e1999fda160f74d4fe1320fb981cb7542ea682169b15c0ff9",
+  "stochastic_seed": 3621,
+  "subsequent_load_factor": 1.0,
+  "temperature_K": 1200.0,
+  "vacancy_energy_variant": "combined"
+}

@@ -49,13 +49,26 @@ def _build_stochastic_engine():
             mode="threshold_scaled", minimum_factor=0.5,
             maximum_factor=4.0, geometry_subsegment_fraction=0.1,
         )
-        return build_current_r4_engine(
+        engine = build_current_r4_engine(
             SharedReducedConfig(
                 mpz_length_um=50.0, mpz_n_bins=80, wake_length_um=50.0,
                 max_internal_steps=100000,
             ),
             spatial_strength_contract=False,
         )
+        # The historical selected stochastic owner is seed/substream (1733,1).
+        # Engine construction ids are process-global diagnostics and must not
+        # silently change the physical mark when unrelated tests construct an
+        # engine first.  Install the declared owner explicitly on this virgin
+        # state before any action is accumulated.
+        engine._hazard_rng = np.random.default_rng(
+            np.random.SeedSequence([1733, 1])
+        )
+        engine.hazard_threshold_action = engine._draw_threshold()
+        engine.hazard_action_current = 0.0
+        engine.hazard_event_index = 0
+        engine.hazard_threshold_history = []
+        return engine
     finally:
         engine_type._hazard_config_default = old_hazard
         engine_type._avalanche_config_default = old_avalanche
@@ -67,15 +80,20 @@ def _phase_K(waveform: FatigueWaveform, phase_count: int, index: int) -> float:
 
 
 def _advance_one_subcall(engine: Any, cursor: PhaseCursor,
-                         waveform: FatigueWaveform, phase_count: int):
+                         waveform: FatigueWaveform, phase_count: int,
+                         maximum_subcall_s: float | None = None):
     duration = waveform.period_s / phase_count
     if cursor.remaining_phase_s <= 0.0:
         cursor.remaining_phase_s = duration
     K = _phase_K(waveform, phase_count, cursor.phase_index)
     from .reduced_persistent_reference_r2 import advance_signed
+    phase_remaining_before = float(cursor.remaining_phase_s)
+    requested = phase_remaining_before
+    if maximum_subcall_s is not None:
+        requested = min(requested, float(maximum_subcall_s))
     result = advance_signed(
         engine, K_Pa_sqrt_m=K, temperature_K=1800.0,
-        dt_s=cursor.remaining_phase_s,
+        dt_s=requested,
     )
     consumed = float(result["kinetic_dt_consumed_s"])
     unused = float(result["kinetic_dt_unused_s"])
@@ -89,7 +107,7 @@ def _advance_one_subcall(engine: Any, cursor: PhaseCursor,
         "phase_midpoint_rad": (
             (cursor.phase_index + 0.5) * 2.0 * math.pi / phase_count
         ),
-        "K_Pa_sqrt_m": K, "requested_s": cursor.remaining_phase_s,
+        "K_Pa_sqrt_m": K, "requested_s": requested,
         "consumed_s": consumed, "unused_s": unused,
         "fired": bool(result["fired"]), "event": event,
         "threshold_before_completion": float(
@@ -103,7 +121,7 @@ def _advance_one_subcall(engine: Any, cursor: PhaseCursor,
         "gross_return_slip": float(engine.mpz.cumulative_gross_return_activity),
         "net_source_slip": float(engine.mpz.local_slip_count()),
     }
-    cursor.remaining_phase_s = unused
+    cursor.remaining_phase_s = max(phase_remaining_before-consumed, 0.0)
     tolerance = max(64.0 * np.spacing(duration), 1.0e-15)
     if cursor.remaining_phase_s <= tolerance:
         cursor.remaining_phase_s = 0.0

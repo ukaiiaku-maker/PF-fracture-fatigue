@@ -162,6 +162,24 @@ class CurrentPersistentFractureAdapter:
         result = self.commit(trial)
         return result, trial.geometry_events
 
+    def advance_adaptive_source_refresh(
+        self, *, applied_K_Pa_sqrt_m: float, temperature_K: float,
+        duration_s: float, tolerance=None,
+    ) -> dict[str, Any]:
+        """Publish only a converged full-versus-two-half source trajectory."""
+        from .accepted_update_controller_r6 import (
+            SourceRefreshTolerance, advance_current_source_adaptive,
+        )
+        selected = SourceRefreshTolerance() if tolerance is None else tolerance
+        accepted, receipt = advance_current_source_adaptive(
+            self.engine, applied_K_Pa_sqrt_m=applied_K_Pa_sqrt_m,
+            temperature_K=temperature_K, duration_s=duration_s,
+            tolerance=selected,
+        )
+        self.engine = accepted
+        self.generation += 1
+        return receipt
+
     def checkpoint(self) -> AdapterCheckpoint:
         return AdapterCheckpoint(self.generation, copy.deepcopy(self.engine))
 
