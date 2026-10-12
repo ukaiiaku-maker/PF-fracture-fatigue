@@ -1,0 +1,45 @@
+{
+  "schema": "common-framework-qualification-receipt/1",
+  "date": "2026-10-12",
+  "status": "CODE_AND_EVIDENCE_PASS_WITH_SCIENTIFIC_GATES_OPEN",
+  "pf_release_commit_tested": "6f1d4a7f",
+  "pf_framework_generation_parent": "e274b28c",
+  "fem_czm_companion_commit_tested": "6d7dcbe",
+  "environment": {
+    "pf_python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "fem_czm_python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"
+  },
+  "clean_checkout": {
+    "kind": "detached_git_worktree",
+    "commit": "6f1d4a7f",
+    "portable_tests": {
+      "passed": 52,
+      "failed": 0
+    },
+    "complete_pf_tests": {
+      "passed": 856,
+      "failed": 0
+    },
+    "external_evidence": {
+      "mandatory_items": 13,
+      "passed": 13,
+      "incomplete": 0,
+      "restored_raw_size_display": "1.7 GiB"
+    }
+  },
+  "independent_fem_czm_suite": {
+    "passed": 684,
+    "subtests_passed": 16,
+    "failed": 0,
+    "historical_version_assertions_replaced_by_semantic_compatibility_contract": true,
+    "stale_fatigue_source_transform_replaced_by_current_audited_behavior_contract": true
+  },
+  "production_campaign_launched": false,
+  "manuscript_modified": false,
+  "local_raw_data_deleted": false,
+  "scientific_gates_remaining": [
+    "recursive physical branch birth and developed daughter continuation",
+    "production PF/FEM-CZM mesh and observer-support convergence",
+    "author selection of the P7 finite-ligament kinetic interpretation"
+  ]
+}
