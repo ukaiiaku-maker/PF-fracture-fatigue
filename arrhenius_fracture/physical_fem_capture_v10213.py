@@ -26,6 +26,7 @@ from .frozen_measurement_reconstruction_v10227 import FrozenMeasurementMeshConfi
 from .physical_fem_capture_v10212 import (
     CaptureRequest,
     PhysicalFEMCapture as _BaseCapture,
+    _accepted_crack_extension,
 )
 from .physical_fem_capture_trace_v10212 import PhysicalFEMCapture as _TraceCapture
 
@@ -156,11 +157,7 @@ class PhysicalFEMCapture(_TraceCapture):
             return
         sigma_local = float(engine.sigma_tip(K))
         opening = min(max(sigma_local / sigma_cap, 0.0), 1.0)
-        path_extension = max(
-            float(getattr(engine, "micro_advance_total_m", 0.0)),
-            float(getattr(engine.mpz, "advance_total_m", 0.0)),
-            0.0,
-        )
+        path_extension = _accepted_crack_extension(engine)
         temperature = float(T)
         tip = np.asarray(drive["tip_xy_m"], dtype=float).reshape(2)
         direction = np.asarray(drive["front_direction"], dtype=float).reshape(2)
@@ -238,11 +235,7 @@ class PhysicalFEMCapture(_TraceCapture):
                     max(float(engine.sigma_tip(K)) / max(sigma_cap, 1.0e-30), 0.0),
                     1.0,
                 ),
-                "crack_extension_m": max(
-                    float(getattr(engine, "micro_advance_total_m", 0.0)),
-                    float(getattr(engine.mpz, "advance_total_m", 0.0)),
-                    0.0,
-                ),
+                "crack_extension_m": _accepted_crack_extension(engine),
             }
             request = self._matching_request(float(T), coordinates)
             if request is not None:

@@ -176,6 +176,18 @@ def _coerce_crack_path(
     return ()
 
 
+def _accepted_crack_extension(engine: Any) -> float:
+    """Prefer the geometry owner's accepted arclength over kinetic counters."""
+    geometric = getattr(engine, "_accepted_crack_path_extension_m", None)
+    if geometric is not None and math.isfinite(float(geometric)):
+        return max(float(geometric), 0.0)
+    return max(
+        float(getattr(engine, "micro_advance_total_m", 0.0)),
+        float(getattr(engine.mpz, "advance_total_m", 0.0)),
+        0.0,
+    )
+
+
 def _digest_array(hasher, name: str, value: Any) -> None:
     array = np.ascontiguousarray(np.asarray(value))
     hasher.update(name.encode("utf-8"))
@@ -338,11 +350,7 @@ class PhysicalFEMCapture:
             "opening_strength_fraction": min(
                 max(sigma_local / sigma_cap, 0.0), 1.0
             ),
-            "crack_extension_m": max(
-                float(getattr(engine, "micro_advance_total_m", 0.0)),
-                float(getattr(engine.mpz, "advance_total_m", 0.0)),
-                0.0,
-            ),
+            "crack_extension_m": _accepted_crack_extension(engine),
         }
         request = self._matching_request(float(T), coordinates)
         if request is None:

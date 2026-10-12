@@ -12,7 +12,10 @@ from arrhenius_fracture.frozen_measurement_reconstruction_v10227 import (
     _reapply_frozen_sharp_crack,
     _resolve_crack_path,
 )
-from arrhenius_fracture.physical_fem_capture_v10212 import _coerce_crack_path
+from arrhenius_fracture.physical_fem_capture_v10212 import (
+    _accepted_crack_extension,
+    _coerce_crack_path,
+)
 from arrhenius_fracture.kernel_configuration_v10227 import (
     MechanicalKernelConfiguration,
 )
@@ -28,6 +31,15 @@ def test_capture_recovers_the_accepted_nonzero_orientation_polyline_from_engine(
 
     path = _coerce_crack_path({}, (0.507e-3, 7.0e-6), Engine())
     assert path == Engine._accepted_crack_path_xy_m
+
+
+def test_capture_uses_geometry_owner_arclength_before_kinetic_counters():
+    class Engine:
+        _accepted_crack_path_extension_m = 31.0e-6
+        micro_advance_total_m = 35.0e-6
+        mpz = SimpleNamespace(advance_total_m=35.0e-6)
+
+    assert _accepted_crack_extension(Engine()) == 31.0e-6
 
 
 def test_capture_reconstruction_has_no_front_or_mpz_kinetic_entry_points():
