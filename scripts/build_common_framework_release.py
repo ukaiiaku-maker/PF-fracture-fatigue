@@ -43,7 +43,7 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
     if not rows:
         raise ValueError(f"refusing empty CSV: {path}")
     with path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
