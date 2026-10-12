@@ -8,6 +8,7 @@ previous attempt and never treats a failed attestation as a physical censor.
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import csv
 import json
 import os
@@ -60,6 +61,15 @@ RATE_FACTORS = {0.01, 1.0, 100.0}
 ORIENTATION_45_CONDITIONS = {("DBTT", 300), ("DBTT", 1200),
                              ("Peak", 300), ("Peak", 900)}
 SOURCE_GEOGRAPHIES = {"bulk_uniform", "tip_plus_bulk"}
+CAPTURE_ENVIRONMENT_KEYS = (
+    "MECHANICAL_CONFIG",
+    "PYTHON_BIN",
+    "CONDA_ENV",
+    "CONDA_DEFAULT_ENV",
+    "KERNEL_CAPTURE_SEED_FAMILY",
+    "KERNEL_CAPTURE_PARAMETER_OPTION",
+    "KERNEL_CAPTURE_HAZARD_SEED",
+)
 
 
 def rows() -> list[dict[str, str]]:
@@ -259,6 +269,33 @@ def write_matrix(entries: list[dict[str, str]]) -> None:
     temporary.replace(MATRIX)
 
 
+@contextmanager
+def isolated_capture_environment(nonzero_orientation: bool):
+    """Scope resolver-only variables to one case and restore the caller env."""
+    missing = object()
+    previous = {key: os.environ.get(key, missing) for key in CAPTURE_ENVIRONMENT_KEYS}
+    for key in CAPTURE_ENVIRONMENT_KEYS:
+        os.environ.pop(key, None)
+    if nonzero_orientation:
+        os.environ.update({
+            "MECHANICAL_CONFIG": str(BASE_KERNEL_CONFIGURATION),
+            "PYTHON_BIN": str(PYTHON_BIN),
+            "CONDA_ENV": "arrhenius-sharp-front-v10-codex",
+            "CONDA_DEFAULT_ENV": "arrhenius-sharp-front-v10-codex",
+            "KERNEL_CAPTURE_SEED_FAMILY": str(ORIENTATION_KERNEL_BOOTSTRAP),
+            "KERNEL_CAPTURE_PARAMETER_OPTION": MATERIAL_OPTIONS["DBTT"],
+            "KERNEL_CAPTURE_HAZARD_SEED": "1733",
+        })
+    try:
+        yield
+    finally:
+        for key, value in previous.items():
+            if value is missing:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
+
 def execute_group(entries: list[dict[str, str]], *, group: str, resume: bool,
                   maximum: int | None, case_id: str | None) -> list[dict[str, object]]:
     prefix = {
@@ -294,20 +331,13 @@ def execute_group(entries: list[dict[str, str]], *, group: str, resume: bool,
             "CLEAVAGE_EVENT_MIN_FACTOR": "0.5",
             "CLEAVAGE_EVENT_MAX_FACTOR": "4.0",
         })
-        if float(row["orientation_deg"]) != 0.0:
+        nonzero_orientation = float(row["orientation_deg"]) != 0.0
+        if nonzero_orientation:
             for required in (BASE_KERNEL_CONFIGURATION, ORIENTATION_KERNEL_BOOTSTRAP, PYTHON_BIN):
                 if not required.is_file():
                     raise FileNotFoundError(required)
-            os.environ.update({
-                "MECHANICAL_CONFIG": str(BASE_KERNEL_CONFIGURATION),
-                "PYTHON_BIN": str(PYTHON_BIN),
-                "CONDA_ENV": "arrhenius-sharp-front-v10-codex",
-                "CONDA_DEFAULT_ENV": "arrhenius-sharp-front-v10-codex",
-                "KERNEL_CAPTURE_SEED_FAMILY": str(ORIENTATION_KERNEL_BOOTSTRAP),
-                "KERNEL_CAPTURE_PARAMETER_OPTION": MATERIAL_OPTIONS["DBTT"],
-                "KERNEL_CAPTURE_HAZARD_SEED": "1733",
-            })
-        execute_shared(options, native, target, source_policy="qualified")
+        with isolated_capture_environment(nonzero_orientation):
+            execute_shared(options, native, target, source_policy="qualified")
         close_matrix_row(row, target)
         write_matrix(entries)
         completed.append({"case_id": row["case_id"], "action": "executed", "path": str(target)})

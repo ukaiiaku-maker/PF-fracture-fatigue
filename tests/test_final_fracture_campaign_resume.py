@@ -56,3 +56,18 @@ def test_nonzero_orientation_does_not_reuse_theta_zero_kernel():
     _, native = campaign.configured_case(row)
     assert "--signed-kernel-family" not in native
     assert native[native.index("--crystal-theta-deg") + 1] == "45"
+
+
+def test_capture_environment_is_scoped_and_restored(monkeypatch):
+    key = "KERNEL_CAPTURE_SEED_FAMILY"
+    monkeypatch.setenv(key, "callers-value")
+    with campaign.isolated_capture_environment(True):
+        assert campaign.ORIENTATION_KERNEL_BOOTSTRAP.samefile(
+            campaign.ORIENTATION_KERNEL_BOOTSTRAP
+        )
+        assert campaign.os.environ[key] == str(campaign.ORIENTATION_KERNEL_BOOTSTRAP)
+    assert campaign.os.environ[key] == "callers-value"
+
+    with campaign.isolated_capture_environment(False):
+        assert key not in campaign.os.environ
+    assert campaign.os.environ[key] == "callers-value"
