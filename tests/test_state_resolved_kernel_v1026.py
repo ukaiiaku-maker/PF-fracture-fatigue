@@ -71,7 +71,7 @@ def test_family_rejects_extrapolation():
         )
 
 
-def _write_builder_inputs(tmp_path: Path, two_magnitudes=True):
+def _write_builder_inputs(tmp_path: Path, two_magnitudes=True, zero_wake=False):
     tmp_path.mkdir(parents=True, exist_ok=True)
     response = tmp_path / "responses.csv"
     normalization = tmp_path / "normalization.json"
@@ -102,6 +102,8 @@ def _write_builder_inputs(tmp_path: Path, two_magnitudes=True):
                         H_I = (1.0 if region == "active" else 0.5) * (
                             system + 1
                         )
+                        if zero_wake and region == "wake":
+                            H_I = 0.0
                         H_II = 0.1 * H_I
                         for sign in (-1, 1):
                             for magnitude in magnitudes:
@@ -194,3 +196,43 @@ def test_builder_requires_two_magnitudes_and_builds_loadable_family(tmp_path):
     )
     assert failed.returncode != 0
     assert "at least two perturbation magnitudes" in (failed.stderr + failed.stdout)
+
+
+def test_builder_serializes_inactive_zero_response_as_json_null(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    script = root / "scripts" / "build_v10_2_6_state_resolved_kernel_family.py"
+    response, normalization = _write_builder_inputs(
+        tmp_path, two_magnitudes=True, zero_wake=True
+    )
+    output = tmp_path / "family.json"
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--responses",
+            str(response),
+            "--normalization",
+            str(normalization),
+            "--out",
+            str(output),
+        ],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr + completed.stdout
+    assert "NaN" not in output.read_text()
+    payload = json.loads(output.read_text(), parse_constant=lambda value: pytest.fail(value))
+    wake_checks = [
+        check
+        for check in payload["linearity_checks"]
+        if check["key"][1] == "wake"
+    ]
+    assert wake_checks
+    assert all(
+        amplitude["normalized_coefficient_ratio"] is None
+        for check in wake_checks
+        for mode in check["modes"].values()
+        for amplitude in mode["amplitude_checks"]
+    )

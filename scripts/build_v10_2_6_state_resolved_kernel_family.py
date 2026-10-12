@@ -137,7 +137,11 @@ def _validate_group(
             for row in ordered[1:]:
                 n = abs(_float(row, "delta_signed_line_content"))
                 coefficient = _coefficient(row, mode)
-                ratio = coefficient / c0 if abs(c0) > 0.0 else math.nan
+                # A mechanically inactive row can have identically zero
+                # influence at every perturbation amplitude.  Its 0/0 ratio
+                # is undefined, but that diagnostic must not poison the
+                # otherwise finite kernel-family artifact with JSON NaN.
+                ratio = coefficient / c0 if abs(c0) > 0.0 else None
                 amplitude_checks.append(
                     {
                         "sign": sign,
@@ -465,7 +469,7 @@ def main() -> None:
         "geometry": normalization.get("geometry", {}),
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(payload, indent=2))
+    args.out.write_text(json.dumps(payload, indent=2, allow_nan=False))
     print(
         json.dumps(
             {
