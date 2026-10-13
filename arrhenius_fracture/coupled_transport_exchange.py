@@ -77,7 +77,7 @@ def _partitioned_exponential_action(matrix, vectors, dt, activity, limit=1.0e2):
 
 
 def _partitioned_affine_action(
-    matrix, vectors, dt, activity, dynamic_size: int, limit=1.0e2
+    matrix, vectors, dt, activity, dynamic_size: int, limit=1.0
 ):
     """Compose the exact bounded-step affine map without state projection."""
     parts = max(1, int(np.ceil(max(float(activity), 0.0) / float(limit))))
