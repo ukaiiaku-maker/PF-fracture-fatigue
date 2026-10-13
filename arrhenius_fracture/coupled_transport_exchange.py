@@ -223,7 +223,12 @@ def joint_transport_exchange(
     error = accounted - initial - emitted
     if abs(error) > tolerance:
         raise FloatingPointError(
-            f"joint transport/exchange conservation error {error:.6e} exceeds {tolerance:.6e}"
+            f"joint transport/exchange conservation error {error:.6e} exceeds {tolerance:.6e}; "
+            f"initial={initial:.9e}, emitted={emitted:.9e}, dt={dt:.9e}, "
+            f"ke_max={float(np.max(ke)):.9e}, kr_max={float(np.max(kr)):.9e}, "
+            f"hop_max={float(np.max(hop)):.9e}, activity={activity:.9e}, "
+            f"population={float(np.sum(m1)+np.sum(r1)):.9e}, "
+            f"escaped={escaped:.9e}, recovered={recovered:.9e}"
         )
     return CoupledTransportExchangeResult(
         mobile=m1,
