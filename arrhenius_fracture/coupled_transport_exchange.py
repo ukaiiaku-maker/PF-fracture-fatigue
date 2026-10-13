@@ -253,25 +253,6 @@ def joint_transport_exchange(
     if float(np.min(physical)) < -tolerance:
         raise FloatingPointError("joint transport/exchange produced a negative population")
     physical = np.maximum(physical, 0.0)
-    preliminary_budget = np.sum(m0 + r0, axis=1) + np.sum(source, axis=1) * dt
-    preliminary_accounted = (
-        np.sum(physical[:n].T + physical[n : 2 * n].T, axis=1)
-        + physical[escaped_i] + physical[recovered_i]
-    )
-    if np.any(
-        np.abs(preliminary_budget - preliminary_accounted)
-        > 1.0e-4 * np.maximum(preliminary_budget, 1.0)
-    ):
-        conditioned_final = _independent_stiff_action(
-            conditioned_generator, conditioned_initial, dt
-        )
-        final = inverse_change @ conditioned_final
-        physical = final[: 2 * n + 2]
-        if float(np.min(physical)) < -tolerance:
-            raise FloatingPointError(
-                "independent stiff solve produced a negative population"
-            )
-        physical = np.maximum(physical, 0.0)
     m1 = physical[:n].T
     r1 = physical[n : 2 * n].T
     escaped_by_species = np.asarray(physical[escaped_i], dtype=float).copy()
