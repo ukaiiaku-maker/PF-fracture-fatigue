@@ -8,5 +8,6 @@ The F1/F4 repair is documented in `F1_F4_REPAIR_RECORD.md`; its storage-light
 active native restart receipt is `F1_ACTIVE_NATIVE_QUALIFICATION.json`, and the
 corrected native-backed parameter diagnostic is
 `PARAMETER_PARENT_DOSSIER_V2_NATIVE.json`. The historical v1 dossier is retained.
-The complete preserved working checkout passes 879/879 tests; see
+The complete working checkout and a real clean clone of `9c122ea6`, with only
+mandatory manifest evidence restored, each pass 901/901 tests; see
 `QUALIFICATION_RECEIPT.json`.

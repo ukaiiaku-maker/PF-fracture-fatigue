@@ -4,16 +4,17 @@
   "manuscript_modified": false,
   "pf_working_checkout": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
-    "tested_content_commit": "327abde972c20166b94067905456d82f4cf19da9",
-    "passed": 879,
+    "tested_content_commit": "8982d4222970d24a1b476a601996cc791788402e",
+    "passed": 901,
     "failed": 0,
-    "elapsed_s": 156.87
+    "elapsed_s": 141.53
   },
   "f1_f4_targeted": {
-    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_f1_no_physics_fallback.py tests/test_parameter_dossier_native_derivatives.py tests/test_shared_entry_v1025.py tests/test_signed_burgers_shared_v1025.py tests/test_v10221_backstress_complementarity.py tests/test_v10221_no_source_inventory.py tests/test_v10221_persistent_site_source.py tests/test_v10_2_30_high_cycle_engine.py tests/test_v10_integrated_baseline.py",
-    "passed": 50,
+    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_v10221_persistent_site_source.py tests/test_v10_2_30_high_cycle_engine.py tests/test_coupled_transport_exchange.py tests/test_f1_no_physics_fallback.py tests/test_parameter_dossier_native_derivatives.py tests/test_taylor_release_contract.py tests/test_signed_burgers_shared_v1025.py tests/test_v10221_backstress_complementarity.py tests/test_v10221_no_source_inventory.py",
+    "passed": 65,
     "failed": 0,
-    "elapsed_s": 1.33
+    "elapsed_s": 1.38,
+    "scope_addition": "C13 joint operator, continuous source/backstress time partitioning, full coupled ledgers and F4 runtime semantics"
   },
   "fem_independent_checkout": {
     "command": "python -m pytest -q",
@@ -24,15 +25,13 @@
     "commit": "90cb6671523bb676cb241eb850b7f5fd41cf5461"
   },
   "clean_checkout_pf": {
-    "commit": "abe1db4f",
-    "full_command_passed": 857,
-    "full_command_failed": 11,
-    "full_command_failure_class": "EXTERNAL_UNTRACKED_EVIDENCE_ABSENT_FROM_CLEAN_GIT_CHECKOUT",
-    "source_only_command": "python -m pytest -q with seven named external-evidence consumer files excluded",
-    "source_only_passed": 852,
-    "source_only_failed": 0,
-    "elapsed_s": 141.54,
-    "status": "SOURCE_ONLY_CLEAN_CHECKOUT_PASSED; EXTERNAL_EVIDENCE_TESTED_IN_WORKING_CHECKOUT"
+    "commit": "9c122ea65fa7058caa79a7792c90b06abf6802e6",
+    "method": "real local Git clone with only mandatory EXTERNAL_EVIDENCE_MANIFEST items restored",
+    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+    "full_command_passed": 901,
+    "full_command_failed": 0,
+    "elapsed_s": 103.55,
+    "status": "FULL_CLEAN_CHECKOUT_PASSED_WITH_MANDATORY_MANIFEST_EVIDENCE"
   },
   "scientific_production": "NOT_REQUESTED_ON_THIS_MACHINE"
 }
