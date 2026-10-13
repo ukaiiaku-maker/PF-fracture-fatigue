@@ -1,22 +1,23 @@
 {
+  "schema": "common-fracture-readiness-source-identities/2",
+  "generated_utc": "2026-10-13",
   "controlling_continuation": {
-    "date": "2026-10-12",
-    "sha256": "4b7f26abe18811c7ac20dac3395866f6d1c76d62a10cf4fa5e767912306beeb0"
+    "date": "2026-10-13",
+    "sha256": "cf461810fd7e52a9ce52295a7d1fd6f78a8b55e9a5216d535c1a6cd60a280366"
   },
   "external_evidence_manifest": {
     "path": "../common_framework_release/EXTERNAL_EVIDENCE_MANIFEST.json",
     "sha256": "58d2a3d1c5bfb10ec5788c162edeae50d17810055c706a20acbb6660c52974aa"
   },
+  "pf": {
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "qualified_solver_commit": "2276745b06220125354687f04c182c8d11be66dd",
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1"
+  },
   "fem": {
     "branch": "codex/current-pf-companion",
     "commit": "90cb6671523bb676cb241eb850b7f5fd41cf5461",
-    "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion"
-  },
-  "generated_utc": "2026-10-12T23:32:48.939068+00:00",
-  "pf": {
-    "branch": "codex/shared-fracture-fatigue-options-v1",
-    "commit": "327abde972c20166b94067905456d82f4cf19da9",
-    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1"
-  },
-  "schema": "common-fracture-readiness-source-identities/1"
+    "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
+    "status": "unchanged_not_rerun_in_this_repair"
+  }
 }

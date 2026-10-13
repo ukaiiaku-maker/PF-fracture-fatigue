@@ -1,32 +1,50 @@
 {
-  "schema": "f1-coupled-native-qualification/3",
+  "schema": "f1-coupled-native-qualification/4",
   "date": "2026-10-13",
-  "status": "PASSED_COMPACT_CORRECTED_LAW",
+  "status": "PASSED_FULL_NATIVE_CORRECTED_LAW",
   "production_execution_authorized": false,
   "current_record": "TAYLOR_PEIERLS_NATIVE_REPAIR.json",
   "equation_to_consumer_map": "TAYLOR_PEIERLS_EQUATION_CONSUMER_MAP.md",
   "parameter_dossier": "PARAMETER_PARENT_DOSSIER_V2_NATIVE.json",
+  "source_commit": "2276745b06220125354687f04c182c8d11be66dd",
   "current_operator_contract": {
     "outer_mode": "validated_scalar",
-    "spatial_meaning": "per-bin Peierls velocity is consumed by the CTMC; scalar velocity is diagnostic only",
+    "spatial_meaning": "per-bin Peierls velocity is consumed by the transport generator; scalar velocity is diagnostic only",
     "exchange_transport_mode": "joint_ctmc",
-    "source": "continuous mobile injection inside the joint CTMC",
+    "source": "continuous mobile injection inside the joint generator",
     "taylor_completion_constructor": {
       "mode": "mean_net_rate_over_density_order",
       "window_s": null,
       "single_rate_cap_s": null
     },
     "runtime_binding_checked_before_and_after_every_step": true,
-    "fresh_process_binding_checked": true
+    "fresh_process_binding_checked": true,
+    "local_equilibrium_projection": false
   },
-  "corrected_native_950K": {
-    "root": "../integration_evidence/native_taylor_peierls_spatial_e5982762",
-    "restart_comparison": "restart_comparison.json",
+  "subsystem_fixture": {
+    "root": "../integration_evidence/native_taylor_peierls_subsystem_2253257c",
+    "status": "PASSED",
+    "classification": "PRESCRIBED_DRIVE_NATIVE_SUBSYSTEM_SYNTHETIC_KERNEL",
+    "full_mechanics_acceptance_evidence": false,
     "bitwise_terminal_state_equal": true,
-    "emitted_line_content_total": 0.2803744981639119,
-    "maximum_velocity_m_s": 118804.25402475965,
-    "terminal_velocity_m_s": 118804.2540247594,
-    "maximum_invariant_roundoff_correction": 5.0862092315639984e-15
+    "complete_ledgers_owned_once": true
+  },
+  "corrected_native_950K_full_mechanics": {
+    "root": "../integration_evidence/f1_native_taylor_peierls_qualification_2276745b",
+    "status": "PASSED",
+    "actual_specimen_equilibrium": true,
+    "initial_terminal_step": 48,
+    "restart_terminal_step": 64,
+    "uninterrupted_terminal_step": 64,
+    "restart_comparison": "restart_comparison.json",
+    "complete_terminal_state_equal": true,
+    "state_arrays_bitwise_equal": 11,
+    "normalized_outer_and_kinetic_json_equal": true,
+    "time_state_refinement": "time_state_refinement.json",
+    "kinetic_state_contraction_ratio": 0.49579100350381394,
+    "mechanical_state_preserved_to_1e-12_relative_l2": true,
+    "population_ledgers_close_to_2e-12": true,
+    "forced_fracture_or_topology_event": false
   },
   "historical_one_second_qualification": {
     "root": "../integration_evidence/f1_coupled_native_qualification_8982d422",
@@ -38,12 +56,12 @@
     "backup_path": "/Users/shen/Fracture_Backups/common-framework-20261012/f1-coupled-native-qualification-8982d422.tar",
     "backup_sha256": "14be87d004214c102bb059b56eaa8e9dec429a5c196f46c6e62def8012a0a7c0"
   },
-  "full_mechanics_corrected_law_attempt": {
+  "superseded_failed_full_mechanics_attempt": {
     "root": "../integration_evidence/f1_native_taylor_peierls_failed_source_residual_a43c8199",
-    "status": "FAILED_NUMERICAL_QUALIFICATION",
+    "status": "PRESERVED_DIAGNOSTIC_SUPERSEDED_BY_CORRECTED_FULL_QUALIFICATION",
     "source_complementarity_residual": 0.0007850824,
     "limit": 0.0001,
     "accepted_as_physical_evidence": false
   },
-  "scientific_scope": "Compact numerical/readiness qualification only; no production campaign, material retuning, forced fracture, manuscript change, or goal change."
+  "scientific_scope": "Full-mechanics numerical/readiness qualification only; no production campaign, material retuning, forced fracture, manuscript change, or goal change."
 }

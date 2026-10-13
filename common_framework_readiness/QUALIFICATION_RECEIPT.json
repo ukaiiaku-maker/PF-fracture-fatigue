@@ -1,22 +1,32 @@
 {
-  "schema": "common-fracture-readiness-qualification-receipt/1",
+  "schema": "common-fracture-readiness-qualification-receipt/2",
+  "date": "2026-10-13",
   "production_execution_authorized": false,
   "manuscript_modified": false,
   "pf_working_checkout": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
-    "tested_content_commit": "8982d4222970d24a1b476a601996cc791788402e",
-    "passed": 901,
+    "tested_content_commit": "2276745b06220125354687f04c182c8d11be66dd",
+    "passed": 913,
     "failed": 0,
-    "elapsed_s": 141.53
+    "elapsed_s": 200.43
   },
-  "f1_f4_targeted": {
-    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_v10221_persistent_site_source.py tests/test_v10_2_30_high_cycle_engine.py tests/test_coupled_transport_exchange.py tests/test_f1_no_physics_fallback.py tests/test_parameter_dossier_native_derivatives.py tests/test_taylor_release_contract.py tests/test_signed_burgers_shared_v1025.py tests/test_v10221_backstress_complementarity.py tests/test_v10221_no_source_inventory.py",
-    "passed": 65,
+  "final_source_repair_targeted": {
+    "passed": 56,
     "failed": 0,
-    "elapsed_s": 1.38,
-    "scope_addition": "C13 joint operator, continuous source/backstress time partitioning, full coupled ledgers and F4 runtime semantics"
+    "elapsed_s": 16.07,
+    "scope": "coupled transport, persistent source fixed point/root bracket, native Taylor-Peierls kinetics and signed recovery ownership"
   },
-  "fem_independent_checkout": {
+  "full_native_950K": {
+    "source_commit": "2276745b06220125354687f04c182c8d11be66dd",
+    "evidence_root": "../integration_evidence/f1_native_taylor_peierls_qualification_2276745b",
+    "initial_terminal_step": 48,
+    "fresh_process_restart_terminal_step": 64,
+    "uninterrupted_terminal_step": 64,
+    "restart_comparison_status": "PASS",
+    "complete_terminal_state_equal": true,
+    "time_state_refinement_status": "PASS"
+  },
+  "historical_fem_independent_checkout_not_rerun": {
     "command": "python -m pytest -q",
     "passed": 686,
     "subtests_passed": 16,
@@ -24,14 +34,14 @@
     "elapsed_s": 260.89,
     "commit": "90cb6671523bb676cb241eb850b7f5fd41cf5461"
   },
-  "clean_checkout_pf": {
+  "historical_clean_checkout_pf_not_current_head": {
     "commit": "9c122ea65fa7058caa79a7792c90b06abf6802e6",
     "method": "real local Git clone with only mandatory EXTERNAL_EVIDENCE_MANIFEST items restored",
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
     "full_command_passed": 901,
     "full_command_failed": 0,
     "elapsed_s": 103.55,
-    "status": "FULL_CLEAN_CHECKOUT_PASSED_WITH_MANDATORY_MANIFEST_EVIDENCE"
+    "status": "HISTORICAL_FULL_CLEAN_CHECKOUT_PASS"
   },
   "scientific_production": "NOT_REQUESTED_ON_THIS_MACHINE"
 }

@@ -99,3 +99,21 @@ blocks it.  A synthetic positive-feedback regression and the exact retained
 step-46 replay both pass.  Next action: commit, then recompute the clean prefix
 under the final source before restart/uninterrupted comparison.
 
+## Completed native qualification, 13 October 2026
+
+- Commit `2276745b` repairs the positive-feedback source bracket without
+  changing the source law: the interval expands until the actual residual has a
+  sign change or the original mechanical gate blocks.
+- A clean actual 950 K full-PF run reached step 48, a fresh-process restart and
+  an independent uninterrupted run reached step 64, and all 11 stored state
+  arrays plus normalized `outer.json` and `kinetic.json` were exactly equal.
+- The actual full-PF step-46-to-48 interval was refined from 8.4 s to 4.2 s and
+  2.1 s. Kinetic and important ledger errors contracted by about 0.50,
+  mechanics were preserved to `1e-12` relative L2, and population ledgers
+  closed to `5.684e-14`.
+- The current working checkout passed 913 tests in 200.43 s; the final focused
+  source/operator/recovery set passed 56 tests in 16.07 s.
+- Final remaining action is administrative only: commit the corrected readiness
+  records, build one compact source/evidence package, copy it to the independent
+  backup location, verify hashes, and retain all local and historical evidence.
+

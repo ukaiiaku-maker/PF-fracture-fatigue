@@ -1,9 +1,9 @@
 {
-  "schema": "taylor-peierls-native-repair/1",
+  "schema": "taylor-peierls-native-repair/2",
   "date": "2026-10-13",
-  "status": "PASSED_COMPACT_NATIVE_QUALIFICATION",
+  "status": "PASSED_FULL_NATIVE_QUALIFICATION",
   "production_execution_authorized": false,
-  "source_head_at_qualification": "e59827626f984675c2dcfeb9fa37c5cdf5570aea",
+  "source_head_at_qualification": "2276745b06220125354687f04c182c8d11be66dd",
   "physical_selection": {
     "taylor_mode": "mean_net_rate_over_density_order",
     "taylor_window_s": null,
@@ -16,7 +16,7 @@
     "peierls_elementary_rate_cap_s": null,
     "signed_forward_reverse_rates": true,
     "zero_bias_cancellation_tested": true,
-    "true_reversal_tested": true,
+    "true_reversal_with_nonzero_native_recovery_tested": true,
     "physical_jump_length": "f_jump/(2*sqrt(rho_f))",
     "spatial_velocity_consumer": "per-bin field"
   },
@@ -32,50 +32,88 @@
     ],
     "local_equilibrium_projection": false,
     "binary_affine_composition_changes_physics": false,
-    "independent_oracle": "scipy BDF integration of the same complete augmented generator"
+    "moderate_scale_method": "exact full mobile-plus-retained population-block exponential with integrated-flux identity",
+    "extreme_scale_method": "error-controlled BDF on the identical augmented generator",
+    "independent_oracle": "high-accuracy Radau integration of the same complete augmented generator",
+    "all_corrections_reported_in_physical_population_units": true
   },
-  "compact_spatial_qualification": {
-    "root": "../integration_evidence/native_taylor_peierls_spatial_e5982762",
+  "nonlinear_source_repair": {
+    "outer_state_captured_before_source_trials": true,
+    "accepted_state_coefficients_recomputed": true,
+    "accepted_state_and_source_residuals_checked": true,
+    "affine_direct_consistency_checked": true,
+    "exact_rollback_on_failure": true,
+    "configured_max_iterations": 64,
+    "configured_coupled_tolerance": 1e-06,
+    "positive_feedback_root_bracket_expands_to_actual_sign_change": true
+  },
+  "subsystem_qualification": {
+    "root": "../integration_evidence/native_taylor_peierls_subsystem_2253257c",
+    "scope": "prescribed-drive native subsystem integration fixture with synthetic shielding kernel; no specimen equilibrium solve",
     "temperature_K": 950.0,
     "tip_opening_stress_Pa": 5000000000.0,
     "bins": 16,
-    "signed_systems": 2,
-    "interval_s": 0.01,
     "steps": 12,
     "emitted_line_content_total": 0.2803744981639119,
-    "maximum_velocity_m_s": 118804.25402475965,
-    "terminal_velocity_m_s": 118804.2540247594,
-    "maximum_coefficient_residual": 2.9061335834785507e-18,
-    "maximum_source_complementarity_residual": 8.067260544809756e-10,
-    "maximum_invariant_roundoff_correction": 5.0862092315639984e-15,
-    "complete_trace_maximum": "maximum_velocity_trace.json",
-    "complete_trace_terminal": "terminal_velocity_trace.json"
-  },
-  "restart": {
-    "fresh_process": true,
-    "checkpoint_step": 6,
-    "terminal_step": 12,
+    "escaped_total": 0.28037449192304725,
+    "gross_trapping_total": 41.635967837568955,
+    "gross_release_total": 41.63596783147075,
+    "mobile_distance_population_total_m": 2.032715087370969e-06,
+    "maximum_coefficient_residual": 4.0130622634575045e-16,
+    "maximum_complete_numerical_correction": 3.5006719745211967e-15,
+    "maximum_population_ledger_balance_error": 2.7755575615628914e-17,
+    "fresh_process_restart": true,
     "arrays_and_scalars_compared": 28,
     "bitwise_terminal_state_equal": true,
     "report": "restart_comparison.json"
   },
+  "full_native_qualification": {
+    "root": "../integration_evidence/f1_native_taylor_peierls_qualification_2276745b",
+    "temperature_K": 950.0,
+    "actual_specimen_mechanics": true,
+    "native_local_drive_and_kernel": true,
+    "persistent_spatial_state_feedback": true,
+    "initial_run_terminal_step": 48,
+    "restart_and_uninterrupted_terminal_step": 64,
+    "forced_fracture_or_topology_event": false,
+    "restart": {
+      "fresh_process": true,
+      "complete_terminal_state_equal": true,
+      "state_arrays_compared": 11,
+      "normalized_outer_and_kinetic_json_equal": true,
+      "report": "restart_comparison.json"
+    },
+    "time_state_refinement": {
+      "interval": "actual full-PF native step 46 to step 48",
+      "dt_s": [8.4, 4.2, 2.1],
+      "same_displacement_and_physical_time_endpoint": true,
+      "mechanical_state_preserved_to_relative_l2": 1e-12,
+      "kinetic_error_contraction_ratio": 0.49579100350381394,
+      "important_ledger_error_contraction_below": 0.55,
+      "maximum_population_ledger_balance_error": 5.684341886080802e-14,
+      "report": "time_state_refinement.json"
+    }
+  },
   "tests": {
-    "native_kinetics": "tests/test_native_taylor_peierls_kinetics.py",
-    "coupled_operator": "tests/test_coupled_transport_exchange.py",
-    "persistent_source": "tests/test_v10221_persistent_site_source.py",
-    "stiff_oracle_test": "test_stiff_affine_source_and_diagnostics_match_independent_bdf_oracle"
+    "full_suite_passed": 913,
+    "full_suite_failed": 0,
+    "full_suite_elapsed_s": 200.43,
+    "focused_after_final_source_repair_passed": 56,
+    "focused_after_final_source_repair_failed": 0,
+    "focused_after_final_source_repair_elapsed_s": 16.07
   },
   "preserved_historical_evidence": {
     "one_second_run": "../integration_evidence/f1_coupled_native_qualification_8982d422",
     "classification": "HISTORICAL_REJECTED_ONE_SECOND_LAW",
     "independent_backup": "/Users/shen/Fracture_Backups/common-framework-20261012/f1-coupled-native-qualification-8982d422.tar"
   },
-  "failed_full_mechanics_diagnostic": {
+  "superseded_failed_diagnostic": {
     "root": "../integration_evidence/f1_native_taylor_peierls_failed_source_residual_a43c8199",
-    "classification": "FAILED_NUMERICAL_SOURCE_COMPLEMENTARITY_NOT_ACCEPTANCE_EVIDENCE",
+    "classification": "PRESERVED_HISTORICAL_NUMERICAL_DIAGNOSTIC",
     "source_complementarity_residual": 0.0007850824,
     "acceptance_limit": 0.0001,
-    "note": "The corrected physics was retained. The run was not accepted, and no cap, clock, equilibrium projection, or altered rate was introduced to force it through."
+    "superseded_by": "full_native_qualification",
+    "note": "The diagnostic exposed the source-root bracket defect. It remains preserved but is not acceptance evidence."
   },
-  "scope": "storage-light qualification only; no production campaign, fitting, manuscript change, historical deletion, or remote action"
+  "scope": "readiness qualification only; no production campaign, fitting, manuscript change, historical deletion, or remote action"
 }
