@@ -83,9 +83,14 @@ def _partitioned_affine_action(
     parts = max(1, int(np.ceil(max(float(activity), 0.0) / float(limit))))
     propagator = expm(np.asarray(matrix, dtype=float) * (float(dt) / parts))
     n = int(dynamic_size)
-    base_a = propagator[:n, :n]
-    base_b = propagator[:n, n:]
-    result_a = np.eye(n)
+    # The bounded exponential is evaluated in float64 by LAPACK, then its
+    # O(log(parts)) affine compositions use extended precision. This retains
+    # tiny source/transport columns beside O(1e11) exchange eigenvalues without
+    # modifying the generator or normalizing the resulting population.
+    work_dtype = np.longdouble
+    base_a = np.asarray(propagator[:n, :n], dtype=work_dtype)
+    base_b = np.asarray(propagator[:n, n:], dtype=work_dtype)
+    result_a = np.eye(n, dtype=work_dtype)
     result_b = np.zeros_like(base_b)
     remaining = parts
     while remaining:
@@ -95,11 +100,11 @@ def _partitioned_affine_action(
         base_b = base_a @ base_b + base_b
         base_a = base_a @ base_a
         remaining >>= 1
-    initial = np.asarray(vectors, dtype=float)
+    initial = np.asarray(vectors, dtype=work_dtype)
     output = np.zeros_like(initial)
     output[:n] = result_a @ initial[:n] + result_b @ initial[n:]
     output[n:] = initial[n:]
-    return output
+    return np.asarray(output, dtype=float)
 
 
 def joint_transport_exchange(
