@@ -266,3 +266,18 @@ def test_large_transport_partition_count_uses_same_semigroup():
     )
     expected = np.array([[np.exp(-20.0)], [1.0 - np.exp(-20.0)]])
     np.testing.assert_allclose(actual, expected, rtol=2e-12, atol=2e-12)
+
+
+def test_active_950_scale_large_hop_preserves_small_species_budget():
+    n = 80
+    mobile = np.zeros((1, n))
+    retained = np.zeros((1, n))
+    retained[0, 0] = 2.202448e-2
+    out = joint_transport_exchange(
+        mobile, retained, KE_1200, KR_1200,
+        velocity_m_s=V_1200, dt_s=21.0, dx_m=LENGTH / n,
+    )
+    remaining = float(np.sum(out.mobile) + np.sum(out.retained))
+    assert remaining <= retained[0, 0]
+    assert np.isclose(remaining + out.escaped, retained[0, 0], atol=2e-10)
+    assert out.invariant_projection_correction <= 1e-12

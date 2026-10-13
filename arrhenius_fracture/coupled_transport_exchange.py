@@ -76,6 +76,45 @@ def _partitioned_exponential_action(matrix, vectors, dt, activity, limit=1.0e4):
     return np.linalg.matrix_power(propagator, parts) @ np.asarray(vectors, dtype=float)
 
 
+def _partitioned_population_action(
+    matrix, vectors, dt, activity, population_size: int, limit=1.0e4
+):
+    """Stable binary composition of a substochastic population affine map."""
+    parts = max(1, int(np.ceil(max(float(activity), 0.0) / float(limit))))
+    propagator = expm(np.asarray(matrix, dtype=float) * (float(dt) / parts))
+    n = int(population_size)
+    source_size = propagator.shape[0] - n
+    base_a = np.maximum(propagator[:n, :n], 0.0)
+    base_b = np.maximum(propagator[:n, n:], 0.0)
+
+    def project(a):
+        result = np.maximum(a, 0.0)
+        sums = np.sum(result, axis=0)
+        high = sums > 1.0
+        if np.any(high):
+            result[:, high] /= sums[high]
+        return result
+
+    base_a = project(base_a)
+    result_a = np.eye(n)
+    result_b = np.zeros((n, source_size))
+    remaining = parts
+    while remaining:
+        if remaining & 1:
+            result_b = base_a @ result_b + base_b
+            result_a = project(base_a @ result_a)
+        base_b = base_a @ base_b + base_b
+        base_a = project(base_a @ base_a)
+        remaining >>= 1
+    initial = np.asarray(vectors, dtype=float)
+    output = np.zeros_like(initial)
+    output[:n] = result_a @ initial[:n]
+    if source_size:
+        output[:n] += result_b @ initial[n:]
+        output[n:] = initial[n:]
+    return output
+
+
 def joint_transport_exchange(
     mobile,
     retained,
@@ -183,8 +222,9 @@ def joint_transport_exchange(
             indices = np.r_[:n, source_j0:size_reduced]
             population = reduced[indices][:, indices]
             population_vectors = vectors[indices]
-        physical_evolved = _partitioned_exponential_action(
-            population, population_vectors, dt, max_hop_dt
+        physical_evolved = _partitioned_population_action(
+            population, population_vectors, dt, max_hop_dt,
+            population_size=n,
         )
         total1 = np.maximum(physical_evolved[:n].T, 0.0)
         # The augmented source columns can lose several digits when expm
