@@ -1,60 +1,54 @@
 import numpy as np
-from scipy.special import gammainc
 
 from arrhenius_fracture.taylor_release import (
-    FINITE_WINDOW_MODE,
-    LEGACY_MODE,
-    SEQUENTIAL_MEAN_MODE,
+    NATIVE_MEAN_MODE,
     completion_rate,
-    finite_window_completion,
+    density_completion_order,
+    historical_legacy_implicit_1s,
+    runtime_selection,
+    signed_arrhenius_components,
 )
+from arrhenius_fracture.material_manifest import ExpFloorBarrier
 from arrhenius_fracture.unified_mpz import UnifiedMPZState
 
 
-def test_legacy_is_exact_archived_expression():
+def test_historical_one_second_expression_is_quarantined_and_reproducible():
     rate = np.array([0.0, 1.0e-20, 0.25, 1.0, 1.0e6, 1.0e13])
     order = np.array([1.0, 2.0, 3.0, 7.5, 50.0, 2.0])
-    expected = gammainc(np.maximum(order, 1.0), np.clip(rate, 0.0, 1.0e12))
-    actual = completion_rate(rate, order, mode=LEGACY_MODE)
-    assert np.array_equal(actual, expected)
-    assert np.all(actual <= 1.0)
+    historical = historical_legacy_implicit_1s(rate, order)
+    native = completion_rate(rate, order)
+    assert np.all(historical <= 1.0)
+    assert native[-1] == 5.0e12
+    assert runtime_selection() == (NATIVE_MEAN_MODE, None, None)
 
 
-def test_finite_window_changes_argument_and_normalization():
-    rate = np.array([1.0e2, 1.0e8, 1.0e11])
-    order = np.array([1.0, 3.0, 43.0])
-    tau = 1.0e-9
-    expected = gammainc(order, np.minimum(rate, 1.0e12) * tau) / tau
-    actual = completion_rate(rate, order, mode=FINITE_WINDOW_MODE, window_s=tau)
-    np.testing.assert_allclose(actual, expected, rtol=0.0, atol=0.0)
-    assert not np.allclose(actual, completion_rate(rate, order, mode=LEGACY_MODE) / tau)
-
-
-def test_seconds_to_milliseconds_unit_invariance():
-    rate_s = np.array([1.0e-6, 2.5e4, 1.0e11])
+def test_native_mean_completion_is_dimensionally_unit_invariant_and_uncapped():
+    rate_s = np.array([1.0e-6, 2.5e4, 1.0e14])
     order = np.array([1.0, 4.5, 43.0])
-    per_s = finite_window_completion(
-        rate_s, order, window_in_unit=1.0e-9, rate_cap_per_unit=1.0e12
-    )
-    rate_ms = rate_s / 1000.0
-    per_ms = finite_window_completion(
-        rate_ms, order, window_in_unit=1.0e-6, rate_cap_per_unit=1.0e9
-    )
-    np.testing.assert_allclose(per_ms * 1000.0, per_s, rtol=2.0e-15, atol=0.0)
+    per_s = completion_rate(rate_s, order)
+    per_ms = completion_rate(rate_s / 1000.0, order)
+    np.testing.assert_allclose(per_ms * 1000.0, per_s, rtol=2e-15)
+    assert per_s[-1] > 1.0e12
 
 
-def test_limits_and_nonfinite_inputs():
-    rate = np.array([0.0, -1.0, np.nan, np.inf, 1.0e-30, 1.0e12])
-    order = np.array([1.0, 1.0, 1.0, 1.0, 8.0, 1.0e6])
-    for mode in (LEGACY_MODE, FINITE_WINDOW_MODE, SEQUENTIAL_MEAN_MODE):
-        result = completion_rate(rate, order, mode=mode, window_s=1.0e-9)
-        assert np.all(np.isfinite(result))
-        assert np.all(result >= 0.0)
-        assert result[0] == result[1] == result[2] == 0.0
-    first_order = completion_rate(
-        np.array([1.0e-12]), np.array([1.0]), mode=FINITE_WINDOW_MODE, window_s=1.0e-9
+def test_density_order_is_the_documented_uncapped_expression():
+    rho = np.array([0.0, 4.0e12, 1.0e24])
+    actual = density_completion_order(
+        rho, correlation_scale=2.5, correlation_density_m2=1.0e12
     )
-    np.testing.assert_allclose(first_order, [1.0e-12], rtol=2.0e-15)
+    np.testing.assert_allclose(actual, 1.0 + 2.5 * np.sqrt(rho / 1.0e12))
+    assert actual[-1] > 1.0e6
+
+
+def test_forward_reverse_identity_zero_bias_and_reversal():
+    surface = ExpFloorBarrier(1.2, 0.0, 2.0e9, 0.0, 1.4, 1.1, 0.1)
+    stress = np.array([-8.0e8, 0.0, 8.0e8])
+    parts = signed_arrhenius_components(surface, stress, 950.0)
+    assert parts["net_rate_s"][1] == 0.0
+    assert parts["forward_rate_s"][1] == parts["reverse_rate_s"][1]
+    assert parts["net_rate_s"][0] == -parts["net_rate_s"][2]
+    assert parts["forward_rate_s"][0] == parts["reverse_rate_s"][2]
+    assert parts["reverse_rate_s"][0] == parts["forward_rate_s"][2]
 
 
 def test_exchange_conserves_inventory_and_positivity_for_stiff_release():

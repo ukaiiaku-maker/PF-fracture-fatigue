@@ -541,7 +541,7 @@ def _signed_evolve_scalar(
             retained0,
             rates["encounter"],
             rates["taylor"],
-            velocity_m_s=max(velocity, 0.0),
+            velocity_m_s=np.maximum(rates["velocity"], 0.0),
             dt_s=dt,
             dx_m=self.dx,
             mobile_recovery_rate_s=max(float(self.cfg.mobile_recovery_rate_s), 0.0),

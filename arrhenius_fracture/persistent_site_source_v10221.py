@@ -577,11 +577,11 @@ def _coupled_persistent_source_transport(
                     if np.sum(eq_mobile) > 0.0 else float(np.mean(new_rates["velocity"][:nsrc])))
         base = joint_transport_exchange(
             mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
-            velocity_m_s=max(velocity, 0.0), dt_s=dt, dx_m=self.dx,
+            velocity_m_s=np.maximum(new_rates["velocity"], 0.0), dt_s=dt, dx_m=self.dx,
         )
         unit = joint_transport_exchange(
             mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
-            velocity_m_s=max(velocity, 0.0), dt_s=dt, dx_m=self.dx,
+            velocity_m_s=np.maximum(new_rates["velocity"], 0.0), dt_s=dt, dx_m=self.dx,
             mobile_source_rate=source_unit,
         )
         for system in range(self.n_systems):
@@ -644,7 +644,7 @@ def _coupled_persistent_source_transport(
             source[row, :nsrc] = activation_rate[system] * conversion[system] / float(nsrc)
     result = joint_transport_exchange(
         mobile0, retained0, rates["encounter"], rates["taylor"],
-        velocity_m_s=max(velocity, 0.0), dt_s=dt, dx_m=self.dx,
+        velocity_m_s=np.maximum(rates["velocity"], 0.0), dt_s=dt, dx_m=self.dx,
         mobile_source_rate=source,
     )
     install_affine_state(base, unit, activation_rate)
@@ -714,6 +714,7 @@ def _coupled_persistent_source_transport(
         "iterations": iteration + 1,
         "activation_rate_s": float(np.sum(activation_rate)),
         "velocity_m_s": float(max(velocity, 0.0)),
+        "velocity_m_s_by_bin": np.maximum(rates["velocity"], 0.0).copy(),
         "coefficient_residual": float(coefficient_error),
         "complementarity_residual": float(rate_error),
     }

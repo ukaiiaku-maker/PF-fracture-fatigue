@@ -14,7 +14,10 @@ from typing import Any
 
 import numpy as np
 from .material_manifest import MaterialManifest
-from .taylor_release import completion_rate, runtime_selection
+from .taylor_release import (
+    completion_rate, density_completion_order, runtime_selection,
+    signed_arrhenius_components,
+)
 
 
 @dataclass
@@ -183,29 +186,33 @@ class UnifiedMPZState:
     def _transport_rates(self, stress_profile: np.ndarray, rho: np.ndarray, T_K: float, b: float) -> dict[str, np.ndarray]:
         p_surface = self.manifest.peierls.as_surface(self.manifest.emission)
         t_surface = self.manifest.taylor.as_surface(self.manifest.emission)
-        tau_p = max(float(self.cfg.peierls_stress_fraction), 0.0) * np.maximum(stress_profile, 0.0)
+        signed_stress = np.asarray(stress_profile, dtype=float)
+        tau_p = max(float(self.cfg.peierls_stress_fraction), 0.0) * signed_stress
         spacing = 1.0 / (2.0 * np.sqrt(np.maximum(rho, 1.0)))
         phi = spacing / max(abs(float(b)), 1.0e-30)
-        tau_t = max(float(self.cfg.taylor_stress_fraction), 0.0) * np.maximum(stress_profile, 0.0) * phi
-        p = p_surface.rate(tau_p, T_K)
-        t1 = t_surface.rate(tau_t, T_K)
-        ratio = np.sqrt(np.maximum(rho, 0.0) / max(self.manifest.taylor_corr_rho_c_m2, 1.0))
-        m = 1.0 + max(self.manifest.taylor_corr_scale, 0.0) * np.maximum(ratio - 1.0, 0.0)
-        release_mode, release_window_s, release_cap_s = runtime_selection()
-        t = completion_rate(
-            t1,
-            m,
-            mode=release_mode,
-            window_s=release_window_s,
-            rate_cap_s=release_cap_s,
+        tau_t = max(float(self.cfg.taylor_stress_fraction), 0.0) * signed_stress * phi
+        p_parts = signed_arrhenius_components(p_surface, tau_p, T_K)
+        t_parts = signed_arrhenius_components(t_surface, tau_t, T_K)
+        p = p_parts["net_rate_s"]
+        t1 = t_parts["net_rate_s"]
+        m = density_completion_order(
+            rho,
+            correlation_scale=self.manifest.taylor_corr_scale,
+            correlation_density_m2=self.manifest.taylor_corr_rho_c_m2,
         )
+        t = completion_rate(t1, m)
+        release_mode, release_window_s, release_cap_s = runtime_selection()
         jump = max(float(self.cfg.jump_fraction), 0.0) * spacing
         velocity = jump * p
-        encounter = max(self.manifest.encounter_efficiency, 0.0) * velocity * np.sqrt(np.maximum(rho, 0.0))
+        encounter = max(self.manifest.encounter_efficiency, 0.0) * np.abs(velocity) * np.sqrt(np.maximum(rho, 0.0))
         return {
             "peierls": p,
+            "peierls_forward": p_parts["forward_rate_s"],
+            "peierls_reverse": p_parts["reverse_rate_s"],
             "taylor": t,
             "taylor_single": t1,
+            "taylor_forward": t_parts["forward_rate_s"],
+            "taylor_reverse": t_parts["reverse_rate_s"],
             "m": m,
             "jump": jump,
             "velocity": velocity,

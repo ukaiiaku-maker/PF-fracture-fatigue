@@ -1,19 +1,17 @@
 """FEM adapter for the existing emission-derived Peierls/Taylor kinetics.
 
 This module does not introduce a second constitutive law.  It applies the same
-EXP-floor descendants, correlated Taylor Poisson completion, and series
+EXP-floor descendants, native mean Taylor completion, and series
 bottleneck already used by :mod:`arrhenius_fracture.unified_mpz` to P0 FEM
 stress and forest-density fields.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
-import math
-
 import numpy as np
-from scipy.special import gammainc
 
 from .material_manifest import ExpFloorBarrier
+from .taylor_release import signed_arrhenius_components
 
 
 @dataclass(frozen=True)
@@ -151,54 +149,26 @@ class EmissionDerivedPeierlsTaylorModel:
 
     def rates(self, equivalent_stress_Pa, forest_density_m2, temperature_K, burgers_vector_m):
         cfg = self.config
-        stress = np.maximum(np.asarray(equivalent_stress_Pa, float), 0.0)
+        stress = np.asarray(equivalent_stress_Pa, float)
         rho = np.maximum(np.asarray(forest_density_m2, float), 1.0)
         spacing = 1.0/(2.0*np.sqrt(rho))
         peierls_stress = cfg.peierls_stress_ratio*stress
-        phi = np.minimum(spacing/max(abs(float(burgers_vector_m)), 1.0e-30),
-                         max(cfg.taylor_phi_max, 1.0))
+        phi = spacing/max(abs(float(burgers_vector_m)), 1.0e-30)
         taylor_stress = cfg.taylor_stress_ratio*stress*phi
-        # v10.4.1 detailed balance.  The reverse barrier is symmetric about the
-        # zero-stress barrier: G_rev=2*G(0)-G_fwd.  This adds no fitted constant.
-        kT = max(8.617333262145e-5*float(temperature_K), 1.0e-30)
-        peierls_forward_barrier = np.asarray(
-            self.peierls.values_eV(peierls_stress, temperature_K), float)
-        peierls_zero_barrier = np.asarray(
-            self.peierls.values_eV(np.zeros_like(stress), temperature_K), float)
-        peierls_reverse_barrier = np.maximum(
-            2.0*peierls_zero_barrier-peierls_forward_barrier,
-            peierls_zero_barrier,
-        )
-        peierls_forward = self.peierls.attempt_frequency_s*np.exp(
-            np.clip(-peierls_forward_barrier/kT, -745.0, 0.0))
-        peierls_reverse = self.peierls.attempt_frequency_s*np.exp(
-            np.clip(-peierls_reverse_barrier/kT, -745.0, 0.0))
-        peierls_rate = np.maximum(peierls_forward-peierls_reverse, 0.0)
-        peierls_rate = np.where(stress == 0.0, 0.0, peierls_rate)
-        taylor_forward_barrier = np.asarray(
-            self.taylor.values_eV(taylor_stress, temperature_K), float)
-        taylor_zero_barrier = np.asarray(
-            self.taylor.values_eV(np.zeros_like(stress), temperature_K), float)
-        taylor_reverse_barrier = np.maximum(
-            2.0*taylor_zero_barrier-taylor_forward_barrier,
-            taylor_zero_barrier,
-        )
-        taylor_forward = self.taylor.attempt_frequency_s*np.exp(
-            np.clip(-taylor_forward_barrier/kT, -745.0, 0.0))
-        taylor_reverse = self.taylor.attempt_frequency_s*np.exp(
-            np.clip(-taylor_reverse_barrier/kT, -745.0, 0.0))
-        taylor_single = np.maximum(taylor_forward-taylor_reverse, 0.0)
-        taylor_single = np.where(stress == 0.0, 0.0, taylor_single)
+        peierls_parts = signed_arrhenius_components(
+            self.peierls, peierls_stress, temperature_K)
+        taylor_parts = signed_arrhenius_components(
+            self.taylor, taylor_stress, temperature_K)
+        peierls_forward = peierls_parts["forward_rate_s"]
+        peierls_reverse = peierls_parts["reverse_rate_s"]
+        peierls_rate = peierls_parts["net_rate_s"]
+        taylor_forward = taylor_parts["forward_rate_s"]
+        taylor_reverse = taylor_parts["reverse_rate_s"]
+        taylor_single = taylor_parts["net_rate_s"]
         density_ratio = np.sqrt(rho/max(cfg.taylor_corr_rho_c_m2, 1.0))
-        m_eff = 1.0 + max(cfg.taylor_m_scale, 0.0)*np.maximum(
-            density_ratio-1.0, 0.0,
-        )**max(cfg.taylor_m_exponent, 1.0e-12)
-        if math.isfinite(cfg.taylor_m_cap):
-            m_eff = np.minimum(m_eff, max(cfg.taylor_m_cap, 1.0))
-        renewal = max(cfg.taylor_renewal_time_s, 1.0e-30)
-        taylor_completion = gammainc(
-            np.maximum(m_eff, 1.0), np.minimum(taylor_single*renewal, 1.0e12),
-        )/renewal
+        m_eff = 1.0 + max(cfg.taylor_m_scale, 0.0)*density_ratio**max(
+            cfg.taylor_m_exponent, 1.0e-12)
+        taylor_completion = np.maximum(taylor_single, 0.0)/m_eff
         series = np.divide(
             peierls_rate*taylor_completion, peierls_rate+taylor_completion,
             out=np.zeros_like(peierls_rate), where=(peierls_rate+taylor_completion) > 0.0,
@@ -207,7 +177,7 @@ class EmissionDerivedPeierlsTaylorModel:
             cfg.mobile_fraction*rho, cfg.mobile_density_floor_m2,
             cfg.mobile_saturation_density_m2,
         )
-        jump = np.maximum(cfg.jump_fraction*spacing, cfg.jump_length_min_m)
+        jump = cfg.jump_fraction*spacing
         equivalent_rate = (max(cfg.equivalent_strain_factor, 0.0)*rho_mobile
                            *abs(float(burgers_vector_m))*jump*series)
         return {

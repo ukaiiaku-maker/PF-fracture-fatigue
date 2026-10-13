@@ -83,7 +83,9 @@ def test_corrected_dossier_is_native_v2_and_has_mechanism_specific_semantics():
     transport = dbtt["native_transport_consumer"]
     assert transport["peierls_stress_projection"] == pytest.approx(1.0 / np.sqrt(3.0))
     assert transport["taylor_stress_projection"] == pytest.approx(1.0 / np.sqrt(3.0))
-    assert transport["completion_law"]["mode"] == "legacy_implicit_1s"
+    assert transport["completion_law"]["mode"] == "mean_net_rate_over_density_order"
+    assert transport["completion_law"]["window_s"] is None
+    assert transport["completion_law"]["single_rate_cap_s"] is None
     for item in dbtt["mechanisms"]:
         assert item["native_callable"].endswith("values_eV/rate/diagnostic")
         assert "generic one-mark" not in item["completion_law"] or item["mechanism"] != "cleavage"

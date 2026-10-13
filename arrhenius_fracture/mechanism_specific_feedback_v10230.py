@@ -55,8 +55,6 @@ class MechanismSpecificFeedback:
 
             t_surface = this.p.taylor.surface(this.p.emission)
             taylor_phi = spacing / max(this.c.b_m, 1e-30)
-            if math.isfinite(float(this.c.taylor_phi_max)):
-                taylor_phi = np.minimum(taylor_phi, float(this.c.taylor_phi_max))
             taylor_single = np.maximum(this._signed_rate(
                 t_surface, this.p.taylor.stress_fraction * tau_eff * taylor_phi,
                 T_K, this.p.taylor.nu0_s,
