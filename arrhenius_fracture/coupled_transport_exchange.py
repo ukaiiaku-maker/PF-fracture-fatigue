@@ -69,10 +69,11 @@ def _partitioned_exponential_action(matrix, vectors, dt, activity, limit=1.0e4):
     """Apply one autonomous semigroup with a numerically bounded exponent."""
     parts = max(1, int(np.ceil(max(float(activity), 0.0) / float(limit))))
     propagator = expm(np.asarray(matrix, dtype=float) * (float(dt) / parts))
-    evolved = np.asarray(vectors, dtype=float)
-    for _ in range(parts):
-        evolved = propagator @ evolved
-    return evolved
+    # Binary exponentiation preserves the same partitioned autonomous
+    # semigroup while avoiding O(parts) dense products in the difficult
+    # high-transport regime.  Direct expm(matrix*dt) is deliberately avoided:
+    # the bounded exponent is what protects the stiff population invariants.
+    return np.linalg.matrix_power(propagator, parts) @ np.asarray(vectors, dtype=float)
 
 
 def joint_transport_exchange(

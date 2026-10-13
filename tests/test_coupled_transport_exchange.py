@@ -255,3 +255,14 @@ def test_stiff_source_projection_preserves_each_species_budget():
     remaining = np.sum(out.mobile + out.retained, axis=1)
     assert np.all(remaining <= budget * (1.0 + 2.0e-14))
     assert np.isclose(np.sum(remaining) + out.escaped, np.sum(budget), atol=2e-12)
+
+
+def test_large_transport_partition_count_uses_same_semigroup():
+    matrix = np.array([[-2.0, 0.0], [2.0, 0.0]])
+    vectors = np.array([[1.0], [0.0]])
+    from arrhenius_fracture.coupled_transport_exchange import _partitioned_exponential_action
+    actual = _partitioned_exponential_action(
+        matrix, vectors, 10.0, activity=1.0e8, limit=1.0e4
+    )
+    expected = np.array([[np.exp(-20.0)], [1.0 - np.exp(-20.0)]])
+    np.testing.assert_allclose(actual, expected, rtol=2e-12, atol=2e-12)
