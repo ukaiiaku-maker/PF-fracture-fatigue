@@ -508,6 +508,11 @@ def _signed_evolve_scalar(
         source_rate_s = float(coupled["activation_rate_s"])
         velocity = float(coupled["velocity_m_s"])
         invariant_correction = float(result.invariant_projection_correction)
+        base_map_correction = float(result.base_map_invariant_correction)
+        positivity_correction = float(result.positivity_correction)
+        complete_numerical_correction = float(result.complete_numerical_correction)
+        affine_retry_discrepancy = float(result.affine_retry_discrepancy)
+        error_controlled_stiff_solve = bool(result.error_controlled_stiff_solve)
         coupled_coefficient_residual = float(coupled["coefficient_residual"])
         coupled_state_residual = float(coupled["state_fixed_point_residual"])
         coupled_source_residual = float(coupled["complementarity_residual"])
@@ -520,6 +525,11 @@ def _signed_evolve_scalar(
         nonlinear_iterations = 0.0
         source_rate_s = emitted / dt if dt > 0.0 else 0.0
         invariant_correction = 0.0
+        base_map_correction = 0.0
+        positivity_correction = 0.0
+        complete_numerical_correction = 0.0
+        affine_retry_discrepancy = 0.0
+        error_controlled_stiff_solve = False
         coupled_coefficient_residual = 0.0
         coupled_state_residual = 0.0
         coupled_source_residual = 0.0
@@ -565,6 +575,11 @@ def _signed_evolve_scalar(
         recovered, escaped = result.recovered, result.escaped
         mobile_distance_population = result.mobile_distance_population_m
         invariant_correction = float(result.invariant_projection_correction)
+        base_map_correction = float(result.base_map_invariant_correction)
+        positivity_correction = float(result.positivity_correction)
+        complete_numerical_correction = float(result.complete_numerical_correction)
+        affine_retry_discrepancy = float(result.affine_retry_discrepancy)
+        error_controlled_stiff_solve = bool(result.error_controlled_stiff_solve)
     elif mode != JOINT_CTMC_EXCHANGE_TRANSPORT:
         gross_trapping = gross_release = 0.0
         for suffix in ("positive", "negative"):
@@ -616,6 +631,11 @@ def _signed_evolve_scalar(
         "dN_gross_release": gross_release,
         "mobile_distance_population_m": mobile_distance_population,
         "transport_invariant_roundoff_correction": invariant_correction,
+        "transport_base_map_correction": base_map_correction,
+        "transport_positivity_correction": positivity_correction,
+        "transport_complete_numerical_correction": complete_numerical_correction,
+        "transport_affine_retry_discrepancy": affine_retry_discrepancy,
+        "transport_error_controlled_stiff_solve": error_controlled_stiff_solve,
         "scalar_transport_velocity_m_s": self.scalar_transport_velocity_m_s,
         "scalar_transport_displacement_m": self.scalar_transport_displacement_m,
         "exchange_transport_mode": mode,

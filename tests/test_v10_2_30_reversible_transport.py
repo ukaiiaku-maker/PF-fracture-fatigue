@@ -173,6 +173,31 @@ def test_installed_actual_state_reverses_mobile_and_bounds_net_blunting():
     assert state.blunted_radius(1.0e-6, 1.0e-10) <= before_radius
 
 
+def test_installed_reversible_wrapper_consumes_nonzero_native_recovery_rates():
+    state = evolvable_actual_mpz()
+    state.mobile_positive[0, 1] = 2.0
+    state.retained_negative[0, 2] = 3.0
+    state.mobile = state.mobile_positive + state.mobile_negative
+    state.retained = state.retained_positive + state.retained_negative
+    state.cfg.mobile_recovery_rate_s = np.log(2.0)
+    state.manifest.retained_recovery_rate_s = np.log(4.0)
+    state._reversible_transport_K_signed_Pa_sqrt_m = 0.0
+    state._reversible_tip_radius_m = 1.0e-6
+
+    result = state.evolve(1.0, 300.0, 0.0, 1.0e-10)
+
+    expected_mobile = 1.0
+    expected_retained = 0.75
+    expected_recovered = 3.25
+    assert result["reversible_transport_active"] == 1.0
+    assert result["reversible_mobile_velocity_m_s"] == 0.0
+    assert result["dN_recovered"] == pytest.approx(expected_recovered)
+    assert state.recovered_total == pytest.approx(expected_recovered)
+    assert np.sum(state.mobile) == pytest.approx(expected_mobile)
+    assert np.sum(state.retained) == pytest.approx(expected_retained)
+    assert reversible_binding_receipt(state)["all_expected_methods_bound"] is True
+
+
 def test_reversible_installation_is_exactly_once_and_attests_live_methods():
     state = evolvable_actual_mpz()
     first = reversible_binding_receipt(state)

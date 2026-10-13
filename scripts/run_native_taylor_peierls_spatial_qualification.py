@@ -163,6 +163,16 @@ def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, A
             out["coupled_source_affine_direct_residual"]),
         "transport_invariant_roundoff_correction": float(
             out["transport_invariant_roundoff_correction"]),
+        "transport_base_map_correction": float(
+            out["transport_base_map_correction"]),
+        "transport_positivity_correction": float(
+            out["transport_positivity_correction"]),
+        "transport_complete_numerical_correction": float(
+            out["transport_complete_numerical_correction"]),
+        "transport_affine_retry_discrepancy": float(
+            out["transport_affine_retry_discrepancy"]),
+        "transport_error_controlled_stiff_solve": bool(
+            out["transport_error_controlled_stiff_solve"]),
         "escaped_total": state.escaped_total,
         "recovered_total": state.recovered_total,
         "gross_trapping_total": state.gross_trapping_total,
@@ -256,6 +266,16 @@ def compare(root: Path) -> None:
         "emitted_total": terminal["emitted_total"],
         "max_invariant_roundoff_correction": max(
             item["transport_invariant_roundoff_correction"] for item in traces),
+        "max_base_map_correction": max(
+            item["transport_base_map_correction"] for item in traces),
+        "max_positivity_correction": max(
+            item["transport_positivity_correction"] for item in traces),
+        "max_complete_numerical_correction": max(
+            item["transport_complete_numerical_correction"] for item in traces),
+        "max_affine_retry_discrepancy": max(
+            item["transport_affine_retry_discrepancy"] for item in traces),
+        "error_controlled_stiff_solve_used": any(
+            item["transport_error_controlled_stiff_solve"] for item in traces),
         "max_coefficient_residual": max(item["coefficient_residual"] for item in traces),
         "max_complementarity_residual": max(item["complementarity_residual"] for item in traces),
         "max_population_ledger_balance_error": max(

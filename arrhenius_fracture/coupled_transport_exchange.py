@@ -29,6 +29,11 @@ class CoupledTransportExchangeResult:
     mobile_distance_population_m: float
     conservation_error: float
     invariant_projection_correction: float = 0.0
+    base_map_invariant_correction: float = 0.0
+    positivity_correction: float = 0.0
+    complete_numerical_correction: float = 0.0
+    affine_retry_discrepancy: float = 0.0
+    error_controlled_stiff_solve: bool = False
 
 
 def exchange_gross_flux(mobile, retained, encounter_rate_s, release_rate_s, dt_s):
@@ -80,6 +85,7 @@ def _partitioned_exponential_action(matrix, vectors, dt, activity, limit=1.0e2):
 def _partitioned_affine_action(
     matrix, vectors, dt, activity, dynamic_size: int, limit=1.0,
     invariant_weights=None, correction_row: int | None = None,
+    return_diagnostics: bool = False,
 ):
     """Compose the exact bounded-step affine map without state projection."""
     parts = max(1, int(np.ceil(max(float(activity), 0.0) / float(limit))))
@@ -92,6 +98,8 @@ def _partitioned_affine_action(
     work_dtype = np.longdouble
     base_a = np.asarray(propagator[:n, :n], dtype=work_dtype)
     base_b = np.asarray(propagator[:n, n:], dtype=work_dtype)
+    raw_base_a = base_a.copy()
+    raw_base_b = base_b.copy()
     if invariant_weights is not None:
         weights = np.asarray(invariant_weights, dtype=work_dtype).reshape(n)
         row = int(correction_row)
@@ -101,37 +109,85 @@ def _partitioned_affine_action(
         source_rate = weights @ np.asarray(matrix[:n, n:], dtype=work_dtype)
         expected_b = source_rate * work_dtype(float(dt) / parts)
         base_b[row] += (expected_b - weights @ base_b) / weights[row]
-    result_a = np.eye(n, dtype=work_dtype)
-    result_b = np.zeros_like(base_b)
-    remaining = parts
-    while remaining:
-        if remaining & 1:
-            result_b = base_a @ result_b + base_b
-            result_a = base_a @ result_a
-        base_b = base_a @ base_b + base_b
-        base_a = base_a @ base_a
-        remaining >>= 1
+    def compose(map_a, map_b):
+        result_a = np.eye(n, dtype=work_dtype)
+        result_b = np.zeros_like(map_b)
+        remaining = parts
+        while remaining:
+            if remaining & 1:
+                result_b = map_a @ result_b + map_b
+                result_a = map_a @ result_a
+            map_b = map_a @ map_b + map_b
+            map_a = map_a @ map_a
+            remaining >>= 1
+        return result_a, result_b
+
+    result_a, result_b = compose(base_a, base_b)
     initial = np.asarray(vectors, dtype=work_dtype)
     output = np.zeros_like(initial)
     output[:n] = result_a @ initial[:n] + result_b @ initial[n:]
     output[n:] = initial[n:]
-    return np.asarray(output, dtype=float)
+    correction_effect = 0.0
+    correction_map = 0.0
+    if invariant_weights is not None:
+        raw_a, raw_b = compose(raw_base_a, raw_base_b)
+        raw_dynamic = raw_a @ initial[:n] + raw_b @ initial[n:]
+        correction_effect = float(np.sum(np.abs(output[:n] - raw_dynamic)))
+        correction_map = float(
+            np.sum(np.abs(base_a - raw_base_a))
+            + np.sum(np.abs(base_b - raw_base_b))
+        )
+    converted = np.asarray(output, dtype=float)
+    if return_diagnostics:
+        return converted, {
+            "base_map_correction_l1": correction_map,
+            "composed_state_correction_l1": correction_effect,
+            "partition_count": parts,
+        }
+    return converted
 
 
 def _independent_stiff_action(matrix, vectors, dt):
-    """Independent error-controlled action of the same augmented generator."""
+    """Independent high-accuracy Radau action of the augmented generator."""
     operator = np.asarray(matrix, dtype=float)
     initial = np.asarray(vectors, dtype=float)
     output = np.empty_like(initial)
     for column in range(initial.shape[1]):
         solution = solve_ivp(
             lambda _time, state: operator @ state,
-            (0.0, float(dt)), initial[:, column], method="BDF", jac=operator,
-            rtol=2.0e-11, atol=1.0e-13,
+            (0.0, float(dt)), initial[:, column], method="Radau", jac=operator,
+            rtol=2.0e-12, atol=1.0e-20,
         )
         if not solution.success:
             raise FloatingPointError(
                 f"independent stiff augmented solve failed: {solution.message}"
+            )
+        output[:, column] = solution.y[:, -1]
+    return output
+
+
+def _error_controlled_stiff_action(matrix, vectors, dt, budgets):
+    """BDF action used when exponential composition cannot resolve slow modes.
+
+    This integrates the identical frozen augmented generator.  The per-species
+    absolute tolerance is expressed in population units and scales with that
+    species' actual initial-plus-source budget, rather than with an artificial
+    unit population.
+    """
+    operator = np.asarray(matrix, dtype=float)
+    initial = np.asarray(vectors, dtype=float)
+    species_budgets = np.asarray(budgets, dtype=float).reshape(-1)
+    output = np.empty_like(initial)
+    for column in range(initial.shape[1]):
+        absolute_tolerance = max(1.0e-24, 1.0e-19 * species_budgets[column])
+        solution = solve_ivp(
+            lambda _time, state: operator @ state,
+            (0.0, float(dt)), initial[:, column], method="BDF", jac=operator,
+            rtol=2.0e-11, atol=absolute_tolerance,
+        )
+        if not solution.success:
+            raise FloatingPointError(
+                f"error-controlled stiff augmented solve failed: {solution.message}"
             )
         output[:, column] = solution.y[:, -1]
     return output
@@ -249,11 +305,10 @@ def joint_transport_exchange(
     conditioned_generator = change @ generator @ inverse_change
     conditioned_initial = change @ initial_vectors
     activity = float(np.max(ke + kr + hop + km + kr_rec) * dt)
-    final = _partitioned_affine_action(
+    affine_full_conditioned = _partitioned_affine_action(
         conditioned_generator, conditioned_initial, dt, activity,
         dynamic_size=source_i0,
     )
-    final = inverse_change @ final
     # Scaling-and-squaring a generator whose rates span ~1e12 s^-1 and whose
     # augmented flux rows grow to ~1e12 loses a few ulps in the conserved
     # population columns.  This tolerance is diagnostic only; it is many
@@ -266,18 +321,44 @@ def joint_transport_exchange(
     physical_indices = np.r_[0 : 2 * n + 2, source_i0:size]
     physical_generator = conditioned_generator[physical_indices][:, physical_indices]
     physical_initial = conditioned_initial[physical_indices]
-    conditioned_physical = _partitioned_affine_action(
+    budgets = np.sum(m0 + r0, axis=1) + np.sum(source, axis=1) * dt
+    affine_physical = _partitioned_affine_action(
         physical_generator, physical_initial, dt, activity,
         dynamic_size=2 * n + 2,
-        invariant_weights=np.r_[np.ones(n), np.zeros(n), 1.0, 1.0],
-        correction_row=2 * n,
     )
+    positive_rates = np.concatenate((ke, kr, hop, np.array([km, kr_rec])))
+    positive_rates = positive_rates[positive_rates > 0.0]
+    scale_separation = (
+        float(np.max(positive_rates) / np.min(positive_rates))
+        if positive_rates.size else 1.0
+    )
+    # With an exponent bounded by the fast rate, a slow decrement can fall
+    # below machine precision in every base map.  Squaring then reproduces its
+    # outgoing contribution without the matching depletion.  Retry the same
+    # generator with error-controlled BDF before any state projection.
+    error_controlled_stiff_solve = bool(
+        activity > 1.0e8 and scale_separation > 1.0e12
+    )
+    if error_controlled_stiff_solve:
+        accepted_full_conditioned = _error_controlled_stiff_action(
+            conditioned_generator, conditioned_initial, dt, budgets)
+        conditioned_physical = accepted_full_conditioned[physical_indices]
+        affine_retry_discrepancy = float(np.sum(np.abs(
+            conditioned_physical[: 2 * n + 2]
+            - affine_physical[: 2 * n + 2]
+        )))
+    else:
+        accepted_full_conditioned = affine_full_conditioned
+        conditioned_physical = affine_physical
+        affine_retry_discrepancy = 0.0
+    final = inverse_change @ accepted_full_conditioned
     physical_inverse = np.eye(conditioned_physical.shape[0])
     for i in range(n):
         physical_inverse[i, n + i] = -1.0
     physical = (physical_inverse @ conditioned_physical)[: 2 * n + 2]
     if float(np.min(physical)) < -tolerance:
         raise FloatingPointError("joint transport/exchange produced a negative population")
+    positivity_correction = float(np.sum(np.maximum(-physical, 0.0)))
     physical = np.maximum(physical, 0.0)
     m1 = physical[:n].T
     r1 = physical[n : 2 * n].T
@@ -291,12 +372,14 @@ def joint_transport_exchange(
     # replaced by their stiff limit. Overshoots are removed from the computed
     # mobile field, which owns the continuous source; undershoots accrue to the
     # absorbing escape ledger.
-    budgets = np.sum(m0 + r0, axis=1) + np.sum(source, axis=1) * dt
     accounted_by_species = (
         np.sum(m1 + r1, axis=1) + escaped_by_species + recovered_by_species
     )
     invariant_defect = budgets - accounted_by_species
-    invariant_limit = 5.0e-8 * np.maximum(budgets, 1.0)
+    # Population units. The absolute term protects near-empty species without
+    # pretending that ``max(budget, 1)`` is a relative bound; the second term
+    # is genuinely relative to each physical species budget.
+    invariant_limit = 2.0e-18 + 5.0e-8 * budgets
     if np.any(np.abs(invariant_defect) > invariant_limit):
         raise FloatingPointError(
             "stiff affine invariant correction exceeds conditioning limit: "
@@ -319,6 +402,19 @@ def joint_transport_exchange(
                 m1[system] *= scale
                 r1[system] *= scale
     invariant_correction = float(np.sum(np.abs(invariant_defect)))
+    complete_numerical_correction = (
+        invariant_correction
+        + positivity_correction
+    )
+    if max(
+        invariant_correction,
+        positivity_correction,
+    ) > float(np.sum(invariant_limit)):
+        raise FloatingPointError(
+            "a stiff affine correction component exceeds mixed population budget: "
+            f"correction={complete_numerical_correction:.6e}, "
+            f"limit={float(np.sum(invariant_limit)):.6e}"
+        )
     escaped = float(np.sum(escaped_by_species))
     recovered = float(np.sum(recovered_by_species))
     gross_trap = max(float(np.sum(final[gross_trap_i])) * flux_scale, 0.0)
@@ -347,6 +443,11 @@ def joint_transport_exchange(
         mobile_distance_population_m=distance_population,
         conservation_error=error,
         invariant_projection_correction=invariant_correction,
+        base_map_invariant_correction=0.0,
+        positivity_correction=positivity_correction,
+        complete_numerical_correction=complete_numerical_correction,
+        affine_retry_discrepancy=affine_retry_discrepancy,
+        error_controlled_stiff_solve=error_controlled_stiff_solve,
     )
 
 

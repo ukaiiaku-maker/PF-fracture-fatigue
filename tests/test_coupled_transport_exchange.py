@@ -289,7 +289,7 @@ def test_active_950_scale_large_hop_preserves_small_species_budget():
     assert out.invariant_projection_correction <= 3e-10
 
 
-def test_stiff_affine_source_and_diagnostics_match_independent_bdf_oracle():
+def test_stiff_affine_source_and_diagnostics_match_independent_radau_oracle():
     # [m0,m1,r0,r1,escape,gross_trap,gross_release,distance,constant_source]
     matrix = np.zeros((9, 9))
     ke, kr, hop, source, dt = 3.0e4, 7.0e4, 2.0e3, 2.5, 0.02
@@ -317,3 +317,62 @@ def test_stiff_affine_source_and_diagnostics_match_independent_bdf_oracle():
     np.testing.assert_allclose(composed[5:8], independent[5:8], rtol=2e-8, atol=2e-11)
     assert np.isclose(np.sum(composed[:5]), source * dt, rtol=0.0, atol=2e-14)
     assert np.isclose(composed[5] - composed[6], np.sum(composed[2:4]), atol=2e-11)
+
+
+def test_closed_stiff_exchange_does_not_create_escape_or_material_correction():
+    mobile = np.array([[2.0e-9, 0.0]])
+    retained = np.array([[0.0, 3.0e-9]])
+    out = joint_transport_exchange(
+        mobile, retained,
+        encounter_rate_s=np.array([1.0e-7, 1.0e-6]),
+        release_rate_s=np.array([5.69e10, 5.69e10]),
+        velocity_m_s=np.zeros(2), dt_s=4.2, dx_m=1.0e-6,
+    )
+    assert out.escaped == 0.0
+    assert out.recovered == 0.0
+    np.testing.assert_allclose(
+        out.mobile + out.retained, mobile + retained, rtol=2.0e-10, atol=2.0e-18)
+    assert out.invariant_projection_correction <= 2.0e-18
+    assert out.base_map_invariant_correction <= 2.0e-18
+    assert out.positivity_correction <= 2.0e-18
+
+
+def test_full_attempt_release_scale_uses_error_controlled_same_equation_retry():
+    # Same stiffness separation as the failed full-native state: Taylor release
+    # O(5.69e10/s) beside O(1e-6/s) encounter/transport, with continuous source.
+    matrix = np.zeros((9, 9))
+    ke, kr, hop, source, dt = 1.0e-6, 5.69e10, 1.0e-6, 0.02, 4.2
+    for i in range(2):
+        mi, ri = i, 2 + i
+        matrix[mi, mi] -= ke + hop
+        matrix[ri, mi] += ke
+        matrix[mi, ri] += kr
+        matrix[ri, ri] -= kr
+        matrix[mi + 1 if i == 0 else 4, mi] += hop
+        matrix[5, mi] += ke
+        matrix[6, ri] += kr
+        matrix[7, mi] += hop
+    matrix[0, 8] = source
+    initial = np.zeros((9, 1))
+    initial[2, 0] = 1.0e-8
+    initial[8, 0] = 1.0
+    out = joint_transport_exchange(
+        np.zeros((1, 2)), np.array([[1.0e-8, 0.0]]),
+        encounter_rate_s=np.full(2, ke),
+        release_rate_s=np.full(2, kr),
+        velocity_m_s=np.full(2, hop), dt_s=dt, dx_m=1.0,
+        mobile_source_rate=np.array([[source, 0.0]]),
+    )
+    independent = _independent_stiff_action(matrix, initial, dt)
+    accepted = np.r_[
+        out.mobile.ravel(), out.retained.ravel(), out.escaped,
+        out.gross_trapping, out.gross_release,
+        out.mobile_distance_population_m,
+    ]
+    np.testing.assert_allclose(accepted[:5], independent[:5, 0], rtol=2e-8, atol=2e-15)
+    np.testing.assert_allclose(accepted[5:8], independent[5:8, 0], rtol=2e-8, atol=2e-15)
+    expected_budget = 1.0e-8 + source * dt
+    assert np.isclose(np.sum(accepted[:5]), expected_budget, atol=2e-14)
+    assert out.error_controlled_stiff_solve
+    assert out.affine_retry_discrepancy > 1.0e-8
+    assert out.complete_numerical_correction <= 2.0e-14
