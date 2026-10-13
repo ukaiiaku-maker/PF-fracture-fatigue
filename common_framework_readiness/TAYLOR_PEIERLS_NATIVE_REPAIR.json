@@ -1,0 +1,78 @@
+{
+  "schema": "taylor-peierls-native-repair/1",
+  "date": "2026-10-13",
+  "status": "PASSED_COMPACT_NATIVE_QUALIFICATION",
+  "production_execution_authorized": false,
+  "source_head_at_qualification": "1513f5794b05e1675834a96a00152c7aff122e7d",
+  "physical_selection": {
+    "taylor_mode": "mean_net_rate_over_density_order",
+    "taylor_window_s": null,
+    "taylor_single_rate_cap_s": null,
+    "taylor_order_cap": null,
+    "peierls_velocity_cap_m_s": null,
+    "peierls_elementary_rate_cap_s": null,
+    "signed_forward_reverse_rates": true,
+    "zero_bias_cancellation_tested": true,
+    "true_reversal_tested": true,
+    "physical_jump_length": "f_jump/(2*sqrt(rho_f))",
+    "spatial_velocity_consumer": "per-bin field"
+  },
+  "coupled_operator": {
+    "source": "continuous persistent-site mobile injection",
+    "population_state": "signed mobile and retained fields",
+    "simultaneous_terms": [
+      "Taylor release and geometric recapture",
+      "Peierls finite-volume transport",
+      "escape and recovery",
+      "gross and net ledgers",
+      "mobile-distance diagnostic integral"
+    ],
+    "local_equilibrium_projection": false,
+    "binary_affine_composition_changes_physics": false,
+    "independent_oracle": "scipy BDF integration of the same complete augmented generator"
+  },
+  "compact_spatial_qualification": {
+    "root": "../integration_evidence/native_taylor_peierls_spatial_1513f579",
+    "temperature_K": 950.0,
+    "tip_opening_stress_Pa": 5000000000.0,
+    "bins": 16,
+    "signed_systems": 2,
+    "interval_s": 0.01,
+    "steps": 12,
+    "emitted_line_content_total": 0.2803744981639119,
+    "maximum_velocity_m_s": 118804.25402475965,
+    "terminal_velocity_m_s": 118804.2540247594,
+    "maximum_coefficient_residual": 2.9061335834785507e-18,
+    "maximum_source_complementarity_residual": 8.067260544809756e-10,
+    "maximum_invariant_roundoff_correction": 5.0862092315639984e-15,
+    "complete_trace_maximum": "maximum_velocity_trace.json",
+    "complete_trace_terminal": "terminal_velocity_trace.json"
+  },
+  "restart": {
+    "fresh_process": true,
+    "checkpoint_step": 6,
+    "terminal_step": 12,
+    "arrays_and_scalars_compared": 28,
+    "bitwise_terminal_state_equal": true,
+    "report": "restart_comparison.json"
+  },
+  "tests": {
+    "native_kinetics": "tests/test_native_taylor_peierls_kinetics.py",
+    "coupled_operator": "tests/test_coupled_transport_exchange.py",
+    "persistent_source": "tests/test_v10221_persistent_site_source.py",
+    "stiff_oracle_test": "test_stiff_affine_source_and_diagnostics_match_independent_bdf_oracle"
+  },
+  "preserved_historical_evidence": {
+    "one_second_run": "../integration_evidence/f1_coupled_native_qualification_8982d422",
+    "classification": "HISTORICAL_REJECTED_ONE_SECOND_LAW",
+    "independent_backup": "/Users/shen/Fracture_Backups/common-framework-20261012/f1-coupled-native-qualification-8982d422.tar"
+  },
+  "failed_full_mechanics_diagnostic": {
+    "root": "../integration_evidence/f1_native_taylor_peierls_failed_source_residual_a43c8199",
+    "classification": "FAILED_NUMERICAL_SOURCE_COMPLEMENTARITY_NOT_ACCEPTANCE_EVIDENCE",
+    "source_complementarity_residual": 0.0007850824,
+    "acceptance_limit": 0.0001,
+    "note": "The corrected physics was retained. The run was not accepted, and no cap, clock, equilibrium projection, or altered rate was introduced to force it through."
+  },
+  "scope": "storage-light qualification only; no production campaign, fitting, manuscript change, historical deletion, or remote action"
+}

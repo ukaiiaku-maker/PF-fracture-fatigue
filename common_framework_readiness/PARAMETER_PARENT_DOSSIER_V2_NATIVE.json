@@ -2453,9 +2453,9 @@
         "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
         "completion_law": {
           "callable": "arrhenius_fracture.taylor_release.completion_rate",
-          "mode": "legacy_implicit_1s",
-          "single_rate_cap_s": 1000000000000.0,
-          "window_s": 1e-09
+          "mode": "mean_net_rate_over_density_order",
+          "single_rate_cap_s": null,
+          "window_s": null
         },
         "expected_projection_1_over_sqrt3": 0.5773502691896258,
         "forest_density_floor_m2": 5000000000000.0,
@@ -4783,9 +4783,9 @@
         "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
         "completion_law": {
           "callable": "arrhenius_fracture.taylor_release.completion_rate",
-          "mode": "legacy_implicit_1s",
-          "single_rate_cap_s": 1000000000000.0,
-          "window_s": 1e-09
+          "mode": "mean_net_rate_over_density_order",
+          "single_rate_cap_s": null,
+          "window_s": null
         },
         "expected_projection_1_over_sqrt3": 0.5773502691896258,
         "forest_density_floor_m2": 5000000000000.0,
@@ -7437,9 +7437,9 @@
         "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
         "completion_law": {
           "callable": "arrhenius_fracture.taylor_release.completion_rate",
-          "mode": "legacy_implicit_1s",
-          "single_rate_cap_s": 1000000000000.0,
-          "window_s": 1e-09
+          "mode": "mean_net_rate_over_density_order",
+          "single_rate_cap_s": null,
+          "window_s": null
         },
         "expected_projection_1_over_sqrt3": 0.5773502691896258,
         "forest_density_floor_m2": 5000000000000.0,
@@ -10091,9 +10091,9 @@
         "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
         "completion_law": {
           "callable": "arrhenius_fracture.taylor_release.completion_rate",
-          "mode": "legacy_implicit_1s",
-          "single_rate_cap_s": 1000000000000.0,
-          "window_s": 1e-09
+          "mode": "mean_net_rate_over_density_order",
+          "single_rate_cap_s": null,
+          "window_s": null
         },
         "expected_projection_1_over_sqrt3": 0.5773502691896258,
         "forest_density_floor_m2": 5000000000000.0,

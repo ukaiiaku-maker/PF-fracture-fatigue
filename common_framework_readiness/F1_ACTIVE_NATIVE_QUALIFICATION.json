@@ -1,115 +1,49 @@
 {
-  "schema": "f1-coupled-native-qualification/2",
-  "date": "2026-10-12",
-  "status": "PASSED",
+  "schema": "f1-coupled-native-qualification/3",
+  "date": "2026-10-13",
+  "status": "PASSED_COMPACT_CORRECTED_LAW",
   "production_execution_authorized": false,
-  "source_commit": "8982d4222970d24a1b476a601996cc791788402e",
-  "preserved_historical_evidence": {
-    "old_48_plus_16_path": "../integration_evidence/f1_active_native_qualification",
-    "scope": "Persistent-source selection and prefix-preserving restart under the formerly split operator; historical evidence, not coupled-operator acceptance.",
-    "old_zero_velocity_interpretation": "Stale scalar-path diagnostic, not a physically zero rate."
-  },
-  "operator_contract": {
+  "current_record": "TAYLOR_PEIERLS_NATIVE_REPAIR.json",
+  "equation_to_consumer_map": "TAYLOR_PEIERLS_EQUATION_CONSUMER_MAP.md",
+  "parameter_dossier": "PARAMETER_PARENT_DOSSIER_V2_NATIVE.json",
+  "current_operator_contract": {
     "outer_mode": "validated_scalar",
+    "spatial_meaning": "per-bin Peierls velocity is consumed by the CTMC; scalar velocity is diagnostic only",
     "exchange_transport_mode": "joint_ctmc",
     "source": "continuous mobile injection inside the joint CTMC",
-    "simultaneous_terms": ["signed exchange", "Taylor release and recapture", "Peierls finite-volume transport", "escape", "gross/net ledgers"],
-    "feedback": "implicit end-state source rate, Taylor backstress, radius, physical multiplicity, and state-dependent rates",
-    "nonlinear_tolerances": {"coefficient_relative": 0.0001, "source_complementarity_relative": 0.0001},
-    "taylor_completion_constructor": {"mode": "legacy_implicit_1s", "window_s_inactive_for_selected_mode": 1e-09, "single_rate_cap_s": 1000000000000.0},
-    "runtime_binding_checked_before_and_after_every_accepted_step": true,
-    "legacy_split_requires_explicit_historical_or_alternative_selection": true
+    "taylor_completion_constructor": {
+      "mode": "mean_net_rate_over_density_order",
+      "window_s": null,
+      "single_rate_cap_s": null
+    },
+    "runtime_binding_checked_before_and_after_every_step": true,
+    "fresh_process_binding_checked": true
   },
-  "c13_discriminating_operator_test": {
-    "test": "tests/test_coupled_transport_exchange.py::test_uniform_1200_benchmark_escapes_within_markov_bound",
-    "length_m": 5e-05,
-    "encounter_rate_s": 2566573621470.7075,
-    "release_rate_s": 999999999.9556313,
-    "velocity_m_s": 1751.0613095657714,
-    "interval_s": 1.0,
-    "mean_exit_time_s": 7.331578365601295e-05,
-    "remaining_fraction": 0.0,
-    "escaped_fraction": 1.0,
-    "gross_trapping": 73286.229541191,
-    "gross_release": 73287.229541191,
-    "mobile_distance_population_m": 5.000000000000008e-05,
-    "conservation_error": 0.0,
-    "historical_split_remaining_reference": 0.999610527234,
-    "partition_signed_and_flux_identity_tests_passed": true
+  "corrected_native_950K": {
+    "root": "../integration_evidence/native_taylor_peierls_spatial_1513f579",
+    "restart_comparison": "restart_comparison.json",
+    "bitwise_terminal_state_equal": true,
+    "emitted_line_content_total": 0.2803744981639119,
+    "maximum_velocity_m_s": 118804.25402475965,
+    "terminal_velocity_m_s": 118804.2540247594,
+    "maximum_invariant_roundoff_correction": 5.0862092315639984e-15
   },
-  "continuous_source_coupled_state_convergence": {
-    "test": "tests/test_v10221_persistent_site_source.py::test_continuous_source_backstress_update_converges_under_time_partition",
-    "common_endpoint_s": 0.5,
-    "partitions": [1, 2, 4, 8, 16, 32],
-    "successive_l2_errors": [0.03406688668996837, 0.02123224634435699, 0.016119341295071938, 0.010505525408114743, 0.006728741322101113],
-    "final_relative_error_estimate": 0.0018678218246999576,
-    "declared_acceptance_tolerance": 0.002,
-    "fields": "signed mobile/retained profiles, accumulated slip, emitted/escaped/gross-exchange/mobile-distance ledgers; radius and multiplicity remain state-derived",
-    "nonlinear_residuals_within_contract": true
-  },
-  "active_native_950K": {
+  "historical_one_second_qualification": {
     "root": "../integration_evidence/f1_coupled_native_qualification_8982d422",
-    "temperature_K": 950.0,
-    "temperature_domain_status": "ADMISSIBLE_PARENT_EXAMPLE",
-    "same_coefficients_mechanics_and_seed_as_preserved_qualification": true,
-    "initial_steps": 48,
-    "terminal_steps": 64,
-    "terminal_physical_time_s": 537.6,
-    "emitted_line_content_total": 515.752105935102,
-    "retained_specimen_ledger": 513.0898344563988,
-    "backstress_terminal_Pa": 724830823.5761157,
-    "scalar_transport_velocity_first_m_s": 6.802040831234622e-20,
-    "scalar_transport_velocity_terminal_m_s": 21345.388395578055,
-    "scalar_transport_velocity_max_m_s": 118390.98424338418,
-    "gross_trapping_total": 32308.65537723431,
-    "gross_release_total": 31792.903275460816,
-    "net_retained_gain_total": 515.7521017759848,
-    "net_retained_loss_total": 2.493718569823393e-09,
-    "escaped_total": 4.161399569480606e-06,
-    "mobile_distance_population_total_m": 0.0004133528705364367,
-    "wake_discarded_mobile_total": 4.379711278624863e-19,
-    "wake_discarded_retained_total": 1.5805019944934667e-13,
-    "wake_discarded_slip_total": 1.4845535846277943e-13,
-    "fracture_forced": false,
-    "accepted_geometry_events": 0,
-    "physical_separation": "Peierls population transport and escape are distinct from crack velocity, frame translation, wake transfer, and recovery."
+    "source_commit": "8982d4222970d24a1b476a601996cc791788402e",
+    "former_status": "PASSED_UNDER_THEN_SELECTED_NUMERICAL_CONFIGURATION",
+    "current_classification": "HISTORICAL_REJECTED_ONE_SECOND_LAW_NOT_CURRENT_BASELINE",
+    "former_taylor_mode": "legacy_implicit_1s",
+    "preserved": true,
+    "backup_path": "/Users/shen/Fracture_Backups/common-framework-20261012/f1-coupled-native-qualification-8982d422.tar",
+    "backup_sha256": "14be87d004214c102bb059b56eaa8e9dec429a5c196f46c6e62def8012a0a7c0"
   },
-  "restart_comparison": {
-    "uninterrupted_generation": "df5fc3bb5c0f0e1c5ddf464d",
-    "interruption_generation": "b962353734d5debec45046b7",
-    "restarted_generation": "c85de2bbf619265e109aa3ed",
-    "fresh_process_restart": true,
-    "state_npz_arrays_compared": 11,
-    "state_npz_arrays_bitwise_equal": true,
-    "outer_json_physical_differences": 0,
-    "kinetic_json_physical_differences": 0,
-    "normalized_nonphysical_fields": ["wall-clock timestamps", "output paths", "JSON NaN equality"],
-    "complete_terminal_state_equal": true,
-    "full_joint_ledgers_checkpoint_owned": true
-  },
-  "f4_runtime_semantics": {
-    "v1_dossier_retained_as_historical": true,
-    "v2_dossier": "PARAMETER_PARENT_DOSSIER_V2_NATIVE.json",
-    "native_transport_consumer": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
-    "stress_projection_applied_once": true,
-    "peierls_and_taylor_projection": 0.5773502691896258,
-    "completion_law": "arrhenius_fracture.taylor_release.completion_rate",
-    "source_sites_per_system_141_0590567476921": "inactive inherited reference normalization; not instantaneous persistent multiplicity",
-    "instantaneous_persistent_multiplicity": "rho_site0*c_arc*r_tip*w_eff from live geometry/state",
-    "dbtt_parent_domain_provenance_remains_separate": true
-  },
-  "raw_evidence_sha256": {
-    "restart_comparison": "13b486e296d2837ce9c8c388b5bae1fef6689bef01f5c7189a52e79e1f44dc9a",
-    "initial_runtime_binding": "08a3f949affd48b3a5158c194a1ebf0c06f66c575e1821f822040eb35233e014",
-    "restart_runtime_binding": "231091ba2e54a7c4078bbdfb056b859d0df31cebb69d5b5fa18c2b2f1eb81534",
-    "uninterrupted_runtime_binding": "9243a8a11c993add88c9b03c5ef74b744012f17aab9553bb25331353adba7057",
-    "uninterrupted_anisotropic_audit": "2fd3a71088634fc0393c4ed1666194a044c172aacb11bad29a45479dec26c8ce",
-    "uninterrupted_checkpoint_manifest": "c874fbd2fa4f9aabf93b1b8df381faf008acc7d3a9787a1d018072fd3d95b7c0"
-  },
-  "raw_evidence_backup": {
-    "path": "/Users/shen/Fracture_Backups/common-framework-20261012/f1-coupled-native-qualification-8982d422.tar",
-    "bytes": 8246784,
-    "sha256": "14be87d004214c102bb059b56eaa8e9dec429a5c196f46c6e62def8012a0a7c0"
+  "full_mechanics_corrected_law_attempt": {
+    "root": "../integration_evidence/f1_native_taylor_peierls_failed_source_residual_a43c8199",
+    "status": "FAILED_NUMERICAL_QUALIFICATION",
+    "source_complementarity_residual": 0.0007850824,
+    "limit": 0.0001,
+    "accepted_as_physical_evidence": false
   },
   "scientific_scope": "Compact numerical/readiness qualification only; no production campaign, material retuning, forced fracture, manuscript change, or goal change."
 }

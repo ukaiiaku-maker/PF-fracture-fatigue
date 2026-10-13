@@ -2,6 +2,8 @@ import numpy as np
 from types import SimpleNamespace
 
 from arrhenius_fracture.coupled_transport_exchange import (
+    _independent_stiff_action,
+    _partitioned_affine_action,
     exchange_gross_flux,
     joint_transport_exchange,
 )
@@ -285,3 +287,33 @@ def test_active_950_scale_large_hop_preserves_small_species_budget():
     assert remaining <= retained[0, 0]
     assert np.isclose(remaining + out.escaped, retained[0, 0], atol=2e-10)
     assert out.invariant_projection_correction <= 3e-10
+
+
+def test_stiff_affine_source_and_diagnostics_match_independent_bdf_oracle():
+    # [m0,m1,r0,r1,escape,gross_trap,gross_release,distance,constant_source]
+    matrix = np.zeros((9, 9))
+    ke, kr, hop, source, dt = 3.0e4, 7.0e4, 2.0e3, 2.5, 0.02
+    for i in range(2):
+        mi, ri = i, 2 + i
+        matrix[mi, mi] -= ke + hop
+        matrix[ri, mi] += ke
+        matrix[mi, ri] += kr
+        matrix[ri, ri] -= kr
+        matrix[mi + 1 if i == 0 else 4, mi] += hop
+        matrix[5, mi] += ke
+        matrix[6, ri] += kr
+        matrix[7, mi] += 4.0e-7
+    matrix[0, 8] = source
+    initial = np.zeros((9, 1))
+    initial[8, 0] = 1.0
+    composed = _partitioned_affine_action(
+        matrix, initial, dt, activity=(ke + kr + hop) * dt,
+        dynamic_size=8,
+        invariant_weights=np.array([1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]),
+        correction_row=4,
+    )
+    independent = _independent_stiff_action(matrix, initial, dt)
+    np.testing.assert_allclose(composed[:5], independent[:5], rtol=2e-8, atol=2e-11)
+    np.testing.assert_allclose(composed[5:8], independent[5:8], rtol=2e-8, atol=2e-11)
+    assert np.isclose(np.sum(composed[:5]), source * dt, rtol=0.0, atol=2e-14)
+    assert np.isclose(composed[5] - composed[6], np.sum(composed[2:4]), atol=2e-11)
