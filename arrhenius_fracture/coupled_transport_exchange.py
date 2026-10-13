@@ -78,7 +78,8 @@ def _partitioned_exponential_action(matrix, vectors, dt, activity, limit=1.0e2):
 
 
 def _partitioned_affine_action(
-    matrix, vectors, dt, activity, dynamic_size: int, limit=1.0
+    matrix, vectors, dt, activity, dynamic_size: int, limit=1.0,
+    invariant_weights=None, correction_row: int | None = None,
 ):
     """Compose the exact bounded-step affine map without state projection."""
     parts = max(1, int(np.ceil(max(float(activity), 0.0) / float(limit))))
@@ -91,6 +92,15 @@ def _partitioned_affine_action(
     work_dtype = np.longdouble
     base_a = np.asarray(propagator[:n, :n], dtype=work_dtype)
     base_b = np.asarray(propagator[:n, n:], dtype=work_dtype)
+    if invariant_weights is not None:
+        weights = np.asarray(invariant_weights, dtype=work_dtype).reshape(n)
+        row = int(correction_row)
+        if row < 0 or row >= n or weights[row] == 0.0:
+            raise ValueError("correction_row must carry nonzero invariant weight")
+        base_a[row] += (weights - weights @ base_a) / weights[row]
+        source_rate = weights @ np.asarray(matrix[:n, n:], dtype=work_dtype)
+        expected_b = source_rate * work_dtype(float(dt) / parts)
+        base_b[row] += (expected_b - weights @ base_b) / weights[row]
     result_a = np.eye(n, dtype=work_dtype)
     result_b = np.zeros_like(base_b)
     remaining = parts
@@ -259,6 +269,8 @@ def joint_transport_exchange(
     conditioned_physical = _partitioned_affine_action(
         physical_generator, physical_initial, dt, activity,
         dynamic_size=2 * n + 2,
+        invariant_weights=np.r_[np.ones(n), np.zeros(n), 1.0, 1.0],
+        correction_row=2 * n,
     )
     physical_inverse = np.eye(conditioned_physical.shape[0])
     for i in range(n):
