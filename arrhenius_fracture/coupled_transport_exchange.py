@@ -222,14 +222,46 @@ def joint_transport_exchange(
     physical = np.maximum(physical, 0.0)
     m1 = physical[:n].T
     r1 = physical[n : 2 * n].T
-    escaped = float(np.sum(physical[escaped_i]))
-    recovered = float(np.sum(physical[recovered_i]))
+    escaped_by_species = np.asarray(physical[escaped_i], dtype=float).copy()
+    recovered_by_species = np.asarray(physical[recovered_i], dtype=float).copy()
     if km == 0.0 and kr_rec == 0.0:
-        # This is an exact CTMC invariant, not an equilibrium or population
-        # projection. It avoids extracting a nearly-unit absorbing counter
-        # from an exponential whose transient rates are O(1e12) s^-1.
-        recovered = 0.0
-        escaped = max(initial + emitted - float(np.sum(m1) + np.sum(r1)), 0.0)
+        recovered_by_species.fill(0.0)
+    # Enforce the exact per-species affine CTMC invariant after the exponential.
+    # This is a small roundoff correction along the conservation direction, not
+    # a local-equilibrium projection: mobile/retained ratios and rates are never
+    # replaced by their stiff limit. Overshoots are removed from the computed
+    # mobile field, which owns the continuous source; undershoots accrue to the
+    # absorbing escape ledger.
+    budgets = np.sum(m0 + r0, axis=1) + np.sum(source, axis=1) * dt
+    accounted_by_species = (
+        np.sum(m1 + r1, axis=1) + escaped_by_species + recovered_by_species
+    )
+    invariant_defect = budgets - accounted_by_species
+    invariant_limit = 2.0e-7 * np.maximum(budgets, 1.0)
+    if np.any(np.abs(invariant_defect) > invariant_limit):
+        raise FloatingPointError(
+            "stiff affine invariant correction exceeds conditioning limit: "
+            f"defect={float(np.max(np.abs(invariant_defect))):.6e}, "
+            f"limit={float(np.max(invariant_limit)):.6e}"
+        )
+    for system, defect in enumerate(invariant_defect):
+        if defect >= 0.0:
+            escaped_by_species[system] += defect
+        else:
+            excess = -defect
+            from_escape = min(float(escaped_by_species[system]), excess)
+            escaped_by_species[system] -= from_escape
+            excess -= from_escape
+            if excess > 0.0:
+                removable = float(np.sum(m1[system] + r1[system]))
+                if removable < excess:
+                    raise FloatingPointError("invariant overshoot exceeds physical content")
+                scale = (removable - excess) / removable
+                m1[system] *= scale
+                r1[system] *= scale
+    invariant_correction = float(np.sum(np.abs(invariant_defect)))
+    escaped = float(np.sum(escaped_by_species))
+    recovered = float(np.sum(recovered_by_species))
     gross_trap = max(float(np.sum(final[gross_trap_i])) * flux_scale, 0.0)
     gross_release = max(float(np.sum(final[gross_release_i])) * flux_scale, 0.0)
     distance_population = max(float(np.sum(final[distance_i])) * distance_scale, 0.0)
@@ -255,6 +287,7 @@ def joint_transport_exchange(
         gross_release=gross_release,
         mobile_distance_population_m=distance_population,
         conservation_error=error,
+        invariant_projection_correction=invariant_correction,
     )
 
 

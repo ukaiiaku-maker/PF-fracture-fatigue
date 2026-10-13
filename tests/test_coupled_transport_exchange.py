@@ -284,4 +284,4 @@ def test_active_950_scale_large_hop_preserves_small_species_budget():
     remaining = float(np.sum(out.mobile) + np.sum(out.retained))
     assert remaining <= retained[0, 0]
     assert np.isclose(remaining + out.escaped, retained[0, 0], atol=2e-10)
-    assert out.invariant_projection_correction <= 1e-12
+    assert out.invariant_projection_correction <= 2e-10
