@@ -227,10 +227,23 @@ def joint_transport_exchange(
         initial_vectors[source_i0 + system, system] = (
             1.0 / source_coordinate_scale[system]
         )
+    # Exact similarity transform from [mobile, retained] to
+    # [mobile+retained, retained]. The conserved local-total coordinate avoids
+    # subtracting O(kr) release fluxes in the stiff population balance while
+    # retaining the complete two-state dynamics and every augmented ledger.
+    change = np.eye(size)
+    inverse_change = np.eye(size)
+    for i in range(n):
+        change[i, n + i] = 1.0
+        inverse_change[i, n + i] = -1.0
+    conditioned_generator = change @ generator @ inverse_change
+    conditioned_initial = change @ initial_vectors
     activity = float(np.max(ke + kr + hop + km + kr_rec) * dt)
     final = _partitioned_affine_action(
-        generator, initial_vectors, dt, activity, dynamic_size=source_i0,
+        conditioned_generator, conditioned_initial, dt, activity,
+        dynamic_size=source_i0,
     )
+    final = inverse_change @ final
     # Scaling-and-squaring a generator whose rates span ~1e12 s^-1 and whose
     # augmented flux rows grow to ~1e12 loses a few ulps in the conserved
     # population columns.  This tolerance is diagnostic only; it is many
@@ -249,7 +262,10 @@ def joint_transport_exchange(
         np.abs(preliminary_budget - preliminary_accounted)
         > 1.0e-6 * np.maximum(preliminary_budget, 1.0)
     ):
-        final = _independent_stiff_action(generator, initial_vectors, dt)
+        conditioned_final = _independent_stiff_action(
+            conditioned_generator, conditioned_initial, dt
+        )
+        final = inverse_change @ conditioned_final
         physical = final[: 2 * n + 2]
         if float(np.min(physical)) < -tolerance:
             raise FloatingPointError(
