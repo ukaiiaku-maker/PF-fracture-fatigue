@@ -100,6 +100,12 @@ def _sha256(path: str | Path) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def _object_sha256(value: Any) -> str:
+    return hashlib.sha256(json.dumps(
+        value, sort_keys=True, separators=(",", ":"), default=str,
+    ).encode()).hexdigest()
+
+
 def _method_identity(value: Any) -> dict[str, Any]:
     function = getattr(value, "__func__", value)
     module = inspect.getmodule(function)
@@ -175,10 +181,13 @@ def build_restored_engine(
     selection_path: str | Path = DEFAULT_SELECTION,
     kernel_family_path: str | Path = DEFAULT_KERNEL_FAMILY,
     local_strength_Pa: float | None = None,
+    material_manifest: MaterialManifest | None = None,
+    persistent_site_config: PersistentSiteConfig | None = None,
 ) -> ReducedPersistentReversibleTipEngine:
     """Build the production signed engine with a reduced mechanics provider."""
     cfg = cfg.validate()
-    manifest = MaterialManifest.from_csv(material_path)
+    manifest = (MaterialManifest.from_csv(material_path)
+                if material_manifest is None else material_manifest)
     kernel_path = Path(kernel_family_path).resolve()
     observed_kernel_hash = _sha256(kernel_path)
     if observed_kernel_hash != DEFAULT_KERNEL_SHA256:
@@ -192,7 +201,9 @@ def build_restored_engine(
     # complementarity solution, not a failed root bracket or a source cap.
     install_backstress_complementarity_fix()
     engine_type.configure_state_resolved_physics(kernel_path, "validated_scalar")
-    engine_type.configure_persistent_sites(load_persistent_config(selection_path))
+    selected_sites = (load_persistent_config(selection_path)
+                      if persistent_site_config is None else persistent_site_config.validate())
+    engine_type.configure_persistent_sites(selected_sites)
     front = _front_config(cfg)
     # The state-resolved production kernel requires the serialized local
     # strength coordinate.  The R2 default is the selected material's existing
@@ -204,8 +215,8 @@ def build_restored_engine(
         float(manifest.cleavage.sigc0_Pa)
         if local_strength_Pa is None else float(local_strength_Pa)
     )
-    if not math.isfinite(selected_strength) or selected_strength <= 0.0:
-        raise ValueError("local strength must be positive and finite")
+    if not math.isfinite(selected_strength) or selected_strength < 0.0:
+        raise ValueError("local strength must be finite and nonnegative")
     front.sigma_cap = selected_strength
     engine = engine_type(
         front, manifest.cleavage, manifest.emission,
@@ -220,15 +231,27 @@ def build_restored_engine(
     install_mean_rate_taylor(engine.mpz)
     engine._r2_model_id = MODEL_ID
     engine._r2_synthetic_drive_setup = True
-    engine._r2_material_path = str(Path(material_path).resolve())
-    engine._r2_selection_path = str(Path(selection_path).resolve())
+    engine._r2_material_path = (str(Path(material_path).resolve())
+                                if material_manifest is None else None)
+    engine._r2_selection_path = (str(Path(selection_path).resolve())
+                                 if persistent_site_config is None else None)
+    engine._r2_material_manifest_embedded = material_manifest is not None
+    engine._r2_persistent_site_config_embedded = persistent_site_config is not None
+    engine._r2_material_sha256 = (_object_sha256(manifest.as_dict())
+                                  if material_manifest is not None
+                                  else _sha256(material_path))
+    engine._r2_selection_sha256 = (_object_sha256(asdict(selected_sites))
+                                   if persistent_site_config is not None
+                                   else _sha256(selection_path))
     engine._r2_kernel_family_path = str(kernel_path)
     engine._r2_kernel_family_sha256 = observed_kernel_hash
     engine._r2_numerical_options = asdict(cfg)
     engine._r2_local_strength_source = (
         "material_manifest.cleavage.sigc0_Pa"
         if local_strength_Pa is None
-        else "explicit_spatial_driver_cohesive_ceiling"
+        else ("explicit_disabled_moving_mpz_contract"
+              if float(local_strength_Pa) == 0.0
+              else "explicit_spatial_driver_cohesive_ceiling")
     )
     _restore_protected_continuum_alias()
     return engine
@@ -237,8 +260,10 @@ def build_restored_engine(
 def runtime_receipt(engine: Any, *, stage: str) -> dict[str, Any]:
     state = engine.mpz
     geometry = dict(_source_geometry(state))
-    manifest_path = Path(engine._r2_material_path)
-    selection_path = Path(engine._r2_selection_path)
+    manifest_path = (None if engine._r2_material_path is None
+                     else Path(engine._r2_material_path))
+    selection_path = (None if engine._r2_selection_path is None
+                      else Path(engine._r2_selection_path))
     methods = {
         name: _method_identity(getattr(state, name))
         for name in (
@@ -277,10 +302,17 @@ def runtime_receipt(engine: Any, *, stage: str) -> dict[str, Any]:
         "engine_class": f"{type(engine).__module__}.{type(engine).__qualname__}",
         "state_class": f"{type(state).__module__}.{type(state).__qualname__}",
         "material": {
-            "path": str(manifest_path), "sha256": _sha256(manifest_path),
+            "path": None if manifest_path is None else str(manifest_path),
+            "sha256": engine._r2_material_sha256,
+            "embedded": bool(engine._r2_material_manifest_embedded),
             "definition": engine.manifest.as_dict(),
         },
-        "selection": {"path": str(selection_path), "sha256": _sha256(selection_path)},
+        "selection": {
+            "path": None if selection_path is None else str(selection_path),
+            "sha256": engine._r2_selection_sha256,
+            "embedded": bool(engine._r2_persistent_site_config_embedded),
+            "definition": asdict(state._persistent_site_cfg),
+        },
         "signed_kernel_family": {
             "path": engine._r2_kernel_family_path,
             "sha256": engine._r2_kernel_family_sha256,
