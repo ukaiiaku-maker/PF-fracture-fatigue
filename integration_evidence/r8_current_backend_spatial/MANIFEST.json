@@ -1,0 +1,41 @@
+{
+  "schema": "r8.current-backend-spatial-evidence-manifest/1",
+  "calculation_commit": "97aaf1cc2a0963f118deab398a17c6cbf3111acd",
+  "calculation_tree": "e7823788ef1ce8ac8722799b6ff87120e6ea98a6",
+  "parent_r7_packaging_commit": "b9184e7d144fa77d6f41fce8c227b2e36173e782",
+  "files": [
+    {
+      "path": "active_interrupted_checkpoint/accepted_state.json",
+      "sha256": "f224658f5d3ebfca6567571049f99203f64299323a4a9c4cef1ce461df7b9515"
+    },
+    {
+      "path": "active_interrupted_checkpoint/accepted_state.json.0d4b63ffc7a94d3703883cdabc5f4f946830398d97656ddc8dc2c4a3d3959e13.state.pkl.gz",
+      "sha256": "0d4b63ffc7a94d3703883cdabc5f4f946830398d97656ddc8dc2c4a3d3959e13"
+    },
+    {
+      "path": "geometry_correspondence.json",
+      "sha256": "8ee759268267a6b44c0d94c7e45f2de03d92c1593f4b6016ba9980a8de1e4ecc"
+    },
+    {
+      "path": "matched_active.json",
+      "sha256": "fb68bc67b89ca744b22b1a0fc580705349885e0a93c019c86530ff4452f856b0"
+    },
+    {
+      "path": "matched_no_void.json",
+      "sha256": "25a7f05eae43460c55bbc5515820437edc7d248d411ff5a9f528f723fe75751a"
+    },
+    {
+      "path": "matched_passive.json",
+      "sha256": "1e4bb6e0e313d56d336ce73ec5503a3da245acdfa5f01da0bb1a08c409ba2cd8"
+    },
+    {
+      "path": "r8_current_backend_spatial.json",
+      "sha256": "eb61cfcd9aacf85a574946a52d61cdcc66e60ce3c96fe99d20bde66bc4be942c"
+    }
+  ],
+  "verification": {
+    "focused_affected_suite": "22 passed in 336.32s",
+    "r8_suite": "4 passed in 64.23s",
+    "full_suite": "824 passed in 1814.39s (0:30:14)"
+  }
+}
