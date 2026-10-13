@@ -514,6 +514,7 @@ def _signed_evolve_scalar(
         affine_invariant_defect = float(result.affine_invariant_defect)
         affine_retry_discrepancy = float(result.affine_retry_discrepancy)
         error_controlled_stiff_solve = bool(result.error_controlled_stiff_solve)
+        stiff_solver_method = str(result.stiff_solver_method)
         coupled_coefficient_residual = float(coupled["coefficient_residual"])
         coupled_state_residual = float(coupled["state_fixed_point_residual"])
         coupled_source_residual = float(coupled["complementarity_residual"])
@@ -532,6 +533,7 @@ def _signed_evolve_scalar(
         affine_invariant_defect = 0.0
         affine_retry_discrepancy = 0.0
         error_controlled_stiff_solve = False
+        stiff_solver_method = "legacy_or_no_joint_operator"
         coupled_coefficient_residual = 0.0
         coupled_state_residual = 0.0
         coupled_source_residual = 0.0
@@ -583,6 +585,7 @@ def _signed_evolve_scalar(
         affine_invariant_defect = float(result.affine_invariant_defect)
         affine_retry_discrepancy = float(result.affine_retry_discrepancy)
         error_controlled_stiff_solve = bool(result.error_controlled_stiff_solve)
+        stiff_solver_method = str(result.stiff_solver_method)
     elif mode != JOINT_CTMC_EXCHANGE_TRANSPORT:
         gross_trapping = gross_release = 0.0
         for suffix in ("positive", "negative"):
@@ -640,6 +643,7 @@ def _signed_evolve_scalar(
         "transport_affine_invariant_defect": affine_invariant_defect,
         "transport_affine_retry_discrepancy": affine_retry_discrepancy,
         "transport_error_controlled_stiff_solve": error_controlled_stiff_solve,
+        "transport_stiff_solver_method": stiff_solver_method,
         "scalar_transport_velocity_m_s": self.scalar_transport_velocity_m_s,
         "scalar_transport_displacement_m": self.scalar_transport_displacement_m,
         "exchange_transport_mode": mode,

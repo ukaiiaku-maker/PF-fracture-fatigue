@@ -35,6 +35,7 @@ class CoupledTransportExchangeResult:
     affine_invariant_defect: float = 0.0
     affine_retry_discrepancy: float = 0.0
     error_controlled_stiff_solve: bool = False
+    stiff_solver_method: str = "affine"
 
 
 def exchange_gross_flux(mobile, retained, encounter_rate_s, release_rate_s, dt_s):
@@ -194,6 +195,39 @@ def _error_controlled_stiff_action(matrix, vectors, dt, budgets):
     return output
 
 
+def _stable_population_flux_action(generator, initial_vectors, dt, population_size):
+    """Evaluate a stable population block and all flux rows without splitting.
+
+    For ``p' = P p + s``, the population and its time integral are
+    ``p(t)=p_ss+exp(Pt)(p(0)-p_ss)`` and
+    ``P integral(p) = p(t)-p(0)-s*t``.  Applying the original augmented rows to
+    that integral gives escape, recovery, gross exchange, and distance from the
+    same solution.  Both mobile and retained degrees of freedom remain in P.
+    """
+    operator = np.asarray(generator, dtype=float)
+    initial = np.asarray(initial_vectors, dtype=float)
+    count = int(population_size)
+    population_operator = operator[:count, :count]
+    source_rate = operator[:count, count:] @ initial[count:]
+    propagator = expm(population_operator * float(dt))
+    output = initial.copy()
+    for column in range(initial.shape[1]):
+        p0 = initial[:count, column]
+        source = source_rate[:, column]
+        steady = np.linalg.solve(population_operator, -source)
+        population = steady + propagator @ (p0 - steady)
+        integral = np.linalg.solve(
+            population_operator,
+            population - p0 - source * float(dt),
+        )
+        output[:count, column] = population
+        output[count:, column] = (
+            initial[count:, column]
+            + operator[count:, :count] @ integral
+        )
+    return output
+
+
 def joint_transport_exchange(
     mobile,
     retained,
@@ -349,14 +383,20 @@ def joint_transport_exchange(
     affine_invariant_defect = float(
         np.sum(np.abs(affine_invariant_defect_by_species))
     )
+    affine_accuracy_limit = 2.0e-18 + 1.0e-10 * budgets
     # With an exponent bounded by the fast rate, a slow decrement can fall
     # below machine precision in every base map.  Squaring then reproduces its
     # outgoing contribution without the matching depletion.  Retry the same
     # generator with error-controlled BDF before any state projection.
-    error_controlled_stiff_solve = bool(
-        (activity > 1.0e8 and scale_separation > 1.0e12)
+    use_bdf = bool(activity > 1.0e8 and scale_separation > 1.0e12)
+    use_stable_population = bool(
+        not use_bdf
+        and activity > 1.0e8
+        and np.any(
+            np.abs(affine_invariant_defect_by_species) > affine_accuracy_limit
+        )
     )
-    if error_controlled_stiff_solve:
+    if use_bdf:
         accepted_full_conditioned = _error_controlled_stiff_action(
             conditioned_generator, conditioned_initial, dt, budgets)
         conditioned_physical = accepted_full_conditioned[physical_indices]
@@ -364,10 +404,23 @@ def joint_transport_exchange(
             conditioned_physical[: 2 * n + 2]
             - affine_physical[: 2 * n + 2]
         )))
+        stiff_solver_method = "error_controlled_bdf"
+    elif use_stable_population:
+        stable_original = _stable_population_flux_action(
+            generator, initial_vectors, dt, 2 * n)
+        accepted_full_conditioned = change @ stable_original
+        conditioned_physical = accepted_full_conditioned[physical_indices]
+        affine_retry_discrepancy = float(np.sum(np.abs(
+            conditioned_physical[: 2 * n + 2]
+            - affine_physical[: 2 * n + 2]
+        )))
+        stiff_solver_method = "stable_population_expm_flux_identity"
     else:
         accepted_full_conditioned = affine_full_conditioned
         conditioned_physical = affine_physical
         affine_retry_discrepancy = 0.0
+        stiff_solver_method = "affine_bounded_exponential"
+    error_controlled_stiff_solve = bool(use_bdf or use_stable_population)
     accepted_base_map_correction = (
         0.0 if error_controlled_stiff_solve
         else float(physical_numerics["composed_state_correction_l1"])
@@ -472,6 +525,7 @@ def joint_transport_exchange(
         affine_invariant_defect=affine_invariant_defect,
         affine_retry_discrepancy=affine_retry_discrepancy,
         error_controlled_stiff_solve=error_controlled_stiff_solve,
+        stiff_solver_method=stiff_solver_method,
     )
 
 

@@ -74,3 +74,14 @@ or remote action is authorized.
   the diagnostic complete checkpoint, and only then recompute a clean qualified
   prefix under the final committed source.
 
+The base-map replay at `c6edd790` demonstrated that the correction did not
+reduce the step-24 defect, so it remains rejected as a solution.  The current
+working repair instead evaluates the complete stable `2*n` mobile/retained
+population block with its matrix exponential and obtains escape, recovery,
+gross exchange, and distance by integrating that same generator.  It neither
+removes retained state nor changes a rate.  Extreme fast/slow blocks continue
+to use the independently checked BDF path.  A stiff continuous-source
+partition test now explicitly exercises the stable-population method; the
+focused 55-test set passes.  Next action is a committed step-24 checkpoint
+replay.
+

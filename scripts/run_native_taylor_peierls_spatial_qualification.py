@@ -175,6 +175,8 @@ def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, A
             out["transport_affine_retry_discrepancy"]),
         "transport_error_controlled_stiff_solve": bool(
             out["transport_error_controlled_stiff_solve"]),
+        "transport_stiff_solver_method": str(
+            out["transport_stiff_solver_method"]),
         "escaped_total": state.escaped_total,
         "recovered_total": state.recovered_total,
         "gross_trapping_total": state.gross_trapping_total,
@@ -280,6 +282,8 @@ def compare(root: Path) -> None:
             item["transport_affine_retry_discrepancy"] for item in traces),
         "error_controlled_stiff_solve_used": any(
             item["transport_error_controlled_stiff_solve"] for item in traces),
+        "stiff_solver_methods": sorted(set(
+            item["transport_stiff_solver_method"] for item in traces)),
         "max_coefficient_residual": max(item["coefficient_residual"] for item in traces),
         "max_complementarity_residual": max(item["complementarity_residual"] for item in traces),
         "max_population_ledger_balance_error": max(

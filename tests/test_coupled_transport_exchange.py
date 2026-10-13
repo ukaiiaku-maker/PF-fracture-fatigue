@@ -216,6 +216,7 @@ def test_stiff_continuous_source_is_partition_invariant():
         mobile = np.zeros_like(source)
         retained = np.zeros_like(source)
         escaped = distance = 0.0
+        methods = set()
         for _ in range(parts):
             out = joint_transport_exchange(
                 mobile,
@@ -230,14 +231,16 @@ def test_stiff_continuous_source_is_partition_invariant():
             mobile, retained = out.mobile, out.retained
             escaped += out.escaped
             distance += out.mobile_distance_population_m
-        return mobile, retained, escaped, distance
+            methods.add(out.stiff_solver_method)
+        return mobile, retained, escaped, distance, methods
 
     one = evolve(1)
     four = evolve(4)
-    for left, right in zip(one, four):
+    for left, right in zip(one[:4], four[:4]):
         np.testing.assert_allclose(left, right, rtol=3e-11, atol=3e-11)
     emitted = float(np.sum(source)) * 0.2
     assert np.isclose(np.sum(one[0]) + np.sum(one[1]) + one[2], emitted, atol=2e-8)
+    assert "stable_population_expm_flux_identity" in one[4]
 
 
 def test_stiff_source_projection_preserves_each_species_budget():
