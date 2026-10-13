@@ -65,6 +65,20 @@ def _bundle_from_state(state) -> UnifiedFractureMaterialBundle:
     )
 
 
+def _front_strategy_from_state(state, front_id=None):
+    """Resolve strategy from the owning payload; state labels are advisory."""
+    from .front_constitutive_strategy_r8 import LEGACY_STRATEGY, strategy_from_payload
+    registry = state.tip_process_state.get("by_branch", {})
+    if front_id is None:
+        front_id = next(iter(state.crack_network.active_tip_ids), None)
+    owner = (state.tip_process_state.get("owner_by_front", {}).get(str(front_id), str(front_id))
+             if front_id is not None else None)
+    payload = registry.get(owner) if owner is not None else None
+    if payload is None and registry:
+        payload = next(iter(registry.values()))
+    return strategy_from_payload(payload) if payload is not None else LEGACY_STRATEGY
+
+
 def vacancy_coupled_void_rates(
     state, config, *, temperature_K, stress_tensor_Pa, center_m,
     equivalent_plastic_strain_rate_gp, radius_m=None,
@@ -77,7 +91,9 @@ def vacancy_coupled_void_rates(
     bundle = _bundle_from_state(state)
     if bundle.vacancy_row_id != REFERENCE_VACANCY_ROW.row_id:
         raise RuntimeError("accepted state does not own the common vacancy row")
-    process_length = float(fresh_sharp_front_engine(state.material, bundle).f.L_pz)
+    process_length = float(fresh_sharp_front_engine(
+        state.material, bundle,
+        constitutive_strategy=_front_strategy_from_state(state)).f.L_pz)
     capture_radius = process_length + (0.0 if radius_m is None else float(radius_m))
     patch = deterministic_capture_patch(state, center_m, capture_radius)
     local_c = local_vacancy_fraction(state, patch)
@@ -707,16 +723,34 @@ def evolve_accepted_plastic_vacancy_interval(
     }
 
 
-def fresh_sharp_front_engine(material, bundle: UnifiedFractureMaterialBundle):
-    """Construct every root, branch and downstream engine through one factory."""
-    return canonical_front_engine(bundle, material)
+def fresh_sharp_front_engine(material, bundle: UnifiedFractureMaterialBundle, *,
+                             constitutive_strategy=None):
+    """Construct a front through its explicit per-state constitutive strategy."""
+    from .front_constitutive_strategy_r8 import (
+        CURRENT_STRATEGY, LEGACY_STRATEGY, build_current_engine,
+    )
+    strategy = LEGACY_STRATEGY if constitutive_strategy is None else str(constitutive_strategy)
+    if strategy == CURRENT_STRATEGY:
+        return build_current_engine()
+    if strategy != LEGACY_STRATEGY:
+        raise ValueError("unknown front constitutive strategy: "+repr(strategy))
+    engine = canonical_front_engine(bundle, material)
+    engine._front_constitutive_strategy = LEGACY_STRATEGY
+    return engine
 
 
 def capture_sharp_front_engine(engine) -> dict[str, Any]:
     """Checkpoint the qualified engine and complete spatial MPZ ownership."""
+    from .front_constitutive_strategy_r8 import (
+        CURRENT_STRATEGY, LEGACY_STRATEGY, capture_current_engine,
+    )
+    strategy = getattr(engine, "_front_constitutive_strategy", LEGACY_STRATEGY)
+    if strategy == CURRENT_STRATEGY:
+        return capture_current_engine(engine)
     from .sharp_front_v11_branching import _capture_shared_engine
     return {
         "schema": FRONT_ENGINE_STATE_SCHEMA,
+        "constitutive_strategy": LEGACY_STRATEGY,
         "initialization_policy": "canonical_front_engine->reset",
         "material_bundle_id": getattr(engine, "_unified_bundle_id", None),
         "material_bundle_sha256": getattr(engine, "_unified_bundle_hash", None),
@@ -753,7 +787,14 @@ def sharp_front_engine_fingerprint(engine) -> str:
 
 
 def restore_sharp_front_engine(material, bundle, payload):
-    engine = fresh_sharp_front_engine(material, bundle)
+    from .front_constitutive_strategy_r8 import (
+        CURRENT_STRATEGY, restore_current_engine, strategy_from_payload,
+    )
+    strategy = strategy_from_payload(payload)
+    if strategy == CURRENT_STRATEGY:
+        return restore_current_engine(payload)
+    engine = fresh_sharp_front_engine(
+        material, bundle, constitutive_strategy=strategy)
     if payload.get("schema") != FRONT_ENGINE_STATE_SCHEMA:
         raise ValueError("unsupported downstream child front-engine state")
     expected = {
@@ -1044,7 +1085,8 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
                                 specimen_height_m=1.0e-3,
                                 far_h_m=5.0e-5,
                                 test_only_extreme_reservoir=False,
-                                cavity_geometry_radius_m=5.0e-5):
+                                cavity_geometry_radius_m=5.0e-5,
+                                front_constitutive_strategy=None):
     if (boundary_segments, radial_layers) != (32, 12) and crack_path_m is None:
         raise ValueError("production resolution transfer requires an explicit fixed crack path")
     source_direction = (math.cos(math.radians(cleavage_theta_deg)),
@@ -1193,7 +1235,9 @@ def build_production_void_state(*, bundle: UnifiedFractureMaterialBundle, enable
             tungsten_cleavage_candidates(theta_deg=cleavage_theta_deg), global_hazard_seed=seed,
         ),
         {"active_branch_id": ROOT_BRANCH_ID,
-         "by_branch": {ROOT_BRANCH_ID: capture_sharp_front_engine(fresh_sharp_front_engine(material, bundle))},
+         "front_constitutive_strategy": front_constitutive_strategy,
+         "by_branch": {ROOT_BRANCH_ID: capture_sharp_front_engine(fresh_sharp_front_engine(
+             material, bundle, constitutive_strategy=front_constitutive_strategy))},
          "owner_by_front": {ROOT_BRANCH_ID: ROOT_BRANCH_ID}}, {
             "source_state": {"density": 3.0, "clock": 0.125},
             "production_mesh_resolution": (int(boundary_segments), int(radial_layers)),
@@ -1562,7 +1606,8 @@ def cavity_fixed_physical_arc_patch_recovery_v3(
     if np.linalg.norm(np.asarray(state.mesh.nodes)[node] - position) > 1.0e-12:
         raise ValueError("stored connection exit is not an aligned cavity-boundary node")
     identity = dict(require_bound_identity(state))
-    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state),
+                                      constitutive_strategy=_front_strategy_from_state(state))
     _, _, sigma, *_ = assemble_mechanics(
         state.mesh,
         state.displacement,
@@ -1606,7 +1651,8 @@ def cavity_source_conforming_recovery_v4(state, *, boundary_node: int | None = N
     if np.linalg.norm(np.asarray(state.mesh.nodes)[node] - position) > 1.0e-12:
         raise ValueError("stored connection exit is not an aligned cavity-boundary node")
     identity = dict(require_bound_identity(state))
-    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state),
+                                      constitutive_strategy=_front_strategy_from_state(state))
     _, _, sigma, *_ = assemble_mechanics(
         state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
@@ -1639,7 +1685,8 @@ def cavity_boundary_fitted_recovery_v1(state, *, boundary_node: int | None = Non
     if np.linalg.norm(np.asarray(state.mesh.nodes)[node]-position) > 1.0e-12:
         raise ValueError("stored connection exit is not an aligned cavity-boundary node")
     identity = dict(require_bound_identity(state))
-    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state),
+                                      constitutive_strategy=_front_strategy_from_state(state))
     _, _, sigma, *_ = assemble_mechanics(
         state.mesh, state.displacement, state.ep_gp, state.rho_gp, state.damage,
         state.elasticity_D, state.material, cohesive_network=state.cohesive_network,
@@ -2100,6 +2147,7 @@ def _overlap_conservative_p0(state, mesh, values):
         distance = np.linalg.norm(centroids - center, axis=1)
         process_length = fresh_sharp_front_engine(
             state.material, _bundle_from_state(state),
+            constitutive_strategy=_front_strategy_from_state(state),
         ).f.L_pz
         recipients = np.flatnonzero(distance <= cavity.radius_m + process_length)
         if not len(recipients):
@@ -2306,6 +2354,7 @@ def remesh_cavity(state, hole, void_state, identity, operation_log=None, failure
     from .vacancy_coupling_v1 import deterministic_capture_patch
     capture_length = fresh_sharp_front_engine(
         trial.material, _bundle_from_state(trial),
+        constitutive_strategy=_front_strategy_from_state(trial),
     ).f.L_pz
     capture_owners = [
         (site.site_id, site.center_m, capture_length) for site in trial.void_state.sites
@@ -2539,7 +2588,9 @@ def _mesh_endpoint_on_direction(state, start, direction, target_distance_m):
 def directional_clock_rates(state, stress_tensor_Pa, *, temperature_K=900.0):
     """Read-only rates from the existing cleavage law and preserved clocks."""
     material = state.material
-    engine = fresh_sharp_front_engine(material, _bundle_from_state(state))
+    engine = fresh_sharp_front_engine(
+        material, _bundle_from_state(state),
+        constitutive_strategy=_front_strategy_from_state(state))
     stress = np.asarray(stress_tensor_Pa, dtype=float).reshape(2, 2)
     rates = []
     for candidate, hazard in zip(state.competition.candidates, state.competition.hazard_states):
@@ -2816,7 +2867,8 @@ def cavity_source_resolution_metrics(
     )
     damage = getattr(state.mesh, "element_damage_gp", None)
     solid = None if damage is None else np.asarray(damage, dtype=float) < 0.5
-    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state),
+                                      constitutive_strategy=_front_strategy_from_state(state))
     try:
         equilibrated = recover_equilibrated_boundary_traction_v1(
             nodes=nodes, elements=elems, stress_Pa=sigma, boundary_node=node,
@@ -3766,7 +3818,8 @@ def ligament_transaction(state, *, failure_stage=None, operation_log=None,
     end = intersections[candidate.candidate_id]
     if end is None:
         raise RuntimeError("selected candidate ray does not intersect the cavity polygon")
-    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state),
+                                      constitutive_strategy=_front_strategy_from_state(state))
     winner = next(item for item in cleavage_audit if item["candidate_id"] == candidate.candidate_id)
     barrier = winner["hazard_barrier_J"]
     resistance = hazard_resistance_J_per_m2(
@@ -4091,15 +4144,16 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         base_network = replace(state.crack_network, branches=state.crack_network.branches + (child,),
                                geometry_generation=state.crack_network.geometry_generation + 1,
                                branching_enabled=True)
-    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state))
+    engine = fresh_sharp_front_engine(state.material, _bundle_from_state(state),
+                                      constitutive_strategy=_front_strategy_from_state(state))
     winner = next(item for item in cleavage_audit if item["candidate_id"] == candidate.candidate_id)
     front_process_advance = _precompleted_front_process
     if continuation and front_process_advance is None:
-        from .legacy_front_process_adapter import LegacyFrontProcessAdapter
+        from .front_constitutive_strategy_r8 import CURRENT_STRATEGY, strategy_from_payload
         process_owner_id = _canonical_front_process_owner(pre_clock_state, child_id)
         payload = pre_clock_state.tip_process_state.get("by_branch", {}).get(process_owner_id)
         if payload is None:
-            raise RuntimeError("continued child has no canonical legacy process owner")
+            raise RuntimeError("continued child has no canonical process owner")
         pre_progress = max(
             (float(item.residual_action) for item in pre_clock_state.competition.hazard_states),
             default=0.0,
@@ -4108,14 +4162,33 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             (float(item.residual_action) for item in state.competition.hazard_states),
             default=pre_progress,
         )
-        front_process_advance = LegacyFrontProcessAdapter(
-            state.material, _bundle_from_state(state),
-        ).advance_front_process(
-            payload, float(winner["K_effective_Pa_sqrt_m"]), 900.0,
-            float(winner["common_advance_duration_s"]),
-            topology_owned_cleavage_action_before=pre_progress,
-            topology_owned_cleavage_action_after=post_progress,
-        )
+        if strategy_from_payload(payload) == CURRENT_STRATEGY:
+            from .current_front_process_adapter_r8 import CurrentFrontProcessAdapter
+            if tensor is None:
+                raise RuntimeError("continued current child lacks an accepted FEM tensor")
+            branch = state.crack_network.branch(child_id)
+            tangent = ((1.0, 0.0) if len(branch.path) < 2 else
+                       tuple(np.asarray(branch.path[-1])-np.asarray(branch.path[-2])))
+            front_process_advance = CurrentFrontProcessAdapter(
+                state.material, _bundle_from_state(state),
+            ).advance_front_process(
+                payload, {
+                    "K_effective_Pa_sqrt_m": float(winner["K_effective_Pa_sqrt_m"]),
+                    "stress_tensor_Pa": np.asarray(tensor, float).tolist(),
+                    "tangent_xy": tangent,
+                    "mechanics_serial": int(state.crack_network.geometry_generation),
+                }, 900.0, float(winner["common_advance_duration_s"]),
+            )
+        else:
+            from .legacy_front_process_adapter import LegacyFrontProcessAdapter
+            front_process_advance = LegacyFrontProcessAdapter(
+                state.material, _bundle_from_state(state),
+            ).advance_front_process(
+                payload, float(winner["K_effective_Pa_sqrt_m"]), 900.0,
+                float(winner["common_advance_duration_s"]),
+                topology_owned_cleavage_action_before=pre_progress,
+                topology_owned_cleavage_action_after=post_progress,
+            )
         tip_state = dict(state.tip_process_state)
         by_branch = dict(tip_state.get("by_branch", {}))
         by_branch[process_owner_id] = front_process_advance.advanced_front_state
@@ -4187,7 +4260,9 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
             tip_state.update({
                 "active_branch_id": child_id,
                 "by_branch": {child_id: capture_sharp_front_engine(
-                    fresh_sharp_front_engine(realized.material, _bundle_from_state(realized))
+                    fresh_sharp_front_engine(
+                        realized.material, _bundle_from_state(realized),
+                        constitutive_strategy=_front_strategy_from_state(state))
                 )},
                 "owner_by_front": {child_id: child_id},
             })
@@ -4221,16 +4296,20 @@ def downstream_front_transaction(state, *, continuation=False, failure_stage=Non
         process_owner_id = _canonical_front_process_owner(accepted, child_id)
         payload = accepted.tip_process_state.get("by_branch", {}).get(process_owner_id)
         child_engine = restore_sharp_front_engine(accepted.material, _bundle_from_state(accepted), payload)
-        # The canonical process interval was already evolved exactly once.
-        # Apply only the topology-owned moving-frame renewal after acceptance.
-        from .tip_directional_observation_v11 import apply_post_interval_event_renewal
         step_info = dict(front_process_advance.audit["step_info"])
-        step_info["interval_evolved"] = True
-        step_info["da"] = 0.0
-        apply_post_interval_event_renewal(
-            child_engine.mpz, step_info, event_selected=True,
-            event_distance_m=math.dist(start, end),
-        )
+        from .front_constitutive_strategy_r8 import CURRENT_STRATEGY
+        if getattr(child_engine, "_front_constitutive_strategy", None) != CURRENT_STRATEGY:
+            # The canonical legacy interval was evolved without renewal; its
+            # topology-owned moving-frame update is therefore applied here.
+            from .tip_directional_observation_v11 import apply_post_interval_event_renewal
+            step_info["interval_evolved"] = True
+            step_info["da"] = 0.0
+            apply_post_interval_event_renewal(
+                child_engine.mpz, step_info, event_selected=True,
+                event_distance_m=math.dist(start, end),
+            )
+        else:
+            step_info["outer_geometry_only_after_native_translation"] = True
         tip_state = dict(accepted.tip_process_state)
         by_branch = dict(tip_state.get("by_branch", {}))
         by_branch[process_owner_id] = {

@@ -72,7 +72,8 @@ def _disable_lifecycle(state):
 
 def initial_state(case, *, width=1.0e-3, height=1.0e-3, far_h=5.0e-5,
                   material_family="DBTT", load_scale=1.0,
-                  cavity_centers=None, temperature_K=900.0):
+                  cavity_centers=None, temperature_K=900.0,
+                  front_constitutive_strategy=None):
     bundle = material_bundle(material_family)
     centers = CENTERS if cavity_centers is None else cavity_centers
     rho_bulk = float(bundle.fracture_row["rho_forest_floor_m2"])
@@ -81,7 +82,8 @@ def initial_state(case, *, width=1.0e-3, height=1.0e-3, far_h=5.0e-5,
             bundle=bundle, enabled=True, crack_path_m=(ROOT_CRACK, TIP),
             cavity_center_m=(TIP[0]+3.0*RADIUS, 0.0), temperature_K=temperature_K,
             bulk_initial_density_m2=rho_bulk, initial_plastic_strain_gp=0.0,
-            specimen_width_m=width, specimen_height_m=height, far_h_m=far_h)
+            specimen_width_m=width, specimen_height_m=height, far_h_m=far_h,
+            front_constitutive_strategy=front_constitutive_strategy)
         state = with_candidates(_disable_lifecycle(state))
         if float(load_scale) != 1.0:
             state = equilibrate_fixed_load_with_production_fem(replace(
@@ -94,6 +96,7 @@ def initial_state(case, *, width=1.0e-3, height=1.0e-3, far_h=5.0e-5,
         initial_vacancy_fraction_gp=None,
         bulk_initial_density_m2=rho_bulk, initial_plastic_strain_gp=0.0,
         specimen_width_m=width, specimen_height_m=height, far_h_m=far_h,
+        front_constitutive_strategy=front_constitutive_strategy,
     )
     site = replace(state.void_state.sites[0], phase=VoidPhase.RESOLVED_VOID)
     area = math.pi*RADIUS**2

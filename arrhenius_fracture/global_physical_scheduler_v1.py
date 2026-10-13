@@ -380,6 +380,105 @@ def commit_front_engine_emission(state: Any, preview: PhysicalEventPreview):
     )
 
 
+def preview_current_front_first_passage(
+    accepted_state: Any, front_id: str, *, K_effective_Pa_sqrt_m: float,
+    stress_tensor_Pa: Any, temperature_K: float, maximum_duration_s: float,
+    directional_preview: PhysicalEventPreview,
+) -> PhysicalEventPreview:
+    """Preview the native current clock while retaining spatial direction/admission.
+
+    Directional mechanics chooses the prospective plane, but does not own a
+    second kinetic clock.  A pending directional event is materialized only as
+    topology-transaction bookkeeping when the native current owner fires.
+    """
+    from dataclasses import replace as dc_replace
+    from .current_front_process_adapter_r8 import CurrentFrontProcessAdapter
+    from .directional_competition_v11 import (
+        commit_directional_interval, preview_directional_interval,
+    )
+    from .voiding_production_v5 import _canonical_front_process_owner
+
+    before = _accepted_fingerprint(accepted_state)
+    owner, payload, bundle = _front_owner(accepted_state, str(front_id))
+    branch = accepted_state.crack_network.branch(str(front_id))
+    path = branch.path
+    tangent = ((1.0, 0.0) if len(path) < 2 else
+               tuple(np.asarray(path[-1], float)-np.asarray(path[-2], float)))
+    drive = {
+        "K_effective_Pa_sqrt_m": float(K_effective_Pa_sqrt_m),
+        "stress_tensor_Pa": np.asarray(stress_tensor_Pa, float).reshape(2, 2).tolist(),
+        "tangent_xy": tangent,
+        "mechanics_serial": int(accepted_state.crack_network.geometry_generation),
+    }
+    advanced = CurrentFrontProcessAdapter(
+        accepted_state.material, bundle,
+    ).advance_front_process(
+        payload, drive, float(temperature_K), float(maximum_duration_s),
+    )
+    trial = _replace_front_payload(
+        accepted_state, owner, advanced.advanced_front_state)
+    rows = tuple(copy.deepcopy(directional_preview.commit_payload["audit"]))
+    candidate_ids: tuple[str, ...] = ()
+    event_ids: tuple[str, ...] = ()
+    if advanced.cleavage_event_occurred:
+        available = [row for row in rows
+                     if row.get("directional_drive_status", "AVAILABLE") == "AVAILABLE"]
+        if not available:
+            raise RuntimeError("native current event has no admissible spatial direction")
+        winner_row = max(available, key=lambda row: (
+            float(row.get("rate_s", row.get("effective_rate_s", 0.0))),
+            str(row["candidate_id"]),
+        ))
+        candidate_id = str(winner_row["candidate_id"])
+        hazards = list(trial.competition.hazard_states)
+        index = next(i for i, item in enumerate(hazards)
+                     if item.candidate_id == candidate_id)
+        hazard = hazards[index]
+        crossing = float(advanced.cleavage_event_time_s)
+        proxy_rate = max(
+            (float(hazard.current_threshold_action)-float(hazard.action))
+            / max(crossing, np.finfo(float).tiny),
+            np.finfo(float).tiny,
+        )
+        interval = preview_directional_interval(
+            hazard, lambda_per_s=proxy_rate, start_time_s=0.0,
+            duration_s=crossing,
+        )
+        hazards[index] = commit_directional_interval(hazard, interval)
+        trial = dc_replace(trial, competition=dc_replace(
+            trial.competition, hazard_states=tuple(hazards)))
+        pending = hazards[index].pending_events[-1]
+        candidate_ids = (candidate_id,)
+        event_ids = (pending.event_id,)
+    if _accepted_fingerprint(accepted_state) != before:
+        raise RuntimeError("native current preview mutated accepted state")
+    crossing_time = (float(advanced.cleavage_event_time_s)
+                     if advanced.cleavage_event_occurred else math.inf)
+    return PhysicalEventPreview(
+        event_type=("DIRECTIONAL_CLEAVAGE" if event_ids
+                    else "NO_CURRENT_FRONT_EVENT"),
+        owner_kind="CurrentPersistentReversibleFront",
+        owner_id=owner, crossing_time_s=crossing_time,
+        accepted_state_fingerprint=before,
+        source_fingerprint=_sha((drive, rows)),
+        topology_fingerprint=_topology_fingerprint(accepted_state),
+        event_ids=event_ids, candidate_ids=candidate_ids,
+        threshold_identity=(("native_threshold_before",
+                             advanced.audit["pre_threshold_action"]),),
+        rng_fingerprint=_rng_fingerprint(accepted_state),
+        commit_payload=MappingProxyType({
+            "advanced_state": trial,
+            "advanced_state_fingerprint": _accepted_fingerprint(trial),
+            "audit": rows,
+            "elapsed_time_s": (float(maximum_duration_s) if not event_ids
+                               else crossing_time),
+            "native_front_advance": advanced,
+            "native_geometry_events": advanced.geometry_events,
+            "directional_clock_role": "TOPOLOGY_PROXY_ONLY_NO_KINETIC_ACTION",
+        }),
+    )
+
+
 def preview_ligament_first_passage(
     state: Any, *, temperature_K: float = 900.0,
     maximum_duration_s: float | None = None,
@@ -881,15 +980,18 @@ def _replace_front_payload(state: Any, owner: str, payload: Mapping[str, Any]):
 
 
 def _advance_front_engines(state_before: Any, state_after: Any, elapsed: float,
-                           K_by_front: Mapping[str, float], temperature: float):
-    """Evolve each unique legacy process owner once, without a cleavage clock."""
+                           K_by_front: Mapping[str, float], temperature: float,
+                           *, stress_tensor_Pa=None):
+    """Evolve each unique process owner once through its serialized strategy."""
     from .legacy_front_process_adapter import LegacyFrontProcessAdapter
     from .voiding_production_v5 import _bundle_from_state, _canonical_front_process_owner
+    from .front_constitutive_strategy_r8 import CURRENT_STRATEGY, strategy_from_payload
     before_actions = [float(item.residual_action) for item in state_before.competition.hazard_states]
     after_actions = [float(item.residual_action) for item in state_after.competition.hazard_states]
     pre_progress = max(before_actions, default=0.0)
     post_progress = max(after_actions, default=pre_progress)
-    adapter = LegacyFrontProcessAdapter(state_after.material, _bundle_from_state(state_after))
+    legacy_adapter = LegacyFrontProcessAdapter(
+        state_after.material, _bundle_from_state(state_after))
     result = state_after
     advances = []
     seen = set()
@@ -903,11 +1005,30 @@ def _advance_front_engines(state_before: Any, state_after: Any, elapsed: float,
             continue
         seen.add(owner)
         payload = result.tip_process_state["by_branch"][owner]
-        advanced = adapter.advance_front_process(
-            payload, float(K_by_front[front_id]), float(temperature), float(elapsed),
-            topology_owned_cleavage_action_before=pre_progress,
-            topology_owned_cleavage_action_after=post_progress,
-        )
+        if strategy_from_payload(payload) == CURRENT_STRATEGY:
+            if stress_tensor_Pa is None:
+                raise RuntimeError("current spatial front advance lacks an accepted FEM tensor")
+            from .current_front_process_adapter_r8 import CurrentFrontProcessAdapter
+            branch = state_after.crack_network.branch(front_id)
+            tangent = ((1.0, 0.0) if len(branch.path) < 2 else
+                       tuple(np.asarray(branch.path[-1], float)
+                             -np.asarray(branch.path[-2], float)))
+            advanced = CurrentFrontProcessAdapter(
+                state_after.material, _bundle_from_state(state_after),
+            ).advance_front_process(
+                payload, {
+                    "K_effective_Pa_sqrt_m": float(K_by_front[front_id]),
+                    "stress_tensor_Pa": np.asarray(stress_tensor_Pa, float).tolist(),
+                    "tangent_xy": tangent,
+                    "mechanics_serial": int(state_after.crack_network.geometry_generation),
+                }, float(temperature), float(elapsed),
+            )
+        else:
+            advanced = legacy_adapter.advance_front_process(
+                payload, float(K_by_front[front_id]), float(temperature), float(elapsed),
+                topology_owned_cleavage_action_before=pre_progress,
+                topology_owned_cleavage_action_after=post_progress,
+            )
         result = _replace_front_payload(result, owner, advanced.advanced_front_state)
         advances.append((owner, advanced))
     return result, tuple(advances)
@@ -1534,10 +1655,12 @@ def advance_global_physical_interval(
             # an actual one-increment segment can reach the cavity polygon.
             from .voiding_production_v5 import (
                 _bundle_from_state, _first_ray_cavity_intersection,
-                fresh_sharp_front_engine,
+                _front_strategy_from_state, fresh_sharp_front_engine,
             )
             engine = fresh_sharp_front_engine(mechanical.material,
-                                              _bundle_from_state(mechanical))
+                _bundle_from_state(mechanical),
+                constitutive_strategy=_front_strategy_from_state(
+                    mechanical, active_tip_id))
             start = mechanical.crack_network.branch(active_tip_id).tip
             finite_contact = any(
                 point is not None and math.dist(start, point) <=
@@ -1614,6 +1737,29 @@ def advance_global_physical_interval(
             else ("CANONICAL_DOWNSTREAM_PROVIDER" if active_fronts and
                   "K_effective_by_front" not in history
                   else "EXPLICIT_COMPLETE_STATE_BOUND_MAP"))
+        current_front_strategy = False
+        if active_tip_id is not None:
+            from .front_constitutive_strategy_r8 import (
+                CURRENT_STRATEGY, strategy_from_payload,
+            )
+            process_owner = mechanical.tip_process_state.get(
+                "owner_by_front", {}).get(str(active_tip_id), str(active_tip_id))
+            process_payload = mechanical.tip_process_state.get(
+                "by_branch", {}).get(process_owner)
+            current_front_strategy = (
+                strategy_from_payload(process_payload) == CURRENT_STRATEGY)
+        if (current_front_strategy and topology_preview is None
+                and active_tip_id is not None and not missing_front_loads):
+            native_preview = preview_current_front_first_passage(
+                mechanical, active_tip_id,
+                K_effective_Pa_sqrt_m=K_by_front[str(active_tip_id)],
+                stress_tensor_Pa=stress_tensor, temperature_K=temperature,
+                maximum_duration_s=segment_horizon,
+                directional_preview=directional,
+            )
+            previews = [native_preview if item is directional else item
+                        for item in previews]
+            front_process_load_policy = "NATIVE_CURRENT_CLOCK_WITH_DIRECTIONAL_ADMISSION"
         transport = current.vacancy_transport_state_v2
         parent = np.asarray(transport.parent_mechanics_element_ids, dtype=int)
         epdot_mechanics = equivalent_plastic_strain_rate_s(
@@ -2042,7 +2188,21 @@ def advance_global_physical_interval(
         directional_owner_advance = None
         phase_cavities = (() if mechanical.void_state is None
                           else mechanical.void_state.cavities)
-        if (phase_cavities and phase_cavities[0].phase in {
+        if current_front_strategy:
+            directional_at_elapsed = None
+            if (winner is not None
+                    and winner.owner_kind == "CurrentPersistentReversibleFront"):
+                native_advanced = winner.commit_payload["advanced_state"]
+                transported = replace(
+                    transported, competition=native_advanced.competition)
+                directional_owner_advance = {
+                    "owner_kind": winner.owner_kind,
+                    "owner_id": winner.owner_id,
+                    "elapsed_time_s": float(elapsed),
+                    "clock_role": "NATIVE_CURRENT_WITH_DIRECTIONAL_TOPOLOGY_PROXY",
+                    "event_ids": tuple(winner.event_ids),
+                }
+        elif (phase_cavities and phase_cavities[0].phase in {
                 VoidPhase.CONNECTED_VOID, VoidPhase.DOWNSTREAM_FRONT_ACTIVE}):
             cached_phase_horizon = (None if topology_preview is None else
                                     topology_preview.commit_payload.get(
@@ -2109,6 +2269,7 @@ def advance_global_physical_interval(
         else:
             transported, front_process_advances = _advance_front_engines(
                 current, transported, elapsed, K_by_front, temperature,
+                stress_tensor_Pa=stress_tensor,
             )
         winning_direct_site = (
             winner.commit_payload["site_id"]
@@ -2524,7 +2685,10 @@ def advance_global_physical_interval(
             from .crack_network_v11 import ROOT_BRANCH_ID
             from .v12_production_driver import (
                 build_physical_cleavage_event_context,execute_event)
-            from .voiding_production_v5 import _bundle_from_state, fresh_sharp_front_engine
+            from .voiding_production_v5 import (
+                _bundle_from_state, _front_strategy_from_state,
+                fresh_sharp_front_engine,
+            )
             failure_injector = history.get("failure_injector")
             if callable(failure_injector):
                 failure_injector(
@@ -2536,9 +2700,20 @@ def advance_global_physical_interval(
                 row for row in winner.commit_payload["audit"]
                 if row["candidate_id"] == candidate_id)
             hazard_barrier_J = float(winner_row["hazard_barrier_J"])
-            engine = fresh_sharp_front_engine(transported.material, _bundle_from_state(transported))
+            engine = fresh_sharp_front_engine(
+                transported.material, _bundle_from_state(transported),
+                constitutive_strategy=_front_strategy_from_state(
+                    transported, ROOT_BRANCH_ID))
             start = np.asarray(transported.crack_network.branch(ROOT_BRANCH_ID).tip)
-            endpoint = tuple(map(float, start + float(engine.f.da)*np.asarray(candidate.direction_xy)))
+            event_length = float(engine.f.da)
+            if winner.owner_kind == "CurrentPersistentReversibleFront":
+                native_events = tuple(winner.commit_payload.get(
+                    "native_geometry_events", ()))
+                if len(native_events) != 1:
+                    raise RuntimeError(
+                        "native current cleavage must own exactly one geometry descriptor")
+                event_length = float(native_events[0]["event_advance_m"])
+            endpoint = tuple(map(float, start + event_length*np.asarray(candidate.direction_xy)))
             physical_context=build_physical_cleavage_event_context(
                 transported,candidate_id=candidate_id,front_id=ROOT_BRANCH_ID,
                 source_fingerprint=winner.source_fingerprint,
@@ -2550,6 +2725,44 @@ def advance_global_physical_interval(
                     candidate_id=candidate_id,
                     physical_context=physical_context,
                 )
+                if winner.owner_kind == "CurrentPersistentReversibleFront":
+                    # Native current evolution already translated/remapped its
+                    # 1-D material state.  The outer commit supplies only the
+                    # accepted 2-D position and frame; no second MPZ advance is
+                    # applied here.
+                    from .voiding_production_v5 import (
+                        _canonical_front_process_owner,
+                        capture_sharp_front_engine, restore_sharp_front_engine,
+                    )
+                    process_owner = _canonical_front_process_owner(
+                        transported, ROOT_BRANCH_ID)
+                    payload = transported.tip_process_state["by_branch"][process_owner]
+                    current_engine = restore_sharp_front_engine(
+                        transported.material, _bundle_from_state(transported), payload)
+                    direction = np.asarray(candidate.direction_xy, float)
+                    direction /= np.linalg.norm(direction)
+                    current_engine._spatial_tip_position_xy_m = tuple(endpoint)
+                    current_engine._spatial_tip_tangent_xy = tuple(map(float, direction))
+                    current_engine._spatial_crystal_frame_angle_rad = float(
+                        math.atan2(direction[1], direction[0]))
+                    if not hasattr(current_engine, "_spatial_material_wake_origin_xy_m"):
+                        current_engine._spatial_material_wake_origin_xy_m = tuple(map(float, start))
+                    transported = _replace_front_payload(
+                        transported, process_owner,
+                        capture_sharp_front_engine(current_engine))
+                    topology_transaction_audit = {
+                        **dict(topology_transaction_audit),
+                        "current_material_frame": {
+                            "tip_position_xy_m": list(endpoint),
+                            "tip_tangent_xy": direction.tolist(),
+                            "crystal_frame_angle_rad": float(
+                                math.atan2(direction[1], direction[0])),
+                            "material_wake_origin_xy_m": list(
+                                current_engine._spatial_material_wake_origin_xy_m),
+                            "mpz_translation_owner": "NATIVE_CURRENT_EVENT",
+                            "outer_geometry_translation_applied": False,
+                        },
+                    }
             except Exception as error:
                 from .v12_production_driver import PhysicalEnergyVeto
                 if not isinstance(error,PhysicalEnergyVeto):
@@ -2578,7 +2791,12 @@ def advance_global_physical_interval(
                 "event_ids": item.event_ids, "candidate_ids": item.candidate_ids,
             } for item in previews),
             "all_losing_clocks_advance_s": elapsed,
-            "legacy_front_process": tuple(dict(item.audit) for _, item in front_process_advances),
+            "front_process": tuple(dict(item.audit) for _, item in front_process_advances),
+            # Retained compatibility key for legacy evidence readers.  It is
+            # empty for current-strategy owners and must not relabel them.
+            "legacy_front_process": tuple(
+                dict(item.audit) for _, item in front_process_advances
+                if item.audit.get("constitutive_strategy") is None),
             "front_process_load_policy": front_process_load_policy,
             "directional_owner_advance": directional_owner_advance,
             "topology_transaction": topology_transaction_audit,
@@ -2709,7 +2927,8 @@ def advance_active_coupled_interval(
             "active coupled interval requires event-time constitutive rebasing: "+
             repr(interrupted))
     front_rows=tuple(item for segment in scheduler["events"]
-                     for item in segment["legacy_front_process"])
+                     for item in segment.get(
+                         "front_process", segment["legacy_front_process"]))
     if not front_rows:
         raise RuntimeError("active coupled interval skipped the front-process owner")
     if any(segment["front_process_load_policy"]=="DIAGNOSTIC_FREEZE"

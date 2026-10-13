@@ -177,7 +177,8 @@ def advance_current_source_adaptive(
     }
 
 
-def _resolved_state(engine: Any, result: dict[str, Any]) -> dict[str, Any]:
+def _resolved_state(engine: Any, result: dict[str, Any], *, parent: Any,
+                    consumed_s: float) -> dict[str, Any]:
     """Mechanically relevant state, retaining signed and bin resolution."""
     arrays = {}
     for name, value in vars(engine.mpz).items():
@@ -185,14 +186,23 @@ def _resolved_state(engine: Any, result: dict[str, Any]) -> dict[str, Any]:
             "mobile", "retained", "slip", "wake", "source", "backstress",
         )):
             arrays[name] = np.asarray(value, float).copy()
+    gross_source = float(engine.mpz.cumulative_gross_source_activity)
+    gross_return = float(engine.mpz.cumulative_gross_return_activity)
+    parent_source = float(parent.mpz.cumulative_gross_source_activity)
+    parent_return = float(parent.mpz.cumulative_gross_return_activity)
+    interval = max(float(consumed_s), np.finfo(float).tiny)
     scalars = {
-        "gross_source": float(engine.mpz.cumulative_gross_source_activity),
-        "gross_return": float(engine.mpz.cumulative_gross_return_activity),
+        "gross_source": gross_source,
+        "gross_return": gross_return,
         "permanent_slip": float(engine.mpz.local_slip_count()),
         "radius_m": float(engine.r_eff()),
         "hazard_action": float(result["hazard_action_current"]),
-        "gross_rate_s": float(result.get("gross_source_rate_s", 0.0)),
-        "returned_rate_s": float(result.get("gross_return_rate_s", 0.0)),
+        # Native step results do not expose these keys.  The accepted gross
+        # ledger increments over the corresponding consumed interval are the
+        # actual observable rates; an absent result key is never interpreted
+        # as physical zero activity.
+        "gross_rate_s": (gross_source-parent_source)/interval,
+        "returned_rate_s": (gross_return-parent_return)/interval,
         "sigma_tip_Pa": float(result.get("sigma_tip", 0.0)),
     }
     return {"arrays": arrays, "scalars": scalars}
@@ -234,9 +244,9 @@ def advance_current_source_to_earliest_event(
         second = one(first[0], 0.5*dt)
         return second[0], second[1], first[2]+second[2], 0.5*dt+second[3]
 
-    def compare(full, half, dt: float):
-        left = _resolved_state(full[0], full[1])
-        right = _resolved_state(half[0], half[1])
+    def compare(parent, full, half, dt: float):
+        left = _resolved_state(full[0], full[1], parent=parent, consumed_s=full[3])
+        right = _resolved_state(half[0], half[1], parent=parent, consumed_s=half[3])
         errors: dict[str, float] = {}
         array_error = 0.0
         names = sorted(set(left["arrays"]) | set(right["arrays"]))
@@ -292,7 +302,7 @@ def advance_current_source_to_earliest_event(
     def integrate(parent: Any, dt: float, depth: int):
         full = one(parent, dt)
         half = composed_half(parent, dt)
-        passed, errors = compare(full, half, dt)
+        passed, errors = compare(parent, full, half, dt)
         records.append({"depth": depth, "duration_s": dt,
                         "accepted": passed, "errors": errors})
         if passed:
