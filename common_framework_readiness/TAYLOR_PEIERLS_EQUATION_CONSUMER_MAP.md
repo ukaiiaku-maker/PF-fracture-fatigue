@@ -47,7 +47,7 @@ projects populations to local equilibrium. A BDF integration of the same full
 augmented generator is retained only as an independent qualification oracle.
 
 The compact evidence is in
-`integration_evidence/native_taylor_peierls_spatial_1513f579`. The maximum and
+`integration_evidence/native_taylor_peierls_spatial_e5982762`. The maximum and
 terminal traces contain local stress, temperature, density, event length,
 forward/reverse barriers and prefactors, forward/reverse/net rates, velocity,
 face flux, completion order, residuals, and diagnostic averaging.

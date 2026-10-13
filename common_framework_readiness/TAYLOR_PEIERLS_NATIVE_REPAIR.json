@@ -3,7 +3,7 @@
   "date": "2026-10-13",
   "status": "PASSED_COMPACT_NATIVE_QUALIFICATION",
   "production_execution_authorized": false,
-  "source_head_at_qualification": "1513f5794b05e1675834a96a00152c7aff122e7d",
+  "source_head_at_qualification": "e59827626f984675c2dcfeb9fa37c5cdf5570aea",
   "physical_selection": {
     "taylor_mode": "mean_net_rate_over_density_order",
     "taylor_window_s": null,
@@ -32,7 +32,7 @@
     "independent_oracle": "scipy BDF integration of the same complete augmented generator"
   },
   "compact_spatial_qualification": {
-    "root": "../integration_evidence/native_taylor_peierls_spatial_1513f579",
+    "root": "../integration_evidence/native_taylor_peierls_spatial_e5982762",
     "temperature_K": 950.0,
     "tip_opening_stress_Pa": 5000000000.0,
     "bins": 16,
