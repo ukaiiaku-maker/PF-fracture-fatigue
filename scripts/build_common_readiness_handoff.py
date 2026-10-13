@@ -106,6 +106,12 @@ Numerical evidence marked `DEFERRED_RESOURCE` has not run. Production and all sc
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--parameter-dossier", action="store_true",
-                        help="accepted compatibility flag; the complete compact handoff is always built")
-    parser.parse_args()
-    build()
+                        help="regenerate only the native v2 parameter dossier")
+    args = parser.parse_args()
+    if args.parameter_dossier:
+        _write_json(
+            OUT / "PARAMETER_PARENT_DOSSIER_V2_NATIVE.json",
+            build_parameter_dossier(ROOT),
+        )
+    else:
+        build()

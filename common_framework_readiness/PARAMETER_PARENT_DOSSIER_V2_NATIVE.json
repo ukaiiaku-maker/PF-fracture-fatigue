@@ -2449,10 +2449,42 @@
           "timescale_s": null
         }
       ],
+      "native_transport_consumer": {
+        "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
+        "completion_law": {
+          "callable": "arrhenius_fracture.taylor_release.completion_rate",
+          "mode": "legacy_implicit_1s",
+          "single_rate_cap_s": 1000000000000.0,
+          "window_s": 1e-09
+        },
+        "expected_projection_1_over_sqrt3": 0.5773502691896258,
+        "forest_density_floor_m2": 5000000000000.0,
+        "peierls_stress_projection": 0.5773502691896258,
+        "peierls_surface": {
+          "H0_eV": 6.368386985268444,
+          "activation_entropy_kB": 12.2265643812716,
+          "attempt_frequency_s": 1000000000000.0,
+          "exp_a": 1.9097672308795155,
+          "exp_n": 1.1372957159765065
+        },
+        "stress_coordinate": "opening stress projected once before barrier evaluation",
+        "taylor_correlation_density_m2": 58780073970578.01,
+        "taylor_correlation_scale": 0.8638954413677038,
+        "taylor_stress_projection": 0.5773502691896258,
+        "taylor_surface": {
+          "H0_eV": 1.6986502355337143,
+          "activation_entropy_kB": 38.45378890633583,
+          "attempt_frequency_s": 100000000000.0,
+          "exp_a": 0.4561179580539465,
+          "exp_n": 1.2506696581840515
+        }
+      },
       "option_key": "v913_paper_peak01_0242980_persistent_sites",
       "physical_multiplicity": {
+        "inherited_reference_source_sites_per_system": 141.0590567476921,
         "n_slip_channels": 2,
-        "source_sites_per_system": 141.0590567476921
+        "persistent_runtime_multiplicity": "rho_site0*c_arc*r_tip*w_eff evaluated from live state",
+        "reference_field_runtime_status": "inactive for persistent-site source; instantaneous multiplicity is geometry/state dependent"
       },
       "state_limits": {
         "retained_recovery_rate_s": 0.0,
@@ -4747,10 +4779,42 @@
           "timescale_s": null
         }
       ],
+      "native_transport_consumer": {
+        "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
+        "completion_law": {
+          "callable": "arrhenius_fracture.taylor_release.completion_rate",
+          "mode": "legacy_implicit_1s",
+          "single_rate_cap_s": 1000000000000.0,
+          "window_s": 1e-09
+        },
+        "expected_projection_1_over_sqrt3": 0.5773502691896258,
+        "forest_density_floor_m2": 5000000000000.0,
+        "peierls_stress_projection": 0.5773502691896258,
+        "peierls_surface": {
+          "H0_eV": 3.525720003992319,
+          "activation_entropy_kB": -36.33932862430811,
+          "attempt_frequency_s": 1000000000000.0,
+          "exp_a": 1.448395521938801,
+          "exp_n": 1.871259921230376
+        },
+        "stress_coordinate": "opening stress projected once before barrier evaluation",
+        "taylor_correlation_density_m2": 22042481205294.297,
+        "taylor_correlation_scale": 1.2690231726199324,
+        "taylor_stress_projection": 0.5773502691896258,
+        "taylor_surface": {
+          "H0_eV": 1.4998139148950578,
+          "activation_entropy_kB": 31.365934647619724,
+          "attempt_frequency_s": 100000000000.0,
+          "exp_a": 0.7048910272121429,
+          "exp_n": 0.5389550719410181
+        }
+      },
       "option_key": "v913_paper_dbtt01_0202500_persistent_sites",
       "physical_multiplicity": {
+        "inherited_reference_source_sites_per_system": 141.0590567476921,
         "n_slip_channels": 2,
-        "source_sites_per_system": 141.0590567476921
+        "persistent_runtime_multiplicity": "rho_site0*c_arc*r_tip*w_eff evaluated from live state",
+        "reference_field_runtime_status": "inactive for persistent-site source; instantaneous multiplicity is geometry/state dependent"
       },
       "state_limits": {
         "retained_recovery_rate_s": 0.0,
@@ -7369,10 +7433,42 @@
           "timescale_s": 4.0048356369090866e-11
         }
       ],
+      "native_transport_consumer": {
+        "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
+        "completion_law": {
+          "callable": "arrhenius_fracture.taylor_release.completion_rate",
+          "mode": "legacy_implicit_1s",
+          "single_rate_cap_s": 1000000000000.0,
+          "window_s": 1e-09
+        },
+        "expected_projection_1_over_sqrt3": 0.5773502691896258,
+        "forest_density_floor_m2": 5000000000000.0,
+        "peierls_stress_projection": 0.5773502691896258,
+        "peierls_surface": {
+          "H0_eV": 7.117342075519264,
+          "activation_entropy_kB": -47.75738567113876,
+          "attempt_frequency_s": 1000000000000.0,
+          "exp_a": 0.2264547564554959,
+          "exp_n": 1.9374389592558143
+        },
+        "stress_coordinate": "opening stress projected once before barrier evaluation",
+        "taylor_correlation_density_m2": 237130686553740.03,
+        "taylor_correlation_scale": 0.0927493991876699,
+        "taylor_stress_projection": 0.5773502691896258,
+        "taylor_surface": {
+          "H0_eV": 3.2621826685033737,
+          "activation_entropy_kB": 39.933723136782646,
+          "attempt_frequency_s": 100000000000.0,
+          "exp_a": 1.055419295541942,
+          "exp_n": 1.0061173520516604
+        }
+      },
       "option_key": "v913_paper_weakT01_0129902_persistent_sites",
       "physical_multiplicity": {
+        "inherited_reference_source_sites_per_system": 141.0590567476921,
         "n_slip_channels": 2,
-        "source_sites_per_system": 141.0590567476921
+        "persistent_runtime_multiplicity": "rho_site0*c_arc*r_tip*w_eff evaluated from live state",
+        "reference_field_runtime_status": "inactive for persistent-site source; instantaneous multiplicity is geometry/state dependent"
       },
       "state_limits": {
         "retained_recovery_rate_s": 0.0,
@@ -9991,10 +10087,42 @@
           "timescale_s": 6.428896954861524e-08
         }
       ],
+      "native_transport_consumer": {
+        "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
+        "completion_law": {
+          "callable": "arrhenius_fracture.taylor_release.completion_rate",
+          "mode": "legacy_implicit_1s",
+          "single_rate_cap_s": 1000000000000.0,
+          "window_s": 1e-09
+        },
+        "expected_projection_1_over_sqrt3": 0.5773502691896258,
+        "forest_density_floor_m2": 5000000000000.0,
+        "peierls_stress_projection": 0.5773502691896258,
+        "peierls_surface": {
+          "H0_eV": 6.716475480981171,
+          "activation_entropy_kB": -43.48882682621479,
+          "attempt_frequency_s": 1000000000000.0,
+          "exp_a": 1.178178071556613,
+          "exp_n": 1.0056940987706184
+        },
+        "stress_coordinate": "opening stress projected once before barrier evaluation",
+        "taylor_correlation_density_m2": 4.043330255464039e+16,
+        "taylor_correlation_scale": 1.8013635924189044,
+        "taylor_stress_projection": 0.5773502691896258,
+        "taylor_surface": {
+          "H0_eV": 0.7904905830975623,
+          "activation_entropy_kB": -25.948952957987785,
+          "attempt_frequency_s": 100000000000.0,
+          "exp_a": 1.0212089663371444,
+          "exp_n": 0.599093577126041
+        }
+      },
       "option_key": "v913_paper_ceramic01_0077080_persistent_sites",
       "physical_multiplicity": {
+        "inherited_reference_source_sites_per_system": 141.0590567476921,
         "n_slip_channels": 2,
-        "source_sites_per_system": 141.0590567476921
+        "persistent_runtime_multiplicity": "rho_site0*c_arc*r_tip*w_eff evaluated from live state",
+        "reference_field_runtime_status": "inactive for persistent-site source; instantaneous multiplicity is geometry/state dependent"
       },
       "state_limits": {
         "retained_recovery_rate_s": 0.0,
