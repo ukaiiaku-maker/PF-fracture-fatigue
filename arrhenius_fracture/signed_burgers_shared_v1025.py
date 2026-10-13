@@ -507,6 +507,7 @@ def _signed_evolve_scalar(
         nonlinear_iterations = float(coupled["iterations"])
         source_rate_s = float(coupled["activation_rate_s"])
         velocity = float(coupled["velocity_m_s"])
+        invariant_correction = float(result.invariant_projection_correction)
     else:
         emitted = self._emit(dt, stress_Pa, T_K, system_weights)
         stress = self.local_stress_profile_Pa(stress_Pa)
@@ -514,6 +515,7 @@ def _signed_evolve_scalar(
         rates = self._transport_rates(stress, rho, T_K, b)
         nonlinear_iterations = 0.0
         source_rate_s = emitted / dt if dt > 0.0 else 0.0
+        invariant_correction = 0.0
     if mode == JOINT_CTMC_EXCHANGE_TRANSPORT and coupled_source is None:
         total_by_bin = np.sum(
             self.mobile_positive + self.mobile_negative
@@ -554,6 +556,7 @@ def _signed_evolve_scalar(
         gross_trapping, gross_release = result.gross_trapping, result.gross_release
         recovered, escaped = result.recovered, result.escaped
         mobile_distance_population = result.mobile_distance_population_m
+        invariant_correction = float(result.invariant_projection_correction)
     elif mode != JOINT_CTMC_EXCHANGE_TRANSPORT:
         gross_trapping = gross_release = 0.0
         for suffix in ("positive", "negative"):
@@ -604,6 +607,7 @@ def _signed_evolve_scalar(
         "dN_gross_trapping": gross_trapping,
         "dN_gross_release": gross_release,
         "mobile_distance_population_m": mobile_distance_population,
+        "transport_invariant_roundoff_correction": invariant_correction,
         "scalar_transport_velocity_m_s": self.scalar_transport_velocity_m_s,
         "scalar_transport_displacement_m": self.scalar_transport_displacement_m,
         "exchange_transport_mode": mode,
