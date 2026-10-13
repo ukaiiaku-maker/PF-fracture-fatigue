@@ -1,6 +1,6 @@
 import math
 from pathlib import Path
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 
 import numpy as np
 import pytest
@@ -278,6 +278,23 @@ def test_coupled_acceptance_recomputes_full_coefficients_at_accepted_state():
     for key in ("encounter", "taylor", "velocity"):
         np.testing.assert_allclose(out["rates"][key], accepted[key], rtol=1.0e-4, atol=1.0e-8)
     assert out["coefficient_residual"] <= 1.0e-4
+
+
+def test_coupled_source_expands_bracket_when_blunting_raises_site_target():
+    state = _coupled_test_state()
+
+    def stronger_blunting(self, r0, _b):
+        return float(r0) * (
+            1.0 + 0.05 * float(np.sum(self.accumulated_slip))
+        )
+
+    state.blunted_radius = MethodType(stronger_blunting, state)
+    out = state._coupled_persistent_source_transport(
+        1.0, 5.0e8, 950.0, 1.0e-9
+    )
+    assert out["activation_rate_s"] > 0.0
+    assert out["complementarity_residual"] <= 1.0e-6
+    assert out["source_bracket_relative_width"] <= 1.0e-8
     assert out["state_fixed_point_residual"] <= 1.0e-4
     assert out["affine_direct_state_residual"] <= 1.0e-8
 

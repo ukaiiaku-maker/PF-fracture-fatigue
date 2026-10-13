@@ -85,3 +85,17 @@ partition test now explicitly exercises the stable-population method; the
 focused 55-test set passes.  Next action is a committed step-24 checkpoint
 replay.
 
+The `d5b056c2` clean recomputation then reached accepted step 45 and exposed the
+original source residual at step 46 with coefficient/state residuals exactly
+zero.  An 8-iteration diagnostic reproduced the same result as 64 iterations:
+activation rates `[1.0983862824, 1.0580603359] s^-1` remained about
+`7.85e-4` below their targets while both sources were fully unblocked
+(~`1.1 kPa` backstress versus ~`6.2 GPa` drive).  The cause was a false source
+root bracket: the zero-activation target was used as an upper bound even though
+blunting raises persistent-site multiplicity and hence raises the target after
+activation is installed.  The working repair expands the bracket until the
+unchanged rate equation has a true sign change or the original mechanical gate
+blocks it.  A synthetic positive-feedback regression and the exact retained
+step-46 replay both pass.  Next action: commit, then recompute the clean prefix
+under the final source before restart/uninterrupted comparison.
+

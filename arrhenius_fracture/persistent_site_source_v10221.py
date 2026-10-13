@@ -651,6 +651,29 @@ def _coupled_persistent_source_transport(
             install_affine_state(base, unit, trial)
             upper = max(float(source_target()[system]), 1.0)
             lower = 0.0
+            # Blunting can increase the persistent-site multiplicity, so the
+            # target evaluated at zero activation is not necessarily an upper
+            # root bound. Expand until the unchanged rate equation changes
+            # sign or the original mechanical gate drives the target to zero.
+            for _ in range(int(cfg.implicit_max_iterations)):
+                trial[system] = upper
+                install_affine_state(base, unit, trial)
+                target_upper = float(source_target()[system])
+                if target_upper <= 0.0 or upper >= target_upper:
+                    break
+                lower = upper
+                upper = max(2.0 * upper, target_upper)
+                if not math.isfinite(upper):
+                    restore_initial_state()
+                    raise RuntimeError(
+                        "persistent source root bracket became non-finite"
+                    )
+            else:
+                restore_initial_state()
+                raise RuntimeError(
+                    "persistent source rate root could not be bracketed before "
+                    "the configured implicit iteration allowance"
+                )
             for _ in range(80):
                 midpoint = 0.5 * (lower + upper)
                 trial[system] = midpoint
@@ -729,6 +752,11 @@ def _coupled_persistent_source_transport(
             f"source_residual={complementarity_error:.6e}, "
             f"affine_direct_error={affine_direct_error:.6e}, "
             f"bracket_width={bracket_relative_width:.6e}, "
+            f"activation_rate={activation_rate.tolist()}, "
+            f"source_target={target_iteration.tolist()}, "
+            f"equation_residual={equation_iteration.tolist()}, "
+            f"gate_residual={gate_iteration.tolist()}, "
+            f"drive_Pa={drive.tolist()}, sigma_back_Pa={sigma_iteration.tolist()}, "
             f"iterations={cfg.coupled_max_iterations}"
         )
 
