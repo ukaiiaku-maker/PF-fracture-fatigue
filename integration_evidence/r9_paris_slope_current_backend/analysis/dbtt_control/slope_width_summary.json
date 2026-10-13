@@ -1,0 +1,15 @@
+{
+  "band": [
+    3.4,
+    4.6
+  ],
+  "largest_connected_m4_interval": {
+    "DeltaK_high": 33.014955920406216,
+    "DeltaK_low": 4.165550729303736,
+    "rate_width_decades": 3.7974861179603434,
+    "start": 0,
+    "stop": 1
+  },
+  "target_rate_width_decades": 2.0,
+  "window_rule": "first committed event at or above 20 and 100 um; common event rewards under CRN"
+}
