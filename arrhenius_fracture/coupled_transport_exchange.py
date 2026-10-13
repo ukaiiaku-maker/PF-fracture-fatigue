@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from scipy.linalg import expm
+from scipy.integrate import solve_ivp
 
 
 @dataclass(frozen=True)
@@ -105,6 +106,25 @@ def _partitioned_affine_action(
     output[:n] = result_a @ initial[:n] + result_b @ initial[n:]
     output[n:] = initial[n:]
     return np.asarray(output, dtype=float)
+
+
+def _independent_stiff_action(matrix, vectors, dt):
+    """Independent error-controlled action of the same augmented generator."""
+    operator = np.asarray(matrix, dtype=float)
+    initial = np.asarray(vectors, dtype=float)
+    output = np.empty_like(initial)
+    for column in range(initial.shape[1]):
+        solution = solve_ivp(
+            lambda _time, state: operator @ state,
+            (0.0, float(dt)), initial[:, column], method="BDF", jac=operator,
+            rtol=2.0e-11, atol=1.0e-13,
+        )
+        if not solution.success:
+            raise FloatingPointError(
+                f"independent stiff augmented solve failed: {solution.message}"
+            )
+        output[:, column] = solution.y[:, -1]
+    return output
 
 
 def joint_transport_exchange(
@@ -220,6 +240,22 @@ def joint_transport_exchange(
     if float(np.min(physical)) < -tolerance:
         raise FloatingPointError("joint transport/exchange produced a negative population")
     physical = np.maximum(physical, 0.0)
+    preliminary_budget = np.sum(m0 + r0, axis=1) + np.sum(source, axis=1) * dt
+    preliminary_accounted = (
+        np.sum(physical[:n].T + physical[n : 2 * n].T, axis=1)
+        + physical[escaped_i] + physical[recovered_i]
+    )
+    if np.any(
+        np.abs(preliminary_budget - preliminary_accounted)
+        > 1.0e-6 * np.maximum(preliminary_budget, 1.0)
+    ):
+        final = _independent_stiff_action(generator, initial_vectors, dt)
+        physical = final[: 2 * n + 2]
+        if float(np.min(physical)) < -tolerance:
+            raise FloatingPointError(
+                "independent stiff solve produced a negative population"
+            )
+        physical = np.maximum(physical, 0.0)
     m1 = physical[:n].T
     r1 = physical[n : 2 * n].T
     escaped_by_species = np.asarray(physical[escaped_i], dtype=float).copy()
