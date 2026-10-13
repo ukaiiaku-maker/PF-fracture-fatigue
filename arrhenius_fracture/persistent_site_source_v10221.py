@@ -563,7 +563,7 @@ def _coupled_persistent_source_transport(
         return np.nan_to_num(values, nan=0.0, posinf=1.0e300, neginf=0.0)
 
     coefficient_error = math.inf
-    for iteration in range(12):
+    for iteration in range(64):
         stress = self.local_stress_profile_Pa(stress_Pa)
         local_rho = self.local_forest_density_m2(False)
         new_rates = self._transport_rates(stress, local_rho, T_K, b)
