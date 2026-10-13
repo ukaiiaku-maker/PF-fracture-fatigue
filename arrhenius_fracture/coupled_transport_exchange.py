@@ -249,7 +249,21 @@ def joint_transport_exchange(
     # population columns.  This tolerance is diagnostic only; it is many
     # orders tighter than the spatial upwind error being measured here.
     tolerance = 2.0e-8 * max(initial + emitted, 1.0)
-    physical = final[: 2 * n + 2]
+    # Population/source/absorber rows form a closed upper block. Evaluate that
+    # block independently so enormous one-way gross-turnover integrals cannot
+    # numerically leak back into populations through dense exponential roundoff.
+    # This is the exact block-triangular identity, not an operator split.
+    physical_indices = np.r_[0 : 2 * n + 2, source_i0:size]
+    physical_generator = conditioned_generator[physical_indices][:, physical_indices]
+    physical_initial = conditioned_initial[physical_indices]
+    conditioned_physical = _partitioned_affine_action(
+        physical_generator, physical_initial, dt, activity,
+        dynamic_size=2 * n + 2,
+    )
+    physical_inverse = np.eye(conditioned_physical.shape[0])
+    for i in range(n):
+        physical_inverse[i, n + i] = -1.0
+    physical = (physical_inverse @ conditioned_physical)[: 2 * n + 2]
     if float(np.min(physical)) < -tolerance:
         raise FloatingPointError("joint transport/exchange produced a negative population")
     physical = np.maximum(physical, 0.0)
