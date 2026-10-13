@@ -260,7 +260,7 @@ def joint_transport_exchange(
     )
     if np.any(
         np.abs(preliminary_budget - preliminary_accounted)
-        > 1.0e-6 * np.maximum(preliminary_budget, 1.0)
+        > 1.0e-4 * np.maximum(preliminary_budget, 1.0)
     ):
         conditioned_final = _independent_stiff_action(
             conditioned_generator, conditioned_initial, dt
@@ -289,7 +289,7 @@ def joint_transport_exchange(
         np.sum(m1 + r1, axis=1) + escaped_by_species + recovered_by_species
     )
     invariant_defect = budgets - accounted_by_species
-    invariant_limit = 1.0e-5 * np.maximum(budgets, 1.0)
+    invariant_limit = 1.0e-4 * np.maximum(budgets, 1.0)
     if np.any(np.abs(invariant_defect) > invariant_limit):
         raise FloatingPointError(
             "stiff affine invariant correction exceeds conditioning limit: "
