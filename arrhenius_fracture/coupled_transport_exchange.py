@@ -88,6 +88,7 @@ def joint_transport_exchange(
     mobile_recovery_rate_s: float = 0.0,
     retained_recovery_rate_s: float = 0.0,
     mobile_source_rate=None,
+    _refinement_depth: int = 0,
 ) -> CoupledTransportExchangeResult:
     """Integrate a frozen-coefficient exchange/transport block exactly in time.
 
@@ -196,6 +197,44 @@ def joint_transport_exchange(
     accounted = float(np.sum(m1) + np.sum(r1) + escaped + recovered)
     error = accounted - initial - emitted
     if abs(error) > tolerance:
+        if _refinement_depth < 16 and dt > np.finfo(float).tiny:
+            first = joint_transport_exchange(
+                m0, r0, ke, kr, velocity_m_s=velocity,
+                dt_s=0.5 * dt, dx_m=dx,
+                mobile_recovery_rate_s=km,
+                retained_recovery_rate_s=kr_rec,
+                mobile_source_rate=source,
+                _refinement_depth=_refinement_depth + 1,
+            )
+            second = joint_transport_exchange(
+                first.mobile, first.retained, ke, kr, velocity_m_s=velocity,
+                dt_s=0.5 * dt, dx_m=dx,
+                mobile_recovery_rate_s=km,
+                retained_recovery_rate_s=kr_rec,
+                mobile_source_rate=source,
+                _refinement_depth=_refinement_depth + 1,
+            )
+            combined_error = (
+                float(np.sum(second.mobile) + np.sum(second.retained))
+                + first.escaped + second.escaped
+                + first.recovered + second.recovered - initial - emitted
+            )
+            return CoupledTransportExchangeResult(
+                mobile=second.mobile,
+                retained=second.retained,
+                escaped=first.escaped + second.escaped,
+                recovered=first.recovered + second.recovered,
+                net_retained_gain=first.net_retained_gain + second.net_retained_gain,
+                net_retained_loss=first.net_retained_loss + second.net_retained_loss,
+                gross_trapping=first.gross_trapping + second.gross_trapping,
+                gross_release=first.gross_release + second.gross_release,
+                mobile_distance_population_m=(
+                    first.mobile_distance_population_m
+                    + second.mobile_distance_population_m
+                ),
+                conservation_error=combined_error,
+                invariant_projection_correction=0.0,
+            )
         raise FloatingPointError(
             f"joint transport/exchange conservation error {error:.6e} exceeds {tolerance:.6e}"
         )
