@@ -190,14 +190,23 @@ def joint_transport_exchange(
         generator[gross_trap_i, mi] += ke[i] / flux_scale
         generator[gross_release_i, ri] += kr[i] / flux_scale
         generator[distance_i, mi] += velocity[i] / distance_scale
+    source_coordinate_scale = np.ones(species, dtype=float)
+    kinetic_scale = max(float(np.max(ke + kr + hop + km + kr_rec)), 1.0)
     for system in range(species):
-        generator[:n, source_i0 + system] = source[system]
+        source_max = float(np.max(source[system]))
+        if source_max > 0.0:
+            source_coordinate_scale[system] = kinetic_scale / source_max
+        generator[:n, source_i0 + system] = (
+            source[system] * source_coordinate_scale[system]
+        )
 
     initial_vectors = np.zeros((size, species), dtype=float)
     initial_vectors[:n, :] = m0.T
     initial_vectors[n : 2 * n, :] = r0.T
     for system in range(species):
-        initial_vectors[source_i0 + system, system] = 1.0
+        initial_vectors[source_i0 + system, system] = (
+            1.0 / source_coordinate_scale[system]
+        )
     activity = float(np.max(ke + kr + hop + km + kr_rec) * dt)
     final = _partitioned_affine_action(
         generator, initial_vectors, dt, activity, dynamic_size=source_i0,
