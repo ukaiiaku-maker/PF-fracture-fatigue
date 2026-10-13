@@ -666,7 +666,9 @@ class DislocationConfig:
     # pt_taylor_m_cap is the finite obstacle count in one correlation domain,
     # not a total-density cap; infinity leaves the cooperative order uncapped.
     pt_taylor_corr_rho_c: float = 1.0e14
-    pt_taylor_renewal_time_s: float = 1.0e-9
+    # Retained only for historical input compatibility; native mean completion
+    # has no renewal/correlation window and does not consume this value.
+    pt_taylor_renewal_time_s: float = 0.0
     pt_taylor_m_exponent: float = 1.0
     pt_taylor_m_scale: float = 1.0
     pt_taylor_m_cap: float = float('inf')
@@ -678,11 +680,13 @@ class DislocationConfig:
     pt_mobile_saturation_density_m2: float = 1.0e14
     pt_mobile_density_floor_m2: float = 1.0e6
     pt_jump_fraction: float = 1.0
-    pt_jump_length_min_m: float = 2.5e-10
+    # Historical compatibility fields; the native event length is the uncapped
+    # forest spacing and the native Taylor stress uses uncapped spacing/b.
+    pt_jump_length_min_m: float = 0.0
     pt_equivalent_strain_factor: float = 0.5773502691896258
     pt_peierls_stress_fraction: float = 0.5773502691896258
     pt_taylor_stress_fraction: float = 0.5773502691896258
-    pt_taylor_phi_max: float = 20.0
+    pt_taylor_phi_max: float = float('inf')
 
     # Explicit integration stabilizers.  These are not intended to fit the
     # toughness; they keep the pseudo-time radial-return update from creating

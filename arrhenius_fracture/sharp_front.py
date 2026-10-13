@@ -1152,7 +1152,7 @@ def run_2d(args):
     cfg.dislocations.pt_taylor_stress_ratio = float(getattr(args, 'taylor_stress_scale', 1.0))
     cfg.dislocations.pt_taylor_nu0_s = float(getattr(args, 'nu0_taylor', 1.0e11))
     cfg.dislocations.pt_taylor_corr_rho_c = float(getattr(args, 'pt_taylor_corr_rho_c', 1.0e14))
-    cfg.dislocations.pt_taylor_renewal_time_s = float(getattr(args, 'pt_taylor_renewal_time_s', 1.0e-9))
+    cfg.dislocations.pt_taylor_renewal_time_s = float(getattr(args, 'pt_taylor_renewal_time_s', 0.0))
     cfg.dislocations.pt_taylor_m_exponent = float(getattr(args, 'pt_taylor_m_exponent', 1.0))
     cfg.dislocations.pt_taylor_m_scale = float(getattr(args, 'pt_taylor_m_scale', 1.0))
     cfg.dislocations.pt_taylor_m_cap = float(getattr(args, 'pt_taylor_m_cap', float('inf')))
@@ -1160,8 +1160,8 @@ def run_2d(args):
     cfg.dislocations.pt_mobile_saturation_density_m2 = float(getattr(args, 'pt_mobile_saturation_density_m2', 1.0e14))
     cfg.dislocations.pt_mobile_density_floor_m2 = float(getattr(args, 'pt_mobile_density_floor_m2', 1.0e6))
     cfg.dislocations.pt_jump_fraction = float(getattr(args, 'pt_jump_fraction', 1.0))
-    cfg.dislocations.pt_jump_length_min_m = float(getattr(args, 'pt_jump_length_min_m', mat.b))
-    cfg.dislocations.pt_taylor_phi_max = float(getattr(args, 'pt_taylor_phi_max', 20.0))
+    cfg.dislocations.pt_jump_length_min_m = float(getattr(args, 'pt_jump_length_min_m', 0.0))
+    cfg.dislocations.pt_taylor_phi_max = float(getattr(args, 'pt_taylor_phi_max', float('inf')))
     os.makedirs(args.out, exist_ok=True)
     fatigue_mode = bool(getattr(args, 'fatigue_cycles', False))
     fatigue_controller = build_controller_from_namespace(args) if fatigue_mode else None
@@ -4011,8 +4011,9 @@ def _build_parser():
                    help='Production uses emission-derived EXP-floor Peierls/Taylor rates; legacy retains the older additive yield-stress ablation.')
     p.add_argument('--pt-taylor-corr-rho-c', type=float, default=1.0e14,
                    dest='pt_taylor_corr_rho_c')
-    p.add_argument('--pt-taylor-renewal-time-s', type=float, default=1.0e-9,
-                   dest='pt_taylor_renewal_time_s')
+    p.add_argument('--pt-taylor-renewal-time-s', type=float, default=0.0,
+                   dest='pt_taylor_renewal_time_s',
+                   help='Historical input compatibility only; native Taylor completion has no time window.')
     p.add_argument('--pt-taylor-m-exponent', type=float, default=1.0,
                    dest='pt_taylor_m_exponent')
     p.add_argument('--pt-taylor-m-scale', type=float, default=1.0,
@@ -4028,10 +4029,12 @@ def _build_parser():
                    dest='pt_mobile_density_floor_m2')
     p.add_argument('--pt-jump-fraction', type=float, default=1.0,
                    dest='pt_jump_fraction')
-    p.add_argument('--pt-jump-length-min-m', type=float, default=2.5e-10,
-                   dest='pt_jump_length_min_m')
-    p.add_argument('--pt-taylor-phi-max', type=float, default=20.0,
-                   dest='pt_taylor_phi_max')
+    p.add_argument('--pt-jump-length-min-m', type=float, default=0.0,
+                   dest='pt_jump_length_min_m',
+                   help='Historical input compatibility only; native Peierls event length has no floor.')
+    p.add_argument('--pt-taylor-phi-max', type=float, default=float('inf'),
+                   dest='pt_taylor_phi_max',
+                   help='Historical input compatibility only; native Taylor spacing/order is uncapped.')
     p.add_argument('--mpz-no-emission-derived-pt', action='store_false',
                    dest='mpz_use_emission_derived_pt', default=True,
                    help='Legacy ablation: use independent fixed glide/detrap barriers in moving-PZ transport.')

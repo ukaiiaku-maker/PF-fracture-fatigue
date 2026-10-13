@@ -51,3 +51,9 @@ The compact evidence is in
 terminal traces contain local stress, temperature, density, event length,
 forward/reverse barriers and prefactors, forward/reverse/net rates, velocity,
 face flux, completion order, residuals, and diagnostic averaging.
+
+The broad bulk/FEM configuration retains old field names for input-file
+compatibility, but their current defaults are inactive (`renewal_time=0`,
+`jump_floor=0`, `phi_max=inf`) and the native rate constructor does not consume
+them. A dedicated test changes all three to finite historical values and verifies
+bitwise-identical current rates.

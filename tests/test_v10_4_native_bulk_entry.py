@@ -91,6 +91,31 @@ def test_exact_row_direct_shapes_and_entropy_are_used_by_runtime_model():
     assert model.taylor.exponent == pytest.approx(float(ROW["taylor_exp_n"]))
 
 
+def test_historical_window_jump_floor_and_phi_cap_cannot_change_native_rates():
+    parameters = BulkManifestParameters.from_row(ROW)
+    cfg = SimpleNamespace(
+        pt_emit_floor_min_eV=1e-4, pt_emit_floor_max_frac=0.95,
+        pt_taylor_renewal_time_s=0.0, pt_mobile_fraction=0.01,
+        pt_mobile_saturation_density_m2=1e14,
+        pt_mobile_density_floor_m2=5e12, pt_jump_fraction=1.0,
+        pt_jump_length_min_m=0.0, pt_taylor_phi_max=float("inf"),
+        pt_equivalent_strain_factor=1.0,
+    )
+    parameters.configure(cfg)
+    stress = np.array([2e8, 8e8])
+    rho = np.array([1e8, 5e12])
+    native = EmissionDerivedPeierlsTaylorModel(
+        config_from_dislocation_config(cfg)).rates(stress, rho, 950.0, 2.74e-10)
+    cfg.pt_taylor_renewal_time_s = 1.0
+    cfg.pt_jump_length_min_m = 1.0
+    cfg.pt_taylor_phi_max = 1.0
+    compatibility = EmissionDerivedPeierlsTaylorModel(
+        config_from_dislocation_config(cfg)).rates(stress, rho, 950.0, 2.74e-10)
+    for key in ("equivalent_plastic_rate_s", "peierls_rate_s",
+                "taylor_completion_rate_s", "taylor_m_eff"):
+        np.testing.assert_array_equal(compatibility[key], native[key])
+
+
 def test_v104_contract_forces_full_field_and_rejects_finite_or_fatigue():
     args = ["--bulk-plasticity-mode", "tip_only", "--rho-transport-c", "3"]
     entry._prepare_v104_args(args)

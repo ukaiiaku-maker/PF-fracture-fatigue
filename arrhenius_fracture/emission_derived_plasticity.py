@@ -16,6 +16,11 @@ from .taylor_release import signed_arrhenius_components
 
 @dataclass(frozen=True)
 class EmissionDerivedPeierlsTaylorConfig:
+    """Native controls plus ignored fields retained for old input compatibility.
+
+    ``taylor_renewal_time_s``, ``taylor_m_cap``, ``jump_length_min_m``, and
+    ``taylor_phi_max`` do not participate in current rate construction.
+    """
     parent: ExpFloorBarrier
     peierls_energy_ratio: float
     peierls_entropy_ratio: float
