@@ -76,6 +76,32 @@ def _partitioned_exponential_action(matrix, vectors, dt, activity, limit=1.0e2):
     return np.linalg.matrix_power(propagator, parts) @ np.asarray(vectors, dtype=float)
 
 
+def _partitioned_affine_action(
+    matrix, vectors, dt, activity, dynamic_size: int, limit=1.0e2
+):
+    """Compose the exact bounded-step affine map without state projection."""
+    parts = max(1, int(np.ceil(max(float(activity), 0.0) / float(limit))))
+    propagator = expm(np.asarray(matrix, dtype=float) * (float(dt) / parts))
+    n = int(dynamic_size)
+    base_a = propagator[:n, :n]
+    base_b = propagator[:n, n:]
+    result_a = np.eye(n)
+    result_b = np.zeros_like(base_b)
+    remaining = parts
+    while remaining:
+        if remaining & 1:
+            result_b = base_a @ result_b + base_b
+            result_a = base_a @ result_a
+        base_b = base_a @ base_b + base_b
+        base_a = base_a @ base_a
+        remaining >>= 1
+    initial = np.asarray(vectors, dtype=float)
+    output = np.zeros_like(initial)
+    output[:n] = result_a @ initial[:n] + result_b @ initial[n:]
+    output[n:] = initial[n:]
+    return output
+
+
 def joint_transport_exchange(
     mobile,
     retained,
@@ -88,7 +114,6 @@ def joint_transport_exchange(
     mobile_recovery_rate_s: float = 0.0,
     retained_recovery_rate_s: float = 0.0,
     mobile_source_rate=None,
-    _refinement_depth: int = 0,
 ) -> CoupledTransportExchangeResult:
     """Integrate a frozen-coefficient exchange/transport block exactly in time.
 
@@ -169,8 +194,8 @@ def joint_transport_exchange(
     for system in range(species):
         initial_vectors[source_i0 + system, system] = 1.0
     activity = float(np.max(ke + kr + hop + km + kr_rec) * dt)
-    final = _partitioned_exponential_action(
-        generator, initial_vectors, dt, activity
+    final = _partitioned_affine_action(
+        generator, initial_vectors, dt, activity, dynamic_size=source_i0,
     )
     # Scaling-and-squaring a generator whose rates span ~1e12 s^-1 and whose
     # augmented flux rows grow to ~1e12 loses a few ulps in the conserved
@@ -197,44 +222,6 @@ def joint_transport_exchange(
     accounted = float(np.sum(m1) + np.sum(r1) + escaped + recovered)
     error = accounted - initial - emitted
     if abs(error) > tolerance:
-        if _refinement_depth < 16 and dt > np.finfo(float).tiny:
-            first = joint_transport_exchange(
-                m0, r0, ke, kr, velocity_m_s=velocity,
-                dt_s=0.5 * dt, dx_m=dx,
-                mobile_recovery_rate_s=km,
-                retained_recovery_rate_s=kr_rec,
-                mobile_source_rate=source,
-                _refinement_depth=_refinement_depth + 1,
-            )
-            second = joint_transport_exchange(
-                first.mobile, first.retained, ke, kr, velocity_m_s=velocity,
-                dt_s=0.5 * dt, dx_m=dx,
-                mobile_recovery_rate_s=km,
-                retained_recovery_rate_s=kr_rec,
-                mobile_source_rate=source,
-                _refinement_depth=_refinement_depth + 1,
-            )
-            combined_error = (
-                float(np.sum(second.mobile) + np.sum(second.retained))
-                + first.escaped + second.escaped
-                + first.recovered + second.recovered - initial - emitted
-            )
-            return CoupledTransportExchangeResult(
-                mobile=second.mobile,
-                retained=second.retained,
-                escaped=first.escaped + second.escaped,
-                recovered=first.recovered + second.recovered,
-                net_retained_gain=first.net_retained_gain + second.net_retained_gain,
-                net_retained_loss=first.net_retained_loss + second.net_retained_loss,
-                gross_trapping=first.gross_trapping + second.gross_trapping,
-                gross_release=first.gross_release + second.gross_release,
-                mobile_distance_population_m=(
-                    first.mobile_distance_population_m
-                    + second.mobile_distance_population_m
-                ),
-                conservation_error=combined_error,
-                invariant_projection_correction=0.0,
-            )
         raise FloatingPointError(
             f"joint transport/exchange conservation error {error:.6e} exceeds {tolerance:.6e}"
         )
