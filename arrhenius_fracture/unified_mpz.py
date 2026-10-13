@@ -13,9 +13,8 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-from scipy.special import gammainc
-
 from .material_manifest import MaterialManifest
+from .taylor_release import completion_rate, runtime_selection
 
 
 @dataclass
@@ -76,6 +75,11 @@ class UnifiedMPZState:
         self.emitted_total = 0.0
         self.escaped_total = 0.0
         self.recovered_total = 0.0
+        self.net_retained_gain_total = 0.0
+        self.net_retained_loss_total = 0.0
+        self.gross_trapping_total = 0.0
+        self.gross_release_total = 0.0
+        self.mobile_distance_population_total_m = 0.0
         self.advance_total_m = 0.0
         self.wake_discarded_mobile_total = 0.0
         self.wake_discarded_retained_total = 0.0
@@ -123,6 +127,9 @@ class UnifiedMPZState:
             setattr(self, name, original * (1.0 - frac))
         for name in (
             "emitted_total", "escaped_total", "recovered_total",
+            "net_retained_gain_total", "net_retained_loss_total",
+            "gross_trapping_total", "gross_release_total",
+            "mobile_distance_population_total_m",
             "wake_discarded_mobile_total", "wake_discarded_retained_total",
             "wake_discarded_slip_total",
         ):
@@ -184,11 +191,29 @@ class UnifiedMPZState:
         t1 = t_surface.rate(tau_t, T_K)
         ratio = np.sqrt(np.maximum(rho, 0.0) / max(self.manifest.taylor_corr_rho_c_m2, 1.0))
         m = 1.0 + max(self.manifest.taylor_corr_scale, 0.0) * np.maximum(ratio - 1.0, 0.0)
-        t = gammainc(np.maximum(m, 1.0), np.minimum(np.maximum(t1, 0.0), 1.0e12))
+        release_mode, release_window_s, release_cap_s = runtime_selection()
+        t = completion_rate(
+            t1,
+            m,
+            mode=release_mode,
+            window_s=release_window_s,
+            rate_cap_s=release_cap_s,
+        )
         jump = max(float(self.cfg.jump_fraction), 0.0) * spacing
         velocity = jump * p
         encounter = max(self.manifest.encounter_efficiency, 0.0) * velocity * np.sqrt(np.maximum(rho, 0.0))
-        return {"peierls": p, "taylor": t, "taylor_single": t1, "m": m, "jump": jump, "velocity": velocity, "encounter": encounter}
+        return {
+            "peierls": p,
+            "taylor": t,
+            "taylor_single": t1,
+            "m": m,
+            "jump": jump,
+            "velocity": velocity,
+            "encounter": encounter,
+            "taylor_release_mode": release_mode,
+            "taylor_release_window_s": release_window_s,
+            "taylor_single_rate_cap_s": release_cap_s,
+        }
 
     @staticmethod
     def _exchange(mobile: np.ndarray, retained: np.ndarray, k_enc: np.ndarray, k_rel: np.ndarray, dt: float) -> tuple[np.ndarray, np.ndarray, float, float]:
@@ -259,6 +284,8 @@ class UnifiedMPZState:
         self.mobile, escaped = self._advect_forward(self.mobile, max(velocity, 0.0) * dt, self.dx)
         self.escaped_total += escaped
         self.recovered_total += recovered
+        self.net_retained_gain_total += trapped
+        self.net_retained_loss_total += released
         self.time_s += dt
         wake = self._evolve_wake(dt, T_K, b)
         return {
@@ -363,6 +390,11 @@ class UnifiedMPZState:
             "mpz_emitted_total": self.emitted_total,
             "mpz_escaped_total": self.escaped_total,
             "mpz_recovered_total": self.recovered_total,
+            "mpz_net_retained_gain_total": self.net_retained_gain_total,
+            "mpz_net_retained_loss_total": self.net_retained_loss_total,
+            "mpz_gross_trapping_total": self.gross_trapping_total,
+            "mpz_gross_release_total": self.gross_release_total,
+            "mpz_mobile_distance_population_total_m": self.mobile_distance_population_total_m,
             "mpz_wake_discarded_mobile_total": self.wake_discarded_mobile_total,
             "mpz_wake_discarded_retained_total": self.wake_discarded_retained_total,
         }

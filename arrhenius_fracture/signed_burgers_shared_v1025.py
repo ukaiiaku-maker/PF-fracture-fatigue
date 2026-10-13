@@ -11,6 +11,7 @@ from __future__ import annotations
 import copy
 import json
 import math
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from types import MethodType
@@ -24,12 +25,76 @@ from .anisotropic_emission_v10174 import (
     finite_source_emission_update,
 )
 from .campaign_calibrated_tip import _campaign_backstress
+from .coupled_transport_exchange import exchange_gross_flux, joint_transport_exchange
 from .fractional_moving_frame import _translate_toward_tip
 
 MODEL_ID = "v10.2.5_shared_signed_burgers_population"
 KERNEL_SCHEMA = "v10.2.5_2d_unit_signed_shielding_kernel"
 VALIDATED_SCALAR_TRANSPORT = "validated_scalar"
 CHANNEL_RESOLVED_TRANSPORT = "channel_resolved"
+LEGACY_SPLIT_EXCHANGE_TRANSPORT = "legacy_split"
+JOINT_CTMC_EXCHANGE_TRANSPORT = "joint_ctmc"
+
+
+def _exchange_transport_mode(state=None) -> str:
+    """Resolve selection, preferring the contract bound to the live state."""
+    bound = None if state is None else getattr(state, "_exchange_transport_mode", None)
+    selected = (
+        bound if bound is not None else
+        os.environ.get("MPZ_TRANSPORT_EXCHANGE_MODE", LEGACY_SPLIT_EXCHANGE_TRANSPORT)
+    )
+    selected = str(selected).strip().lower().replace("-", "_")
+    if selected not in {
+        LEGACY_SPLIT_EXCHANGE_TRANSPORT,
+        JOINT_CTMC_EXCHANGE_TRANSPORT,
+    }:
+        raise ValueError(f"invalid MPZ_TRANSPORT_EXCHANGE_MODE={selected!r}")
+    return selected
+
+
+def _event_state_record(self, stage: str, *, K: float, T: float, dt: float, sigma_tip: float) -> None:
+    path = os.environ.get("TAYLOR_EVENT_STATE_TRACE", "").strip()
+    if not path:
+        return
+    record = {
+        "stage": stage,
+        "physical_time_s": float(self.t),
+        "applied_displacement_m": float(getattr(self, "_applied_displacement_U_m", float("nan"))),
+        "temperature_K": float(T),
+        "interval_s": float(dt),
+        "K_drive_Pa_sqrt_m": float(K),
+        "crack_advance_coordinate_m": float(self.a_adv),
+        "accepted_crack_events": int(self.n_adv),
+        "local_opening_stress_Pa": float(sigma_tip),
+        "opening_stress_cap_active": bool(self.f.sigma_cap > 0.0 and sigma_tip >= self.f.sigma_cap),
+        "opening_action_B": float(self.B),
+        "physical_hazard_action": float(getattr(self, "hazard_action_current", float("nan"))),
+        "hazard_threshold_action": float(getattr(self, "hazard_threshold_action", float("nan"))),
+        "signed_shielding_Pa_sqrt_m": float(_total_K(self.mpz)),
+        "effective_radius_m": float(self.r_eff()),
+        "source_slip_moment": float(self.mpz.local_slip_count()),
+        "source_multiplicity_remaining": float(np.sum(self.mpz.available_sites)),
+        "mobile_population": float(self.mpz.mobile_count),
+        "retained_population": float(self.mpz.retained_count),
+        "wake_mobile_population": float(self.mpz.wake_mobile_count),
+        "wake_retained_population": float(self.mpz.wake_retained_count),
+        "exchange_transport_mode": _exchange_transport_mode(self.mpz),
+    }
+    if os.environ.get("TAYLOR_TRACE_PROFILES", "0") == "1":
+        record.update({
+            "mobile_positive": np.asarray(self.mpz.mobile_positive, dtype=float).tolist(),
+            "mobile_negative": np.asarray(self.mpz.mobile_negative, dtype=float).tolist(),
+            "retained_positive": np.asarray(self.mpz.retained_positive, dtype=float).tolist(),
+            "retained_negative": np.asarray(self.mpz.retained_negative, dtype=float).tolist(),
+            "accumulated_slip_positive": np.asarray(
+                self.mpz.accumulated_slip_positive, dtype=float
+            ).tolist(),
+            "accumulated_slip_negative": np.asarray(
+                self.mpz.accumulated_slip_negative, dtype=float
+            ).tolist(),
+        })
+    with open(path, "a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, sort_keys=True) + "\n")
 
 
 @dataclass(frozen=True)
@@ -424,32 +489,109 @@ def _signed_evolve_scalar(
     self, dt_s: float, T_K: float, stress_Pa: float, b: float, system_weights=None
 ) -> dict[str, float]:
     dt = max(float(dt_s), 0.0)
-    emitted = self._emit(dt, stress_Pa, T_K, system_weights)
-    stress = self.local_stress_profile_Pa(stress_Pa)
-    rho = self.local_forest_density_m2(False)
-    rates = self._transport_rates(stress, rho, T_K, b)
-    trapped, released = _exchange_species(
-        self, rates["encounter"], rates["taylor"], dt
-    )
-    recovered = _recover_active(self, dt)
-    mobile_by_bin = np.sum(np.maximum(self.mobile, 0.0), axis=0)
-    if np.sum(mobile_by_bin) > 0.0:
-        velocity = float(
-            np.sum(rates["velocity"] * mobile_by_bin) / np.sum(mobile_by_bin)
-        )
+    mode = _exchange_transport_mode(self)
+    coupled_source = getattr(self, "_coupled_persistent_source_transport", None)
+    if mode == JOINT_CTMC_EXCHANGE_TRANSPORT and coupled_source is not None:
+        if system_weights is not None:
+            supplied = np.asarray(system_weights, dtype=float)
+            if supplied.size and not np.allclose(supplied, 1.0):
+                raise RuntimeError("post-hazard system_weights are forbidden")
+        coupled = coupled_source(dt, stress_Pa, T_K, b)
+        emitted = float(coupled["emitted"])
+        result = coupled["result"]
+        rates = coupled["rates"]
+        trapped, released = result.net_retained_gain, result.net_retained_loss
+        gross_trapping, gross_release = result.gross_trapping, result.gross_release
+        recovered, escaped = result.recovered, result.escaped
+        mobile_distance_population = result.mobile_distance_population_m
+        nonlinear_iterations = float(coupled["iterations"])
+        source_rate_s = float(coupled["activation_rate_s"])
+        velocity = float(coupled["velocity_m_s"])
     else:
-        nsrc = max(min(int(self.cfg.source_bin_count), self.n_bins), 1)
-        velocity = float(np.mean(rates["velocity"][:nsrc]))
-    escaped = 0.0
-    for name in ("mobile_positive", "mobile_negative"):
-        moved, amount = self._advect_forward(
-            getattr(self, name), max(velocity, 0.0) * dt, self.dx
+        emitted = self._emit(dt, stress_Pa, T_K, system_weights)
+        stress = self.local_stress_profile_Pa(stress_Pa)
+        rho = self.local_forest_density_m2(False)
+        rates = self._transport_rates(stress, rho, T_K, b)
+        nonlinear_iterations = 0.0
+        source_rate_s = emitted / dt if dt > 0.0 else 0.0
+    if mode == JOINT_CTMC_EXCHANGE_TRANSPORT and coupled_source is None:
+        total_by_bin = np.sum(
+            self.mobile_positive + self.mobile_negative
+            + self.retained_positive + self.retained_negative,
+            axis=0,
         )
-        setattr(self, name, moved)
-        escaped += float(amount)
+        equilibrium_mobile = total_by_bin * np.divide(
+            rates["taylor"],
+            rates["encounter"] + rates["taylor"],
+            out=np.zeros_like(total_by_bin),
+            where=(rates["encounter"] + rates["taylor"]) > 0.0,
+        )
+        if np.sum(equilibrium_mobile) > 0.0:
+            velocity = float(
+                np.sum(rates["velocity"] * equilibrium_mobile)
+                / np.sum(equilibrium_mobile)
+            )
+        else:
+            nsrc = max(min(int(self.cfg.source_bin_count), self.n_bins), 1)
+            velocity = float(np.mean(rates["velocity"][:nsrc]))
+        mobile0 = np.concatenate((self.mobile_positive, self.mobile_negative), axis=0)
+        retained0 = np.concatenate((self.retained_positive, self.retained_negative), axis=0)
+        result = joint_transport_exchange(
+            mobile0,
+            retained0,
+            rates["encounter"],
+            rates["taylor"],
+            velocity_m_s=max(velocity, 0.0),
+            dt_s=dt,
+            dx_m=self.dx,
+            mobile_recovery_rate_s=max(float(self.cfg.mobile_recovery_rate_s), 0.0),
+            retained_recovery_rate_s=max(float(self.manifest.retained_recovery_rate_s), 0.0),
+        )
+        split = self.n_systems
+        self.mobile_positive, self.mobile_negative = result.mobile[:split], result.mobile[split:]
+        self.retained_positive, self.retained_negative = result.retained[:split], result.retained[split:]
+        trapped, released = result.net_retained_gain, result.net_retained_loss
+        gross_trapping, gross_release = result.gross_trapping, result.gross_release
+        recovered, escaped = result.recovered, result.escaped
+        mobile_distance_population = result.mobile_distance_population_m
+    elif mode != JOINT_CTMC_EXCHANGE_TRANSPORT:
+        gross_trapping = gross_release = 0.0
+        for suffix in ("positive", "negative"):
+            qtrap, qrelease = exchange_gross_flux(
+                getattr(self, f"mobile_{suffix}"),
+                getattr(self, f"retained_{suffix}"),
+                rates["encounter"], rates["taylor"], dt,
+            )
+            gross_trapping += qtrap; gross_release += qrelease
+        trapped, released = _exchange_species(self, rates["encounter"], rates["taylor"], dt)
+        recovered = _recover_active(self, dt)
+        mobile_by_bin = np.sum(np.maximum(self.mobile, 0.0), axis=0)
+        if np.sum(mobile_by_bin) > 0.0:
+            velocity = float(
+                np.sum(rates["velocity"] * mobile_by_bin) / np.sum(mobile_by_bin)
+            )
+        else:
+            nsrc = max(min(int(self.cfg.source_bin_count), self.n_bins), 1)
+            velocity = float(np.mean(rates["velocity"][:nsrc]))
+        mobile_distance_population = max(velocity, 0.0) * dt * float(np.sum(self.mobile))
+        escaped = 0.0
+        for name in ("mobile_positive", "mobile_negative"):
+            moved, amount = self._advect_forward(getattr(self, name), max(velocity, 0.0) * dt, self.dx)
+            setattr(self, name, moved)
+            escaped += float(amount)
     _sync_active(self)
+    self.scalar_transport_velocity_m_s = float(max(velocity, 0.0))
+    self.scalar_transport_displacement_m = float(max(velocity, 0.0) * dt)
+    self.anisotropic_last_transport_velocity_by_system_m_s = np.full(
+        self.n_systems, self.scalar_transport_velocity_m_s, dtype=float
+    )
     self.escaped_total += escaped
     self.recovered_total += recovered
+    self.net_retained_gain_total += trapped
+    self.net_retained_loss_total += released
+    self.gross_trapping_total += gross_trapping
+    self.gross_release_total += gross_release
+    self.mobile_distance_population_total_m += mobile_distance_population
     self.time_s += dt
     wake = _signed_evolve_wake(self, dt, T_K, b)
     return {
@@ -459,6 +601,14 @@ def _signed_evolve_scalar(
         "dN_released": released,
         "dN_recovered": recovered,
         "dN_escaped": escaped,
+        "dN_gross_trapping": gross_trapping,
+        "dN_gross_release": gross_release,
+        "mobile_distance_population_m": mobile_distance_population,
+        "scalar_transport_velocity_m_s": self.scalar_transport_velocity_m_s,
+        "scalar_transport_displacement_m": self.scalar_transport_displacement_m,
+        "exchange_transport_mode": mode,
+        "coupled_source_state_iterations": nonlinear_iterations,
+        "coupled_source_activation_rate_s": source_rate_s,
         "peierls_rate_s": float(np.max(rates["peierls"])),
         "taylor_completion_rate_s": float(np.max(rates["taylor"])),
         "encounter_rate_s": float(np.max(rates["encounter"])),
@@ -548,6 +698,8 @@ def _signed_evolve_channel(
     _sync_active(self)
     self.escaped_total += escaped
     self.recovered_total += recovered
+    self.net_retained_gain_total += trapped
+    self.net_retained_loss_total += released
     self.time_s += dt
     wake = _signed_evolve_wake(self, dt, T_K, b)
     self.anisotropic_last_transport_velocity_by_system_m_s = velocities.copy()
@@ -703,6 +855,12 @@ def _signed_diagnostics(self, G=None, nu=None, b=None, r0=None) -> dict[str, Any
         ),
         "mpz_escaped_total": self.escaped_total,
         "mpz_recovered_total": self.recovered_total,
+        "mpz_net_retained_gain_total": self.net_retained_gain_total,
+        "mpz_net_retained_loss_total": self.net_retained_loss_total,
+        "mpz_gross_trapping_total": self.gross_trapping_total,
+        "mpz_gross_release_total": self.gross_release_total,
+        "mpz_mobile_distance_population_total_m": self.mobile_distance_population_total_m,
+        "mpz_exchange_transport_mode": _exchange_transport_mode(self),
         "mpz_wake_discarded_mobile_total": self.wake_discarded_mobile_total,
         "mpz_wake_discarded_retained_total": self.wake_discarded_retained_total,
         "signed_burgers_population": True,
@@ -809,6 +967,9 @@ class SignedBurgersAnisotropicTipEngine(AnisotropicStochasticAvalancheTipEngine)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._event_state_observer = lambda stage, **values: _event_state_record(
+            self, stage, **values
+        )
         kernel = type(self)._signed_kernel_default
         if kernel is None:
             raise RuntimeError(
@@ -858,7 +1019,15 @@ class SignedBurgersAnisotropicTipEngine(AnisotropicStochasticAvalancheTipEngine)
         }
 
     def step(self, K, T, dt):
+        _event_state_record(self, "last_accepted_pre_interval", K=K, T=T, dt=dt,
+                            sigma_tip=self.sigma_tip(K))
         result = super().step(K, T, dt)
+        if bool(result.get("fired", False)):
+            self._trace_first_event_pending_equilibrium = True
+        elif bool(getattr(self, "_trace_first_event_pending_equilibrium", False)):
+            _event_state_record(self, "first_subsequent_equilibrium", K=K, T=T, dt=dt,
+                                sigma_tip=float(result.get("sigma_tip", self.sigma_tip(K))))
+            self._trace_first_event_pending_equilibrium = False
         result.update(self._signed_engine_diagnostics())
         return result
 

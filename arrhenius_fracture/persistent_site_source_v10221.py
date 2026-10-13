@@ -31,7 +31,12 @@ import numpy as np
 
 from .anisotropic_emission_v10174 import _drive_factors_for_state
 from .campaign_calibrated_tip import _campaign_backstress, _campaign_local_density_m2
-from .signed_burgers_shared_v1025 import _signed_advance, _sync_active
+from .coupled_transport_exchange import joint_transport_exchange
+from .signed_burgers_shared_v1025 import (
+    JOINT_CTMC_EXCHANGE_TRANSPORT,
+    _signed_advance,
+    _sync_active,
+)
 from .state_resolved_signed_engine_v10214 import StateResolvedSignedBurgersTipEngine
 
 
@@ -487,6 +492,233 @@ def _persistent_emit(
     return emitted_lines
 
 
+def _coupled_persistent_source_transport(
+    self, dt: float, stress_Pa: float, T_K: float, b: float
+) -> dict[str, Any]:
+    """Implicit end-state source plus complete exchange/transport update.
+
+    The persistent source is a rate law.  Its line content is therefore injected
+    continuously through the same CTMC that transports and recaptures it, rather
+    than as one mechanically blocking batch at the start of every numerical
+    half-step.  Source rate, backstress, kinetic radius/multiplicity, and the
+    state-dependent transport coefficients are iterated to one end state.
+    """
+    dt = max(float(dt), 0.0)
+    mobile0 = np.concatenate((self.mobile_positive, self.mobile_negative), axis=0)
+    retained0 = np.concatenate((self.retained_positive, self.retained_negative), axis=0)
+    slip_pos0 = self.accumulated_slip_positive.copy()
+    slip_neg0 = self.accumulated_slip_negative.copy()
+    factors = _drive_factors_for_state(self)
+    tau_signed = np.asarray(
+        getattr(self, "_anisotropic_tau_signed_Pa", np.zeros(self.n_systems)), dtype=float
+    ).reshape(-1)
+    if tau_signed.size < self.n_systems:
+        tau_signed = np.pad(tau_signed, (0, self.n_systems - tau_signed.size))
+    signs = np.sign(tau_signed[: self.n_systems])
+    drive = np.maximum(np.asarray(factors, dtype=float) * max(float(stress_Pa), 0.0), 0.0)
+    nsrc = _source_zone_bin_count(self)
+    conversion = np.asarray(self._signed_kernel.activation_to_line_content, dtype=float)
+    result = None
+    rates = None
+    activation_rate = np.zeros(self.n_systems, dtype=float)
+    source_unit = np.zeros_like(mobile0)
+    for system in range(self.n_systems):
+        row = system if signs[system] > 0.0 else self.n_systems + system
+        if signs[system] != 0.0:
+            source_unit[row, :nsrc] = conversion[system] / float(nsrc)
+
+    def install_affine_state(base, unit, activation: np.ndarray) -> None:
+        mobile = base.mobile.copy()
+        retained = base.retained.copy()
+        for system in range(self.n_systems):
+            row = system if signs[system] > 0.0 else self.n_systems + system
+            if signs[system] != 0.0:
+                mobile[row] += activation[system] * (unit.mobile[row] - base.mobile[row])
+                retained[row] += activation[system] * (unit.retained[row] - base.retained[row])
+        mobile = np.maximum(mobile, 0.0)
+        retained = np.maximum(retained, 0.0)
+        split = self.n_systems
+        self.mobile_positive, self.mobile_negative = mobile[:split], mobile[split:]
+        self.retained_positive, self.retained_negative = retained[:split], retained[split:]
+        self.accumulated_slip_positive = slip_pos0.copy()
+        self.accumulated_slip_negative = slip_neg0.copy()
+        for system in range(self.n_systems):
+            amount = activation[system] * conversion[system] * dt / float(nsrc)
+            if signs[system] > 0.0:
+                self.accumulated_slip_positive[system, :nsrc] += amount
+            elif signs[system] < 0.0:
+                self.accumulated_slip_negative[system, :nsrc] += amount
+        _sync_active(self)
+
+    def source_target() -> np.ndarray:
+        _, _, sigma_back = _campaign_backstress(self)
+        geometry = _source_geometry(self)
+        effective = np.maximum(drive - sigma_back, 0.0)
+        values = np.asarray([
+            float(geometry["multiplicity_per_system"])
+            * float(self.emission_rate_per_site(float(value), T_K))
+            if signs[system] != 0.0 and value > 0.0 else 0.0
+            for system, value in enumerate(effective)
+        ])
+        return np.nan_to_num(values, nan=0.0, posinf=1.0e300, neginf=0.0)
+
+    coefficient_error = math.inf
+    for iteration in range(12):
+        stress = self.local_stress_profile_Pa(stress_Pa)
+        local_rho = self.local_forest_density_m2(False)
+        new_rates = self._transport_rates(stress, local_rho, T_K, b)
+        total_by_bin = np.sum(self.mobile + self.retained, axis=0)
+        eq_mobile = total_by_bin * np.divide(
+            new_rates["taylor"], new_rates["encounter"] + new_rates["taylor"],
+            out=np.zeros_like(total_by_bin),
+            where=(new_rates["encounter"] + new_rates["taylor"]) > 0.0,
+        )
+        velocity = (float(np.sum(new_rates["velocity"] * eq_mobile) / np.sum(eq_mobile))
+                    if np.sum(eq_mobile) > 0.0 else float(np.mean(new_rates["velocity"][:nsrc])))
+        base = joint_transport_exchange(
+            mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
+            velocity_m_s=max(velocity, 0.0), dt_s=dt, dx_m=self.dx,
+        )
+        unit = joint_transport_exchange(
+            mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
+            velocity_m_s=max(velocity, 0.0), dt_s=dt, dx_m=self.dx,
+            mobile_source_rate=source_unit,
+        )
+        for system in range(self.n_systems):
+            if signs[system] == 0.0:
+                activation_rate[system] = 0.0
+                continue
+            trial = activation_rate.copy()
+            trial[system] = 0.0
+            install_affine_state(base, unit, trial)
+            upper = max(float(source_target()[system]), 1.0)
+            lower = 0.0
+            for _ in range(80):
+                midpoint = 0.5 * (lower + upper)
+                trial[system] = midpoint
+                install_affine_state(base, unit, trial)
+                target_system = float(source_target()[system])
+                if target_system <= 0.0 or midpoint > target_system:
+                    upper = midpoint
+                else:
+                    lower = midpoint
+                if (upper - lower) / max(upper, 1.0) <= 1.0e-9:
+                    break
+            # The upper endpoint is the mechanically blocked side when the
+            # Arrhenius branch has no interior rate root.
+            activation_rate[system] = upper
+        previous_state = np.concatenate((self.mobile, self.retained), axis=0)
+        install_affine_state(base, unit, activation_rate)
+        current_state = np.concatenate((self.mobile, self.retained), axis=0)
+        coefficient_error = float(np.sum(np.abs(current_state - previous_state))) / max(
+            float(np.sum(np.abs(current_state))), float(np.sum(np.abs(previous_state))), 1.0
+        )
+        rates = new_rates
+        # State coefficients can settle before the backstress-limited source
+        # complementarity does.  Do not terminate the nonlinear iteration on
+        # the transport state alone: the final acceptance check below requires
+        # both residuals, so the iteration criterion must do the same.
+        _, _, sigma_iteration = _campaign_backstress(self)
+        target_iteration = source_target()
+        equation_iteration = np.abs(target_iteration - activation_rate) / np.maximum(
+            np.maximum(target_iteration, activation_rate), 1.0
+        )
+        gate_iteration = np.abs(drive - sigma_iteration) / np.maximum(drive, 1.0)
+        complementarity_error = float(
+            np.max(np.minimum(equation_iteration, gate_iteration))
+        )
+        if (
+            iteration >= 1
+            and coefficient_error <= 1.0e-4
+            and complementarity_error <= 1.0e-4
+        ):
+            break
+
+    source = source_unit * np.repeat(activation_rate, 2)[:, None]
+    # The row ordering is [positive systems, negative systems], so overwrite
+    # with the exact system-to-sign mapping instead of relying on repeat order.
+    source.fill(0.0)
+    for system in range(self.n_systems):
+        row = system if signs[system] > 0.0 else self.n_systems + system
+        if signs[system] != 0.0:
+            source[row, :nsrc] = activation_rate[system] * conversion[system] / float(nsrc)
+    result = joint_transport_exchange(
+        mobile0, retained0, rates["encounter"], rates["taylor"],
+        velocity_m_s=max(velocity, 0.0), dt_s=dt, dx_m=self.dx,
+        mobile_source_rate=source,
+    )
+    install_affine_state(base, unit, activation_rate)
+    _, _, sigma_check = _campaign_backstress(self)
+    target = source_target()
+    equation_error = np.abs(target - activation_rate) / np.maximum(
+        np.maximum(target, activation_rate), 1.0
+    )
+    gate_error = np.abs(drive - sigma_check) / np.maximum(drive, 1.0)
+    residual = np.minimum(equation_error, gate_error)
+    rate_error = float(np.max(residual))
+    if coefficient_error > 1.0e-4 or rate_error > 1.0e-4:
+        raise RuntimeError(
+            "coupled persistent source/transport complementarity did not converge: "
+            f"coefficient_error={coefficient_error:.6e}, residual={rate_error:.6e}"
+        )
+
+    activations = activation_rate * dt
+    line_by_system = activations * conversion
+    emitted_lines = float(np.sum(line_by_system))
+    self.emitted_total += emitted_lines
+    self.signed_source_activations_total += float(np.sum(activations))
+    self.signed_line_content_emitted_total += emitted_lines
+    self.signed_last_source_activations = float(np.sum(activations))
+    self.signed_last_line_content = emitted_lines
+    self.signed_last_line_content_by_system = line_by_system.copy()
+    self.signed_last_burgers_sign_by_system = signs.copy()
+    rho_final, tau_final, sigma_final = _campaign_backstress(self)
+    geometry = _source_geometry(self)
+    effective_final = np.maximum(drive - sigma_final, 0.0)
+    rate_final = np.asarray(
+        [self.emission_rate_per_site(float(value), T_K) if value > 0.0 else 0.0
+         for value in effective_final], dtype=float
+    )
+    self.available_sites = np.asarray(self.site_capacity, dtype=float).copy()
+    self.tip_source_activity = np.ones(self.n_systems, dtype=float)
+    self.persistent_site_last_geometry = dict(geometry)
+    self.persistent_site_last_drive_Pa = drive.copy()
+    self.persistent_site_last_sigma_back_initial_Pa = sigma_final.copy()
+    self.persistent_site_last_sigma_effective_final_Pa = effective_final.copy()
+    self.persistent_site_last_rate_initial_s = rate_final.copy()
+    self.persistent_site_last_rate_final_s = rate_final.copy()
+    self.persistent_site_last_activations = activations.copy()
+    self.persistent_site_last_line_content = line_by_system.copy()
+    self.continuum_source_last_emission_rate_s = float(np.sum(activation_rate))
+    self.continuum_source_last_aggregate_hazard_s = float(np.sum(activation_rate))
+    self.continuum_source_last_rho_back_m2 = float(np.mean(rho_final))
+    self.continuum_source_last_tau_back_Pa = float(np.mean(tau_final))
+    self.continuum_source_last_sigma_back_Pa = float(np.mean(sigma_final))
+    self.continuum_source_last_sigma_emit_effective_Pa = float(np.mean(effective_final))
+    self.continuum_source_last_sigma_emit_effective_min_Pa = float(np.min(effective_final))
+    self.anisotropic_last_drive_factors = np.asarray(factors, dtype=float).copy()
+    self.anisotropic_last_sigma_opening_Pa = max(float(stress_Pa), 0.0)
+    self.anisotropic_last_rho_back_by_system_m2 = rho_final.copy()
+    self.anisotropic_last_tau_back_by_system_Pa = tau_final.copy()
+    self.anisotropic_last_sigma_back_by_system_Pa = sigma_final.copy()
+    self.anisotropic_last_sigma_emit_by_system_Pa = effective_final.copy()
+    self.anisotropic_last_lambda_emit_by_system_s = rate_final.copy()
+    self.anisotropic_last_probability_by_system = 1.0 - np.exp(
+        -np.minimum(np.maximum(rate_final * dt, 0.0), 700.0)
+    )
+    self.anisotropic_last_dN_emit_by_system = line_by_system.copy()
+    return {
+        "emitted": emitted_lines,
+        "result": result,
+        "rates": rates,
+        "iterations": iteration + 1,
+        "activation_rate_s": float(np.sum(activation_rate)),
+        "velocity_m_s": float(max(velocity, 0.0)),
+        "coefficient_residual": float(coefficient_error),
+        "complementarity_residual": float(rate_error),
+    }
+
+
 def _persistent_advance(self, distance_m: float) -> dict[str, float]:
     # Keep the legacy availability arrays full so the inherited moving-frame
     # operation computes zero source refresh.  Accumulated slip is still convected
@@ -577,6 +809,7 @@ def install_persistent_site_source(
         raise RuntimeError("invalid active tip-arc factor")
 
     state.source_model = SOURCE_MODEL
+    state._exchange_transport_mode = JOINT_CTMC_EXCHANGE_TRANSPORT
     state._persistent_site_cfg = cfg
     state._persistent_r0_m = r0
     state._persistent_b = float(b_m)
@@ -603,6 +836,9 @@ def install_persistent_site_source(
     )
     state.persistent_site_last_substep_roots = []
     state._emit = MethodType(_persistent_emit, state)
+    state._coupled_persistent_source_transport = MethodType(
+        _coupled_persistent_source_transport, state
+    )
     state.advance = MethodType(_persistent_advance, state)
     state.diagnostics = MethodType(_persistent_diagnostics, state)
 

@@ -74,6 +74,16 @@ def test_corrected_dossier_is_native_v2_and_has_mechanism_specific_semantics():
     dossier = build_parameter_dossier(ROOT, temperatures=(950.0,), stress_fractions=(0.1,))
     assert dossier["schema"].endswith("/2")
     dbtt = next(p for p in dossier["parents"] if p["family"] == "DBTT")
+    multiplicity = dbtt["physical_multiplicity"]
+    assert "source_sites_per_system" not in multiplicity
+    assert multiplicity["inherited_reference_source_sites_per_system"] == pytest.approx(
+        141.0590567476921
+    )
+    assert "inactive for persistent-site" in multiplicity["reference_field_runtime_status"]
+    transport = dbtt["native_transport_consumer"]
+    assert transport["peierls_stress_projection"] == pytest.approx(1.0 / np.sqrt(3.0))
+    assert transport["taylor_stress_projection"] == pytest.approx(1.0 / np.sqrt(3.0))
+    assert transport["completion_law"]["mode"] == "legacy_implicit_1s"
     for item in dbtt["mechanisms"]:
         assert item["native_callable"].endswith("values_eV/rate/diagnostic")
         assert "generic one-mark" not in item["completion_law"] or item["mechanism"] != "cleavage"

@@ -7,7 +7,8 @@ import pytest
 
 from arrhenius_fracture.persistent_runtime_contract import require_persistent_binding
 from arrhenius_fracture.persistent_site_source_v10221 import (
-    SOURCE_MODEL, _persistent_advance, _persistent_emit,
+    SOURCE_MODEL, _coupled_persistent_source_transport, _persistent_advance,
+    _persistent_emit,
 )
 from arrhenius_fracture.shared_execution import (
     build_execution_plan, construct_and_attest, execute_shared,
@@ -20,9 +21,13 @@ from arrhenius_fracture.signed_burgers_shared_v1025 import _signed_evolve_scalar
 def _bound_state():
     state = SimpleNamespace(
         source_model=SOURCE_MODEL, _signed_transport_mode="validated_scalar",
+        _exchange_transport_mode="joint_ctmc",
         persistent_source_inventory_active=False,
     )
     state._emit = MethodType(_persistent_emit, state)
+    state._coupled_persistent_source_transport = MethodType(
+        _coupled_persistent_source_transport, state
+    )
     state.evolve = MethodType(_signed_evolve_scalar, state)
     state.advance = MethodType(_persistent_advance, state)
     state._exchange = lambda *a: None
@@ -36,6 +41,20 @@ def test_actual_bound_object_is_checked_and_corruption_fails_closed():
     state._emit = MethodType(lambda self, *a: 0.0, state)
     with pytest.raises(RuntimeError, match="no substitute"):
         require_persistent_binding(state, stage="after_remesh")
+
+
+def test_split_exchange_selection_fails_closed_even_when_outer_wrapper_matches():
+    state = _bound_state()
+    state._exchange_transport_mode = "legacy_split"
+    with pytest.raises(RuntimeError, match="no substitute"):
+        require_persistent_binding(state, stage="split_selection")
+
+
+def test_coupled_inner_operator_binding_is_required():
+    state = _bound_state()
+    state._coupled_persistent_source_transport = MethodType(lambda self, *a: {}, state)
+    with pytest.raises(RuntimeError, match="coupled_source_transport"):
+        require_persistent_binding(state, stage="inner_corruption")
 
 
 def test_missing_executed_binding_receipt_is_failure_not_fallback(tmp_path):

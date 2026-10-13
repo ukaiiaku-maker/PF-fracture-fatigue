@@ -13,9 +13,15 @@ from pathlib import Path
 from typing import Any
 
 from .persistent_site_source_v10221 import (
-    SOURCE_MODEL, _persistent_advance, _persistent_emit,
+    SOURCE_MODEL, _coupled_persistent_source_transport, _persistent_advance,
+    _persistent_emit,
 )
-from .signed_burgers_shared_v1025 import _signed_evolve_scalar
+from .coupled_transport_exchange import joint_transport_exchange
+from .signed_burgers_shared_v1025 import (
+    JOINT_CTMC_EXCHANGE_TRANSPORT, _signed_evolve_scalar,
+)
+from .taylor_release import completion_rate, runtime_selection
+from .unified_mpz import UnifiedMPZState
 
 
 MODEL_ID = "persistent-native-runtime-contract/1"
@@ -35,13 +41,18 @@ def _identity(function: Any) -> dict[str, Any]:
         "source_file": None if path is None else str(path),
         "source_sha256": None if path is None or not path.is_file()
                          else hashlib.sha256(path.read_bytes()).hexdigest(),
+        "body_sha256": hashlib.sha256(inspect.getsource(fn).encode("utf-8")).hexdigest(),
     }
 
 
 def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
     reversible = bool(getattr(mpz, "_reversible_transport_installed", False))
-    expected = {"emit": _persistent_emit, "advance": _persistent_advance,
-                "evolve": _signed_evolve_scalar}
+    expected = {
+        "emit": _persistent_emit,
+        "advance": _persistent_advance,
+        "evolve": _signed_evolve_scalar,
+        "coupled_source_transport": _coupled_persistent_source_transport,
+    }
     # Reversible transport intentionally wraps evolve/advance after the base
     # persistent state is installed.  Its own authoritative receipt verifies
     # those wrappers and the preserved base advance callable.
@@ -51,12 +62,21 @@ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
         matches = {
             "emit": _function(getattr(mpz, "_emit", None)) is _persistent_emit,
             "base_advance": _function(getattr(mpz, "_reversible_base_advance", None)) is _persistent_advance,
+            "coupled_source_transport": _function(
+                getattr(mpz, "_coupled_persistent_source_transport", None)
+            ) is _coupled_persistent_source_transport,
             "reversible_overlay": bool(reversible_receipt["all_expected_methods_bound"]),
         }
     else:
         reversible_receipt = None
         matches = {
-            name: _function(getattr(mpz, "_emit" if name == "emit" else name, None)) is fn
+            name: _function(getattr(
+                mpz,
+                "_emit" if name == "emit" else
+                "_coupled_persistent_source_transport" if name == "coupled_source_transport" else
+                name,
+                None,
+            )) is fn
             for name, fn in expected.items()
         }
     inventory = bool(getattr(mpz, "persistent_source_inventory_active", False))
@@ -72,14 +92,23 @@ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
         "object_type": f"{type(mpz).__module__}.{type(mpz).__qualname__}",
         "source_model": str(getattr(mpz, "source_model", "")),
         "signed_transport_mode": str(getattr(mpz, "_signed_transport_mode", "")),
+        "exchange_transport_mode": str(getattr(mpz, "_exchange_transport_mode", "")),
         "persistent_source_inventory_active": inventory,
         "available_sites_are_diagnostic_only": True,
         "bindings": observed, "expected_method_match": matches,
+        "inner_operator_identities": {
+            "joint_transport_exchange": _identity(joint_transport_exchange),
+            "taylor_completion_rate": _identity(completion_rate),
+            "transport_rate_constructor": _identity(UnifiedMPZState._transport_rates),
+        },
+        "taylor_completion_constructor": dict(zip(
+            ("mode", "window_s", "hard_cap"), runtime_selection()
+        )),
         "reversible_overlay": reversible_receipt,
         "physical_contract": {
-            "injection": "implicit simultaneous persistent-site backstress root",
-            "transport": "validated signed scalar Peierls population transport",
-            "exchange_release": "native mobile/retained exchange with Taylor cooperative completion",
+            "injection": "continuous mobile source inside the coupled CTMC with an implicit persistent-site backstress/end-state root",
+            "transport": "signed finite-volume Peierls transport in the same CTMC generator",
+            "exchange_release": "simultaneous encounter/Taylor release/recapture, transport, escape, and gross/net ledgers",
             "backstress": "unsigned active mobile plus retained line content",
             "shielding": "signed retained line content",
             "advance": "signed moving-frame wake inheritance with persistent sites not consumed",
@@ -88,6 +117,7 @@ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
         "all_expected_methods_bound": (
             str(getattr(mpz, "source_model", "")) == SOURCE_MODEL
             and str(getattr(mpz, "_signed_transport_mode", "")) == "validated_scalar"
+            and str(getattr(mpz, "_exchange_transport_mode", "")) == JOINT_CTMC_EXCHANGE_TRANSPORT
             and not inventory and all(matches.values())
         ),
     }

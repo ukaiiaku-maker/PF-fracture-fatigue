@@ -7,6 +7,7 @@ from typing import Any
 
 from .material_manifest import ExpFloorBarrier, TransportBarrier
 from .prospective_campaign import REGISTRY
+from .taylor_release import runtime_selection
 
 
 def _barrier(row: dict[str, str], prefix: str) -> ExpFloorBarrier:
@@ -80,6 +81,7 @@ def build_parameter_dossier(root: str | Path, temperatures=(300.0, 600.0, 800.0,
     parents = []
     with path.open(newline="") as handle:
         rows = list(csv.DictReader(handle))
+    release_mode, release_window_s, release_cap_s = runtime_selection()
     for row in rows:
         mechanisms = []
         emit = _barrier(row, "emit")
@@ -99,8 +101,49 @@ def build_parameter_dossier(root: str | Path, temperatures=(300.0, 600.0, 800.0,
         invalid = [m for m in mechanisms if m["domain_status"] != "ADMISSIBLE_PARENT_EXAMPLE"]
         parents.append({"family": row["material_class"], "option_key": row["option_key"],
                         "candidate_id": row["candidate_id"], "classification": "PRESERVED_PARENT_NOT_NEWLY_VALIDATED",
-                        "physical_multiplicity": {"n_slip_channels": int(row["n_slip_channels"]),
-                                                  "source_sites_per_system": float(row["source_sites_per_system"])},
+                        "physical_multiplicity": {
+                            "n_slip_channels": int(row["n_slip_channels"]),
+                            "inherited_reference_source_sites_per_system": float(
+                                row["source_sites_per_system"]
+                            ),
+                            "reference_field_runtime_status": (
+                                "inactive for persistent-site source; instantaneous multiplicity "
+                                "is geometry/state dependent"
+                            ),
+                            "persistent_runtime_multiplicity": (
+                                "rho_site0*c_arc*r_tip*w_eff evaluated from live state"
+                            ),
+                        },
+                        "native_transport_consumer": {
+                            "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
+                            "stress_coordinate": "opening stress projected once before barrier evaluation",
+                            "peierls_stress_projection": float(row["peierls_stress_fraction"]),
+                            "taylor_stress_projection": float(row["taylor_stress_fraction"]),
+                            "expected_projection_1_over_sqrt3": 0.5773502691896258,
+                            "forest_density_floor_m2": float(row["rho_forest_floor_m2"]),
+                            "taylor_correlation_density_m2": float(row["taylor_corr_rho_c_m2"]),
+                            "taylor_correlation_scale": float(row["taylor_corr_scale"]),
+                            "completion_law": {
+                                "callable": "arrhenius_fracture.taylor_release.completion_rate",
+                                "mode": release_mode,
+                                "window_s": release_window_s,
+                                "single_rate_cap_s": release_cap_s,
+                            },
+                            "peierls_surface": {
+                                "H0_eV": float(row["peierls_H0_eV"]),
+                                "activation_entropy_kB": float(row["peierls_activation_entropy_kB"]),
+                                "exp_a": float(row["peierls_exp_a"]),
+                                "exp_n": float(row["peierls_exp_n"]),
+                                "attempt_frequency_s": float(row["peierls_nu0_s"]),
+                            },
+                            "taylor_surface": {
+                                "H0_eV": float(row["taylor_H0_eV"]),
+                                "activation_entropy_kB": float(row["taylor_activation_entropy_kB"]),
+                                "exp_a": float(row["taylor_exp_a"]),
+                                "exp_n": float(row["taylor_exp_n"]),
+                                "attempt_frequency_s": float(row["taylor_nu0_s"]),
+                            },
+                        },
                         "state_limits": {"rho_forest_floor_m2": float(row["rho_forest_floor_m2"]),
                                          "source_refresh_length_m": float(row["source_refresh_length_um"])*1e-6,
                                          "retained_recovery_rate_s": float(row["retained_recovery_rate_s"])},

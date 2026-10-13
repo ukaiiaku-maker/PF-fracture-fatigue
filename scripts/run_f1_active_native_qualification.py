@@ -52,13 +52,14 @@ def _run(output: Path, steps: int, restart_from: Path | None = None) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "phase", choices=("initial", "resume", "all"), default="all", nargs="?",
+        "phase", choices=("initial", "resume", "uninterrupted", "all"), default="all", nargs="?",
     )
     parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
     values = parser.parse_args(argv)
     root = values.root.resolve()
     initial = root / "initial_to_step48"
     resumed = root / "fresh_process_restart_to_step64"
+    uninterrupted = root / "uninterrupted_to_step64"
     if values.phase in {"initial", "all"}:
         _run(initial, INITIAL_STEPS)
     if values.phase in {"resume", "all"}:
@@ -66,6 +67,8 @@ def main(argv: list[str] | None = None) -> int:
         if not (checkpoint / "run_state_checkpoint.json").is_file():
             raise SystemExit(f"complete outer checkpoint is missing: {checkpoint}")
         _run(resumed, FINAL_STEPS, checkpoint)
+    if values.phase in {"uninterrupted", "all"}:
+        _run(uninterrupted, FINAL_STEPS)
     return 0
 
 
