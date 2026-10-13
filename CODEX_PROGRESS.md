@@ -52,3 +52,25 @@ or remote action is authorized.
    identities/counts, package the source/test patch and compact accepted states,
    then create the requested verified backup without deleting local evidence.
 
+## Full-native diagnostic, 13 October 2026
+
+- Commit `2253257c` completed 23 fresh full-PF accepted states through the
+  normal checkpoint before an affine invariant defect of `3.714389e-09`
+  exceeded the mixed population-unit limit `1.801674e-11` during step 24.
+  This is a numerical conditioning failure, not a physical-domain event.
+- The failed prefix remains diagnostic only at
+  `integration_evidence/f1_native_taylor_peierls_qualification_2253257c`.
+- The actual active-state rates are all fast (encounter about `2.43e12 s^-1`,
+  Taylor release `5.69e10 s^-1`, hop about `4.75e12 s^-1`), so their ratio is
+  only about 84.  The earlier scale-ratio selector therefore correctly did not
+  choose BDF; the error instead came from repeated multiplication of a tiny
+  base-map conservation bias over an activity near `2e13`.
+- Current repair restores the invariant correction on the bounded base map
+  before binary affine composition, while retaining BDF for the independently
+  demonstrated extreme fast/slow separation.  Raw affine defect, accepted
+  base-map correction, positivity, final invariant correction, and discarded
+  affine/BDF discrepancy remain distinct diagnostics.  The 15 operator tests
+  pass.  Exact next action: commit this numerical repair, replay step 24 from
+  the diagnostic complete checkpoint, and only then recompute a clean qualified
+  prefix under the final committed source.
+

@@ -511,6 +511,7 @@ def _signed_evolve_scalar(
         base_map_correction = float(result.base_map_invariant_correction)
         positivity_correction = float(result.positivity_correction)
         complete_numerical_correction = float(result.complete_numerical_correction)
+        affine_invariant_defect = float(result.affine_invariant_defect)
         affine_retry_discrepancy = float(result.affine_retry_discrepancy)
         error_controlled_stiff_solve = bool(result.error_controlled_stiff_solve)
         coupled_coefficient_residual = float(coupled["coefficient_residual"])
@@ -528,6 +529,7 @@ def _signed_evolve_scalar(
         base_map_correction = 0.0
         positivity_correction = 0.0
         complete_numerical_correction = 0.0
+        affine_invariant_defect = 0.0
         affine_retry_discrepancy = 0.0
         error_controlled_stiff_solve = False
         coupled_coefficient_residual = 0.0
@@ -578,6 +580,7 @@ def _signed_evolve_scalar(
         base_map_correction = float(result.base_map_invariant_correction)
         positivity_correction = float(result.positivity_correction)
         complete_numerical_correction = float(result.complete_numerical_correction)
+        affine_invariant_defect = float(result.affine_invariant_defect)
         affine_retry_discrepancy = float(result.affine_retry_discrepancy)
         error_controlled_stiff_solve = bool(result.error_controlled_stiff_solve)
     elif mode != JOINT_CTMC_EXCHANGE_TRANSPORT:
@@ -634,6 +637,7 @@ def _signed_evolve_scalar(
         "transport_base_map_correction": base_map_correction,
         "transport_positivity_correction": positivity_correction,
         "transport_complete_numerical_correction": complete_numerical_correction,
+        "transport_affine_invariant_defect": affine_invariant_defect,
         "transport_affine_retry_discrepancy": affine_retry_discrepancy,
         "transport_error_controlled_stiff_solve": error_controlled_stiff_solve,
         "scalar_transport_velocity_m_s": self.scalar_transport_velocity_m_s,

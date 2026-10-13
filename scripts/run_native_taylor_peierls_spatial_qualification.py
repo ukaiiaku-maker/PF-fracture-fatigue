@@ -169,6 +169,8 @@ def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, A
             out["transport_positivity_correction"]),
         "transport_complete_numerical_correction": float(
             out["transport_complete_numerical_correction"]),
+        "transport_affine_invariant_defect": float(
+            out["transport_affine_invariant_defect"]),
         "transport_affine_retry_discrepancy": float(
             out["transport_affine_retry_discrepancy"]),
         "transport_error_controlled_stiff_solve": bool(
@@ -272,6 +274,8 @@ def compare(root: Path) -> None:
             item["transport_positivity_correction"] for item in traces),
         "max_complete_numerical_correction": max(
             item["transport_complete_numerical_correction"] for item in traces),
+        "max_affine_invariant_defect": max(
+            item["transport_affine_invariant_defect"] for item in traces),
         "max_affine_retry_discrepancy": max(
             item["transport_affine_retry_discrepancy"] for item in traces),
         "error_controlled_stiff_solve_used": any(

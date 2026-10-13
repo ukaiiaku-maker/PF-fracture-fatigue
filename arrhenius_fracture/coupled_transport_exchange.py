@@ -32,6 +32,7 @@ class CoupledTransportExchangeResult:
     base_map_invariant_correction: float = 0.0
     positivity_correction: float = 0.0
     complete_numerical_correction: float = 0.0
+    affine_invariant_defect: float = 0.0
     affine_retry_discrepancy: float = 0.0
     error_controlled_stiff_solve: bool = False
 
@@ -322,9 +323,16 @@ def joint_transport_exchange(
     physical_generator = conditioned_generator[physical_indices][:, physical_indices]
     physical_initial = conditioned_initial[physical_indices]
     budgets = np.sum(m0 + r0, axis=1) + np.sum(source, axis=1) * dt
-    affine_physical = _partitioned_affine_action(
+    raw_affine_physical = _partitioned_affine_action(
         physical_generator, physical_initial, dt, activity,
         dynamic_size=2 * n + 2,
+    )
+    affine_physical, physical_numerics = _partitioned_affine_action(
+        physical_generator, physical_initial, dt, activity,
+        dynamic_size=2 * n + 2,
+        invariant_weights=np.r_[np.ones(n), np.zeros(n), 1.0, 1.0],
+        correction_row=2 * n,
+        return_diagnostics=True,
     )
     positive_rates = np.concatenate((ke, kr, hop, np.array([km, kr_rec])))
     positive_rates = positive_rates[positive_rates > 0.0]
@@ -332,12 +340,21 @@ def joint_transport_exchange(
         float(np.max(positive_rates) / np.min(positive_rates))
         if positive_rates.size else 1.0
     )
+    affine_accounted = (
+        np.sum(raw_affine_physical[:n], axis=0)
+        + raw_affine_physical[2 * n]
+        + raw_affine_physical[2 * n + 1]
+    )
+    affine_invariant_defect_by_species = budgets - affine_accounted
+    affine_invariant_defect = float(
+        np.sum(np.abs(affine_invariant_defect_by_species))
+    )
     # With an exponent bounded by the fast rate, a slow decrement can fall
     # below machine precision in every base map.  Squaring then reproduces its
     # outgoing contribution without the matching depletion.  Retry the same
     # generator with error-controlled BDF before any state projection.
     error_controlled_stiff_solve = bool(
-        activity > 1.0e8 and scale_separation > 1.0e12
+        (activity > 1.0e8 and scale_separation > 1.0e12)
     )
     if error_controlled_stiff_solve:
         accepted_full_conditioned = _error_controlled_stiff_action(
@@ -351,6 +368,10 @@ def joint_transport_exchange(
         accepted_full_conditioned = affine_full_conditioned
         conditioned_physical = affine_physical
         affine_retry_discrepancy = 0.0
+    accepted_base_map_correction = (
+        0.0 if error_controlled_stiff_solve
+        else float(physical_numerics["composed_state_correction_l1"])
+    )
     final = inverse_change @ accepted_full_conditioned
     physical_inverse = np.eye(conditioned_physical.shape[0])
     for i in range(n):
@@ -404,10 +425,12 @@ def joint_transport_exchange(
     invariant_correction = float(np.sum(np.abs(invariant_defect)))
     complete_numerical_correction = (
         invariant_correction
+        + accepted_base_map_correction
         + positivity_correction
     )
     if max(
         invariant_correction,
+        accepted_base_map_correction,
         positivity_correction,
     ) > float(np.sum(invariant_limit)):
         raise FloatingPointError(
@@ -443,9 +466,10 @@ def joint_transport_exchange(
         mobile_distance_population_m=distance_population,
         conservation_error=error,
         invariant_projection_correction=invariant_correction,
-        base_map_invariant_correction=0.0,
+        base_map_invariant_correction=accepted_base_map_correction,
         positivity_correction=positivity_correction,
         complete_numerical_correction=complete_numerical_correction,
+        affine_invariant_defect=affine_invariant_defect,
         affine_retry_discrepancy=affine_retry_discrepancy,
         error_controlled_stiff_solve=error_controlled_stiff_solve,
     )

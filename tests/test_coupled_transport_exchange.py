@@ -374,5 +374,6 @@ def test_full_attempt_release_scale_uses_error_controlled_same_equation_retry():
     expected_budget = 1.0e-8 + source * dt
     assert np.isclose(np.sum(accepted[:5]), expected_budget, atol=2e-14)
     assert out.error_controlled_stiff_solve
+    assert out.affine_invariant_defect > 1.0e-8
     assert out.affine_retry_discrepancy > 1.0e-8
     assert out.complete_numerical_correction <= 2.0e-14
