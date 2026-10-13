@@ -127,6 +127,26 @@ def _coupled_test_state():
     class State:
         _advect_forward = staticmethod(UnifiedMPZState._advect_forward)
 
+        @property
+        def mobile_count(self):
+            return float(np.sum(self.mobile))
+
+        @property
+        def retained_count(self):
+            return float(np.sum(self.retained))
+
+        @property
+        def wake_mobile_count(self):
+            return float(np.sum(self.wake_mobile))
+
+        @property
+        def wake_retained_count(self):
+            return float(np.sum(self.wake_retained))
+
+        @property
+        def available_site_fraction(self):
+            return float(np.sum(self.available_sites) / np.sum(self.site_capacity))
+
         def blunted_radius(self, r0, b):
             return float(r0 + 0.1 * abs(b) * np.sum(self.accumulated_slip))
 
@@ -231,15 +251,54 @@ def test_continuous_source_backstress_update_converges_under_time_partition():
         ))
         return vector
 
-    one, two, four, eight, sixteen, thirty_two = (
-        evolve(parts) for parts in (1, 2, 4, 8, 16, 32)
+    one, two, four, eight, sixteen, thirty_two, sixty_four = (
+        evolve(parts) for parts in (1, 2, 4, 8, 16, 32, 64)
     )
     e12 = np.linalg.norm(one - two)
     e24 = np.linalg.norm(two - four)
     e48 = np.linalg.norm(four - eight)
     e816 = np.linalg.norm(eight - sixteen)
     e1632 = np.linalg.norm(sixteen - thirty_two)
+    e3264 = np.linalg.norm(thirty_two - sixty_four)
     assert e24 < e12
     assert e48 < e24
-    assert e1632 < e816 < e48
-    assert e1632 / max(np.linalg.norm(thirty_two), 1.0) < 2.0e-3
+    assert e3264 < e1632 < e816 < e48
+    assert e3264 / max(np.linalg.norm(sixty_four), 1.0) < 2.0e-3
+
+
+def test_coupled_acceptance_recomputes_full_coefficients_at_accepted_state():
+    state = _coupled_test_state()
+    out = state._coupled_persistent_source_transport(1.0, 5.0e8, 950.0, 1.0e-9)
+    accepted = state._transport_rates(
+        state.local_stress_profile_Pa(5.0e8),
+        state.local_forest_density_m2(False),
+        950.0,
+        1.0e-9,
+    )
+    for key in ("encounter", "taylor", "velocity"):
+        np.testing.assert_allclose(out["rates"][key], accepted[key], rtol=1.0e-4, atol=1.0e-8)
+    assert out["coefficient_residual"] <= 1.0e-4
+    assert out["state_fixed_point_residual"] <= 1.0e-4
+    assert out["affine_direct_state_residual"] <= 1.0e-8
+
+
+def test_outer_evolve_owns_coupled_flux_ledgers_once_and_conserves_source():
+    state = _coupled_test_state()
+    out = state.evolve(1.0, 950.0, 5.0e8, 1.0e-9)
+    accounted = (
+        state.mobile_count + state.retained_count
+        + state.wake_mobile_count + state.wake_retained_count
+        + state.escaped_total + state.recovered_total
+        + state.wake_discarded_mobile_total + state.wake_discarded_retained_total
+    )
+    assert accounted == pytest.approx(state.emitted_total, abs=2.0e-10)
+    assert state.emitted_total == pytest.approx(out["dN_emit"])
+    assert state.escaped_total == pytest.approx(out["dN_escaped"])
+    assert state.gross_trapping_total == pytest.approx(out["dN_gross_trapping"])
+    assert state.gross_release_total == pytest.approx(out["dN_gross_release"])
+    assert state.mobile_distance_population_total_m == pytest.approx(
+        out["mobile_distance_population_m"])
+    assert state.escaped_total > 0.0
+    assert state.gross_trapping_total > 0.0
+    assert state.gross_release_total > 0.0
+    assert state.mobile_distance_population_total_m > 0.0

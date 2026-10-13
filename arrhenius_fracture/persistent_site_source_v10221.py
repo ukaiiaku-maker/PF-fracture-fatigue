@@ -57,6 +57,8 @@ class PersistentSiteConfig:
     maximum_front_width_m: float = 0.0
     implicit_tolerance: float = 1.0e-10
     implicit_max_iterations: int = 96
+    coupled_tolerance: float = 1.0e-6
+    coupled_max_iterations: int = 64
 
     def validate(self) -> "PersistentSiteConfig":
         if not math.isfinite(self.rho_site0_m2) or self.rho_site0_m2 <= 0.0:
@@ -77,6 +79,10 @@ class PersistentSiteConfig:
             raise ValueError("implicit_tolerance must be positive")
         if self.implicit_max_iterations < 8:
             raise ValueError("implicit_max_iterations must be at least 8")
+        if self.coupled_tolerance <= 0.0:
+            raise ValueError("coupled_tolerance must be positive")
+        if self.coupled_max_iterations < 8:
+            raise ValueError("coupled_max_iterations must be at least 8")
         return self
 
 
@@ -527,16 +533,11 @@ def _coupled_persistent_source_transport(
         if signs[system] != 0.0:
             source_unit[row, :nsrc] = conversion[system] / float(nsrc)
 
-    def install_affine_state(base, unit, activation: np.ndarray) -> None:
-        mobile = base.mobile.copy()
-        retained = base.retained.copy()
-        for system in range(self.n_systems):
-            row = system if signs[system] > 0.0 else self.n_systems + system
-            if signs[system] != 0.0:
-                mobile[row] += activation[system] * (unit.mobile[row] - base.mobile[row])
-                retained[row] += activation[system] * (unit.retained[row] - base.retained[row])
-        mobile = np.maximum(mobile, 0.0)
-        retained = np.maximum(retained, 0.0)
+    def install_population_state(
+        mobile: np.ndarray, retained: np.ndarray, activation: np.ndarray
+    ) -> None:
+        mobile = np.maximum(np.asarray(mobile, dtype=float), 0.0).copy()
+        retained = np.maximum(np.asarray(retained, dtype=float), 0.0).copy()
         split = self.n_systems
         self.mobile_positive, self.mobile_negative = mobile[:split], mobile[split:]
         self.retained_positive, self.retained_negative = retained[:split], retained[split:]
@@ -548,6 +549,54 @@ def _coupled_persistent_source_transport(
                 self.accumulated_slip_positive[system, :nsrc] += amount
             elif signs[system] < 0.0:
                 self.accumulated_slip_negative[system, :nsrc] += amount
+        _sync_active(self)
+
+    def install_affine_state(base, unit, activation: np.ndarray) -> None:
+        mobile = base.mobile.copy()
+        retained = base.retained.copy()
+        for system in range(self.n_systems):
+            row = system if signs[system] > 0.0 else self.n_systems + system
+            if signs[system] != 0.0:
+                mobile[row] += activation[system] * (unit.mobile[row] - base.mobile[row])
+                retained[row] += activation[system] * (unit.retained[row] - base.retained[row])
+        install_population_state(mobile, retained, activation)
+
+    def active_state_vector() -> np.ndarray:
+        return np.concatenate((
+            self.mobile_positive.ravel(), self.mobile_negative.ravel(),
+            self.retained_positive.ravel(), self.retained_negative.ravel(),
+            self.accumulated_slip_positive.ravel(),
+            self.accumulated_slip_negative.ravel(),
+        ))
+
+    def relative_vector_error(left: np.ndarray, right: np.ndarray) -> float:
+        lhs = np.asarray(left, dtype=float)
+        rhs = np.asarray(right, dtype=float)
+        return float(np.sum(np.abs(lhs - rhs))) / max(
+            float(np.sum(np.abs(lhs))), float(np.sum(np.abs(rhs))), 1.0
+        )
+
+    def coefficient_vector(stress, rho, rate_fields) -> np.ndarray:
+        values = [np.asarray(stress, dtype=float), np.asarray(rho, dtype=float)]
+        for key in ("peierls", "taylor", "encounter", "m", "velocity"):
+            if key in rate_fields:
+                values.append(np.asarray(rate_fields[key], dtype=float))
+        return np.concatenate([value.ravel() for value in values])
+
+    def coefficient_relative_error(left: np.ndarray, right: np.ndarray) -> float:
+        lhs = np.asarray(left, dtype=float)
+        rhs = np.asarray(right, dtype=float)
+        scale = np.maximum(np.maximum(np.abs(lhs), np.abs(rhs)), 1.0)
+        return float(np.max(np.abs(lhs - rhs) / scale))
+
+    def restore_initial_state() -> None:
+        split = self.n_systems
+        self.mobile_positive = mobile0[:split].copy()
+        self.mobile_negative = mobile0[split:].copy()
+        self.retained_positive = retained0[:split].copy()
+        self.retained_negative = retained0[split:].copy()
+        self.accumulated_slip_positive = slip_pos0.copy()
+        self.accumulated_slip_negative = slip_neg0.copy()
         _sync_active(self)
 
     def source_target() -> np.ndarray:
@@ -562,11 +611,19 @@ def _coupled_persistent_source_transport(
         ])
         return np.nan_to_num(values, nan=0.0, posinf=1.0e300, neginf=0.0)
 
+    cfg = self._persistent_site_cfg
+    coupled_tolerance = float(cfg.coupled_tolerance)
     coefficient_error = math.inf
-    for iteration in range(12):
+    state_fixed_point_error = math.inf
+    affine_direct_error = math.inf
+    complementarity_error = math.inf
+    bracket_relative_width = math.inf
+    for iteration in range(int(cfg.coupled_max_iterations)):
+        outer_state = active_state_vector()
         stress = self.local_stress_profile_Pa(stress_Pa)
         local_rho = self.local_forest_density_m2(False)
         new_rates = self._transport_rates(stress, local_rho, T_K, b)
+        consumed_coefficients = coefficient_vector(stress, local_rho, new_rates)
         total_by_bin = np.sum(self.mobile + self.retained, axis=0)
         eq_mobile = total_by_bin * np.divide(
             new_rates["taylor"], new_rates["encounter"] + new_rates["taylor"],
@@ -584,6 +641,7 @@ def _coupled_persistent_source_transport(
             velocity_m_s=np.maximum(new_rates["velocity"], 0.0), dt_s=dt, dx_m=self.dx,
             mobile_source_rate=source_unit,
         )
+        bracket_widths = np.zeros(self.n_systems, dtype=float)
         for system in range(self.n_systems):
             if signs[system] == 0.0:
                 activation_rate[system] = 0.0
@@ -607,17 +665,40 @@ def _coupled_persistent_source_transport(
             # The upper endpoint is the mechanically blocked side when the
             # Arrhenius branch has no interior rate root.
             activation_rate[system] = upper
-        previous_state = np.concatenate((self.mobile, self.retained), axis=0)
+            bracket_widths[system] = (upper - lower) / max(upper, 1.0)
         install_affine_state(base, unit, activation_rate)
-        current_state = np.concatenate((self.mobile, self.retained), axis=0)
-        coefficient_error = float(np.sum(np.abs(current_state - previous_state))) / max(
-            float(np.sum(np.abs(current_state))), float(np.sum(np.abs(previous_state))), 1.0
+        affine_state = active_state_vector()
+        source = np.zeros_like(source_unit)
+        for system in range(self.n_systems):
+            row = system if signs[system] > 0.0 else self.n_systems + system
+            if signs[system] != 0.0:
+                source[row, :nsrc] = (
+                    activation_rate[system] * conversion[system] / float(nsrc)
+                )
+        direct_result = joint_transport_exchange(
+            mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
+            velocity_m_s=np.maximum(new_rates["velocity"], 0.0), dt_s=dt,
+            dx_m=self.dx, mobile_source_rate=source,
+            mobile_recovery_rate_s=max(float(self.cfg.mobile_recovery_rate_s), 0.0),
+            retained_recovery_rate_s=max(
+                float(self.manifest.retained_recovery_rate_s), 0.0
+            ),
         )
-        rates = new_rates
-        # State coefficients can settle before the backstress-limited source
-        # complementarity does.  Do not terminate the nonlinear iteration on
-        # the transport state alone: the final acceptance check below requires
-        # both residuals, so the iteration criterion must do the same.
+        install_population_state(
+            direct_result.mobile, direct_result.retained, activation_rate
+        )
+        candidate_state = active_state_vector()
+        affine_direct_error = relative_vector_error(affine_state, candidate_state)
+        state_fixed_point_error = relative_vector_error(outer_state, candidate_state)
+        candidate_stress = self.local_stress_profile_Pa(stress_Pa)
+        candidate_rho = self.local_forest_density_m2(False)
+        candidate_rates = self._transport_rates(candidate_stress, candidate_rho, T_K, b)
+        candidate_coefficients = coefficient_vector(
+            candidate_stress, candidate_rho, candidate_rates
+        )
+        coefficient_error = coefficient_relative_error(
+            consumed_coefficients, candidate_coefficients
+        )
         _, _, sigma_iteration = _campaign_backstress(self)
         target_iteration = source_target()
         equation_iteration = np.abs(target_iteration - activation_rate) / np.maximum(
@@ -627,27 +708,30 @@ def _coupled_persistent_source_transport(
         complementarity_error = float(
             np.max(np.minimum(equation_iteration, gate_iteration))
         )
+        bracket_relative_width = float(np.max(bracket_widths))
+        rates = new_rates
+        result = direct_result
         if (
             iteration >= 1
-            and coefficient_error <= 1.0e-4
-            and complementarity_error <= 1.0e-4
+            and coefficient_error <= coupled_tolerance
+            and state_fixed_point_error <= coupled_tolerance
+            and complementarity_error <= coupled_tolerance
+            and affine_direct_error <= 1.0e-8
+            and bracket_relative_width <= 1.0e-8
         ):
             break
+    else:
+        restore_initial_state()
+        raise RuntimeError(
+            "coupled persistent source/transport fixed point did not converge: "
+            f"coefficient_error={coefficient_error:.6e}, "
+            f"state_error={state_fixed_point_error:.6e}, "
+            f"source_residual={complementarity_error:.6e}, "
+            f"affine_direct_error={affine_direct_error:.6e}, "
+            f"bracket_width={bracket_relative_width:.6e}, "
+            f"iterations={cfg.coupled_max_iterations}"
+        )
 
-    source = source_unit * np.repeat(activation_rate, 2)[:, None]
-    # The row ordering is [positive systems, negative systems], so overwrite
-    # with the exact system-to-sign mapping instead of relying on repeat order.
-    source.fill(0.0)
-    for system in range(self.n_systems):
-        row = system if signs[system] > 0.0 else self.n_systems + system
-        if signs[system] != 0.0:
-            source[row, :nsrc] = activation_rate[system] * conversion[system] / float(nsrc)
-    result = joint_transport_exchange(
-        mobile0, retained0, rates["encounter"], rates["taylor"],
-        velocity_m_s=np.maximum(rates["velocity"], 0.0), dt_s=dt, dx_m=self.dx,
-        mobile_source_rate=source,
-    )
-    install_affine_state(base, unit, activation_rate)
     _, _, sigma_check = _campaign_backstress(self)
     target = source_target()
     equation_error = np.abs(target - activation_rate) / np.maximum(
@@ -656,10 +740,20 @@ def _coupled_persistent_source_transport(
     gate_error = np.abs(drive - sigma_check) / np.maximum(drive, 1.0)
     residual = np.minimum(equation_error, gate_error)
     rate_error = float(np.max(residual))
-    if coefficient_error > 1.0e-4 or rate_error > 1.0e-4:
+    if (
+        coefficient_error > coupled_tolerance
+        or state_fixed_point_error > coupled_tolerance
+        or rate_error > coupled_tolerance
+        or affine_direct_error > 1.0e-8
+        or bracket_relative_width > 1.0e-8
+    ):
+        restore_initial_state()
         raise RuntimeError(
             "coupled persistent source/transport complementarity did not converge: "
-            f"coefficient_error={coefficient_error:.6e}, residual={rate_error:.6e}"
+            f"coefficient_error={coefficient_error:.6e}, "
+            f"state_error={state_fixed_point_error:.6e}, residual={rate_error:.6e}, "
+            f"affine_direct_error={affine_direct_error:.6e}, "
+            f"bracket_width={bracket_relative_width:.6e}"
         )
 
     activations = activation_rate * dt
@@ -716,6 +810,9 @@ def _coupled_persistent_source_transport(
         "velocity_m_s": float(max(velocity, 0.0)),
         "velocity_m_s_by_bin": np.maximum(rates["velocity"], 0.0).copy(),
         "coefficient_residual": float(coefficient_error),
+        "state_fixed_point_residual": float(state_fixed_point_error),
+        "affine_direct_state_residual": float(affine_direct_error),
+        "source_bracket_relative_width": float(bracket_relative_width),
         "complementarity_residual": float(rate_error),
     }
 

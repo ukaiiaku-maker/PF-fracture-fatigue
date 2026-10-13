@@ -508,6 +508,10 @@ def _signed_evolve_scalar(
         source_rate_s = float(coupled["activation_rate_s"])
         velocity = float(coupled["velocity_m_s"])
         invariant_correction = float(result.invariant_projection_correction)
+        coupled_coefficient_residual = float(coupled["coefficient_residual"])
+        coupled_state_residual = float(coupled["state_fixed_point_residual"])
+        coupled_source_residual = float(coupled["complementarity_residual"])
+        coupled_affine_residual = float(coupled["affine_direct_state_residual"])
     else:
         emitted = self._emit(dt, stress_Pa, T_K, system_weights)
         stress = self.local_stress_profile_Pa(stress_Pa)
@@ -516,6 +520,10 @@ def _signed_evolve_scalar(
         nonlinear_iterations = 0.0
         source_rate_s = emitted / dt if dt > 0.0 else 0.0
         invariant_correction = 0.0
+        coupled_coefficient_residual = 0.0
+        coupled_state_residual = 0.0
+        coupled_source_residual = 0.0
+        coupled_affine_residual = 0.0
     if mode == JOINT_CTMC_EXCHANGE_TRANSPORT and coupled_source is None:
         total_by_bin = np.sum(
             self.mobile_positive + self.mobile_negative
@@ -613,6 +621,10 @@ def _signed_evolve_scalar(
         "exchange_transport_mode": mode,
         "coupled_source_state_iterations": nonlinear_iterations,
         "coupled_source_activation_rate_s": source_rate_s,
+        "coupled_source_coefficient_residual": coupled_coefficient_residual,
+        "coupled_source_state_residual": coupled_state_residual,
+        "coupled_source_complementarity_residual": coupled_source_residual,
+        "coupled_source_affine_direct_residual": coupled_affine_residual,
         "peierls_rate_s": float(np.max(rates["peierls"])),
         "taylor_completion_rate_s": float(np.max(rates["taylor"])),
         "encounter_rate_s": float(np.max(rates["encounter"])),

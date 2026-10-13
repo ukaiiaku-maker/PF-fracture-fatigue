@@ -152,13 +152,24 @@ def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, A
         "velocity_m_s_by_bin": rates["velocity"].tolist(),
         "face_flux_population_s_by_system_bin": face_flux.tolist(),
         "diagnostic_scalar_velocity_m_s": scalar,
-        "emitted_this_interval": float(out["emitted"]),
+        "emitted_this_interval": float(out["dN_emit"]),
         "emitted_total": state.emitted_total,
         "mobile_total": state.mobile_count, "retained_total": state.retained_count,
-        "coefficient_residual": float(out["coefficient_residual"]),
-        "complementarity_residual": float(out["complementarity_residual"]),
+        "coefficient_residual": float(out["coupled_source_coefficient_residual"]),
+        "state_fixed_point_residual": float(out["coupled_source_state_residual"]),
+        "complementarity_residual": float(
+            out["coupled_source_complementarity_residual"]),
+        "affine_direct_state_residual": float(
+            out["coupled_source_affine_direct_residual"]),
         "transport_invariant_roundoff_correction": float(
-            out["result"].invariant_projection_correction),
+            out["transport_invariant_roundoff_correction"]),
+        "escaped_total": state.escaped_total,
+        "recovered_total": state.recovered_total,
+        "gross_trapping_total": state.gross_trapping_total,
+        "gross_release_total": state.gross_release_total,
+        "mobile_distance_population_total_m": state.mobile_distance_population_total_m,
+        "population_ledger_balance_error": float(
+            out["population_ledger_balance_error"]),
         "taylor_release_mode": rates["taylor_release_mode"],
         "taylor_release_window_s": rates["taylor_release_window_s"],
         "taylor_single_rate_cap_s": rates["taylor_single_rate_cap_s"],
@@ -169,8 +180,19 @@ def evolve(state: UnifiedMPZState, start: int, stop: int) -> list[dict[str, Any]
     records = []
     for step in range(start + 1, stop + 1):
         require_persistent_binding(state, stage=f"before-step-{step}")
-        out = state._coupled_persistent_source_transport(DT_S, STRESS_PA, T_K, B_M)
-        state.time_s = step * DT_S
+        out = state.evolve(DT_S, T_K, STRESS_PA, B_M)
+        accounted = (
+            state.mobile_count + state.retained_count
+            + state.wake_mobile_count + state.wake_retained_count
+            + state.escaped_total + state.recovered_total
+            + state.wake_discarded_mobile_total + state.wake_discarded_retained_total
+        )
+        balance = accounted - state.emitted_total
+        if abs(balance) > 2.0e-8 * max(state.emitted_total, 1.0):
+            raise RuntimeError(
+                f"owned population/flux ledger imbalance at step {step}: {balance:.6e}"
+            )
+        out["population_ledger_balance_error"] = balance
         records.append(trace(state, step, out))
         require_persistent_binding(state, stage=f"after-step-{step}")
     return records
@@ -236,7 +258,17 @@ def compare(root: Path) -> None:
             item["transport_invariant_roundoff_correction"] for item in traces),
         "max_coefficient_residual": max(item["coefficient_residual"] for item in traces),
         "max_complementarity_residual": max(item["complementarity_residual"] for item in traces),
-        "scope": "compact original spatial MPZ qualification; not a production campaign",
+        "max_population_ledger_balance_error": max(
+            abs(item.get("population_ledger_balance_error", 0.0)) for item in traces),
+        "terminal_escaped_total": terminal["escaped_total"],
+        "terminal_gross_trapping_total": terminal["gross_trapping_total"],
+        "terminal_gross_release_total": terminal["gross_release_total"],
+        "terminal_mobile_distance_population_total_m": terminal[
+            "mobile_distance_population_total_m"],
+        "scope": (
+            "prescribed-drive native subsystem integration fixture with a synthetic "
+            "shielding kernel; no specimen equilibrium solve and not a production campaign"
+        ),
     }
     (root / "restart_comparison.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     if report["status"] != "PASSED":

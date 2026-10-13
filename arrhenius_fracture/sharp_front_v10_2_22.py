@@ -134,6 +134,8 @@ def _prepare_option(
         * _env_float("PERSISTENT_SOURCE_MAX_WIDTH_UM", selected.mpz_length_um),
         implicit_tolerance=_env_float("PERSISTENT_SOURCE_IMPLICIT_TOL", 1.0e-10),
         implicit_max_iterations=_env_int("PERSISTENT_SOURCE_IMPLICIT_MAX_ITER", 96),
+        coupled_tolerance=_env_float("PERSISTENT_SOURCE_COUPLED_TOL", 1.0e-6),
+        coupled_max_iterations=_env_int("PERSISTENT_SOURCE_COUPLED_MAX_ITER", 64),
     ).validate()
 
     install_physical_front_width()
