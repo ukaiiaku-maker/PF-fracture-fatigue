@@ -361,6 +361,26 @@ def test_complete_state_round_trip_does_not_touch_ledgers_or_rng():
     assert capture_stochastic_state(engine) == stochastic
 
 
+def test_joint_transport_exchange_ledgers_are_checkpoint_owned():
+    engine = Engine()
+    expected = {
+        "recovered_total": 1.0,
+        "net_retained_gain_total": 2.0,
+        "net_retained_loss_total": 3.0,
+        "gross_trapping_total": 4.0,
+        "gross_release_total": 5.0,
+        "mobile_distance_population_total_m": 6.0,
+        "wake_discarded_mobile_total": 7.0,
+        "wake_discarded_retained_total": 8.0,
+        "wake_discarded_slip_total": 9.0,
+    }
+    for name, value in expected.items():
+        setattr(engine.mpz, name, value)
+    ledgers = capture_ledgers(engine)
+    for name, value in expected.items():
+        assert ledgers[f"mpz.{name}"] == value
+
+
 def test_one_cycle_map_preserves_first_passage_and_rng():
     engine = Engine(lambda_per_s=0.25, threshold=3.5, drift_per_cycle=0.5)
     stochastic = capture_stochastic_state(engine)

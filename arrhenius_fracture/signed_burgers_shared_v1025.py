@@ -860,6 +860,15 @@ def _signed_diagnostics(self, G=None, nu=None, b=None, r0=None) -> dict[str, Any
         "mpz_gross_trapping_total": self.gross_trapping_total,
         "mpz_gross_release_total": self.gross_release_total,
         "mpz_mobile_distance_population_total_m": self.mobile_distance_population_total_m,
+        "mpz_scalar_transport_velocity_m_s": float(
+            getattr(self, "scalar_transport_velocity_m_s", 0.0)
+        ),
+        "mpz_scalar_transport_displacement_m": float(
+            getattr(self, "scalar_transport_displacement_m", 0.0)
+        ),
+        "mpz_transport_velocity_producer": (
+            "population-weighted velocity consumed by signed scalar joint CTMC"
+        ),
         "mpz_exchange_transport_mode": _exchange_transport_mode(self),
         "mpz_wake_discarded_mobile_total": self.wake_discarded_mobile_total,
         "mpz_wake_discarded_retained_total": self.wake_discarded_retained_total,

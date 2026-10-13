@@ -1,6 +1,8 @@
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
+import numpy as np
 import pytest
 
 from arrhenius_fracture.parameter_registry_v9111 import select_option
@@ -10,7 +12,12 @@ from arrhenius_fracture.persistent_site_source_v10221 import (
     effective_front_width_m,
     persistent_site_multiplicity,
     solve_backstress_limited_activations,
+    install_persistent_site_source,
 )
+from arrhenius_fracture.signed_burgers_shared_v1025 import (
+    KERNEL_SCHEMA, SignedShieldingKernel, install_signed_burgers_population,
+)
+from arrhenius_fracture.unified_mpz import UnifiedMPZState
 
 
 def test_reference_width_and_density_scaling():
@@ -114,3 +121,125 @@ def test_engine_audit_declares_no_finite_inventory():
     assert audit["source_depletion_on_emission"] is False
     assert audit["source_refresh_on_crack_advance"] is False
     assert audit["site_multiplicity_in_arrhenius_hazard"] is True
+
+
+def _coupled_test_state():
+    class State:
+        _advect_forward = staticmethod(UnifiedMPZState._advect_forward)
+
+        def blunted_radius(self, r0, b):
+            return float(r0 + 0.1 * abs(b) * np.sum(self.accumulated_slip))
+
+        def local_stress_profile_Pa(self, stress):
+            return float(stress) * np.sqrt(1.0e-6 / (1.0e-6 + self.x))
+
+        def local_forest_density_m2(self, wake=False):
+            return 1.0e10 + np.sum(self.retained, axis=0) / (self.dx * 1.0e-6)
+
+        def emission_rate_per_site(self, stress, temperature):
+            return 0.02 * math.exp(max(float(stress), 0.0) / 1.0e9)
+
+        def _transport_rates(self, stress, rho, temperature, b):
+            n = self.n_bins
+            return {
+                "peierls": np.full(n, 4.0),
+                "taylor": np.full(n, 3.0),
+                "encounter": 10.0 + 1.0e-10 * np.asarray(rho),
+                "m": np.full(n, 2.0),
+                "velocity": np.full(n, 2.0e-6),
+            }
+
+    state = State()
+    state.n_systems = 1
+    state.n_bins = 8
+    state.length_m = 8.0e-6
+    state.dx = 1.0e-6
+    state.x = (np.arange(8) + 0.5) * state.dx
+    state.wake_n_bins = 8
+    state.wake_dx = state.dx
+    state.wake_x = state.x.copy()
+    state.cfg = SimpleNamespace(
+        source_bin_count=2, mobile_recovery_rate_s=0.0,
+        blunting_length_m=1.0e-6, forest_density_floor_m2=1.0e10,
+        taylor_stress_fraction=1.0 / math.sqrt(3.0), wake_shielding=False,
+        mobile_shield_fraction=0.0,
+    )
+    state.manifest = SimpleNamespace(
+        retained_recovery_rate_s=0.0, source_refresh_length_m=1.0e-6,
+    )
+    state.site_capacity = np.ones(1)
+    state.available_sites = np.ones(1)
+    for name in ("mobile", "retained", "accumulated_slip"):
+        setattr(state, name, np.zeros((1, 8)))
+    for name in ("wake_mobile", "wake_retained", "wake_slip"):
+        setattr(state, name, np.zeros((1, 8)))
+    for name in (
+        "emitted_total", "escaped_total", "recovered_total",
+        "net_retained_gain_total", "net_retained_loss_total",
+        "gross_trapping_total", "gross_release_total",
+        "mobile_distance_population_total_m", "advance_total_m",
+        "wake_discarded_mobile_total", "wake_discarded_retained_total",
+        "wake_discarded_slip_total", "time_s",
+    ):
+        setattr(state, name, 0.0)
+    kernel = SignedShieldingKernel(
+        active_kernel=np.ones((1, 8)), wake_kernel=np.zeros((1, 8)),
+        active_x_m=state.x.copy(), wake_x_m=state.x.copy(),
+        activation_to_line_content=np.array([1.0]),
+        source_capacity_bounds=np.array([[0.1, 10.0]]),
+        metadata={"schema": KERNEL_SCHEMA}, source_path="coupled-test",
+    )
+    install_signed_burgers_population(state, kernel, "validated_scalar")
+    state._campaign_G_Pa = 1.0e9
+    state._campaign_b = 1.0e-9
+    state._campaign_backstress_scale = 1.0
+    state._anisotropic_drive_reliable = True
+    state._anisotropic_drive_factors = np.array([1.0])
+    state._anisotropic_tau_signed_Pa = np.array([1.0])
+    install_persistent_site_source(
+        state,
+        config=PersistentSiteConfig(
+            rho_site0_m2=1.0e14, reference_source_area_m2=1.0e-12,
+            reference_front_width_m=1.0e-6, reference_density_m2=1.0e10,
+            source_zone_length_m=2.0e-6,
+        ),
+        r0_m=1.0e-6, b_m=1.0e-9,
+    )
+    return state
+
+
+def test_continuous_source_backstress_update_converges_under_time_partition():
+    def evolve(parts):
+        state = _coupled_test_state()
+        ledgers = np.zeros(5)
+        for _ in range(parts):
+            out = state._coupled_persistent_source_transport(
+                0.5 / parts, 5.0e8, 950.0, 1.0e-9
+            )
+            result = out["result"]
+            ledgers += (
+                result.escaped, result.gross_trapping, result.gross_release,
+                result.mobile_distance_population_m, out["emitted"],
+            )
+            assert out["coefficient_residual"] <= 1.0e-4
+            assert out["complementarity_residual"] <= 1.0e-4
+        vector = np.concatenate((
+            state.mobile_positive.ravel(), state.mobile_negative.ravel(),
+            state.retained_positive.ravel(), state.retained_negative.ravel(),
+            state.accumulated_slip_positive.ravel(),
+            state.accumulated_slip_negative.ravel(), ledgers,
+        ))
+        return vector
+
+    one, two, four, eight, sixteen, thirty_two = (
+        evolve(parts) for parts in (1, 2, 4, 8, 16, 32)
+    )
+    e12 = np.linalg.norm(one - two)
+    e24 = np.linalg.norm(two - four)
+    e48 = np.linalg.norm(four - eight)
+    e816 = np.linalg.norm(eight - sixteen)
+    e1632 = np.linalg.norm(sixteen - thirty_two)
+    assert e24 < e12
+    assert e48 < e24
+    assert e1632 < e816 < e48
+    assert e1632 / max(np.linalg.norm(thirty_two), 1.0) < 2.0e-3

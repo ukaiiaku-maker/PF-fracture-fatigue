@@ -13,7 +13,7 @@ import numpy as np
 
 IGNORED_KEYS = {
     "created_unix_s", "output_directory", "output_dir", "restart_from",
-    "wall_time_s", "elapsed_seconds",
+    "wall_time_s", "elapsed_seconds", "timestamp_unix_s",
 }
 
 
@@ -55,6 +55,9 @@ def _json_differences(left: Any, right: Any, path: str = "") -> list[str]:
         for index, (a, b) in enumerate(zip(left, right)):
             rows.extend(_json_differences(a, b, f"{path}/{index}"))
         return rows
+    if isinstance(left, float) and isinstance(right, float):
+        if np.isnan(left) and np.isnan(right):
+            return []
     return [] if left == right else [f"{path}: {left!r} != {right!r}"]
 
 
