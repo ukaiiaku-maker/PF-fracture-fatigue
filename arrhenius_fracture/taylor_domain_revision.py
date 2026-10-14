@@ -13,11 +13,15 @@ from pathlib import Path
 from typing import Iterable
 
 from .material_manifest import KB_EV_PER_K
+from .taylor_release import (
+    completion_rate, density_completion_order, signed_arrhenius_components,
+)
 
 T_MIN_K = 300.0
 T_MAX_K = 1300.0
 DEFAULT_MARGINS_EV = (0.10, 0.25, 0.50)
 MINIMUM_RAW_STRESS_PA = 1.0
+DEFAULT_BURGERS_M = 2.74e-10
 
 
 def sha256_file(path: str | Path) -> str:
@@ -176,9 +180,148 @@ def assert_amplitude_only(parent: dict[str, str], variant: dict[str, str]) -> No
         raise AssertionError(f"non-amplitude parameter change: {sorted(changed)}")
 
 
+def native_taylor_coordinates(
+    row: dict[str, str], *, raw_density_m2: float, barrier_argument_Pa: float,
+    burgers_m: float = DEFAULT_BURGERS_M,
+) -> dict[str, float | str | bool]:
+    """Map the Taylor surface argument back to every native stress coordinate."""
+    raw_density = float(raw_density_m2)
+    density = max(raw_density, float(row["rho_forest_floor_m2"]), 1.0)
+    spacing = 1.0 / (2.0 * math.sqrt(density))
+    amplification = spacing / max(abs(float(burgers_m)), 1.0e-30)
+    projection = float(row["taylor_stress_fraction"])
+    scale = projection * amplification
+    if scale <= 0.0:
+        raise ValueError("native Taylor projection and amplification must be positive")
+    argument = float(barrier_argument_Pa)
+    local = argument / scale
+    return {
+        "raw_forest_density_m2": raw_density,
+        "consumed_forest_density_m2": density,
+        "density_floor_was_active": density != raw_density,
+        "forest_spacing_m": spacing,
+        "burgers_m": abs(float(burgers_m)),
+        "amplification_phi": amplification,
+        "projection_fraction": projection,
+        "local_specimen_stress_Pa": local,
+        "projected_local_stress_before_amplification_Pa": projection * local,
+        "barrier_argument_Pa": argument,
+        "forward_coordinate_identity": "barrier_argument = projection_fraction * local_specimen_stress * amplification_phi",
+        "fixed_density_chain_rule": "dG/d(local_specimen_stress) = dG/d(barrier_argument) * projection_fraction * amplification_phi",
+    }
+
+
+def inverse_elementary_forward_contour(
+    surface, row: dict[str, str], *, temperature_K: float, rate_s: float,
+    densities_m2: Iterable[float],
+) -> dict[str, object]:
+    """Invert the one-way surface rate and verify it in that same coordinate."""
+    T_K = float(temperature_K)
+    rate = float(rate_s)
+    diagnostic = surface.diagnostic(0.0, T_K)
+    G0 = float(diagnostic["executed_G0_eV"])
+    floor = float(diagnostic["floor_eV"])
+    sigc = float(diagnostic["executed_sigc_Pa"])
+    target = -KB_EV_PER_K * T_K * math.log(rate / surface.attempt_frequency_s)
+    base: dict[str, object] = {
+        "rate_s": rate,
+        "target_barrier_eV": target,
+        "coordinate": "Taylor surface barrier argument; not specimen stress",
+    }
+    if not floor < target < G0 or surface.alpha <= 0.0 or surface.exponent <= 0.0:
+        return {**base, "status": "NO_FINITE_CONTOUR"}
+    ratio = (target - floor) / (G0 - floor)
+    argument = sigc * ((-math.log(ratio) / surface.alpha) ** (1.0 / surface.exponent))
+    forward = float(surface.rate(argument, T_K))
+    return {
+        **base,
+        "status": "FINITE_CONTOUR",
+        "barrier_argument_Pa": argument,
+        "exact_forward_rate_s": forward,
+        "relative_forward_error": abs(forward - rate) / rate,
+        "native_coordinate_conversions": [
+            native_taylor_coordinates(
+                row, raw_density_m2=density, barrier_argument_Pa=argument
+            )
+            for density in densities_m2
+        ],
+    }
+
+
+def inverse_net_completion_contour(
+    surface, row: dict[str, str], *, temperature_K: float,
+    completion_rate_s: float, raw_density_m2: float,
+) -> dict[str, object]:
+    """Invert the exact signed-net native Taylor completion mapping."""
+    T_K = float(temperature_K)
+    target = float(completion_rate_s)
+    coordinates_at_zero = native_taylor_coordinates(
+        row, raw_density_m2=raw_density_m2, barrier_argument_Pa=0.0
+    )
+    density = float(coordinates_at_zero["consumed_forest_density_m2"])
+    order = float(density_completion_order(
+        density,
+        correlation_scale=float(row["taylor_corr_scale"]),
+        correlation_density_m2=float(row["taylor_corr_rho_c_m2"]),
+    ))
+
+    def evaluated(argument: float) -> tuple[float, float, float, float]:
+        parts = signed_arrhenius_components(surface, float(argument), T_K)
+        forward = float(parts["forward_rate_s"])
+        reverse = float(parts["reverse_rate_s"])
+        net = float(parts["net_rate_s"])
+        completed = float(completion_rate(net, order))
+        return completed, forward, reverse, net
+
+    if not math.isfinite(target) or target <= 0.0:
+        raise ValueError("completion-rate contour must be positive and finite")
+    upper = max(float(surface.diagnostic(0.0, T_K)["executed_sigc_Pa"]), 1.0)
+    upper_value = evaluated(upper)[0]
+    for _ in range(80):
+        if upper_value >= target:
+            break
+        upper *= 2.0
+        upper_value = evaluated(upper)[0]
+    else:
+        return {
+            "status": "NO_FINITE_CONTOUR",
+            "target_completion_rate_s": target,
+            "raw_forest_density_m2": float(raw_density_m2),
+            "completion_order": order,
+            "maximum_bracketed_completion_rate_s": upper_value,
+        }
+    lower = 0.0
+    for _ in range(160):
+        middle = 0.5 * (lower + upper)
+        if evaluated(middle)[0] < target:
+            lower = middle
+        else:
+            upper = middle
+    argument = 0.5 * (lower + upper)
+    completed, forward, reverse, net = evaluated(argument)
+    coordinates = native_taylor_coordinates(
+        row, raw_density_m2=raw_density_m2, barrier_argument_Pa=argument
+    )
+    return {
+        "status": "FINITE_CONTOUR",
+        "target_completion_rate_s": target,
+        "completion_order": order,
+        "target_net_elementary_rate_s": target * order,
+        "forward_elementary_rate_s": forward,
+        "reverse_elementary_rate_s": reverse,
+        "exact_net_elementary_rate_s": net,
+        "exact_forward_completion_rate_s": completed,
+        "relative_forward_error": abs(completed - target) / target,
+        **coordinates,
+    }
+
+
 __all__ = [
-    "DEFAULT_MARGINS_EV", "MINIMUM_RAW_STRESS_PA", "T_MAX_K", "T_MIN_K",
+    "DEFAULT_BURGERS_M", "DEFAULT_MARGINS_EV", "MINIMUM_RAW_STRESS_PA",
+    "T_MAX_K", "T_MIN_K",
     "assert_amplitude_only", "construct_amplitude_rows", "linear_extrema",
+    "inverse_elementary_forward_contour", "inverse_net_completion_contour",
     "margin_token", "minimal_intercept_stress_candidate", "raw_emission_stress_extrema",
-    "raw_taylor_extrema", "read_rows", "required_taylor_reference", "sha256_file",
+    "native_taylor_coordinates", "raw_taylor_extrema", "read_rows",
+    "required_taylor_reference", "sha256_file",
 ]

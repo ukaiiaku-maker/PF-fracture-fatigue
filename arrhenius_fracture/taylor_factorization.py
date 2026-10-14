@@ -47,10 +47,16 @@ def raw_scales(row: dict[str, str], temperature_K: float) -> dict[str, float]:
         "emission_sigc_Pa": emit_sigc,
         "peierls_G0_eV": float(row["peierls_H0_eV"])
         - float(row["peierls_activation_entropy_kB"]) * KB_EV_PER_K * dT,
-        "peierls_sigc_Pa": float(row["peierls_stress_fraction"]) * emit_sigc,
+        "peierls_surface_sigc_Pa": emit_sigc,
+        "peierls_projected_equivalent_sigc_Pa": (
+            float(row["peierls_stress_fraction"]) * emit_sigc
+        ),
         "taylor_G0_eV": float(row["taylor_H0_eV"])
         - float(row["taylor_activation_entropy_kB"]) * KB_EV_PER_K * dT,
-        "taylor_sigc_Pa": float(row["taylor_stress_fraction"]) * emit_sigc,
+        "taylor_surface_sigc_Pa": emit_sigc,
+        "taylor_projected_equivalent_sigc_Pa": (
+            float(row["taylor_stress_fraction"]) * emit_sigc
+        ),
     }
 
 

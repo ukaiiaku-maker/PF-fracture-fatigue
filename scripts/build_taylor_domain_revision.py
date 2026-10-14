@@ -6,7 +6,6 @@ import argparse
 import csv
 import hashlib
 import json
-import math
 from pathlib import Path
 import subprocess
 import sys
@@ -16,14 +15,15 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from arrhenius_fracture.material_manifest import KB_EV_PER_K, MaterialManifest
+from arrhenius_fracture.material_manifest import MaterialManifest
 from arrhenius_fracture.parameter_registry_v9111 import (
     select_option, write_compatibility_manifest,
 )
 from arrhenius_fracture.taylor_domain_revision import (
     DEFAULT_MARGINS_EV, T_MAX_K, T_MIN_K, assert_amplitude_only,
-    construct_amplitude_rows, minimal_intercept_stress_candidate, read_rows,
-    sha256_file,
+    construct_amplitude_rows, inverse_elementary_forward_contour,
+    inverse_net_completion_contour, minimal_intercept_stress_candidate,
+    read_rows, sha256_file,
 )
 from arrhenius_fracture.taylor_factorization import evaluate_same_state, raw_scales
 
@@ -48,23 +48,6 @@ def _write_csv(path: Path, fields: list[str], rows: list[dict[str, str]]) -> Non
         writer.writerows(rows)
 
 
-def _inverse_elementary_contour(surface, T_K: float, rate_s: float) -> dict[str, object]:
-    diagnostic = surface.diagnostic(0.0, T_K)
-    G0 = float(diagnostic["executed_G0_eV"])
-    floor = float(diagnostic["floor_eV"])
-    sigc = float(diagnostic["executed_sigc_Pa"])
-    target = -KB_EV_PER_K * T_K * math.log(rate_s / surface.attempt_frequency_s)
-    if not floor < target < G0 or surface.alpha <= 0.0 or surface.exponent <= 0.0:
-        return {"rate_s": rate_s, "target_barrier_eV": target, "status": "NO_FINITE_CONTOUR"}
-    ratio = (target - floor) / (G0 - floor)
-    stress = sigc * ((-math.log(ratio) / surface.alpha) ** (1.0 / surface.exponent))
-    return {
-        "rate_s": rate_s, "target_barrier_eV": target,
-        "activated_resolved_stress_Pa": stress, "status": "FINITE_CONTOUR",
-        "stress_definition": "Taylor-surface argument after projection/amplification, not applied specimen stress",
-    }
-
-
 def _native_dossier(registry: Path, records: list[dict[str, object]]) -> list[dict[str, object]]:
     by_key = {str(item["variant_option_key"]): item for item in records}
     result: list[dict[str, object]] = []
@@ -87,7 +70,24 @@ def _native_dossier(registry: Path, records: list[dict[str, object]]) -> list[di
                 if valid:
                     item["zero_stress_native_diagnostic"] = surface.diagnostic(0.0, T_K)
                     item["inverse_elementary_rate_contours"] = [
-                        _inverse_elementary_contour(surface, T_K, rate)
+                        inverse_elementary_forward_contour(
+                            surface, row, temperature_K=T_K, rate_s=rate,
+                            densities_m2=(
+                                ratio * float(row["taylor_corr_rho_c_m2"])
+                                for ratio in DENSITY_RATIOS
+                            ),
+                        )
+                        for rate in RATE_CONTOURS_S
+                    ]
+                    item["inverse_native_net_completion_rate_contours"] = [
+                        inverse_net_completion_contour(
+                            surface, row, temperature_K=T_K,
+                            completion_rate_s=rate,
+                            raw_density_m2=(
+                                ratio * float(row["taylor_corr_rho_c_m2"])
+                            ),
+                        )
+                        for ratio in DENSITY_RATIOS
                         for rate in RATE_CONTOURS_S
                     ]
                     states = []
@@ -135,10 +135,10 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
         for variant in matches:
             assert_amplitude_only(parent, variant)
 
-    registry = output / "v10_2_31_taylor_domain_registry.csv"
+    registry = output / "v10_2_32_taylor_domain_registry.csv"
     _write_csv(registry, fields, variants)
     variant_selection = {
-        "schema": "v10.2.31-taylor-domain-selection/1",
+        "schema": "v10.2.32-taylor-domain-selection/1",
         "status": "PROSPECTIVE_CONSTRUCTED_NOT_MATERIAL_CALIBRATED",
         "source_head": _git_head(),
         "declared_continuous_temperature_domain_K": [T_MIN_K, T_MAX_K],
@@ -158,7 +158,7 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
         "production_selection": None,
         "checkpoint_policy": "old checkpoints require an explicitly labeled state-transfer diagnostic; they are not resumable as current-parameter physics",
     }
-    selection_path = output / "v10_2_31_taylor_domain_selection.json"
+    selection_path = output / "v10_2_32_taylor_domain_selection.json"
     selection_path.write_text(json.dumps(variant_selection, indent=2, sort_keys=True) + "\n")
 
     invalid_parents = [row for row in parents if min(
@@ -168,7 +168,7 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
     minimal = [minimal_intercept_stress_candidate(row) for row in invalid_parents]
     approved = select_option(APPROVED_ALTERNATIVE_KEY, APPROVED_ALTERNATIVE_REGISTRY)
     stress_payload = {
-        "schema": "v10.2.31-shared-stress-scale-candidates/1",
+        "schema": "v10.2.32-shared-stress-scale-candidates/1",
         "status": "EXPLICIT_PROSPECTIVE_ALTERNATIVES_NOT_SELECTED",
         "domain_K": [T_MIN_K, T_MAX_K],
         "invalid_selected_parent_count": len(invalid_parents),
@@ -184,11 +184,11 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
         },
         "production_selection": None,
     }
-    stress_path = output / "v10_2_31_shared_stress_scale_candidates.json"
+    stress_path = output / "v10_2_32_shared_stress_scale_candidates.json"
     stress_path.write_text(json.dumps(stress_payload, indent=2, sort_keys=True) + "\n")
 
     dossier = {
-        "schema": "v10.2.31-taylor-domain-dossier/1",
+        "schema": "v10.2.32-taylor-domain-dossier/2",
         "status": "PASS_TAYLOR_AMPLITUDE_DOMAIN_WITH_SEPARATE_SHARED_STRESS_DISPOSITION",
         "taylor_amplitude_domain_status": "PASS_ALL_12_CONTINUOUS_INTERVAL_CONSTRUCTIONS",
         "shared_stress_scale_status": "ONE_SELECTED_PARENT_INVALID; EXPLICIT_UNSELECTED_CANDIDATES_RECORDED",
@@ -196,10 +196,11 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
         "derivative_conventions": [
             "fixed physical stress and frozen external state",
             "fixed normalized stress reported separately by native diagnostic",
+            "at fixed density, dG/dsigma_local = dG/dtau_T * f_T * phi, where tau_T=f_T*sigma_local*phi",
         ],
         "records": _native_dossier(registry, records),
     }
-    dossier_path = output / "v10_2_31_taylor_domain_dossier.json"
+    dossier_path = output / "v10_2_32_taylor_domain_dossier.json"
     dossier_path.write_text(json.dumps(dossier, indent=2, sort_keys=True) + "\n")
     manifest = {path.name: sha256_file(path) for path in sorted(output.iterdir())}
     (output / "sha256_manifest.json").write_text(

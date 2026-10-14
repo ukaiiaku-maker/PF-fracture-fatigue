@@ -3,21 +3,24 @@ import json
 import hashlib
 from pathlib import Path
 
+import pytest
+
 from arrhenius_fracture.material_manifest import MaterialManifest
 from arrhenius_fracture.parameter_registry_v9111 import (
     select_option, write_compatibility_manifest,
 )
 from arrhenius_fracture.taylor_domain_revision import (
     T_MAX_K, T_MIN_K, assert_amplitude_only, construct_amplitude_rows,
-    minimal_intercept_stress_candidate, raw_taylor_extrema, read_rows,
-    required_taylor_reference,
+    inverse_elementary_forward_contour, inverse_net_completion_contour,
+    minimal_intercept_stress_candidate, native_taylor_coordinates,
+    raw_taylor_extrema, read_rows, required_taylor_reference,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv"
-REVISION_ROOT = ROOT / "arrhenius_fracture/data/materials/v10_2_31_taylor_domain"
-REVISION_REGISTRY = REVISION_ROOT / "v10_2_31_taylor_domain_registry.csv"
+REVISION_ROOT = ROOT / "arrhenius_fracture/data/materials/v10_2_32_taylor_domain"
+REVISION_REGISTRY = REVISION_ROOT / "v10_2_32_taylor_domain_registry.csv"
 
 
 def _rows():
@@ -66,7 +69,7 @@ def test_dbtt_minimal_intercept_is_separate_shared_law_candidate():
 
 
 def test_saved_revision_hashes_and_all_rows_resolve_through_native_constructor(tmp_path):
-    selection_path = REVISION_ROOT / "v10_2_31_taylor_domain_selection.json"
+    selection_path = REVISION_ROOT / "v10_2_32_taylor_domain_selection.json"
     selection = json.loads(selection_path.read_text())
     assert selection["production_selection"] is None
     assert len(selection["source_head"]) == 40
@@ -91,11 +94,67 @@ def test_saved_revision_hashes_and_all_rows_resolve_through_native_constructor(t
 
 def test_saved_stress_scale_candidates_are_explicit_and_unselected():
     payload = json.loads((
-        REVISION_ROOT / "v10_2_31_shared_stress_scale_candidates.json"
+        REVISION_ROOT / "v10_2_32_shared_stress_scale_candidates.json"
     ).read_text())
     assert payload["invalid_selected_parent_count"] == 1
     assert payload["production_selection"] is None
     assert payload["existing_approved_alternative"]["option_key"] == "dbtt_primary"
     assert payload["existing_approved_alternative"]["substitution_status"].startswith(
         "not substituted"
+    )
+
+
+def test_taylor_inverse_coordinates_close_exact_native_forward_map(tmp_path):
+    row = _rows()[0]
+    variants, _ = construct_amplitude_rows([row], (0.10,))
+    fields = list(variants[0])
+    registry = tmp_path / "registry.csv"
+    import csv
+    with registry.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        writer.writerow(variants[0])
+    selected = select_option(variants[0]["option_key"], registry)
+    manifest_path = tmp_path / "manifest.csv"
+    write_compatibility_manifest(selected, manifest_path)
+    surface = MaterialManifest.from_csv(manifest_path).taylor.as_surface(
+        MaterialManifest.from_csv(manifest_path).emission
+    )
+    rho_c = float(variants[0]["taylor_corr_rho_c_m2"])
+
+    elementary = inverse_elementary_forward_contour(
+        surface, variants[0], temperature_K=800.0, rate_s=1.0e6,
+        densities_m2=(rho_c,),
+    )
+    assert elementary["status"] == "FINITE_CONTOUR"
+    assert elementary["relative_forward_error"] < 1.0e-12
+    coordinates = elementary["native_coordinate_conversions"][0]
+    assert coordinates["barrier_argument_Pa"] == pytest.approx(
+        coordinates["projection_fraction"]
+        * coordinates["local_specimen_stress_Pa"]
+        * coordinates["amplification_phi"]
+    )
+
+    completed = inverse_net_completion_contour(
+        surface, variants[0], temperature_K=800.0,
+        completion_rate_s=1.0e6, raw_density_m2=rho_c,
+    )
+    assert completed["status"] == "FINITE_CONTOUR"
+    assert completed["relative_forward_error"] < 1.0e-12
+    assert completed["exact_forward_completion_rate_s"] == pytest.approx(1.0e6)
+    assert completed["barrier_argument_Pa"] == pytest.approx(
+        completed["projection_fraction"]
+        * completed["local_specimen_stress_Pa"]
+        * completed["amplification_phi"]
+    )
+
+
+def test_native_coordinate_conversion_applies_density_floor():
+    row = _rows()[0]
+    coordinate = native_taylor_coordinates(
+        row, raw_density_m2=1.0, barrier_argument_Pa=2.0e9
+    )
+    assert coordinate["density_floor_was_active"] is True
+    assert coordinate["consumed_forest_density_m2"] == float(
+        row["rho_forest_floor_m2"]
     )
