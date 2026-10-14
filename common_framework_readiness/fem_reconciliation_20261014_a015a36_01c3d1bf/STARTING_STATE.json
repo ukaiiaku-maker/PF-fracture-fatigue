@@ -1,0 +1,35 @@
+{
+  "schema": "fem-reconciliation-starting-state/1",
+  "date": "2026-10-14",
+  "pf": {
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1",
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "head": "01c3d1bf50653f5c160065cf672bcc09b7760046",
+    "partial_clone": true,
+    "remote": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
+    "tracked_dirty_before_mission": false,
+    "untracked_historical_evidence_present_and_preserved": true,
+    "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "imported_package": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/__init__.py"
+  },
+  "fem_czm": {
+    "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
+    "branch": "codex/current-pf-companion",
+    "head": "a015a36b07a8887e7bc42f63f2bc39f42e3470f6",
+    "partial_clone": false,
+    "remote": "https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ.git",
+    "tracked_dirty_before_mission": false,
+    "preexisting_untracked_user_file_preserved": "v1005135_candidate_audit.json",
+    "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+    "imported_package": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion/arrhenius_fracture/__init__.py"
+  },
+  "recovery_refs": "refs/codex-recovery/fem-reconciliation-start-20261014 in both repositories",
+  "fem_donor_worktree": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/Arrhenius_FEM_CZM_MPZ_v10_0_5_17_paper7_self_contained",
+    "head": "293491157063484bb10df6adc479f847a6a08ba6"
+  },
+  "pf_worktree_inventory": "Recorded by git worktree list; includes base 9e884fb0, local V10.4 donors, c04 replay and R12 clean portability worktrees.",
+  "free_space_GiB": 30,
+  "active_process_inventory": "unavailable in the managed sandbox; no production worker was launched by this mission",
+  "destructive_actions": false
+}

@@ -1,0 +1,71 @@
+{
+  "schema": "fem-reconciliation-runtime-attestation/1",
+  "date": "2026-10-14",
+  "production_campaign_executed": false,
+  "constitutive_physics_changed": false,
+  "historical_reference": {
+    "commit": "23463cac72ebbc3be9eb53ea9fd86229102e1e98",
+    "regenerated_not_original_archived_bytes": true,
+    "current_and_historical_scientific_payload_equal_full_precision": true,
+    "opening_1um": {
+      "G_J_per_m2": 28.789526830110503,
+      "median_J_J_per_m2": 28.468695078083666,
+      "J_over_G": 0.9888559560592957,
+      "derivative_consistency_relative_error": 0.015401631559229462
+    },
+    "opening_2um_scales_by_four": true
+  },
+  "invalid_prior_generic_protocol": {
+    "selected_support_spacing_m": [1.225e-5, 1.225e-5, 1.1025e-5],
+    "strictly_refined": false,
+    "reported_medium_to_fine_max_relative_change": 0.1281599292814948,
+    "common_observer": "algebraic_KJ_squared_over_Eprime",
+    "common_observer_independent": false,
+    "classification": "demonstrated qualification-protocol regression"
+  },
+  "controlled_current_support_convergence": {
+    "status": "PASS",
+    "support_h_over_L_pz": [0.245, 0.18, 0.12],
+    "nodes": [1539, 2653, 5724],
+    "medium_to_fine_relative_change": {
+      "reaction": 0.002276360290384409,
+      "stored_energy": 0.0022763602905347827,
+      "fixed_grip_G": 0.015870477833989573,
+      "native_full_energy_J": 0.004172438249466202
+    },
+    "relative_tolerance": 0.02,
+    "fine_J_over_G": 0.8229384003154491,
+    "historical_observer_parity_claimed": false
+  },
+  "native_lifecycle_tests": {
+    "passed": 78,
+    "skipped": 0,
+    "failed": 0,
+    "capabilities": [
+      "atomic exact-endpoint path insertion and rollback",
+      "cohesive remeshing and quality gates",
+      "bulk integration-state transfer",
+      "same-load post-event equilibrium",
+      "moving-tip process-zone translation without repeated checkpoint advance",
+      "persistent signed-state restart",
+      "cohesive active-damage restart"
+    ]
+  },
+  "retained_actual_event_evidence": {
+    "path": "integration_evidence/final_fracture_campaign/fem_czm_peak1000_theta0_seed8666_tip_only_matched_run5",
+    "physical_events": 4,
+    "successful_atomic_transactions": 4,
+    "failed_atomic_transactions": 0,
+    "exact_endpoints": true,
+    "complete_event_remeshed_before_cohesive_commit": true,
+    "run_completed_without_exception": false,
+    "terminal_issue": "physical-refinement metadata unavailable to final attestation",
+    "law_provenance": "historical retained run; not current-law effect-size evidence"
+  },
+  "generic_active_state_restart": {
+    "native_capability_preserved": true,
+    "shared_interface_wired": false,
+    "fail_closed": true
+  }
+}
+

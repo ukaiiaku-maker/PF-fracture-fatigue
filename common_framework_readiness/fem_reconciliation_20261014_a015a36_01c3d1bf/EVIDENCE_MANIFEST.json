@@ -1,0 +1,25 @@
+{
+  "schema": "fem-reconciliation-evidence-manifest/1",
+  "files": [
+    {
+      "path": "../GENERIC_FEM_THREE_LEVEL_CONVERGENCE.json",
+      "sha256": "8729433d785fa13f3ca41bf7ec4dc448bbae17fd6729f12c71087dfbdf0db9da",
+      "role": "preserved original failed receipt; not overwritten"
+    },
+    {
+      "path": "evidence/prior_generic_protocol_reclassified.json",
+      "sha256": "15a3903c7a76f5a5539eb447c16e7f7e947d6daf3cb592c44181c24f479df43f",
+      "role": "same retained levels reclassified by the discriminating regression"
+    },
+    {
+      "path": "evidence/fem_baseline_reconciliation_v1.json",
+      "sha256": "264b677d8410e02dcefed696d545c4f87c4df89760b297ee4968e70bcac3e987",
+      "role": "corrected independently evaluated physical-support convergence"
+    }
+  ],
+  "temporary_historical_reproduction": {
+    "source_commit": "23463cac72ebbc3be9eb53ea9fd86229102e1e98",
+    "artifact_kind": "regenerated from exact source, not represented as original archived bytes",
+    "scientific_payload_captured_in": "RUNTIME_CAPABILITY_ATTESTATION.json"
+  }
+}

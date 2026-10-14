@@ -1,0 +1,121 @@
+{
+  "common_observer": {
+    "independent_field_evaluation": false,
+    "provenance": "algebraic_KJ_squared_over_Eprime",
+    "validation_role": "unit conversion only"
+  },
+  "interpretation": "The retained generic runs execute three requested initial-tip spacings, but the first two use the same path-envelope support spacing and the third changes support only after the quality search. This is not a controlled support-refinement sequence. KJ^2/Eprime is derived from native J and is not an independent common field observer. The original 2% receipt remains preserved as a failed protocol result.",
+  "levels": [
+    {
+      "common_isotropic_plane_strain_J_J_per_m2": 0.48045518810756743,
+      "common_observer_independent_field_evaluation": false,
+      "common_observer_provenance": "algebraic_KJ_squared_over_Eprime",
+      "common_to_native_J_relative_difference": 0.0015127452316730152,
+      "directory": "level_1",
+      "initial_hbar_tip_m": 4.2828994692272265e-06,
+      "material_option": "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+      "maximum_sampled_hbar_tip_m": 6.042057190504643e-06,
+      "native_J_J_per_m2": 0.4797294796247721,
+      "native_KJ_Pa_sqrt_m": 461975.4517021768,
+      "node_count": 1493,
+      "remote_half_opening_m": 1e-07,
+      "selected_support_h_over_L_pz": 0.245,
+      "selected_support_spacing_m": 1.2249999999999998e-05,
+      "sha256": {
+        "anisotropic_calibrated_tip_first_passage_summary.json": "d304625a097f6c5e27fa386db20eb8f84e2e1ff6a27e4547ebc6f8b8474f7643",
+        "compact_corridor_mesh_v91852.json": "3d24f93e496a28bcd576a682b0332a71be39602283489e5a56e7ef8705c27d61",
+        "generic_current_pf_companion_contract_v1.json": "691736d3983a9870b5afef2f1ce5d27286f7cf7942d5cba942280858619d6bc5",
+        "run_args.json": "f25eb604ce580783f484615475958af803524a8e716eafdcd19b0cb2a9c71482",
+        "steps_0900K.csv": "2b7359f7dcb9ecf041896c62ad64d5436b75cc4cf7b6dc7b8cd919c456221370"
+      },
+      "sigma_tip_Pa": 184141385.71780035,
+      "top_reaction_N_per_unit_thickness": 19532.557734510316,
+      "triangle_count": 2860
+    },
+    {
+      "common_isotropic_plane_strain_J_J_per_m2": 0.4805677060618933,
+      "common_observer_independent_field_evaluation": false,
+      "common_observer_provenance": "algebraic_KJ_squared_over_Eprime",
+      "common_to_native_J_relative_difference": 0.0015127452316728302,
+      "directory": "level_2",
+      "initial_hbar_tip_m": 2.916095966696485e-06,
+      "material_option": "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+      "maximum_sampled_hbar_tip_m": 5.2145775746635565e-06,
+      "native_J_J_per_m2": 0.4798418276251961,
+      "native_KJ_Pa_sqrt_m": 462029.54362488136,
+      "node_count": 1539,
+      "remote_half_opening_m": 1e-07,
+      "selected_support_h_over_L_pz": 0.245,
+      "selected_support_spacing_m": 1.2249999999999998e-05,
+      "sha256": {
+        "anisotropic_calibrated_tip_first_passage_summary.json": "08964211c107d54c46be5abe77d9b526048df10a21c46cbea58746aea5176303",
+        "compact_corridor_mesh_v91852.json": "3dcf7d3233d94425c19d38fe1a5197664cd4e16e7a01e258cb7e2d050f3c759d",
+        "generic_current_pf_companion_contract_v1.json": "7c162c571e1a87b7c4101b0452c3af3b95a2871277520cb5d283faa4631b52a0",
+        "run_args.json": "03b622480e757c3ecdfcc2e27efb0c92c1927a07dd7d4a77fba386b35a676046",
+        "steps_0900K.csv": "97996993dcafe9ebf54e1a84c63acc3fe9bd040e3770219157219a1343e35855"
+      },
+      "sigma_tip_Pa": 184148406.0150664,
+      "top_reaction_N_per_unit_thickness": 19532.200112046306,
+      "triangle_count": 2952
+    },
+    {
+      "common_isotropic_plane_strain_J_J_per_m2": 0.42597480515724256,
+      "common_observer_independent_field_evaluation": false,
+      "common_observer_provenance": "algebraic_KJ_squared_over_Eprime",
+      "common_to_native_J_relative_difference": 0.0015127452316728242,
+      "directory": "level_3",
+      "initial_hbar_tip_m": 2.2848542559721864e-06,
+      "material_option": "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+      "maximum_sampled_hbar_tip_m": 4.711591171602064e-06,
+      "native_J_J_per_m2": 0.42533138712948165,
+      "native_KJ_Pa_sqrt_m": 434995.14674800955,
+      "node_count": 1868,
+      "remote_half_opening_m": 1e-07,
+      "selected_support_h_over_L_pz": 0.2205,
+      "selected_support_spacing_m": 1.1024999999999999e-05,
+      "sha256": {
+        "anisotropic_calibrated_tip_first_passage_summary.json": "c8aed0302fd5c134b74f7e79b831fc8a534a7b32043a67a8d7dbbd8abc59870c",
+        "compact_corridor_mesh_v91852.json": "614999766de4980723be9c80a012e236be39fc4e295961d2643c1d1fa3182329",
+        "generic_current_pf_companion_contract_v1.json": "3b685e965bed7703448c23dacf19f730bb7eb99d5d054380eb5f6d8d958bcd5b",
+        "run_args.json": "356df451a1834bf2375e97810b9718d2f53a01ee0fd9fd96482090a602294a2a",
+        "steps_0900K.csv": "21a201bcbbdc604c5abdc093bbfadfdd6655ef293d0c0894e5944e7df00cf269"
+      },
+      "sigma_tip_Pa": 173387154.6801043,
+      "top_reaction_N_per_unit_thickness": 19944.651240109903,
+      "triangle_count": 3596
+    }
+  ],
+  "maximum_medium_to_fine_relative_change": 0.1281599292814948,
+  "no_fitted_scale_factor": true,
+  "refinement_axis": {
+    "quantity": "selected path-envelope support spacing",
+    "requested_tip_h_is_not_a_proxy_for_envelope_support": true,
+    "strictly_refined": false,
+    "values_m": [
+      1.2249999999999998e-05,
+      1.2249999999999998e-05,
+      1.1024999999999999e-05
+    ]
+  },
+  "relative_changes": {
+    "native_J_J_per_m2": {
+      "coarse_to_medium": 0.00023413548789620925,
+      "medium_to_fine": 0.1281599292814948
+    },
+    "native_KJ_Pa_sqrt_m": {
+      "coarse_to_medium": 0.00011707459717869195,
+      "medium_to_fine": 0.06214873218466666
+    },
+    "sigma_tip_Pa": {
+      "coarse_to_medium": 3.812304118158859e-05,
+      "medium_to_fine": 0.06206487069250537
+    },
+    "top_reaction_N_per_unit_thickness": {
+      "coarse_to_medium": 1.8309379484015314e-05,
+      "medium_to_fine": 0.020679786429864056
+    }
+  },
+  "relative_tolerance": 0.02,
+  "schema": "generic-fem-three-level-pre-event-convergence/1",
+  "status": "FAIL_INVALID_REFINEMENT_AXIS"
+}

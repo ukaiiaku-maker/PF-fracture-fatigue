@@ -1,0 +1,81 @@
+{
+  "schema": "fracture-development-lineage-and-coverage/1",
+  "date": "2026-10-14",
+  "current_source_pair_at_audit_start": {
+    "pf": "01c3d1bf50653f5c160065cf672bcc09b7760046",
+    "fem_czm": "a015a36b07a8887e7bc42f63f2bc39f42e3470f6"
+  },
+  "fem_reconciliation_commit": "14bc458",
+  "pf_qualification_repair_commit": "db95906c",
+  "recovery_refs_created": {
+    "pf": "refs/codex-recovery/fem-reconciliation-start-20261014",
+    "fem_czm": "refs/codex-recovery/fem-reconciliation-start-20261014"
+  },
+  "fem_anchors": [
+    {"commit": "2b9122b19ed333827c8801faac7e5a9cc50fbff4", "role": "v10.0.5.8 fixed-grip elastic convergence; local object verified"},
+    {"commit": "23463cac72ebbc3be9eb53ea9fd86229102e1e98", "role": "recovered v10.0.5.11 same-mesh FEM/J benchmark"},
+    {"commit": "293491157063484bb10df6adc479f847a6a08ba6", "role": "qualified theta0 PF-parity preset and retained event lineage"},
+    {"commit": "8a86519", "role": "orientation repair; local object verified"},
+    {"commit": "90cb6671523bb676cb241eb850b7f5fd41cf5461", "role": "later FEM companion; local object verified"},
+    {"commit": "a015a36b07a8887e7bc42f63f2bc39f42e3470f6", "role": "current generic PF-companion FEM entry"}
+  ],
+  "pf_anchor_availability": {
+    "local_objects_verified": [
+      "9e884fb0b0845da621d2612bdf1042e481b8df49",
+      "baedb069c912db69032eea8b339cb01b4bf97278",
+      "b927dac18c58f2fb896fe3520fb4c23ba950ec7e",
+      "2276745b06220125354687f04c182c8d11be66dd",
+      "8736c5d0a85e7b60a2a9dc6f29c46b2b61cb4a78",
+      "ab771c8a84897c7727fb73a769cc68485aeacab8",
+      "0a6b817112d7d09c16bdf91216488ac5143122d6"
+    ],
+    "not_objects_in_current_partial_clone": [
+      "9e2c43ebfb42d6694c27f01ea9092e79da7e3a06",
+      "94871be15702e7fb85116b92af62c1226c61be42",
+      "0a0e522291882bd13e0d03c7e231fd8a6627aa4f",
+      "a2a90cd5b448dc7daf8e83711389e25da49d3757",
+      "f75194852107e4cf39b156bca1bb7789cf02d76f"
+    ],
+    "handling": "Roles remain covered by the existing capability matrix, integration records, preserved snapshots and receipts. Absence from this partial clone is recorded as unavailable Git-object evidence, not loss of capability and not authority to fetch unrelated histories."
+  },
+  "historical_core_blobs_equal_to_current": {
+    "arrhenius_fracture/mesh.py": "c375896702a60c01fc36c0565487b7981cd2454d",
+    "arrhenius_fracture/fem.py": "783f098ea857be15c19badbc5e041fe90a9b6faf",
+    "arrhenius_fracture/j_integral.py": "334bff7732c368c20d266dc2ec84009b1e07804e",
+    "arrhenius_fracture/physical_refinement_mesh_v100510.py": "a58826389080f6c825274164b16eba3f727c2d66",
+    "arrhenius_fracture/production_j_same_mesh_energy_v100511.py": "ccb302f1ca84a56e88081bc76b2ca13a9ed760ed",
+    "run_v10_0_5_11_same_mesh_energy_audit.py": "58071b872863741a7d4a3798a3f652b263ee9eb5"
+  },
+  "coverage_classification": [
+    {"capability": "historical production-mesh FEM/J", "classification": "native capability preserved and connected"},
+    {"capability": "physical path-envelope mesh support", "classification": "native capability preserved and connected"},
+    {"capability": "atomic cohesive remeshing and state transfer", "classification": "native capability preserved and connected"},
+    {"capability": "native cohesive and persistent-state serialization", "classification": "native capability preserved and connected"},
+    {"capability": "generic specimen active-state restart", "classification": "native capability preserved but not wired through shared interface"},
+    {"capability": "old generic three-level convergence qualification", "classification": "demonstrated regression in qualification protocol"},
+    {"capability": "current physical-support field benchmark", "classification": "genuinely new extension"},
+    {"capability": "historical/current J-G parity on path-envelope topology", "classification": "unavailable evidence; discrepancy isolated but not resolved"},
+    {"capability": "rejected historical Taylor completion laws", "classification": "intentional and authorized supersession; diagnostic only"}
+  ],
+  "inspected_runtime_surfaces": [
+    "historical/current mesh.py, fem.py and j_integral.py blob identity",
+    "physical_refinement_mesh_v100510 and v10.0.5.11 same-mesh observer",
+    "Phase-C physical contour radius to legacy ell conversion (factor eight applied once)",
+    "explicit-zero orientation preservation at cbb6e51 in the live v9.11 consumer; older inactive modules retaining `or 45` were not mistaken for the active route",
+    "v10.0.5.18.3.4 reachable path-envelope construction",
+    "generic current PF-companion request normalization and fail-closed axes",
+    "v10.0.5.18.3.9 atomic path-corridor remeshing and local-scale quality",
+    "event-driven same-load equilibrium and remesh audit",
+    "bulk remesh state transfer",
+    "moving-tip persistent signed state and checkpoint ownership",
+    "cohesive irreversible state serialization and restart"
+  ],
+  "coverage_limits": [
+    "No network fetch was needed for the demonstrated FEM divergence; the PF repository is a partial clone and listed missing donor objects were not represented as inspected commits.",
+    "The retained actual four-event result uses historical kinetics and terminates at a refinement-metadata attestation; it is transition evidence only.",
+    "Branch and cavity transitions retain their existing ledger qualifications; they were not replayed because no changed FEM reconciliation source intersects those implementations.",
+    "Generic active-state restart remains unwired and was not simulated by relabeling native serializer unit coverage."
+  ],
+  "preservation_statement": "No branch, worktree, source snapshot, result, checkpoint, or manuscript artifact was deleted or reset. Historical alternatives remain non-default and diagnostic-only."
+}
+

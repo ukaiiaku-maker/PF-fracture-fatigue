@@ -1,0 +1,34 @@
+{
+  "schema": "fem-reconciliation-regression-coverage/1",
+  "date": "2026-10-14",
+  "groups": [
+    {
+      "repository": "PF/shared",
+      "tests": ["tests/test_generic_fem_convergence_qualification.py"],
+      "result": "1 passed",
+      "discriminates": "requested tip spacing versus actual selected physical-support spacing and independent versus algebraic observer"
+    },
+    {
+      "repository": "FEM/CZM",
+      "tests": ["tests/test_fem_baseline_reconciliation_v1.py", "tests/test_v100511_same_mesh_energy.py"],
+      "result": "8 passed",
+      "discriminates": "strict support axis, unequal-station energy derivative, 2% current field convergence, and recovered historical same-mesh behavior"
+    },
+    {
+      "repository": "FEM/CZM",
+      "tests": ["tests/test_atomic_path_corridor_v10051839.py", "tests/test_event_driven_remesh_v914.py", "tests/test_bulk_remesh_transfer_v911.py", "tests/test_cohesive_trial_state_v10.py", "tests/test_kinetic_cohesive_stepper_v10.py", "tests/test_v1005131_preserved_state.py"],
+      "result": "25 passed, 1 skipped in the shared PF interpreter; the optional triangulator path passes in the dedicated FEM interpreter",
+      "discriminates": "topology transaction, rollback, transfer, equilibrium and cohesive event state"
+    },
+    {
+      "repository": "FEM/CZM",
+      "tests": ["tests/test_moving_tip_coupling_v100515.py", "tests/test_persistent_site_v100514.py", "tests/test_signed_kernel_family_v1005141.py", "tests/test_bilinear_czm_native.py", "tests/test_generic_current_pf_companion.py", "tests/test_event_hook_v914.py", "tests/test_progressive_event_lifecycle_transform_v1002.py", "tests/test_v100518_runner_contract.py"],
+      "result": "49 passed",
+      "discriminates": "moving-tip ownership, signed state, native restart, generic fail-closed axes and event lifecycle"
+    }
+  ],
+  "deduplicated_targeted_fem_group": {"passed": 78, "skipped": 0, "failed": 0, "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"},
+  "full_fem_suite": {"passed": 701, "skipped": 0, "subtests_passed": 16, "failed": 0, "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"},
+  "pf_shared_contract_group": {"passed": 41, "failed": 0}
+}
+

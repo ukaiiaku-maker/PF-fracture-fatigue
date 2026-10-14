@@ -1,0 +1,296 @@
+{
+  "algebraic_K_squared_over_Eprime_used_as_validation": false,
+  "common_observer_is_field_independent": true,
+  "config": {
+    "C11_Pa": 523000000000.0,
+    "C12_Pa": 203000000000.0,
+    "C44_Pa": 160000000000.0,
+    "crack_m": 0.0005,
+    "crystal_theta_deg": 17.5,
+    "energy_perturbation_m": 2.2e-05,
+    "height_m": 0.004,
+    "kappa": 1e-06,
+    "minimum_global_forward": 0.05,
+    "notch_half_thickness_m": 8e-05,
+    "nx": 24,
+    "ny": 48,
+    "physical_event_m": 5e-06,
+    "physical_refinement_radius_m": 0.00033,
+    "process_zone_m": 5e-05,
+    "relative_tolerance": 0.02,
+    "target_plus_guard_m": 1.5e-05,
+    "tip_h_fine_m": 2e-06,
+    "tip_ratio": 1.2,
+    "total_grip_opening_m": 2e-07,
+    "width_m": 0.002
+  },
+  "levels": [
+    {
+      "effective_crack_stations_m": [
+        0.0005,
+        0.000520625,
+        0.00054159780352
+      ],
+      "energy_closure_relative_error": 9.32543157723804e-15,
+      "field_norms": {
+        "displacement_l2_dof_norm_m": 2.251081927599384e-06,
+        "stress_area_l2_Pa_sqrt_m2": 59014.265017862606,
+        "stress_area_mean_Pa": 19797382.13019944
+      },
+      "fixed_grip_G_J_per_m2": 2.183237212997412,
+      "forward_derivative_relative_error": 0.01316295115444735,
+      "independent_primary_observer": "same_mesh_fixed_grip_energy_derivative",
+      "matrix_energy_J_per_m": 0.0039064350742148025,
+      "maximum_sampled_hbar_m": 5.214577574663557e-06,
+      "maximum_sampled_hbar_over_L_pz": 0.10429155149327114,
+      "minimum_triangle_quality": 0.20081790922513826,
+      "native_J_over_fixed_grip_G": 0.8848292956939392,
+      "native_full_energy_J_contours": [
+        {
+          "J_active_elements": 473,
+          "J_full_J_per_m2": 1.828600032461331,
+          "J_full_signed_J_per_m2": 1.828600032461331,
+          "J_tension_filtered_J_per_m2": 1.8286519111855528,
+          "J_tension_filtered_signed_J_per_m2": 1.8286519111855528,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9019450031719799,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9019577975018984,
+          "annulus_radial_elements_estimate": 11.020408163265307,
+          "annulus_width_m": 0.000135,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.00018,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 1.225e-05
+        },
+        {
+          "J_active_elements": 536,
+          "J_full_J_per_m2": 1.9317922455092986,
+          "J_full_signed_J_per_m2": 1.9317922455092986,
+          "J_tension_filtered_J_per_m2": 1.93189456974366,
+          "J_tension_filtered_signed_J_per_m2": 1.93189456974366,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9270451892075774,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9270697410022435,
+          "annulus_radial_elements_estimate": 14.69387755102041,
+          "annulus_width_m": 0.00018,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.00024,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 1.225e-05
+        },
+        {
+          "J_active_elements": 622,
+          "J_full_J_per_m2": 1.9549015251592499,
+          "J_full_signed_J_per_m2": 1.9549015251592499,
+          "J_tension_filtered_J_per_m2": 1.9550422897174071,
+          "J_tension_filtered_signed_J_per_m2": 1.9550422897174071,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9325736452729829,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9326072200982123,
+          "annulus_radial_elements_estimate": 18.367346938775512,
+          "annulus_width_m": 0.000225,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.0003,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 1.225e-05
+        }
+      ],
+      "native_full_energy_J_median_J_per_m2": 1.9317922455092986,
+      "node_count": 1539,
+      "stored_energy_J_per_m": 0.003906435074214766,
+      "support_h_over_L_pz": 0.245,
+      "support_spacing_m": 1.225e-05,
+      "top_reaction_N_per_unit_thickness": 39064.350742148235,
+      "triangle_count": 2952
+    },
+    {
+      "effective_crack_stations_m": [
+        0.0005,
+        0.000522,
+        0.00054159780352
+      ],
+      "energy_closure_relative_error": 3.332246533219513e-14,
+      "field_norms": {
+        "displacement_l2_dof_norm_m": 2.9834755882368146e-06,
+        "stress_area_l2_Pa_sqrt_m2": 58990.37030888073,
+        "stress_area_mean_Pa": 19786688.663342685
+      },
+      "fixed_grip_G_J_per_m2": 2.391424579018917,
+      "forward_derivative_relative_error": 0.05455294168485758,
+      "independent_primary_observer": "same_mesh_fixed_grip_energy_derivative",
+      "matrix_energy_J_per_m": 0.003904400811921855,
+      "maximum_sampled_hbar_m": 5.1488148825372985e-06,
+      "maximum_sampled_hbar_over_L_pz": 0.10297629765074597,
+      "minimum_triangle_quality": 0.1425689418086866,
+      "native_J_over_fixed_grip_G": 0.813462028875814,
+      "native_full_energy_J_contours": [
+        {
+          "J_active_elements": 749,
+          "J_full_J_per_m2": 1.8607692407404206,
+          "J_full_signed_J_per_m2": 1.8607692407404206,
+          "J_tension_filtered_J_per_m2": 1.8608413875683376,
+          "J_tension_filtered_signed_J_per_m2": 1.8608413875683376,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9098440399204156,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9098616782507559,
+          "annulus_radial_elements_estimate": 15.0,
+          "annulus_width_m": 0.000135,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.00018,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 9e-06
+        },
+        {
+          "J_active_elements": 851,
+          "J_full_J_per_m2": 1.9453330899522177,
+          "J_full_signed_J_per_m2": 1.9453330899522177,
+          "J_tension_filtered_J_per_m2": 1.9454484429407395,
+          "J_tension_filtered_signed_J_per_m2": 1.9454484429407395,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9302885643827282,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9303161457711983,
+          "annulus_radial_elements_estimate": 20.0,
+          "annulus_width_m": 0.00018,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.00024,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 9e-06
+        },
+        {
+          "J_active_elements": 993,
+          "J_full_J_per_m2": 1.9582919952030504,
+          "J_full_signed_J_per_m2": 1.9582919952030504,
+          "J_tension_filtered_J_per_m2": 1.9584188810768595,
+          "J_tension_filtered_signed_J_per_m2": 1.9584188810768595,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9333819962860546,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9334122346448149,
+          "annulus_radial_elements_estimate": 25.0,
+          "annulus_width_m": 0.000225,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.0003,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 9e-06
+        }
+      ],
+      "native_full_energy_J_median_J_per_m2": 1.9453330899522177,
+      "node_count": 2653,
+      "stored_energy_J_per_m": 0.003904400811921725,
+      "support_h_over_L_pz": 0.18,
+      "support_spacing_m": 9e-06,
+      "top_reaction_N_per_unit_thickness": 39044.008119218386,
+      "triangle_count": 5136
+    },
+    {
+      "effective_crack_stations_m": [
+        0.0005,
+        0.000522,
+        0.000543
+      ],
+      "energy_closure_relative_error": 1.8135287363096928e-13,
+      "field_norms": {
+        "displacement_l2_dof_norm_m": 4.414409027603603e-06,
+        "stress_area_l2_Pa_sqrt_m2": 58892.13674863985,
+        "stress_area_mean_Pa": 19737351.577634305
+      },
+      "fixed_grip_G_J_per_m2": 2.3540644513243905,
+      "forward_derivative_relative_error": 0.06826489118005151,
+      "independent_primary_observer": "same_mesh_fixed_grip_energy_derivative",
+      "matrix_energy_J_per_m": 0.0038955331748926464,
+      "maximum_sampled_hbar_m": 5.00283566626826e-06,
+      "maximum_sampled_hbar_over_L_pz": 0.10005671332536518,
+      "minimum_triangle_quality": 0.049613657694132084,
+      "native_J_over_fixed_grip_G": 0.8229384003154491,
+      "native_full_energy_J_contours": [
+        {
+          "J_active_elements": 1471,
+          "J_full_J_per_m2": 1.7963024930774756,
+          "J_full_signed_J_per_m2": 1.7963024930774756,
+          "J_tension_filtered_J_per_m2": 1.7963606890223582,
+          "J_tension_filtered_signed_J_per_m2": 1.7963606890223582,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.8939442425393634,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.8939587232598187,
+          "annulus_radial_elements_estimate": 22.5,
+          "annulus_width_m": 0.000135,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.00018,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 6e-06
+        },
+        {
+          "J_active_elements": 1723,
+          "J_full_J_per_m2": 1.9372500338123593,
+          "J_full_signed_J_per_m2": 1.9372500338123593,
+          "J_tension_filtered_J_per_m2": 1.9373529565351977,
+          "J_tension_filtered_signed_J_per_m2": 1.9373529565351977,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9283538309044084,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9283784914885653,
+          "annulus_radial_elements_estimate": 30.0,
+          "annulus_width_m": 0.00018,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.00024,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 6e-06
+        },
+        {
+          "J_active_elements": 2044,
+          "J_full_J_per_m2": 1.9648572263318205,
+          "J_full_signed_J_per_m2": 1.9648572263318205,
+          "J_tension_filtered_J_per_m2": 1.9649624107582249,
+          "J_tension_filtered_signed_J_per_m2": 1.9649624107582249,
+          "KJ_full_isotropic_MPa_sqrt_m": 0.9349452823482738,
+          "KJ_tension_filtered_isotropic_MPa_sqrt_m": 0.9349703071607214,
+          "annulus_radial_elements_estimate": 37.5,
+          "annulus_width_m": 0.000225,
+          "audit_status": "complete",
+          "contour_within_safety_limit": true,
+          "nearest_tip_boundary_m": 0.0005,
+          "outer_radius_m": 0.0003,
+          "safe_outer_radius_limit_m": 0.0004,
+          "tip_h_fine_m": 6e-06
+        }
+      ],
+      "native_full_energy_J_median_J_per_m2": 1.9372500338123593,
+      "node_count": 5724,
+      "stored_energy_J_per_m": 0.00389553317489194,
+      "support_h_over_L_pz": 0.12,
+      "support_spacing_m": 6e-06,
+      "top_reaction_N_per_unit_thickness": 38955.33174892638,
+      "triangle_count": 11194
+    }
+  ],
+  "maximum_medium_to_fine_relative_change": 0.015870477833989573,
+  "mesh_provider": "v10.0.5.18.3.4 path-aware physical reachable-envelope provider",
+  "physics_advanced": false,
+  "refinement_axis": "path-envelope support spacing",
+  "relative_changes": {
+    "fixed_grip_G_J_per_m2": {
+      "coarse_to_medium": 0.08705579421071025,
+      "medium_to_fine": 0.015870477833989573
+    },
+    "native_full_energy_J_median_J_per_m2": {
+      "coarse_to_medium": 0.006960681701688233,
+      "medium_to_fine": 0.004172438249466202
+    },
+    "stored_energy_J_per_m": {
+      "coarse_to_medium": 0.0005210177927506159,
+      "medium_to_fine": 0.0022763602905347827
+    },
+    "top_reaction_N_per_unit_thickness": {
+      "coarse_to_medium": 0.0005210177927361968,
+      "medium_to_fine": 0.002276360290384409
+    }
+  },
+  "schema": "fem-baseline-reconciliation-v1",
+  "status": "PASS"
+}
