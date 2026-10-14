@@ -1,0 +1,2749 @@
+{
+  "beta": 1.0,
+  "fits": [
+    {
+      "held_out_temperature_diagnostics": [
+        {
+          "B0_A_times_Gamma_eV": 3.350620389812746,
+          "activation_volume_error_max_abs_eV_Pa": 5.747046821950876e-11,
+          "activation_volume_error_rms_eV_Pa": 3.3287014515646936e-11,
+          "barrier_error_max_abs_eV": 0.2698516986919248,
+          "barrier_error_rms_eV": 0.1761764284000499,
+          "log_rate_error_max_abs": 7.368232770827245,
+          "log_rate_error_rms": 4.810453072843275,
+          "peak_traction_Pa": 15412132037.107264,
+          "stress_Pa": [
+            989219979.6934474,
+            2612223227.2494164,
+            4433896466.570704,
+            6882271605.26247,
+            9885168125.990068
+          ],
+          "temperature_K": 425.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0004227909752414988,
+          "thermal_slope_error_rms_eV_K": 0.00029347956663779016
+        },
+        {
+          "B0_A_times_Gamma_eV": 5.410146226634656,
+          "activation_volume_error_max_abs_eV_Pa": 7.865870910351732e-11,
+          "activation_volume_error_rms_eV_Pa": 4.837186997622231e-11,
+          "barrier_error_max_abs_eV": 0.3030251145647158,
+          "barrier_error_rms_eV": 0.20425916354347204,
+          "log_rate_error_max_abs": 5.209571012223862,
+          "log_rate_error_rms": 3.511598762715455,
+          "peak_traction_Pa": 14783363007.964125,
+          "stress_Pa": [
+            948879889.6663421,
+            2505697558.2159295,
+            4253083516.6667256,
+            6601614661.562937,
+            9482053975.122347
+          ],
+          "temperature_K": 675.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.00041421645592688893,
+          "thermal_slope_error_rms_eV_K": 0.0002734586567471303
+        },
+        {
+          "B0_A_times_Gamma_eV": 7.439873948787038,
+          "activation_volume_error_max_abs_eV_Pa": 1.0521657883560198e-10,
+          "activation_volume_error_rms_eV_Pa": 6.703709097337624e-11,
+          "barrier_error_max_abs_eV": 0.3623052535520763,
+          "barrier_error_rms_eV": 0.24936383316541716,
+          "log_rate_error_max_abs": 4.545273384192383,
+          "log_rate_error_rms": 3.128375265759281,
+          "peak_traction_Pa": 14154581874.920155,
+          "stress_Pa": [
+            908539799.6392369,
+            2399171889.1824427,
+            4072270566.7627473,
+            6320957717.863402,
+            9078939824.254623
+          ],
+          "temperature_K": 925.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.00045453552838334527,
+          "thermal_slope_error_rms_eV_K": 0.0002783060528153216
+        },
+        {
+          "B0_A_times_Gamma_eV": 9.459005420179542,
+          "activation_volume_error_max_abs_eV_Pa": 1.3553281504439838e-10,
+          "activation_volume_error_rms_eV_Pa": 8.7981330490126e-11,
+          "barrier_error_max_abs_eV": 0.4308783231016431,
+          "barrier_error_rms_eV": 0.30022234140086407,
+          "log_rate_error_max_abs": 4.255434305205304,
+          "log_rate_error_rms": 2.965051575557953,
+          "peak_traction_Pa": 13525786951.64015,
+          "stress_Pa": [
+            868199709.612132,
+            2292646220.1489563,
+            3891457616.85877,
+            6040300774.16387,
+            8675825673.386902
+          ],
+          "temperature_K": 1175.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0004994924536860405,
+          "thermal_slope_error_rms_eV_K": 0.00029065174101878556
+        }
+      ],
+      "material_class": "peak",
+      "opening_surface": {
+        "G00_eV": 4.011803912930191,
+        "Tref_K": 481.33,
+        "alpha": 1.3227705595549195,
+        "attempt_frequency_s": 1000000000000.0,
+        "exponent": 1.2558047282509506,
+        "floor_fraction": 0.0184513317135146,
+        "floor_max_fraction": 0.95,
+        "floor_min_eV": 0.0001,
+        "gT_eV_per_K": 0.0081468212408944,
+        "sT_Pa_per_K": -1209982.0682778,
+        "sigc0_Pa": 7349638969.637453
+      },
+      "outside_domain_behavior": "not fitted; EXP-floor retains a positive asymptote while the unmodified bilinear barrier reaches zero at peak traction and is mechanically unstable beyond it",
+      "parent_candidate_id": "v913_zeroD_sobol_0242980__taylor_margin_0p10eV",
+      "parent_option_key": "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+      "reference_temperature_frozen_control": {
+        "B0_A_times_Gamma_eV": 4.4997966175935185,
+        "peak_traction_Pa": 15101020427.606413,
+        "temperature_K": 550.0
+      },
+      "schema": "bilinear-opening-analogue/1",
+      "shared_across_taylor_margin_variants": true,
+      "slices": [
+        {
+          "B0_A_times_Gamma_eV": 2.4949254267924914,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            569011686.5519261,
+            11768898956.952213
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              3.378103380403086e-12,
+              -2.9165913595301285e-11,
+              -1.3336471057821955e-11,
+              1.4914140545543827e-11,
+              2.5663816309713415e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 2.9165913595301285e-11,
+            "activation_volume_error_rms_eV_Pa": 1.960095209097936e-11,
+            "barrier_error_eV": [
+              -0.10076842437864286,
+              -0.06720090042335869,
+              -0.024547004687454743,
+              -0.02862606556472924,
+              -0.09884081218276725
+            ],
+            "barrier_error_max_abs_eV": 0.10076842437864286,
+            "barrier_error_rms_eV": 0.07191905114954675,
+            "log_elementary_rate_error": [
+              3.8978966892734475,
+              2.599446889157882,
+              0.9495205357511641,
+              1.1073056553152938,
+              3.8233333204122477
+            ],
+            "log_rate_error_max_abs": 3.8978966892734475,
+            "log_rate_error_rms": 2.7819531078320656,
+            "stress_Pa": [
+              1009390024.7069998,
+              2665486061.766159,
+              4524302941.522693,
+              7022600077.112236,
+              10086725201.42393
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 122.89936534493557,
+          "peak_traction_Pa": 15729653175.952906,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 11199887270.400288,
+          "second_best_objective": 122.89936534493569,
+          "separation_work_J_m2": null,
+          "temperature_K": 300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              3.82056301320602e-11,
+              -2.374500482895986e-11,
+              -2.4202558605331517e-11,
+              6.197599240528359e-13,
+              2.5123969760181487e-11,
+              1.8753809611332958e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 3.82056301320602e-11,
+            "activation_volume_error_rms_eV_Pa": 2.4469581814202576e-11,
+            "barrier_error_eV": [
+              -0.09246694703503788,
+              -0.09014800687592306,
+              -0.0431178605659146,
+              -0.01743557459147227,
+              -0.06687861080506702,
+              -0.1373546135655652
+            ],
+            "barrier_error_max_abs_eV": 0.1373546135655652,
+            "barrier_error_rms_eV": 0.08384408849143729,
+            "log_elementary_rate_error": [
+              3.576781208375103,
+              3.487080598044307,
+              1.6678733143321198,
+              0.6744381376879409,
+              2.5869801701050377,
+              5.313113674000476
+            ],
+            "log_rate_error_max_abs": 5.313113674000476,
+            "log_rate_error_rms": 3.2432341476125086,
+            "stress_Pa": [
+              569011686.5519261,
+              1834758956.7123525,
+              3548130691.7383957,
+              5650276935.960754,
+              8848666656.570738,
+              11768898956.952213
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 4.4997966175935185,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            546271237.270547,
+            11298557035.7695
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              6.346307455104385e-12,
+              -5.479283253979279e-11,
+              -2.5054693463561394e-11,
+              2.8018597963016343e-11,
+              4.821358284672789e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 5.479283253979279e-11,
+            "activation_volume_error_rms_eV_Pa": 3.682352287148244e-11,
+            "barrier_error_eV": [
+              -0.18174387468676745,
+              -0.12120217316793935,
+              -0.044272476813778994,
+              -0.05162938792063465,
+              -0.17826727301138845
+            ],
+            "barrier_error_max_abs_eV": 0.18174387468676745,
+            "barrier_error_rms_eV": 0.12971173369745195,
+            "log_elementary_rate_error": [
+              3.8346365223333883,
+              2.557259663452059,
+              0.9341104717662086,
+              1.0893348504173748,
+              3.761283272981847
+            ],
+            "log_rate_error_max_abs": 3.8346365223333883,
+            "log_rate_error_rms": 2.736803935035983,
+            "stress_Pa": [
+              969049934.6798947,
+              2558960392.7326727,
+              4343489991.618715,
+              6741943133.4127035,
+              9683611050.556208
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 118.94259302407221,
+          "peak_traction_Pa": 15101020427.606413,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 10752285798.498953,
+          "second_best_objective": 118.94259302407235,
+          "separation_work_J_m2": null,
+          "temperature_K": 550.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              7.177538571322382e-11,
+              -4.460878856331435e-11,
+              -4.5468376507679767e-11,
+              1.1643181646380456e-12,
+              4.719939478279043e-11,
+              3.5232030279882996e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 7.177538571322382e-11,
+            "activation_volume_error_rms_eV_Pa": 4.5970022362233464e-11,
+            "barrier_error_eV": [
+              -0.16677149942636937,
+              -0.16258910632571322,
+              -0.07776649368727107,
+              -0.03144644657450035,
+              -0.1206208984303504,
+              -0.24772997974395505
+            ],
+            "barrier_error_max_abs_eV": 0.24772997974395505,
+            "barrier_error_rms_eV": 0.15121948786525177,
+            "log_elementary_rate_error": [
+              3.5187325222753136,
+              3.430487692224384,
+              1.6408048822606651,
+              0.6634924711493698,
+              2.5449952757685126,
+              5.2268855258000375
+            ],
+            "log_rate_error_max_abs": 5.2268855258000375,
+            "log_rate_error_rms": 3.190598704116133,
+            "stress_Pa": [
+              546271237.270547,
+              1761433146.391116,
+              3406330289.4863434,
+              5424464638.736106,
+              8495031291.83695,
+              11298557035.7695
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 6.5046678063468955,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            523530787.98916775,
+            10828215114.586788
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              9.572369802938912e-12,
+              -8.264604882331345e-11,
+              -3.7790917596273e-11,
+              4.226148403922389e-11,
+              7.272232394495956e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 8.264604882331345e-11,
+            "activation_volume_error_rms_eV_Pa": 5.554227675504712e-11,
+            "barrier_error_eV": [
+              -0.2627193273502515,
+              -0.1752034486422831,
+              -0.0639979518970093,
+              -0.07463271321704434,
+              -0.25769373625669945
+            ],
+            "barrier_error_max_abs_eV": 0.2627193273502515,
+            "barrier_error_rms_eV": 0.18750441851572705,
+            "log_elementary_rate_error": [
+              3.8109139938968806,
+              2.541439493409357,
+              0.9283317406636877,
+              1.0825958412345742,
+              3.7380145402510974
+            ],
+            "log_rate_error_max_abs": 3.8109139938968806,
+            "log_rate_error_rms": 2.7198730281706376,
+            "stress_Pa": [
+              928709844.6527896,
+              2452434723.699186,
+              4162677041.7147365,
+              6461286189.713169,
+              9280496899.688484
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 117.47549444795216,
+          "peak_traction_Pa": 14472387668.962515,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 10304684326.59762,
+          "second_best_objective": 117.47549444795224,
+          "separation_work_J_m2": null,
+          "temperature_K": 800.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              1.0826146036231947e-10,
+              -6.728507984201583e-11,
+              -6.858162813876887e-11,
+              1.7561840308231502e-12,
+              7.119258678693344e-11,
+              5.3141769580271326e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.0826146036231947e-10,
+            "activation_volume_error_rms_eV_Pa": 6.933827917918152e-11,
+            "barrier_error_eV": [
+              -0.2410760540462178,
+              -0.23503020833772403,
+              -0.11241512967171063,
+              -0.04545732155270743,
+              -0.17436318875078327,
+              -0.3581053478155131
+            ],
+            "barrier_error_max_abs_eV": 0.3581053478155131,
+            "barrier_error_rms_eV": 0.21859488933223545,
+            "log_elementary_rate_error": [
+              3.496964297313974,
+              3.4092653897085827,
+              1.6306542617647442,
+              0.6593878896444167,
+              2.5292509794872045,
+              5.1945499976865035
+            ],
+            "log_rate_error_max_abs": 5.1945499976865035,
+            "log_rate_error_rms": 3.1708604431677667,
+            "stress_Pa": [
+              523530787.98916775,
+              1688107336.0698793,
+              3264529887.234291,
+              5198652341.511457,
+              8141395927.103162,
+              10828215114.586788
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 8.50953899902942,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            500790338.7077886,
+            10357873193.404078
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              1.3091417374643219e-11,
+              -1.1302884526491772e-10,
+              -5.168382312254201e-11,
+              5.779788423892842e-11,
+              9.945690624735704e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.1302884526491772e-10,
+            "activation_volume_error_rms_eV_Pa": 7.596103509846634e-11,
+            "barrier_error_eV": [
+              -0.3436947759805147,
+              -0.2292047200184717,
+              -0.08372342296584367,
+              -0.0976360348725911,
+              -0.3371201967278912
+            ],
+            "barrier_error_max_abs_eV": 0.3436947759805147,
+            "barrier_error_rms_eV": 0.24529710011153968,
+            "log_elementary_rate_error": [
+              3.798487862998153,
+              2.533152692380212,
+              0.9253047419098622,
+              1.07906584380505,
+              3.7258261257804026
+            ],
+            "log_rate_error_max_abs": 3.798487862998153,
+            "log_rate_error_rms": 2.711004422293434,
+            "stress_Pa": [
+              888369754.6256845,
+              2345909054.6656995,
+              3981864091.810759,
+              6180629246.013637,
+              8877382748.820763
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 116.71064766600118,
+          "peak_traction_Pa": 13843754923.97108,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 9857082854.69629,
+          "second_best_objective": 116.71064766600126,
+          "separation_work_J_m2": null,
+          "temperature_K": 1050.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              1.480611360833423e-10,
+              -9.202079209211561e-11,
+              -9.379398461928124e-11,
+              2.4018022781098633e-12,
+              9.736479866500126e-11,
+              7.267804042908553e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.480611360833423e-10,
+            "activation_volume_error_rms_eV_Pa": 9.482880010856713e-11,
+            "barrier_error_eV": [
+              -0.31538060467224494,
+              -0.30747130626771213,
+              -0.14706376157711265,
+              -0.05946819264782599,
+              -0.22810547589269015,
+              -0.46848071378019607
+            ],
+            "barrier_error_max_abs_eV": 0.46848071378019607,
+            "barrier_error_rms_eV": 0.28597028785162437,
+            "log_elementary_rate_error": [
+              3.485561849623395,
+              3.3981489004194425,
+              1.6253372249951998,
+              0.6572378278452784,
+              2.5210039320205553,
+              5.177612316818204
+            ],
+            "log_rate_error_max_abs": 5.177612316818204,
+            "log_rate_error_rms": 3.160521321522988,
+            "stress_Pa": [
+              500790338.7077886,
+              1614781525.748643,
+              3122729484.982239,
+              4972840044.286809,
+              7787760562.369375,
+              10357873193.404078
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 10.514410187107789,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            478049889.42640936,
+            9887531272.221363
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              1.6945261265817128e-11,
+              -1.4630221240066996e-10,
+              -6.689847764640573e-11,
+              7.481239226482917e-11,
+              1.2873497337273728e-10
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.4630221240066996e-10,
+            "activation_volume_error_rms_eV_Pa": 9.832240126214397e-11,
+            "barrier_error_eV": [
+              -0.424670229042146,
+              -0.2832059955060995,
+              -0.10344889773308541,
+              -0.12063935958155136,
+              -0.41654665932071033
+            ],
+            "barrier_error_max_abs_eV": 0.424670229042146,
+            "barrier_error_rms_eV": 0.3030897847961857,
+            "log_elementary_rate_error": [
+              3.790841052771161,
+              2.5280531592171003,
+              0.9234420064599966,
+              1.0768935649510294,
+              3.718325581968024
+            ],
+            "log_rate_error_max_abs": 3.790841052771161,
+            "log_rate_error_rms": 2.705546846249326,
+            "stress_Pa": [
+              848029664.5985793,
+              2239383385.6322126,
+              3801051141.9067807,
+              5899972302.314103,
+              8474268597.953041
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 116.24121432249294,
+          "peak_traction_Pa": 13215122173.564209,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 9409481382.794954,
+          "second_best_objective": 116.24121432249306,
+          "separation_work_J_m2": null,
+          "temperature_K": 1300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              1.9164728881509001e-10,
+              -1.1910982050127273e-10,
+              -1.214050044589464e-10,
+              3.1088433034756487e-12,
+              1.260269923715793e-10,
+              9.407296027916365e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.9164728881509001e-10,
+            "activation_volume_error_rms_eV_Pa": 1.2274444816113785e-10,
+            "barrier_error_eV": [
+              -0.3896851598070903,
+              -0.37991240847528296,
+              -0.18171239740494016,
+              -0.0734790671634089,
+              -0.2818477655513765,
+              -0.5788560812890474
+            ],
+            "barrier_error_max_abs_eV": 0.5788560812890474,
+            "barrier_error_rms_eV": 0.3533456891772417,
+            "log_elementary_rate_error": [
+              3.4785449989850865,
+              3.391308022117884,
+              1.6220652373815245,
+              0.6559147434249168,
+              2.515928848353396,
+              5.167189142375659
+            ],
+            "log_rate_error_max_abs": 5.167189142375659,
+            "log_rate_error_rms": 3.154158810176145,
+            "stress_Pa": [
+              478049889.42640936,
+              1541455715.4274063,
+              2980929082.730186,
+              4747027747.0621605,
+              7434125197.635587,
+              9887531272.221363
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        }
+      ],
+      "temperature_law": {
+        "extrapolation": "forbidden",
+        "kind": "piecewise_linear_interpolation_in_log_positive_parameters",
+        "knots_K": [
+          300.0,
+          550.0,
+          800.0,
+          1050.0,
+          1300.0
+        ],
+        "log_B0_eV": [
+          0.9142588396956695,
+          1.5040321996645707,
+          1.8725200432272615,
+          2.1411877694410255,
+          2.352746715057195
+        ],
+        "log_peak_traction_Pa": [
+          23.478813505200918,
+          23.43802815647118,
+          23.395508372198766,
+          23.35110005987364,
+          23.304627630027216
+        ]
+      }
+    },
+    {
+      "held_out_temperature_diagnostics": [
+        {
+          "B0_A_times_Gamma_eV": 2.435004690443684,
+          "activation_volume_error_max_abs_eV_Pa": 9.026967200436103e-11,
+          "activation_volume_error_rms_eV_Pa": 6.268837278333052e-11,
+          "barrier_error_max_abs_eV": 0.2285868967046426,
+          "barrier_error_rms_eV": 0.1558069949871884,
+          "log_rate_error_max_abs": 6.241507729783474,
+          "log_rate_error_rms": 4.25427081598383,
+          "peak_traction_Pa": 22220905968.446556,
+          "stress_Pa": [
+            3771055964.83045,
+            6007457001.823403,
+            7742400696.566962,
+            9559623835.033659,
+            11372306396.451038
+          ],
+          "temperature_K": 425.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.000742130260218416,
+          "thermal_slope_error_rms_eV_K": 0.00046380187075079396
+        },
+        {
+          "B0_A_times_Gamma_eV": 4.281448958120318,
+          "activation_volume_error_max_abs_eV_Pa": 1.4859605566730628e-10,
+          "activation_volume_error_rms_eV_Pa": 1.0527232018524806e-10,
+          "barrier_error_max_abs_eV": 0.4270548361507027,
+          "barrier_error_rms_eV": 0.2533271894238751,
+          "log_rate_error_max_abs": 7.34187494075042,
+          "log_rate_error_rms": 4.35517031163077,
+          "peak_traction_Pa": 21239294085.63679,
+          "stress_Pa": [
+            3604552060.8646264,
+            5742209004.169943,
+            7400549513.750038,
+            9137536572.52086,
+            10870183534.906675
+          ],
+          "temperature_K": 675.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.000785391388406189,
+          "thermal_slope_error_rms_eV_K": 0.0005107321078119454
+        },
+        {
+          "B0_A_times_Gamma_eV": 6.088673560507188,
+          "activation_volume_error_max_abs_eV_Pa": 2.150916024476179e-10,
+          "activation_volume_error_rms_eV_Pa": 1.5345399385142677e-10,
+          "barrier_error_max_abs_eV": 0.6161225208128699,
+          "barrier_error_rms_eV": 0.3589954133303209,
+          "log_rate_error_max_abs": 7.729518873371042,
+          "log_rate_error_rms": 4.503750031940711,
+          "peak_traction_Pa": 20257657939.16057,
+          "stress_Pa": [
+            3438048156.898803,
+            5476961006.516482,
+            7058698330.933113,
+            8715449310.008064,
+            10368060673.362312
+          ],
+          "temperature_K": 925.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0008166366642078313,
+          "thermal_slope_error_rms_eV_K": 0.0005617129372747874
+        },
+        {
+          "B0_A_times_Gamma_eV": 7.883696439387507,
+          "activation_volume_error_max_abs_eV_Pa": 2.8917649253031924e-10,
+          "activation_volume_error_rms_eV_Pa": 2.0694561314903883e-10,
+          "barrier_error_max_abs_eV": 0.8022181687019445,
+          "barrier_error_rms_eV": 0.46504841875645686,
+          "log_rate_error_max_abs": 7.9228555541605346,
+          "log_rate_error_rms": 4.59290451307032,
+          "peak_traction_Pa": 19275993795.43304,
+          "stress_Pa": [
+            3271544252.93298,
+            5211713008.863021,
+            6716847148.116188,
+            8293362047.495267,
+            9865937811.817951
+          ],
+          "temperature_K": 1175.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0009059414078708724,
+          "thermal_slope_error_rms_eV_K": 0.0006197517067459015
+        }
+      ],
+      "material_class": "DBTT",
+      "opening_surface": {
+        "G00_eV": 2.357721022795886,
+        "Tref_K": 481.33,
+        "alpha": 0.4968366474844515,
+        "attempt_frequency_s": 1000000000000.0,
+        "exponent": 2.618804107885808,
+        "floor_fraction": 0.026239358201278,
+        "floor_max_fraction": 0.95,
+        "floor_min_eV": 0.0001,
+        "gT_eV_per_K": 0.0056085130451247,
+        "sT_Pa_per_K": -1204138.7008503,
+        "sigc0_Pa": 6750140779.651701
+      },
+      "outside_domain_behavior": "not fitted; EXP-floor retains a positive asymptote while the unmodified bilinear barrier reaches zero at peak traction and is mechanically unstable beyond it",
+      "parent_candidate_id": "v913_zeroD_sobol_0202500__taylor_margin_0p10eV",
+      "parent_option_key": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "reference_temperature_frozen_control": {
+        "B0_A_times_Gamma_eV": 3.482818760202734,
+        "peak_traction_Pa": 21735642109.25437,
+        "temperature_K": 550.0
+      },
+      "schema": "bilinear-opening-analogue/1",
+      "shared_across_taylor_margin_variants": true,
+      "slices": [
+        {
+          "B0_A_times_Gamma_eV": 1.7024279041547379,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            2928008553.587268,
+            12515662784.108038
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              4.033717497789408e-11,
+              -2.965440914454587e-11,
+              -5.206710918363164e-11,
+              -4.097238212137014e-11,
+              -1.0511645667270312e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 5.206710918363164e-11,
+            "activation_volume_error_rms_eV_Pa": 3.7434439536297054e-11,
+            "barrier_error_eV": [
+              -0.03642833106987009,
+              -0.04255063427060757,
+              0.03499138138658897,
+              0.12607285594905854,
+              0.17497686772384474
+            ],
+            "barrier_error_max_abs_eV": 0.17497686772384474,
+            "barrier_error_rms_eV": 0.10086946594317699,
+            "log_elementary_rate_error": [
+              1.4091107601271402,
+              1.6459320215890856,
+              -1.353527064662501,
+              -4.8767158049881765,
+              -6.7684074411782325
+            ],
+            "log_rate_error_max_abs": 6.7684074411782325,
+            "log_rate_error_rms": 3.901805151495668,
+            "stress_Pa": [
+              3854307916.8133616,
+              6140081000.650134,
+              7913326287.975426,
+              9770667466.290058,
+              11623367827.223219
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 259.99529929630046,
+          "peak_traction_Pa": 22717003692.6727,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 9587654230.520771,
+          "second_best_objective": 259.99529929630046,
+          "separation_work_J_m2": null,
+          "temperature_K": 300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              7.366360690069612e-11,
+              -2.8850950990868103e-12,
+              -4.5376224149154514e-11,
+              -5.054686329912199e-11,
+              -2.2957798387010253e-11,
+              4.404924909851813e-12
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 7.366360690069612e-11,
+            "activation_volume_error_rms_eV_Pa": 4.2022021474867876e-11,
+            "barrier_error_eV": [
+              0.016404147829409688,
+              -0.05964730701897514,
+              -0.008034887389381629,
+              0.0812396309530714,
+              0.16313189004213846,
+              0.1775709853188009
+            ],
+            "barrier_error_max_abs_eV": 0.1775709853188009,
+            "barrier_error_rms_eV": 0.1069538862697272,
+            "log_elementary_rate_error": [
+              -0.6345407691832503,
+              2.307260850677909,
+              0.3108033210489842,
+              -3.1424892319432582,
+              -6.310223247322501,
+              -6.86875238997857
+            ],
+            "log_rate_error_max_abs": 6.86875238997857,
+            "log_rate_error_rms": 4.137161037957605,
+            "stress_Pa": [
+              2928008553.587268,
+              5133280393.884993,
+              7042766714.2457485,
+              8803243827.332195,
+              10915905643.98254,
+              12515662784.108038
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 3.482818760202734,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            2801520253.8614182,
+            11974993289.28556
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              8.624743716899582e-11,
+              -6.340594736474794e-11,
+              -1.1132794338638041e-10,
+              -8.760561334606193e-11,
+              -2.247560711640878e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.1132794338638041e-10,
+            "activation_volume_error_rms_eV_Pa": 8.004091699009084e-11,
+            "barrier_error_eV": [
+              -0.07452490118960986,
+              -0.08704987928381702,
+              0.07158520071433228,
+              0.25791924008077527,
+              0.3579668303429282
+            ],
+            "barrier_error_max_abs_eV": 0.3579668303429282,
+            "barrier_error_rms_eV": 0.20635826582502906,
+            "log_elementary_rate_error": [
+              1.5724101206574086,
+              1.8366761847778592,
+              -1.5103850162259744,
+              -5.441869991661536,
+              -7.552786490233527
+            ],
+            "log_rate_error_max_abs": 7.552786490233527,
+            "log_rate_error_rms": 4.353978609633179,
+            "stress_Pa": [
+              3687804012.8475385,
+              5874833002.996674,
+              7571475105.158501,
+              9348580203.77726,
+              11121244965.678858
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 323.7478687421333,
+          "peak_traction_Pa": 21735642109.25437,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 9173473035.424143,
+          "second_best_objective": 323.7478687421334,
+          "separation_work_J_m2": null,
+          "temperature_K": 550.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              1.5750476609576223e-10,
+              -6.168802376754774e-12,
+              -9.70217435405702e-11,
+              -1.0807741053776288e-10,
+              -4.9087504874093814e-11,
+              9.418445611680113e-12
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.5750476609576223e-10,
+            "activation_volume_error_rms_eV_Pa": 8.984991291625246e-11,
+            "barrier_error_eV": [
+              0.03355952810326368,
+              -0.12202616961070678,
+              -0.016437731507427777,
+              0.16619964561239953,
+              0.3337344324341732,
+              0.36327386347676205
+            ],
+            "barrier_error_max_abs_eV": 0.36327386347676205,
+            "barrier_error_rms_eV": 0.2188057435613704,
+            "log_elementary_rate_error": [
+              -0.7080766400454558,
+              2.574645266456036,
+              0.34682173300931696,
+              -3.5066669078260575,
+              -7.041504125395772,
+              -7.664760239639423
+            ],
+            "log_rate_error_max_abs": 7.664760239639423,
+            "log_rate_error_rms": 4.6166094841040275,
+            "stress_Pa": [
+              2801520253.8614182,
+              4911525608.284022,
+              6738523208.549923,
+              8422948714.31857,
+              10444344745.301577,
+              11974993289.28556
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 5.263209613560979,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            2675031954.1355686,
+            11434323794.463083
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              1.3649941263106947e-10,
+              -1.0034935387190632e-10,
+              -1.7619304882304423e-10,
+              -1.3864892893241058e-10,
+              -3.55709952866233e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.7619304882304423e-10,
+            "activation_volume_error_rms_eV_Pa": 1.266766704049971e-10,
+            "barrier_error_eV": [
+              -0.11262147366382491,
+              -0.13154912642929073,
+              0.1081790180941824,
+              0.38976562246894253,
+              0.5409567914337453
+            ],
+            "barrier_error_max_abs_eV": 0.5409567914337453,
+            "barrier_error_rms_eV": 0.3118470649556406,
+            "log_elementary_rate_error": [
+              1.6336474150094482,
+              1.9082052769035234,
+              -1.5692067198068247,
+              -5.653802786372731,
+              -7.846928611460769
+            ],
+            "log_rate_error_max_abs": 7.846928611460769,
+            "log_rate_error_rms": 4.523543645537514,
+            "stress_Pa": [
+              3521300108.8817153,
+              5609585005.343213,
+              7229623922.341576,
+              8926492941.264463,
+              10619122104.134495
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 349.455521216481,
+          "peak_traction_Pa": 20754280503.36271,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 8759291840.327515,
+          "second_best_objective": 349.4555212164811,
+          "separation_work_J_m2": null,
+          "temperature_K": 800.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              2.4927474686995153e-10,
+              -9.76304851934522e-12,
+              -1.535513571787673e-10,
+              -1.7104859653374257e-10,
+              -7.768828637914896e-11,
+              1.490609263506455e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 2.4927474686995153e-10,
+            "activation_volume_error_rms_eV_Pa": 1.4220086711482443e-10,
+            "barrier_error_eV": [
+              0.05071490593754824,
+              -0.18440503443472256,
+              -0.02484057766519321,
+              0.25115965842030774,
+              0.5043369732143854,
+              0.548976740214219
+            ],
+            "barrier_error_max_abs_eV": 0.548976740214219,
+            "barrier_error_rms_eV": 0.33065759998648897,
+            "log_elementary_rate_error": [
+              -0.7356525562312481,
+              2.6749144547535613,
+              0.360328667081891,
+              -3.6432335094260626,
+              -7.315734431292719,
+              -7.963263162656911
+            ],
+            "log_rate_error_max_abs": 7.963263162656911,
+            "log_rate_error_rms": 4.796402638839435,
+            "stress_Pa": [
+              2675031954.1355686,
+              4689770822.683051,
+              6434279702.854097,
+              8042653601.304945,
+              9972783846.620615,
+              11434323794.463083
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 7.043600473540169,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            2548543654.409719,
+            10893654299.640608
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              1.917395605526816e-10,
+              -1.4095988065780233e-10,
+              -2.4749687178506123e-10,
+              -1.9475896700171029e-10,
+              -4.9966273269598114e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 2.4749687178506123e-10,
+            "activation_volume_error_rms_eV_Pa": 1.7794163777565596e-10,
+            "barrier_error_eV": [
+              -0.15071804154599366,
+              -0.1760483700111357,
+              0.14477283832949261,
+              0.5216120070548078,
+              0.7239467541517557
+            ],
+            "barrier_error_max_abs_eV": 0.7239467541517557,
+            "barrier_error_rms_eV": 0.41733586476592743,
+            "log_elementary_rate_error": [
+              1.665724042252436,
+              1.9456728572034483,
+              -1.6000181199074972,
+              -5.764815226938811,
+              -8.001003073896747
+            ],
+            "log_rate_error_max_abs": 8.001003073896747,
+            "log_rate_error_rms": 4.612363433761028,
+            "stress_Pa": [
+              3354796204.915892,
+              5344337007.689752,
+              6887772739.524652,
+              8504405678.751666,
+              10116999242.590134
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 363.31336670188193,
+          "peak_traction_Pa": 19772918898.033813,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 8345110645.230888,
+          "second_best_objective": 363.31336670188193,
+          "separation_work_J_m2": null,
+          "temperature_K": 1050.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              3.5015411021097617e-10,
+              -1.3714070523996359e-11,
+              -2.1569228072472233e-10,
+              -2.402705035755953e-10,
+              -1.091280726423259e-10,
+              2.0938461366292162e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 3.5015411021097617e-10,
+            "activation_volume_error_rms_eV_Pa": 1.9974834454203314e-10,
+            "barrier_error_eV": [
+              0.06787028881770052,
+              -0.24678389525816868,
+              -0.03324342062961527,
+              0.3361196737577967,
+              0.6749395158295495,
+              0.7346796183346129
+            ],
+            "barrier_error_max_abs_eV": 0.7346796183346129,
+            "barrier_error_rms_eV": 0.44250945729813074,
+            "log_elementary_rate_error": [
+              -0.7500971395236761,
+              2.7274363663144716,
+              0.3674036924939907,
+              -3.7147684239351757,
+              -7.459378897518483,
+              -8.119621851902561
+            ],
+            "log_rate_error_max_abs": 8.119621851902561,
+            "log_rate_error_rms": 4.890580015403387,
+            "stress_Pa": [
+              2548543654.409719,
+              4468016037.082081,
+              6130036197.158272,
+              7662358488.29132,
+              9501222947.939651,
+              10893654299.640608
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 8.823991335382031,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            2422055354.6838694,
+            10352984804.81813
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              2.527493830903602e-10,
+              -1.8581205631365665e-10,
+              -3.262481692652926e-10,
+              -2.567295338275758e-10,
+              -6.586509593703911e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 3.262481692652926e-10,
+            "activation_volume_error_rms_eV_Pa": 2.3456108086174137e-10,
+            "barrier_error_eV": [
+              -0.18881461827806412,
+              -0.22054762678891393,
+              0.181366643026597,
+              0.6534583746134022,
+              0.9069366993400776
+            ],
+            "barrier_error_max_abs_eV": 0.9069366993400776,
+            "barrier_error_rms_eV": 0.5228246549126607,
+            "log_elementary_rate_error": [
+              1.685463584170309,
+              1.9687299474898992,
+              -1.6189788428053025,
+              -5.83313042298465,
+              -8.09581797122382
+            ],
+            "log_rate_error_max_abs": 8.09581797122382,
+            "log_rate_error_rms": 4.667021678713281,
+            "stress_Pa": [
+              3188292300.9500685,
+              5079089010.036291,
+              6545921556.7077265,
+              8082318416.238869,
+              9614876381.04577
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 371.97520113924617,
+          "peak_traction_Pa": 18791557216.09321,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 7930929450.134261,
+          "second_best_objective": 371.9752011392463,
+          "separation_work_J_m2": null,
+          "temperature_K": 1300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              4.615700310850149e-10,
+              -1.8077762972361606e-11,
+              -2.843236404371752e-10,
+              -3.16722435413228e-10,
+              -1.43851652395295e-10,
+              2.7600893071253343e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 4.615700310850149e-10,
+            "activation_volume_error_rms_eV_Pa": 2.6330648805483585e-10,
+            "barrier_error_eV": [
+              0.08502566503463616,
+              -0.3091627675474138,
+              -0.041646278094702005,
+              0.4210796727205044,
+              0.8455420409910162,
+              0.9203824790336036
+            ],
+            "barrier_error_max_abs_eV": 0.9203824790336036,
+            "barrier_error_rms_eV": 0.5543613043561936,
+            "log_elementary_rate_error": [
+              -0.7589860543779253,
+              2.7597576450097026,
+              0.3717576837269951,
+              -3.7587897636165937,
+              -7.547775336317609,
+              -8.215842428232971
+            ],
+            "log_rate_error_max_abs": 8.215842428232971,
+            "log_rate_error_rms": 4.948535232529017,
+            "stress_Pa": [
+              2422055354.6838694,
+              4246261251.4811106,
+              5825792691.462447,
+              7282063375.277695,
+              9029662049.25869,
+              10352984804.81813
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        }
+      ],
+      "temperature_law": {
+        "extrapolation": "forbidden",
+        "kind": "piecewise_linear_interpolation_in_log_positive_parameters",
+        "knots_K": [
+          300.0,
+          550.0,
+          800.0,
+          1050.0,
+          1300.0
+        ],
+        "log_B0_eV": [
+          0.5320554110991936,
+          1.2478419544866821,
+          1.6607410333499564,
+          1.9521194703343334,
+          2.1774743000130528
+        ],
+        "log_peak_traction_Pa": [
+          23.846379542378553,
+          23.802219243589594,
+          23.756018351667088,
+          23.70757910602463,
+          23.65667352166342
+        ]
+      }
+    },
+    {
+      "held_out_temperature_diagnostics": [
+        {
+          "B0_A_times_Gamma_eV": 2.1702255109738493,
+          "activation_volume_error_max_abs_eV_Pa": 3.713728244169724e-11,
+          "activation_volume_error_rms_eV_Pa": 2.6668389605513945e-11,
+          "barrier_error_max_abs_eV": 0.18998030155076867,
+          "barrier_error_rms_eV": 0.14740226931573172,
+          "log_rate_error_max_abs": 5.187364357843506,
+          "log_rate_error_rms": 4.024781895134235,
+          "peak_traction_Pa": 10641817093.198746,
+          "stress_Pa": [
+            591792663.4319844,
+            1747085741.7018719,
+            3151195519.7516026,
+            5144564476.834516,
+            7702978302.065037
+          ],
+          "temperature_K": 425.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.00047845622577659527,
+          "thermal_slope_error_rms_eV_K": 0.0002942030425451047
+        },
+        {
+          "B0_A_times_Gamma_eV": 3.6898707144197407,
+          "activation_volume_error_max_abs_eV_Pa": 5.5113429582656523e-11,
+          "activation_volume_error_rms_eV_Pa": 3.818351250769217e-11,
+          "barrier_error_max_abs_eV": 0.3022910540162376,
+          "barrier_error_rms_eV": 0.1879612540920346,
+          "log_rate_error_max_abs": 5.196951132317002,
+          "log_rate_error_rms": 3.2314070803856887,
+          "peak_traction_Pa": 10501569655.219234,
+          "stress_Pa": [
+            583993828.9609003,
+            1724062082.6600256,
+            3109668049.4682727,
+            5076767747.9126425,
+            7601465971.101403
+          ],
+          "temperature_K": 675.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.00048002024132135076,
+          "thermal_slope_error_rms_eV_K": 0.00027425368664382895
+        },
+        {
+          "B0_A_times_Gamma_eV": 5.18150896737344,
+          "activation_volume_error_max_abs_eV_Pa": 8.258712004545509e-11,
+          "activation_volume_error_rms_eV_Pa": 5.3050880913844284e-11,
+          "barrier_error_max_abs_eV": 0.41673847651053925,
+          "barrier_error_rms_eV": 0.24364726593514227,
+          "log_rate_error_max_abs": 5.228161300123055,
+          "log_rate_error_rms": 3.056658500335729,
+          "peak_traction_Pa": 10361322138.325243,
+          "stress_Pa": [
+            576194994.4898162,
+            1701038423.6181793,
+            3068140579.1849422,
+            5008971018.990768,
+            7499953640.13777
+          ],
+          "temperature_K": 925.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.00048499093873225017,
+          "thermal_slope_error_rms_eV_K": 0.0002722025807963842
+        },
+        {
+          "B0_A_times_Gamma_eV": 6.663973785294358,
+          "activation_volume_error_max_abs_eV_Pa": 1.0988749863499798e-10,
+          "activation_volume_error_rms_eV_Pa": 6.878371975193448e-11,
+          "barrier_error_max_abs_eV": 0.5318862850786568,
+          "barrier_error_rms_eV": 0.3033887499456195,
+          "log_rate_error_max_abs": 5.253007688339875,
+          "log_rate_error_rms": 2.996323614143354,
+          "peak_traction_Pa": 10221074547.686047,
+          "stress_Pa": [
+            568396160.018732,
+            1678014764.5763326,
+            3026613108.9016113,
+            4941174290.068894,
+            7398441309.174135
+          ],
+          "temperature_K": 1175.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0004907746750987874,
+          "thermal_slope_error_rms_eV_K": 0.00027369558852956803
+        }
+      ],
+      "material_class": "weakT",
+      "opening_surface": {
+        "G00_eV": 2.683425398543477,
+        "Tref_K": 481.33,
+        "alpha": 1.1411482973955571,
+        "attempt_frequency_s": 1000000000000.0,
+        "exponent": 1.1264505988918243,
+        "floor_fraction": 0.0019271603769193,
+        "floor_max_fraction": 0.95,
+        "floor_min_eV": 0.0001,
+        "gT_eV_per_K": 0.0060197069197893,
+        "sT_Pa_per_K": -258587.0958864,
+        "sigc0_Pa": 4890972775.872797
+      },
+      "outside_domain_behavior": "not fitted; EXP-floor retains a positive asymptote while the unmodified bilinear barrier reaches zero at peak traction and is mechanically unstable beyond it",
+      "parent_candidate_id": "v913_zeroD_sobol_0129902__taylor_margin_0p10eV",
+      "parent_option_key": "v913_paper_weakT01_0129902_persistent_sites__taylor_margin_0p10eV",
+      "reference_temperature_frozen_control": {
+        "B0_A_times_Gamma_eV": 3.0269642085532373,
+        "peak_traction_Pa": 10571925937.76165,
+        "temperature_K": 550.0
+      },
+      "schema": "bilinear-opening-analogue/1",
+      "shared_across_taylor_margin_variants": true,
+      "slices": [
+        {
+          "B0_A_times_Gamma_eV": 1.5559743835665738,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            314410928.171459,
+            9208497130.920835
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -1.0541353274110125e-11,
+              -1.1275401868866289e-11,
+              8.938136486451354e-12,
+              2.5239760064964127e-11,
+              1.4546822801787258e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 2.5239760064964127e-11,
+            "activation_volume_error_rms_eV_Pa": 1.5276129364259874e-11,
+            "barrier_error_eV": [
+              -0.04525759518409522,
+              -0.028203932988980274,
+              -0.026540643138958764,
+              -0.06448747489089734,
+              -0.12270997915069254
+            ],
+            "barrier_error_max_abs_eV": 0.12270997915069254,
+            "barrier_error_rms_eV": 0.06747516713145867,
+            "log_elementary_rate_error": [
+              1.7506419448387385,
+              1.0909768382320417,
+              1.0266379142121573,
+              2.4944869032814654,
+              4.746633922497579
+            ],
+            "log_rate_error_max_abs": 4.746633922497579,
+            "log_rate_error_rms": 2.6100559991054957,
+            "stress_Pa": [
+              595692080.6675265,
+              1758597571.2227952,
+              3171959254.8932686,
+              5178462841.295454,
+              7753734467.546854
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 31.757597677883265,
+          "peak_traction_Pa": 10712170300.076334,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 8894086202.749376,
+          "second_best_objective": 31.757597677883272,
+          "separation_work_J_m2": null,
+          "temperature_K": 300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              4.603195355447295e-12,
+              -1.6438936685162183e-11,
+              -1.8507219166509958e-12,
+              1.888352461527163e-11,
+              2.2816879569653988e-11,
+              -3.9732183518339226e-12
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 2.2816879569653988e-11,
+            "activation_volume_error_rms_eV_Pa": 1.4070282973315118e-11,
+            "barrier_error_eV": [
+              -0.04645515831343827,
+              -0.036798478102035403,
+              -0.023788254749290583,
+              -0.03923768898937263,
+              -0.10260776565191593,
+              -0.1312894601819809
+            ],
+            "barrier_error_max_abs_eV": 0.1312894601819809,
+            "barrier_error_rms_eV": 0.07459106621299778,
+            "log_elementary_rate_error": [
+              1.7969657549592783,
+              1.4234286866018084,
+              0.9201707777273268,
+              1.517781576416434,
+              3.9690455863981566,
+              5.078503066167856
+            ],
+            "log_rate_error_max_abs": 5.078503066167856,
+            "log_rate_error_rms": 2.8853112652483093,
+            "stress_Pa": [
+              314410928.171459,
+              1159693956.8306,
+              2419104506.004626,
+              4063770300.5204773,
+              6700507923.7809305,
+              9208497130.920835
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 3.0269642085532373,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            310294642.4858051,
+            9087938964.743725
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -2.077899650944081e-11,
+              -2.2225944921817747e-11,
+              1.7618753192217682e-11,
+              4.975232906600069e-11,
+              2.8674531762294085e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 4.975232906600069e-11,
+            "activation_volume_error_rms_eV_Pa": 3.011213312581405e-11,
+            "barrier_error_eV": [
+              -0.08804330755559242,
+              -0.05486742363916708,
+              -0.05163168942878449,
+              -0.12545276352484314,
+              -0.23871776059528127
+            ],
+            "barrier_error_max_abs_eV": 0.23871776059528127,
+            "barrier_error_rms_eV": 0.1312649645831249,
+            "log_elementary_rate_error": [
+              1.8576366509274556,
+              1.1576545670972598,
+              1.0893834102228868,
+              2.6469433958592896,
+              5.036735597752459
+            ],
+            "log_rate_error_max_abs": 5.036735597752459,
+            "log_rate_error_rms": 2.76957574587188,
+            "stress_Pa": [
+              587893246.1964424,
+              1735573912.1809487,
+              3130431784.6099377,
+              5110666112.373579,
+              7652222136.58322
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 35.75810216387169,
+          "peak_traction_Pa": 10571925937.76165,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 8777644322.25792,
+          "second_best_objective": 35.7581021638717,
+          "separation_work_J_m2": null,
+          "temperature_K": 550.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              9.07376654720005e-12,
+              -3.2404246307558206e-11,
+              -3.648122429131295e-12,
+              3.72229897310101e-11,
+              4.497637426833912e-11,
+              -7.83196411586948e-12
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 4.497637426833912e-11,
+            "activation_volume_error_rms_eV_Pa": 2.7735182482798466e-11,
+            "barrier_error_eV": [
+              -0.09037302507668565,
+              -0.071587095229948,
+              -0.046277243466761986,
+              -0.07633229069389924,
+              -0.1996112815761243,
+              -0.25540812531038165
+            ],
+            "barrier_error_max_abs_eV": 0.25540812531038165,
+            "barrier_error_rms_eV": 0.14510810449308656,
+            "log_elementary_rate_error": [
+              1.9067916494576733,
+              1.5104249888456003,
+              0.9764092916826104,
+              1.6105444556669104,
+              4.2116231533018516,
+              5.388887670100944
+            ],
+            "log_rate_error_max_abs": 5.388887670100944,
+            "log_rate_error_rms": 3.0616538694069835,
+            "stress_Pa": [
+              310294642.4858051,
+              1144511177.8413215,
+              2387433452.749322,
+              4010567189.499171,
+              6612784494.402453,
+              9087938964.743725
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 4.497954039449947,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            306178356.80015117,
+            8967380798.566614
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -3.1291910344884924e-11,
+              -3.34709271802573e-11,
+              2.6532776321877494e-11,
+              7.492399641554792e-11,
+              4.3182109238804144e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 7.492399641554792e-11,
+            "activation_volume_error_rms_eV_Pa": 4.5347049817764854e-11,
+            "barrier_error_eV": [
+              -0.1308290144566726,
+              -0.08153090963951692,
+              -0.07672273199902735,
+              -0.18641804963348907,
+              -0.3547255408300962
+            ],
+            "barrier_error_max_abs_eV": 0.3547255408300962,
+            "barrier_error_rms_eV": 0.1950547596969139,
+            "log_elementary_rate_error": [
+              1.8977595863587828,
+              1.18265864797282,
+              1.112912917271952,
+              2.704114543944864,
+              5.145523708424488
+            ],
+            "log_rate_error_max_abs": 5.145523708424488,
+            "log_rate_error_rms": 2.8293956169968513,
+            "stress_Pa": [
+              580094411.7253582,
+              1712550253.1391025,
+              3088904314.326607,
+              5042869383.451706,
+              7550709805.619586
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 37.31945739328408,
+          "peak_traction_Pa": 10431681594.505304,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 8661202441.766462,
+          "second_best_objective": 37.31945739328409,
+          "separation_work_J_m2": null,
+          "temperature_K": 800.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              1.3664543911065334e-11,
+              -4.8798832937792264e-11,
+              -5.493851049062129e-12,
+              5.605556985815799e-11,
+              6.773169742943327e-11,
+              -1.179446401649699e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 6.773169742943327e-11,
+            "activation_volume_error_rms_eV_Pa": 4.176750608221827e-11,
+            "barrier_error_eV": [
+              -0.1342908861635541,
+              -0.10637570729164025,
+              -0.06876622797829013,
+              -0.11342688922796063,
+              -0.2966147957820603,
+              -0.37952678986417915
+            ],
+            "barrier_error_max_abs_eV": 0.37952678986417915,
+            "barrier_error_rms_eV": 0.21562514070338434,
+            "log_elementary_rate_error": [
+              1.947976277555019,
+              1.543048528698215,
+              0.9974986734059107,
+              1.6453304893961875,
+              4.302589715966083,
+              5.50528188824086
+            ],
+            "log_rate_error_max_abs": 5.50528188824086,
+            "log_rate_error_rms": 3.1277823159428264,
+            "stress_Pa": [
+              306178356.80015117,
+              1129328398.8520432,
+              2355762399.4940186,
+              3957364078.477865,
+              6525061065.023978,
+              8967380798.566614
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 5.968943867255391,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            302062071.11449724,
+            8846822632.389502
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -4.209134855309652e-11,
+              -4.502238622960635e-11,
+              3.568974739707399e-11,
+              1.0078170642562654e-10,
+              5.808508374583266e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.0078170642562654e-10,
+            "activation_volume_error_rms_eV_Pa": 6.099718724320757e-11,
+            "barrier_error_eV": [
+              -0.17361472479800177,
+              -0.10819439958463217,
+              -0.10181377881248155,
+              -0.2473833398159242,
+              -0.47073332390137584
+            ],
+            "barrier_error_max_abs_eV": 0.47073332390137584,
+            "barrier_error_rms_eV": 0.25884455774613474,
+            "log_elementary_rate_error": [
+              1.9187764000822702,
+              1.1957560672667815,
+              1.1252379440504365,
+              2.734061380822413,
+              5.202507988220127
+            ],
+            "log_rate_error_max_abs": 5.202507988220127,
+            "log_rate_error_rms": 2.860729867647333,
+            "stress_Pa": [
+              572295577.254274,
+              1689526594.0972557,
+              3047376844.043277,
+              4975072654.529831,
+              7449197474.6559515
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 38.15062519038672,
+          "peak_traction_Pa": 10291437241.594559,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 8544760561.275004,
+          "second_best_objective": 38.15062519038673,
+          "separation_work_J_m2": null,
+          "temperature_K": 1050.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              1.8380441537313502e-11,
+              -6.564024649563679e-11,
+              -7.389883977768665e-12,
+              7.540142376026151e-11,
+              9.110720655927818e-11,
+              -1.5864961135178035e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 9.110720655927818e-11,
+            "activation_volume_error_rms_eV_Pa": 5.618227442923266e-11,
+            "barrier_error_eV": [
+              -0.17820875053353102,
+              -0.14116432306746773,
+              -0.09125521661703706,
+              -0.15052149201585863,
+              -0.3936183134690595,
+              -0.5036454560487322
+            ],
+            "barrier_error_max_abs_eV": 0.5036454560487322,
+            "barrier_error_rms_eV": 0.286142179428655,
+            "log_elementary_rate_error": [
+              1.9695492142716204,
+              1.5601370906217271,
+              1.00854553801753,
+              1.663551792172213,
+              4.350238906310263,
+              5.566250306241895
+            ],
+            "log_rate_error_max_abs": 5.566250306241895,
+            "log_rate_error_rms": 3.1624210538283153,
+            "stress_Pa": [
+              302062071.11449724,
+              1114145619.8627646,
+              2324091346.2387147,
+              3904160967.456559,
+              6437337635.645501,
+              8846822632.389502
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 7.43993369659717,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            297945785.4288433,
+            8726264466.21239
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -5.318919079856824e-11,
+              -5.6893027561256333e-11,
+              4.509973412395239e-11,
+              1.2735389355436525e-10,
+              7.33998459630913e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.2735389355436525e-10,
+            "activation_volume_error_rms_eV_Pa": 7.707975637196279e-11,
+            "barrier_error_eV": [
+              -0.21640043142455845,
+              -0.1348578823305111,
+              -0.12690481555965372,
+              -0.3083486184396267,
+              -0.5867410979310078
+            ],
+            "barrier_error_max_abs_eV": 0.5867410979310078,
+            "barrier_error_rms_eV": 0.32263434840529476,
+            "log_elementary_rate_error": [
+              1.9317097907519971,
+              1.203815953337167,
+              1.1328224860569251,
+              2.7524901003366566,
+              5.237575156614394
+            ],
+            "log_rate_error_max_abs": 5.237575156614394,
+            "log_rate_error_rms": 2.8800124174644797,
+            "stress_Pa": [
+              564496742.7831899,
+              1666502935.0554094,
+              3005849373.7599463,
+              4907275925.607958,
+              7347685143.692318
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 38.66666303353236,
+          "peak_traction_Pa": 10151192924.455791,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 8428318680.783547,
+          "second_best_objective": 38.666663033532366,
+          "separation_work_J_m2": null,
+          "temperature_K": 1300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              2.3226640781517198e-11,
+              -8.294701010068621e-11,
+              -9.338308569223223e-12,
+              9.528182411541395e-11,
+              1.1512860806063592e-10,
+              -2.0047927382644287e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.1512860806063592e-10,
+            "activation_volume_error_rms_eV_Pa": 7.099533919754989e-11,
+            "barrier_error_eV": [
+              -0.22212661218415342,
+              -0.1759529333116836,
+              -0.11374419652988621,
+              -0.1876160837006915,
+              -0.4906218204827679,
+              -0.6277641168159585
+            ],
+            "barrier_error_max_abs_eV": 0.6277641168159585,
+            "barrier_error_rms_eV": 0.3566592119433608,
+            "log_elementary_rate_error": [
+              1.9828248433612221,
+              1.5706530793502829,
+              1.0153435306555736,
+              1.674764802460751,
+              4.379561389707915,
+              5.603769284346018
+            ],
+            "log_rate_error_max_abs": 5.603769284346018,
+            "log_rate_error_rms": 3.183737144780452,
+            "stress_Pa": [
+              297945785.4288433,
+              1098962840.8734863,
+              2292420292.9834113,
+              3850957856.4352536,
+              6349614206.267026,
+              8726264466.21239
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        }
+      ],
+      "temperature_law": {
+        "extrapolation": "forbidden",
+        "kind": "piecewise_linear_interpolation_in_log_positive_parameters",
+        "knots_K": [
+          300.0,
+          550.0,
+          800.0,
+          1050.0,
+          1300.0
+        ],
+        "log_B0_eV": [
+          0.44210196261719586,
+          1.1075602059040135,
+          1.5036226354880207,
+          1.786570005097294,
+          2.0068619370575984
+        ],
+        "log_peak_traction_Pa": [
+          23.094646343274288,
+          23.08146782815518,
+          23.068113319665795,
+          23.054578050663267,
+          23.04085706503119
+        ]
+      }
+    },
+    {
+      "held_out_temperature_diagnostics": [
+        {
+          "B0_A_times_Gamma_eV": 2.868433389746737,
+          "activation_volume_error_max_abs_eV_Pa": 1.1006294143982966e-10,
+          "activation_volume_error_rms_eV_Pa": 6.56909183726291e-11,
+          "barrier_error_max_abs_eV": 0.44187345626634894,
+          "barrier_error_rms_eV": 0.30082869137819884,
+          "log_rate_error_max_abs": 12.065243601588046,
+          "log_rate_error_rms": 8.214051766071949,
+          "peak_traction_Pa": 7785354840.691476,
+          "stress_Pa": [
+            365895373.5789557,
+            1190521432.1294992,
+            2264178700.12774,
+            3862847215.088986,
+            5997450190.721861
+          ],
+          "temperature_K": 425.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0012855248163324074,
+          "thermal_slope_error_rms_eV_K": 0.0007775360084993418
+        },
+        {
+          "B0_A_times_Gamma_eV": 5.1087555026054225,
+          "activation_volume_error_max_abs_eV_Pa": 1.8432204133199532e-10,
+          "activation_volume_error_rms_eV_Pa": 1.2371896546912305e-10,
+          "barrier_error_max_abs_eV": 0.7422001341348401,
+          "barrier_error_rms_eV": 0.4358724570669762,
+          "log_rate_error_max_abs": 12.759814676125677,
+          "log_rate_error_rms": 7.493466409953171,
+          "peak_traction_Pa": 6833314475.768614,
+          "stress_Pa": [
+            321328930.50386345,
+            1045514663.8948975,
+            1988399342.3182187,
+            3392348343.143306,
+            5266954421.108557
+          ],
+          "temperature_K": 675.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0013798940370384658,
+          "thermal_slope_error_rms_eV_K": 0.0008417789522375185
+        },
+        {
+          "B0_A_times_Gamma_eV": 7.298979411811039,
+          "activation_volume_error_max_abs_eV_Pa": 3.1608355971190224e-10,
+          "activation_volume_error_rms_eV_Pa": 2.0553753374220516e-10,
+          "barrier_error_max_abs_eV": 1.0467670282755657,
+          "barrier_error_rms_eV": 0.5954009841200025,
+          "log_rate_error_max_abs": 13.132137241800194,
+          "log_rate_error_rms": 7.469558388983206,
+          "peak_traction_Pa": 5880623205.262647,
+          "stress_Pa": [
+            276762487.42877126,
+            900507895.6602958,
+            1712619984.5086973,
+            2921849471.1976256,
+            4536458651.495252
+          ],
+          "temperature_K": 925.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0014990971476212948,
+          "thermal_slope_error_rms_eV_K": 0.0009583377200951051
+        },
+        {
+          "B0_A_times_Gamma_eV": 9.473914860193778,
+          "activation_volume_error_max_abs_eV_Pa": 4.953238918048376e-10,
+          "activation_volume_error_rms_eV_Pa": 3.185121518113592e-10,
+          "barrier_error_max_abs_eV": 1.3551995617230312,
+          "barrier_error_rms_eV": 0.7628497526886374,
+          "log_rate_error_max_abs": 13.384202444537847,
+          "log_rate_error_rms": 7.534045769442956,
+          "peak_traction_Pa": 4926903428.42607,
+          "stress_Pa": [
+            232196044.35367903,
+            755501127.4256943,
+            1436840626.6991763,
+            2451350599.251946,
+            3805962881.8819475
+          ],
+          "temperature_K": 1175.0,
+          "thermal_derivative_convention": "fixed physical traction; centered difference of log-linear fit at held-out interval midpoint versus native analytic derivative",
+          "thermal_slope_error_max_abs_eV_K": 0.0017205522206086713,
+          "thermal_slope_error_rms_eV_K": 0.0011289432150163351
+        }
+      ],
+      "material_class": "ceramic",
+      "opening_surface": {
+        "G00_eV": 3.673669350333512,
+        "Tref_K": 481.33,
+        "alpha": 1.4499619576428089,
+        "attempt_frequency_s": 1000000000000.0,
+        "exponent": 1.0335969480220228,
+        "floor_fraction": 0.0436070518879531,
+        "floor_max_fraction": 0.95,
+        "floor_min_eV": 0.0001,
+        "gT_eV_per_K": 0.00892692707479,
+        "sT_Pa_per_K": -2252859.2869639,
+        "sigc0_Pa": 4497151743.154973
+      },
+      "outside_domain_behavior": "not fitted; EXP-floor retains a positive asymptote while the unmodified bilinear barrier reaches zero at peak traction and is mechanically unstable beyond it",
+      "parent_candidate_id": "v913_zeroD_sobol_0077080__taylor_margin_0p10eV",
+      "parent_option_key": "v913_paper_ceramic01_0077080_persistent_sites__taylor_margin_0p10eV",
+      "reference_temperature_frozen_control": {
+        "B0_A_times_Gamma_eV": 4.142903143247513,
+        "peak_traction_Pa": 7324818652.388352,
+        "temperature_K": 550.0
+      },
+      "schema": "bilinear-opening-analogue/1",
+      "shared_across_taylor_margin_variants": true,
+      "slices": [
+        {
+          "B0_A_times_Gamma_eV": 1.9860252163569325,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            193453182.28266037,
+            7674107267.635685
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -3.8726620403698227e-11,
+              5.190975577778999e-12,
+              4.7585017585072395e-11,
+              6.32510864603245e-11,
+              2.006989039897236e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 6.32510864603245e-11,
+            "activation_volume_error_rms_eV_Pa": 4.048340818891387e-11,
+            "barrier_error_eV": [
+              -0.05435158973282617,
+              -0.03932465059144552,
+              -0.071929806094851,
+              -0.17322226615690872,
+              -0.27836183824002353
+            ],
+            "barrier_error_max_abs_eV": 0.27836183824002353,
+            "barrier_error_rms_eV": 0.15307886002735163,
+            "log_elementary_rate_error": [
+              2.1024133599654986,
+              1.521145401373547,
+              2.7823691276909974,
+              6.7005364222462,
+              10.767516654014708
+            ],
+            "log_rate_error_max_abs": 10.767516654014708,
+            "log_rate_error_rms": 5.921354684045556,
+            "stress_Pa": [
+              388178595.1165018,
+              1263024816.2467997,
+              2402068379.0325003,
+              4098096651.0618258,
+              6362698075.528513
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 169.96958814781374,
+          "peak_traction_Pa": 8274846500.90483,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 7480654085.3530245,
+          "second_best_objective": 169.9695881478139,
+          "separation_work_J_m2": null,
+          "temperature_K": 300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              -4.288542292491862e-11,
+              -1.8505762077804808e-11,
+              2.806704976340285e-11,
+              6.087152370556697e-11,
+              4.47233349506991e-11,
+              -2.6102164241758967e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 6.087152370556697e-11,
+            "activation_volume_error_rms_eV_Pa": 3.948886779292862e-11,
+            "barrier_error_eV": [
+              -0.06243244119902047,
+              -0.042309020771812866,
+              -0.048289088313176576,
+              -0.11298561815278796,
+              -0.2474090415441232,
+              -0.27567688065550844
+            ],
+            "barrier_error_max_abs_eV": 0.27567688065550844,
+            "barrier_error_rms_eV": 0.1622726231161402,
+            "log_elementary_rate_error": [
+              2.41499465088886,
+              1.636585994171838,
+              1.8679053346780046,
+              4.370478844428643,
+              9.570209020113913,
+              10.663657857531042
+            ],
+            "log_rate_error_max_abs": 10.663657857531042,
+            "log_rate_error_rms": 6.276985318609183,
+            "stress_Pa": [
+              193453182.28266037,
+              802314213.0193183,
+              1787891633.0730593,
+              3146685598.3715415,
+              5426780568.013086,
+              7674107267.635685
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 4.142903143247513,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            171242992.5803969,
+            6793049762.152693
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -9.126256868553207e-11,
+              1.2232974913835269e-11,
+              1.121381342106309e-10,
+              1.4905655553869637e-10,
+              4.7296400762044686e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.4905655553869637e-10,
+            "activation_volume_error_rms_eV_Pa": 9.540258857774233e-11,
+            "barrier_error_eV": [
+              -0.11337890788969229,
+              -0.08203230036327591,
+              -0.15004755037881257,
+              -0.36134640405133456,
+              -0.5806704389953602
+            ],
+            "barrier_error_max_abs_eV": 0.5806704389953602,
+            "barrier_error_rms_eV": 0.3193267057030235,
+            "log_elementary_rate_error": [
+              2.3921956203773074,
+              1.7308096656692624,
+              3.1658718499366643,
+              7.624092534492284,
+              12.25163751267316
+            ],
+            "log_rate_error_max_abs": 12.25163751267316,
+            "log_rate_error_rms": 6.737513714592187,
+            "stress_Pa": [
+              343612152.04140955,
+              1118018048.0121982,
+              2126289021.222979,
+              3627597779.1161456,
+              5632202305.915208
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 220.05355835538148,
+          "peak_traction_Pa": 7324818652.388352,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 6621806769.572296,
+          "second_best_objective": 220.05355835538174,
+          "separation_work_J_m2": null,
+          "temperature_K": 550.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              -1.0106313991133181e-10,
+              -4.361039926011128e-11,
+              6.61423859424286e-11,
+              1.4344891391067311e-10,
+              1.0539433601265013e-10,
+              -6.151196615364044e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 1.4344891391067311e-10,
+            "activation_volume_error_rms_eV_Pa": 9.305886966172418e-11,
+            "barrier_error_eV": [
+              -0.1302357859201022,
+              -0.08825777841629234,
+              -0.10073236374233518,
+              -0.2356911019433936,
+              -0.5161020549884089,
+              -0.5750695437807126
+            ],
+            "barrier_error_max_abs_eV": 0.5750695437807126,
+            "barrier_error_rms_eV": 0.33850514800935966,
+            "log_elementary_rate_error": [
+              2.747860977789408,
+              1.862161798181159,
+              2.125364619044595,
+              4.972875751982318,
+              10.88930118124064,
+              12.133463530827193
+            ],
+            "log_rate_error_max_abs": 12.133463530827193,
+            "log_rate_error_rms": 7.142162044204888,
+            "stress_Pa": [
+              171242992.5803969,
+              710201223.9140546,
+              1582625367.2557225,
+              2785417392.5526466,
+              4803736664.232698,
+              6793049762.152693
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 6.299781067278962,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            149032802.87813345,
+            5911992256.669702
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -1.5945726881767996e-10,
+              2.1373891757882733e-11,
+              1.9593180334451654e-10,
+              2.6043700772156864e-10,
+              8.263798604826175e-11
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 2.6043700772156864e-10,
+            "activation_volume_error_rms_eV_Pa": 1.6669085584913345e-10,
+            "barrier_error_eV": [
+              -0.1724062269651716,
+              -0.12473994733230942,
+              -0.2281652883682419,
+              -0.5494705332892236,
+              -0.8829790332326094
+            ],
+            "barrier_error_max_abs_eV": 0.8829790332326094,
+            "barrier_error_rms_eV": 0.4855745463787273,
+            "log_elementary_rate_error": [
+              2.5008639813568148,
+              1.8094337241237717,
+              3.3096852794725224,
+              7.970425951015893,
+              12.808182740121
+            ],
+            "log_rate_error_max_abs": 12.808182740121,
+            "log_rate_error_rms": 7.043573278519398,
+            "stress_Pa": [
+              299045708.96631736,
+              973011279.7775966,
+              1850509663.413458,
+              3157098907.1704655,
+              4901706536.301904
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 240.5000409887163,
+          "peak_traction_Pa": 6374790822.913248,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 5762959453.791568,
+          "second_best_objective": 240.50004098871636,
+          "separation_work_J_m2": null,
+          "temperature_K": 800.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              -1.7658118183790692e-10,
+              -7.619767325216973e-11,
+              1.1556636646779838e-10,
+              2.5063913189118585e-10,
+              1.8414879965121046e-10,
+              -1.0747592838881514e-10
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 2.5063913189118585e-10,
+            "activation_volume_error_rms_eV_Pa": 1.625958252221709e-10,
+            "barrier_error_eV": [
+              -0.1980391325110098,
+              -0.13420653510516267,
+              -0.15317563456951078,
+              -0.35839657798445046,
+              -0.7847950602970789,
+              -0.8744622043932821
+            ],
+            "barrier_error_max_abs_eV": 0.8744622043932821,
+            "barrier_error_rms_eV": 0.5147376690746522,
+            "log_elementary_rate_error": [
+              2.8726858775001483,
+              1.9467527108229246,
+              2.221911783927322,
+              5.198774479902723,
+              11.383960623650788,
+              12.684640621865855
+            ],
+            "log_rate_error_max_abs": 12.684640621865855,
+            "log_rate_error_rms": 7.4666032607767185,
+            "stress_Pa": [
+              149032802.87813345,
+              618088234.8087912,
+              1377359101.438386,
+              2424149186.733752,
+              4180692760.4523106,
+              5911992256.669702
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 8.456659030700619,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            126822613.17587,
+            5030934751.18671
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -2.515375589777177e-10,
+              3.371648025701308e-11,
+              3.090747160742777e-10,
+              4.1082913729668774e-10,
+              1.3035817764038429e-10
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 4.1082913729668774e-10,
+            "activation_volume_error_rms_eV_Pa": 2.6294826839644654e-10,
+            "barrier_error_eV": [
+              -0.2314335097387472,
+              -0.16744756451189335,
+              -0.30628300411790743,
+              -0.7375946495804464,
+              -1.1852876232973788
+            ],
+            "barrier_error_max_abs_eV": 1.1852876232973788,
+            "barrier_error_rms_eV": 0.6518223764084968,
+            "log_elementary_rate_error": [
+              2.5577851025688427,
+              1.8506174255121266,
+              3.3850158777229797,
+              8.151838549918905,
+              13.099706384574993
+            ],
+            "log_rate_error_max_abs": 13.099706384574993,
+            "log_rate_error_rms": 7.203890075299424,
+            "stress_Pa": [
+              254479265.89122516,
+              828004511.5429951,
+              1574730305.603937,
+              2686600035.224786,
+              4171210766.6885996
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 251.57255095159107,
+          "peak_traction_Pa": 5424762983.276952,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 4904112138.01084,
+          "second_best_objective": 251.57255095159113,
+          "separation_work_J_m2": null,
+          "temperature_K": 1050.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              -2.785498578514991e-10,
+              -1.2019882363818784e-10,
+              1.8230140218172786e-10,
+              3.953733738286007e-10,
+              2.904874912580075e-10,
+              -1.695390406404397e-10
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 3.953733738286007e-10,
+            "activation_volume_error_rms_eV_Pa": 2.5648851675457805e-10,
+            "barrier_error_eV": [
+              -0.2658424412660665,
+              -0.1801552586523103,
+              -0.20561887921672017,
+              -0.4811020361528029,
+              -1.0534880583109383,
+              -1.1738548640142044
+            ],
+            "barrier_error_max_abs_eV": 1.1738548640142044,
+            "barrier_error_rms_eV": 0.6909701807667068,
+            "log_elementary_rate_error": [
+              2.938069930618329,
+              1.991061870212686,
+              2.272483819050758,
+              5.317102187476152,
+              11.643067870005853,
+              12.973352420497926
+            ],
+            "log_rate_error_max_abs": 12.973352420497926,
+            "log_rate_error_rms": 7.636548556341096,
+            "stress_Pa": [
+              126822613.17587,
+              525975245.7035275,
+              1172092835.6210494,
+              2062880980.9148574,
+              3557648856.671923,
+              5030934751.18671
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        },
+        {
+          "B0_A_times_Gamma_eV": 10.613536912432954,
+          "activation_area_m2": null,
+          "beta": 1.0,
+          "final_separation_m": null,
+          "fit_window_stress_Pa": [
+            104612423.47360654,
+            4149877245.703718
+          ],
+          "held_out": {
+            "activation_volume_error_eV_Pa": [
+              -3.827168634352701e-10,
+              5.129994806559802e-11,
+              4.702601973118599e-10,
+              6.250805421936152e-10,
+              1.9834122735347715e-10
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 6.250805421936152e-10,
+            "activation_volume_error_rms_eV_Pa": 4.0007835785060934e-10,
+            "barrier_error_eV": [
+              -0.29046087183265,
+              -0.2101552551446746,
+              -0.38440078458551774,
+              -0.925718815284895,
+              -1.4875962380533978
+            ],
+            "barrier_error_max_abs_eV": 1.4875962380533978,
+            "barrier_error_rms_eV": 0.8180702420897314,
+            "log_elementary_rate_error": [
+              2.592814192910225,
+              1.875961897434929,
+              3.4313737466621554,
+              8.263477513410507,
+              13.279105770800571
+            ],
+            "log_rate_error_max_abs": 13.279105770800571,
+            "log_rate_error_rms": 7.302546883870267,
+            "stress_Pa": [
+              209912822.8161329,
+              682997743.3083935,
+              1298950947.7944157,
+              2216101163.2791057,
+              3440714997.075295
+            ]
+          },
+          "held_out_decay_fractions": [
+            0.9,
+            0.7,
+            0.5,
+            0.3,
+            0.15
+          ],
+          "multistart_count": 12,
+          "objective": 258.5102573825768,
+          "peak_traction_Pa": 4474735111.537182,
+          "physical_support_status": "UNIDENTIFIED_REQUIRES_AUTHORITATIVE_ACTIVATION_AREA",
+          "q_span_Pa": 4045264822.2301116,
+          "second_best_objective": 258.5102573825771,
+          "separation_work_J_m2": null,
+          "temperature_K": 1300.0,
+          "training": {
+            "activation_volume_error_eV_Pa": [
+              -4.2381634024410154e-10,
+              -1.8288369267409727e-10,
+              2.773733603397904e-10,
+              6.015644485171798e-10,
+              4.4197954726959035e-10,
+              -2.579553284082684e-10
+            ],
+            "activation_volume_error_max_abs_eV_Pa": 6.015644485171798e-10,
+            "activation_volume_error_rms_eV_Pa": 3.902497861858977e-10,
+            "barrier_error_eV": [
+              -0.3336458305478285,
+              -0.22610405883358098,
+              -0.258062193446019,
+              -0.6038075526583508,
+              -1.322181091827483,
+              -1.4732475317688793
+            ],
+            "barrier_error_max_abs_eV": 1.4732475317688793,
+            "barrier_error_rms_eV": 0.8672027224978037,
+            "log_elementary_rate_error": [
+              2.9783069898246026,
+              2.018329729300285,
+              2.3036056925625785,
+              5.389919759040602,
+              11.802518800064012,
+              13.151021292262495
+            ],
+            "log_rate_error_max_abs": 13.151021292262495,
+            "log_rate_error_rms": 7.741130544833491,
+            "stress_Pa": [
+              104612423.47360654,
+              433862256.59826386,
+              966826569.8037125,
+              1701612775.0959623,
+              2934604952.891535,
+              4149877245.703718
+            ]
+          },
+          "training_decay_fractions": [
+            0.95,
+            0.8,
+            0.6,
+            0.4,
+            0.2,
+            0.1
+          ]
+        }
+      ],
+      "temperature_law": {
+        "extrapolation": "forbidden",
+        "kind": "piecewise_linear_interpolation_in_log_positive_parameters",
+        "knots_K": [
+          300.0,
+          550.0,
+          800.0,
+          1050.0,
+          1300.0
+        ],
+        "log_B0_eV": [
+          0.6861352626002453,
+          1.4213967844120199,
+          1.8405148815680876,
+          2.1349541819904405,
+          2.3621302535719395
+        ],
+        "log_peak_traction_Pa": [
+          22.83648620829789,
+          22.714534234189948,
+          22.575617115360533,
+          22.414240045699977,
+          22.221712993968673
+        ]
+      }
+    }
+  ],
+  "objective": "sum w*((G_BL-G_EXP)/(kBT))^2 + beta*sum w*(q_span*(V_BL-V_EXP)/(kBT))^2",
+  "physical_support_policy": "report identifiable B0=A*Gamma and peak traction; do not assign A, Gamma, delta_f, delta_p or stiffness without authoritative support",
+  "schema": "v10.2.32-bilinear-opening-fit-registry/1",
+  "source_head": "353f0ac201a607727e945166b0e7e8cb1b20d7d4",
+  "source_registry": "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_registry.csv",
+  "source_registry_sha256": "144cab65039f9a5322ff45de02b3705ec3743afb00cfc66c795b0cc51278b8e8",
+  "status": "PASS_IDENTIFIABLE_FIT_PHYSICAL_SUPPORT_UNRESOLVED",
+  "weighting": "uniform normalized weights within every temperature slice"
+}
