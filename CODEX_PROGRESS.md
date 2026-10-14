@@ -117,3 +117,28 @@ under the final source before restart/uninterrupted comparison.
   records, build one compact source/evidence package, copy it to the independent
   backup location, verify hashes, and retain all local and historical evidence.
 
+## Recovery wiring qualification, 13 October 2026
+
+- Commit `15b98bbf` makes the base, unit-source, and direct-source evaluations
+  consume one frozen set of velocity, timestep, bin width, mobile recovery,
+  and retained recovery arguments. Predictors remain ledger-pure; the accepted
+  outer update owns recovery and escape once, and rejected evaluations roll
+  back exactly.
+- Regression coverage spans zero, mobile-only, retained-only, and combined
+  recovery for empty and populated states, nonzero continuous injection,
+  source/backstress feedback, affine amplitudes 0.25/1/2.5, full mass ledgers,
+  and forced-failure rollback. Explicit zero recovery is exactly neutral.
+- Commit `9f73dbff` supports an explicitly recorded prescribed diagnostic stress.
+  The compact 950 K, 0.5 GPa, 16-bin numerical recovery overlay uses unchanged
+  material laws and the error-controlled BDF route. Its fresh-process restart
+  and uninterrupted terminal states are byte-identical across 28 arrays and
+  scalars; recovered content is `1.335756144352698e-12`, and the maximum
+  population-ledger balance error is `5.169878828456423e-26`.
+- The accepted `2276745b` 5 GPa full-PF result remains the qualified
+  zero-recovery specimen baseline. It was not rerun because the repaired
+  coefficients are exactly zero in that configuration and regression proves
+  numerical equivalence.
+- Current status: 61/61 affected tests and 925/925 full-suite tests pass.
+- Remaining readiness scopes are native source geography, tensor/constraint,
+  FEM/CZM, branch/cavity, capability-wide restart, and long-growth analysis.
+

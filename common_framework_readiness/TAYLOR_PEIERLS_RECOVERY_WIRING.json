@@ -1,0 +1,79 @@
+{
+  "schema": "taylor-peierls-recovery-wiring/1",
+  "date": "2026-10-13",
+  "status": "PASSED_COMPACT_NATIVE_RECOVERY_QUALIFICATION",
+  "production_execution_authorized": false,
+  "qualified_source_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750",
+  "recovery_wiring_commit": "15b98bbfba921da184a4d87d0d580055979b21e4",
+  "corrected_argument_ownership": {
+    "owner": "persistent source frozen outer iteration",
+    "shared_arguments": ["per-bin velocity_m_s", "dt_s", "dx_m", "mobile_recovery_rate_s", "retained_recovery_rate_s"],
+    "consumers": ["zero-source base response", "unit-source response", "direct accepted-source response"],
+    "predictor_updates_cumulative_ledgers": false,
+    "accepted_outer_update_owns_ledgers_once": true,
+    "rollback_after_rejected_evaluation": "exact"
+  },
+  "zero_recovery_equivalence": {
+    "status": "PASS",
+    "reason": "The repaired arguments are the already-configured zero coefficients in the accepted 2276745b full-PF run; explicit-zero and omitted-default operator calls are exactly equal in regression tests.",
+    "accepted_full_pf_baseline": "2276745b06220125354687f04c182c8d11be66dd",
+    "baseline_evidence": "../integration_evidence/f1_native_taylor_peierls_qualification_2276745b",
+    "full_pf_rerun_required": false,
+    "claim_limit": "Numerical equivalence applies only to the default zero-recovery equations; the historical full-PF trajectory is not relabeled as nonzero-recovery evidence."
+  },
+  "regression_matrix": {
+    "recovery_modes": ["zero", "mobile-only", "retained-only", "mobile-and-retained"],
+    "initial_states": ["empty", "populated"],
+    "continuous_emission": "nonzero",
+    "active_source_and_backstress_feedback": true,
+    "frozen_affine_source_amplitudes": [0.25, 1.0, 2.5],
+    "checked_outputs": ["mobile and retained populations", "escape and recovery", "gross trapping and release", "mobile-distance integral"],
+    "outer_mass_ledgers_checked": true,
+    "forced_failure_rollback_checked": true,
+    "acceptance_tolerances_changed": false
+  },
+  "compact_native_recovery": {
+    "root": "../integration_evidence/native_taylor_peierls_recovery_9f73dbff",
+    "classification": "PRESCRIBED_DRIVE_NUMERICAL_QUALIFICATION_OVERLAY",
+    "selected_material_recovery_unchanged": true,
+    "temperature_K": 950.0,
+    "tip_opening_stress_Pa": 500000000.0,
+    "dt_s": 0.01,
+    "bins": 16,
+    "initial_steps": 6,
+    "terminal_steps": 12,
+    "mobile_recovery_rate_s": 0.1,
+    "retained_recovery_rate_s": 0.1,
+    "error_controlled_bdf_used": true,
+    "fresh_process_restart": true,
+    "arrays_and_scalars_compared": 28,
+    "bitwise_terminal_state_equal": true,
+    "emitted_total": 2.235174179077148e-10,
+    "terminal_recovered_total": 1.335756144352698e-12,
+    "terminal_escaped_total": 9.370405376577267e-26,
+    "terminal_gross_trapping_total": 5.708229268561501e-10,
+    "terminal_gross_release_total": 5.708229267706343e-10,
+    "maximum_population_ledger_balance_error": 5.169878828456423e-26,
+    "maximum_complete_numerical_correction": 7.754818242684634e-26,
+    "maximum_affine_direct_retry_discrepancy": 1.4435055404258717e-17,
+    "scope": "Synthetic-kernel prescribed-drive native subsystem fixture; recovery/removal is distinct from Taylor retained-to-mobile release and sign-reversing return; no specimen equilibrium solve or production campaign."
+  },
+  "tests": {
+    "affected_suite_passed": 61,
+    "affected_suite_failed": 0,
+    "affected_suite_elapsed_s": 21.73,
+    "full_suite_passed": 925,
+    "full_suite_failed": 0,
+    "full_suite_elapsed_s": 256.68
+  },
+  "sha256": {
+    "persistent_site_source_v10221.py": "80f6bc21ee3473010242ac4785ab11fa7e018c5e282ca6148858982e4ba615b6",
+    "test_v10221_persistent_site_source.py": "03dc6a72e58a897579bb72de4ffa737ddd7abc6aa9dc57261c950f25510c5323",
+    "test_coupled_transport_exchange.py": "c0e4b30eac2ee99abac8f1b909d7017e480f1284430ac82da327eecb582898c7",
+    "qualification_runner.py": "83c1ae00dc27c42673afdd7d1d973bc7366ed5ea045828e60b7161711523c324",
+    "restart_comparison.json": "cfa8b34295ef00b3f644e3e6239b28e217186de46d327a37126d156d3a8d7f03",
+    "resume_terminal_state.npz": "2621063fbe39dd5406ad3118b122af6d65a31f280f58197e7c17aae56af6c11b",
+    "uninterrupted_terminal_state.npz": "2621063fbe39dd5406ad3118b122af6d65a31f280f58197e7c17aae56af6c11b"
+  },
+  "remaining_readiness_scopes": ["native source geography", "tensor and constraint qualification", "FEM/CZM option qualification", "branch and cavity option qualification", "capability-wide restart coverage", "long-growth analysis"]
+}

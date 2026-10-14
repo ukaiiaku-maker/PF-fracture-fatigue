@@ -1,0 +1,16 @@
+{
+  "dt_s": 0.01,
+  "initial_steps": 6,
+  "manifest": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/f1_coupled_native_qualification_8982d422/initial_to_step48/selected_material_manifest_v10_2_22.csv",
+  "manifest_sha256": "ed4b3d3ad82d0f24cb53113e1471f5ce93a3beaa54b62c485a5b4f2d06fa049e",
+  "mobile_recovery_rate_s": 0.1,
+  "phase": "resume",
+  "production_execution_authorized": false,
+  "recovery_input_classification": "post-install numerical qualification overlay",
+  "retained_recovery_rate_s": 0.1,
+  "selected_material_recovery_unchanged": true,
+  "source_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750",
+  "stress_Pa": 500000000.0,
+  "temperature_K": 950.0,
+  "total_steps": 12
+}

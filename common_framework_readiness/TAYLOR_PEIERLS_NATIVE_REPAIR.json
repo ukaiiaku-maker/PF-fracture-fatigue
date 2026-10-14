@@ -4,6 +4,7 @@
   "status": "PASSED_FULL_NATIVE_QUALIFICATION",
   "production_execution_authorized": false,
   "source_head_at_qualification": "2276745b06220125354687f04c182c8d11be66dd",
+  "subsequent_recovery_wiring_qualification": "TAYLOR_PEIERLS_RECOVERY_WIRING.json",
   "physical_selection": {
     "taylor_mode": "mean_net_rate_over_density_order",
     "taylor_window_s": null,
@@ -100,7 +101,11 @@
     "full_suite_elapsed_s": 200.43,
     "focused_after_final_source_repair_passed": 56,
     "focused_after_final_source_repair_failed": 0,
-    "focused_after_final_source_repair_elapsed_s": 16.07
+    "focused_after_final_source_repair_elapsed_s": 16.07,
+    "current_full_suite_passed": 925,
+    "current_full_suite_failed": 0,
+    "current_full_suite_elapsed_s": 256.68,
+    "current_source_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750"
   },
   "preserved_historical_evidence": {
     "one_second_run": "../integration_evidence/f1_coupled_native_qualification_8982d422",

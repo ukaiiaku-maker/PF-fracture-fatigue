@@ -7,6 +7,12 @@
   "equation_to_consumer_map": "TAYLOR_PEIERLS_EQUATION_CONSUMER_MAP.md",
   "parameter_dossier": "PARAMETER_PARENT_DOSSIER_V2_NATIVE.json",
   "source_commit": "2276745b06220125354687f04c182c8d11be66dd",
+  "subsequent_zero_neutral_recovery_wiring": {
+    "record": "TAYLOR_PEIERLS_RECOVERY_WIRING.json",
+    "source_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750",
+    "accepted_full_pf_baseline_reused": true,
+    "reason": "The accepted full-PF configuration has explicit zero recovery, and exact zero-neutral regressions show the wiring repair does not change its active equations or numerical behavior."
+  },
   "current_operator_contract": {
     "outer_mode": "validated_scalar",
     "spatial_meaning": "per-bin Peierls velocity is consumed by the transport generator; scalar velocity is diagnostic only",

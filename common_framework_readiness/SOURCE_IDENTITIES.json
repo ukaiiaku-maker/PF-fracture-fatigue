@@ -3,7 +3,7 @@
   "generated_utc": "2026-10-13",
   "controlling_continuation": {
     "date": "2026-10-13",
-    "sha256": "cf461810fd7e52a9ce52295a7d1fd6f78a8b55e9a5216d535c1a6cd60a280366"
+    "sha256": "17e658d723c9b59e2e5cdfed34f3cdfe3c8fa51926a42b4d168b063f1365ccae"
   },
   "external_evidence_manifest": {
     "path": "../common_framework_release/EXTERNAL_EVIDENCE_MANIFEST.json",
@@ -12,6 +12,8 @@
   "pf": {
     "branch": "codex/shared-fracture-fatigue-options-v1",
     "qualified_solver_commit": "2276745b06220125354687f04c182c8d11be66dd",
+    "current_recovery_wiring_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750",
+    "recovery_wiring_record": "TAYLOR_PEIERLS_RECOVERY_WIRING.json",
     "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1"
   },
   "fem": {

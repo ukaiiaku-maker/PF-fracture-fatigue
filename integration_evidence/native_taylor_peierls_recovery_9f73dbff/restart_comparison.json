@@ -1,0 +1,33 @@
+{
+  "array_keys_equal": true,
+  "arrays_and_scalars_compared": 28,
+  "bitwise_terminal_state_equal": true,
+  "differences": {},
+  "emitted_total": 2.235174179077148e-10,
+  "error_controlled_stiff_solve_used": true,
+  "fresh_process_restart": true,
+  "max_affine_invariant_defect": 1.330182267107682e-18,
+  "max_affine_retry_discrepancy": 1.4435055404258717e-17,
+  "max_base_map_correction": 0.0,
+  "max_coefficient_residual": 0.0,
+  "max_complementarity_residual": 8.717817453695183e-10,
+  "max_complete_numerical_correction": 7.754818242684634e-26,
+  "max_invariant_roundoff_correction": 7.754818242684634e-26,
+  "max_population_ledger_balance_error": 5.169878828456423e-26,
+  "max_positivity_correction": 0.0,
+  "maximum_velocity_m_s": 0.0006250138584028688,
+  "mobile_recovery_rate_s": 0.1,
+  "retained_recovery_rate_s": 0.1,
+  "schema": "native-taylor-peierls-spatial-qualification/1",
+  "scope": "prescribed-drive native subsystem integration fixture with a synthetic shielding kernel; explicit removal/recovery is distinct from Taylor retained-to-mobile release and sign-reversing source-surface return; no specimen equilibrium solve and not a production campaign",
+  "status": "PASSED",
+  "stiff_solver_methods": [
+    "error_controlled_bdf"
+  ],
+  "terminal_escaped_total": 9.370405376577267e-26,
+  "terminal_gross_release_total": 5.708229267706343e-10,
+  "terminal_gross_trapping_total": 5.708229268561501e-10,
+  "terminal_mobile_distance_population_total_m": 2.7868221542277844e-17,
+  "terminal_recovered_total": 1.335756144352698e-12,
+  "terminal_velocity_m_s": 0.0006250138584028688
+}

@@ -8,11 +8,18 @@ The F1/F4 repair is documented in `F1_F4_REPAIR_RECORD.md`. The completed
 full-mechanics native Taylor–Peierls qualification and its fresh-process restart
 and time/state-refinement receipts are indexed by
 `F1_ACTIVE_NATIVE_QUALIFICATION.json` and `TAYLOR_PEIERLS_NATIVE_REPAIR.json`.
+The later recovery-argument repair and its compact nonzero-recovery,
+fresh-process restart receipt are indexed by
+`TAYLOR_PEIERLS_RECOVERY_WIRING.json`. That record establishes exact neutrality
+for the accepted zero-recovery full-PF baseline; it does not relabel that
+trajectory as nonzero-recovery specimen evidence.
 The prescribed-drive 16-bin calculation is retained only as a labeled subsystem
 fixture; it is not the full-mechanics acceptance calculation. The corrected
 native-backed parameter diagnostic is `PARAMETER_PARENT_DOSSIER_V2_NATIVE.json`,
 and the historical v1 dossier is retained.
 
-At qualified solver commit `2276745b`, the working checkout passed 913/913
-tests. The earlier 901-test clean-clone receipt and the independent FEM/CZM
-receipt remain explicitly labeled historical in `QUALIFICATION_RECEIPT.json`.
+At qualified full-PF solver commit `2276745b`, the working checkout passed
+913/913 tests. At recovery-wiring commit `9f73dbff`, the expanded checkout
+passed 925/925 tests. The earlier 901-test clean-clone receipt and the
+independent FEM/CZM receipt remain explicitly labeled historical in
+`QUALIFICATION_RECEIPT.json`.

@@ -10,6 +10,14 @@
     "failed": 0,
     "elapsed_s": 200.43
   },
+  "current_recovery_wiring_checkout": {
+    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+    "tested_content_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750",
+    "passed": 925,
+    "failed": 0,
+    "elapsed_s": 256.68,
+    "record": "TAYLOR_PEIERLS_RECOVERY_WIRING.json"
+  },
   "final_source_repair_targeted": {
     "passed": 56,
     "failed": 0,
