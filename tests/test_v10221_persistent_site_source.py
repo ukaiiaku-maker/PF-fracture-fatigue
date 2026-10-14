@@ -1,4 +1,5 @@
 import math
+from dataclasses import replace
 from pathlib import Path
 from types import MethodType, SimpleNamespace
 
@@ -228,6 +229,21 @@ def _coupled_test_state():
     return state
 
 
+def _populate_coupled_test_state(state):
+    state.mobile_positive[0, 1] = 0.7
+    state.mobile_negative[0, 3] = 0.2
+    state.retained_positive[0, 2] = 0.6
+    state.retained_negative[0, 4] = 0.4
+    state.accumulated_slip_positive[0, 0] = 0.3
+    state.accumulated_slip_negative[0, 1] = 0.1
+    state.mobile = state.mobile_positive + state.mobile_negative
+    state.retained = state.retained_positive + state.retained_negative
+    state.accumulated_slip = (
+        state.accumulated_slip_positive + state.accumulated_slip_negative
+    )
+    return state
+
+
 def test_continuous_source_backstress_update_converges_under_time_partition():
     def evolve(parts):
         state = _coupled_test_state()
@@ -280,6 +296,84 @@ def test_coupled_acceptance_recomputes_full_coefficients_at_accepted_state():
     assert out["coefficient_residual"] <= 1.0e-4
 
 
+@pytest.mark.parametrize(
+    "mobile_recovery,retained_recovery",
+    ((0.0, 0.0), (0.1, 0.0), (0.0, 0.1), (0.1, 0.1)),
+)
+@pytest.mark.parametrize("populated", (False, True))
+def test_coupled_source_uses_one_recovery_generator_for_all_affine_maps(
+    mobile_recovery, retained_recovery, populated
+):
+    state = _coupled_test_state()
+    if populated:
+        _populate_coupled_test_state(state)
+    state.cfg.mobile_recovery_rate_s = mobile_recovery
+    state.manifest.retained_recovery_rate_s = retained_recovery
+    initial_population = float(np.sum(state.mobile) + np.sum(state.retained))
+
+    out = state._coupled_persistent_source_transport(
+        1.0, 5.0e8, 950.0, 1.0e-9
+    )
+    result = out["result"]
+    terminal_population = float(np.sum(result.mobile) + np.sum(result.retained))
+
+    assert out["emitted"] > 0.0
+    assert out["activation_rate_s"] > 0.0
+    assert out["affine_direct_state_residual"] <= 1.0e-8
+    assert out["coefficient_residual"] <= 1.0e-6
+    assert initial_population + out["emitted"] == pytest.approx(
+        terminal_population + result.escaped + result.recovered, abs=2.0e-10
+    )
+    if mobile_recovery > 0.0 or retained_recovery > 0.0:
+        assert result.recovered > 0.0
+    else:
+        assert result.recovered == 0.0
+        if not populated:
+            assert out["emitted"] == pytest.approx(
+                3.2917807917488653, rel=2.0e-13, abs=2.0e-13
+            )
+            assert result.escaped == pytest.approx(
+                1.1938952951645873e-06, rel=2.0e-12, abs=2.0e-15
+            )
+
+
+def test_coupled_source_recovery_failure_rolls_back_exactly():
+    state = _populate_coupled_test_state(_coupled_test_state())
+    state.cfg.mobile_recovery_rate_s = 0.1
+    state.manifest.retained_recovery_rate_s = 0.1
+    state._persistent_site_cfg = replace(
+        state._persistent_site_cfg,
+        coupled_tolerance=1.0e-30,
+        coupled_max_iterations=8,
+    )
+    arrays = {
+        name: np.asarray(getattr(state, name)).copy()
+        for name in (
+            "mobile_positive", "mobile_negative", "retained_positive",
+            "retained_negative", "accumulated_slip_positive",
+            "accumulated_slip_negative",
+        )
+    }
+    ledgers = {
+        name: float(getattr(state, name))
+        for name in (
+            "emitted_total", "escaped_total", "recovered_total",
+            "gross_trapping_total", "gross_release_total",
+            "mobile_distance_population_total_m", "time_s",
+        )
+    }
+
+    with pytest.raises(RuntimeError, match="fixed point did not converge"):
+        state._coupled_persistent_source_transport(
+            1.0, 5.0e8, 950.0, 1.0e-9
+        )
+
+    for name, expected in arrays.items():
+        np.testing.assert_array_equal(getattr(state, name), expected)
+    for name, expected in ledgers.items():
+        assert getattr(state, name) == expected
+
+
 def test_coupled_source_expands_bracket_when_blunting_raises_site_target():
     state = _coupled_test_state()
 
@@ -319,3 +413,30 @@ def test_outer_evolve_owns_coupled_flux_ledgers_once_and_conserves_source():
     assert state.gross_trapping_total > 0.0
     assert state.gross_release_total > 0.0
     assert state.mobile_distance_population_total_m > 0.0
+
+
+def test_outer_evolve_owns_nonzero_recovery_ledger_exactly_once():
+    state = _populate_coupled_test_state(_coupled_test_state())
+    state.cfg.mobile_recovery_rate_s = 0.1
+    state.manifest.retained_recovery_rate_s = 0.1
+    initial_population = (
+        state.mobile_count + state.retained_count
+        + state.wake_mobile_count + state.wake_retained_count
+    )
+
+    out = state.evolve(1.0, 950.0, 5.0e8, 1.0e-9)
+    accounted = (
+        state.mobile_count + state.retained_count
+        + state.wake_mobile_count + state.wake_retained_count
+        + state.escaped_total + state.recovered_total
+        + state.wake_discarded_mobile_total + state.wake_discarded_retained_total
+    )
+
+    assert accounted == pytest.approx(
+        initial_population + state.emitted_total, abs=2.0e-10
+    )
+    assert state.recovered_total == pytest.approx(out["dN_recovered"])
+    assert state.recovered_total > 0.0
+    assert state.escaped_total == pytest.approx(out["dN_escaped"])
+    assert state.gross_trapping_total == pytest.approx(out["dN_gross_trapping"])
+    assert state.gross_release_total == pytest.approx(out["dN_gross_release"])

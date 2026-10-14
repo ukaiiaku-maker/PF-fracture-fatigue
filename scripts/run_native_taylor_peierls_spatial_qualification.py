@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
@@ -55,11 +56,21 @@ def _commit() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
 
 
-def build_state(manifest_path: Path) -> UnifiedMPZState:
-    state = UnifiedMPZState(
+def build_state(
+    manifest_path: Path,
+    *,
+    mobile_recovery_rate_s: float = 0.0,
+    retained_recovery_rate_s: float = 0.0,
+) -> UnifiedMPZState:
+    manifest = replace(
         MaterialManifest.from_csv(manifest_path),
+        retained_recovery_rate_s=max(float(retained_recovery_rate_s), 0.0),
+    )
+    state = UnifiedMPZState(
+        manifest,
         MPZConfig(length_m=8.0e-6, n_bins=16, n_systems=2, source_bin_count=2,
-                  mobile_recovery_rate_s=0.0, wake_length_m=8.0e-6),
+                  mobile_recovery_rate_s=max(float(mobile_recovery_rate_s), 0.0),
+                  wake_length_m=8.0e-6),
     )
     kernel = SignedShieldingKernel(
         active_kernel=np.ones((2, 16)), wake_kernel=np.zeros((2, 16)),
@@ -131,6 +142,8 @@ def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, A
     return {
         "step": step, "time_s": step * DT_S, "temperature_K": T_K,
         "tip_opening_stress_Pa": STRESS_PA, "x_m": state.x.tolist(),
+        "mobile_recovery_rate_s": float(state.cfg.mobile_recovery_rate_s),
+        "retained_recovery_rate_s": float(state.manifest.retained_recovery_rate_s),
         "local_opening_stress_Pa": stress.tolist(), "forest_density_m2": rho.tolist(),
         "peierls_projected_stress_Pa": tau_p.tolist(),
         "taylor_projected_stress_Pa": tau_t.tolist(),
@@ -218,7 +231,11 @@ def run(args: argparse.Namespace) -> None:
     manifest = args.manifest.resolve()
     phase_dir = root / args.phase
     phase_dir.mkdir(exist_ok=True)
-    state = build_state(manifest)
+    state = build_state(
+        manifest,
+        mobile_recovery_rate_s=args.mobile_recovery_rate_s,
+        retained_recovery_rate_s=args.retained_recovery_rate_s,
+    )
     if args.phase == "initial":
         records = evolve(state, 0, INITIAL_STEPS)
         save_checkpoint(state, root / "restart_checkpoint_step6.npz", INITIAL_STEPS)
@@ -238,6 +255,8 @@ def run(args: argparse.Namespace) -> None:
         "phase": args.phase, "source_commit": _commit(), "manifest": str(manifest),
         "manifest_sha256": _sha(manifest), "temperature_K": T_K, "stress_Pa": STRESS_PA,
         "dt_s": DT_S, "initial_steps": INITIAL_STEPS, "total_steps": TOTAL_STEPS,
+        "mobile_recovery_rate_s": float(state.cfg.mobile_recovery_rate_s),
+        "retained_recovery_rate_s": float(state.manifest.retained_recovery_rate_s),
         "production_execution_authorized": False,
     }
     (phase_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
@@ -257,6 +276,7 @@ def compare(root: Path) -> None:
     traces = json.loads((root / "uninterrupted" / "trace.json").read_text())
     max_record = max(traces, key=lambda item: max(item["velocity_m_s_by_bin"]))
     terminal = traces[-1]
+    metadata = json.loads((root / "uninterrupted" / "metadata.json").read_text())
     (root / "maximum_velocity_trace.json").write_text(json.dumps(max_record, indent=2, sort_keys=True) + "\n")
     (root / "terminal_velocity_trace.json").write_text(json.dumps(terminal, indent=2, sort_keys=True) + "\n")
     report = {
@@ -289,13 +309,18 @@ def compare(root: Path) -> None:
         "max_population_ledger_balance_error": max(
             abs(item.get("population_ledger_balance_error", 0.0)) for item in traces),
         "terminal_escaped_total": terminal["escaped_total"],
+        "terminal_recovered_total": terminal["recovered_total"],
+        "mobile_recovery_rate_s": metadata["mobile_recovery_rate_s"],
+        "retained_recovery_rate_s": metadata["retained_recovery_rate_s"],
         "terminal_gross_trapping_total": terminal["gross_trapping_total"],
         "terminal_gross_release_total": terminal["gross_release_total"],
         "terminal_mobile_distance_population_total_m": terminal[
             "mobile_distance_population_total_m"],
         "scope": (
             "prescribed-drive native subsystem integration fixture with a synthetic "
-            "shielding kernel; no specimen equilibrium solve and not a production campaign"
+            "shielding kernel; explicit removal/recovery is distinct from Taylor "
+            "retained-to-mobile release and sign-reversing source-surface return; no "
+            "specimen equilibrium solve and not a production campaign"
         ),
     }
     (root / "restart_comparison.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
@@ -309,6 +334,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, default=Path(
         "integration_evidence/f1_coupled_native_qualification_8982d422/initial_to_step48/selected_material_manifest_v10_2_22.csv"))
+    parser.add_argument("--mobile-recovery-rate-s", type=float, default=0.0)
+    parser.add_argument("--retained-recovery-rate-s", type=float, default=0.0)
     args = parser.parse_args()
     compare(args.output.resolve()) if args.phase == "compare" else run(args)
 

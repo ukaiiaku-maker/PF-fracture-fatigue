@@ -632,14 +632,24 @@ def _coupled_persistent_source_transport(
         )
         velocity = (float(np.sum(new_rates["velocity"] * eq_mobile) / np.sum(eq_mobile))
                     if np.sum(eq_mobile) > 0.0 else float(np.mean(new_rates["velocity"][:nsrc])))
+        frozen_operator_args = {
+            "velocity_m_s": np.maximum(new_rates["velocity"], 0.0),
+            "dt_s": dt,
+            "dx_m": self.dx,
+            "mobile_recovery_rate_s": max(
+                float(self.cfg.mobile_recovery_rate_s), 0.0
+            ),
+            "retained_recovery_rate_s": max(
+                float(self.manifest.retained_recovery_rate_s), 0.0
+            ),
+        }
         base = joint_transport_exchange(
             mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
-            velocity_m_s=np.maximum(new_rates["velocity"], 0.0), dt_s=dt, dx_m=self.dx,
+            **frozen_operator_args,
         )
         unit = joint_transport_exchange(
             mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
-            velocity_m_s=np.maximum(new_rates["velocity"], 0.0), dt_s=dt, dx_m=self.dx,
-            mobile_source_rate=source_unit,
+            mobile_source_rate=source_unit, **frozen_operator_args,
         )
         bracket_widths = np.zeros(self.n_systems, dtype=float)
         for system in range(self.n_systems):
@@ -700,12 +710,7 @@ def _coupled_persistent_source_transport(
                 )
         direct_result = joint_transport_exchange(
             mobile0, retained0, new_rates["encounter"], new_rates["taylor"],
-            velocity_m_s=np.maximum(new_rates["velocity"], 0.0), dt_s=dt,
-            dx_m=self.dx, mobile_source_rate=source,
-            mobile_recovery_rate_s=max(float(self.cfg.mobile_recovery_rate_s), 0.0),
-            retained_recovery_rate_s=max(
-                float(self.manifest.retained_recovery_rate_s), 0.0
-            ),
+            mobile_source_rate=source, **frozen_operator_args,
         )
         install_population_state(
             direct_result.mobile, direct_result.retained, activation_rate

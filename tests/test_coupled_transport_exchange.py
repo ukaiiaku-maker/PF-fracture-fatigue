@@ -380,3 +380,104 @@ def test_full_attempt_release_scale_uses_error_controlled_same_equation_retry():
     assert out.affine_invariant_defect > 1.0e-8
     assert out.affine_retry_discrepancy > 1.0e-8
     assert out.complete_numerical_correction <= 2.0e-14
+
+
+def test_explicit_zero_recovery_is_operator_neutral():
+    mobile = np.array([[0.3, 0.1, 0.0], [0.0, 0.2, 0.1]])
+    retained = np.array([[0.4, 0.0, 0.2], [0.1, 0.3, 0.0]])
+    source = np.array([[0.7, 0.0, 0.0], [0.2, 0.0, 0.0]])
+    kwargs = dict(
+        encounter_rate_s=np.array([4.0, 5.0, 6.0]),
+        release_rate_s=np.array([3.0, 2.0, 1.0]),
+        velocity_m_s=np.array([2.0e-6, 1.5e-6, 1.0e-6]),
+        dt_s=0.4,
+        dx_m=1.0e-6,
+        mobile_source_rate=source,
+    )
+    omitted = joint_transport_exchange(mobile, retained, **kwargs)
+    explicit = joint_transport_exchange(
+        mobile,
+        retained,
+        mobile_recovery_rate_s=0.0,
+        retained_recovery_rate_s=0.0,
+        **kwargs,
+    )
+    np.testing.assert_array_equal(explicit.mobile, omitted.mobile)
+    np.testing.assert_array_equal(explicit.retained, omitted.retained)
+    for name in (
+        "escaped", "recovered", "net_retained_gain", "net_retained_loss",
+        "gross_trapping", "gross_release", "mobile_distance_population_m",
+        "conservation_error", "invariant_projection_correction",
+        "base_map_invariant_correction", "positivity_correction",
+        "complete_numerical_correction", "affine_invariant_defect",
+        "affine_retry_discrepancy",
+    ):
+        assert getattr(explicit, name) == getattr(omitted, name)
+
+
+def test_recovery_source_operator_is_affine_for_populations_and_flux_integrals():
+    source_unit = np.zeros((2, 6))
+    source_unit[0, :2] = (0.7, 0.3)
+    source_unit[1, :2] = (0.2, 0.1)
+    initial_states = (
+        (np.zeros((2, 6)), np.zeros((2, 6))),
+        (
+            np.array([
+                [0.2, 0.1, 0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.3, 0.1, 0.0, 0.0, 0.0],
+            ]),
+            np.array([
+                [0.4, 0.0, 0.2, 0.0, 0.0, 0.0],
+                [0.1, 0.2, 0.0, 0.1, 0.0, 0.0],
+            ]),
+        ),
+    )
+    scalar_fields = (
+        "escaped", "recovered", "gross_trapping", "gross_release",
+        "mobile_distance_population_m",
+    )
+    for mobile_recovery, retained_recovery in (
+        (0.0, 0.0), (0.1, 0.0), (0.0, 0.1), (0.1, 0.1)
+    ):
+        frozen = dict(
+            encounter_rate_s=np.linspace(4.0, 9.0, 6),
+            release_rate_s=np.linspace(3.0, 1.0, 6),
+            velocity_m_s=np.linspace(2.0e-6, 0.5e-6, 6),
+            dt_s=0.6,
+            dx_m=1.0e-6,
+            mobile_recovery_rate_s=mobile_recovery,
+            retained_recovery_rate_s=retained_recovery,
+        )
+        for mobile, retained in initial_states:
+            base = joint_transport_exchange(mobile, retained, **frozen)
+            unit = joint_transport_exchange(
+                mobile, retained, mobile_source_rate=source_unit, **frozen
+            )
+            for amplitude in (0.25, 1.0, 2.5):
+                direct = joint_transport_exchange(
+                    mobile,
+                    retained,
+                    mobile_source_rate=amplitude * source_unit,
+                    **frozen,
+                )
+                np.testing.assert_allclose(
+                    direct.mobile,
+                    base.mobile + amplitude * (unit.mobile - base.mobile),
+                    rtol=2.0e-12,
+                    atol=2.0e-13,
+                )
+                np.testing.assert_allclose(
+                    direct.retained,
+                    base.retained + amplitude * (unit.retained - base.retained),
+                    rtol=2.0e-12,
+                    atol=2.0e-13,
+                )
+                for name in scalar_fields:
+                    predicted = getattr(base, name) + amplitude * (
+                        getattr(unit, name) - getattr(base, name)
+                    )
+                    np.testing.assert_allclose(
+                        getattr(direct, name), predicted,
+                        rtol=3.0e-12,
+                        atol=3.0e-13,
+                    )
