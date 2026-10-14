@@ -1,0 +1,99 @@
+{
+  "capability_matrix": [
+    {
+      "executable": true,
+      "owner": "tip moving process zone",
+      "population_transfer": "within native tip/wake state",
+      "transport": "signed Peierls field plus Taylor exchange, wake/return and moving-frame advection"
+    },
+    {
+      "bulk_density_transport": false,
+      "direct_tip_bulk_population_exchange": false,
+      "executable": true,
+      "owner": "V10.4 bulk_uniform or tip_plus_bulk",
+      "transport": "local full-field Peierls-Taylor constitutive evolution"
+    },
+    {
+      "classification": "distinct vacancy/cavity capability; not dislocation-density transport or a tip/bulk transfer coefficient",
+      "executable": true,
+      "owner": "V5 cavity vacancy field",
+      "transport": "positive conservative vacancy transport"
+    },
+    {
+      "classification": "NOT_IMPLEMENTED_NO_PHYSICAL_TRANSFER_COEFFICIENT_INVENTED",
+      "executable": false,
+      "owner": "conservative tip/bulk dislocation population transfer",
+      "transport": null
+    }
+  ],
+  "decision": "PARTIAL_REQUIRED_INTERVENTION_ADAPTERS_UNRESOLVED",
+  "interpretation": "Source support and transport are now reported as independent axes. The active support evidence cannot be promoted into nonexistent bulk density transport or conservative tip/bulk population exchange.",
+  "planned_interventions": {
+    "blunting_fixed": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
+    "history_reset_reequilibrated": "UNRESOLVED_STATE_PREPARATION_ADAPTER",
+    "native": "EXECUTABLE",
+    "retained_shielding_off": "PARTIAL_EXISTING_COARSE_TOGGLE_NOT_ISOLATED",
+    "source_backstress_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
+    "transport_retention_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER"
+  },
+  "production_execution_authorized": false,
+  "schema": "source-transport-axis-qualification/1",
+  "support_qualification": {
+    "bulk_uniform": {
+      "accepted_steps": 2,
+      "bulk_process_active": true,
+      "fresh_process_restart": "PASS_COMPLETE_TERMINAL_STATE_EQUAL",
+      "full_mechanics_history_present": true,
+      "maximum_bulk_plastic_work_J_per_m": 6.465866602553669,
+      "maximum_tip_mobile_plus_retained_count": 0.0,
+      "native_capabilities": {
+        "bulk_density_transport": false,
+        "bulk_net_slip_model": "v10.4.1_bulk_peierls_taylor_detailed_balance",
+        "direct_tip_bulk_population_exchange": false,
+        "zero_stress_net_plastic_rate_exactly_zero": true
+      },
+      "root": "integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/uninterrupted_to_step2",
+      "sha256": {
+        "integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/uninterrupted_to_step2/steps_0900K.csv": "fc44156ad7d0b2170674bb063aed199fea7484cf3ee6407e599d6566bb05c263",
+        "integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/uninterrupted_to_step2/v10_4_bulk_coupled_model_audit.json": "4d33c5f89c55b0b39409e7fcd677a578800cf65357f5b543c7923b182b65d817"
+      },
+      "status": "PASS_ACTIVE_NATIVE_SUPPORT",
+      "tip_process_active": false
+    },
+    "tip_only": {
+      "accepted_steps": 186,
+      "bulk_process_active": false,
+      "full_mechanics_history_present": true,
+      "maximum_bulk_plastic_work_J_per_m": 0.0,
+      "maximum_tip_mobile_plus_retained_count": 29268.48274558333,
+      "native_capabilities": null,
+      "root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/accommodation_enabled",
+      "sha256": {
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/accommodation_enabled/steps_1200K.csv": "d9c1afb755d20ab446b66db42503131d63601e8c53d2f8fe86a984d7058b6c23"
+      },
+      "status": "PASS_ACTIVE_NATIVE_SUPPORT",
+      "tip_process_active": true
+    },
+    "tip_plus_bulk": {
+      "accepted_steps": 2,
+      "bulk_process_active": true,
+      "fresh_process_restart": "PASS_COMPLETE_TERMINAL_STATE_EQUAL",
+      "full_mechanics_history_present": true,
+      "maximum_bulk_plastic_work_J_per_m": 6.465866602553669,
+      "maximum_tip_mobile_plus_retained_count": 1.572664266067374e-08,
+      "native_capabilities": {
+        "bulk_density_transport": false,
+        "bulk_net_slip_model": "v10.4.1_bulk_peierls_taylor_detailed_balance",
+        "direct_tip_bulk_population_exchange": false,
+        "zero_stress_net_plastic_rate_exactly_zero": true
+      },
+      "root": "integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/uninterrupted_to_step2",
+      "sha256": {
+        "integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/uninterrupted_to_step2/steps_0900K.csv": "f50d32e90bbcc13ff856924cdd1de7e89ef864b542d34ced3f167cb078cc365e",
+        "integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/uninterrupted_to_step2/v10_4_bulk_coupled_model_audit.json": "0e03b88cdccc8da141adcfd13b729c4d1b23f385cdc15985385726312ea56ffc"
+      },
+      "status": "PASS_ACTIVE_NATIVE_SUPPORT",
+      "tip_process_active": true
+    }
+  }
+}

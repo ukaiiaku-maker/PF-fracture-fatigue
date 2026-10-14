@@ -1,6 +1,6 @@
 {
   "schema": "fracture-framework-completion-ledger/1",
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "mission_status": "ACTIVE_READINESS_IMPLEMENTATION",
   "production_execution_authorized": false,
   "manuscript_modification_authorized": false,
@@ -139,16 +139,20 @@
     {
       "id": "R06",
       "goal_ids": ["FG-04", "FG-05", "FG-16"],
-      "status": "PARTIAL_NATIVE_SPATIAL_QUALIFICATION",
-      "concrete_defect": "Source support is executable, but density transport and conservative tip/bulk transfer remain distinct unavailable axes for options that claim them.",
+      "status": "PARTIAL_ACTIVE_SUPPORT_QUALIFIED_INTERVENTION_AND_TRANSFER_ADAPTERS_UNRESOLVED",
+      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active, but density transport and conservative tip/bulk transfer remain distinct unavailable axes. Four requested intervention adapters are not implemented, and the existing shielding toggle is not isolated enough to qualify the requested retained-shielding intervention.",
       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
       "authoritative_source": "native geography audits and existing positive transport implementation",
       "dependencies": ["R01", "R03"],
-      "exact_next_command": "python scripts/qualify_source_transport_axes.py --output integration_evidence/source_transport_axes_<commit>",
-      "input_output_identity": "bulk-only, tip-only and combined support with invariant kinetics where representations permit",
+      "exact_next_command": "python scripts/qualify_source_transport_axes.py --output common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json",
+      "input_output_identity": "retained tip-only history plus native V10.4 bulk-only and tip-plus-bulk histories; exact evidence-file hashes recorded in the receipt",
       "numerical_criteria": "Nonzero activity, full mechanics, ledgers, support exclusions and fresh-process restart.",
-      "executed_evidence": ["common_framework_readiness/NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json"],
-      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange."
+      "executed_evidence": [
+        "common_framework_readiness/NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json",
+        "common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json",
+        "tests/test_source_transport_axes_qualification.py"
+      ],
+      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
     },
     {
       "id": "R07",
