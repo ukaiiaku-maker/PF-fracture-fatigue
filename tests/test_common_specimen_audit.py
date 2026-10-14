@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -16,6 +18,7 @@ def _load(name: str):
     return module
 
 
+@pytest.mark.external_evidence
 def test_common_specimen_audit_detects_executed_accommodation_mismatch():
     audit = _load("audit_common_specimen_contract")
     payload = audit.classify_contract(audit.DEFAULT_PF, audit.DEFAULT_FEM,

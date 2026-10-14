@@ -1,9 +1,14 @@
+import pytest
+
 from scripts.run_final_fracture_campaign import (
     BASELINE_TEMPERATURES,
     configured_case,
     rows,
     validate_matrix,
 )
+
+
+pytestmark = pytest.mark.external_evidence
 
 
 def test_baseline_matrix_is_exact_finite_product():

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from scripts import run_final_fracture_campaign as campaign
 
 
@@ -43,6 +45,7 @@ def test_close_matrix_row_distinguishes_event_and_physical_censor(tmp_path, monk
         assert row["producer_commit"] == "abcdef123456"
 
 
+@pytest.mark.external_evidence
 def test_nonzero_orientation_does_not_reuse_theta_zero_kernel():
     row = {
         "arm": "accommodation_enabled",

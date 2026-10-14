@@ -11,6 +11,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "build_taylor_native_operator_consequence.py"
 
 
+pytestmark = pytest.mark.external_evidence
+
+
 def _module():
     spec = importlib.util.spec_from_file_location("taylor_native_consequence", SCRIPT)
     module = importlib.util.module_from_spec(spec)

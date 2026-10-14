@@ -1,3 +1,5 @@
+import pytest
+
 from scripts.run_independent_seed_pf_pairs import CASES, SEED, case_matrix
 
 
@@ -11,6 +13,7 @@ def test_seed_matrix_has_exactly_two_matched_pairs():
     )
 
 
+@pytest.mark.external_evidence
 def test_seed_matrix_preserves_spatial_mechanics_and_short_endpoint():
     matrix = case_matrix()
     assert matrix["scope"] == "two-seed pilot variability check only"

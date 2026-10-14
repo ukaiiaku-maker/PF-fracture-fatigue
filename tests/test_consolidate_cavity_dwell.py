@@ -1,6 +1,11 @@
 import math
 
+import pytest
+
 from scripts.consolidate_cavity_dwell import consolidate
+
+
+pytestmark = pytest.mark.external_evidence
 
 
 def test_declared_dwell_is_an_exact_restart_chain_and_complete():

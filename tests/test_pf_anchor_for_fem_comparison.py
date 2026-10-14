@@ -1,4 +1,9 @@
+import pytest
+
 from scripts.run_pf_anchor_for_fem_comparison import configured_request, matrix
+
+
+pytestmark = pytest.mark.external_evidence
 
 
 def test_pf_anchor_matches_declared_common_condition():
