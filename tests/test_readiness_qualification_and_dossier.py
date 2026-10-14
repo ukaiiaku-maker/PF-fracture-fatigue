@@ -17,8 +17,9 @@ def test_qualification_manifest_is_separate_and_fail_closed():
     assert payload["maximum_substantial_workers"] == 1
     assert {j["job_id"] for j in payload["jobs"]} >= {"Q-MECH-PATCH", "Q-PF-FEM-3LEVEL"}
     assert all(not j["production_job"] for j in payload["jobs"])
-    with pytest.raises(RuntimeError, match="PARTIAL_CONTRACT_QUALIFIED"):
-        assert_qualification_launch("Q-MECH-PATCH")
+    mechanics = assert_qualification_launch("Q-MECH-PATCH")
+    assert mechanics.evidence_status == "QUALIFIED_COMPACT_AFFINE_PATCH"
+    assert mechanics.native_entrypoint == "scripts/qualify_mechanics_constraint_patch.py"
     with pytest.raises(PermissionError):
         assert_qualification_launch("Q-MECH-PATCH", production_execution_authorized=True)
     with pytest.raises(RuntimeError, match="UNRESOLVED_GENERIC_FEM_ADAPTER"):
