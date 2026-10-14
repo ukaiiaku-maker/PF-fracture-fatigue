@@ -7,3 +7,4 @@ def test_current_companion_is_source_bound_without_overclaiming_generic_adapter(
     assert receipt.exact_current_entry_status.startswith("SOURCE_BOUND")
     assert receipt.generic_parameter_loading_adapter_status.startswith("IMPLEMENTED")
     assert receipt.opening_only_adapter_status.startswith("UNRESOLVED")
+    assert receipt.generic_entry.endswith("generic_current_pf_companion.py")

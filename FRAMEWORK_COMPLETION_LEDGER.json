@@ -171,16 +171,20 @@
     {
       "id": "R08",
       "goal_ids": ["FG-12", "FG-16"],
-      "status": "INCOMPLETE",
-      "concrete_defect": "Independent FEM is locked to a source-bound Peak/1000 K entry; generic material/loading/source/orientation/constraint/mesh/restart inputs and common observer are absent.",
+      "status": "PARTIAL_GENERIC_NATIVE_PLANE_STRAIN_TIP_ONLY_EXECUTION_QUALIFIED",
+      "concrete_defect": "The independent FEM now has a registry-driven native entry for generic material option, temperature, loading, orientation and mesh under plane-strain/tip-only active accommodation. Opening-only, generic full-field support, non-plane-strain constraint, production bilinear selection, native restart deserialization and the common observer/convergence comparison remain unresolved and fail closed.",
       "owner_consumer": "fem-czm-current-pf-companion native constructor and isolated shared worker",
-      "authoritative_source": "FEM head 90cb6671 and current source-bound entry",
+      "authoritative_source": "FEM a015a36, preserved source-bound entry and registry-driven generic entry",
       "dependencies": ["R03", "R07"],
-      "exact_next_command": "implement generic FEM constructor/CLI and common observer, then run three related pre-event levels per backend",
+      "exact_next_command": "implement the common specimen observer and three related pre-event mesh/support levels, then wire opening-only and active restart at the native driver",
       "input_output_identity": "independent package paths and constructor-visible coefficient receipts",
       "numerical_criteria": "Convergent reaction, energy, stress/displacement and common/native J without fitted scale factor; opening-only and active accommodation plus cohesive restart.",
-      "executed_evidence": ["common_framework_readiness/CURRENT_FEM_COMPANION_BINDING.json"],
-      "remaining_limitation": "18 GiB job is storage-admitted but adapter/observer implementation is incomplete."
+      "executed_evidence": [
+        "common_framework_readiness/CURRENT_FEM_COMPANION_BINDING.json",
+        "common_framework_readiness/GENERIC_FEM_NATIVE_RUN_QUALIFICATION.json",
+        "fem-czm-current-pf-companion@a015a36:tests/test_generic_current_pf_companion.py"
+      ],
+      "remaining_limitation": "One native one-step cracked-body run is not convergence evidence. Plane stress/generalized transverse control, opening-only, generic full-field source scope, production bilinear selection, active-state restart and the common observer remain explicit fail-closed gaps."
     },
     {
       "id": "R09",

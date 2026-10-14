@@ -1,0 +1,33 @@
+{
+  "acceptance_boundary": "This proves registry-driven native plane-strain/tip-only execution outside the Peak/1000 K preset. It is not three-level convergence, opening-only, plane-stress/generalized constraint, bilinear specimen integration, or active-state restart evidence.",
+  "checks": {
+    "adaptive_czm_backend": true,
+    "native_J_finite_positive": true,
+    "native_entry_completed": true,
+    "orientation_17p5deg": true,
+    "plane_strain_declared": true,
+    "registry_material_class_peak": true,
+    "summary_material_class_peak": true,
+    "temperature_900K": true,
+    "tip_state_updated": true,
+    "transfer_material_class_peak": true
+  },
+  "evidence_directory": "generic_fem_native_run_a015a36",
+  "observed": {
+    "J_first_J_per_m2": 0.4798418276251961,
+    "KJ_reference_first_MPa_sqrt_m": 0.46202954362488136,
+    "N_em_final": 4.8333360650963685e-31,
+    "material_option": "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+    "mesh_nx": "24",
+    "mesh_ny": "48",
+    "registry_sha256": "144cab65039f9a5322ff45de02b3705ec3743afb00cfc66c795b0cc51278b8e8"
+  },
+  "schema": "generic-fem-native-run-qualification/1",
+  "sha256": {
+    "anisotropic_calibrated_tip_first_passage_summary.json": "08964211c107d54c46be5abe77d9b526048df10a21c46cbea58746aea5176303",
+    "four_class_parameter_transfer_v10_0_5_18_3_9.json": "e8c7f415aa695d5aa73be5aa2ba5ee52e2147353672de31316b10562edb68797",
+    "generic_current_pf_companion_contract_v1.json": "7c162c571e1a87b7c4101b0452c3af3b95a2871277520cb5d283faa4631b52a0",
+    "persistent_site_production_manifest_v10_0_5_18_3_9.json": "50fc39dccd3928b674882fc1a9106a52d6742eaf8a9a92b0c7bae92f7f26a092"
+  },
+  "status": "PASS_NATIVE_CRACKED_BODY_ONE_STEP"
+}

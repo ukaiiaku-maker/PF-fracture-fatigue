@@ -1,8 +1,8 @@
-"""Source-bound current FEM companion for readiness v2.
+"""Current independent FEM companion bindings for framework readiness.
 
 The accepted v1 external pairing remains untouched.  This binding exposes the
-newest independently tested companion and states the generic-adapter boundary
-without pretending its Peak/1000 K entry is a four-family production adapter.
+newest independently tested source-bound preset and registry-driven entry while
+preserving the still-open constraint, restart and convergence boundaries.
 """
 from __future__ import annotations
 
@@ -12,9 +12,10 @@ import subprocess
 
 
 ROOT = Path("/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion")
-COMMIT = "b14497fcf4ad366cf74922e8e65b4f18090907c4"
+COMMIT = "a015a36"
 BRANCH = "codex/current-pf-companion"
 ENTRY = Path("arrhenius_fracture/mode_i_first_passage_v10_0_5_18_4_0_current_pf_companion.py")
+GENERIC_ENTRY = Path("arrhenius_fracture/generic_current_pf_companion.py")
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,7 @@ class CurrentCompanionBinding:
     observed_branch: str | None
     tracked_clean: bool
     entry: str
+    generic_entry: str
     source_bound: bool
     exact_current_entry_status: str
     generic_parameter_loading_adapter_status: str
@@ -49,12 +51,14 @@ def inspect_current_companion() -> CurrentCompanionBinding:
     except (OSError, subprocess.CalledProcessError):
         pass
     bound = bool(observed and observed.startswith(COMMIT) and branch == BRANCH
-                 and tracked_clean and (ROOT / ENTRY).is_file())
+                 and tracked_clean and (ROOT / ENTRY).is_file()
+                 and (ROOT / GENERIC_ENTRY).is_file())
     return CurrentCompanionBinding(
-        str(ROOT), COMMIT, observed, BRANCH, branch, tracked_clean, str(ROOT / ENTRY), bound,
+        str(ROOT), COMMIT, observed, BRANCH, branch, tracked_clean,
+        str(ROOT / ENTRY), str(ROOT / GENERIC_ENTRY), bound,
         "SOURCE_BOUND_PEAK_1000K_CURRENT_KERNEL" if bound else "UNAVAILABLE",
-        "IMPLEMENTED_EXACT_VERSIONED_OPTION_LOADER; SPECIMEN_ADAPTER_PENDING",
-        "UNRESOLVED_GENERIC_CONTROL_BINDING",
+        "IMPLEMENTED_REGISTRY_DRIVEN_NATIVE_PLANE_STRAIN_TIP_ONLY_ENTRY",
+        "UNRESOLVED_FAIL_CLOSED_AT_GENERIC_ENTRY",
     )
 
 
