@@ -1,0 +1,34 @@
+{
+  "decision": "COMPLETE",
+  "mandatory_incomplete": [],
+  "manifest": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/common_framework_release/EXTERNAL_EVIDENCE_MANIFEST.json",
+  "manifest_sha256": "58d2a3d1c5bfb10ec5788c162edeae50d17810055c706a20acbb6660c52974aa",
+  "profile": "full",
+  "records": [
+    {
+      "backup_archive": "/Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar",
+      "evidence_id": "integration_evidence__current_science_pilots_6abbf10",
+      "expected": {
+        "bytes": 156715732,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 302,
+        "kind": "directory",
+        "sha256": "b990c13009f7793b99899eb16315eaa72ada3af402e0db0aba0f5e46cc003ba6"
+      },
+      "mandatory": true,
+      "observed": {
+        "bytes": 156715732,
+        "digest_algorithm": "sha256(sorted(relative_path\\0bytes\\0file_sha256\\n))",
+        "file_count": 302,
+        "kind": "directory",
+        "sha256": "b990c13009f7793b99899eb16315eaa72ada3af402e0db0aba0f5e46cc003ba6"
+      },
+      "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/current_science_pilots_6abbf10",
+      "restore_command": "tar -xf /Users/shen/Fracture_Backups/fracture-completion-20261010-d1d15bf/final_release_20261011/final-fracture-evidence-20261011.tar -C <clean-checkout-parent> integration_evidence/current_science_pilots_6abbf10",
+      "status": "VERIFIED"
+    }
+  ],
+  "retrieval_instructions": [],
+  "schema": "external-evidence-audit/1",
+  "verify_hashes": true
+}

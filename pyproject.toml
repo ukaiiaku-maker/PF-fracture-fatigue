@@ -18,6 +18,10 @@ packages = ["arrhenius_fracture"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not external_evidence'"
+markers = [
+  "external_evidence: requires a manifest-restored external evidence root",
+]
 
 [tool.setuptools.package-data]
 arrhenius_fracture = ["data/materials/*.csv", "data/materials/*.json", "data/materials/*/*.csv", "data/materials/*/*.json"]

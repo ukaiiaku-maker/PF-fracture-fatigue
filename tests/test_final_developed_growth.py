@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import pytest
+
 from arrhenius_fracture.fracture_observation_history import ObservationHistory
 from scripts.analyze_current_science_pilots_v2 import event_pairs
 from scripts.analyze_final_developed_growth import CASES, selected_resistance
 from scripts.export_physical_growth_packet import history_rows
+
+
+pytestmark = pytest.mark.external_evidence
 
 
 def test_accepted_developed_histories_select_exact_event_resistance():
