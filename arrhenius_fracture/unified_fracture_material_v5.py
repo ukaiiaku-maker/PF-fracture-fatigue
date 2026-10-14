@@ -154,6 +154,31 @@ def material_bundle(material_class: str) -> UnifiedFractureMaterialBundle:
     )
 
 
+def complete_row_bundle(row: Mapping[str, Any]) -> UnifiedFractureMaterialBundle:
+    """Bind an explicit complete fracture row to the common spatial owners.
+
+    This is the narrow prospective-row path: it changes only the fracture-row
+    owner while retaining the already-qualified void, elastic, site, loading,
+    vacancy, and algorithm identities.  It performs no class-label lookup and
+    no parameter fitting.
+    """
+    normalized = {str(key): str(value) for key, value in row.items()}
+    candidate = normalized.get("candidate_id", "")
+    material_class = normalized.get("material_class", "")
+    if not candidate or not material_class:
+        raise ValueError("complete row requires candidate_id and material_class")
+    return UnifiedFractureMaterialBundle(
+        fracture_material_row_id=candidate,
+        void_kinetics_row_id=COMMON_VOID_KINETICS_ROW_ID,
+        elastic_row_id=COMMON_ELASTIC_ROW_ID,
+        site_population_row_id=COMMON_SITE_POPULATION_ROW_ID,
+        specimen_loading_row_id=COMMON_SPECIMEN_LOADING_ROW_ID,
+        vacancy_row_id=COMMON_VACANCY_ROW_ID,
+        material_class=material_class,
+        fracture_row_items=tuple(sorted(normalized.items())),
+    )
+
+
 def all_material_bundles() -> Mapping[str, UnifiedFractureMaterialBundle]:
     return MappingProxyType({family: material_bundle(family) for family in FRACTURE_ROWS})
 

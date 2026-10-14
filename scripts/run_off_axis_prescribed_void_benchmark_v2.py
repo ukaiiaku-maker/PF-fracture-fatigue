@@ -73,8 +73,9 @@ def _disable_lifecycle(state):
 def initial_state(case, *, width=1.0e-3, height=1.0e-3, far_h=5.0e-5,
                   material_family="DBTT", load_scale=1.0,
                   cavity_centers=None, temperature_K=900.0,
-                  front_constitutive_strategy=None):
-    bundle = material_bundle(material_family)
+                  front_constitutive_strategy=None, material_bundle_override=None):
+    bundle = (material_bundle(material_family) if material_bundle_override is None
+              else material_bundle_override)
     centers = CENTERS if cavity_centers is None else cavity_centers
     rho_bulk = float(bundle.fracture_row["rho_forest_floor_m2"])
     if case == "no_void":

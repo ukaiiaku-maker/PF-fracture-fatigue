@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 import argparse
+import csv
 from collections.abc import Mapping
 import copy
 import hashlib
@@ -34,7 +35,7 @@ from arrhenius_fracture.persistent_site_high_cycle_state_v10230 import (
 from arrhenius_fracture.topology_transaction_v11 import (
     complete_accepted_state_fingerprint, equilibrate_fixed_load_with_production_fem,
 )
-from arrhenius_fracture.unified_fracture_material_v5 import material_bundle
+from arrhenius_fracture.unified_fracture_material_v5 import complete_row_bundle, material_bundle
 from arrhenius_fracture.voiding_production_v5 import (
     _bundle_from_state, _refine_state_around_graph, build_production_void_state,
     crack_tip_tensor, restore_sharp_front_engine,
@@ -47,6 +48,8 @@ T_K = 900.0
 EVENT_EXPOSURE_S = 1.0e-6
 POST_EVENT_EXPOSURE_S = 0.25e-6
 TURN_DEG = 6.974492530416398
+ACTIVE_BUNDLE = material_bundle("DBTT")
+ACTIVE_BINDING = {"mode": "PINNED_CLASS_LABEL", "candidate_id": ACTIVE_BUNDLE.fracture_material_row_id}
 
 
 def finite(value):
@@ -178,10 +181,12 @@ def _event_rows(audit):
 def matched_arms(destination: Path):
     no_initial = initial_state(
         "no_void", load_scale=75.0,
-        front_constitutive_strategy=CURRENT_STRATEGY)
+        front_constitutive_strategy=CURRENT_STRATEGY,
+        material_bundle_override=ACTIVE_BUNDLE)
     active_initial = initial_state(
         "above", load_scale=75.0,
-        front_constitutive_strategy=CURRENT_STRATEGY)
+        front_constitutive_strategy=CURRENT_STRATEGY,
+        material_bundle_override=ACTIVE_BUNDLE)
     passive_initial = copy.deepcopy(active_initial)
     reference_tensor, _ = crack_tip_tensor(no_initial, branch_id=ROOT_BRANCH_ID)
     definitions = {
@@ -243,7 +248,7 @@ def matched_arms(destination: Path):
 
 def _loaded_turning_state():
     state, _ = build_production_void_state(
-        bundle=material_bundle("DBTT"), enabled=False,
+        bundle=ACTIVE_BUNDLE, enabled=False,
         cleavage_theta_deg=TURN_DEG,
         front_constitutive_strategy=CURRENT_STRATEGY)
     state = _refine_state_around_graph(state, 3)
@@ -371,9 +376,37 @@ def geometry_correspondence():
 
 
 def main():
+    global ACTIVE_BUNDLE, ACTIVE_BINDING
     parser = argparse.ArgumentParser()
     parser.add_argument("output", type=Path)
+    parser.add_argument("--offspring-registry", type=Path)
+    parser.add_argument("--candidate-id")
     args = parser.parse_args()
+    if bool(args.offspring_registry) != bool(args.candidate_id):
+        parser.error("--offspring-registry and --candidate-id must be supplied together")
+    if args.offspring_registry:
+        source = args.offspring_registry.resolve()
+        with source.open(newline="") as stream:
+            matches = [row for row in csv.DictReader(stream)
+                       if row["candidate_id"] == args.candidate_id]
+        if len(matches) != 1:
+            raise KeyError(f"expected one complete row {args.candidate_id!r}")
+        record = matches[0]
+        if record["family"] != "A_ORIGINAL_SINGLE_EXP_FLOOR":
+            raise ValueError("prospective spatial binding accepts strict-family rows only")
+        complete = json.loads(record["complete_parameter_vector"])
+        row_hash = hashlib.sha256(json.dumps(
+            complete, sort_keys=True, separators=(",", ":"), default=str,
+        ).encode()).hexdigest()
+        if row_hash != record["complete_row_sha256"]:
+            raise ValueError("complete candidate row hash mismatch")
+        ACTIVE_BUNDLE = complete_row_bundle(complete)
+        ACTIVE_BINDING = {
+            "mode": "EXACT_COMPLETE_ROW", "candidate_id": args.candidate_id,
+            "family": record["family"], "complete_row_sha256": row_hash,
+            "source": {"path": str(source), "sha256": sha256(source)},
+            "no_refit": True,
+        }
     destination = args.output.resolve()
     if destination.exists():
         raise FileExistsError(destination)
@@ -385,7 +418,8 @@ def main():
     result = {
         "schema": SCHEMA,
         "declared_strategy": CURRENT_STRATEGY,
-        "material_family": "DBTT",
+        "material_family": ACTIVE_BUNDLE.material_class,
+        "material_binding": ACTIVE_BINDING,
         "event_law": "native current persistent/reversible deterministic mark/reward",
         "no_refit_or_multiplier": True,
         "matched_arms": arms,

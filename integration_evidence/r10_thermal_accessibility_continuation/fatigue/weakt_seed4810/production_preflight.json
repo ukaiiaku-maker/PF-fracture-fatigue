@@ -1,0 +1,50 @@
+{
+  "backend": "R8_RESTORED_PERSISTENT_REVERSIBLE_CURRENT_BACKEND",
+  "binding": {
+    "barrier_changed": false,
+    "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+    "complete_row_sha256": "8ffdbb1084e3465b3ded48e223b72546e42985d4f7716e209a27517b5f1fac44",
+    "event_law_changed": false,
+    "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+    "historical_engine_loaded": false,
+    "mechanics_changed": false,
+    "source": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/thermal_state_candidates.csv",
+      "sha256": "b3a6c897ef9216931c950065579ce57817abe444c25c8333a03bc80aef1b704b"
+    },
+    "translation": "EXACT_RETAINED_ROW_TO_CURRENT_PERSISTENT_REVERSIBLE_INTERFACES"
+  },
+  "kernel": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+    "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+  },
+  "loading": {
+    "Kmax_MPa_sqrt_m": [
+      5.55555556,
+      7.77777778,
+      11.1111111,
+      16.6666667,
+      24.4444444
+    ],
+    "R": 0.1,
+    "frequency_Hz": 1000.0,
+    "phase_count": 64,
+    "temperature_K": 300.0
+  },
+  "local_strength_Pa": 30000000000.0,
+  "local_strength_role": "independent qualified mechanical coordinate; not barrier knee",
+  "schema": "r10.retained-current-bridge/1",
+  "stochastic": {
+    "mark": "unit_exponential",
+    "owner": "PCG64_SeedSequence_[seed,1]",
+    "reward": "threshold_scaled_bounded",
+    "seed": 4810
+  },
+  "stops": {
+    "maximum_cycles": 1000000000000.0,
+    "maximum_events": 40,
+    "target_events": 12,
+    "target_extension_um": 70.0
+  },
+  "trajectory": "R9_PHASE_EXACT_STOCHASTIC_WITH_QUALIFIED_MEAN_BLOCKS"
+}

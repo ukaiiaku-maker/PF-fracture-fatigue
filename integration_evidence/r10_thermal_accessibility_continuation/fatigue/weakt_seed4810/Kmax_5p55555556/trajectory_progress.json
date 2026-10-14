@@ -1,0 +1,48 @@
+{
+  "acceleration": [],
+  "cursor": {
+    "completed_cycles": 0,
+    "phase_index": 0,
+    "remaining_phase_s": 0.0
+  },
+  "events": [],
+  "geometry": {
+    "committed_extension_m": 0.0,
+    "continuous_mpz_progress_m": 0.0,
+    "n_adv": 0
+  },
+  "history": [
+    {
+      "cycles": 0.0,
+      "extension_m": 0.0,
+      "kind": "initial"
+    }
+  ],
+  "identity": {
+    "Kmax_MPa_sqrt_m": 5.55555556,
+    "R": 0.1,
+    "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+    "frequency_Hz": 1000.0,
+    "phase_count": 64,
+    "seed": 4810,
+    "temperature_K": 300.0
+  },
+  "overlap": {
+    "explicit_hazard_action": 1.8107030056824967e-06,
+    "hazard_relative_error": 0.0014029152646202225,
+    "mean_hazard_action": 1.8132468373491381e-06,
+    "mean_inputs": {
+      "cycles": 1,
+      "emission_weighted_stress_Pa": 2136936502.092764,
+      "hazard_action_per_cycle": 1.8132468373491381e-06,
+      "mean_cleavage_rate_s-1": 0.001813246837349138,
+      "sigma_max_Pa": 2215144645.3814178,
+      "sigma_min_Pa": 222835959.0221667
+    },
+    "micro_translation_relative_error": 4.675237187436657e-84,
+    "passed": false,
+    "phase_count": 64,
+    "state_relative_max_error": 0.35994677032563277
+  },
+  "schema": "r9.trajectory-progress/1"
+}
