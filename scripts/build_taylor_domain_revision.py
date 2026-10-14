@@ -124,6 +124,12 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
     if [row["option_key"] for row in parents] != expected:
         raise RuntimeError("parent registry order does not match selected four-family order")
     variants, records = construct_amplitude_rows(parents, margins)
+    if any(
+        float(record["revised_minimum_eV"])
+        < float(record["declared_margin_eV"])
+        for record in records
+    ):
+        raise RuntimeError("a saved Taylor revision misses its declared margin")
     for parent in parents:
         matches = [row for row in variants if row["option_key"].startswith(parent["option_key"] + "__")]
         for variant in matches:
@@ -179,7 +185,9 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
 
     dossier = {
         "schema": "v10.2.31-taylor-domain-dossier/1",
-        "status": "PASS_CONSTRUCTED_DOMAIN_AND_NATIVE_LAW",
+        "status": "PASS_TAYLOR_AMPLITUDE_DOMAIN_WITH_SEPARATE_SHARED_STRESS_DISPOSITION",
+        "taylor_amplitude_domain_status": "PASS_ALL_12_CONTINUOUS_INTERVAL_CONSTRUCTIONS",
+        "shared_stress_scale_status": "ONE_SELECTED_PARENT_INVALID; EXPLICIT_UNSELECTED_CANDIDATES_RECORDED",
         "scope": "analytical continuous-domain construction plus native constructor and same-state law evaluation; no calibration or specimen outcome",
         "derivative_conventions": [
             "fixed physical stress and frozen external state",

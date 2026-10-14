@@ -1,6 +1,12 @@
 import math
+import json
+import hashlib
 from pathlib import Path
 
+from arrhenius_fracture.material_manifest import MaterialManifest
+from arrhenius_fracture.parameter_registry_v9111 import (
+    select_option, write_compatibility_manifest,
+)
 from arrhenius_fracture.taylor_domain_revision import (
     T_MAX_K, T_MIN_K, assert_amplitude_only, construct_amplitude_rows,
     minimal_intercept_stress_candidate, raw_taylor_extrema, read_rows,
@@ -10,6 +16,8 @@ from arrhenius_fracture.taylor_domain_revision import (
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv"
+REVISION_ROOT = ROOT / "arrhenius_fracture/data/materials/v10_2_31_taylor_domain"
+REVISION_REGISTRY = REVISION_ROOT / "v10_2_31_taylor_domain_registry.csv"
 
 
 def _rows():
@@ -55,3 +63,33 @@ def test_dbtt_minimal_intercept_is_separate_shared_law_candidate():
         "Peierls characteristic stress inherited through peierls_stress_fraction",
         "Taylor characteristic stress inherited through taylor_stress_fraction",
     ]
+
+
+def test_saved_revision_hashes_and_all_rows_resolve_through_native_constructor(tmp_path):
+    selection_path = REVISION_ROOT / "v10_2_31_taylor_domain_selection.json"
+    selection = json.loads(selection_path.read_text())
+    assert selection["production_selection"] is None
+    assert selection["source_head"].startswith("a74d3e34")
+    assert selection["registry_sha256"] == hashlib.sha256(
+        REVISION_REGISTRY.read_bytes()
+    ).hexdigest()
+    assert len(selection["variant_option_order"]) == 12
+    for option in selection["variant_option_order"]:
+        selected = select_option(option, REVISION_REGISTRY)
+        manifest_path = tmp_path / f"{len(list(tmp_path.iterdir()))}.csv"
+        write_compatibility_manifest(selected, manifest_path)
+        manifest = MaterialManifest.from_csv(manifest_path)
+        assert manifest.candidate_id == selected.candidate_id
+        assert manifest.taylor.H0_eV == float(selected.row["taylor_H0_eV"])
+
+
+def test_saved_stress_scale_candidates_are_explicit_and_unselected():
+    payload = json.loads((
+        REVISION_ROOT / "v10_2_31_shared_stress_scale_candidates.json"
+    ).read_text())
+    assert payload["invalid_selected_parent_count"] == 1
+    assert payload["production_selection"] is None
+    assert payload["existing_approved_alternative"]["option_key"] == "dbtt_primary"
+    assert payload["existing_approved_alternative"]["substitution_status"].startswith(
+        "not substituted"
+    )
