@@ -12,7 +12,7 @@ import subprocess
 
 
 ROOT = Path("/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion")
-COMMIT = "90cb6671523bb676cb241eb850b7f5fd41cf5461"
+COMMIT = "b14497fcf4ad366cf74922e8e65b4f18090907c4"
 BRANCH = "codex/current-pf-companion"
 ENTRY = Path("arrhenius_fracture/mode_i_first_passage_v10_0_5_18_4_0_current_pf_companion.py")
 
@@ -53,7 +53,7 @@ def inspect_current_companion() -> CurrentCompanionBinding:
     return CurrentCompanionBinding(
         str(ROOT), COMMIT, observed, BRANCH, branch, tracked_clean, str(ROOT / ENTRY), bound,
         "SOURCE_BOUND_PEAK_1000K_CURRENT_KERNEL" if bound else "UNAVAILABLE",
-        "UNRESOLVED_NOT_EQUIVALENT_TO_LOCKED_CURRENT_ENTRY",
+        "IMPLEMENTED_EXACT_VERSIONED_OPTION_LOADER; SPECIMEN_ADAPTER_PENDING",
         "UNRESOLVED_GENERIC_CONTROL_BINDING",
     )
 
