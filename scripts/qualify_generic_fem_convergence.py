@@ -66,6 +66,10 @@ def observe(root: Path) -> dict:
         "native_KJ_Pa_sqrt_m": K,
         "common_isotropic_plane_strain_J_J_per_m2": common_J,
         "common_to_native_J_relative_difference": abs(common_J - native_J) / native_J,
+        "common_observer_provenance": "algebraic_KJ_squared_over_Eprime",
+        "common_observer_independent_field_evaluation": False,
+        "selected_support_h_over_L_pz": float(mesh["selected_support_h_over_L_pz"]),
+        "selected_support_spacing_m": float(mesh["selected_support_spacing_m"]),
         "material_option": contract["material"]["option_key"],
         "sha256": {path.name: _sha(path) for path in paths},
     }
@@ -94,19 +98,52 @@ def qualify(roots: list[Path], tolerance: float) -> dict:
         for metric in metrics
     }
     max_fine = max(item["medium_to_fine"] for item in changes.values())
-    passed = max_fine <= tolerance
+    support = [level["selected_support_spacing_m"] for level in levels]
+    support_strictly_refined = all(
+        finer < coarser for coarser, finer in zip(support, support[1:])
+    )
+    independent_common_observer = all(
+        level["common_observer_independent_field_evaluation"] for level in levels
+    )
+    passed = bool(
+        support_strictly_refined
+        and independent_common_observer
+        and max_fine <= tolerance
+    )
+    if not support_strictly_refined:
+        status = "FAIL_INVALID_REFINEMENT_AXIS"
+    elif not independent_common_observer:
+        status = "FAIL_COMMON_OBSERVER_NOT_INDEPENDENT"
+    elif not passed:
+        status = "FAIL_NOT_CONVERGED"
+    else:
+        status = "PASS"
     return {
         "schema": "generic-fem-three-level-pre-event-convergence/1",
-        "status": "PASS" if passed else "FAIL_NOT_CONVERGED",
+        "status": status,
         "no_fitted_scale_factor": True,
         "relative_tolerance": tolerance,
         "levels": levels,
         "relative_changes": changes,
         "maximum_medium_to_fine_relative_change": max_fine,
+        "refinement_axis": {
+            "quantity": "selected path-envelope support spacing",
+            "values_m": support,
+            "strictly_refined": support_strictly_refined,
+            "requested_tip_h_is_not_a_proxy_for_envelope_support": True,
+        },
+        "common_observer": {
+            "provenance": "algebraic_KJ_squared_over_Eprime",
+            "independent_field_evaluation": independent_common_observer,
+            "validation_role": "unit conversion only",
+        },
         "interpretation": (
-            "The generic adapter executes three genuine physical tip-resolution "
-            "levels. Failure is retained as a numerical finding and does not "
-            "qualify R08 convergence or cross-backend agreement."
+            "The retained generic runs execute three requested initial-tip spacings, "
+            "but the first two use the same path-envelope support spacing and the "
+            "third changes support only after the quality search. This is not a "
+            "controlled support-refinement sequence. KJ^2/Eprime is derived from "
+            "native J and is not an independent common field observer. The original "
+            "2% receipt remains preserved as a failed protocol result."
         ),
     }
 
