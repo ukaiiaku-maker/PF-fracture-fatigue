@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
 
 from arrhenius_fracture.coupled_transport_exchange import joint_transport_exchange
 from arrhenius_fracture.material_manifest import MaterialManifest
+from arrhenius_fracture.run_state_checkpoint_v10230 import load_combined_checkpoint
 from arrhenius_fracture.taylor_release import historical_legacy_implicit_1s
 from arrhenius_fracture.unified_mpz import MPZConfig, UnifiedMPZState
 
@@ -72,26 +73,36 @@ def _load_state() -> tuple[UnifiedMPZState, dict]:
     material = MaterialManifest.from_csv(material_path)
     with material_path.open(newline="") as handle:
         material_row = next(csv.DictReader(handle))
+    # The native constructor owns the physical geometry through the promoted
+    # ``--mpz-length-um`` value.  ``mpz_length_m`` is a stale parser alias in
+    # this retained run receipt (2 um versus the effective 50 um) and must not
+    # be allowed to reconstruct a different grid silently.
+    effective_length_m = float(run_args["mpz_length_um"]) * 1.0e-6
+    stale_length_m = float(run_args["mpz_length_m"])
+    if np.isclose(effective_length_m, stale_length_m, rtol=0.0, atol=1.0e-18):
+        alias_disposition = "consistent_alias"
+    else:
+        alias_disposition = "rejected_stale_parser_alias"
+    cfg = MPZConfig(
+        length_m=effective_length_m,
+        n_bins=int(run_args["mpz_n_bins"]),
+        n_systems=int(run_args["mpz_n_systems"]),
+        source_bin_count=int(run_args["mpz_source_bin_count"]),
+        blunting_length_m=float(run_args["mpz_blunting_length_um"]) * 1.0e-6,
+        forest_density_floor_m2=float(material_row["rho_forest_floor_m2"]),
+        jump_fraction=float(run_args["pt_jump_fraction"]),
+        mobile_recovery_rate_s=float(run_args["mpz_mobile_recovery_rate_s"]),
+        mobile_shield_fraction=float(run_args["mpz_mobile_shield_fraction"]),
+        wake_length_m=float(run_args["wake_length_um"]) * 1.0e-6,
+        wake_n_bins=int(run_args["wake_n_bins"]),
+        wake_shielding=bool(run_args["wake_shielding"]),
+    )
     state = UnifiedMPZState(
         material,
-        MPZConfig(
-            length_m=float(run_args["mpz_length_m"]),
-            n_bins=int(run_args["mpz_n_bins"]),
-            n_systems=int(run_args["mpz_n_systems"]),
-            source_bin_count=int(run_args["mpz_source_bin_count"]),
-            blunting_length_m=float(run_args["mpz_blunting_length_m"]),
-            forest_density_floor_m2=float(material_row["rho_forest_floor_m2"]),
-            jump_fraction=float(run_args["pt_jump_fraction"]),
-            mobile_recovery_rate_s=float(run_args["mpz_mobile_recovery_rate_s"]),
-            mobile_shield_fraction=float(run_args["mpz_mobile_shield_fraction"]),
-            wake_length_m=float(run_args["wake_length_um"]) * 1.0e-6,
-            wake_n_bins=int(run_args["wake_n_bins"]),
-            wake_shielding=bool(run_args["wake_shielding"]),
-        ),
+        cfg,
     )
-    kinetic = json.loads((directory / "kinetic.json").read_text())
-    with np.load(directory / "state.npz", allow_pickle=False) as data:
-        vector = data["kinetic_active_vector"].copy()
+    _outer, kinetic, arrays = load_combined_checkpoint(SOURCE_CHECKPOINT)
+    vector = arrays["kinetic_active_vector"]
     signed_fields = {
         "mobile_positive", "mobile_negative", "retained_positive", "retained_negative",
         "accumulated_slip_positive", "accumulated_slip_negative",
@@ -106,6 +117,15 @@ def _load_state() -> tuple[UnifiedMPZState, dict]:
         start, stop = int(field["start"]), int(field["stop"])
         values = vector[start:stop].reshape(field["shape"])
         setattr(state, name, values.copy())
+    active_shape = (state.n_systems, state.n_bins)
+    wake_shape = (state.n_systems, state.wake_n_bins)
+    for name in signed_fields:
+        expected = wake_shape if name.startswith("wake_") else active_shape
+        actual = np.asarray(getattr(state, name)).shape
+        if actual != expected:
+            raise RuntimeError(
+                f"checkpoint field {name} shape {actual} conflicts with native geometry {expected}"
+            )
     state.mobile = state.mobile_positive + state.mobile_negative
     state.retained = state.retained_positive + state.retained_negative
     state.accumulated_slip = (
@@ -118,6 +138,36 @@ def _load_state() -> tuple[UnifiedMPZState, dict]:
         "material_manifest": str(material_path.relative_to(ROOT)),
         "material_manifest_sha256": _sha(material_path),
         "run_args_sha256": _sha(SOURCE_RUN / "run_args.json"),
+        "geometry_ownership": {
+            "native_constructor": "arrhenius_fracture.sharp_front.build_engine",
+            "effective_argument": "mpz_length_um",
+            "effective_length_m": effective_length_m,
+            "contradictory_alias": "mpz_length_m",
+            "contradictory_alias_value_m": stale_length_m,
+            "contradictory_alias_disposition": alias_disposition,
+            "active_centers_m": state.x.tolist(),
+            "wake_centers_m": state.wake_x.tolist(),
+            "active_dx_m": state.dx,
+            "wake_dx_m": state.wake_dx,
+            "active_support_m": [0.0, state.length_m],
+            "wake_support_m": [0.0, state.wake_length_m],
+            "active_shape": list(active_shape),
+            "wake_shape": list(wake_shape),
+            "kinetic_active_vector_sha256": hashlib.sha256(
+                np.asarray(vector, dtype=float).tobytes()
+            ).hexdigest(),
+        },
+        "native_config": {
+            "source_bin_count": cfg.source_bin_count,
+            "blunting_length_m": cfg.blunting_length_m,
+            "forest_density_floor_m2": cfg.forest_density_floor_m2,
+            "jump_fraction": cfg.jump_fraction,
+            "mobile_recovery_rate_s": cfg.mobile_recovery_rate_s,
+            "mobile_shield_fraction": cfg.mobile_shield_fraction,
+            "peierls_stress_fraction": cfg.peierls_stress_fraction,
+            "taylor_stress_fraction": cfg.taylor_stress_fraction,
+            "wake_shielding": cfg.wake_shielding,
+        },
     }
 
 
@@ -186,7 +236,7 @@ def build(output: Path) -> dict:
     delta_retained = current.retained - historical.retained
     initial_total = float(np.sum(mobile) + np.sum(retained))
     payload = {
-        "schema": "taylor-completion-native-operator-consequence/1",
+        "schema": "taylor-completion-native-operator-consequence/2",
         "status": "PASS",
         "source_head": _git_head(),
         "source": source,
@@ -269,6 +319,7 @@ def build(output: Path) -> dict:
             "effect-size claim"
         ),
         "failed_predecessors": [
+            "integration_evidence/taylor_native_operator_consequence_90a4364e: reconstructed the retained vector on the contradictory stale 2 um parser alias instead of the effective native 50 um grid; preserved as erroneous geometry provenance",
             "taylor_completion_native_consequence_d4cdd51e: parent-only overlay did not cross worker boundary",
             "taylor_completion_native_consequence_e42ca85f: worker-bound full re-equilibration stopped after active 9.4 GiB repeated global factorization; receipt also overwritten by child process",
             "uncommitted full-state 8.4 s native-operator validation: current arm completed but historical arm was stopped after 16 minutes and 3.5 GiB while repeatedly factoring in solve_ivp BDF",
