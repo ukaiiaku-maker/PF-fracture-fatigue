@@ -127,8 +127,10 @@ def load_checkpoint(state: UnifiedMPZState, path: Path) -> int:
     return step
 
 
-def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, Any]:
-    stress = state.local_stress_profile_Pa(STRESS_PA)
+def trace(
+    state: UnifiedMPZState, step: int, out: dict[str, Any], stress_Pa: float
+) -> dict[str, Any]:
+    stress = state.local_stress_profile_Pa(stress_Pa)
     rho = state.local_forest_density_m2(False)
     rates = state._transport_rates(stress, rho, T_K, B_M)
     tau_p = state.cfg.peierls_stress_fraction * stress
@@ -146,7 +148,7 @@ def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, A
               if np.sum(eq_mobile) > 0.0 else float(np.mean(rates["velocity"][:2])))
     return {
         "step": step, "time_s": step * DT_S, "temperature_K": T_K,
-        "tip_opening_stress_Pa": STRESS_PA, "x_m": state.x.tolist(),
+        "tip_opening_stress_Pa": stress_Pa, "x_m": state.x.tolist(),
         "mobile_recovery_rate_s": float(state.cfg.mobile_recovery_rate_s),
         "retained_recovery_rate_s": float(state.manifest.retained_recovery_rate_s),
         "local_opening_stress_Pa": stress.tolist(), "forest_density_m2": rho.tolist(),
@@ -208,11 +210,13 @@ def trace(state: UnifiedMPZState, step: int, out: dict[str, Any]) -> dict[str, A
     }
 
 
-def evolve(state: UnifiedMPZState, start: int, stop: int) -> list[dict[str, Any]]:
+def evolve(
+    state: UnifiedMPZState, start: int, stop: int, stress_Pa: float
+) -> list[dict[str, Any]]:
     records = []
     for step in range(start + 1, stop + 1):
         require_persistent_binding(state, stage=f"before-step-{step}")
-        out = state.evolve(DT_S, T_K, STRESS_PA, B_M)
+        out = state.evolve(DT_S, T_K, stress_Pa, B_M)
         accounted = (
             state.mobile_count + state.retained_count
             + state.wake_mobile_count + state.wake_retained_count
@@ -225,7 +229,7 @@ def evolve(state: UnifiedMPZState, start: int, stop: int) -> list[dict[str, Any]
                 f"owned population/flux ledger imbalance at step {step}: {balance:.6e}"
             )
         out["population_ledger_balance_error"] = balance
-        records.append(trace(state, step, out))
+        records.append(trace(state, step, out, stress_Pa))
         require_persistent_binding(state, stage=f"after-step-{step}")
     return records
 
@@ -242,13 +246,13 @@ def run(args: argparse.Namespace) -> None:
         retained_recovery_rate_s=args.retained_recovery_rate_s,
     )
     if args.phase == "initial":
-        records = evolve(state, 0, INITIAL_STEPS)
+        records = evolve(state, 0, INITIAL_STEPS, args.stress_Pa)
         save_checkpoint(state, root / "restart_checkpoint_step6.npz", INITIAL_STEPS)
     elif args.phase == "resume":
         start = load_checkpoint(state, root / "restart_checkpoint_step6.npz")
-        records = evolve(state, start, TOTAL_STEPS)
+        records = evolve(state, start, TOTAL_STEPS, args.stress_Pa)
     elif args.phase == "uninterrupted":
-        records = evolve(state, 0, TOTAL_STEPS)
+        records = evolve(state, 0, TOTAL_STEPS, args.stress_Pa)
     else:
         raise ValueError(args.phase)
     save_checkpoint(state, phase_dir / "terminal_state.npz", TOTAL_STEPS if args.phase != "initial" else INITIAL_STEPS)
@@ -258,7 +262,8 @@ def run(args: argparse.Namespace) -> None:
     )
     metadata = {
         "phase": args.phase, "source_commit": _commit(), "manifest": str(manifest),
-        "manifest_sha256": _sha(manifest), "temperature_K": T_K, "stress_Pa": STRESS_PA,
+        "manifest_sha256": _sha(manifest), "temperature_K": T_K,
+        "stress_Pa": float(args.stress_Pa),
         "dt_s": DT_S, "initial_steps": INITIAL_STEPS, "total_steps": TOTAL_STEPS,
         "mobile_recovery_rate_s": float(state.cfg.mobile_recovery_rate_s),
         "retained_recovery_rate_s": float(state.manifest.retained_recovery_rate_s),
@@ -343,6 +348,7 @@ def main() -> None:
         "integration_evidence/f1_coupled_native_qualification_8982d422/initial_to_step48/selected_material_manifest_v10_2_22.csv"))
     parser.add_argument("--mobile-recovery-rate-s", type=float, default=0.0)
     parser.add_argument("--retained-recovery-rate-s", type=float, default=0.0)
+    parser.add_argument("--stress-Pa", type=float, default=STRESS_PA)
     args = parser.parse_args()
     compare(args.output.resolve()) if args.phase == "compare" else run(args)
 
