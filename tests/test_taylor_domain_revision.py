@@ -69,11 +69,17 @@ def test_saved_revision_hashes_and_all_rows_resolve_through_native_constructor(t
     selection_path = REVISION_ROOT / "v10_2_31_taylor_domain_selection.json"
     selection = json.loads(selection_path.read_text())
     assert selection["production_selection"] is None
-    assert selection["source_head"].startswith("a74d3e34")
+    assert len(selection["source_head"]) == 40
+    assert set(selection["source_head"]) <= set("0123456789abcdef")
     assert selection["registry_sha256"] == hashlib.sha256(
         REVISION_REGISTRY.read_bytes()
     ).hexdigest()
     assert len(selection["variant_option_order"]) == 12
+    assert len(selection["prospective_readiness_option_order"]) == 4
+    assert all(
+        option.endswith("__taylor_margin_0p10eV")
+        for option in selection["prospective_readiness_option_order"]
+    )
     for option in selection["variant_option_order"]:
         selected = select_option(option, REVISION_REGISTRY)
         manifest_path = tmp_path / f"{len(list(tmp_path.iterdir()))}.csv"

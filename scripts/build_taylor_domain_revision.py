@@ -150,6 +150,10 @@ def build(output: Path, margins: tuple[float, ...]) -> None:
         "registry_sha256": sha256_file(registry),
         "margins_eV": list(margins),
         "primary_readiness_margin_eV": 0.10,
+        "prospective_readiness_option_order": [
+            row["option_key"] for row in variants
+            if row["option_key"].endswith("__taylor_margin_0p10eV")
+        ],
         "variant_option_order": [row["option_key"] for row in variants],
         "production_selection": None,
         "checkpoint_policy": "old checkpoints require an explicitly labeled state-transfer diagnostic; they are not resumable as current-parameter physics",
