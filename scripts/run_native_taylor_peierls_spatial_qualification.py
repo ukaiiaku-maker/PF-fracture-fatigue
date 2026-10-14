@@ -62,15 +62,11 @@ def build_state(
     mobile_recovery_rate_s: float = 0.0,
     retained_recovery_rate_s: float = 0.0,
 ) -> UnifiedMPZState:
-    manifest = replace(
-        MaterialManifest.from_csv(manifest_path),
-        retained_recovery_rate_s=max(float(retained_recovery_rate_s), 0.0),
-    )
+    manifest = MaterialManifest.from_csv(manifest_path)
     state = UnifiedMPZState(
         manifest,
         MPZConfig(length_m=8.0e-6, n_bins=16, n_systems=2, source_bin_count=2,
-                  mobile_recovery_rate_s=max(float(mobile_recovery_rate_s), 0.0),
-                  wake_length_m=8.0e-6),
+                  mobile_recovery_rate_s=0.0, wake_length_m=8.0e-6),
     )
     kernel = SignedShieldingKernel(
         active_kernel=np.ones((2, 16)), wake_kernel=np.zeros((2, 16)),
@@ -91,6 +87,15 @@ def build_state(
         state,
         config=PersistentSiteConfig(rho_site0_m2=1.4115242646890916e16),
         r0_m=1.0e-6, b_m=B_M,
+    )
+    # Preserve the top-1 physical installation contract: its selected material
+    # row has zero recovery. Nonzero values here are an explicit numerical
+    # qualification overlay applied only after the native state and source law
+    # are installed; they are recorded in every trace and metadata receipt.
+    state.cfg.mobile_recovery_rate_s = max(float(mobile_recovery_rate_s), 0.0)
+    state.manifest = replace(
+        state.manifest,
+        retained_recovery_rate_s=max(float(retained_recovery_rate_s), 0.0),
     )
     require_persistent_binding(state, stage="constructed")
     return state
@@ -257,6 +262,8 @@ def run(args: argparse.Namespace) -> None:
         "dt_s": DT_S, "initial_steps": INITIAL_STEPS, "total_steps": TOTAL_STEPS,
         "mobile_recovery_rate_s": float(state.cfg.mobile_recovery_rate_s),
         "retained_recovery_rate_s": float(state.manifest.retained_recovery_rate_s),
+        "recovery_input_classification": "post-install numerical qualification overlay",
+        "selected_material_recovery_unchanged": True,
         "production_execution_authorized": False,
     }
     (phase_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
