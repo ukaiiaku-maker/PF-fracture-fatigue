@@ -1,0 +1,176 @@
+{
+  "by_block": {
+    "P1": 288,
+    "P2": 68,
+    "P3": 18,
+    "P4": 44,
+    "P5": 96,
+    "P6": 64,
+    "P7": 44,
+    "P8": 22,
+    "P9": 48
+  },
+  "canonical_semantic_sha256": "287c6856e6e0ebfb9d09f5d2c08e1d1766e69c0eb7e4915c0a11ab33ae1530d0",
+  "case_count": 692,
+  "cohesive_comparison_case_count": 48,
+  "goal_records": [
+    {
+      "case_count": 0,
+      "goal_id": "FG-01",
+      "status": "FRAMEWORK_LEVEL_NO_DEDICATED_CASE"
+    },
+    {
+      "case_count": 288,
+      "goal_id": "FG-02",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 288,
+      "goal_id": "FG-03",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 134,
+      "goal_id": "FG-04",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 288,
+      "goal_id": "FG-05",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 164,
+      "goal_id": "FG-06",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 182,
+      "goal_id": "FG-07",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 44,
+      "goal_id": "FG-08",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 44,
+      "goal_id": "FG-09",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 44,
+      "goal_id": "FG-10",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 70,
+      "goal_id": "FG-11",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 70,
+      "goal_id": "FG-12",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 108,
+      "goal_id": "FG-13",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 64,
+      "goal_id": "FG-14",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 288,
+      "goal_id": "FG-15",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 108,
+      "goal_id": "FG-16",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    },
+    {
+      "case_count": 0,
+      "goal_id": "FG-17",
+      "status": "FRAMEWORK_LEVEL_NO_DEDICATED_CASE"
+    },
+    {
+      "case_count": 48,
+      "goal_id": "FG-18",
+      "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
+    }
+  ],
+  "output_root": null,
+  "production_execution_authorized": false,
+  "raw_jsonl_sha256": "dc8354451704758f911f610dd7f4844a66abc3fb80cd65bc57eeaf7f1489905d",
+  "readiness_counts": {
+    "fit_quality": {
+      "NOT_APPLICABLE_OR_NATIVE_OPENING": 656,
+      "QUALIFIED_FINITE_DOMAIN_ABSOLUTE_SUPPORT_UNASSIGNED": 36
+    },
+    "implementation": {
+      "IMPLEMENTED": 388,
+      "IMPLEMENTED_CONSTITUTIVE_SPECIMEN_ADAPTER_PENDING": 36,
+      "UNRESOLVED_ADAPTER": 256,
+      "UNRESOLVED_GENERIC_FEM_ADAPTER": 12
+    },
+    "input_availability": {
+      "AVAILABLE_VERSIONED_INPUTS": 656,
+      "BLOCKED_PHYSICAL_COHESIVE_SUPPORT": 36
+    },
+    "kernel_validity": {
+      "BOUND_NATIVE_KERNEL": 622,
+      "PENDING_THREE_LEVEL_COMMON_OBSERVER": 70
+    },
+    "material_domain": {
+      "BLOCKED_RAW_CONSTITUTIVE_SCALE_NONPOSITIVE": 36,
+      "CONSTRUCTED_PROSPECTIVE_NOT_PRODUCTION_SELECTED": 550,
+      "None": 48,
+      "QUALIFICATION_REQUIRED_NEAR_SCALE_ZERO": 58
+    },
+    "native_qualification": {
+      "COMPACT_PATH_QUALIFIED": 388,
+      "PENDING_SPECIMEN_LEVEL": 292,
+      "PENDING_THREE_LEVEL_SPECIMEN": 12
+    },
+    "numerical_convergence": {
+      "CASE_LEVEL_PRODUCTION_CONVERGENCE_PENDING": 622,
+      "PENDING_THREE_LEVEL": 70
+    },
+    "production_permission": {
+      "DENIED_CURRENT_MACHINE": 692
+    },
+    "resource_admission": {
+      "PENDING_AUTHORIZED_TARGET_MACHINE_AND_OUTPUT_ROOT": 692
+    }
+  },
+  "resource_estimates": {
+    "admission_rule": "target free >= selected concurrent peak transient + reserve",
+    "maximum_single_case_peak_transient_GiB": 24.0,
+    "maximum_substantial_workers_current_plan": 1,
+    "reserve_GiB": 12.0,
+    "summed_retained_output_GiB": 31.23
+  },
+  "schema": "prospective-common-fracture-campaign/3",
+  "status_axes": [
+    "material_domain",
+    "fit_quality",
+    "implementation",
+    "native_qualification",
+    "kernel_validity",
+    "numerical_convergence",
+    "input_availability",
+    "resource_admission",
+    "production_permission"
+  ],
+  "target_machine": null,
+  "validation": {
+    "errors": [],
+    "valid": true
+  }
+}

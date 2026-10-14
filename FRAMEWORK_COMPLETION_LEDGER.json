@@ -241,16 +241,20 @@
     {
       "id": "R13",
       "goal_ids": ["FG-01", "FG-02", "FG-03", "FG-04", "FG-05", "FG-06", "FG-07", "FG-08", "FG-09", "FG-10", "FG-11", "FG-12", "FG-13", "FG-14", "FG-15", "FG-16", "FG-17", "FG-18"],
-      "status": "DEPENDENCY_PENDING",
-      "concrete_defect": "Campaign v2 predates parameter/cohesive/constraint additions and does not provide every required typed executable cell or independent status axis.",
+      "status": "COMPLETE_IMPLEMENTATION_ACCEPTANCE_DEPENDENCIES_EXPLICIT",
+      "concrete_defect": "Closed at the planning layer: v3 preserves all 644 v2 cells, adds 48 deliberate cohesive comparisons, binds v10.2.32 prospective options, and records nine independent readiness axes. Cases blocked by physical support, adapters, convergence, target resources or production permission remain explicit rather than omitted.",
       "owner_consumer": "prospective campaign schema, launcher, audit/resume and all-goal records",
       "authoritative_source": "unchanged charter plus completed R01-R12 registries",
       "dependencies": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R11", "R12"],
-      "exact_next_command": "python scripts/build_prospective_campaign_v3.py --disabled --audit",
+      "exact_next_command": "python scripts/build_prospective_campaign_v3.py --disabled --audit --dry-run",
       "input_output_identity": "frozen model/parameter/fit IDs; target machine/output root intentionally unset",
       "numerical_criteria": "All required cells have typed parameters, endpoints, nonempty native commands and independent readiness axes; production launch remains disabled.",
-      "executed_evidence": ["common_framework_readiness/PROSPECTIVE_CAMPAIGN_V2.jsonl"],
-      "remaining_limitation": "Final count and resource estimate must be recomputed after implementation."
+      "executed_evidence": [
+        "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V2.jsonl",
+        "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
+        "common_framework_readiness/CAMPAIGN_V3_SUMMARY.json"
+      ],
+      "remaining_limitation": "Production remains disabled. Cohesive comparison cells await physical activation-area/stiffness/work support and specimen adapter qualification; P6-P8 retain their separately reported native-adapter/convergence dependencies."
     }
   ],
   "next_priority": "R04 and R08 can proceed from the prospective 0.10 eV Taylor identities while the distinct DBTT shared-stress production selection remains explicit and unresolved."
