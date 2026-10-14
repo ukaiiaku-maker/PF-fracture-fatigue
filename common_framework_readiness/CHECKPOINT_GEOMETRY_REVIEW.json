@@ -1,0 +1,41 @@
+{
+  "schema": "checkpoint-geometry-review/1",
+  "status": "PASS",
+  "checkpoint_generation": "834191da44593796b9f607ec",
+  "checkpoint_manifest_sha256": "11a29c8ea32c51a92197000290c5068e8a4b19852310427a3138b8f204f0a952",
+  "kinetic_active_vector_sha256": "b7fb86349398b1caa283d0cd9574f95160800a82dbd01d73f2a5ab3fc7039d72",
+  "native_geometry_owner": "arrhenius_fracture.sharp_front.build_engine",
+  "effective_runtime_input": {
+    "name": "mpz_length_um",
+    "value": 50.0,
+    "conversion": "value * 1e-6 m"
+  },
+  "rejected_alias": {
+    "name": "mpz_length_m",
+    "value_m": 2e-06,
+    "reason": "stale parser alias contradicts the promoted native runtime input and retained field shapes"
+  },
+  "active_grid": {
+    "shape": [2, 80],
+    "support_m": [0.0, 4.9999999999999996e-05],
+    "dx_m": 6.249999999999999e-07,
+    "center_definition": "(arange(80) + 0.5) * dx_m"
+  },
+  "wake_grid": {
+    "shape": [2, 160],
+    "support_m": [0.0, 9.999999999999999e-05],
+    "dx_m": 6.249999999999999e-07,
+    "center_definition": "(arange(160) + 0.5) * dx_m"
+  },
+  "retained_state": {
+    "mobile_total": 2.3271780906246097e-09,
+    "retained_total": 3.445677922597454e-08,
+    "population_total": 3.6783957316599154e-08
+  },
+  "regression_test": "tests/test_taylor_native_operator_geometry.py",
+  "corrected_evidence": "integration_evidence/taylor_native_operator_consequence_7b815443/native_operator_consequence.json",
+  "superseded_evidence": {
+    "path": "integration_evidence/taylor_native_operator_consequence_90a4364e/native_operator_consequence.json",
+    "limitation": "reconstructed the retained vector on a 2 um active support and therefore used incorrect coordinates, stress decay, density conversion and transport spacing"
+  }
+}
