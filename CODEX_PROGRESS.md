@@ -142,3 +142,22 @@ under the final source before restart/uninterrupted comparison.
 - Remaining readiness scopes are native source geography, tensor/constraint,
   FEM/CZM, branch/cavity, capability-wide restart, and long-growth analysis.
 
+## Native source-geography qualification, 13 October 2026
+
+- Commits `1192ee92`, `c6b98e09`, and `9d9f3edf` add fail-closed post-run
+  verification and a directly executable compact qualification for the two
+  persistent bulk geographies.
+- `bulk_uniform` executed homogeneous persistent full-field bulk plasticity
+  with tip emission disabled. `tip_plus_bulk` executed the same bulk mechanics
+  with tip emission enabled. All six initial/restarted/uninterrupted native
+  model-audit bindings matched the requested option exactly.
+- Each fresh-process step-1-to-2 restart matched an independent uninterrupted
+  step-2 state across all 11 checkpoint arrays; the paired NPZ files also have
+  identical SHA-256 hashes.
+- This closes execution/restart readiness for native source geography only. It
+  is not a production or scientific sensitivity result.
+- Focused status: 11/11 tests pass; the complete suite passes 929/929 in
+  242.42 s.
+- Remaining readiness scopes are tensor/constraint, FEM/CZM, branch/cavity,
+  capability-wide restart, and long-growth analysis.
+

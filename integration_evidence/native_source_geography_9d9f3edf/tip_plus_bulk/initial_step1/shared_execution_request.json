@@ -1,0 +1,159 @@
+{
+  "native_args": [
+    "--signed-kernel-family",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+    "--mode",
+    "2d",
+    "--parameter-option",
+    "v913_paper_dbtt01_0202500_persistent_sites",
+    "--temperatures",
+    "900",
+    "--steps",
+    "1",
+    "--dU",
+    "1e-5",
+    "--dt",
+    "8.4",
+    "--n-stagger",
+    "1",
+    "--da-phys",
+    "5e-6",
+    "--target-crack-extension-um",
+    "10",
+    "--front-state-model",
+    "moving_pz",
+    "--tip-source-model",
+    "continuum",
+    "--tip-kinetics-mode",
+    "moving_velocity",
+    "--bulk-plasticity-mode",
+    "full_field",
+    "--directional-j-mode",
+    "root_signed",
+    "--active-shielding",
+    "--signed-active-shielding",
+    "--mobile-shield-fraction",
+    "0",
+    "--no-wake-shielding",
+    "--crystal-aniso",
+    "--crystal-compete",
+    "--crystal-theta-deg",
+    "30",
+    "--crystal-material",
+    "w",
+    "--j-decomposition",
+    "cluster",
+    "--max-fronts",
+    "1",
+    "--crack-backend",
+    "sharp_wake",
+    "--print-every",
+    "1",
+    "--nx",
+    "12",
+    "--ny",
+    "24"
+  ],
+  "options": {
+    "cavity": "disabled",
+    "crack_path": "single_front",
+    "integration": "adaptive_transactional",
+    "kernel_manifest": null,
+    "kinetics": "native_signed",
+    "loading": "monotonic",
+    "material_manifest": null,
+    "mechanics": "spatial_pf",
+    "output": "compact_smoke",
+    "plasticity": "tip_plus_full_field",
+    "random_seed": 1733,
+    "schema": "shared-fracture-fatigue-options/1",
+    "source_lifecycle": "persistent_reusable",
+    "source_location": "tip_plus_bulk"
+  },
+  "options_sha256": "6dd5dfd8b1656972ed65958e5d0b33ab8f31cc580365be54da9f9618e81a7f84",
+  "output_dir": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/initial_step1",
+  "plan": {
+    "bindings": [
+      {
+        "attribute": "assemble_mechanics",
+        "consumer": "full spatial finite-element mechanics assembly",
+        "module": "arrhenius_fracture.fem",
+        "requested": "spatial_pf",
+        "role": "mechanics"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native displacement-step controller",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "monotonic",
+        "role": "loading"
+      },
+      {
+        "attribute": "advance_event_aware_coupled_interval",
+        "consumer": "composed tip and bulk scheduler",
+        "module": "arrhenius_fracture.global_physical_scheduler_v1",
+        "requested": "tip_plus_bulk",
+        "role": "source_location"
+      },
+      {
+        "attribute": "install_persistent_site_source",
+        "consumer": "persistent site ledger installer",
+        "module": "arrhenius_fracture.persistent_site_source_v10221",
+        "requested": "persistent_reusable",
+        "role": "source_lifecycle"
+      },
+      {
+        "attribute": "accepted_bulk_load_step",
+        "consumer": "accepted full-field plastic update",
+        "module": "arrhenius_fracture.bulk_plasticity_v104",
+        "requested": "tip_plus_full_field",
+        "role": "plasticity"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native signed state update",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "native_signed",
+        "role": "kinetics"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "single-front topology",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "single_front",
+        "role": "crack_path"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "adaptive accepted-state transaction",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "adaptive_transactional",
+        "role": "integration"
+      },
+      {
+        "attribute": "run_2d",
+        "consumer": "native --save-snapshots/--no-plots retention flags",
+        "module": "arrhenius_fracture.sharp_front",
+        "requested": "compact_smoke",
+        "role": "output"
+      },
+      {
+        "attribute": "_require_stochastic_seed",
+        "consumer": "CLEAVAGE_HAZARD_SEED before provider import",
+        "module": "arrhenius_fracture.sharp_front_v10_2_17",
+        "requested": "1733",
+        "role": "random_seed"
+      }
+    ],
+    "executable": true,
+    "executor_attribute": "main",
+    "executor_module": "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited",
+    "limitation": null,
+    "options_sha256": "6dd5dfd8b1656972ed65958e5d0b33ab8f31cc580365be54da9f9618e81a7f84",
+    "restart_family": "v10_4_tip_plus_bulk_combined_outer",
+    "schema": "shared-execution-plan/1"
+  },
+  "restart_from": null,
+  "schema": "shared-execution-request/1",
+  "source_policy": "qualified"
+}

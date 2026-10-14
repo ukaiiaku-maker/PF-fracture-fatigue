@@ -1,0 +1,94 @@
+{
+  "comparison": "same current source, loading, seed, and terminal physical step",
+  "complete_terminal_state_equal": true,
+  "json_differences_after_nonphysical_provenance_normalization": {
+    "kinetic.json": [],
+    "outer.json": []
+  },
+  "restarted_generation": "183360643f57ccc88f72efc9",
+  "schema": "f1-current-source-full-state-restart-comparison/1",
+  "state_arrays": {
+    "damage": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        1124
+      ]
+    },
+    "displacement": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2248
+      ]
+    },
+    "ep_gp": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        3,
+        2126
+      ]
+    },
+    "kinetic_active_vector": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2882
+      ]
+    },
+    "mesh_elems": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2126,
+        3
+      ]
+    },
+    "mesh_nodes": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        1124,
+        2
+      ]
+    },
+    "pz_emit_gp": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2126
+      ]
+    },
+    "pz_escape_gp": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2126
+      ]
+    },
+    "pz_mobile_gp": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2126
+      ]
+    },
+    "pz_store_gp": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2126
+      ]
+    },
+    "rho_gp": {
+      "equal": true,
+      "max_abs_difference": 0.0,
+      "shape": [
+        2126
+      ]
+    }
+  },
+  "status": "PASS",
+  "uninterrupted_generation": "2cdf70b67c6a8db0d40d20dd"
+}

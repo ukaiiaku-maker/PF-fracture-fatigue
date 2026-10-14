@@ -1,0 +1,108 @@
+{
+  "classification": "compact readiness qualification",
+  "kernel_family": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+  "production_execution_authorized": false,
+  "results": {
+    "bulk_uniform": {
+      "complete_terminal_state_equal": true,
+      "executed_bindings": {
+        "initial": {
+          "all_expected_bindings_match": true,
+          "bulk_density_transport": false,
+          "bulk_finite_inventory": false,
+          "bulk_plasticity_mode": "full_field",
+          "bulk_sources": "homogeneous_persistent_background",
+          "direct_tip_bulk_population_exchange": false,
+          "model_audit": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/initial_step1/v10_4_bulk_coupled_model_audit.json",
+          "schema": "shared-executed-bulk-geography-binding/1",
+          "source_geography": "bulk_uniform",
+          "tip_emission_enabled": false,
+          "zero_stress_net_plastic_rate_exactly_zero": true
+        },
+        "restarted": {
+          "all_expected_bindings_match": true,
+          "bulk_density_transport": false,
+          "bulk_finite_inventory": false,
+          "bulk_plasticity_mode": "full_field",
+          "bulk_sources": "homogeneous_persistent_background",
+          "direct_tip_bulk_population_exchange": false,
+          "model_audit": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/restart_to_step2/v10_4_bulk_coupled_model_audit.json",
+          "schema": "shared-executed-bulk-geography-binding/1",
+          "source_geography": "bulk_uniform",
+          "tip_emission_enabled": false,
+          "zero_stress_net_plastic_rate_exactly_zero": true
+        },
+        "uninterrupted": {
+          "all_expected_bindings_match": true,
+          "bulk_density_transport": false,
+          "bulk_finite_inventory": false,
+          "bulk_plasticity_mode": "full_field",
+          "bulk_sources": "homogeneous_persistent_background",
+          "direct_tip_bulk_population_exchange": false,
+          "model_audit": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/uninterrupted_to_step2/v10_4_bulk_coupled_model_audit.json",
+          "schema": "shared-executed-bulk-geography-binding/1",
+          "source_geography": "bulk_uniform",
+          "tip_emission_enabled": false,
+          "zero_stress_net_plastic_rate_exactly_zero": true
+        }
+      },
+      "options_sha256": "d82fd42563dfd5d2b03790acadb74c9bffffc489a00b08b7951d00e43d294e54",
+      "restart_comparison": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/restart_comparison.json",
+      "restart_family": "v10_4_pure_bulk_combined_outer",
+      "state_arrays_compared": 11,
+      "status": "PASS"
+    },
+    "tip_plus_bulk": {
+      "complete_terminal_state_equal": true,
+      "executed_bindings": {
+        "initial": {
+          "all_expected_bindings_match": true,
+          "bulk_density_transport": false,
+          "bulk_finite_inventory": false,
+          "bulk_plasticity_mode": "full_field",
+          "bulk_sources": "homogeneous_persistent_background",
+          "direct_tip_bulk_population_exchange": false,
+          "model_audit": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/initial_step1/v10_4_bulk_coupled_model_audit.json",
+          "schema": "shared-executed-bulk-geography-binding/1",
+          "source_geography": "tip_plus_bulk",
+          "tip_emission_enabled": true,
+          "zero_stress_net_plastic_rate_exactly_zero": true
+        },
+        "restarted": {
+          "all_expected_bindings_match": true,
+          "bulk_density_transport": false,
+          "bulk_finite_inventory": false,
+          "bulk_plasticity_mode": "full_field",
+          "bulk_sources": "homogeneous_persistent_background",
+          "direct_tip_bulk_population_exchange": false,
+          "model_audit": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/restart_to_step2/v10_4_bulk_coupled_model_audit.json",
+          "schema": "shared-executed-bulk-geography-binding/1",
+          "source_geography": "tip_plus_bulk",
+          "tip_emission_enabled": true,
+          "zero_stress_net_plastic_rate_exactly_zero": true
+        },
+        "uninterrupted": {
+          "all_expected_bindings_match": true,
+          "bulk_density_transport": false,
+          "bulk_finite_inventory": false,
+          "bulk_plasticity_mode": "full_field",
+          "bulk_sources": "homogeneous_persistent_background",
+          "direct_tip_bulk_population_exchange": false,
+          "model_audit": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/uninterrupted_to_step2/v10_4_bulk_coupled_model_audit.json",
+          "schema": "shared-executed-bulk-geography-binding/1",
+          "source_geography": "tip_plus_bulk",
+          "tip_emission_enabled": true,
+          "zero_stress_net_plastic_rate_exactly_zero": true
+        }
+      },
+      "options_sha256": "6dd5dfd8b1656972ed65958e5d0b33ab8f31cc580365be54da9f9618e81a7f84",
+      "restart_comparison": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/tip_plus_bulk/restart_comparison.json",
+      "restart_family": "v10_4_tip_plus_bulk_combined_outer",
+      "state_arrays_compared": 11,
+      "status": "PASS"
+    }
+  },
+  "schema": "native-source-geography-qualification/1",
+  "scope": "native geography selection, fail-closed post-run binding, and two-step restart only; not a source-geography sensitivity campaign",
+  "status": "PASS"
+}

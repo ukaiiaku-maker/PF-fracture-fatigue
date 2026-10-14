@@ -1,0 +1,74 @@
+{
+  "schema": "native-source-geography-readiness/1",
+  "date": "2026-10-13",
+  "status": "PASSED_COMPACT_NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION",
+  "production_execution_authorized": false,
+  "manuscript_modified": false,
+  "qualified_source_commit": "9d9f3edfe4c78fa854b1bb070b2d207cef3c83a2",
+  "implementation": {
+    "selection_contract": "SharedOptions.source_geography selects the native V10.4 --no-tip-plasticity or --tip-plasticity path.",
+    "post_run_verification": "The worker fails closed unless the native V10.4 model audit exactly matches the requested persistent bulk geography and its required mechanics flags.",
+    "binding_schema": "shared-executed-bulk-geography-binding/1",
+    "required_common_mechanics": {
+      "bulk_plasticity_mode": "full_field",
+      "bulk_sources": "homogeneous_persistent_background",
+      "bulk_finite_inventory": false,
+      "bulk_density_transport": false,
+      "direct_tip_bulk_population_exchange": false,
+      "zero_stress_net_plastic_rate_exactly_zero": true
+    }
+  },
+  "compact_native_qualification": {
+    "root": "../integration_evidence/native_source_geography_9d9f3edf",
+    "temperature_K": 900.0,
+    "mesh": [12, 24],
+    "initial_terminal_step": 1,
+    "fresh_process_restart_terminal_step": 2,
+    "uninterrupted_terminal_step": 2,
+    "geographies": {
+      "bulk_uniform": {
+        "preset": "pf_monotonic_bulk",
+        "tip_emission_enabled": false,
+        "restart_family": "v10_4_pure_bulk_combined_outer",
+        "all_three_executed_bindings_match": true,
+        "complete_terminal_state_equal": true,
+        "state_arrays_compared": 11
+      },
+      "tip_plus_bulk": {
+        "preset": "pf_monotonic_tip_plus_bulk",
+        "tip_emission_enabled": true,
+        "restart_family": "v10_4_tip_plus_bulk_combined_outer",
+        "all_three_executed_bindings_match": true,
+        "complete_terminal_state_equal": true,
+        "state_arrays_compared": 11
+      }
+    },
+    "scope": "Native geography selection, fail-closed post-run binding, and two-step fresh-process restart only; not a source-geography sensitivity campaign and not production evidence."
+  },
+  "tests": {
+    "focused_passed": 11,
+    "focused_failed": 0,
+    "focused_elapsed_s": 0.95,
+    "full_suite_passed": 929,
+    "full_suite_failed": 0,
+    "full_suite_elapsed_s": 242.42
+  },
+  "sha256": {
+    "shared_execution_worker.py": "88cdf85b6132d5b87e4f8dcb935b607ca072762e40836d6a56b015ccdfb3e6e1",
+    "qualify_native_source_geography.py": "d7d5ce79f983d368da569c48a3663df42a5f4a283f944ed9b24b8194d9625ef6",
+    "test_f1_no_physics_fallback.py": "bf9b8997a421f203af2f46a1bb82bfd7bedd03135254c9df15385e5d365e7033",
+    "test_native_source_geography_qualification.py": "f2482b4cad35b8a903385bb57c25013a6d37034a29ae83324ba535c2b8dc5310",
+    "qualification_report.json": "60f7a15fb2c9b3a40839011b2196e6688ae8798a2d37423b636b7a4ce3abeb5a",
+    "bulk_uniform_restart_comparison.json": "b9058731fe3ad6b1768d8d3adb482e8853db3c5843ed166b77fef758e057500a",
+    "tip_plus_bulk_restart_comparison.json": "14dcaaea1937530d1dfffdac09d595b7b99db3d880a9b95754a26eaf967876f0",
+    "bulk_uniform_terminal_state.npz": "9c9a4193df80365c9fd778aba321e4b1a43d187fb06992730728cdde4c6c2676",
+    "tip_plus_bulk_terminal_state.npz": "cee6df6d8ab7bd86fc83917a0c79687824d66cc2f0ebeb78788ffe841b2d0f03"
+  },
+  "remaining_readiness_scopes": [
+    "tensor and constraint qualification",
+    "FEM/CZM option qualification",
+    "branch and cavity option qualification",
+    "capability-wide restart coverage",
+    "long-growth analysis"
+  ]
+}

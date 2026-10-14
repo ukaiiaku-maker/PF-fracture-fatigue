@@ -18,6 +18,18 @@
     "elapsed_s": 256.68,
     "record": "TAYLOR_PEIERLS_RECOVERY_WIRING.json"
   },
+  "current_native_source_geography_checkout": {
+    "tested_content_commit": "9d9f3edfe4c78fa854b1bb070b2d207cef3c83a2",
+    "focused_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_f1_no_physics_fallback.py tests/test_native_source_geography_qualification.py",
+    "focused_passed": 11,
+    "focused_failed": 0,
+    "focused_elapsed_s": 0.95,
+    "full_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+    "full_suite_passed": 929,
+    "full_suite_failed": 0,
+    "full_suite_elapsed_s": 242.42,
+    "record": "NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json"
+  },
   "final_source_repair_targeted": {
     "passed": 56,
     "failed": 0,

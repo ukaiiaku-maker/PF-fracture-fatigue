@@ -1,0 +1,448 @@
+{
+  "case": {
+    "R": 0.1,
+    "crack_backend": "sharp_wake",
+    "da_phys_m": 5e-06,
+    "deltaK_MPa_sqrt_m": 0.0,
+    "frequency_Hz": 1000.0,
+    "material_manifest_sha256": "ed4b3d3ad82d0f24cb53113e1471f5ce93a3beaa54b62c485a5b4f2d06fa049e",
+    "parameter_option": "",
+    "seed": 1733,
+    "source_geography": "bulk_uniform",
+    "temperature_K": 900.0
+  },
+  "cycles_total": 0.0,
+  "driver": {
+    "Ftop_prev": 2178398.5892120274,
+    "Kc_first": null,
+    "Kc_first_step": null,
+    "Uapp_accepted": 1e-05,
+    "Uapp_prev": 1e-05,
+    "W_ext_acc": 10.891992946060137,
+    "W_p_acc": 2.217420261053335,
+    "a_killed": 0.0005,
+    "a_tip": 0.0005,
+    "carry_frac": 1.0,
+    "crack_extension_start_a": 0.0005,
+    "cyclic_mechanics_updates": 0,
+    "cyclic_plastic_work_acc": 0.0,
+    "dt_cur": 8.4,
+    "next_snapshot_ext_m": Infinity,
+    "prev_a_tip_for_block": 0.0005,
+    "refine_centers": [
+      [
+        0.0005,
+        0.0
+      ]
+    ],
+    "step": 1
+  },
+  "geometry": {
+    "committed_event_count": 0,
+    "crack_tip_m": [
+      0.0005,
+      0.0
+    ],
+    "energy_gate_attempt_log": [],
+    "front_inventory": [
+      {
+        "J_active_elems": 251,
+        "J_active_elems_trial": 251,
+        "J_effective_trial": 643.6926863199468,
+        "J_sign_ref": 1.0,
+        "J_signed_trial": 643.6926863199468,
+        "J_source": "cluster",
+        "J_source_code": 0,
+        "J_source_code_trial": 0,
+        "J_source_trial": "cluster",
+        "KJ": 16922323.09319959,
+        "KJ_trial": 16922323.09319959,
+        "N_em_prev": 0.0,
+        "active": true,
+        "adv_since_branch": 0.0,
+        "birth_budget_w": 0.0,
+        "birth_parent": -1,
+        "birth_xy": [
+          0.0005,
+          0.0
+        ],
+        "born_this_step": false,
+        "branch_B": 0.0,
+        "branch_B_before_spawn": 0.0,
+        "branch_J_secondary_active_elems": 0,
+        "branch_J_secondary_effective": 0.0,
+        "branch_J_secondary_effective_at_spawn": 0.0,
+        "branch_J_secondary_signed": 0.0,
+        "branch_J_secondary_signed_at_spawn": 0.0,
+        "branch_K_secondary": 0.0,
+        "branch_K_secondary_at_spawn": 0.0,
+        "branch_clock_angle_deg": NaN,
+        "branch_clock_ready": false,
+        "branch_dB_at_spawn": 0.0,
+        "branch_dB_last": 0.0,
+        "branch_lambda_secondary": 0.0,
+        "branch_lambda_secondary_at_spawn": 0.0,
+        "branch_metric_ratio": 0.0,
+        "branch_metric_ratio_at_spawn": 0.0,
+        "branch_spawn_reason": "none",
+        "branch_spawn_step": -1,
+        "branch_veto_reason": "none",
+        "cands": [
+          {
+            "angle_deg": 6.974492530416398,
+            "family": "cleavage",
+            "gamma": 1.1555018669425294,
+            "gamma_rel": 1.1555018669425294,
+            "n": [
+              -0.12142746038854178,
+              0.9926003082125197
+            ],
+            "name": "cleave",
+            "overdrive": 596478697.0200746,
+            "sigma_nn": 641180437.3420554,
+            "t": [
+              0.9926003082125197,
+              0.12142746038854178
+            ]
+          }
+        ],
+        "cluster_hold_reason": "root",
+        "cluster_id": 0,
+        "coalesced": false,
+        "fatigue_cycles_last": 0.0,
+        "fired": false,
+        "fwd": [
+          1.0,
+          0.0
+        ],
+        "id": 0,
+        "inactive_reason": "active",
+        "last_advance_m": 0.0,
+        "last_fired_step": -1,
+        "last_plane": {
+          "angle_deg": 30.0,
+          "family": "cleavage",
+          "gamma_rel": 1.0,
+          "n": [
+            -0.49999999999999994,
+            0.8660254037844387
+          ],
+          "name": "(100)",
+          "t": [
+            0.8660254037844387,
+            0.49999999999999994
+          ]
+        },
+        "merge_step": -1,
+        "merge_target_front_id": -1,
+        "merge_x_m": NaN,
+        "merge_y_m": NaN,
+        "n_geom_adv": 0.0,
+        "parent": -1,
+        "path": [
+          [
+            0.0005,
+            0.0
+          ]
+        ],
+        "resolved": true,
+        "retire_step": -1,
+        "spawn_ratio": 0.0,
+        "spawn_step": 0,
+        "spawn_weight": 1.0,
+        "stagnant_K_ratio": Infinity,
+        "stagnant_count": 0,
+        "stagnant_lag_m": 0.0,
+        "stagnant_lambda": 0.0,
+        "starved_recorded": false,
+        "t_win": [
+          0.9926003082125197,
+          0.12142746038854178
+        ],
+        "win_plane": {
+          "angle_deg": 6.974492530416398,
+          "family": "cleavage",
+          "gamma": 1.1555018669425294,
+          "gamma_rel": 1.1555018669425294,
+          "n": [
+            -0.12142746038854178,
+            0.9926003082125197
+          ],
+          "name": "cleave",
+          "overdrive": 596478697.0200746,
+          "sigma_nn": 641180437.3420554,
+          "t": [
+            0.9926003082125197,
+            0.12142746038854178
+          ]
+        },
+        "xy": [
+          0.0005,
+          0.0
+        ]
+      }
+    ],
+    "front_paths": [
+      [
+        [
+          0.0005,
+          0.0
+        ]
+      ]
+    ],
+    "kinetic_event_index": 0,
+    "mesh_metadata": {
+      "hbar_m": 8.769397410508995e-05,
+      "hbar_tip_m": 1.384579911336366e-06,
+      "tip_reference_centers_m": [
+        [
+          0.0005,
+          0.0
+        ]
+      ]
+    },
+    "sharp_wake_advance_log": [],
+    "transaction_index": 0,
+    "transaction_state": "committed"
+  },
+  "history": {
+    "branch_rows": [
+      [
+        1,
+        1e-05,
+        16922323.09319959,
+        NaN,
+        1,
+        6.974492530416398,
+        NaN,
+        596478697.0200746,
+        0.0,
+        0.0,
+        0,
+        0,
+        1.0,
+        0.0,
+        0,
+        0,
+        0.0,
+        0.0,
+        0.0005,
+        0.0,
+        NaN,
+        NaN,
+        4.407807618445941e-26,
+        NaN,
+        -1,
+        -1,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "energy_gate_direction_serial": 0,
+    "energy_gate_event_records": [],
+    "energy_gate_mechanics_serial": 0,
+    "fronts_rows": [
+      [
+        1,
+        0,
+        -1,
+        0.0005,
+        0.0,
+        16922323.09319959,
+        3.7025583994945906e-25,
+        0.0,
+        4.407807618445941e-26,
+        0,
+        1,
+        1,
+        0.0,
+        0,
+        0,
+        251,
+        643.6926863199468,
+        643.6926863199468,
+        1.0,
+        NaN,
+        NaN,
+        0,
+        0.0,
+        NaN,
+        NaN,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0,
+        0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        Infinity,
+        0.0,
+        0,
+        -1,
+        0,
+        0,
+        -1,
+        -1,
+        NaN,
+        NaN,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "hist": {
+      "B": [
+        3.7025583994945906e-25
+      ],
+      "Ftop": [
+        2178398.5892120274
+      ],
+      "KJ": [
+        16922323.09319959
+      ],
+      "N_em": [
+        0.0
+      ],
+      "U_el": [
+        10.891992946060201
+      ],
+      "Uapp": [
+        1e-05
+      ],
+      "W_emit": [
+        0.0
+      ],
+      "W_ext": [
+        10.891992946060137
+      ],
+      "W_p": [
+        2.217420261053335
+      ],
+      "a_tip": [
+        0.0005
+      ],
+      "lambda_c": [
+        4.407807618445941e-26
+      ],
+      "lambda_e": [
+        0.0
+      ],
+      "n_fire": [
+        0
+      ],
+      "n_fronts": [
+        1
+      ],
+      "r_eff_over_r0": [
+        1.0
+      ],
+      "rho_max": [
+        6250000000000.0
+      ],
+      "rho_mean": [
+        6078745267802.526
+      ],
+      "rho_p95": [
+        6250000000000.0
+      ],
+      "rho_p99": [
+        6250000000000.0
+      ],
+      "sigma_back": [
+        0.0
+      ],
+      "sigma_tip": [
+        6751030164.4908695
+      ]
+    },
+    "kinetic_audit_records": [],
+    "rows": [
+      [
+        1,
+        1e-05,
+        2178398.5892120274,
+        16922323.09319959,
+        6751030164.4908695,
+        0.0,
+        4.407807618445941e-26,
+        0.0,
+        3.7025583994945906e-25,
+        0.0,
+        0.0005,
+        0.0,
+        0.0,
+        0.0,
+        0,
+        0.0,
+        0.0,
+        1.0,
+        8.4,
+        3.7025583994945906e-25,
+        0.0,
+        3.7025583994945906e-25,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0,
+        0.0,
+        2.6157016875494756,
+        2.6157016875494756,
+        -27.283715064141234,
+        -0.5887959367778528,
+        4.585888694101982,
+        6751030164.4908695,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    ]
+  },
+  "provenance": {
+    "git_head": "",
+    "output_directory": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/native_source_geography_9d9f3edf/bulk_uniform/initial_step1"
+  },
+  "schema": "v10.2.30_combined_outer_kinetic_run_state_v2"
+}

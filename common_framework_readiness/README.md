@@ -13,6 +13,10 @@ fresh-process restart receipt are indexed by
 `TAYLOR_PEIERLS_RECOVERY_WIRING.json`. That record establishes exact neutrality
 for the accepted zero-recovery full-PF baseline; it does not relabel that
 trajectory as nonzero-recovery specimen evidence.
+The subsequent `NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json` records compact
+native execution and fresh-process restart for both homogeneous persistent
+bulk-only and tip-plus-bulk source geography. It proves option selection and
+executed-mechanics binding, not scientific source-geography sensitivity.
 The prescribed-drive 16-bin calculation is retained only as a labeled subsystem
 fixture; it is not the full-mechanics acceptance calculation. The corrected
 native-backed parameter diagnostic is `PARAMETER_PARENT_DOSSIER_V2_NATIVE.json`,
@@ -20,6 +24,8 @@ and the historical v1 dossier is retained.
 
 At qualified full-PF solver commit `2276745b`, the working checkout passed
 913/913 tests. At recovery-wiring commit `9f73dbff`, the expanded checkout
-passed 925/925 tests. The earlier 901-test clean-clone receipt and the
+passed 925/925 tests. At native source-geography qualification commit
+`9d9f3edf`, the expanded checkout passed 929/929 tests. The earlier 901-test
+clean-clone receipt and the
 independent FEM/CZM receipt remain explicitly labeled historical in
 `QUALIFICATION_RECEIPT.json`.
