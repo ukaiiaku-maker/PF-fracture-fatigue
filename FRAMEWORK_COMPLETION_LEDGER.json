@@ -1,0 +1,239 @@
+{
+  "schema": "fracture-framework-completion-ledger/1",
+  "date": "2026-10-13",
+  "mission_status": "ACTIVE_READINESS_IMPLEMENTATION",
+  "production_execution_authorized": false,
+  "manuscript_modification_authorized": false,
+  "authoritative_inputs": {
+    "author_direction": {
+      "path": "common_framework_readiness/AUTHOR_DIRECTION_SUPPLEMENT_2026-10-13.md",
+      "source_path": "/Volumes/Data/working-papers/Fracture/CODEX_COMPLETE_FRAMEWORK_AND_CZM_OPTIONS.md",
+      "sha256": "c51296b1c4340c7f4bc8bb458f404a95617b6626837013c6f907984a316f2dad"
+    },
+    "charter": {
+      "path": "/Volumes/Data/working-papers/Fracture/FRACTURE_GOALS_CHARTER_v1.0.md",
+      "sha256": "fa744fe4c97b65fb70595ab35a87f05d409dd7c3efb2dd2b80a50a957a82f6ab",
+      "modified": false
+    },
+    "technical_specification": {
+      "requested_filename_present": false,
+      "tracked_candidate": "docs/COMMON_FRAMEWORK_SCIENTIFIC_SPECIFICATION.md",
+      "tracked_candidate_sha256": "19a6fa64ba012f03f86b8e0ce0e11e697c95bc134208619aa6fe4d82f591099b",
+      "handling": "Use the tracked scientific equations and domain limits for independent work; do not claim identity with the absent separately named file."
+    }
+  },
+  "repositories": {
+    "pf": {
+      "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1",
+      "branch": "codex/shared-fracture-fatigue-options-v1",
+      "starting_head": "0a6b817112d7d09c16bdf91216488ac5143122d6",
+      "tracked_dirty_at_start": false,
+      "untracked_historical_evidence_preserved": true
+    },
+    "fem_czm": {
+      "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
+      "branch": "codex/current-pf-companion",
+      "starting_head": "90cb6671523bb676cb241eb850b7f5fd41cf5461",
+      "tracked_dirty_at_start": false,
+      "untracked_user_file": "v1005135_candidate_audit.json"
+    }
+  },
+  "storage": {
+    "volume": "/Volumes/Data",
+    "free_GiB_at_start": 35.0,
+    "pf_checkout_GiB": 1.9,
+    "fem_checkout_MiB": 27.0,
+    "policy": "Sequential compact qualifications; preserve unique checkpoints and selected fields; no production campaign."
+  },
+  "accepted_foundations": [
+    {"scope": "native Taylor-Peierls full-PF baseline", "commit": "2276745b06220125354687f04c182c8d11be66dd", "status": "NATIVE_SPATIAL_QUALIFIED_HISTORICAL_ZERO_RECOVERY"},
+    {"scope": "recovery argument ownership", "commit": "8736c5d0a85e7b60a2a9dc6f29c46b2b61cb4a78", "status": "NUMERICALLY_QUALIFIED"},
+    {"scope": "native source geography", "commit": "ab771c8a84897c7727fb73a769cc68485aeacab8", "status": "NATIVE_SPATIAL_QUALIFIED_TWO_STEP_RESTART"},
+    {"scope": "affine tensor and transverse constraint", "commit": "0a6b817112d7d09c16bdf91216488ac5143122d6", "status": "NUMERICALLY_QUALIFIED_AFFINE_PATCH"}
+  ],
+  "work_items": [
+    {
+      "id": "R01",
+      "goal_ids": ["FG-01", "FG-04", "FG-16"],
+      "status": "IN_PROGRESS",
+      "concrete_defect": "Current-law identity is qualified in the PF tip/bulk paths but not yet attested across every independent FEM consumer and topology/restart transition.",
+      "owner_consumer": "PF shared workers, V10.4 bulk consumer, independent FEM/CZM workers",
+      "authoritative_source": "native installed call graph plus recovery/geography receipts",
+      "dependencies": ["R03", "R08"],
+      "exact_next_command": "python -m pytest -q tests/test_shared_execution.py tests/test_shared_options_resolution.py tests/test_f1_no_physics_fallback.py",
+      "input_output_identity": "PF 0a6b8171; FEM 90cb6671; namespace-isolated receipts",
+      "numerical_criteria": "All requested/constructed/accepted/restarted bindings exact; unsupported fallbacks fail before execution.",
+      "executed_evidence": ["common_framework_readiness/TAYLOR_PEIERLS_NATIVE_REPAIR.json", "common_framework_readiness/TAYLOR_PEIERLS_RECOVERY_WIRING.json", "common_framework_readiness/NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json"],
+      "remaining_limitation": "FEM generic consumer binding and topology-wide re-attestation incomplete."
+    },
+    {
+      "id": "R02",
+      "goal_ids": ["FG-01", "FG-03", "FG-15"],
+      "status": "READY_TO_IMPLEMENT",
+      "concrete_defect": "No single executable same-state matrix isolates completion mapping, density-order shift, phi cap, rate cap and jump-length floor using exact historical/current functions.",
+      "owner_consumer": "Taylor-Peierls diagnostic runner",
+      "authoritative_source": "current native law and versioned historical implementations",
+      "dependencies": [],
+      "exact_next_command": "python scripts/build_taylor_peierls_factorization_matrix.py --output integration_evidence/taylor_peierls_factorization_<commit>",
+      "input_output_identity": "selected four-family native manifests; diagnostic-only historical law",
+      "numerical_criteria": "Both signs, zero bias, dilute/correlation/dense regimes and all admissible temperature anchors; signed rates never logged.",
+      "executed_evidence": [],
+      "remaining_limitation": "Runner and active native consequence comparison not yet implemented."
+    },
+    {
+      "id": "R03",
+      "goal_ids": ["FG-02", "FG-03", "FG-05", "FG-15"],
+      "status": "READY_TO_IMPLEMENT",
+      "concrete_defect": "Selected Taylor raw amplitudes and inherited emission characteristic stresses are not yet versioned over their whole declared continuous temperature domains.",
+      "owner_consumer": "material constructors, selection registry, PF/FEM native consumers",
+      "authoritative_source": "full-precision selected rows and override chain",
+      "dependencies": ["R02"],
+      "exact_next_command": "python scripts/build_taylor_domain_revision.py --margins-eV 0.10 0.25 0.50",
+      "input_output_identity": "parent hashes plus machine-readable amplitude-only diffs",
+      "numerical_criteria": "Analytic interval minimum is at least each declared margin; no raw-scale clamp counted as admissibility.",
+      "executed_evidence": ["common_framework_readiness/PARAMETER_PARENT_DOSSIER_V2_NATIVE.json"],
+      "remaining_limitation": "Prospective parameter versions and constructor/native derivative qualification absent."
+    },
+    {
+      "id": "R04",
+      "goal_ids": ["FG-03", "FG-11", "FG-15"],
+      "status": "DEPENDENCY_PENDING",
+      "concrete_defect": "No frozen finite-window bilinear analogue registry exists for every finalized opening family.",
+      "owner_consumer": "cohesive-fit registry and FEM/CZM constructors",
+      "authoritative_source": "finalized R03 opening surfaces and physical activation support",
+      "dependencies": ["R03"],
+      "exact_next_command": "python scripts/fit_bilinear_opening_analogues.py --registry <R03-registry> --output <fit-registry>",
+      "input_output_identity": "parent surface hashes, fixed fit grid/objective/weights and support convention",
+      "numerical_criteria": "Report barrier, log-rate and activation-volume residuals without shrinking the frozen domain.",
+      "executed_evidence": [],
+      "remaining_limitation": "Technical Specification B filename absent; tracked scientific equations are available but detailed fit choices must be frozen explicitly."
+    },
+    {
+      "id": "R05",
+      "goal_ids": ["FG-11", "FG-12", "FG-16"],
+      "status": "DEPENDENCY_PENDING",
+      "concrete_defect": "Independent FEM lacks selectable autonomous classical bilinear and activated-bilinear specimen paths with restartable damage.",
+      "owner_consumer": "independent FEM interface assembly, state update, serializer and restart",
+      "authoritative_source": "original FEM/CZM solver plus R04 fitted registry",
+      "dependencies": ["R04", "R08"],
+      "exact_next_command": "python -m pytest -q tests/test_bilinear_czm_native.py",
+      "input_output_identity": "three explicit opening-model IDs with common accommodation inputs",
+      "numerical_criteria": "Consistent residual/tangent, autonomous separation, irreversible unload/reload, nonnegative dissipation and active-damage restart equality.",
+      "executed_evidence": [],
+      "remaining_limitation": "Not implemented."
+    },
+    {
+      "id": "R06",
+      "goal_ids": ["FG-04", "FG-05", "FG-16"],
+      "status": "PARTIAL_NATIVE_SPATIAL_QUALIFICATION",
+      "concrete_defect": "Source support is executable, but density transport and conservative tip/bulk transfer remain distinct unavailable axes for options that claim them.",
+      "owner_consumer": "V10.4 bulk, tip process and transport implementations",
+      "authoritative_source": "native geography audits and existing positive transport implementation",
+      "dependencies": ["R01", "R03"],
+      "exact_next_command": "python scripts/qualify_source_transport_axes.py --output integration_evidence/source_transport_axes_<commit>",
+      "input_output_identity": "bulk-only, tip-only and combined support with invariant kinetics where representations permit",
+      "numerical_criteria": "Nonzero activity, full mechanics, ledgers, support exclusions and fresh-process restart.",
+      "executed_evidence": ["common_framework_readiness/NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json"],
+      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange."
+    },
+    {
+      "id": "R07",
+      "goal_ids": ["FG-08", "FG-09", "FG-10"],
+      "status": "PARTIAL_NUMERICAL_QUALIFICATION",
+      "concrete_defect": "Affine transverse control is correct, but cracked-body constitutive state, hazards, observers and restart do not yet carry all declared constraint/mixity paths.",
+      "owner_consumer": "PF/FEM cracked-body solvers and mechanism tensor projections",
+      "authoritative_source": "mechanics constraint contract and native cracked-body fields",
+      "dependencies": ["R01", "R03"],
+      "exact_next_command": "python scripts/qualify_cracked_body_constraints.py --compact --output integration_evidence/cracked_constraint_<commit>",
+      "input_output_identity": "plane strain, plane stress and explicit generalized control; mode I/II separate",
+      "numerical_criteria": "Nonuniform active state, tensor-consumer trace, response refinement and active-update restart.",
+      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json"],
+      "remaining_limitation": "Cracked-body path incomplete; no 3-D claim."
+    },
+    {
+      "id": "R08",
+      "goal_ids": ["FG-12", "FG-16"],
+      "status": "INCOMPLETE",
+      "concrete_defect": "Independent FEM is locked to a source-bound Peak/1000 K entry; generic material/loading/source/orientation/constraint/mesh/restart inputs and common observer are absent.",
+      "owner_consumer": "fem-czm-current-pf-companion native constructor and isolated shared worker",
+      "authoritative_source": "FEM head 90cb6671 and current source-bound entry",
+      "dependencies": ["R03", "R07"],
+      "exact_next_command": "implement generic FEM constructor/CLI and common observer, then run three related pre-event levels per backend",
+      "input_output_identity": "independent package paths and constructor-visible coefficient receipts",
+      "numerical_criteria": "Convergent reaction, energy, stress/displacement and common/native J without fitted scale factor; opening-only and active accommodation plus cohesive restart.",
+      "executed_evidence": ["common_framework_readiness/CURRENT_FEM_COMPANION_BINDING.json"],
+      "remaining_limitation": "18 GiB job is storage-admitted but adapter/observer implementation is incomplete."
+    },
+    {
+      "id": "R09",
+      "goal_ids": ["FG-13", "FG-16"],
+      "status": "INCOMPLETE",
+      "concrete_defect": "Native spontaneous branch birth, daughter continuation, second-generation ownership and active topology restart are not jointly qualified.",
+      "owner_consumer": "branch scheduler, crack graph, topology transaction and checkpoint",
+      "authoritative_source": "native V11/V12 branch implementations",
+      "dependencies": ["R01", "R03", "R07"],
+      "exact_next_command": "python scripts/run_recursive_branch_readiness.py --second-generation",
+      "input_output_identity": "documented qualification initial state; no forced event",
+      "numerical_criteria": "Actual eligible native birth, continuation, clocks/marks/state conservation and fresh-process topology restart.",
+      "executed_evidence": [],
+      "remaining_limitation": "Existing initialized two-front evidence cannot satisfy spontaneous birth."
+    },
+    {
+      "id": "R10",
+      "goal_ids": ["FG-14", "FG-16"],
+      "status": "INCOMPLETE",
+      "concrete_defect": "Local incremental cavity approach/connection and combined branch/cavity competition are not fully qualified through occupied-state restart.",
+      "owner_consumer": "V5 vacancy/cavity scheduler, local candidate law, topology/remesh and combined executor",
+      "authoritative_source": "original V5 native vacancy/cavity implementation",
+      "dependencies": ["R01", "R03", "R07", "R09"],
+      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact",
+      "input_output_identity": "absent/small/distant and approach/contact/downstream states with declared event-size rule",
+      "numerical_criteria": "New-solid accounting, conservative inventories, like-operation drives, coupled interval and occupied-state restart.",
+      "executed_evidence": [],
+      "remaining_limitation": "Prospective local-incremental direction is authorized but not yet native-qualified."
+    },
+    {
+      "id": "R11",
+      "goal_ids": ["FG-07", "FG-10", "FG-16"],
+      "status": "READY_TO_QUALIFY",
+      "concrete_defect": "Long-growth and resistance capabilities exist but lack one current regression covering repeated lengths, stage validity, front identity, modal labels and output-policy independence.",
+      "owner_consumer": "long-growth driver, observer/query and compact retention",
+      "authoritative_source": "retained native developed histories and current observer code",
+      "dependencies": ["R01"],
+      "exact_next_command": "python scripts/qualify_long_growth_analysis_contract.py --retained-evidence <manifest>",
+      "input_output_identity": "historical law labeled historical; rerun only code-affected intervals",
+      "numerical_criteria": "No fabricated equilibrium; restart-continuous chronology/resistance and K/J-at-length queries; identical state under output profiles.",
+      "executed_evidence": [],
+      "remaining_limitation": "Law-to-result status and unified current regression absent."
+    },
+    {
+      "id": "R12",
+      "goal_ids": ["FG-16", "FG-17"],
+      "status": "INCOMPLETE",
+      "concrete_defect": "Portable/core and manifest-restored full test profiles are not enforced at collection/launch; retained results lack a release-level law map.",
+      "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
+      "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
+      "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],
+      "exact_next_command": "implement pytest profiles and evidence loader, then execute portable clean clone and manifest-restored full suite",
+      "input_output_identity": "explicit manifest IDs/checksums; no incidental untracked path access",
+      "numerical_criteria": "Portable profile passes in real clean clone; mandatory missing evidence exits INCOMPLETE before affected tests.",
+      "executed_evidence": ["common_framework_readiness/QUALIFICATION_RECEIPT.json"],
+      "remaining_limitation": "Current 934-test local receipt is not yet the requested portable/full separation."
+    },
+    {
+      "id": "R13",
+      "goal_ids": ["FG-01", "FG-02", "FG-03", "FG-04", "FG-05", "FG-06", "FG-07", "FG-08", "FG-09", "FG-10", "FG-11", "FG-12", "FG-13", "FG-14", "FG-15", "FG-16", "FG-17", "FG-18"],
+      "status": "DEPENDENCY_PENDING",
+      "concrete_defect": "Campaign v2 predates parameter/cohesive/constraint additions and does not provide every required typed executable cell or independent status axis.",
+      "owner_consumer": "prospective campaign schema, launcher, audit/resume and all-goal records",
+      "authoritative_source": "unchanged charter plus completed R01-R12 registries",
+      "dependencies": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R11", "R12"],
+      "exact_next_command": "python scripts/build_prospective_campaign_v3.py --disabled --audit",
+      "input_output_identity": "frozen model/parameter/fit IDs; target machine/output root intentionally unset",
+      "numerical_criteria": "All required cells have typed parameters, endpoints, nonempty native commands and independent readiness axes; production launch remains disabled.",
+      "executed_evidence": ["common_framework_readiness/PROSPECTIVE_CAMPAIGN_V2.jsonl"],
+      "remaining_limitation": "Final count and resource estimate must be recomputed after implementation."
+    }
+  ],
+  "next_priority": "R02 then R03; these establish the current-law factorization and finalized parameter identities required by downstream cohesive/FEM work."
+}
