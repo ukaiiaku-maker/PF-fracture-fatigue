@@ -1,0 +1,17 @@
+{
+  "schema": "portable-clean-checkout-test-receipt/1",
+  "source_commit": "412082a5ba7487e7c24c3c73001991ba378e6e54",
+  "source_branch": "detached clean worktree",
+  "checkout": "/Volumes/Data/working-papers/Fracture/.worktrees/r12-portable-clean",
+  "git_status_short": "",
+  "external_current_science_root_present": false,
+  "command": "MPLCONFIGDIR=/private/tmp/mpl-pf-clean-412082a5 /opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+  "result": {
+    "exit_code": 0,
+    "passed": 953,
+    "deselected_external_evidence": 13,
+    "elapsed_s": 65.33
+  },
+  "profile": "portable default",
+  "production_execution_authorized": false
+}

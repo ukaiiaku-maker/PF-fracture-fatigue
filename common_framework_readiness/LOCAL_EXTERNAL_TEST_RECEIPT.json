@@ -1,0 +1,13 @@
+{
+  "schema": "local-manifest-backed-test-receipt/1",
+  "source_commit": "412082a5ba7487e7c24c3c73001991ba378e6e54",
+  "command": "MPLCONFIGDIR=/private/tmp/mpl-pf-external /opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q -m external_evidence",
+  "result": {
+    "exit_code": 0,
+    "passed": 13,
+    "deselected_portable": 953,
+    "elapsed_s": 8.01
+  },
+  "scope": "local external regressions; not a substitute for verifying every mandatory independent archive item",
+  "production_execution_authorized": false
+}

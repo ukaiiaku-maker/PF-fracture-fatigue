@@ -227,8 +227,8 @@
     {
       "id": "R12",
       "goal_ids": ["FG-16", "FG-17"],
-      "status": "PORTABLE_LOCAL_COMPLETE_CLEAN_CLONE_AND_FULL_ARCHIVE_AUDIT_PENDING",
-      "concrete_defect": "Portable/core selection, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are implemented. A real clean-clone receipt and complete mandatory archive audit remain to close acceptance.",
+      "status": "PORTABLE_CLEAN_COMPLETE_FULL_ARCHIVE_AUDIT_PENDING",
+      "concrete_defect": "Portable/core selection, a real clean-worktree pass, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are complete. Complete verification of every mandatory independent archive item remains open.",
       "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
       "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
       "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],
@@ -239,9 +239,12 @@
         "common_framework_readiness/QUALIFICATION_RECEIPT.json",
         "common_framework_readiness/PORTABLE_EVIDENCE_PROFILE.json",
         "common_framework_readiness/FULL_EVIDENCE_CURRENT_SCIENCE_AUDIT.json",
-        "common_framework_readiness/LAW_TO_RESULT_MAP_V3.json"
+        "common_framework_readiness/FULL_EVIDENCE_AVAILABILITY_AUDIT.json",
+        "common_framework_readiness/LAW_TO_RESULT_MAP_V3.json",
+        "common_framework_readiness/CLEAN_CHECKOUT_TEST_RECEIPT.json",
+        "common_framework_readiness/LOCAL_EXTERNAL_TEST_RECEIPT.json"
       ],
-      "remaining_limitation": "Local portable profile passes 964 tests with two manifest-backed long-growth tests deselected. The current-science evidence root is independently hash-verified; the entire mandatory archive set and a post-commit real clean checkout are not yet recorded."
+      "remaining_limitation": "At commit 412082a5, a real clean worktree with no current-science root passes 953 portable tests and deselects 13 explicitly marked external tests; all 13 external tests pass locally. The current-science root is hash-verified, but the entire mandatory independent archive set is not currently mounted/verified."
     },
     {
       "id": "R13",
