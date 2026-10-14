@@ -6,6 +6,11 @@ import argparse
 from dataclasses import replace
 import json
 from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from arrhenius_fracture.shared_execution import execute_shared
 from arrhenius_fracture.shared_options import OutputProfile, PRESETS
