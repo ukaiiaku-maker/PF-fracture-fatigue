@@ -16,10 +16,13 @@
       "modified": false
     },
     "technical_specification": {
-      "requested_filename_present": false,
-      "tracked_candidate": "docs/COMMON_FRAMEWORK_SCIENTIFIC_SPECIFICATION.md",
-      "tracked_candidate_sha256": "19a6fa64ba012f03f86b8e0ce0e11e697c95bc134208619aa6fe4d82f591099b",
-      "handling": "Use the tracked scientific equations and domain limits for independent work; do not claim identity with the absent separately named file."
+      "requested_filename_present": true,
+      "authoritative_source_path": "/Users/shen/.codex/attachments/d8b6efc0-bfa0-4c43-8dec-7f79469d2969/Pasted text.txt",
+      "authoritative_source_sha256": "5cc2caca6d51b1d73c2e0fb6396a0e8c213cdbb6de36ce3eb50daa753e36a6d8",
+      "installed_workspace_path": "/Volumes/Data/working-papers/Fracture/TECHNICAL_SPECIFICATION.md",
+      "installed_workspace_sha256": "8e8fb9021dc168509637c49b2df24d51b32ac199c1063635701d5858fbd21336",
+      "byte_difference": "installed workspace copy has one terminal newline; substantive bytes are otherwise identical",
+      "handling": "The supplied Sections A-D are controlling; the older tracked scientific summary is not a substitute."
     }
   },
   "repositories": {
@@ -70,7 +73,7 @@
     {
       "id": "R02",
       "goal_ids": ["FG-01", "FG-03", "FG-15"],
-      "status": "COMPLETE_DIAGNOSTIC_QUALIFICATION",
+      "status": "COMPLETE_CORRECTED_DIAGNOSTIC_QUALIFICATION",
       "concrete_defect": "RESOLVED: exact same-state factorization and an active accepted-state native-operator consequence now isolate the historical/current completion change without exposing the historical law to production.",
       "owner_consumer": "Taylor-Peierls diagnostic runner",
       "authoritative_source": "current native law and versioned historical implementations",
@@ -80,14 +83,15 @@
       "numerical_criteria": "Both signs, zero bias, dilute/correlation/dense regimes and all admissible temperature anchors; signed rates never logged; active-state comparison conserves population, uses the exact native operator and changes only completion mapping.",
       "executed_evidence": [
         "integration_evidence/taylor_peierls_factorization_f2ceb329/factorization_matrix.json",
-        "integration_evidence/taylor_native_operator_consequence_90a4364e/native_operator_consequence.json"
+        "integration_evidence/taylor_native_operator_consequence_7b815443/native_operator_consequence.json",
+        "common_framework_readiness/CHECKPOINT_GEOMETRY_REVIEW.json"
       ],
-      "remaining_limitation": "The active consequence is an activity-bounded 1.3807333012514253e-07 s frozen-coefficient micro-interval, not a mechanics-re-equilibrated effect-size study. The attempted historical 8.4 s arm exposed disproportionate BDF history accumulation and is retained only as failed diagnostic provenance."
+      "remaining_limitation": "The corrected active consequence is an activity-bounded 3.730723895887999e-07 s frozen-coefficient micro-interval on the effective 50 um / 80-bin grid, not a mechanics-re-equilibrated effect-size study. The superseded 90a4364e result used the contradictory 2 um alias and is retained only as erroneous geometry provenance. The attempted historical 8.4 s arm exposed disproportionate BDF history accumulation and is retained only as failed diagnostic provenance."
     },
     {
       "id": "R03",
       "goal_ids": ["FG-02", "FG-03", "FG-05", "FG-15"],
-      "status": "COMPLETE_AUTHORIZED_TAYLOR_REVISION_SHARED_STRESS_SELECTION_PENDING",
+      "status": "COMPLETE_AUTHORIZED_TAYLOR_REVISION_AND_NATIVE_COORDINATE_QUALIFICATION_SHARED_STRESS_SELECTION_PENDING",
       "concrete_defect": "RESOLVED for the authorized Taylor-amplitude axis: all four selected families now have traceable 0.10, 0.25 and 0.50 eV continuous-domain versions. The distinct DBTT shared characteristic-stress defect has calculated explicit alternatives but no unauthorized production selection.",
       "owner_consumer": "material constructors, selection registry, PF/FEM native consumers",
       "authoritative_source": "full-precision selected rows and override chain",
@@ -97,16 +101,17 @@
       "numerical_criteria": "Analytic continuous-interval Taylor minimum is at least each declared margin; unchanged parents remain unchanged; native constructor/rates/derivatives/floor branches and inverse elementary-rate contours are evaluated only at admissible raw states; no raw-scale clamp counted as admissibility.",
       "executed_evidence": [
         "common_framework_readiness/PARAMETER_PARENT_DOSSIER_V2_NATIVE.json",
-        "arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_taylor_domain_selection.json",
-        "arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_taylor_domain_dossier.json",
-        "arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_shared_stress_scale_candidates.json"
+        "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_selection.json",
+        "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_dossier.json",
+        "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_shared_stress_scale_candidates.json",
+        "fem-czm-current-pf-companion@b14497fc:tests/test_v10232_registry_option_bridge.py"
       ],
       "remaining_limitation": "These are constructed, not material-calibrated, choices. The selected DBTT parent retains a raw shared stress-scale crossing within 300-1300 K; its minimal-intercept and earlier 2-D-qualified dbtt_primary alternatives are implemented and explicitly unselected because either changes shared emission/Peierls/Taylor physics. Full specimen reruns with the prospective Taylor identities remain downstream qualification, not reused historical evidence."
     },
     {
       "id": "R04",
       "goal_ids": ["FG-03", "FG-11", "FG-15"],
-      "status": "DEPENDENCY_PENDING",
+      "status": "COMPLETE_IDENTIFIABLE_FIT_PHYSICAL_SUPPORT_DECISION_PENDING",
       "concrete_defect": "No frozen finite-window bilinear analogue registry exists for every finalized opening family. Existing PF code supplies reversible cohesive landscapes and FEM 90cb6671 supplies an opt-in reversible bilinear potential, but neither is a fitted autonomous irreversible classical CZM.",
       "owner_consumer": "cohesive-fit registry and FEM/CZM constructors",
       "authoritative_source": "finalized R03 opening surfaces and physical activation support",
@@ -114,13 +119,13 @@
       "exact_next_command": "python scripts/fit_bilinear_opening_analogues.py --registry <R03-registry> --output <fit-registry>",
       "input_output_identity": "parent surface hashes, fixed fit grid/objective/weights and support convention",
       "numerical_criteria": "Report barrier, log-rate and activation-volume residuals without shrinking the frozen domain.",
-      "executed_evidence": [],
-      "remaining_limitation": "Technical Specification B filename absent; tracked scientific equations are available but detailed fit choices must be frozen explicitly. The native source does not identify a unique cleavage activation area: the fit must report identifiable A_* Gamma and peak traction, with any activation-area/stiffness convention explicit rather than using numerical element area."
+      "executed_evidence": ["arrhenius_fracture/data/materials/v10_2_32_bilinear_opening/v10_2_32_bilinear_opening_fit_registry.json"],
+      "remaining_limitation": "The native source does not identify a unique physical activation area or interface stiffness. Identifiable A_*Gamma and peak traction are saved for all four shared opening surfaces; Gamma, delta_f, delta_p and eta remain unset rather than fabricated."
     },
     {
       "id": "R05",
       "goal_ids": ["FG-11", "FG-12", "FG-16"],
-      "status": "DEPENDENCY_PENDING",
+      "status": "PARTIAL_IMPLEMENTATION_NATIVE_SPECIMEN_QUALIFICATION_PENDING",
       "concrete_defect": "Independent FEM lacks selectable autonomous classical bilinear and activated-bilinear specimen paths with restartable damage.",
       "owner_consumer": "independent FEM interface assembly, state update, serializer and restart",
       "authoritative_source": "original FEM/CZM solver plus R04 fitted registry",
@@ -128,8 +133,8 @@
       "exact_next_command": "python -m pytest -q tests/test_bilinear_czm_native.py",
       "input_output_identity": "three explicit opening-model IDs with common accommodation inputs",
       "numerical_criteria": "Consistent residual/tangent, autonomous separation, irreversible unload/reload, nonnegative dissipation and active-damage restart equality.",
-      "executed_evidence": [],
-      "remaining_limitation": "Not implemented."
+      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py"],
+      "remaining_limitation": "Autonomous irreversible and activated-bilinear constitutive paths, unilateral contact and JSON-safe active-damage restart are implemented. Specimen-level event/damage/energy evidence awaits an authoritative activation area and stiffness (or explicitly authorized qualification-only values) plus generic specimen adapter completion."
     },
     {
       "id": "R06",
