@@ -1,0 +1,40 @@
+{
+  "automatic_class_promotion": false,
+  "rows": [
+    {
+      "K300_MPa_sqrt_m": 2.2821783382402825,
+      "all_complete": false,
+      "candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "censored_temperatures_K": [
+        750.0,
+        1200.0
+      ],
+      "disposition": "JOINT_REJECT_LOW_T_FRACTURE_SCALE",
+      "inherited_low_temperature_scale_gate_5_to_30": false,
+      "maximum_K_shield_MPa_sqrt_m": 3.35280957665944e-69,
+      "plastic_state_exercised": true,
+      "temperatures_K": [
+        300.0,
+        750.0,
+        1200.0
+      ]
+    },
+    {
+      "K300_MPa_sqrt_m": 23.271332460742197,
+      "all_complete": true,
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "censored_temperatures_K": [],
+      "disposition": "REFERENCE_OR_REQUIRES_DENSE_CLASSIFICATION",
+      "inherited_low_temperature_scale_gate_5_to_30": true,
+      "maximum_K_shield_MPa_sqrt_m": 0.23873832768785988,
+      "plastic_state_exercised": true,
+      "temperatures_K": [
+        300.0,
+        750.0,
+        1200.0
+      ]
+    }
+  ],
+  "schema": "r10.current-fracture-bridge-decision/1",
+  "scope": "current deterministic diagnostic-mark 0.005 MPa sqrt(m)/s monotonic bridge; censored K is a lower bound"
+}
