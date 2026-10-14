@@ -107,13 +107,19 @@ def isotropic_stress_tensor(strain: np.ndarray, E_Pa: float, nu: float, *,
 def full_tensor_from_in_plane(strain_xx: float, strain_yy: float,
                               engineering_gamma_xy: float, E_Pa: float, nu: float,
                               options: MechanicsStateOptions) -> tuple[np.ndarray, np.ndarray]:
+    lam = E_Pa * nu / ((1.0 + nu) * (1.0 - 2.0 * nu))
+    mu = E_Pa / (2.0 * (1.0 + nu))
+    if options.plane_state is PlaneState.PLANE_STRESS:
+        eps_zz = -lam * (strain_xx + strain_yy) / (lam + 2.0 * mu)
+    elif options.sigma_zz_Pa is not None:
+        eps_zz = (float(options.sigma_zz_Pa)
+                  - lam * (strain_xx + strain_yy)) / (lam + 2.0 * mu)
+    else:
+        eps_zz = float(options.eps_zz or 0.0)
     eps = np.array([[strain_xx, 0.5 * engineering_gamma_xy, 0.0],
                     [0.5 * engineering_gamma_xy, strain_yy, 0.0],
-                    [0.0, 0.0, float(options.eps_zz or 0.0)]])
-    prescribed_sigma = (0.0 if options.plane_state is PlaneState.PLANE_STRESS
-                        else options.sigma_zz_Pa)
-    return eps, isotropic_stress_tensor(eps, E_Pa, nu,
-                                        transverse_sigma_Pa=prescribed_sigma)
+                    [0.0, 0.0, eps_zz]])
+    return eps, isotropic_stress_tensor(eps, E_Pa, nu)
 
 
 def rotate_tensor(tensor: np.ndarray, rotation: np.ndarray) -> np.ndarray:
@@ -143,6 +149,16 @@ def elastic_work_density(stress: np.ndarray, strain: np.ndarray) -> float:
     return 0.5 * float(np.einsum("ij,ij->", stress, strain))
 
 
+def constrained_elastic_potential_density(stress: np.ndarray, strain: np.ndarray,
+                                           options: MechanicsStateOptions) -> float:
+    """Reduced elastic potential for the declared transverse control."""
+    potential = elastic_work_density(stress, strain)
+    if options.sigma_zz_Pa is not None:
+        potential -= float(options.sigma_zz_Pa) * float(strain[2, 2])
+    return potential
+
+
 __all__ = ["ConstraintControl", "InPlaneMode", "MechanicsStateOptions", "PlaneState",
-           "elastic_work_density", "full_tensor_from_in_plane", "isotropic_stress_tensor",
-           "resolved_traction", "rotate_tensor"]
+           "constrained_elastic_potential_density", "elastic_work_density",
+           "full_tensor_from_in_plane", "isotropic_stress_tensor", "resolved_traction",
+           "rotate_tensor"]
