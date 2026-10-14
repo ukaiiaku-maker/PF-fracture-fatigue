@@ -49,7 +49,8 @@
     {"scope": "native Taylor-Peierls full-PF baseline", "commit": "2276745b06220125354687f04c182c8d11be66dd", "status": "NATIVE_SPATIAL_QUALIFIED_HISTORICAL_ZERO_RECOVERY"},
     {"scope": "recovery argument ownership", "commit": "8736c5d0a85e7b60a2a9dc6f29c46b2b61cb4a78", "status": "NUMERICALLY_QUALIFIED"},
     {"scope": "native source geography", "commit": "ab771c8a84897c7727fb73a769cc68485aeacab8", "status": "NATIVE_SPATIAL_QUALIFIED_TWO_STEP_RESTART"},
-    {"scope": "affine tensor and transverse constraint", "commit": "0a6b817112d7d09c16bdf91216488ac5143122d6", "status": "NUMERICALLY_QUALIFIED_AFFINE_PATCH"}
+    {"scope": "affine tensor and transverse constraint", "commit": "0a6b817112d7d09c16bdf91216488ac5143122d6", "status": "NUMERICALLY_QUALIFIED_AFFINE_PATCH"},
+    {"scope": "Taylor factorization and versioned continuous-domain construction", "commit": "fe5d0bef", "status": "950_TEST_FULL_PF_REGRESSION_PASS"}
   ],
   "work_items": [
     {
@@ -106,7 +107,7 @@
       "id": "R04",
       "goal_ids": ["FG-03", "FG-11", "FG-15"],
       "status": "DEPENDENCY_PENDING",
-      "concrete_defect": "No frozen finite-window bilinear analogue registry exists for every finalized opening family.",
+      "concrete_defect": "No frozen finite-window bilinear analogue registry exists for every finalized opening family. Existing PF code supplies reversible cohesive landscapes and FEM 90cb6671 supplies an opt-in reversible bilinear potential, but neither is a fitted autonomous irreversible classical CZM.",
       "owner_consumer": "cohesive-fit registry and FEM/CZM constructors",
       "authoritative_source": "finalized R03 opening surfaces and physical activation support",
       "dependencies": ["R03"],
@@ -114,7 +115,7 @@
       "input_output_identity": "parent surface hashes, fixed fit grid/objective/weights and support convention",
       "numerical_criteria": "Report barrier, log-rate and activation-volume residuals without shrinking the frozen domain.",
       "executed_evidence": [],
-      "remaining_limitation": "Technical Specification B filename absent; tracked scientific equations are available but detailed fit choices must be frozen explicitly."
+      "remaining_limitation": "Technical Specification B filename absent; tracked scientific equations are available but detailed fit choices must be frozen explicitly. The native source does not identify a unique cleavage activation area: the fit must report identifiable A_* Gamma and peak traction, with any activation-area/stiffness convention explicit rather than using numerical element area."
     },
     {
       "id": "R05",
