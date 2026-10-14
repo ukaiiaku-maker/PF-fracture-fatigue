@@ -182,9 +182,10 @@
       "executed_evidence": [
         "common_framework_readiness/CURRENT_FEM_COMPANION_BINDING.json",
         "common_framework_readiness/GENERIC_FEM_NATIVE_RUN_QUALIFICATION.json",
+        "common_framework_readiness/GENERIC_FEM_THREE_LEVEL_CONVERGENCE.json",
         "fem-czm-current-pf-companion@a015a36:tests/test_generic_current_pf_companion.py"
       ],
-      "remaining_limitation": "One native one-step cracked-body run is not convergence evidence. Plane stress/generalized transverse control, opening-only, generic full-field source scope, production bilinear selection, active-state restart and the common observer remain explicit fail-closed gaps."
+      "remaining_limitation": "The first three genuine tip-resolution levels are not converged at the declared 2% criterion (the compact receipt retains the response rather than fitting a scale factor). The PF-side matched levels and final common observer comparison therefore remain open. Plane stress/generalized transverse control, opening-only, generic full-field source scope, production bilinear selection and active-state restart remain explicit fail-closed gaps."
     },
     {
       "id": "R09",
