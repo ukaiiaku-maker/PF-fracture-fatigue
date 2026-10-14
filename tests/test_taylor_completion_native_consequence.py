@@ -7,11 +7,13 @@ SCRIPT = ROOT / "scripts" / "run_taylor_completion_native_consequence.py"
 
 def test_consequence_runner_is_diagnostic_only_and_uses_exact_historical_callable():
     text = SCRIPT.read_text()
-    assert "historical_legacy_implicit_1s" in text
     assert "DIAGNOSTIC_ONLY_STATE_TRANSFER_NOT_PRODUCTION_SELECTABLE" in text
-    assert "production_environment_selector\": None" in text
+    assert "production_runtime_option_added\": False" in text
     assert "MPZ_TAYLOR_RELEASE_MODE" not in text
     assert "restart_from=SOURCE_CHECKPOINT" in text
+    hook = (ROOT / "scripts" / "diagnostic_taylor_sitecustomize" / "sitecustomize.py").read_text()
+    assert "historical_legacy_implicit_1s" in hook
+    assert "DIAGNOSTIC_ONLY_NOT_PRODUCTION_SELECTABLE" in hook
 
 
 def test_consequence_runner_executes_arms_in_isolated_processes():
@@ -20,3 +22,4 @@ def test_consequence_runner_executes_arms_in_isolated_processes():
     assert '"current_native"' in text
     assert '"historical_completion_diagnostic"' in text
     assert '"active_vector"' in text
+    assert 'worker_receipt["pid"] != worker_attestation["worker"]["pid"]' in text

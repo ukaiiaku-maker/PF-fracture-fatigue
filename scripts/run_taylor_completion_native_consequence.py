@@ -11,6 +11,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -24,7 +25,6 @@ if str(ROOT) not in sys.path:
 
 from arrhenius_fracture.shared_execution import execute_shared
 from arrhenius_fracture.shared_options import OutputProfile, SharedOptions
-from arrhenius_fracture.taylor_release import historical_legacy_implicit_1s
 import arrhenius_fracture.unified_mpz as unified_mpz
 
 SOURCE_REQUEST = (
@@ -36,6 +36,7 @@ SOURCE_CHECKPOINT = (
     / "refinement_step46_checkpoint"
 )
 FINAL_STEP = 48
+DIAGNOSTIC_SITE_DIR = ROOT / "scripts" / "diagnostic_taylor_sitecustomize"
 
 
 def _sha(path: Path) -> str:
@@ -78,38 +79,6 @@ def _checkpoint_identity(path: Path) -> dict[str, Any]:
     }
 
 
-def _install_historical_diagnostic_overlay() -> dict[str, Any]:
-    def diagnostic_historical_completion(net_elementary_rate_s, order):
-        return historical_legacy_implicit_1s(
-            net_elementary_rate_s, order, rate_cap_s=1.0e12
-        )
-
-    before = unified_mpz.UnifiedMPZState._transport_rates.__globals__["completion_rate"]
-    if before is not unified_mpz.completion_rate:
-        raise RuntimeError("unexpected Taylor completion binding before diagnostic overlay")
-    unified_mpz.completion_rate = diagnostic_historical_completion
-    after = unified_mpz.UnifiedMPZState._transport_rates.__globals__["completion_rate"]
-    if after is not diagnostic_historical_completion:
-        raise RuntimeError("historical diagnostic overlay did not bind")
-    return {
-        "classification": "DIAGNOSTIC_ONLY_STATE_TRANSFER_NOT_PRODUCTION_SELECTABLE",
-        "changed_symbol": "arrhenius_fracture.unified_mpz.completion_rate",
-        "transport_constructor": (
-            "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates"
-        ),
-        "before_callable": f"{before.__module__}.{before.__qualname__}",
-        "after_callable": (
-            "scripts.run_taylor_completion_native_consequence."
-            "diagnostic_historical_completion"
-        ),
-        "exact_historical_callable": (
-            "arrhenius_fracture.taylor_release.historical_legacy_implicit_1s"
-        ),
-        "implicit_window_s": 1.0, "rate_cap_s": 1.0e12,
-        "production_environment_selector": None,
-    }
-
-
 def run_arm(root: Path, arm: str) -> None:
     output = root / arm
     if output.exists():
@@ -117,8 +86,15 @@ def run_arm(root: Path, arm: str) -> None:
     output.mkdir(parents=True)
     checkpoint = _checkpoint_identity(SOURCE_CHECKPOINT)
     overlay = None
+    worker_overlay_receipt = output / "worker_diagnostic_overlay.json"
     if arm == "historical_completion_diagnostic":
-        overlay = _install_historical_diagnostic_overlay()
+        overlay = {
+            "classification": "DIAGNOSTIC_ONLY_STATE_TRANSFER_NOT_PRODUCTION_SELECTABLE",
+            "installation": "isolated worker startup hook outside the production package",
+            "sitecustomize_sha256": _sha(DIAGNOSTIC_SITE_DIR / "sitecustomize.py"),
+            "expected_worker_receipt": worker_overlay_receipt.name,
+            "production_runtime_option_added": False,
+        }
     elif arm != "current_native":
         raise ValueError(arm)
     bound = unified_mpz.UnifiedMPZState._transport_rates.__globals__["completion_rate"]
@@ -128,7 +104,7 @@ def run_arm(root: Path, arm: str) -> None:
         "source_request": str(SOURCE_REQUEST.relative_to(ROOT)),
         "source_request_sha256": _sha(SOURCE_REQUEST),
         "source_checkpoint": checkpoint,
-        "actual_completion_callable_before_execution": (
+        "parent_process_completion_callable": (
             f"{bound.__module__}.{bound.__qualname__}"
         ),
         "overlay": overlay,
@@ -142,10 +118,39 @@ def run_arm(root: Path, arm: str) -> None:
         json.dumps(receipt, indent=2, sort_keys=True) + "\n"
     )
     options, native = _configuration()
-    execute_shared(
-        options, native, output, source_policy="qualified",
-        restart_from=SOURCE_CHECKPOINT,
-    )
+    saved = {
+        name: os.environ.get(name) for name in (
+            "PYTHONPATH", "FRACTURE_DIAGNOSTIC_TAYLOR_COMPLETION",
+            "FRACTURE_DIAGNOSTIC_TAYLOR_RECEIPT",
+        )
+    }
+    try:
+        if arm == "historical_completion_diagnostic":
+            prior = os.environ.get("PYTHONPATH", "")
+            os.environ["PYTHONPATH"] = str(DIAGNOSTIC_SITE_DIR) + (
+                os.pathsep + prior if prior else ""
+            )
+            os.environ["FRACTURE_DIAGNOSTIC_TAYLOR_COMPLETION"] = "historical_implicit_1s"
+            os.environ["FRACTURE_DIAGNOSTIC_TAYLOR_RECEIPT"] = str(worker_overlay_receipt)
+        execute_shared(
+            options, native, output, source_policy="qualified",
+            restart_from=SOURCE_CHECKPOINT,
+        )
+    finally:
+        for name, value in saved.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value
+    if arm == "historical_completion_diagnostic":
+        if not worker_overlay_receipt.is_file():
+            raise RuntimeError("isolated worker produced no diagnostic overlay receipt")
+        worker_receipt = json.loads(worker_overlay_receipt.read_text())
+        worker_attestation = json.loads(
+            (output / "shared_runtime_attestation.post.json").read_text()
+        )
+        if worker_receipt["pid"] != worker_attestation["worker"]["pid"]:
+            raise RuntimeError("diagnostic overlay was not installed in the native worker")
 
 
 def _generation(checkpoint: Path) -> tuple[dict[str, Any], Path]:
@@ -225,6 +230,10 @@ def compare(root: Path) -> dict[str, Any]:
         "interpretation_limit": (
             "This two-step marked state-transfer sensitivity establishes an active native "
             "consequence; it is not a historical production rerun or an effect-size estimate."
+        ),
+        "failed_predecessor": (
+            "taylor_completion_native_consequence_d4cdd51e: parent-only overlay did not "
+            "cross the isolated worker boundary and correctly failed with exact equality"
         ),
     }
     (root / "native_consequence_comparison.json").write_text(
