@@ -86,16 +86,21 @@
     {
       "id": "R03",
       "goal_ids": ["FG-02", "FG-03", "FG-05", "FG-15"],
-      "status": "READY_TO_IMPLEMENT",
-      "concrete_defect": "Selected Taylor raw amplitudes and inherited emission characteristic stresses are not yet versioned over their whole declared continuous temperature domains.",
+      "status": "COMPLETE_AUTHORIZED_TAYLOR_REVISION_SHARED_STRESS_SELECTION_PENDING",
+      "concrete_defect": "RESOLVED for the authorized Taylor-amplitude axis: all four selected families now have traceable 0.10, 0.25 and 0.50 eV continuous-domain versions. The distinct DBTT shared characteristic-stress defect has calculated explicit alternatives but no unauthorized production selection.",
       "owner_consumer": "material constructors, selection registry, PF/FEM native consumers",
       "authoritative_source": "full-precision selected rows and override chain",
       "dependencies": ["R02"],
-      "exact_next_command": "python scripts/build_taylor_domain_revision.py --margins-eV 0.10 0.25 0.50",
-      "input_output_identity": "parent hashes plus machine-readable amplitude-only diffs",
-      "numerical_criteria": "Analytic interval minimum is at least each declared margin; no raw-scale clamp counted as admissibility.",
-      "executed_evidence": ["common_framework_readiness/PARAMETER_PARENT_DOSSIER_V2_NATIVE.json"],
-      "remaining_limitation": "Prospective parameter versions and constructor/native derivative qualification absent."
+      "exact_next_command": "python scripts/fit_bilinear_opening_analogues.py --registry arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_taylor_domain_registry.csv --output <fit-registry>",
+      "input_output_identity": "parent registry SHA-256 4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760; 12 machine-readable amplitude variants; four prospective 0.10 eV readiness identities; no checkpoint identity inheritance",
+      "numerical_criteria": "Analytic continuous-interval Taylor minimum is at least each declared margin; unchanged parents remain unchanged; native constructor/rates/derivatives/floor branches and inverse elementary-rate contours are evaluated only at admissible raw states; no raw-scale clamp counted as admissibility.",
+      "executed_evidence": [
+        "common_framework_readiness/PARAMETER_PARENT_DOSSIER_V2_NATIVE.json",
+        "arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_taylor_domain_selection.json",
+        "arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_taylor_domain_dossier.json",
+        "arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_shared_stress_scale_candidates.json"
+      ],
+      "remaining_limitation": "These are constructed, not material-calibrated, choices. The selected DBTT parent retains a raw shared stress-scale crossing within 300-1300 K; its minimal-intercept and earlier 2-D-qualified dbtt_primary alternatives are implemented and explicitly unselected because either changes shared emission/Peierls/Taylor physics. Full specimen reruns with the prospective Taylor identities remain downstream qualification, not reused historical evidence."
     },
     {
       "id": "R04",
@@ -238,5 +243,5 @@
       "remaining_limitation": "Final count and resource estimate must be recomputed after implementation."
     }
   ],
-  "next_priority": "R03; R02 now establishes the current-law factorization and active native consequence required before finalized parameter identities."
+  "next_priority": "R04 and R08 can proceed from the prospective 0.10 eV Taylor identities while the distinct DBTT shared-stress production selection remains explicit and unresolved."
 }

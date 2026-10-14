@@ -1,0 +1,43 @@
+{
+  "checkpoint_policy": "old checkpoints require an explicitly labeled state-transfer diagnostic; they are not resumable as current-parameter physics",
+  "declared_continuous_temperature_domain_K": [
+    300.0,
+    1300.0
+  ],
+  "margins_eV": [
+    0.1,
+    0.25,
+    0.5
+  ],
+  "parent_registry": "arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv",
+  "parent_registry_sha256": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760",
+  "parent_selection": "arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_selection.json",
+  "parent_selection_sha256": "3267ac05595cee0800a81a6300e80cb0e71b216067c35cc7a50d82ac4c70e4a2",
+  "primary_readiness_margin_eV": 0.1,
+  "production_selection": null,
+  "prospective_readiness_option_order": [
+    "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+    "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+    "v913_paper_weakT01_0129902_persistent_sites__taylor_margin_0p10eV",
+    "v913_paper_ceramic01_0077080_persistent_sites__taylor_margin_0p10eV"
+  ],
+  "registry": "v10_2_31_taylor_domain_registry.csv",
+  "registry_sha256": "144cab65039f9a5322ff45de02b3705ec3743afb00cfc66c795b0cc51278b8e8",
+  "schema": "v10.2.31-taylor-domain-selection/1",
+  "source_head": "40fa9a1b6c7d304dc39650f7809a54b498bf2422",
+  "status": "PROSPECTIVE_CONSTRUCTED_NOT_MATERIAL_CALIBRATED",
+  "variant_option_order": [
+    "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+    "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p25eV",
+    "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p50eV",
+    "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+    "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p25eV",
+    "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p50eV",
+    "v913_paper_weakT01_0129902_persistent_sites__taylor_margin_0p10eV",
+    "v913_paper_weakT01_0129902_persistent_sites__taylor_margin_0p25eV",
+    "v913_paper_weakT01_0129902_persistent_sites__taylor_margin_0p50eV",
+    "v913_paper_ceramic01_0077080_persistent_sites__taylor_margin_0p10eV",
+    "v913_paper_ceramic01_0077080_persistent_sites__taylor_margin_0p25eV",
+    "v913_paper_ceramic01_0077080_persistent_sites__taylor_margin_0p50eV"
+  ]
+}
