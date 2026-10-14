@@ -1,0 +1,55 @@
+{
+  "schema": "mechanics-constraint-readiness/1",
+  "date": "2026-10-13",
+  "status": "PASSED_COMPACT_AFFINE_SPATIAL_PATCH",
+  "production_execution_authorized": false,
+  "manuscript_modified": false,
+  "qualified_source_commit": "2111155b742b262f7f4e662a0874016219be4e76",
+  "qualification_manifest_commit": "9866e398bc12464266c578183eb82ba238aa3630",
+  "correction": {
+    "defect": "The prescribed-sigma_zz path solved with a nonzero transverse strain internally but returned a strain tensor with eps_zz=0.",
+    "resolution": "The returned full strain and stress tensors now use the same solved transverse state.",
+    "stress_controlled_work": "A reduced elastic potential subtracts prescribed transverse dead-load work before in-plane differentiation.",
+    "constitutive_parameters_changed": false
+  },
+  "compact_patch": {
+    "root": "../integration_evidence/mechanics_constraint_patch_2111155b",
+    "mesh": "unit square split into two linear triangular elements",
+    "affine_engineering_strain": [0.0012, -0.0002, 0.0004],
+    "cases": [
+      "plane_strain",
+      "plane_stress",
+      "generalized_prescribed_eps_zz",
+      "generalized_prescribed_sigma_zz"
+    ],
+    "all_cases_status": "PASS",
+    "maximum_uniform_patch_absolute_error": 3.725290298461914e-09,
+    "maximum_transverse_stress_absolute_error_Pa": 1.4901161193847656e-08,
+    "maximum_reduced_potential_derivative_relative_error": 8.974709943933474e-12,
+    "maximum_rotation_potential_absolute_error_J_m3": 2.9103830456733704e-11,
+    "scope": "Full tensor, transverse control, rotation, work potential, and derivative on an affine two-element patch; not a cracked-body, nonlinear, or 3-D qualification."
+  },
+  "tests": {
+    "focused_related_passed": 23,
+    "focused_related_failed": 0,
+    "focused_related_elapsed_s": 1.51,
+    "full_suite_passed": 934,
+    "full_suite_failed": 0,
+    "full_suite_elapsed_s": 212.51
+  },
+  "sha256": {
+    "mechanics_state_contract.py": "071e861e3bedb656095be36fecfe89a54b41761cd7caabf12179e71811fb4c45",
+    "qualify_mechanics_constraint_patch.py": "592092b9f0c6c53f0e77a070e2afd1b01216789f85bbaef4e2ac30a5ed340f51",
+    "test_readiness_mechanics_state.py": "956b618355e5393b905bd74bcdb75c23c151aba69cd80af03eb32ef74245ec70",
+    "qualification_manifest.py": "bbd4e599ce847184598ebe483f204b9f1dc0f94eccb33803d8b124b286eedf2d",
+    "test_readiness_qualification_and_dossier.py": "8b0820aebea0b41c0854ad4bc9a96cdf824e195772c6f7d44c048ebb3d5bf28c",
+    "QUALIFICATION_ONLY_MANIFEST.json": "22e2bd199733d4a9570ae1e622374361a8c6b45c739f86630d18d967295c352a",
+    "qualification_report.json": "bdc9bd9acf608a47a00af9bbbd7aac24196daa82584ba25e239c07ee82e878ae"
+  },
+  "remaining_readiness_scopes": [
+    "FEM/CZM option qualification",
+    "branch and cavity option qualification",
+    "capability-wide restart coverage",
+    "long-growth analysis"
+  ]
+}

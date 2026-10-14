@@ -161,3 +161,19 @@ under the final source before restart/uninterrupted comparison.
 - Remaining readiness scopes are tensor/constraint, FEM/CZM, branch/cavity,
   capability-wide restart, and long-growth analysis.
 
+## Tensor and transverse-constraint qualification, 13 October 2026
+
+- Commit `2111155b` corrects the full returned strain state for prescribed
+  transverse stress and defines the reduced elastic potential appropriate to
+  that dead-load control. No elastic parameter or constitutive law changed.
+- A two-element affine triangular patch passes plane strain, plane stress,
+  generalized prescribed `eps_zz`, and generalized prescribed `sigma_zz`.
+  Each case checks the full tensor, transverse condition, rotation-invariant
+  potential, and a finite-difference derivative against in-plane stress.
+- The largest derivative relative error is `8.975e-12`; the prescribed-stress
+  residual is `1.49e-8 Pa`. Twenty-three related mechanics/FEM and manifest
+  tests pass; the complete checkout passes 934/934 tests in 212.51 s.
+- The scope is compact affine-patch readiness, not a cracked-body, nonlinear,
+  or 3-D qualification. Remaining scopes are FEM/CZM, branch/cavity,
+  capability-wide restart, and long-growth analysis.
+

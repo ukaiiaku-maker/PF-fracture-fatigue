@@ -30,6 +30,19 @@
     "full_suite_elapsed_s": 242.42,
     "record": "NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json"
   },
+  "current_mechanics_constraint_checkout": {
+    "qualified_source_commit": "2111155b742b262f7f4e662a0874016219be4e76",
+    "tested_content_commit": "9866e398bc12464266c578183eb82ba238aa3630",
+    "focused_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_readiness_mechanics_state.py tests/test_readiness_fem_backend.py tests/test_mechanics_delta_regression.py tests/test_pf_anchor_for_fem_comparison.py tests/test_readiness_qualification_and_dossier.py",
+    "focused_passed": 23,
+    "focused_failed": 0,
+    "focused_elapsed_s": 1.51,
+    "full_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+    "full_suite_passed": 934,
+    "full_suite_failed": 0,
+    "full_suite_elapsed_s": 212.51,
+    "record": "MECHANICS_CONSTRAINT_QUALIFICATION.json"
+  },
   "final_source_repair_targeted": {
     "passed": 56,
     "failed": 0,

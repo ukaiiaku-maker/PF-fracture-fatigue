@@ -17,6 +17,9 @@ The subsequent `NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json` records compact
 native execution and fresh-process restart for both homogeneous persistent
 bulk-only and tip-plus-bulk source geography. It proves option selection and
 executed-mechanics binding, not scientific source-geography sensitivity.
+`MECHANICS_CONSTRAINT_QUALIFICATION.json` then closes the compact affine
+spatial-patch scope for plane stress, plane strain, and both generalized
+transverse controls. Its claim does not extend to a cracked-body or 3-D solve.
 The prescribed-drive 16-bin calculation is retained only as a labeled subsystem
 fixture; it is not the full-mechanics acceptance calculation. The corrected
 native-backed parameter diagnostic is `PARAMETER_PARENT_DOSSIER_V2_NATIVE.json`,
@@ -25,7 +28,7 @@ and the historical v1 dossier is retained.
 At qualified full-PF solver commit `2276745b`, the working checkout passed
 913/913 tests. At recovery-wiring commit `9f73dbff`, the expanded checkout
 passed 925/925 tests. At native source-geography qualification commit
-`9d9f3edf`, the expanded checkout passed 929/929 tests. The earlier 901-test
-clean-clone receipt and the
-independent FEM/CZM receipt remain explicitly labeled historical in
-`QUALIFICATION_RECEIPT.json`.
+`9d9f3edf`, the expanded checkout passed 929/929 tests. At
+mechanics-constraint manifest commit `9866e398`, it passed 934/934 tests. The
+earlier 901-test clean-clone receipt and the independent FEM/CZM receipt remain
+explicitly labeled historical in `QUALIFICATION_RECEIPT.json`.
