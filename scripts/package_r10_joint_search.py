@@ -13,19 +13,32 @@ def main():
   "current_bridge_windows.csv","information_batch_decision.json","continuation_state.json",
   "reused_sealed_2d_terminal_summary.csv","projection_frontier/strict_projection_frontier.csv",
   "projection_frontier/strict_projection_frontier_decision.json","fracture/current_fracture_case_table.csv",
-  "fracture/current_fracture_decision.json","figures/current_developed_fatigue.png","figures/current_dbtt_fracture_bridge.png"]
+  "fracture/current_fracture_decision.json","figures/current_developed_fatigue.png","figures/current_dbtt_fracture_bridge.png",
+  "joint_level_iteration/joint_level_scan.csv","joint_level_iteration/joint_level_candidates.csv",
+  "joint_level_iteration/joint_level_decision.json","amendment/process_surface_audit.json",
+  "amendment/hazard_stage_state_comparison.csv","amendment/action_convention_reconciliation.json",
+  "amendment/class_family_result_table.csv","amendment/selection_ledger.json"]
  for name in files:cp(a.run_root/name,a.out/name)
  for src,name in [(a.original_registry,"original_four_registry.csv"),(a.parent_registry,"fatigue_parent_registry.csv"),
                   (a.v2_rows,"v2_candidate_rows.csv"),(a.v2_manifest,"v2_candidate_manifest.json")]:cp(src,a.out/"inputs"/name)
- for campaign in ("p40_transfer_current_seed4810","r10_dbtt_p40_projection_seed4810"):
+ for campaign in ("p40_transfer_current_seed4810","r10_dbtt_p40_projection_seed4810",
+                  "r10j_dbtt_p40_lshift_036mev_seed4810","r10j_dbtt_p40_lshift_036mev_seed9117"):
   for result in (a.run_root/"bridges"/campaign).glob("Kmax_*/result.json"):
    cp(result,a.out/"trajectories"/campaign/result.parent.name/"result.json")
- for campaign in ("original_dbtt_current_coarse","r10_dbtt_p40_projection_coarse"):
+ for campaign in ("original_dbtt_current_coarse","r10_dbtt_p40_projection_coarse",
+                  "r10j_dbtt_p40_lshift_036mev_screen","r10j_peak_p40_lshift_036mev_screen",
+                  "r10j_weakt_p40_lshift_036mev_screen"):
   for result in (a.run_root/"fracture"/campaign).glob("T_*K.json"):
    cp(result,a.out/"fracture_cases"/campaign/result.name)
- commands="""# Reproduction commands\n\nUse `/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python`.\n\n- `python scripts/design_r10_strict_projection_frontier.py --help`\n- `python scripts/run_r10_retained_bridge.py --help`\n- `python scripts/run_r10_current_fracture_panel.py --help`\n- `python scripts/analyze_r10_information_batch.py --root runs/r10_joint_search`\n- `python scripts/analyze_r10_fracture_bridge.py --root runs/r10_joint_search/fracture`\n"""
+ root=Path(__file__).resolve().parents[1]
+ for name in ("design_r10_joint_level_iteration.py","run_r10_current_fracture_panel.py",
+              "run_r10_retained_bridge.py","analyze_r10_information_batch.py",
+              "analyze_r10_fracture_bridge.py","analyze_r10_amendment.py","package_r10_joint_search.py"):
+  cp(root/"scripts"/name,a.out/"source"/"scripts"/name)
+ cp(root/"arrhenius_fracture"/"retained_material_r10.py",a.out/"source"/"arrhenius_fracture"/"retained_material_r10.py")
+ commands="""# Reproduction commands\n\nUse `/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python`.\n\n- `python scripts/design_r10_joint_level_iteration.py --help`\n- `python scripts/run_r10_retained_bridge.py --help`\n- `python scripts/run_r10_current_fracture_panel.py --help`\n- `python scripts/analyze_r10_information_batch.py --root runs/r10_joint_search`\n- `python scripts/analyze_r10_fracture_bridge.py --root runs/r10_joint_search/fracture`\n- `python scripts/analyze_r10_amendment.py --help`\n"""
  (a.out/"COMMANDS.md").write_text(commands)
- readme="""# R10 joint fracture–fatigue continuation\n\nThis package preserves the original strict EXP-floor family and inherited V2 identities. The restored current backend produced a strict-family DBTT-parent projection with developed fatigue slopes 4.081 and 3.962 over 2.414 decades, but the row is **not promoted**: its 300 K monotonic initiation fell to 2.282 MPa√m (the inherited 5–30 gate fails) and its projection is bound-active. The original DBTT current-backend control initiated at 23.271, 22.632, and 32.299 MPa√m at 300/750/1200 K.\n\nThe retained P40 row transferred with global slope 3.705 but only 0.340 decades. Exact inherited V2 2-D results are reused only at their sealed 300/1200 K monotonic scope; no new 2-D run was justified for the rejected projection. Ceramic remains a control. Peak and weak-T remain unresolved, and no joint success is claimed.\n"""
+ readme="""# R10 joint fracture–fatigue continuation amendment\n\nThis package preserves the original strict EXP-floor and inherited V2 family identities. The new strict DBTT descendant changes only `cleave_G00_eV` (+0.036 eV) and `cleave_floor_frac` (0.461420 to 0.487264), giving complete-state Kinit=5.218 MPa√m at 300 K. Its developed fatigue response is independently confirmed: seed 4810 gives m=3.999 over 2.574 decades (three amplitudes), and seed 9117 gives m=4.004 with all four adjacent secants 3.868–4.095 over five amplitudes.\n\nThis is not a DBTT-class promotion. The descendant is right-censored at K=80 from 450 through 1200 K. Equivalent Peak and compensated weak-T descendants pass the low-temperature scale but are likewise censored from 450 through 1200 K, so they are retained as class near misses and were not sent to fatigue or 2-D. The original projected DBTT row remains a positive fatigue frontier/control but fails the inherited low-temperature scale at Kinit=2.282. All censors include residual action and synchronized state ledgers; none are called re-entrant failures.\n"""
  (a.out/"README.md").write_text(readme)
  manifest={}
  for path in sorted(x for x in a.out.rglob("*") if x.is_file() and x.name!="MANIFEST.json"):

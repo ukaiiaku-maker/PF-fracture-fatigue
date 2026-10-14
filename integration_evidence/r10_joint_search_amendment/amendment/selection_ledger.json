@@ -1,0 +1,153 @@
+{
+  "analytical_to_1d": {
+    "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+    "complete_state_Kinit_300": 5.218191433095953,
+    "difference_MPa_sqrt_m": -0.001808566904047,
+    "frozen_Kinit_300": 5.22
+  },
+  "near_misses": [
+    {
+      "A0_action_max": "0.0018443068758174275",
+      "A0_action_min": "1.849553281705e-07",
+      "A0_band_DeltaK_high": "27.0",
+      "A0_band_DeltaK_low": "2.7",
+      "A0_band_width_decades": "3.998766338430944",
+      "A0_local_slope_max": "4.098477783252229",
+      "A0_local_slope_min": "3.7108936719086283",
+      "base_candidate_id": "R10_PEAK_P40_THERMAL_ANCHOR_V1",
+      "class": "PEAK",
+      "cleave_G00_eV": "2.5922410048981073",
+      "cleave_floor_frac": "0.48589367577034737",
+      "delta_G_eV": "0.034",
+      "fracture_scale_penalty": "0.011999999999999567",
+      "frozen_Kinit_300": "4.988",
+      "frozen_Kinit_by_T_json": "{\"1050\": null, \"1200\": null, \"300\": 4.988, \"450\": null, \"600\": null, \"750\": null, \"900\": null}"
+    },
+    {
+      "A0_action_max": "0.0014646914514931113",
+      "A0_action_min": "1.4665750840347038e-07",
+      "A0_band_DeltaK_high": "27.0",
+      "A0_band_DeltaK_low": "2.7",
+      "A0_band_width_decades": "3.9994418444577233",
+      "A0_local_slope_max": "4.098734916846617",
+      "A0_local_slope_min": "3.7128267508775803",
+      "base_candidate_id": "R10_PEAK_P40_THERMAL_ANCHOR_V1",
+      "class": "PEAK",
+      "cleave_G00_eV": "2.5942410048981075",
+      "cleave_floor_frac": "0.4872642154390153",
+      "delta_G_eV": "0.036000000000000004",
+      "fracture_scale_penalty": "0.0",
+      "frozen_Kinit_300": "5.22",
+      "frozen_Kinit_by_T_json": "{\"1050\": null, \"1200\": null, \"300\": 5.22, \"450\": null, \"600\": null, \"750\": null, \"900\": null}"
+    },
+    {
+      "A0_action_max": "0.0018443068826607468",
+      "A0_action_min": "1.8495532795280915e-07",
+      "A0_band_DeltaK_high": "27.0",
+      "A0_band_DeltaK_low": "2.7",
+      "A0_band_width_decades": "3.998766340553559",
+      "A0_local_slope_max": "4.098477783862795",
+      "A0_local_slope_min": "3.7108936774092913",
+      "base_candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "class": "DBTT",
+      "cleave_G00_eV": "1.8914430984322184",
+      "cleave_floor_frac": "0.485893675460703",
+      "delta_G_eV": "0.034",
+      "fracture_scale_penalty": "0.011999999999999567",
+      "frozen_Kinit_300": "4.988",
+      "frozen_Kinit_by_T_json": "{\"1050\": null, \"1200\": null, \"300\": 4.988, \"450\": null, \"600\": null, \"750\": null, \"900\": null}"
+    },
+    {
+      "A0_action_max": "0.0014646914569313408",
+      "A0_action_min": "1.4665750823085346e-07",
+      "A0_band_DeltaK_high": "27.0",
+      "A0_band_DeltaK_low": "2.7",
+      "A0_band_width_decades": "3.9994418465813757",
+      "A0_local_slope_max": "4.098734917457152",
+      "A0_local_slope_min": "3.712826756384029",
+      "base_candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "class": "DBTT",
+      "cleave_G00_eV": "1.8934430984322184",
+      "cleave_floor_frac": "0.48726421513082346",
+      "delta_G_eV": "0.036000000000000004",
+      "fracture_scale_penalty": "0.0",
+      "frozen_Kinit_300": "5.22",
+      "frozen_Kinit_by_T_json": "{\"1050\": null, \"1200\": null, \"300\": 5.22, \"450\": null, \"600\": null, \"750\": null, \"900\": null}"
+    },
+    {
+      "A0_action_max": "0.001844306871258067",
+      "A0_action_min": "1.8495532825700865e-07",
+      "A0_band_DeltaK_high": "27.0",
+      "A0_band_DeltaK_low": "2.7",
+      "A0_band_width_decades": "3.998766337154181",
+      "A0_local_slope_max": "4.0984777832348565",
+      "A0_local_slope_min": "3.7108936678086013",
+      "base_candidate_id": "R10_WEAKT_P40_THERMAL_ANCHOR_V1",
+      "class": "WEAKT",
+      "cleave_G00_eV": "2.0166045352791606",
+      "cleave_floor_frac": "0.48589367598529576",
+      "delta_G_eV": "0.034",
+      "fracture_scale_penalty": "0.011999999999999567",
+      "frozen_Kinit_300": "4.988",
+      "frozen_Kinit_by_T_json": "{\"1050\": null, \"1200\": null, \"300\": 4.988, \"450\": null, \"600\": null, \"750\": null, \"900\": null}"
+    },
+    {
+      "A0_action_max": "0.0014646914478698742",
+      "A0_action_min": "1.4665750847206867e-07",
+      "A0_band_DeltaK_high": "27.0",
+      "A0_band_DeltaK_low": "2.7",
+      "A0_band_width_decades": "3.9994418431802607",
+      "A0_local_slope_max": "4.098734916829305",
+      "A0_local_slope_min": "3.7128267467733718",
+      "base_candidate_id": "R10_WEAKT_P40_THERMAL_ANCHOR_V1",
+      "class": "WEAKT",
+      "cleave_G00_eV": "2.018604535279161",
+      "cleave_floor_frac": "0.48726421565281924",
+      "delta_G_eV": "0.036000000000000004",
+      "fracture_scale_penalty": "0.0",
+      "frozen_Kinit_300": "5.22",
+      "frozen_Kinit_by_T_json": "{\"1050\": null, \"1200\": null, \"300\": 5.22, \"450\": null, \"600\": null, \"750\": null, \"900\": null}"
+    }
+  ],
+  "pending_jobs": [
+    "joint thermal-coefficient/local-derivative Pareto continuation for DBTT, Peak-T, and compensated weak-T",
+    "resume informative active-state V2 checkpoints within declared resource share",
+    "same-row 2-D only after a class-feasible 1-D selection"
+  ],
+  "rate_uncertainty": {
+    "interpretation": "about 7.3% seed effect; identical ratio arises from shared mark/reward histories in inactive state",
+    "shared_amplitudes_seed_ratio_9117_over_4810": [
+      0.927025,
+      0.927025,
+      0.927025
+    ]
+  },
+  "resource_censored_jobs": [
+    "DBTT V2 P25 high-load checkpoints",
+    "original Peak low-side checkpoint"
+  ],
+  "running_jobs": [],
+  "schema": "r10.amendment-selection-ledger/1",
+  "selected": [
+    {
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "global_slope": "3.998719617868541",
+      "growth_rate_width_decades": "2.574002746034532",
+      "local_slope_max": "4.079098503293832",
+      "local_slope_min": "3.9310238977638146",
+      "moderate_two_decade_interval": "True",
+      "point_count": "3",
+      "seed": "4810"
+    },
+    {
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "global_slope": "4.004066566123788",
+      "growth_rate_width_decades": "2.574003326663611",
+      "local_slope_max": "4.0947479277224375",
+      "local_slope_min": "3.868171085691368",
+      "moderate_two_decade_interval": "True",
+      "point_count": "5",
+      "seed": "9117"
+    }
+  ]
+}

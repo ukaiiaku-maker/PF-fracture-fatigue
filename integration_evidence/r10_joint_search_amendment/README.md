@@ -1,0 +1,5 @@
+# R10 joint fracture–fatigue continuation amendment
+
+This package preserves the original strict EXP-floor and inherited V2 family identities. The new strict DBTT descendant changes only `cleave_G00_eV` (+0.036 eV) and `cleave_floor_frac` (0.461420 to 0.487264), giving complete-state Kinit=5.218 MPa√m at 300 K. Its developed fatigue response is independently confirmed: seed 4810 gives m=3.999 over 2.574 decades (three amplitudes), and seed 9117 gives m=4.004 with all four adjacent secants 3.868–4.095 over five amplitudes.
+
+This is not a DBTT-class promotion. The descendant is right-censored at K=80 from 450 through 1200 K. Equivalent Peak and compensated weak-T descendants pass the low-temperature scale but are likewise censored from 450 through 1200 K, so they are retained as class near misses and were not sent to fatigue or 2-D. The original projected DBTT row remains a positive fatigue frontier/control but fails the inherited low-temperature scale at Kinit=2.282. All censors include residual action and synchronized state ledgers; none are called re-entrant failures.

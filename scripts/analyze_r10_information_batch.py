@@ -53,20 +53,21 @@ def main(argv=None):
     slope_rows=[]; candidate_windows=[]
     for candidate,group in frame[
         frame.complete & frame.rate_20_60_m_per_cycle.notna()
-    ].groupby("candidate_id"):
+    ].groupby(["candidate_id","seed"]):
+        candidate,seed=candidate
         group=group.sort_values("DeltaK_MPa_sqrt_m")
         for (_,left),(_,right) in zip(group.iloc[:-1].iterrows(),group.iloc[1:].iterrows()):
             m=math.log(right.rate_20_60_m_per_cycle/left.rate_20_60_m_per_cycle)/math.log(
                 right.DeltaK_MPa_sqrt_m/left.DeltaK_MPa_sqrt_m)
-            slope_rows.append({"candidate_id":candidate,
+            slope_rows.append({"candidate_id":candidate,"seed":int(seed),
                 "DeltaK_low":left.DeltaK_MPa_sqrt_m,"DeltaK_high":right.DeltaK_MPa_sqrt_m,
                 "rate_low":left.rate_20_60_m_per_cycle,"rate_high":right.rate_20_60_m_per_cycle,
                 "local_slope":m,"moderate_slope":3.4<=m<=4.6})
         if len(group)>=2:
             x=np.log(group.DeltaK_MPa_sqrt_m.to_numpy(float));y=np.log(group.rate_20_60_m_per_cycle.to_numpy(float))
             fit=np.polyfit(x,y,1); width=float(np.log10(group.rate_20_60_m_per_cycle.max()/group.rate_20_60_m_per_cycle.min()))
-            local=[r for r in slope_rows if r["candidate_id"]==candidate]
-            candidate_windows.append({"candidate_id":candidate,"point_count":len(group),
+            local=[r for r in slope_rows if r["candidate_id"]==candidate and r["seed"]==int(seed)]
+            candidate_windows.append({"candidate_id":candidate,"seed":int(seed),"point_count":len(group),
                 "global_slope":float(fit[0]),"growth_rate_width_decades":width,
                 "local_slope_min":min((r["local_slope"] for r in local),default=None),
                 "local_slope_max":max((r["local_slope"] for r in local),default=None),
@@ -99,6 +100,9 @@ def main(argv=None):
     }
     (a.root/"information_batch_decision.json").write_text(json.dumps(decision,indent=2,sort_keys=True)+"\n")
     state_path=a.root/"continuation_state.json";state=json.loads(state_path.read_text())
+    # Older packaged state may contain duplicate completion labels; normalize
+    # without disturbing their original order.
+    state["completed"]=list(dict.fromkeys(state["completed"]))
     if "fresh four-class current-backend information batch" not in state["completed"]:
         state["completed"].append("fresh four-class current-backend information batch")
     if two_decade:

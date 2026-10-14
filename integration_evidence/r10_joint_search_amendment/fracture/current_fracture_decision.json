@@ -1,0 +1,118 @@
+{
+  "automatic_class_promotion": false,
+  "rows": [
+    {
+      "K300_MPa_sqrt_m": 5.218191433095953,
+      "all_complete": false,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "censored_temperatures_K": [
+        450.0,
+        600.0,
+        750.0,
+        900.0,
+        1050.0,
+        1200.0
+      ],
+      "disposition": "THERMAL_CLASS_UNRESOLVED_RIGHT_CENSORED",
+      "inherited_low_temperature_scale_gate_5_to_30": true,
+      "maximum_K_shield_MPa_sqrt_m": 1.1482406063137343,
+      "plastic_state_exercised": true,
+      "temperatures_K": [
+        300.0,
+        450.0,
+        600.0,
+        750.0,
+        900.0,
+        1050.0,
+        1200.0
+      ]
+    },
+    {
+      "K300_MPa_sqrt_m": 5.218191431656145,
+      "all_complete": false,
+      "candidate_id": "R10J_PEAK_P40_LSHIFT_036MEV_V1",
+      "censored_temperatures_K": [
+        450.0,
+        600.0,
+        750.0,
+        900.0,
+        1050.0,
+        1200.0
+      ],
+      "disposition": "THERMAL_CLASS_UNRESOLVED_RIGHT_CENSORED",
+      "inherited_low_temperature_scale_gate_5_to_30": true,
+      "maximum_K_shield_MPa_sqrt_m": 1.1975414474469077,
+      "plastic_state_exercised": true,
+      "temperatures_K": [
+        300.0,
+        450.0,
+        600.0,
+        750.0,
+        900.0,
+        1050.0,
+        1200.0
+      ]
+    },
+    {
+      "K300_MPa_sqrt_m": 5.237396657908613,
+      "all_complete": false,
+      "candidate_id": "R10J_WEAKT_P40_LSHIFT_036MEV_V1",
+      "censored_temperatures_K": [
+        450.0,
+        600.0,
+        750.0,
+        900.0,
+        1050.0,
+        1200.0
+      ],
+      "disposition": "THERMAL_CLASS_UNRESOLVED_RIGHT_CENSORED",
+      "inherited_low_temperature_scale_gate_5_to_30": true,
+      "maximum_K_shield_MPa_sqrt_m": 1.2137288548719153e-11,
+      "plastic_state_exercised": true,
+      "temperatures_K": [
+        300.0,
+        450.0,
+        600.0,
+        750.0,
+        900.0,
+        1050.0,
+        1200.0
+      ]
+    },
+    {
+      "K300_MPa_sqrt_m": 2.2821783382402825,
+      "all_complete": false,
+      "candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "censored_temperatures_K": [
+        750.0,
+        1200.0
+      ],
+      "disposition": "JOINT_REJECT_LOW_T_FRACTURE_SCALE",
+      "inherited_low_temperature_scale_gate_5_to_30": false,
+      "maximum_K_shield_MPa_sqrt_m": 1.1482406063137343,
+      "plastic_state_exercised": true,
+      "temperatures_K": [
+        300.0,
+        750.0,
+        1200.0
+      ]
+    },
+    {
+      "K300_MPa_sqrt_m": 23.271332460742197,
+      "all_complete": true,
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "censored_temperatures_K": [],
+      "disposition": "REFERENCE_OR_REQUIRES_DENSE_CLASSIFICATION",
+      "inherited_low_temperature_scale_gate_5_to_30": true,
+      "maximum_K_shield_MPa_sqrt_m": 0.23873832768785988,
+      "plastic_state_exercised": true,
+      "temperatures_K": [
+        300.0,
+        750.0,
+        1200.0
+      ]
+    }
+  ],
+  "schema": "r10.current-fracture-bridge-decision/1",
+  "scope": "current deterministic diagnostic-mark 0.005 MPa sqrt(m)/s monotonic bridge; censored K is a lower bound"
+}

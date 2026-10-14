@@ -1,0 +1,37 @@
+{
+  "finding": "22.258 belongs to original Peak. 0.092684 and 0.039237 belong to the DBTT V2 row; their mismatch is the measured failed A0/evolved overlap, not inconsistent units or a live binding error.",
+  "records": [
+    {
+      "convention": "one explicit 64-phase cycle from initial state",
+      "material": "v913_zeroD_sobol_0242980",
+      "overlap_passed": true,
+      "q": 3.0,
+      "state": "initial",
+      "tau_s": 1e-06,
+      "units": "dimensionless action/cycle",
+      "value": 22.25795620880647
+    },
+    {
+      "convention": "A0 mean-cycle predictor from initial state",
+      "material": "P25_TJBSV2_S_002987",
+      "overlap_passed": false,
+      "q": 3.273241435177624,
+      "state": "initial",
+      "tau_s": 6.992153587194454e-07,
+      "units": "dimensionless action/cycle",
+      "value": 0.09268414460651599
+    },
+    {
+      "convention": "explicit 64-phase cycle after state evolution in overlap copy",
+      "material": "P25_TJBSV2_S_002987",
+      "overlap_passed": false,
+      "q": 3.273241435177624,
+      "state": "evolved",
+      "tau_s": 6.992153587194454e-07,
+      "units": "dimensionless action/cycle",
+      "value": 0.03923678231816478
+    }
+  ],
+  "same_load_label_only": true,
+  "schema": "r10.action-convention-reconciliation/1"
+}

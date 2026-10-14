@@ -1,0 +1,141 @@
+{
+  "completed_cases": 18,
+  "current_windows": [
+    {
+      "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "global_slope": 3.7049176451475216,
+      "growth_rate_width_decades": 0.34025345899017434,
+      "local_slope_max": 3.952982037262158,
+      "local_slope_min": 3.4568532530328793,
+      "moderate_two_decade_interval": false,
+      "point_count": 3,
+      "seed": 4810
+    },
+    {
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "global_slope": 3.998719617868541,
+      "growth_rate_width_decades": 2.574002746034532,
+      "local_slope_max": 4.079098503293832,
+      "local_slope_min": 3.9310238977638146,
+      "moderate_two_decade_interval": true,
+      "point_count": 3,
+      "seed": 4810
+    },
+    {
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "global_slope": 4.004066566123788,
+      "growth_rate_width_decades": 2.574003326663611,
+      "local_slope_max": 4.0947479277224375,
+      "local_slope_min": 3.868171085691368,
+      "moderate_two_decade_interval": true,
+      "point_count": 5,
+      "seed": 9117
+    },
+    {
+      "candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "global_slope": 4.005378267652729,
+      "growth_rate_width_decades": 2.4137733539245705,
+      "local_slope_max": 4.08076778820914,
+      "local_slope_min": 3.9618042068317587,
+      "moderate_two_decade_interval": true,
+      "point_count": 3,
+      "seed": 4810
+    }
+  ],
+  "developed_20_60_rates": [
+    {
+      "DeltaK_MPa_sqrt_m": 3.354877551070978,
+      "candidate_id": "P25_TJBSV2_S_002987",
+      "rate_20_60_m_per_cycle": 4.789453453620753e-10
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 4.144909057043921,
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "rate_20_60_m_per_cycle": 1.106021315367989e-10
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 7.032517761670186,
+      "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "rate_20_60_m_per_cycle": 2.480753904162706e-09
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 7.816818066234514,
+      "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "rate_20_60_m_per_cycle": 3.5753577430049013e-09
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 8.688587324107766,
+      "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "rate_20_60_m_per_cycle": 5.4304665447837605e-09
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 5.0000000004,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 8.987126803774987e-12
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 5.0000000004,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 8.331288662714332e-12
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 7.0000000002,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 3.304225308755153e-11
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 9.9999999999,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 1.5189793646485915e-10
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 9.9999999999,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 1.4081325395980187e-10
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 15.000000000300002,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 7.100960757507614e-10
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 21.9999999996,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 3.3699512272330683e-09
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 21.9999999996,
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "rate_20_60_m_per_cycle": 3.1240322521961032e-09
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 4.5,
+      "candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "rate_20_60_m_per_cycle": 3.7838512723994174e-10
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 7.816818066234514,
+      "candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "rate_20_60_m_per_cycle": 3.6022474863140437e-09
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 18.0,
+      "candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "rate_20_60_m_per_cycle": 9.810867528127977e-08
+    }
+  ],
+  "findings": [
+    "current acceleration resolves the historical zero-event low-load DBTT and Weak-T censors",
+    "V2 active amplitudes fail overlap and require costly phase-exact execution",
+    "original Peak has an extreme low/high kinetic transition and no demonstrated moderate interval",
+    "ceramic is retained only as a physical control",
+    "a strict-family projected complete row passes the current developed two-decade fatigue gate; this is not a class promotion until its monotonic and spatial gates pass"
+  ],
+  "next_acquisition": [
+    "use measured current P40 discrepancy and recovered strict-family projection machinery to rank class-parent offspring with protected fracture anchors",
+    "complete one additional amplitude for DBTT and Weak-T only after strict analytical candidates are ranked",
+    "reuse sealed same-row V2 2D cases; launch new 2D only for a promoted complete row"
+  ],
+  "restartable_cases": 4,
+  "schema": "r10.information-batch-decision/1"
+}

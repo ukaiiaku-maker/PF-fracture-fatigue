@@ -1,0 +1,67 @@
+{
+  "bounds_provenance": {
+    "floor_fraction_max": {
+      "kind": "constitutive-domain limit",
+      "source": "ExpFloorBarrier.floor_max_fraction",
+      "value": 0.95
+    },
+    "inherited_fracture_gate": {
+      "kind": "inherited campaign selection gate; not universal impossibility test",
+      "value": "5-30 MPa sqrt(m) at low temperature"
+    },
+    "projection_exponent_min": {
+      "kind": "inverse-helper default/design restriction",
+      "source": "ExpFloorBounds default and R10 projection call; not a universal physical limit",
+      "value": 0.25
+    }
+  },
+  "limitations": [
+    "frozen ramp is a prospective score, not complete-state qualification",
+    "A0 is not used as a hard rejection for state-mediated rows",
+    "thermal surfaces outside 300 K are changed and explicitly evaluated"
+  ],
+  "schema": "r10.joint-level-iteration/1",
+  "selected": [
+    {
+      "candidate_id": "R10J_PEAK_P40_LSHIFT_036MEV_V1",
+      "changed_fields_json": "{\"cleave_G00_eV\": {\"offspring\": 2.5942410048981075, \"parent\": 2.5582410048981075}, \"cleave_floor_frac\": {\"offspring\": 0.4872642154390153, \"parent\": 0.46142012262349935}}",
+      "cleavage_hits": 3.0,
+      "cleavage_tau_s": 1e-06,
+      "complete_row_sha256": "8248844d9803df29351a7c0611efc552bb8e760ac724a8cbeebfc1d1d29b6f8f",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "parent_candidate_id": "R10_PEAK_P40_THERMAL_ANCHOR_V1",
+      "realization": "existing EXP_floor G00 and floor_fraction; exact constant +delta_G surface shift at 300 K only",
+      "selection_metrics_json": "{\"A0_action_max\": 0.0014646914514931113, \"A0_action_min\": 1.4665750840347038e-07, \"A0_band_DeltaK_high\": 27.0, \"A0_band_DeltaK_low\": 2.7, \"A0_band_width_decades\": 3.9994418444577233, \"A0_local_slope_max\": 4.098734916846617, \"A0_local_slope_min\": 3.7128267508775803, \"base_candidate_id\": \"R10_PEAK_P40_THERMAL_ANCHOR_V1\", \"class\": \"PEAK\", \"cleave_G00_eV\": 2.5942410048981075, \"cleave_floor_frac\": 0.4872642154390153, \"delta_G_eV\": 0.036000000000000004, \"fracture_scale_penalty\": 0.0, \"frozen_Kinit_300\": 5.22, \"frozen_Kinit_by_T_json\": \"{\\\"1050\\\": null, \\\"1200\\\": null, \\\"300\\\": 5.22, \\\"450\\\": null, \\\"600\\\": null, \\\"750\\\": null, \\\"900\\\": null}\"}",
+      "target": "P40"
+    },
+    {
+      "candidate_id": "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+      "changed_fields_json": "{\"cleave_G00_eV\": {\"offspring\": 1.8934430984322184, \"parent\": 1.8574430984322183}, \"cleave_floor_frac\": {\"offspring\": 0.48726421513082346, \"parent\": 0.46142012228735413}}",
+      "cleavage_hits": 3.0,
+      "cleavage_tau_s": 1e-06,
+      "complete_row_sha256": "54d11b13451dffa87f63bca6426a915105f570bde72cae1593b766b077daea53",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "parent_candidate_id": "R10_DBTT_P40_THERMAL_ANCHOR_V1",
+      "realization": "existing EXP_floor G00 and floor_fraction; exact constant +delta_G surface shift at 300 K only",
+      "selection_metrics_json": "{\"A0_action_max\": 0.0014646914569313408, \"A0_action_min\": 1.4665750823085346e-07, \"A0_band_DeltaK_high\": 27.0, \"A0_band_DeltaK_low\": 2.7, \"A0_band_width_decades\": 3.9994418465813757, \"A0_local_slope_max\": 4.098734917457152, \"A0_local_slope_min\": 3.712826756384029, \"base_candidate_id\": \"R10_DBTT_P40_THERMAL_ANCHOR_V1\", \"class\": \"DBTT\", \"cleave_G00_eV\": 1.8934430984322184, \"cleave_floor_frac\": 0.48726421513082346, \"delta_G_eV\": 0.036000000000000004, \"fracture_scale_penalty\": 0.0, \"frozen_Kinit_300\": 5.22, \"frozen_Kinit_by_T_json\": \"{\\\"1050\\\": null, \\\"1200\\\": null, \\\"300\\\": 5.22, \\\"450\\\": null, \\\"600\\\": null, \\\"750\\\": null, \\\"900\\\": null}\"}",
+      "target": "P40"
+    },
+    {
+      "candidate_id": "R10J_WEAKT_P40_LSHIFT_036MEV_V1",
+      "changed_fields_json": "{\"cleave_G00_eV\": {\"offspring\": 2.018604535279161, \"parent\": 1.9826045352791608}, \"cleave_floor_frac\": {\"offspring\": 0.48726421565281924, \"parent\": 0.4614201228593988}}",
+      "cleavage_hits": 3.0,
+      "cleavage_tau_s": 1e-06,
+      "complete_row_sha256": "5e992d4a3c485dfad95317d788c036a2ef350049808f55a32049ac9488e8b573",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "parent_candidate_id": "R10_WEAKT_P40_THERMAL_ANCHOR_V1",
+      "realization": "existing EXP_floor G00 and floor_fraction; exact constant +delta_G surface shift at 300 K only",
+      "selection_metrics_json": "{\"A0_action_max\": 0.0014646914478698742, \"A0_action_min\": 1.4665750847206867e-07, \"A0_band_DeltaK_high\": 27.0, \"A0_band_DeltaK_low\": 2.7, \"A0_band_width_decades\": 3.9994418431802607, \"A0_local_slope_max\": 4.098734916829305, \"A0_local_slope_min\": 3.7128267467733718, \"base_candidate_id\": \"R10_WEAKT_P40_THERMAL_ANCHOR_V1\", \"class\": \"WEAKT\", \"cleave_G00_eV\": 2.018604535279161, \"cleave_floor_frac\": 0.48726421565281924, \"delta_G_eV\": 0.036000000000000004, \"fracture_scale_penalty\": 0.0, \"frozen_Kinit_300\": 5.22, \"frozen_Kinit_by_T_json\": \"{\\\"1050\\\": null, \\\"1200\\\": null, \\\"300\\\": 5.22, \\\"450\\\": null, \\\"600\\\": null, \\\"750\\\": null, \\\"900\\\": null}\"}",
+      "target": "P40"
+    }
+  ],
+  "selection_rule": "lowest 300 K EXP-floor level shift with frozen 5-30 scale and >=2-decade moderate A0 band",
+  "source": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/projection_frontier/strict_projection_frontier.csv",
+    "sha256": "ecb69dbe4a59b6fb5e69b46c8ef533ba8fe764f6fde72d071d6873f65845fc2e"
+  }
+}

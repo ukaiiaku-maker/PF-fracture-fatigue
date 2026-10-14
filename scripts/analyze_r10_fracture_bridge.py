@@ -14,16 +14,21 @@ def main(argv=None):
     a=p.parse_args(argv);rows=[]
     for path in sorted(a.root.glob("*/*K.json")):
         d=json.loads(path.read_text()); events=d["events"]
+        terminal=d.get("terminal_hazard_bearing_state",{})
         rows.append({"campaign":path.parent.name,"candidate_id":d["candidate_id"],
             "temperature_K":d["temperature_K"],"status":d["status"],
             "K_init_MPa_sqrt_m":d["K_init_MPa_sqrt_m"],
             "K_init_lower_bound_MPa_sqrt_m":d["Kmax_MPa_sqrt_m"] if not events else None,
             "K_final_event_MPa_sqrt_m":d["K_final_event_MPa_sqrt_m"],
             "event_count":d["event_count"],"final_extension_um":d["final_extension_um"],
-            "maximum_mobile_count":max((x["mobile_count"] for x in events),default=0.),
-            "maximum_retained_count":max((x["retained_count"] for x in events),default=0.),
-            "maximum_source_activity":max((x["source_activity"] for x in events),default=0.),
-            "maximum_K_shield_MPa_sqrt_m":max((abs(x["K_shield_MPa_sqrt_m"]) for x in events),default=0.),
+            "maximum_mobile_count":max([float(terminal.get("mobile_count",0.)),*(x["mobile_count"] for x in events)]),
+            "maximum_retained_count":max([float(terminal.get("retained_count",0.)),*(x["retained_count"] for x in events)]),
+            "maximum_source_activity":max([float(terminal.get("gross_source_activity",0.)),*(x["source_activity"] for x in events)]),
+            "maximum_K_shield_MPa_sqrt_m":max([abs(float(terminal.get("K_shield_MPa_sqrt_m",0.))),*(abs(x["K_shield_MPa_sqrt_m"]) for x in events)]),
+            "terminal_hazard_action":terminal.get("hazard_action_current"),
+            "terminal_remaining_action_to_mark":terminal.get("remaining_action_to_mark"),
+            "terminal_radius_over_r0":terminal.get("radius_over_r0"),
+            "terminal_opening_stress_Pa":terminal.get("opening_stress_Pa"),
             "artifact":str(path.resolve())})
     frame=pd.DataFrame(rows).sort_values(["candidate_id","temperature_K"])
     frame.to_csv(a.root/"current_fracture_case_table.csv",index=False)
@@ -39,6 +44,7 @@ def main(argv=None):
             "plastic_state_exercised":bool(g.maximum_source_activity.max()>0),
             "maximum_K_shield_MPa_sqrt_m":float(g.maximum_K_shield_MPa_sqrt_m.max()),
             "disposition":("JOINT_REJECT_LOW_T_FRACTURE_SCALE" if pd.notna(lowK) and lowK<5
+                           else "THERMAL_CLASS_UNRESOLVED_RIGHT_CENSORED" if bool((g.status!="complete").any())
                            else "REFERENCE_OR_REQUIRES_DENSE_CLASSIFICATION")})
     payload={"schema":"r10.current-fracture-bridge-decision/1","rows":decisions,
         "scope":"current deterministic diagnostic-mark 0.005 MPa sqrt(m)/s monotonic bridge; censored K is a lower bound",
