@@ -1,0 +1,79 @@
+{
+  "calculated_state_artifacts": {
+    "branch_diagnostics_0700K.csv": {
+      "byte_identical": true,
+      "full_sha256": "fd76941227faa4a2b798430645f88f512734e310438c6e004ebf3214cc05b1fa",
+      "sparse_sha256": "fd76941227faa4a2b798430645f88f512734e310438c6e004ebf3214cc05b1fa"
+    },
+    "crack_path_700K.csv": {
+      "byte_identical": true,
+      "full_sha256": "c37ea8254b7c022830c4b5a548c8d0e31c2ea13419c645990c1d1fe617575762",
+      "sparse_sha256": "c37ea8254b7c022830c4b5a548c8d0e31c2ea13419c645990c1d1fe617575762"
+    },
+    "crack_path_front0_700K.csv": {
+      "byte_identical": true,
+      "full_sha256": "c37ea8254b7c022830c4b5a548c8d0e31c2ea13419c645990c1d1fe617575762",
+      "sparse_sha256": "c37ea8254b7c022830c4b5a548c8d0e31c2ea13419c645990c1d1fe617575762"
+    },
+    "fronts_0700K.csv": {
+      "byte_identical": true,
+      "full_sha256": "e0b757ca0beba74874186f0203082d90c91593e083f2535d7832c2c376d6e1b4",
+      "sparse_sha256": "e0b757ca0beba74874186f0203082d90c91593e083f2535d7832c2c376d6e1b4"
+    },
+    "kinetic_tip_cell_audit_v101.json": {
+      "byte_identical": true,
+      "full_sha256": "dae48dd307ace358be1111049905178e0947a99c1bc7e3b543be56bd0d6d796c",
+      "sparse_sha256": "dae48dd307ace358be1111049905178e0947a99c1bc7e3b543be56bd0d6d796c"
+    },
+    "steps_0700K.csv": {
+      "byte_identical": true,
+      "full_sha256": "32ef313ab2f60ec648812640c78a7101d46b982d2c50d1f8c4dba80a62bc5551",
+      "sparse_sha256": "32ef313ab2f60ec648812640c78a7101d46b982d2c50d1f8c4dba80a62bc5551"
+    },
+    "summary.json": {
+      "byte_identical": true,
+      "full_sha256": "7f14c1c1e9458c47c13c70ffc65ccfd46ecf8561af2c722090fe0f1ee093a4b7",
+      "sparse_sha256": "7f14c1c1e9458c47c13c70ffc65ccfd46ecf8561af2c722090fe0f1ee093a4b7"
+    },
+    "v10_0_1_driver_modes.json": {
+      "byte_identical": true,
+      "full_sha256": "3d4b6f0ca4f4ef94a12cbec999adf6445735310ee5c9bab6adbb27f7d720af9a",
+      "sparse_sha256": "3d4b6f0ca4f4ef94a12cbec999adf6445735310ee5c9bab6adbb27f7d720af9a"
+    },
+    "v10_1_driver_modes.json": {
+      "byte_identical": true,
+      "full_sha256": "dd1d6c6ad2b697f1687876b2fe6ff18cad675191de37f13bdaa507bd83d43ae1",
+      "sparse_sha256": "dd1d6c6ad2b697f1687876b2fe6ff18cad675191de37f13bdaa507bd83d43ae1"
+    }
+  },
+  "decision": "PASS",
+  "full_only_rendered_outputs": [
+    "dislocations_700K.png",
+    "energetics_700K.png",
+    "field_snapshots_700K.png",
+    "hazard_clocks_700K.png",
+    "load_displacement_700K.png",
+    "tip_state_700K.png",
+    "toughness_700K.png"
+  ],
+  "interpretation": "selected field/diagnostic retention changed stored outputs but did not change the byte-level calculated state and history",
+  "mismatches": [],
+  "output_policies": {
+    "full": {
+      "no_mpz_state_output": false,
+      "no_plots": false,
+      "save_snapshots": 4,
+      "snapshot_cols": 2
+    },
+    "sparse": {
+      "no_mpz_state_output": true,
+      "no_plots": true,
+      "save_snapshots": 0,
+      "snapshot_cols": 4
+    }
+  },
+  "physics_arguments_identical": true,
+  "production_execution_authorized": false,
+  "qualification_scope": "short native 2-D ceramic event trajectory; two accepted 5 um events, not a production material prediction",
+  "schema": "native-output-policy-independence/1"
+}

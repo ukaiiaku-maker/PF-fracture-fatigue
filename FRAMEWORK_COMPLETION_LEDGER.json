@@ -209,16 +209,20 @@
     {
       "id": "R11",
       "goal_ids": ["FG-07", "FG-10", "FG-16"],
-      "status": "READY_TO_QUALIFY",
-      "concrete_defect": "Long-growth and resistance capabilities exist but lack one current regression covering repeated lengths, stage validity, front identity, modal labels and output-policy independence.",
+      "status": "COMPLETE_PRESERVED_CAPABILITY",
+      "concrete_defect": "Closed: retained 300 K/1200 K native 1 mm histories now have a fail-closed current regression, and a fresh native sparse/full-output pair establishes state independence from field/diagnostic retention.",
       "owner_consumer": "long-growth driver, observer/query and compact retention",
       "authoritative_source": "retained native developed histories and current observer code",
       "dependencies": ["R01"],
-      "exact_next_command": "python scripts/qualify_long_growth_analysis_contract.py --retained-evidence <manifest>",
+      "exact_next_command": "python scripts/qualify_long_growth_analysis_contract.py --output common_framework_readiness/LONG_GROWTH_ANALYSIS_QUALIFICATION.json",
       "input_output_identity": "historical law labeled historical; rerun only code-affected intervals",
       "numerical_criteria": "No fabricated equilibrium; restart-continuous chronology/resistance and K/J-at-length queries; identical state under output profiles.",
-      "executed_evidence": [],
-      "remaining_limitation": "Law-to-result status and unified current regression absent."
+      "executed_evidence": [
+        "common_framework_readiness/LONG_GROWTH_ANALYSIS_QUALIFICATION.json",
+        "common_framework_readiness/OUTPUT_POLICY_INDEPENDENCE_QUALIFICATION.json",
+        "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_GROWTH_RESISTANCE.json"
+      ],
+      "remaining_limitation": "The retained developed histories are historical-law, monotonic common-mark trajectories; they do not provide independent unload/reload R-curve points or mixed-mode specimen evidence, and the qualifier states those scopes explicitly."
     },
     {
       "id": "R12",

@@ -1,0 +1,195 @@
+{
+  "cases": {
+    "cold_300K": {
+      "accepted_event_pairs": 203,
+      "artifact_sha256": {
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current/fracture_observations_online.jsonl": "0da5a9072dd1089f0e7a2b4edb1672b810f4da2f32efdd9c2b93723768594055",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current/kinetic_tip_cell_audit_v101.json": "0d0b2a30bfe2a656d1f997e66a6dc7ed2153826d03702bc218595d000d0264b3",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current/run_args.json": "6b39a3c3574bb48c9ea0742ea713630b244463441b74e89e9a290d606c9c46bf",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current/shared_runtime_attestation.post.json": "6fef814cf195300ed0f6d08137126235f8eb366e4d30586af444b7284253fa06",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current/steps_0300K.csv": "a0283ad9f5e679bd7cf0d8a1b150afcffc35a9af9f9314981675c11ae706a418",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current/stochastic_avalanche_geometry_events.json": "8d52d31c513e62659167efacdf40c16b0b70ce26b5907c2bcbb2992026cdd165"
+      },
+      "execution_attestation_sha256": "6fef814cf195300ed0f6d08137126235f8eb366e4d30586af444b7284253fa06",
+      "field_outputs": [],
+      "front_ids": [
+        "primary"
+      ],
+      "length_queries": [
+        {
+          "coordinate": "extension",
+          "interpolation_performed": false,
+          "lower_sequence": 325,
+          "status": "discrete_jump_bracket",
+          "target_m": 9.999999999999999e-05,
+          "upper_sequence": 326
+        },
+        {
+          "coordinate": "path_arclength",
+          "interpolation_performed": false,
+          "lower_sequence": 316,
+          "status": "discrete_jump_bracket",
+          "target_m": 9.999999999999999e-05,
+          "upper_sequence": 317
+        },
+        {
+          "coordinate": "extension",
+          "interpolation_performed": false,
+          "lower_sequence": 998,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.0005,
+          "upper_sequence": 999
+        },
+        {
+          "coordinate": "path_arclength",
+          "interpolation_performed": false,
+          "lower_sequence": 998,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.0005,
+          "upper_sequence": 999
+        },
+        {
+          "coordinate": "extension",
+          "interpolation_performed": false,
+          "lower_sequence": 1787,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.001,
+          "upper_sequence": 1788
+        },
+        {
+          "coordinate": "path_arclength",
+          "interpolation_performed": false,
+          "lower_sequence": 1776,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.001,
+          "upper_sequence": 1777
+        }
+      ],
+      "load_segments": [
+        "native-000-loading"
+      ],
+      "observation_count": 1789,
+      "repeated_stage_coordinate_count": 203,
+      "resistance_definition": "native K_J at exact pre-event state, carried only across its paired realized committed jump",
+      "resistance_rows": 203,
+      "root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_300K/developed_1000um_current",
+      "status": "QUALIFIED_RETAINED_NATIVE_HISTORY",
+      "terminal_path_arclength_m": 0.0010085595119085254,
+      "terminal_projected_extension_m": 0.0010049257634758525,
+      "topology_generations": [
+        0
+      ]
+    },
+    "hot_1200K": {
+      "accepted_event_pairs": 203,
+      "artifact_sha256": {
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/field_snapshots_1200K.png": "d7b3aa4f4d765a8cb8668b56102f961b4c3bf6749a96bf8ed67167b5503c988e",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/fracture_observations_online.jsonl": "8b5c81979b9c2c6bedfd8cb886f8ae87f29699aeedea64e8a2cca0ab5e703798",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/kinetic_tip_cell_audit_v101.json": "f22ef1e1be7699037a4897d7a2579e8b5adcc07ed03d54c7808173b013258daa",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/run_args.json": "c35f01973972fa3a199139ff0d31effadbe4feee7bf5ed914101267560f0e94e",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/shared_runtime_attestation.post.json": "e155310253240a3273b6c4e6df07973600a557b0e514191bc24e9f8ff45e09b0",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/steps_1200K.csv": "0ed0176a8ce5757cc2802cfde4f556d61694e103deb80684de186a14810d6b9b",
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/stochastic_avalanche_geometry_events.json": "8d52d31c513e62659167efacdf40c16b0b70ce26b5907c2bcbb2992026cdd165"
+      },
+      "execution_attestation_sha256": "e155310253240a3273b6c4e6df07973600a557b0e514191bc24e9f8ff45e09b0",
+      "field_outputs": [
+        "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3/field_snapshots_1200K.png"
+      ],
+      "front_ids": [
+        "primary"
+      ],
+      "length_queries": [
+        {
+          "coordinate": "extension",
+          "interpolation_performed": false,
+          "lower_sequence": 442,
+          "status": "discrete_jump_bracket",
+          "target_m": 9.999999999999999e-05,
+          "upper_sequence": 443
+        },
+        {
+          "coordinate": "path_arclength",
+          "interpolation_performed": false,
+          "lower_sequence": 433,
+          "status": "discrete_jump_bracket",
+          "target_m": 9.999999999999999e-05,
+          "upper_sequence": 434
+        },
+        {
+          "coordinate": "extension",
+          "interpolation_performed": false,
+          "lower_sequence": 1115,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.0005,
+          "upper_sequence": 1116
+        },
+        {
+          "coordinate": "path_arclength",
+          "interpolation_performed": false,
+          "lower_sequence": 1115,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.0005,
+          "upper_sequence": 1116
+        },
+        {
+          "coordinate": "extension",
+          "interpolation_performed": false,
+          "lower_sequence": 1904,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.001,
+          "upper_sequence": 1905
+        },
+        {
+          "coordinate": "path_arclength",
+          "interpolation_performed": false,
+          "lower_sequence": 1893,
+          "status": "discrete_jump_bracket",
+          "target_m": 0.001,
+          "upper_sequence": 1894
+        }
+      ],
+      "load_segments": [
+        "native-000-loading"
+      ],
+      "observation_count": 1906,
+      "repeated_stage_coordinate_count": 203,
+      "resistance_definition": "native K_J at exact pre-event state, carried only across its paired realized committed jump",
+      "resistance_rows": 203,
+      "root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3",
+      "status": "QUALIFIED_RETAINED_NATIVE_HISTORY",
+      "terminal_path_arclength_m": 0.0010085595119085254,
+      "terminal_projected_extension_m": 0.0010049257634758525,
+      "topology_generations": [
+        0
+      ]
+    }
+  },
+  "contract_results": {
+    "K_J_not_relabelled_as_modal_K_I": "PASS",
+    "chronological_stage_history": "PASS",
+    "developed_resistance_selector": "PASS",
+    "discrete_jump_queries_do_not_interpolate": "PASS",
+    "event_hold_reload_control": "IMPLEMENTED_SCHEMA; retained developed histories contain one loading segment and do not prove independent unload/reload resistance",
+    "exact_pre_event_committed_pairing": "PASS",
+    "mixed_mode_and_signed_J_schema": "IMPLEMENTED_AND_UNIT_TESTED; these mode-I retained histories do not constitute a mixed-mode specimen qualification",
+    "output_policy_state_independence": "PASS_NATIVE_BYTE_IDENTICAL_STATE",
+    "projected_extension_separate_from_path_arclength": "PASS",
+    "repeated_length_coordinates_retained": "PASS",
+    "restart_continuity": "NOT_REQUALIFIED_BY_THIS_ANALYSIS; native execution attestations and atomic restart tests remain separate evidence",
+    "selected_native_field_render_retained": "PASS"
+  },
+  "decision": "COMPLETE_RETAINED_LONG_GROWTH_ANALYSIS",
+  "limitations": [
+    "The common-mark hot/cold geometry is controlled evidence, not independent morphology invariance.",
+    "The histories provide event-sampled monotonic resistance, not unload/reload R-curve points.",
+    "K_J remains J-derived K_J and is not interpreted as modal K_I."
+  ],
+  "output_policy_qualification": {
+    "receipt": "common_framework_readiness/OUTPUT_POLICY_INDEPENDENCE_QUALIFICATION.json",
+    "receipt_sha256": "db072e9a29225d74f620f1a1fbdc3b7ba63011ed27ddc9340df60113df12260c",
+    "scope": "short native 2-D ceramic event trajectory; two accepted 5 um events, not a production material prediction"
+  },
+  "production_execution_authorized": false,
+  "schema": "common-fracture-long-growth-qualification/1",
+  "scope": "analysis regression over two retained native 1 mm trajectories; no new physical trajectory was executed"
+}
