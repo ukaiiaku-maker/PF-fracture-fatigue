@@ -1,0 +1,110 @@
+{
+  "active_consequence": {
+    "escaped_difference_current_minus_historical": 3.651787585759671e-08,
+    "gross_release_difference_current_minus_historical": 7.600094543350468e-07,
+    "mobile_l1_difference": 1.457347482711238e-20,
+    "mobile_max_abs_difference": 1.15908683333993e-22,
+    "retained_l1_difference": 3.6517875857582153e-08,
+    "retained_max_abs_difference": 2.929783272882011e-10
+  },
+  "changed_input_only": {
+    "current": "arrhenius_fracture.taylor_release.completion_rate",
+    "current_body_sha256": "e6bce5d26caea9a02337abfcc43fa282465999347294a98417313efdc16e6a46",
+    "historical": "arrhenius_fracture.taylor_release.historical_legacy_implicit_1s",
+    "historical_body_sha256": "e06ab71b55b554a0aec0809eff620bd81a8ae7c097004103c40f10f9e469f6fe",
+    "historical_implicit_window_s": 1.0,
+    "historical_rate_cap_s": 1000000000000.0
+  },
+  "current_terminal": {
+    "complete_numerical_correction": 7.937625158058854e-21,
+    "conservation_error": -1.3234889800848443e-23,
+    "error_controlled_stiff_solve": false,
+    "escaped": 3.678395731659914e-08,
+    "gross_release": 7.600094593771908e-07,
+    "gross_trapping": 7.255526801512138e-07,
+    "mobile_distance_population_m": 3.5422303149995405e-14,
+    "mobile_total": 0.0,
+    "net_retained_gain": 0.0,
+    "net_retained_loss": 3.445677922597454e-08,
+    "recovered": 0.0,
+    "retained_total": 0.0,
+    "stiff_solver_method": "affine_bounded_exponential"
+  },
+  "failed_predecessors": [
+    "taylor_completion_native_consequence_d4cdd51e: parent-only overlay did not cross worker boundary",
+    "taylor_completion_native_consequence_e42ca85f: worker-bound full re-equilibration stopped after active 9.4 GiB repeated global factorization; receipt also overwritten by child process",
+    "uncommitted full-state 8.4 s native-operator validation: current arm completed but historical arm was stopped after 16 minutes and 3.5 GiB while repeatedly factoring in solve_ivp BDF"
+  ],
+  "historical_terminal": {
+    "complete_numerical_correction": 4.06969157157909e-18,
+    "conservation_error": 0.0,
+    "error_controlled_stiff_solve": false,
+    "escaped": 2.6608145900242945e-10,
+    "gross_release": 5.042143985308025e-15,
+    "gross_trapping": 2.0611016788361568e-09,
+    "mobile_distance_population_m": 1.0062531707693809e-16,
+    "mobile_total": 1.457347482711238e-20,
+    "net_retained_gain": 2.0610966316076093e-09,
+    "net_retained_loss": 0.0,
+    "recovered": 0.0,
+    "retained_total": 3.6517875857582153e-08,
+    "stiff_solver_method": "affine_bounded_exponential"
+  },
+  "identical_inputs": {
+    "density_order": "current unshifted exact order in both arms",
+    "elementary_signed_rates": "current exact UnifiedMPZState._transport_rates",
+    "encounter_field": "current native field in both arms",
+    "jump_and_velocity": "current native spatial fields in both arms",
+    "mobile_source_rate": null,
+    "native_operator": "arrhenius_fracture.coupled_transport_exchange.joint_transport_exchange",
+    "native_operator_body_sha256": "1c9120ce46db0d29b8ed9a722041ec636ea17c00d68acad6cb169af1768f89a7",
+    "phi_policy": "current uncapped exact phi in both arms",
+    "source_exclusion_reason": "isolate completion effect on already-active accepted populations"
+  },
+  "rate_fields": {
+    "current_completion_max_s": 56898509099.77024,
+    "current_completion_min_s": 56898509043.3196,
+    "current_to_historical_max_ratio": 56898509099.77024,
+    "historical_completion_max_s": 1.0,
+    "historical_completion_min_s": 1.0,
+    "order_max": 1.6043998064426983,
+    "order_min": 1.6043998048509274,
+    "phi_max": 816.0832027506538,
+    "phi_min": 816.083200601385,
+    "velocity_max_m_s": 118804.25392546003,
+    "velocity_min_m_s": 118804.25361257247
+  },
+  "schema": "taylor-completion-native-operator-consequence/1",
+  "scope": "one activity-bounded frozen-coefficient native coupled exchange/transport micro-interval on an accepted original full-PF spatial state; the bound avoids the native long-horizon BDF branch whose historical arm accumulated unbounded adaptive history, without changing the operator or rates; no mechanics re-equilibration, source injection, production selection, or effect-size claim",
+  "source": {
+    "checkpoint_generation": "834191da44593796b9f607ec",
+    "checkpoint_manifest": "integration_evidence/f1_native_taylor_peierls_qualification_2276745b/refinement_step46_checkpoint/run_state_checkpoint.json",
+    "checkpoint_manifest_sha256": "11a29c8ea32c51a92197000290c5068e8a4b19852310427a3138b8f204f0a952",
+    "material_manifest": "integration_evidence/f1_native_taylor_peierls_qualification_2276745b/initial_to_step48/selected_material_manifest_v10_2_22.csv",
+    "material_manifest_sha256": "ed4b3d3ad82d0f24cb53113e1471f5ce93a3beaa54b62c485a5b4f2d06fa049e",
+    "run_args_sha256": "d5eeb0d78b4f3d24704131caf2a4c6fa857bcb40e9a33b4753a7a2e7a1f9ca39"
+  },
+  "source_head": "90a4364e888aaa89bd3d30fb37c771dec6ec5dfd",
+  "state": {
+    "bins": 80,
+    "classification": "accepted full-PF active step-46 spatial checkpoint",
+    "current_max_activity": 1000000.0,
+    "diagnostic_interval_policy": "min(reference native interval, target activity / maximum exact current-or-historical generator activity rate)",
+    "diagnostic_interval_s": 1.3807333012514253e-07,
+    "dx_m": 2.5e-08,
+    "forest_density_max_m2": 5000000035115.189,
+    "forest_density_min_m2": 5000000008778.797,
+    "historical_max_activity": 992143.833369577,
+    "initial_mobile_total": 2.3271780906246097e-09,
+    "initial_population_total": 3.6783957316599154e-08,
+    "initial_retained_total": 3.445677922597454e-08,
+    "local_stress_max_Pa": 6121851498.058875,
+    "local_stress_min_Pa": 2778741713.2984295,
+    "reference_native_interval_s": 8.4,
+    "systems": 2,
+    "target_max_activity": 1000000.0,
+    "temperature_K": 950.0,
+    "tip_stress_Pa": 6197902258.699538
+  },
+  "status": "PASS"
+}
