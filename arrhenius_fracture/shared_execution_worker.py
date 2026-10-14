@@ -111,14 +111,53 @@ def _verify_loaded_files(receipt: dict) -> None:
 
 
 def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict | None:
-    """Compare the constructed tip-persistent object with the request.
+    """Compare native post-run physics receipts with the requested options.
 
     Absence or mismatch is fatal.  This function never selects a replacement
     executor, irrespective of elapsed time or output profile.
     """
     if (options.mechanics is not MechanicsBackend.SPATIAL_PF
-            or options.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE
-            or options.source_location is not SourceLocation.TIP_SURFACE):
+            or options.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE):
+        return None
+    if options.source_location in {
+        SourceLocation.BULK_UNIFORM, SourceLocation.TIP_PLUS_BULK,
+    }:
+        path = output / "v10_4_bulk_coupled_model_audit.json"
+        if not path.is_file():
+            raise RuntimeError(
+                "requested bulk source geography produced no native model audit; "
+                "no alternate geography will be accepted"
+            )
+        payload = json.loads(path.read_text())
+        expected_geography = options.source_location.value
+        expected_tip = options.source_location is SourceLocation.TIP_PLUS_BULK
+        required = {
+            "source_geography": expected_geography,
+            "tip_emission_enabled": expected_tip,
+            "bulk_plasticity_mode": "full_field",
+            "bulk_sources": "homogeneous_persistent_background",
+            "bulk_finite_inventory": False,
+            "bulk_density_transport": False,
+            "direct_tip_bulk_population_exchange": False,
+            "zero_stress_net_plastic_rate_exactly_zero": True,
+        }
+        mismatches = {
+            key: {"expected": expected, "observed": payload.get(key)}
+            for key, expected in required.items()
+            if payload.get(key) != expected
+        }
+        if mismatches:
+            raise RuntimeError(
+                "executed bulk source geography does not match the request: "
+                + json.dumps(mismatches, sort_keys=True)
+            )
+        return {
+            "schema": "shared-executed-bulk-geography-binding/1",
+            "all_expected_bindings_match": True,
+            "model_audit": str(path),
+            **required,
+        }
+    if options.source_location is not SourceLocation.TIP_SURFACE:
         return None
     path = output / "persistent_native_runtime_binding.json"
     if not path.is_file():

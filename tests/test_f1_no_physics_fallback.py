@@ -69,6 +69,43 @@ def test_missing_executed_binding_receipt_is_failure_not_fallback(tmp_path):
     assert _verify_executed_physics(tmp_path, options, plan)["all_expected_methods_bound"]
 
 
+@pytest.mark.parametrize(
+    ("preset", "geography", "tip_enabled"),
+    [
+        ("pf_monotonic_bulk", "bulk_uniform", False),
+        ("pf_monotonic_tip_plus_bulk", "tip_plus_bulk", True),
+    ],
+)
+def test_bulk_geography_requires_matching_native_post_run_audit(
+    tmp_path, preset, geography, tip_enabled,
+):
+    options = PRESETS[preset]
+    plan = build_execution_plan(options)
+    with pytest.raises(RuntimeError, match="no native model audit"):
+        _verify_executed_physics(tmp_path, options, plan)
+    payload = {
+        "source_geography": geography,
+        "tip_emission_enabled": tip_enabled,
+        "bulk_plasticity_mode": "full_field",
+        "bulk_sources": "homogeneous_persistent_background",
+        "bulk_finite_inventory": False,
+        "bulk_density_transport": False,
+        "direct_tip_bulk_population_exchange": False,
+        "zero_stress_net_plastic_rate_exactly_zero": True,
+    }
+    path = tmp_path / "v10_4_bulk_coupled_model_audit.json"
+    path.write_text(json.dumps(payload))
+    receipt = _verify_executed_physics(tmp_path, options, plan)
+    assert receipt["all_expected_bindings_match"] is True
+    assert receipt["source_geography"] == geography
+    payload["source_geography"] = (
+        "tip_plus_bulk" if geography == "bulk_uniform" else "bulk_uniform"
+    )
+    path.write_text(json.dumps(payload))
+    with pytest.raises(RuntimeError, match="does not match"):
+        _verify_executed_physics(tmp_path, options, plan)
+
+
 def test_provider_import_failure_never_imports_finite_source(monkeypatch):
     options = PRESETS["pf_monotonic_tip_persistent"]
     plan = build_execution_plan(options)
