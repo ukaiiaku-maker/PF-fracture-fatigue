@@ -1,0 +1,67 @@
+{
+  "schema": "fem-observer-restart-continuation-handoff/1",
+  "date": "2026-10-14",
+  "status": "IMPLEMENTATION_AND_QUALIFICATION_COMPLETE_AT_DECLARED_SCOPE",
+  "source_pair": {
+    "pf_common": "a2ad99b504e3d906b104bf089220b85dec515c53",
+    "fem_czm": "2c34559d5ce9bba51f599780e7315565720b7386"
+  },
+  "resolved": [
+    "The old projected killed-band G and native domain J were shown to represent different virtual operations.",
+    "A matched fixed-topology material-coordinate derivative agrees with native J within 0.8618% across all three physical-support levels.",
+    "Refinement metadata is verified at the provider/serialization owner; genuine support/provider mismatches still fail closed.",
+    "The generic FEM entry restores a full native specimen checkpoint and continues through active cohesive remeshing and post-event equilibrium.",
+    "Uninterrupted and fresh-process resumed histories are byte-identical through two physical events and six numerical cohesive subsegments."
+  ],
+  "preserved_current_physics": [
+    "authorized Taylor-Peierls completion",
+    "persistent source lifecycle",
+    "signed return and wake state",
+    "event ownership and exactly-once stochastic marks",
+    "conservative transport corrections",
+    "physical reachable-envelope support",
+    "native cohesive damage/contact/history"
+  ],
+  "tests": {
+    "focused_fem": "41 passed",
+    "full_fem": "709 passed, 16 subtests passed",
+    "full_pf_common": "954 passed, 15 deselected",
+    "post_update_pf_targeted": "5 passed"
+  },
+  "principal_evidence": [
+    "FEM_OBSERVER_AND_RESTART_COMPLETION.md",
+    "evidence/fem_baseline_reconciliation_v2.json",
+    "SPECIMEN_RESTART_QUALIFICATION.json",
+    "REGRESSION_TEST_COVERAGE_V2.json",
+    "DEVELOPMENT_LINEAGE_AND_COVERAGE_V2.json",
+    "../../CAPABILITY_PRESERVATION_MATRIX.csv",
+    "../../FRAMEWORK_COMPLETION_LEDGER.json"
+  ],
+  "raw_local_evidence_preserved": {
+    "root": "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence",
+    "accepted_pre_event_checkpoint": "specimen_restart_checkpoint_step121",
+    "accepted_post_event_checkpoint": "specimen_restart_checkpoint_postevent_femenv",
+    "uninterrupted_run": "specimen_restart_uninterrupted_to145_femenv",
+    "fresh_process_resumed_run": "specimen_restart_resumed_to145_femenv",
+    "active_post_event_continuation": "specimen_restart_postevent_to146_femenv",
+    "negative_missing_dependency_receipt": "specimen_restart_resumed_to145"
+  },
+  "unresolved_authority_or_external_dependencies": [
+    "No authoritative activation area or interface stiffness is available for a physical bilinear specimen selection.",
+    "No DBTT shared characteristic-stress alternative has been authorized.",
+    "Some historical PF Git objects remain unavailable in the partial clone and were not represented as inspected.",
+    "Archival evidence not presently mounted remains intentionally unverified."
+  ],
+  "remaining_independent_readiness_work": [
+    "The generic opening-only state-update owner and new three-level PF/FEM common-mechanics comparison remain open under FG-12/R08.",
+    "Cracked-body plane-stress/generalized constraint integration remains R07.",
+    "Predictive recursive branch birth/ownership remains R09.",
+    "Local-incremental physical cavity transitions remain R10."
+  ],
+  "disabled": {
+    "production_campaign": true,
+    "manuscript_changes": true,
+    "remote_writes": true
+  },
+  "preservation": "All raw states, failed receipts, checkpoints, historical source and the user's untracked FEM audit file were retained."
+}
