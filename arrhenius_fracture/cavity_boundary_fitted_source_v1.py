@@ -16,6 +16,7 @@ from .cavity_source_recovery_v3 import (
 
 SCHEMA = "v5.cavity-boundary-fitted-source/1"
 RECOVERY_ID = "CAVITY_BOUNDARY_FITTED_PHYSICAL_PATCH_V1"
+MAXIMUM_POINT_FACET_PAIRS_PER_BLOCK = 1_048_576
 
 
 class CavityBoundaryFittedSourceUnavailable(RuntimeError):
@@ -52,6 +53,42 @@ def _ordered_cycle(edges, source_node: int) -> tuple[int, ...]:
     if len(ordered) != len(adjacency):
         raise CavityBoundaryFittedSourceUnavailable("owned cavity boundary has multiple components")
     return tuple(ordered)
+
+
+def _nearest_polygon_coordinates(points, polygon, vectors, lengths):
+    """Exact nearest-facet coordinates with bounded temporary storage.
+
+    The production cavity cycle can contain O(10^3) refined facets while the
+    mechanics mesh contains O(10^5) elements.  Broadcasting both complete
+    axes creates multiple gigabyte arrays.  Blocking only the point axis does
+    not change the calculation or tie-breaking order used by ``argmin``.
+    """
+    samples=np.asarray(points,float); facets=np.asarray(polygon,float)
+    directions=np.asarray(vectors,float); facet_lengths=np.asarray(lengths,float)
+    if samples.ndim!=2 or samples.shape[1]!=2 or facets.ndim!=2 or facets.shape[1]!=2:
+        raise ValueError("points and polygon must be planar coordinate arrays")
+    if len(facets)!=len(directions) or len(facets)!=len(facet_lengths) or not len(facets):
+        raise ValueError("polygon facet arrays must be nonempty and aligned")
+    block=max(1,MAXIMUM_POINT_FACET_PAIRS_PER_BLOCK//len(facets))
+    nearest=np.empty(len(samples),dtype=int)
+    nearest_fraction=np.empty(len(samples),dtype=float)
+    nearest_projection=np.empty((len(samples),2),dtype=float)
+    denominator=np.maximum(facet_lengths**2,1.0e-300)
+    for start in range(0,len(samples),block):
+        stop=min(start+block,len(samples)); current=samples[start:stop]
+        relative=current[:,None,:]-facets[None,:,:]
+        fraction=np.clip(
+            np.einsum("nki,ki->nk",relative,directions)/denominator[None,:],
+            0.0,1.0,
+        )
+        projection=facets[None,:,:]+fraction[:,:,None]*directions[None,:,:]
+        squared=np.einsum("nki,nki->nk",current[:,None,:]-projection,
+                          current[:,None,:]-projection)
+        local=np.argmin(squared,axis=1); rows=np.arange(stop-start)
+        nearest[start:stop]=local
+        nearest_fraction[start:stop]=fraction[rows,local]
+        nearest_projection[start:stop]=projection[rows,local]
+    return nearest,nearest_fraction,nearest_projection
 
 
 def recover_boundary_fitted_physical_patch_v1(
@@ -102,20 +139,13 @@ def recover_boundary_fitted_physical_patch_v1(
         source_normal *= -1.0
 
     points = xy[tri]; centroids = points.mean(axis=1)
-    relative = centroids[:, None, :] - polygon[None, :, :]
-    fraction = np.clip(
-        np.einsum("nki,ki->nk", relative, vectors)
-        / np.maximum(lengths[None, :]**2, 1.0e-300), 0.0, 1.0,
+    nearest,nearest_fraction,nearest_projection=_nearest_polygon_coordinates(
+        centroids,polygon,vectors,lengths,
     )
-    projections = polygon[None, :, :] + fraction[:, :, None] * vectors[None, :, :]
-    distances = np.linalg.norm(centroids[:, None, :] - projections, axis=2)
-    nearest = np.argmin(distances, axis=1)
-    rows = np.arange(len(centroids))
-    nearest_projection = projections[rows, nearest]
     point_normals = normals[nearest]
     point_tangents = tangents[nearest]
     n_all = np.einsum("ij,ij->i", centroids-nearest_projection, point_normals)
-    arc = cumulative[nearest] + fraction[rows, nearest]*lengths[nearest]
+    arc = cumulative[nearest] + nearest_fraction*lengths[nearest]
     s_all = (arc + 0.5*perimeter) % perimeter - 0.5*perimeter
 
     physical_scale = min(radius, process)

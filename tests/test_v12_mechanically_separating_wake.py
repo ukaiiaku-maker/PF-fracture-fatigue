@@ -5,6 +5,7 @@ import pytest
 
 from arrhenius_fracture.causal_sharp_wake_v11 import CRACK_REPRESENTATION as V11_ID, causal_segment_support
 from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
+import arrhenius_fracture.mechanically_separating_sharp_wake_v12 as wake_v12
 from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
     MODEL_ID, apply_mechanically_separating_graph, certification_arcs, classify_graph_vertices,
     graph_component_count, independent_intact_path_certificate, mechanically_separating_graph_support as _graph_support,
@@ -14,6 +15,20 @@ from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
 def mechanically_separating_graph_support(*args,**kwargs):
     kwargs.setdefault("allow_offgrid_active_tips_for_screen",True)
     return _graph_support(*args,**kwargs)
+
+
+def test_component_separation_is_exact_without_quadratic_pairwise_array(monkeypatch):
+    nodes=np.asarray(((0.,0.),(0.,1.),(1.,0.),(10.,0.),(10.,1.),(11.,0.)))
+    specimen=SimpleNamespace(nodes=nodes,elems=np.asarray(((0,1,2),(3,4,5)),int))
+    original_norm=np.linalg.norm
+    def reject_pairwise_tensor(values,*args,**kwargs):
+        if np.asarray(values).ndim>=3:
+            raise AssertionError("quadratic pairwise displacement tensor was allocated")
+        return original_norm(values,*args,**kwargs)
+    monkeypatch.setattr(wake_v12.np.linalg,"norm",reject_pairwise_tensor)
+    measured=wake_v12._minimum_component_separation(specimen,(0,1),(1,2))
+    expected=min(original_norm(nodes[i]-nodes[j]) for i in (0,1,2) for j in (3,4,5))
+    assert measured==pytest.approx(expected,rel=0.,abs=1.e-15)
 
 def mesh(n=9,perturb=False):
     x=np.linspace(0,1,n); y=np.linspace(-.5,.5,n); X,Y=np.meshgrid(x,y); nodes=np.c_[X.ravel(),Y.ravel()]; elems=[]

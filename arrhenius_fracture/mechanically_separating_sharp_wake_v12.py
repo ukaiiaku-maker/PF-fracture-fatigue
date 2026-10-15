@@ -339,10 +339,21 @@ def _minimum_component_separation(mesh,selected,labels):
     ids=np.asarray(sorted(map(int,np.asarray(selected,int))),int); unique=sorted(set(labels))
     if len(unique)<2: return math.inf
     nodes={label:np.unique(mesh.elems[ids[np.asarray(labels)==label]]) for label in unique}; result=math.inf
+    # Do not materialize ``a[:,None,:]-b[None,:,:]`` here.  Production crack
+    # supports can contain O(10^4) nodes on each disconnected component, so
+    # that otherwise exact expression has quadratic storage and can exhaust
+    # memory before the topology trial reaches its equilibrium solve.  A
+    # cKDTree query returns the same Euclidean nearest-neighbour minimum with
+    # storage linear in the component sizes.
+    from scipy.spatial import cKDTree
     for index,left in enumerate(unique):
         for right in unique[index+1:]:
             a=mesh.nodes[nodes[left]]; b=mesh.nodes[nodes[right]]
-            result=min(result,float(np.min(np.linalg.norm(a[:,None,:]-b[None,:,:],axis=2))))
+            # Build the tree on the larger component so the temporary query
+            # result is bounded by the smaller component.
+            tree_points, query_points = (a, b) if len(a) >= len(b) else (b, a)
+            distance, _ = cKDTree(tree_points).query(query_points, k=1)
+            result=min(result,float(np.min(distance)))
     return result
 
 def junction_sector_certificates(mesh,network,selected,tolerance=1e-12):
