@@ -359,6 +359,9 @@ def _native_high_cycle_call(
     # The R9 outer checkpoint and cursor are one atomic restart unit.  Suppress
     # inner snapshots during a bounded block, then write both after return.
     previous = os.environ.pop("V10230_HIGH_CYCLE_CHECKPOINT_DIR", None)
+    flag_existed = hasattr(engine, "_v10230_standalone_geometry_commit")
+    previous_flag = getattr(engine, "_v10230_standalone_geometry_commit", None)
+    engine._v10230_standalone_geometry_commit = True
     clear_pending_geometry_events()
     try:
         with pending_geometry_event_scope():
@@ -368,6 +371,10 @@ def _native_high_cycle_call(
             )
             event = pop_pending_geometry_event() if result.get("fired") else None
     finally:
+        if flag_existed:
+            engine._v10230_standalone_geometry_commit = previous_flag
+        else:
+            delattr(engine, "_v10230_standalone_geometry_commit")
         if previous is not None:
             os.environ["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = previous
     if bool(result.get("fired")) != bool(event is not None):

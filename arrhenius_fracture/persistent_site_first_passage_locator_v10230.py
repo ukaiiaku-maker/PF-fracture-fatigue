@@ -22,6 +22,27 @@ from .persistent_site_poincare_v10230 import one_cycle_map
 MODEL_ID = "v10.2.30_transactional_cycle_number_first_passage_locator_v1"
 
 
+def _qualified_standalone_geometry_commit(engine, before, after) -> bool:
+    """Recognize the native 1-D engine's already-committed event transaction."""
+    if not bool(getattr(engine, "_v10230_standalone_geometry_commit", False)):
+        return False
+    event_length = float(
+        getattr(engine, "avalanche_last_completed_advance_m", 0.0)
+    )
+    tolerance = max(1.0e-18, 1.0e-10*abs(event_length))
+    return bool(
+        event_length > 0.0
+        and int(after[0]) == int(before[0]) + 1
+        and math.isclose(float(after[1])-float(before[1]), event_length,
+                         rel_tol=1.0e-10, abs_tol=tolerance)
+        and math.isclose(float(after[3])-float(before[3]), event_length,
+                         rel_tol=1.0e-10, abs_tol=tolerance)
+        and float(after[2]) >= float(before[2])
+        and float(after[4]) >= float(before[4])
+        and after[5:] == before[5:]
+    )
+
+
 def _set_signed_transport_phase(engine, K_signed: float) -> None:
     """Expose the true waveform phase to mobile transport only."""
     mpz = getattr(engine, "mpz", None)
@@ -243,7 +264,10 @@ def localize_first_passage(
     # The stochastic engine provisionally increments n_adv when it constructs
     # the pending event descriptor.  Physical crack and MPZ distances remain
     # unchanged until the checked outer energy-gate transaction.
-    if geometry_after[1:] != geometry_before[1:]:
+    standalone_commit = _qualified_standalone_geometry_commit(
+        engine, geometry_before, geometry_after,
+    )
+    if geometry_after[1:] != geometry_before[1:] and not standalone_commit:
         raise RuntimeError("first-passage locator advanced physical geometry before energy gate")
     _sum(plastic, dict(final.get("plastic", {})))
     final.update({
@@ -262,6 +286,7 @@ def localize_first_passage(
         "coupled_hazard_locator_initial_high_cycles": initial_high,
         "coupled_hazard_locator_initial_high_action": initial_action_high,
         "coupled_hazard_locator_initial_high_fired": initial_fired_high,
+        "coupled_hazard_standalone_geometry_commit": standalone_commit,
         "plastic": plastic,
     })
     return final

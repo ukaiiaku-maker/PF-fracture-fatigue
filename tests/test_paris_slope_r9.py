@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 
@@ -11,6 +12,9 @@ from arrhenius_fracture.fatigue_v1 import FatigueWaveform
 from arrhenius_fracture.paris_slope_r9 import (
     PhaseCursor, _set_cursor_cycles, configure_stochastic_engine,
     mean_cycle_inputs, qualify_mean_cycle_overlap,
+)
+from arrhenius_fracture.persistent_site_first_passage_locator_v10230 import (
+    _qualified_standalone_geometry_commit,
 )
 
 
@@ -76,3 +80,17 @@ def test_native_fractional_return_maps_to_restartable_phase_cursor():
 
     _set_cursor_cycles(cursor, 18.0, waveform, 64)
     assert cursor == PhaseCursor(completed_cycles=18)
+
+
+def test_standalone_geometry_commit_requires_exact_native_event_delta():
+    engine = SimpleNamespace(
+        _v10230_standalone_geometry_commit=True,
+        avalanche_last_completed_advance_m=2.75e-6,
+    )
+    before = (0, 0.0, 0.0, 0.0, 0.0, 80, 160, (2, 80))
+    after = (1, 2.75e-6, 1.0e-11, 2.75e-6, 1.0e-11, 80, 160, (2, 80))
+    assert _qualified_standalone_geometry_commit(engine, before, after)
+    bad = list(after); bad[3] = 3.0e-6
+    assert not _qualified_standalone_geometry_commit(engine, before, tuple(bad))
+    engine._v10230_standalone_geometry_commit = False
+    assert not _qualified_standalone_geometry_commit(engine, before, after)
