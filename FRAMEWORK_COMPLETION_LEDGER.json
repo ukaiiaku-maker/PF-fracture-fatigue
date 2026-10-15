@@ -207,19 +207,20 @@
     {
       "id": "R09",
       "goal_ids": ["FG-13", "FG-16"],
-      "status": "PARTIAL_SECOND_GENERATION_OWNER_ADAPTER_QUALIFIED_NATIVE_BIRTH_PENDING",
-      "concrete_defect": "The recursive ownership adapter now executes single-owner birth ownership, first-generation cluster resolution, independent daughter ownership, a resolved-daughter second-generation transition and exact checkpoint round-trip without mutable-owner aliasing. This is an explicitly injected ownership fixture, not a spontaneous native branch prediction. Native spontaneous birth, mechanical daughter continuation and active topology restart are not yet jointly qualified.",
+      "status": "NATIVE_FIRST_BIRTH_DAUGHTER_RESTART_QUALIFIED_SECOND_GENERATION_OWNER_GATE_PENDING",
+      "concrete_defect": "The injected recursive-owner fixture remains a transaction regression. Separately, the source-bound theta40 V11/V12 path now proves a native binary birth, two mechanically evolved generation-1 daughters, a later accepted 5 um daughter advance, positive native rates on both active tips and exact fresh-process V12 checkpoint loading. The 30 um and 300 um daughters still share one unresolved process region, so the authorized shared-region policy correctly vetoes recursive birth until physical connectivity detaches an independent owner.",
       "owner_consumer": "branch scheduler, crack graph, topology transaction and checkpoint",
       "authoritative_source": "native V11/V12 branch implementations",
       "dependencies": ["R01", "R03", "R07"],
-      "exact_next_command": "python scripts/run_recursive_branch_readiness.py --second-generation",
-      "input_output_identity": "injected ownership-transition fixture is labeled non-predictive; future native run requires a documented admissible initial state and no forced event",
+      "exact_next_command": "python scripts/run_recursive_branch_readiness.py --second-generation --native-checkpoint integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl --accepted-interval integration_evidence/targeted_completion/theta40_v12_qualified_restarted/accepted_intervals/transactions/interval-00002184 --output <new-report>",
+      "input_output_identity": "accepted V12 payload d10ec7af6a78dddc923107ced700a8f847676f8353d2cd02a17365acef8f2430 at step 2184; immutable V11 native-birth prefix; current exact-loader validation; four-front continuation command retained in the report; injected ownership fixture remains labeled non-predictive",
       "numerical_criteria": "Actual eligible native birth, continuation, clocks/marks/state conservation and fresh-process topology restart.",
       "executed_evidence": [
         "common_framework_readiness/local_preservation_and_kinetics_20261014/RECURSIVE_BRANCH_OWNER_ADAPTER_QUALIFICATION.json",
+        "integration_evidence/r09_native_branch_a8620304/qualification_report.json",
         "tests/test_recursive_branch_readiness.py"
       ],
-      "remaining_limitation": "Existing initialized/injected ownership evidence cannot satisfy spontaneous birth. The 24 GiB qualification plus 12 GiB reserve is not admitted with the currently observed free space, and production execution remains disabled."
+      "remaining_limitation": "A second-generation physical birth has not yet occurred. The exact continuation is configured for four fronts and preserves all clocks/marks/state, but the current checkpoint is not yet recursively eligible because its owner region remains physically unresolved. Disk admission passes; launch is temporarily deferred because current machine swap is 9.4/10 GiB with multiple unrelated scientific workers active. Production execution remains disabled."
     },
     {
       "id": "R10",

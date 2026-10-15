@@ -1,0 +1,213 @@
+{
+  "active_tips": [
+    "daughter-2",
+    "granddaughter-1",
+    "granddaughter-2"
+  ],
+  "capacity": {
+    "admitted": true,
+    "free_GiB": 40.77610397338867,
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1",
+    "peak_GiB": 24.0,
+    "reason": "capacity admitted",
+    "reserve_GiB": 12.0
+  },
+  "checkpoint_exact": true,
+  "fixture_classification": "INJECTED_OWNER_TRANSITIONS_NOT_NATURAL_BRANCH_PREDICTION",
+  "mutable_independent_owner_aliasing": false,
+  "native_birth_demonstrated": false,
+  "native_birth_entry": "scripts/run_v11_branching_case.py",
+  "native_evidence": {
+    "accepted_one_arm_advances": 1,
+    "active_front_ids": [
+      "b0fa22bb892937f8",
+      "b7d5efe0822562b9"
+    ],
+    "active_fronts": [
+      {
+        "front_id": "b0fa22bb892937f8",
+        "generation": 1,
+        "path_length_um": 30.00000000000015,
+        "tip_xy_um": [
+          595.536822860576,
+          -43.84877966040878
+        ]
+      },
+      {
+        "front_id": "b7d5efe0822562b9",
+        "generation": 1,
+        "path_length_um": 300.0000000000008,
+        "tip_xy_um": [
+          806.0665275056739,
+          171.9688365391225
+        ]
+      }
+    ],
+    "checkpoint": {
+      "exact_current_loader_validation": true,
+      "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl",
+      "payload_sha256": "e4ff3c761a2ed87da64821069b8879a19c66443d344ec5c5d73803bae52eb4ff",
+      "sha256": "42669902e1742bfe6de96ef94af5f30201529dcca88e212c0fc892674a0561ee",
+      "step": 2184
+    },
+    "cumulative_branch_births": 1,
+    "mechanically_evolved_daughters_demonstrated": true,
+    "native_birth_evidence_origin": "immutable_v11_native_birth_imported_with_exact_v12_prefix",
+    "native_first_birth_demonstrated": true,
+    "next_native_command": [
+      "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+      "-m",
+      "arrhenius_fracture.sharp_front_current_source_multifront_physical_v12",
+      "--maximum-fronts",
+      "4",
+      "--v12-restart-checkpoint",
+      "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl",
+      "--v12-stop-after-total-births",
+      "2",
+      "--v12-post-birth-events",
+      "3",
+      "--signed-kernel-family",
+      "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_repro/family.json",
+      "--mode",
+      "2d",
+      "--parameter-option",
+      "v913_paper_weakT01_0129902_persistent_sites",
+      "--temperatures",
+      "700",
+      "--steps",
+      "10000",
+      "--nx",
+      "36",
+      "--ny",
+      "72",
+      "--dU",
+      "2e-7",
+      "--dt",
+      "1e-6",
+      "--n-stagger",
+      "2",
+      "--tip-h-fine",
+      "1e-6",
+      "--tip-ratio",
+      "1.2",
+      "--da-phys",
+      "5e-6",
+      "--target-crack-extension-um",
+      "1000",
+      "--mpz-length-um",
+      "50",
+      "--mpz-n-bins",
+      "80",
+      "--front-state-model",
+      "moving_pz",
+      "--tip-source-model",
+      "continuum",
+      "--tip-kinetics-mode",
+      "moving_velocity",
+      "--bulk-plasticity-mode",
+      "tip_only",
+      "--directional-j-mode",
+      "root_signed",
+      "--tip-plasticity",
+      "--active-shielding",
+      "--signed-active-shielding",
+      "--mobile-shield-fraction",
+      "0",
+      "--no-wake-shielding",
+      "--crystal-aniso",
+      "--crystal-compete",
+      "--crystal-theta-deg",
+      "40",
+      "--crystal-material",
+      "w",
+      "--j-decomposition",
+      "cluster",
+      "--crack-backend",
+      "sharp_wake",
+      "--adaptive-events",
+      "--adaptive-event-target",
+      "0.15",
+      "--print-every",
+      "1",
+      "--out",
+      "{new_output_directory}"
+    ],
+    "positive_rate_active_fronts": {
+      "b0fa22bb892937f8": 1000000.0,
+      "b7d5efe0822562b9": 1000000.0
+    },
+    "production_execution_authorized": false,
+    "recursive_eligible_front_ids": [],
+    "schema": "recursive-native-branch-readiness/2",
+    "second_generation_birth_demonstrated": false,
+    "status": "NATIVE_FIRST_BIRTH_DAUGHTER_RESTART_QUALIFIED_SECOND_GENERATION_PHYSICAL_OWNER_GATE_PENDING",
+    "unresolved_owner_gates": [
+      {
+        "front_id": "b0fa22bb892937f8",
+        "member_front_ids": [
+          "b0fa22bb892937f8",
+          "b7d5efe0822562b9"
+        ],
+        "owner_id": "owner:v11:jc9ec4d7327bde23",
+        "reason": "parent_process_zone_still_unresolved",
+        "unresolved_junction_ids": [
+          "jc9ec4d7327bde23"
+        ]
+      },
+      {
+        "front_id": "b7d5efe0822562b9",
+        "member_front_ids": [
+          "b0fa22bb892937f8",
+          "b7d5efe0822562b9"
+        ],
+        "owner_id": "owner:v11:jc9ec4d7327bde23",
+        "reason": "parent_process_zone_still_unresolved",
+        "unresolved_junction_ids": [
+          "jc9ec4d7327bde23"
+        ]
+      }
+    ]
+  },
+  "owner_registry": {
+    "owner_by_tip": {
+      "daughter-2": "daughter-2",
+      "granddaughter-1": "cluster-2",
+      "granddaughter-2": "cluster-2"
+    },
+    "owners": {
+      "cluster-2": {
+        "cluster_id": "cluster-2",
+        "junction_reservoir_id": null,
+        "owner_id": "cluster-2",
+        "owner_type": "unresolved_branch_cluster",
+        "process_engine_id": "cluster-2"
+      },
+      "daughter-2": {
+        "cluster_id": null,
+        "junction_reservoir_id": null,
+        "owner_id": "daughter-2",
+        "owner_type": "resolved_tip_engine",
+        "process_engine_id": "daughter-2"
+      },
+      "reservoir-1": {
+        "cluster_id": "cluster-1",
+        "junction_reservoir_id": "reservoir-1",
+        "owner_id": "reservoir-1",
+        "owner_type": "junction_reservoir",
+        "process_engine_id": null
+      }
+    },
+    "schema": "v11.process-state-owner-registry/1"
+  },
+  "production_execution_authorized": false,
+  "qualification": "Q-BRANCH-RECURSIVE",
+  "schema": "recursive-branch-owner-adapter-qualification/1",
+  "source_commit": "a8620304",
+  "status": "PARTIAL_ADAPTER_QUALIFIED_NATIVE_BIRTH_PENDING",
+  "transitions": [
+    "single_owner_to_unresolved_first_generation_cluster",
+    "first_generation_cluster_to_independent_daughter_owners",
+    "resolved_daughter_to_unresolved_second_generation_cluster",
+    "checkpoint_round_trip"
+  ]
+}
