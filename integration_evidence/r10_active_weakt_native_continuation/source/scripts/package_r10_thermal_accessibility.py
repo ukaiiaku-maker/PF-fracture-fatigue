@@ -31,6 +31,7 @@ def main(argv=None) -> int:
         "thermal_accessibility_scan.csv", "thermal_state_candidates.csv",
         "thermal_accessibility_decision.json", "accessibility_bound_audit.json",
         "thermal_accessibility_result.json",
+        "native_execution_receipt.json",
         "full_state_case_table.csv", "causal_decomposition.csv",
         "fatigue_case_table.csv", "fatigue_windows.csv", "fatigue_two_windows.csv",
     )

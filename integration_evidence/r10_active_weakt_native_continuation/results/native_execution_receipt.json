@@ -1,0 +1,29 @@
+{
+  "schema": "r10.weakt-native-execution-receipt/1",
+  "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+  "seed": 4810,
+  "phase_count": 64,
+  "completed_DeltaK_MPa_sqrt_m": [5.000000004, 7.000000002, 9.999999990000001, 15.00000003, 21.99999996],
+  "mean_cycle_trial": {
+    "committed": false,
+    "state_relative_errors": [0.35994677032563277, 0.5723847618148552, 0.38766200589025374, 1.0, 1.0],
+    "hazard_relative_errors": [0.0014029152646202225, 0.012058862583459786, 0.05885134088440718, 0.47038674292182714, 0.6874421073903074]
+  },
+  "native_numerical_schedule": [
+    {
+      "scope": "DeltaK=5 case through accepted checkpoint cycle 1888808",
+      "DMD_chain_growth_factor": 2.0
+    },
+    {
+      "scope": "DeltaK=5 after accepted checkpoint cycle 1888808 and all other amplitudes",
+      "DMD_chain_growth_factor": 8.0
+    }
+  ],
+  "schedule_effect": "proposal granularity only; every segment retained the existing state, hazard, ledger, positivity, and event-guard validation",
+  "interrupted_transactions": {
+    "accepted_restart_cycles": [40000, 1888808],
+    "uncommitted_in_memory_blocks_discarded": true,
+    "random_stream_or_state_advanced_on_disk": false
+  },
+  "independent_seed_9117": "not triggered because the first-stream five-point curve failed the established slope/width objective"
+}

@@ -4,8 +4,8 @@
     "sha256": "dfb9479c5e1c8adfea9dc45326589f50dcb7ed1db1f89e40fecd36558a2c5dc8"
   },
   "PROVENANCE.json": {
-    "bytes": 824,
-    "sha256": "1ba246c4b76ebf9d3a8458d22b902dd11458f95632adf0d02b40ec967c47e379"
+    "bytes": 840,
+    "sha256": "c2adcacdce54448a4be39347fa288fb0022b060e09eeb513e8d92447ad51c911"
   },
   "README.md": {
     "bytes": 1598,
@@ -204,12 +204,12 @@
     "sha256": "4d6ffe630b6d3d40556997730848065fc35e7f07aea9d1436bc20d5f2881c785"
   },
   "fatigue/weakt_seed4810/campaign_summary.json": {
-    "bytes": 8151,
-    "sha256": "40519b064e44537fb66e5d640cc13bd1b3fc672d757e6c15ffaddea4f5851d4c"
+    "bytes": 8170,
+    "sha256": "3148496f080f97bb4200caa370a8b0cc11ca51c48284bb45c06ec4d782be604d"
   },
   "fatigue/weakt_seed4810/production_preflight.json": {
-    "bytes": 2135,
-    "sha256": "ecd5efae5956a18b437986a824e9ae3a3b271cf2c46d5c56ec18e61597c86f06"
+    "bytes": 2154,
+    "sha256": "a01b11341446a7341c7fd3bbd46a017e3ba21441f29700380cc5bc9075254484"
   },
   "full_state/R10T_DBTT_P40_G3075_S0P25GPA_P4_EP400_PP040_V1/T_0450K.json": {
     "bytes": 34162,
@@ -311,6 +311,10 @@
     "bytes": 55461,
     "sha256": "5f3292007f358cf1e2b9a4cc5d0f8e9de6a5bd9ce678483ccf9fe324fe467486"
   },
+  "results/native_execution_receipt.json": {
+    "bytes": 1334,
+    "sha256": "c10a41a5672ef685505196bf5d185539dedae2d447faf5632b4b1742edb9d186"
+  },
   "results/thermal_accessibility_decision.json": {
     "bytes": 67290,
     "sha256": "7f380ebe60021ad9a7b8807abfd017f1cd7500035c8f67681f9f3eb0950ee2c2"
@@ -360,8 +364,8 @@
     "sha256": "fd70e5fb5f1816268dbf88f55b9476aeaaef85133116e2da7415f0c4c72a76ff"
   },
   "source/scripts/package_r10_thermal_accessibility.py": {
-    "bytes": 6983,
-    "sha256": "49edf83be942cade6bc15a35bfba8ef9083e1d87c80c4374088925deb5551a25"
+    "bytes": 7024,
+    "sha256": "833e80c03a251d14f62d0e558ccb2fbf537875e25ef59af094d160a5aa966992"
   },
   "source/scripts/run_off_axis_prescribed_void_benchmark_v2.py": {
     "bytes": 18656,
@@ -372,8 +376,8 @@
     "sha256": "63d6692b11490c8c5c43864d8f53667e2030d4fc9a9a55390f2a3e84e1359b4e"
   },
   "source/scripts/run_r10_retained_bridge.py": {
-    "bytes": 4962,
-    "sha256": "6595bcf5d28da257656c85b7cd994be2259cc42efab4ce9982a984c1510c98ef"
+    "bytes": 4981,
+    "sha256": "872e1b16c16e62e0ecccfff018ed8c32f51bf59360e9c420d7c364ae31a018c6"
   },
   "source/tests/test_paris_slope_r9.py": {
     "bytes": 4432,

@@ -167,8 +167,8 @@
     "local_strength_Pa": 30000000000.0,
     "local_strength_role": "independent qualified mechanical coordinate; not barrier knee",
     "native_numerical_controls": {
-      "DMD_chain_growth_factor": 8.0,
-      "all_projected_segments_require_existing_state_hazard_ledger_positivity_and_event_guard_validation": true
+      "all_projected_segments_require_existing_state_hazard_ledger_positivity_and_event_guard_validation": true,
+      "current_invocation_DMD_chain_growth_factor": 8.0
     },
     "schema": "r10.retained-current-bridge/1",
     "stochastic": {
