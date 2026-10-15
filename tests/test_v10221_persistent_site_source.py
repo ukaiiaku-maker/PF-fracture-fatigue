@@ -7,6 +7,9 @@ import numpy as np
 import pytest
 
 from arrhenius_fracture.parameter_registry_v9111 import select_option
+from arrhenius_fracture.diagnostic_interventions_v1 import (
+    apply_history_reset_reequilibrated,install_diagnostic_intervention,
+)
 from arrhenius_fracture.persistent_site_source_v10221 import (
     PersistentSiteConfig,
     PersistentSiteStateResolvedTipEngine,
@@ -16,7 +19,8 @@ from arrhenius_fracture.persistent_site_source_v10221 import (
     install_persistent_site_source,
 )
 from arrhenius_fracture.signed_burgers_shared_v1025 import (
-    KERNEL_SCHEMA, SignedShieldingKernel, install_signed_burgers_population,
+    KERNEL_SCHEMA,SignedShieldingKernel,_sync_active,_sync_wake,
+    install_signed_burgers_population,
 )
 from arrhenius_fracture.unified_mpz import UnifiedMPZState
 
@@ -149,6 +153,8 @@ def _coupled_test_state():
             return float(np.sum(self.available_sites) / np.sum(self.site_capacity))
 
         def blunted_radius(self, r0, b):
+            if getattr(self,"_diagnostic_fixed_blunting",False):
+                return float(self._diagnostic_fixed_blunting_radius_m)
             return float(r0 + 0.1 * abs(b) * np.sum(self.accumulated_slip))
 
         def local_stress_profile_Pa(self, stress):
@@ -227,6 +233,96 @@ def _coupled_test_state():
         r0_m=1.0e-6, b_m=1.0e-9,
     )
     return state
+
+
+def test_diagnostic_interventions_are_orthogonal_on_populated_native_state():
+    retained=_coupled_test_state()
+    retained.retained_positive[0,0]=3.0
+    retained.retained_negative[0,1]=1.0
+    retained.accumulated_slip_positive[0,0]=4.0
+    retained.accumulated_slip_negative[0,1]=1.0
+    _sync_active(retained)
+    baseline_shield=retained.shielding_K()
+    population_before=retained.retained.copy()
+    receipt=install_diagnostic_intervention(retained,"retained_shielding_off")
+    assert baseline_shield!=0.0 and retained.shielding_K()==0.0
+    np.testing.assert_array_equal(retained.retained,population_before)
+    assert receipt["population_state_unchanged"]
+
+    fixed=_coupled_test_state()
+    fixed.accumulated_slip_positive[0,0]=4.0
+    _sync_active(fixed)
+    fixed_receipt=install_diagnostic_intervention(fixed,"blunting_fixed")
+    radius=fixed.blunted_radius(fixed._persistent_r0_m,fixed._persistent_b)
+    fixed.accumulated_slip_positive[0,0]+=100.0
+    _sync_active(fixed)
+    assert fixed.blunted_radius(fixed._persistent_r0_m,fixed._persistent_b)==radius
+    assert fixed_receipt["fixed_blunting_radius_m"]==radius
+
+    native=object.__new__(UnifiedMPZState)
+    native.cfg=SimpleNamespace(blunting_length_m=1.0)
+    native.manifest=SimpleNamespace(c_blunt=0.5)
+    native.x=np.array([0.5,1.5]); native.dx=1.0
+    native.accumulated_slip=np.array([[2.0,1.0]])
+    native._diagnostic_fixed_blunting=False
+    developed=UnifiedMPZState.blunted_radius(native,1.0,0.1)
+    native._diagnostic_fixed_blunting=True
+    native._diagnostic_fixed_blunting_radius_m=developed
+    native.accumulated_slip*=10.0
+    assert UnifiedMPZState.blunted_radius(native,1.0,0.1)==developed
+
+
+def test_source_backstress_and_transport_retention_switches_remove_only_named_terms():
+    from arrhenius_fracture.persistent_site_source_v10221 import _source_backstress
+
+    source=_coupled_test_state()
+    source.retained_positive[0,0]=3.0
+    _sync_active(source)
+    rho0,tau0,sigma0=_source_backstress(source)
+    install_diagnostic_intervention(source,"source_backstress_off")
+    rho,tau,sigma=_source_backstress(source)
+    np.testing.assert_array_equal(rho,rho0)
+    assert np.any(sigma0>0.0)
+    np.testing.assert_array_equal(tau,np.zeros_like(tau))
+    np.testing.assert_array_equal(sigma,np.zeros_like(sigma))
+    np.testing.assert_array_equal(source.diagnostic_counterfactual_source_backstress_Pa,sigma0)
+
+    transport=_coupled_test_state()
+    install_diagnostic_intervention(transport,"transport_retention_off")
+    retained_before=transport.retained.copy()
+    result=transport.evolve(0.01,900.0,2.0e9,1.0e-9)
+    assert result["dN_emit"]>0.0
+    assert result["dN_trapped"]==result["dN_released"]==0.0
+    assert result["dN_escaped"]==result["dN_recovered"]==0.0
+    assert result["mobile_distance_population_m"]==0.0
+    np.testing.assert_array_equal(transport.retained,retained_before)
+
+
+def test_history_reset_records_removed_state_and_requires_reequilibration():
+    state=_coupled_test_state()
+    state.mobile_positive[0,:2]=[2.0,1.0]
+    state.retained_negative[0,2]=4.0
+    state.accumulated_slip_positive[0,0]=5.0
+    state.wake_mobile_negative[0,1]=6.0
+    _sync_active(state); _sync_wake(state)
+    ledgers=(state.recovered_total,state.escaped_total,state.wake_discarded_mobile_total)
+    calls=[]
+    receipt=apply_history_reset_reequilibrated(
+        state,reequilibrate=lambda:(calls.append(True) or {
+            "converged":True,"residual_norm":0.0,"native_mechanics":True,
+        }),accumulated_work={"W_emit_J_per_m":12.5},
+    )
+    assert calls==[True]
+    assert receipt["removed_population_total"]==18.0
+    assert receipt["counterfactual_removed_work"]["W_emit_J_per_m"]==12.5
+    assert all(np.count_nonzero(value)==0 for value in _population_arrays_for_test(state))
+    assert ledgers==(state.recovered_total,state.escaped_total,state.wake_discarded_mobile_total)
+
+
+def _population_arrays_for_test(state):
+    return [value for name,value in vars(state).items() if isinstance(value,np.ndarray)
+            and any(token in name for token in ("mobile","retained","slip"))
+            and not name.startswith("persistent_site_last")]
 
 
 def _populate_coupled_test_state(state):

@@ -167,6 +167,8 @@ class UnifiedMPZState:
         return float(np.sum(self.accumulated_slip * w[None, :]))
 
     def blunted_radius(self, r0: float, b: float) -> float:
+        if bool(getattr(self,"_diagnostic_fixed_blunting",False)):
+            return float(getattr(self,"_diagnostic_fixed_blunting_radius_m",r0))
         return max(float(r0) + max(self.manifest.c_blunt, 0.0) * abs(float(b)) * self.local_slip_count(), float(r0))
 
     def local_forest_density_m2(self, wake: bool = False) -> np.ndarray:

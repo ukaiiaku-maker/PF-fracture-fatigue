@@ -44,6 +44,15 @@ MODEL_ID = "v10.2.21_persistent_site_backstress_blunting"
 SOURCE_MODEL = "persistent_areal_sites_backstress_limited_no_inventory"
 
 
+def _source_backstress(state):
+    """Backstress consumed by the source, with its isolated diagnostic switch."""
+    rho,tau,sigma=_campaign_backstress(state)
+    if bool(getattr(state,"_diagnostic_source_backstress_off",False)):
+        state.diagnostic_counterfactual_source_backstress_Pa=np.asarray(sigma,float).copy()
+        return rho,np.zeros_like(tau),np.zeros_like(sigma)
+    return rho,tau,sigma
+
+
 @dataclass(frozen=True)
 class PersistentSiteConfig:
     """Physical and numerical controls for the persistent-site closure."""
@@ -322,7 +331,7 @@ def _persistent_emit(
         tau_signed = np.pad(tau_signed, (0, self.n_systems - tau_signed.size))
     signs = np.sign(tau_signed[: self.n_systems])
 
-    rho0, tau_back0, sigma_back0 = _campaign_backstress(self)
+    rho0, tau_back0, sigma_back0 = _source_backstress(self)
     opening = max(float(stress_Pa), 0.0)
     drive = np.maximum(np.asarray(factors, dtype=float) * opening, 0.0)
     geometry = _source_geometry(self)
@@ -366,6 +375,20 @@ def _persistent_emit(
 
         sigma_initial = max(float(drive[system] - sigma_back0[system]), 0.0)
         rates_initial[system] = rate_at(sigma_initial)
+        if bool(getattr(self,"_diagnostic_source_backstress_off",False)):
+            activations[system]=multiplicity*rates_initial[system]*dt
+            root=PersistentActivationRootDiagnostic(
+                activations=float(activations[system]),lower_bound=float(activations[system]),
+                upper_bound=float(activations[system]),residual=0.0,iteration_count=0,
+                converged=True,initial_rate_per_s=float(rates_initial[system]),
+            )
+            root_lower[system]=root.lower_bound; root_upper[system]=root.upper_bound
+            root_residual[system]=0.0; root_iterations[system]=0
+            root_converged[system]=True
+            line_by_system[system]=activations[system]*conversion[system]
+            sigma_final[system]=float(drive[system])
+            rates_final[system]=rates_initial[system]
+            continue
         activations[system] = solve_backstress_limited_activations(
             multiplicity=multiplicity,
             dt_s=dt,
@@ -600,7 +623,7 @@ def _coupled_persistent_source_transport(
         _sync_active(self)
 
     def source_target() -> np.ndarray:
-        _, _, sigma_back = _campaign_backstress(self)
+        _, _, sigma_back = _source_backstress(self)
         geometry = _source_geometry(self)
         effective = np.maximum(drive - sigma_back, 0.0)
         values = np.asarray([
@@ -727,7 +750,7 @@ def _coupled_persistent_source_transport(
         coefficient_error = coefficient_relative_error(
             consumed_coefficients, candidate_coefficients
         )
-        _, _, sigma_iteration = _campaign_backstress(self)
+        _, _, sigma_iteration = _source_backstress(self)
         target_iteration = source_target()
         equation_iteration = np.abs(target_iteration - activation_rate) / np.maximum(
             np.maximum(target_iteration, activation_rate), 1.0
@@ -765,7 +788,7 @@ def _coupled_persistent_source_transport(
             f"iterations={cfg.coupled_max_iterations}"
         )
 
-    _, _, sigma_check = _campaign_backstress(self)
+    _, _, sigma_check = _source_backstress(self)
     target = source_target()
     equation_error = np.abs(target - activation_rate) / np.maximum(
         np.maximum(target, activation_rate), 1.0
@@ -799,7 +822,7 @@ def _coupled_persistent_source_transport(
     self.signed_last_line_content = emitted_lines
     self.signed_last_line_content_by_system = line_by_system.copy()
     self.signed_last_burgers_sign_by_system = signs.copy()
-    rho_final, tau_final, sigma_final = _campaign_backstress(self)
+    rho_final, tau_final, sigma_final = _source_backstress(self)
     geometry = _source_geometry(self)
     effective_final = np.maximum(drive - sigma_final, 0.0)
     rate_final = np.asarray(
@@ -883,7 +906,7 @@ def _persistent_advance(self, distance_m: float) -> dict[str, float]:
 def _persistent_diagnostics(self, G=None, nu=None, b=None, r0=None) -> dict[str, Any]:
     data = dict(self._persistent_base_diagnostics(G, nu, b, r0))
     geometry = _source_geometry(self)
-    rho, tau, sigma = _campaign_backstress(self)
+    rho, tau, sigma = _source_backstress(self)
     drive = np.asarray(
         getattr(self, "persistent_site_last_drive_Pa", np.zeros(self.n_systems)),
         dtype=float,
@@ -910,6 +933,9 @@ def _persistent_diagnostics(self, G=None, nu=None, b=None, r0=None) -> dict[str,
             "persistent_source_zone_bins": int(_source_zone_bin_count(self)),
             "persistent_rho_back_mean_m2": float(np.mean(rho)),
             "persistent_sigma_back_mean_Pa": float(np.mean(sigma)),
+            "persistent_counterfactual_source_backstress_mean_Pa": float(np.mean(
+                np.asarray(getattr(self,"diagnostic_counterfactual_source_backstress_Pa",sigma))
+            )),
             "persistent_backstress_drive_ratio_max": float(np.max(ratio)),
             "legacy_source_sites_per_system_active": False,
             "legacy_source_refresh_length_active": False,

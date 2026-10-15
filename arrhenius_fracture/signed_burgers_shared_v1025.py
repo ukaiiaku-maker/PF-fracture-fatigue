@@ -263,21 +263,50 @@ def _sync_wake(state) -> None:
 
 
 def _signed_active_content(state) -> np.ndarray:
-    return (
-        state.retained_positive
-        - state.retained_negative
-        + float(state.cfg.mobile_shield_fraction)
-        * (state.mobile_positive - state.mobile_negative)
-    )
+    retained = (state.retained_positive-state.retained_negative)
+    if not bool(getattr(state,"_diagnostic_retained_shielding_enabled",True)):
+        retained=np.zeros_like(retained)
+    return retained+float(state.cfg.mobile_shield_fraction)*(state.mobile_positive-state.mobile_negative)
 
 
 def _signed_wake_content(state) -> np.ndarray:
-    return (
-        state.wake_retained_positive
-        - state.wake_retained_negative
-        + float(state.cfg.mobile_shield_fraction)
-        * (state.wake_mobile_positive - state.wake_mobile_negative)
-    )
+    retained=(state.wake_retained_positive-state.wake_retained_negative)
+    if not bool(getattr(state,"_diagnostic_retained_shielding_enabled",True)):
+        retained=np.zeros_like(retained)
+    return retained+float(state.cfg.mobile_shield_fraction)*(state.wake_mobile_positive-state.wake_mobile_negative)
+
+
+def _transport_retention_off_step(self,dt,stress_Pa,T_K,b,system_weights):
+    """Emit natively while disabling only exchange, retention and transport."""
+    emitted=self._emit(dt,stress_Pa,T_K,system_weights)
+    self.scalar_transport_velocity_m_s=0.0
+    self.scalar_transport_displacement_m=0.0
+    self.anisotropic_last_transport_velocity_by_system_m_s=np.zeros(self.n_systems)
+    self.time_s+=dt
+    return {
+        "dN_emit":emitted,"dN_source_activations":float(self.signed_last_source_activations),
+        "dN_trapped":0.0,"dN_released":0.0,"dN_recovered":0.0,"dN_escaped":0.0,
+        "dN_gross_trapping":0.0,"dN_gross_release":0.0,
+        "mobile_distance_population_m":0.0,
+        "transport_invariant_roundoff_correction":0.0,"transport_base_map_correction":0.0,
+        "transport_positivity_correction":0.0,"transport_complete_numerical_correction":0.0,
+        "transport_affine_invariant_defect":0.0,"transport_affine_retry_discrepancy":0.0,
+        "transport_error_controlled_stiff_solve":False,
+        "transport_stiff_solver_method":"diagnostic_transport_retention_off",
+        "scalar_transport_velocity_m_s":0.0,"scalar_transport_displacement_m":0.0,
+        "exchange_transport_mode":"diagnostic_transport_retention_off",
+        "coupled_source_state_iterations":0.0,
+        "coupled_source_activation_rate_s":emitted/dt if dt>0.0 else 0.0,
+        "coupled_source_coefficient_residual":0.0,"coupled_source_state_residual":0.0,
+        "coupled_source_complementarity_residual":0.0,"coupled_source_affine_direct_residual":0.0,
+        "peierls_rate_s":0.0,"taylor_completion_rate_s":0.0,
+        "encounter_rate_s":0.0,"taylor_m_eff":0.0,
+        "available_site_fraction":self.available_site_fraction,
+        "anisotropic_transport_active":0.0,"signed_burgers_transport":0.0,
+        "wake_dN_trapped":0.0,"wake_dN_released":0.0,"wake_dN_recovered":0.0,
+        "wake_dN_mobile_transport_loss":0.0,
+        "diagnostic_intervention":"transport_retention_off",
+    }
 
 
 def _active_K(self, G=None, nu=None, b=None) -> float:
@@ -489,6 +518,8 @@ def _signed_evolve_scalar(
     self, dt_s: float, T_K: float, stress_Pa: float, b: float, system_weights=None
 ) -> dict[str, float]:
     dt = max(float(dt_s), 0.0)
+    if bool(getattr(self,"_diagnostic_transport_retention_off",False)):
+        return _transport_retention_off_step(self,dt,stress_Pa,T_K,b,system_weights)
     mode = _exchange_transport_mode(self)
     coupled_source = getattr(self, "_coupled_persistent_source_transport", None)
     if mode == JOINT_CTMC_EXCHANGE_TRANSPORT and coupled_source is not None:
@@ -667,6 +698,8 @@ def _signed_evolve_channel(
     self, dt_s: float, T_K: float, stress_Pa: float, b: float, system_weights=None
 ) -> dict[str, float]:
     dt = max(float(dt_s), 0.0)
+    if bool(getattr(self,"_diagnostic_transport_retention_off",False)):
+        return _transport_retention_off_step(self,dt,stress_Pa,T_K,b,system_weights)
     emitted = self._emit(dt, stress_Pa, T_K, system_weights)
     sigma_system = np.asarray(
         getattr(
