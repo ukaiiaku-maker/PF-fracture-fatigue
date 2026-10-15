@@ -189,6 +189,9 @@ def qualification(checkpoint: Path | None) -> dict[str, Any]:
         ]
     return {
         "schema": "r10.cavity-kinetic-role-and-restart-qualification/2",
+        "qualification_source_commit": subprocess.check_output(
+            ("git", "rev-parse", "HEAD"), cwd=ROOT, text=True,
+        ).strip(),
         "status": (
             "COLLECTIVE_LIGAMENT_RESTART_READY_LOCAL_INCREMENTAL_PENDING"
             if connected is not None else "INCOMPLETE_NATIVE_CHECKPOINT_UNAVAILABLE"
