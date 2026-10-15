@@ -94,6 +94,18 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         and row["readiness"]["implementation"] == "IMPLEMENTED"
         for row in p4_tip
     )
+    p4_bulk = [
+        row for row in rows
+        if row["block"] == "P4"
+        and row["source_location"] in {"bulk_uniform", "tip_plus_bulk"}
+    ]
+    assert len(p4_bulk) == 4
+    assert all(row["native_args"] for row in p4_bulk)
+    assert all(row["shared_options"]["material_manifest"] for row in p4_bulk)
+    assert {
+        row["shared_options"]["source_location"] for row in p4_bulk
+    } == {"bulk_uniform", "tip_plus_bulk"}
+    assert all(row["readiness"]["implementation"] == "IMPLEMENTED" for row in p4_bulk)
 
 
 def test_v3_summary_has_all_goal_records_and_distinct_digests():

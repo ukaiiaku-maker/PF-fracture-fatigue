@@ -1,0 +1,46 @@
+{
+  "mapping": "exact field projection; no fitted or default coefficient",
+  "production_execution_authorized": false,
+  "products": [
+    {
+      "candidate_id": "v913_zeroD_sobol_0202500__taylor_margin_0p10eV",
+      "field_count": 25,
+      "material_class": "DBTT",
+      "native_constructor_valid": true,
+      "option_key": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "path": "arrhenius_fracture/data/materials/v10_4_current_bulk/DBTT_selected_bulk.csv",
+      "sha256": "da74b169182e95226c22e3f73138ce3683470e80236b4d8fa951e4f8c0e90251"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0077080__taylor_margin_0p10eV",
+      "field_count": 25,
+      "material_class": "ceramic",
+      "native_constructor_valid": true,
+      "option_key": "v913_paper_ceramic01_0077080_persistent_sites__taylor_margin_0p10eV",
+      "path": "arrhenius_fracture/data/materials/v10_4_current_bulk/ceramic_selected_bulk.csv",
+      "sha256": "c00d456f23ed75e4bb180df6daa8b2429e44f8a58e5c0c4a14c874c6b3328f5e"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0242980__taylor_margin_0p10eV",
+      "field_count": 25,
+      "material_class": "peak",
+      "native_constructor_valid": true,
+      "option_key": "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+      "path": "arrhenius_fracture/data/materials/v10_4_current_bulk/peak_selected_bulk.csv",
+      "sha256": "66ff461a3e4b9a3f8aca7fc14580ad89cc49b98fd2a11b76cd9bded0225b6d0b"
+    },
+    {
+      "candidate_id": "v913_zeroD_sobol_0129902__taylor_margin_0p10eV",
+      "field_count": 25,
+      "material_class": "weakT",
+      "native_constructor_valid": true,
+      "option_key": "v913_paper_weakT01_0129902_persistent_sites__taylor_margin_0p10eV",
+      "path": "arrhenius_fracture/data/materials/v10_4_current_bulk/weakT_selected_bulk.csv",
+      "sha256": "adfe7120c85991ea881bdd84f37a5d7a0d11838625c5a57e5f8f2c111efde74b"
+    }
+  ],
+  "schema": "v10.4-current-bulk-manifest-projection/1",
+  "source_registry": "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_registry.csv",
+  "source_sha256": "144cab65039f9a5322ff45de02b3705ec3743afb00cfc66c795b0cc51278b8e8",
+  "status": "PASS"
+}

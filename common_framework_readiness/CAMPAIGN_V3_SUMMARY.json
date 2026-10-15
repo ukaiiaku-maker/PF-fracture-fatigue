@@ -10,7 +10,7 @@
     "P8": 22,
     "P9": 48
   },
-  "canonical_semantic_sha256": "86a71065f644c7c99c21b48b32dc548b31882fd1233c333f04eb0b9a6c3b44ed",
+  "canonical_semantic_sha256": "14ecb35f10c0fff69ce3cc52e4c9d7301e314fbd0ee5c10d9558a137c4110231",
   "case_count": 692,
   "cohesive_comparison_case_count": 48,
   "goal_records": [
@@ -107,16 +107,16 @@
   ],
   "output_root": null,
   "production_execution_authorized": false,
-  "raw_jsonl_sha256": "a6786ca9232aa162b21b9bfdda344e1a83cdd7a54740c6253aeee77bf4f6bf42",
+  "raw_jsonl_sha256": "19f012611d59817762438da4e077701d16a0916484f579c2baef974719aea9ab",
   "readiness_counts": {
     "fit_quality": {
       "NOT_APPLICABLE_OR_NATIVE_OPENING": 656,
       "QUALIFIED_FINITE_DOMAIN_ABSOLUTE_SUPPORT_UNASSIGNED": 36
     },
     "implementation": {
-      "IMPLEMENTED": 526,
+      "IMPLEMENTED": 530,
       "IMPLEMENTED_CONSTITUTIVE_SPECIMEN_ADAPTER_PENDING": 36,
-      "UNRESOLVED_ADAPTER": 130
+      "UNRESOLVED_ADAPTER": 126
     },
     "input_availability": {
       "AVAILABLE_QUALIFICATION_INPUT_PRODUCTION_SELECTION_PENDING": 75,
@@ -124,9 +124,10 @@
       "BLOCKED_PHYSICAL_COHESIVE_SUPPORT": 36
     },
     "kernel_validity": {
-      "BOUND_NATIVE_KERNEL": 582,
+      "BOUND_NATIVE_KERNEL": 578,
       "BOUND_NATIVE_KERNEL_COMMON_OBSERVER_CONVERGENCE_PENDING": 34,
       "BOUND_NATIVE_ORIENTATION_RESOLVER": 40,
+      "BOUND_NATIVE_SIGNED_KERNEL_FAMILY": 4,
       "PENDING_THREE_LEVEL_COMMON_OBSERVER": 36
     },
     "material_domain": {
@@ -137,10 +138,11 @@
     },
     "native_qualification": {
       "COMPACT_PATH_QUALIFIED": 386,
+      "FULL_FIELD_GEOGRAPHY_RESTART_QUALIFIED": 4,
       "GENERIC_ENTRY_DRY_RUN_QUALIFIED_CASE_LEVEL_PENDING": 34,
       "ORIENTATION_AND_TIP_SUPPORT_NATIVE_QUALIFIED": 40,
       "PENDING_CASE_LEVEL_QUALIFICATION": 66,
-      "PENDING_SPECIMEN_LEVEL": 166
+      "PENDING_SPECIMEN_LEVEL": 162
     },
     "numerical_convergence": {
       "CASE_LEVEL_PRODUCTION_CONVERGENCE_PENDING": 622,

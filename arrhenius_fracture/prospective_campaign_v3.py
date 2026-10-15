@@ -230,6 +230,47 @@ def _bind_p4_tip_surface(
     converted["command_status"] = "RESOLVED_DISABLED"
 
 
+def _bind_p4_bulk(
+    root: Path, converted: dict[str, Any], original, *, registry: str, option: str,
+) -> None:
+    """Connect current exact material rows to the qualified native bulk route."""
+    args = list(_base_args(
+        SimpleNamespace(option_key=original.parameter_option),
+        float(converted["temperature_K"]), float(converted["rate_factor"]),
+        str(converted["arm"]), target_um=float(converted["target_extension_um"]),
+        theta=float(converted["orientation_deg"]),
+        a0_m=float(converted["initial_crack_length_m"]),
+    ))
+    args = _replace_arg(args, "--parameter-registry", registry)
+    args = _replace_arg(args, "--parameter-option", option)
+    args = _replace_arg(args, "--bulk-plasticity-mode", "full_field")
+    if "--signed-kernel-family" not in args:
+        args[0:0] = ["--signed-kernel-family", SIGNED_KERNEL_FAMILY]
+    geography = str(converted["source_location"])
+    preset = {
+        "bulk_uniform": "pf_monotonic_bulk",
+        "tip_plus_bulk": "pf_monotonic_tip_plus_bulk",
+    }[geography]
+    if geography == "bulk_uniform":
+        args = [token for token in args if token not in {"--tip-plasticity"}]
+        if "--no-tip-plasticity" not in args:
+            args.append("--no-tip-plasticity")
+    manifest = (
+        root / "arrhenius_fracture/data/materials/v10_4_current_bulk"
+        / f"{converted['family']}_selected_bulk.csv"
+    ).resolve()
+    converted["native_args"] = args
+    converted["native_entrypoint"] = (
+        "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited"
+    )
+    converted["bulk_material_manifest"] = str(manifest)
+    converted["shared_options"] = replace(
+        PRESETS[preset], random_seed=int(converted["seed"]),
+        material_manifest=str(manifest),
+    ).to_dict()
+    converted["command_status"] = "RESOLVED_DISABLED"
+
+
 def _convert_v2(
     root: Path, row: dict[str, Any], options: dict[str, str], original,
 ) -> dict[str, Any]:
@@ -273,6 +314,13 @@ def _convert_v2(
             and converted.get("source_location") == "tip_surface"):
         _bind_p4_tip_surface(
             converted, original,
+            registry=str(converted["parameter_registry"]),
+            option=str(converted["parameter_option"]),
+        )
+    if (converted.get("block") == "P4"
+            and converted.get("source_location") in {"bulk_uniform", "tip_plus_bulk"}):
+        _bind_p4_bulk(
+            root, converted, original,
             registry=str(converted["parameter_registry"]),
             option=str(converted["parameter_option"]),
         )
@@ -323,6 +371,14 @@ def _convert_v2(
                 if converted.get("material_selection_scope") == "QUALIFICATION_ONLY"
                 else "AVAILABLE_VERSIONED_INPUTS"
             ),
+        })
+    if (converted.get("block") == "P4"
+            and converted.get("source_location") in {"bulk_uniform", "tip_plus_bulk"}):
+        converted["readiness"].update({
+            "implementation": "IMPLEMENTED",
+            "native_qualification": "FULL_FIELD_GEOGRAPHY_RESTART_QUALIFIED",
+            "kernel_validity": "BOUND_NATIVE_SIGNED_KERNEL_FAMILY",
+            "input_availability": "AVAILABLE_VERSIONED_INPUTS",
         })
     converted["execution"] = _execution(converted)
     converted["production_execution_authorized"] = False
