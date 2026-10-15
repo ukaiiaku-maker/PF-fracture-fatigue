@@ -1,0 +1,158 @@
+{
+  "schema": "fracture-development-lineage-and-coverage/2",
+  "date": "2026-10-14",
+  "extends": "../fem_reconciliation_20261014_a015a36_01c3d1bf/DEVELOPMENT_LINEAGE_AND_COVERAGE.json",
+  "source_pair_at_continuation_start": {
+    "pf_common": "ef7399c2b7ddc3471a0ec5495fa6aeac3cc1275a",
+    "fem_czm": "14bc458498e92f1f1c7bcaf0fdd9e6046232ee1b"
+  },
+  "source_pair_at_handoff": {
+    "pf_common": "PENDING_FINAL_LOCAL_COMMIT",
+    "fem_czm": "2c34559d5ce9bba51f599780e7315565720b7386"
+  },
+  "continuation_changes": [
+    {
+      "capability": "matched FEM energy-release observer",
+      "classification": "NEW_EXTENSION_NOT_PREVIOUSLY_IMPLEMENTED",
+      "result": "A fixed-topology centered material-coordinate derivative using the domain-J plateau weight agrees with native full-energy J within 0.8618% at all three physical-support resolutions."
+    },
+    {
+      "capability": "projected killed-band fixed-grip observer",
+      "classification": "PRESERVED_SCOPE_LIMITED",
+      "result": "Retained unchanged as a distinct finite-height damage/removal operation; its fine J/G=0.8229384 is not a domain-J identity and is not scaled or relabeled."
+    },
+    {
+      "capability": "refinement provider metadata",
+      "classification": "REGRESSION_CONFIRMED_AND_REPAIRED",
+      "result": "Attestation is now produced and verified at the live provider/serialization boundary. Exact support and provider mismatches still fail closed."
+    },
+    {
+      "capability": "generic FEM specimen restart",
+      "classification": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "result": "The shared entry delegates to native engine, cohesive-network and stochastic-geometry state owners and resumes a current-law active specimen through two physical events, six cohesive subsegments and post-event equilibrium."
+    },
+    {
+      "capability": "rejected historical Taylor completion laws",
+      "classification": "INTENTIONAL_SUPERSESSION",
+      "result": "Retained only in explicitly historical diagnostic paths; never used as automatic restart or response-curve fallback."
+    }
+  ],
+  "families": [
+    {
+      "family": "A",
+      "name": "mechanical problem and observers",
+      "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "current_implementation": "Native spatial assembly, equilibrium, anisotropic elasticity, physical envelope support and domain J remain live; matched material-coordinate G is diagnostic-only.",
+      "current_wiring": "Native and generic FEM entries exercised.",
+      "meaningful_activity": "Three controlled support levels, three contours per level, historical same-mesh reproduction and active cohesive remeshing.",
+      "qualification_scope": "FEM internal observer identity complete; new independently discretized PF/FEM common-mechanics comparison pending.",
+      "affected_items": ["R07", "R08"]
+    },
+    {
+      "family": "B",
+      "name": "activation surfaces, parameters and physical support",
+      "source_preservation": "PRESERVED_SCOPE_LIMITED",
+      "current_implementation": "v10.2.32 Taylor-coordinate options and exact registry identities remain authoritative.",
+      "current_wiring": "Current selected Taylor-margin row exercised through the FEM generic route.",
+      "meaningful_activity": "Current-law hazard accumulation and two accepted events.",
+      "qualification_scope": "Constructed variants remain non-calibrated; DBTT shared-stress selection, activation area and interface stiffness remain unselected.",
+      "affected_items": ["R03", "R04", "R05"]
+    },
+    {
+      "family": "C",
+      "name": "source geography and lifecycle",
+      "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "current_implementation": "Tip, pure-bulk, combined, persistent and finite-inventory routes remain separately represented.",
+      "current_wiring": "PF shared entries qualified; current FEM persistent-site route exercised across restart.",
+      "meaningful_activity": "Persisted source owner, renewal origin and next event state restored without redrawing.",
+      "qualification_scope": "Dislocation-density transport and conservative tip/bulk exchange remain unavailable, distinct from vacancy transport.",
+      "affected_items": ["R01", "R06"]
+    },
+    {
+      "family": "D",
+      "name": "current Taylor-Peierls operator and nonlinear coupling",
+      "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "current_implementation": "Authorized uncapped signed completion, persistent injection, coupled exchange/transport/escape/recovery and rollback are unchanged.",
+      "current_wiring": "Current-law family is restored through native deserializers rather than migrated to an old law.",
+      "meaningful_activity": "Active hazard and source state continue through two post-checkpoint events.",
+      "qualification_scope": "No historical law or scalarized fallback used.",
+      "affected_items": ["R01", "R02", "R03"]
+    },
+    {
+      "family": "E",
+      "name": "signed state, return, shielding, blunting and wake",
+      "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "current_implementation": "Signed mobile/retained/wake ledgers and graph-aware moving-tip inheritance use native state owners.",
+      "current_wiring": "Captured by the specimen envelope and restored by the current engine.",
+      "meaningful_activity": "Tip motion and remesh occur after restart with persistent state retained.",
+      "qualification_scope": "Existing intervention adapters listed under R06 remain independent gaps.",
+      "affected_items": ["R01", "R06"]
+    },
+    {
+      "family": "F",
+      "name": "hazards, integration, event ownership and loading history",
+      "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "current_implementation": "First-passage action, pending mark, RNG, loading/controller state and transaction ownership are serialized.",
+      "current_wiring": "Stochastic geometry adapter now exposes restart_state_dict/restore_restart_state to the generic specimen envelope.",
+      "meaningful_activity": "Exactly two physical marks/translations produce six numerical cohesive subsegments after restart.",
+      "qualification_scope": "Current monotonic FEM path; no new fatigue production claim.",
+      "affected_items": ["R01", "R11"]
+    },
+    {
+      "family": "G",
+      "name": "branching and multifront development",
+      "source_preservation": "PRESERVED_SCOPE_LIMITED",
+      "current_implementation": "Existing owner-specific branch and theta-40 continuation paths remain unchanged.",
+      "current_wiring": "Shared bounded compatibility adapter remains live.",
+      "meaningful_activity": "Prior daughter birth/advance and exact restart receipts retained.",
+      "qualification_scope": "Predictive recursive branching remains R09 work; not retested because this continuation did not alter it.",
+      "affected_items": ["R09"]
+    },
+    {
+      "family": "H",
+      "name": "full-order voiding and cavity interaction",
+      "source_preservation": "PRESERVED_SCOPE_LIMITED",
+      "current_implementation": "Positive shared-face vacancy flux and explicit cavity states remain live and distinct from centered reference transport.",
+      "current_wiring": "Existing bounded branch/cavity compatibility route retained.",
+      "meaningful_activity": "Prior accepted refined prefix, rollback and functional growth fixture retained.",
+      "qualification_scope": "Local-incremental physical cavity transition remains R10; no matched scientific prediction added here.",
+      "affected_items": ["R10"]
+    },
+    {
+      "family": "I",
+      "name": "constraint and cohesive-law extensions",
+      "source_preservation": "PRESERVED_SCOPE_LIMITED",
+      "current_implementation": "Affine tensor correction and native Arrhenius/adaptive, classical bilinear and activated-bilinear code paths remain present.",
+      "current_wiring": "Adaptive atomic cohesive route is active in the restart qualification.",
+      "meaningful_activity": "Six cohesive subsegments, remesh/state transfer and post-event equilibrium.",
+      "qualification_scope": "Cracked-body constraint integration and material selection for autonomous bilinear specimen use remain unresolved.",
+      "affected_items": ["R05", "R07"]
+    },
+    {
+      "family": "J",
+      "name": "long growth, observations and output",
+      "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "current_implementation": "Long-growth, stage-aware K/J-at-length, native fields and output thinning remain unchanged.",
+      "current_wiring": "Observer correction adds diagnostics and does not alter accepted mechanics or drives.",
+      "meaningful_activity": "Existing 1002.9 micrometre/201-event evidence retained; new FEM run supplies active native fields through step 146.",
+      "qualification_scope": "No historical campaign was rerun and no manuscript was modified.",
+      "affected_items": ["R11"]
+    },
+    {
+      "family": "K",
+      "name": "restart, portability and evidence preservation",
+      "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
+      "current_implementation": "Versioned JSON/NPZ specimen envelope restores native mesh, fields, graph, cohesive state, engine state, providers, stochastic queues and controller state.",
+      "current_wiring": "Generic --restart-from maps to native specimen restart after provider attestation.",
+      "meaningful_activity": "Fresh-process pre-event and active post-event continuations completed in the dedicated FEM environment.",
+      "qualification_scope": "Wrong interpreter without triangle fails explicitly and is preserved as negative environmental evidence; old-law checkpoint migration is not claimed.",
+      "affected_items": ["R01", "R08", "R12", "R13"]
+    }
+  ],
+  "unavailable_evidence": [
+    "PF Git objects already listed as absent from the partial clone in version 1 were not reclassified as inspected.",
+    "A new independently qualified PF/FEM common-mechanics comparison has not yet been executed.",
+    "No material authority was supplied for activation area, cohesive stiffness or DBTT shared-stress selection."
+  ],
+  "preservation_statement": "No source, branch, worktree, raw result, failed receipt, checkpoint, user file or manuscript artifact was deleted or reset. Production remains disabled."
+}

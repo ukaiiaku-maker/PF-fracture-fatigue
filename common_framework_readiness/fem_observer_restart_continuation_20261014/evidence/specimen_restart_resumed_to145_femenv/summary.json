@@ -1,0 +1,40 @@
+[
+  {
+    "Kc_first_MPa_sqrt_m": 61.154463270311,
+    "N_em_final": 20.802001740177815,
+    "N_em_init": 46.386124809554964,
+    "T": 1000.0,
+    "W_emit_J_per_m": 4.015046206355159,
+    "a_final_mm": 0.5062364217294542,
+    "branch_length_dx_mm": 0.0,
+    "branched": false,
+    "deflection_deg": 0.0,
+    "geometry_path_length_m": 6.23642172945416e-06,
+    "geometry_projected_extension_m": 6.23642172945416e-06,
+    "hbar_tip_m": 2.0650134861341134e-06,
+    "mode": "brittle",
+    "n_active_fronts_final": 1,
+    "n_advances": 1,
+    "n_advances_branch": 0,
+    "n_advances_primary": 1,
+    "n_advances_semantics": "rounded_path_length_over_nominal_checkpoint",
+    "n_coalesced": 0,
+    "n_equivalent_checkpoints_exact": 1.2472843458908318,
+    "n_equivalent_checkpoints_rounded": 1,
+    "n_fronts": 1,
+    "n_geometry_events": 2,
+    "n_geometry_events_semantics": "accepted_stochastic_cleavage_renewals_and_adaptive_CZM_commits",
+    "n_nodes": 2029,
+    "n_stagnant_retired": 0,
+    "nominal_checkpoint_length_m": 5e-06,
+    "path_span_dy_mm": 0.0,
+    "r_eff_over_r0_init": 1.7341837318385938,
+    "shelf": {
+      "clock_completable": true,
+      "lambda_c_max": 1000000.0,
+      "lambda_e_max": 182260347.81796116,
+      "t_min_fire_s": 1e-06
+    },
+    "sigma_back_init_GPa": 3.4223336154323043
+  }
+]

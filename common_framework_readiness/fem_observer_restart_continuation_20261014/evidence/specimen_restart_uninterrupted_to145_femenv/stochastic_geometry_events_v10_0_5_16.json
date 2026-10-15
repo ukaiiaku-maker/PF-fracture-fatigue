@@ -1,0 +1,72 @@
+[
+  {
+    "actual_p1_m": [
+      0.0005039390816338293,
+      0.0
+    ],
+    "angle_error_deg": 0.0,
+    "event_advance_m": 3.939081633829308e-06,
+    "event_length_factor": 0.7878163267658616,
+    "event_length_mismatch_m": -4.997494388800372e-20,
+    "front_id": 0,
+    "hazard_action_completed": 0.8573135604369185,
+    "hazard_event_index": 0,
+    "hazard_seed": 8666,
+    "inserted": true,
+    "microstructure_geometry_length_synchronized": true,
+    "moved_m": 3.939081633829258e-06,
+    "nominal_checkpoint_m": 5e-06,
+    "nominal_p1_m": [
+      0.000505,
+      0.0
+    ],
+    "p0_m": [
+      0.0005,
+      0.0
+    ],
+    "reason": "v10051839_atomic_target_aware_path_corridor",
+    "requested_fixed_length_m": 5.000000000000013e-06,
+    "requested_stochastic_length_m": 3.939081633829308e-06,
+    "schema": "PF_v10_1_7_3_threshold_correlated_single_checked_CZM_commit_v10_0_5_16",
+    "stochastic_p1_requested_m": [
+      0.0005039390816338293,
+      0.0
+    ],
+    "threshold_action": 0.8573135604369198
+  },
+  {
+    "actual_p1_m": [
+      0.0005062364217294542,
+      0.0
+    ],
+    "angle_error_deg": 0.0,
+    "event_advance_m": 2.2973400956248734e-06,
+    "event_length_factor": 0.45946801912497465,
+    "event_length_mismatch_m": 2.879912020664621e-20,
+    "front_id": 0,
+    "hazard_action_completed": 0.14625818600138324,
+    "hazard_event_index": 1,
+    "hazard_seed": 8666,
+    "inserted": true,
+    "microstructure_geometry_length_synchronized": true,
+    "moved_m": 2.2973400956249022e-06,
+    "nominal_checkpoint_m": 5e-06,
+    "nominal_p1_m": [
+      0.0005089390816338293,
+      0.0
+    ],
+    "p0_m": [
+      0.0005039390816338293,
+      0.0
+    ],
+    "reason": "v10051839_atomic_target_aware_path_corridor",
+    "requested_fixed_length_m": 5.000000000000013e-06,
+    "requested_stochastic_length_m": 2.2973400956248734e-06,
+    "schema": "PF_v10_1_7_3_threshold_correlated_single_checked_CZM_commit_v10_0_5_16",
+    "stochastic_p1_requested_m": [
+      0.0005062364217294542,
+      0.0
+    ],
+    "threshold_action": 0.14625818600138327
+  }
+]

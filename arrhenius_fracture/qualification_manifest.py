@@ -81,7 +81,7 @@ def qualification_jobs() -> tuple[QualificationJob, ...]:
                          "three fixed pre-event common loads and one short accepted/restart event",
                          ("one worker", "capacity preflight", "checkpoint/resume same physics; no model-selection wall cap"),
                          ("reaction", "stored energy", "stress", "displacement", "J/support", "restart"), 18.0, compact,
-                         "UNRESOLVED_GENERIC_FEM_ADAPTER"),
+                         "FEM_OBSERVER_AND_RESTART_READY_OPENING_ONLY_ADAPTER_UNRESOLVED"),
         QualificationJob("Q-CAVITY-LOCAL", ("FG-13", "FG-16"),
                          "Does opt-in local_incremental_front preserve solid-area accounting, marks, clocks and rollback?",
                          "pytest:tests/test_candidate_drive_contract.py", (), "solid-area and transaction/refinement contract checks; spatial geometry cases remain open",

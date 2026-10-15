@@ -59,16 +59,16 @@
     {
       "id": "R01",
       "goal_ids": ["FG-01", "FG-04", "FG-16"],
-      "status": "IN_PROGRESS_FEM_NATIVE_TRANSITIONS_REATTESTED_GENERIC_RESTART_UNWIRED",
-      "concrete_defect": "Current-law identity is qualified in the PF tip/bulk paths and the independent FEM native topology/state transitions have been re-attested. The generic FEM specimen entry still lacks restart deserialization and the retained actual-event run is historical-law evidence, so current-law identity is not yet attested through a generic active topology restart.",
+      "status": "COMPLETE_CURRENT_FEM_GENERIC_ACTIVE_TOPOLOGY_RESTART",
+      "concrete_defect": "RESOLVED for the current FEM route: the generic entry now delegates checkpoint state to the existing native kinetic, cohesive, topology and stochastic owners. A fresh-process continuation crosses two current-law physical events, six numerical cohesive subsegments and post-event equilibrium without redrawing marks or losing state.",
       "owner_consumer": "PF shared workers, V10.4 bulk consumer, independent FEM/CZM workers",
       "authoritative_source": "native installed call graph plus recovery/geography receipts",
       "dependencies": ["R03", "R08"],
-      "exact_next_command": "python -m pytest -q tests/test_shared_execution.py tests/test_shared_options_resolution.py tests/test_f1_no_physics_fallback.py",
-      "input_output_identity": "PF 0a6b8171; FEM 90cb6671; namespace-isolated receipts",
+      "exact_next_command": "python -m pytest -q tests/test_specimen_restart_v1.py tests/test_generic_current_pf_companion.py tests/test_current_pf_tip_only_companion_v1.py tests/test_stochastic_hazard_event_length_v100516.py",
+      "input_output_identity": "PF ef7399c2 continuation; FEM 14bc458 continuation; namespace-isolated dedicated FEM interpreter and versioned specimen checkpoint",
       "numerical_criteria": "All requested/constructed/accepted/restarted bindings exact; unsupported fallbacks fail before execution.",
-      "executed_evidence": ["common_framework_readiness/TAYLOR_PEIERLS_NATIVE_REPAIR.json", "common_framework_readiness/TAYLOR_PEIERLS_RECOVERY_WIRING.json", "common_framework_readiness/NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json", "common_framework_readiness/fem_reconciliation_20261014_a015a36_01c3d1bf/RUNTIME_CAPABILITY_ATTESTATION.json"],
-      "remaining_limitation": "FEM native topology, transfer, event-equilibrium and state serializers are tested; generic specimen restart wiring and a current-law active topology restart remain incomplete."
+      "executed_evidence": ["common_framework_readiness/TAYLOR_PEIERLS_NATIVE_REPAIR.json", "common_framework_readiness/TAYLOR_PEIERLS_RECOVERY_WIRING.json", "common_framework_readiness/NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json", "common_framework_readiness/fem_reconciliation_20261014_a015a36_01c3d1bf/RUNTIME_CAPABILITY_ATTESTATION.json", "common_framework_readiness/fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json"],
+      "remaining_limitation": "This closes current-law identity for the exercised FEM specimen topology/restart route. It is not a claim that every PF, branching, cavity or fatigue checkpoint generation is mutually migratable."
     },
     {
       "id": "R02",
@@ -125,8 +125,8 @@
     {
       "id": "R05",
       "goal_ids": ["FG-11", "FG-12", "FG-16"],
-      "status": "PARTIAL_IMPLEMENTATION_NATIVE_SPECIMEN_QUALIFICATION_PENDING",
-      "concrete_defect": "Independent FEM lacks selectable autonomous classical bilinear and activated-bilinear specimen paths with restartable damage.",
+      "status": "PARTIAL_IMPLEMENTATION_AND_GENERIC_RESTART_WIRED_MATERIAL_SPECIMEN_SELECTION_PENDING",
+      "concrete_defect": "Autonomous classical bilinear and activated-bilinear constitutive paths with restartable damage are implemented, and the generic specimen checkpoint now preserves the native cohesive network. A material specimen selection remains unavailable because activation area and interface stiffness have not been authorized.",
       "owner_consumer": "independent FEM interface assembly, state update, serializer and restart",
       "authoritative_source": "original FEM/CZM solver plus R04 fitted registry",
       "dependencies": ["R04", "R08"],
@@ -134,7 +134,7 @@
       "input_output_identity": "three explicit opening-model IDs with common accommodation inputs",
       "numerical_criteria": "Consistent residual/tangent, autonomous separation, irreversible unload/reload, nonnegative dissipation and active-damage restart equality.",
       "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py"],
-      "remaining_limitation": "Autonomous irreversible and activated-bilinear constitutive paths, unilateral contact and JSON-safe active-damage restart are implemented. Specimen-level event/damage/energy evidence awaits an authoritative activation area and stiffness (or explicitly authorized qualification-only values) plus generic specimen adapter completion."
+      "remaining_limitation": "Autonomous irreversible and activated-bilinear constitutive paths, unilateral contact and JSON-safe active-damage restart are implemented; generic native specimen restart is now complete on the adaptive atomic cohesive route. Bilinear specimen-level event/damage/energy evidence still awaits authoritative activation area and stiffness or an explicitly selected qualification-only fixture."
     },
     {
       "id": "R06",
@@ -171,14 +171,14 @@
     {
       "id": "R08",
       "goal_ids": ["FG-12", "FG-16"],
-      "status": "PARTIAL_CURRENT_SUPPORT_CONVERGENCE_QUALIFIED_HISTORICAL_PARITY_REPRODUCED_GENERIC_RESTART_UNWIRED",
-      "concrete_defect": "The historical v10.0.5.11 FEM/J reference is exactly reproducible from both its source commit and current FEM head. The earlier generic three-level failure is now identified as an invalid qualification protocol: its first two levels selected identical physical support and its common observer was algebraic, not independent. A corrected current path-envelope support study passes 2% reaction, energy, fixed-grip G and native-J convergence. Opening-only, generic full-field support, non-plane-strain constraint, production bilinear selection and generic native restart deserialization remain unresolved and fail closed; historical/current representation-level J/G parity is not claimed.",
+      "status": "PARTIAL_MATCHED_FEM_OBSERVER_AND_GENERIC_RESTART_COMPLETE_PF_FEM_COMPARISON_PENDING",
+      "concrete_defect": "The historical v10.0.5.11 FEM/J reference is exactly reproducible. The old path-envelope G advanced a finite-height killed-node band and divided by projected damaged-node length, so it did not differentiate the same virtual operation as domain J. The new fixed-topology material-coordinate derivative uses the identical plateau weight and converges to native full-energy J within 0.8618% across the controlled support series. Both quantities are observer-only. Generic current-law specimen restart is now connected and exercised through active remeshing. A new cross-backend PF/FEM scientific comparison remains separate and must not be manufactured from unlike crack representations.",
       "owner_consumer": "fem-czm-current-pf-companion native constructor and isolated shared worker",
-      "authoritative_source": "FEM a015a36, preserved source-bound entry and registry-driven generic entry",
+      "authoritative_source": "FEM 14bc458 continuation, preserved source-bound entry and registry-driven generic entry",
       "dependencies": ["R03", "R07"],
-      "exact_next_command": "isolate the production-mesh versus path-envelope J/G representation difference at fixed support and contour, then wire the already-preserved native serializers into an explicitly versioned generic specimen restart entry",
+      "exact_next_command": "Define and execute the remaining PF/FEM common-mechanics comparison only on independently qualified native discretizations, retaining native J, common energy measure and J-derived K as distinct observations.",
       "input_output_identity": "independent package paths and constructor-visible coefficient receipts",
-      "numerical_criteria": "Medium-to-fine reaction, stored energy, independent fixed-grip G and native full-energy J below 2% without fitted scale factor; historical production benchmark exactly reproduced; opening-only and active accommodation plus cohesive restart remain separate gates.",
+      "numerical_criteria": "Medium-to-fine reaction, stored energy, projected-band diagnostic, matched material-coordinate G and native full-energy J below 2%; matched-operation J/G within 2% at every support without fitted scale factor; historical production benchmark exactly reproduced.",
       "executed_evidence": [
         "common_framework_readiness/CURRENT_FEM_COMPANION_BINDING.json",
         "common_framework_readiness/GENERIC_FEM_NATIVE_RUN_QUALIFICATION.json",
@@ -186,9 +186,11 @@
         "common_framework_readiness/fem_reconciliation_20261014_a015a36_01c3d1bf/RUNTIME_CAPABILITY_ATTESTATION.json",
         "common_framework_readiness/fem_reconciliation_20261014_a015a36_01c3d1bf/evidence/fem_baseline_reconciliation_v1.json",
         "fem-czm-current-pf-companion@14bc458:tests/test_fem_baseline_reconciliation_v1.py",
-        "fem-czm-current-pf-companion@a015a36:tests/test_generic_current_pf_companion.py"
+        "fem-czm-current-pf-companion@a015a36:tests/test_generic_current_pf_companion.py",
+        "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/fem_baseline_reconciliation_v2.json",
+        "common_framework_readiness/fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json"
       ],
-      "remaining_limitation": "The current fine path-envelope result has J/G=0.8229384 versus 0.988856 for the recovered historical production-mesh benchmark; support convergence alone does not resolve that representation/observer difference. Plane stress/generalized transverse control, opening-only, generic full-field source scope, production bilinear selection and generic specimen active-state restart remain explicit fail-closed gaps. Native state serializers and lifecycle transitions are present and tested, but not yet connected at the generic specimen entry."
+      "remaining_limitation": "The retained projected killed-band result still has fine J/G=0.8229384 because it is a different finite crack/removal operation; it is not renamed or scaled. Plane stress/generalized transverse control, opening-only, generic full-field source scope, production bilinear selection and the new PF/FEM common-mechanics comparison remain explicit independent gaps."
     },
     {
       "id": "R09",
@@ -277,5 +279,5 @@
       "remaining_limitation": "Production remains disabled. Cohesive comparison cells await physical activation-area/stiffness/work support and specimen adapter qualification; P6-P8 retain their separately reported native-adapter/convergence dependencies."
     }
   ],
-  "next_priority": "R08 support convergence is repaired and qualified, and the historical FEM/J baseline is exactly reproduced. Next isolate the production-mesh versus path-envelope J/G representation difference at fixed physical support and connect the preserved native state serializers to the generic specimen restart entry. R07 cracked-body constraint integration, R09 recursive branch ownership and R10 local cavity transitions remain independent implementation work."
+  "next_priority": "R08's internal FEM observer identity and generic active-state restart are closed. The remaining R08 work is an explicitly common, independently qualified PF/FEM scientific comparison; R07 cracked-body constraints, R09 recursive branch ownership and R10 local cavity transitions remain independent implementation work and are not blocked on that comparison."
 }

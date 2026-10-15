@@ -1,0 +1,79 @@
+{
+  "schema": "fem-czm-specimen-restart-qualification/1",
+  "date": "2026-10-14",
+  "status": "PASS_BYTE_EXACT_ACTIVE_TOPOLOGY_RESTART",
+  "source": {
+    "repository": "fem-czm-current-pf-companion",
+    "commit_containing_executed_source_tree": "2c34559d5ce9bba51f599780e7315565720b7386",
+    "branch": "codex/current-pf-companion",
+    "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+    "required_triangulator": "triangle==20250106"
+  },
+  "case": {
+    "temperature_K": 1000.0,
+    "hazard_seed": 8666,
+    "parameter_option": "v913_paper_peak01_0242980_persistent_sites__taylor_margin_0p10eV",
+    "constraint": "plane_strain",
+    "source_scope": "tip_only",
+    "accommodation_mode": "active_tip",
+    "cohesive_backend": "adaptive_czm_v10051839_atomic_path_corridor_adaptive_quality",
+    "pre_event_checkpoint_step": 121,
+    "common_endpoint_step": 145
+  },
+  "pre_event_state": {
+    "hazard_threshold_action": 0.8573135604369198,
+    "hazard_action_current": 0.2735864819783538,
+    "hazard_event_index": 0,
+    "B": 0.3191206748659425
+  },
+  "comparison": {
+    "uninterrupted_output": "evidence/specimen_restart_uninterrupted_to145_femenv",
+    "fresh_process_resumed_output": "evidence/specimen_restart_resumed_to145_femenv",
+    "byte_exact_files": {
+      "steps_1000K.csv": "de0aed3da942d526cb8ba5d7e074c46ac4d593ca6921dade2ee49803bca03d37",
+      "stochastic_geometry_events_v10_0_5_16.json": "9a9460070966ddd832efe7994eb85c942ea5120ed35b2b9d7acbf8de51f73dbd",
+      "atomic_path_corridor_audit_v10_0_5_18_3_9.json": "ba3789549856ebdea8b264ba650635e62a0e8bed1974e8a14bac87b4a24bbf31",
+      "summary.json": "5614c06046b62ea9d942b105406525707916083960f22729edf240f6a00057a1"
+    },
+    "normalization_required": false,
+    "accepted_rows": 145,
+    "physical_events": 2,
+    "physical_event_steps": [140, 142],
+    "stochastic_marks": 2,
+    "mpz_translations": 2,
+    "numerical_cohesive_subsegments": 6,
+    "final_nodes": 2029,
+    "final_bulk_triangles": 3904,
+    "final_cohesive_elements": 6,
+    "final_tip_x_m": 0.0005062364217294542,
+    "final_crack_extension_m": 0.00000623642172945416,
+    "final_B": 0.47997815545598504,
+    "final_hazard_event_index": 2,
+    "final_next_hazard_threshold": 0.5250238935573996,
+    "final_mpz_advance_total_m": 0.000007394281137649096
+  },
+  "checkpoint_integrity": {
+    "pre_event_checkpoint_json_sha256": "8a6969813bc6c04fd3105187c0ce8d21da9d7edf52c80fccd116c19879e6aef4",
+    "pre_event_arrays_npz_sha256": "4ab6ada25b41d28ea8b73428838c3c7bbaac5a03b24ed5779b64836939ed9709",
+    "post_event_checkpoint_json_sha256": "6a04728ef81d5b5d2a371dd8379bb5f04bd114fe20ec30dfcd6c9190aaa4a2a5",
+    "post_event_arrays_npz_sha256": "fc883278099087129e924ab8a940e742d77da74eab5c09c5b96e47b116ad84b2"
+  },
+  "active_post_event_restart": {
+    "checkpoint": "evidence/specimen_restart_checkpoint_postevent_femenv",
+    "output": "evidence/specimen_restart_postevent_to146_femenv",
+    "accepted_endpoint_step": 146,
+    "post_event_equilibrium_completed": true,
+    "event_count_unchanged": 2,
+    "tip_x_unchanged_m": 0.0005062364217294542,
+    "B": 0.6399708739413135,
+    "retained_count": 13.55275850883919
+  },
+  "negative_environment_evidence": {
+    "output": "evidence/specimen_restart_resumed_to145",
+    "interpreter": "arrhenius-sharp-front-v10-codex",
+    "result": "FAIL_CLOSED_MANDATORY_TRIANGLE_DEPENDENCY_MISSING",
+    "corridor_candidates_rejected": 600,
+    "transaction_rollback": "renewal origin restored"
+  },
+  "semantic_conclusion": "The generic entry restores native engine, cohesive, topology, stochastic, loading and field state. A fresh process produces a byte-identical accepted history through physical advance/remeshing and preserves exactly-once event ownership."
+}

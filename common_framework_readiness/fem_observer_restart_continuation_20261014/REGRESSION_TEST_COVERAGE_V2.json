@@ -1,0 +1,47 @@
+{
+  "schema": "fem-observer-restart-regression-coverage/2",
+  "date": "2026-10-14",
+  "source_pair_during_test": {
+    "pf_common": "ef7399c2b7ddc3471a0ec5495fa6aeac3cc1275a plus readiness-document working tree",
+    "fem_czm": "2c34559d5ce9bba51f599780e7315565720b7386"
+  },
+  "focused_fem_group": {
+    "passed": 41,
+    "failed": 0,
+    "tests": [
+      "tests/test_specimen_restart_v1.py",
+      "tests/test_generic_current_pf_companion.py",
+      "tests/test_current_pf_tip_only_companion_v1.py",
+      "tests/test_fem_baseline_reconciliation_v1.py",
+      "tests/test_v100511_same_mesh_energy.py",
+      "tests/test_stochastic_hazard_event_length_v100516.py",
+      "tests/test_v100510_refinement_support.py",
+      "tests/test_corridor_refinement_metadata_v10051840.py",
+      "tests/test_theta0_pf_full_field_metadata_v10051840.py"
+    ],
+    "discriminates": [
+      "projected killed-band operation versus matched material-coordinate derivative",
+      "all-contour J/G agreement and perturbation-size stability",
+      "native-owner checkpoint round trip and physics-identity rejection",
+      "valid persisted-provider reconstruction and real provider mismatch rejection",
+      "stochastic pending/realized event queue restoration"
+    ]
+  },
+  "full_fem_suite": {
+    "passed": 709,
+    "subtests_passed": 16,
+    "failed": 0,
+    "duration_s": 73.97,
+    "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"
+  },
+  "full_pf_shared_suite": {
+    "passed": 954,
+    "deselected": 15,
+    "failed": 0,
+    "duration_s": 88.15,
+    "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "note": "A preceding run correctly failed only the external source-binding sentinel while the FEM checkout was dirty. After the FEM source was committed and the binding advanced to 2c34559, the complete suite passed."
+  },
+  "executed_transition": "SPECIMEN_RESTART_QUALIFICATION.json",
+  "external_evidence_scope": "The dedicated FEM dependency was present and exercised. Missing PF Git objects already recorded for the partial clone and unmounted archival evidence were not reclassified as verified."
+}

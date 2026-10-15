@@ -22,10 +22,10 @@ def main() -> None:
     receipt = capacity_preflight(ROOT, 18.0)
     payload = {"qualification": "Q-PF-FEM-3LEVEL", "capacity": receipt.__dict__,
                "production_execution_authorized": False,
-               "status": "UNRESOLVED_GENERIC_FEM_ADAPTER"}
+               "status": "FEM_OBSERVER_AND_RESTART_READY_OPENING_ONLY_ADAPTER_UNRESOLVED"}
     print(json.dumps(payload, indent=2, sort_keys=True))
     if not args.dry_run:
-        raise SystemExit("execution disabled: generic current-companion adapter and common observer are not qualified")
+        raise SystemExit("execution disabled: opening-only current-companion state-update ownership is not qualified")
 
 
 if __name__ == "__main__":

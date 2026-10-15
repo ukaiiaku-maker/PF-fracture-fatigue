@@ -74,9 +74,11 @@ def build() -> None:
         elif goal == "FG-11":
             status = "NATIVE_INTERFACE_IMPLEMENTED_MINIMAL_CONSTITUTIVE_QUALIFICATION_COMPLETE_SPECIMEN_OPEN"
         elif goal == "FG-12":
-            status = "UNRESOLVED_GENERIC_ADAPTER_THREE_LEVEL_PF_FEM_QUALIFICATION_OPEN"
-        elif goal in {"FG-13", "FG-14", "FG-16"}:
+            status = "FEM_INTERNAL_MATCHED_OBSERVER_AND_ACTIVE_RESTART_QUALIFIED_PF_FEM_THREE_LEVEL_OPEN"
+        elif goal in {"FG-13", "FG-14"}:
             status = "TRANSACTION_CONTRACT_READY_SPATIAL_OR_RECURSIVE_NATIVE_ADAPTER_QUALIFICATION_OPEN"
+        elif goal == "FG-16":
+            status = "FEM_ACTIVE_TOPOLOGY_RESTART_QUALIFIED_BRANCH_AND_CAVITY_TRANSITIONS_OPEN"
         goals.append({"goal_id": goal, "status": status, "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE"})
     _write_json(OUT / "FRAC_GOALS_1.0_LIVE_PROGRESS.json", {
         "schema": "frac-goals-live-progress/1", "charter_modified": False,
