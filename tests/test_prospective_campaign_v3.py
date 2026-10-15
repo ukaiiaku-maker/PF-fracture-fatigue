@@ -34,6 +34,16 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     fitted = [row for row in cohesive if row["cohesive_law"]["fit"] is not None]
     assert all(row["readiness"]["input_availability"] == "BLOCKED_PHYSICAL_COHESIVE_SUPPORT" for row in fitted)
     assert all(row["cohesive_law"]["fit"]["unassigned_physical_quantities"] for row in fitted)
+    assert all(row["qualification_execution"]["launcher"] for row in fitted)
+    assert all(
+        row["readiness"]["implementation"]
+        == "IMPLEMENTED_CONSTITUTIVE_SPECIMEN_ADAPTER_MOVING_TIP_NOT_CONNECTED"
+        for row in fitted
+    )
+    assert all(
+        row["qualification_execution"]["production_case_substitution"] is False
+        for row in fitted
+    )
     native_opening = [
         row for row in cohesive
         if row["cohesive_law"]["kind"] == "original_activated_opening"

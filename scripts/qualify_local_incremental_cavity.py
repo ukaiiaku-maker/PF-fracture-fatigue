@@ -19,6 +19,10 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+DURABLE_CHECKPOINT = ROOT / (
+    "common_framework_readiness/acceptance_review_20261015/"
+    "r10_durable_checkpoint/immediately-before-child-birth.json"
+)
 CHECKPOINT_GLOB = Path(
     "/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T"
 ).glob("unified-one-void-*/immediately-before-child-birth.json")
@@ -53,6 +57,8 @@ def _sha256(path: Path) -> str:
 
 
 def discover_checkpoint() -> Path | None:
+    if DURABLE_CHECKPOINT.is_file():
+        return DURABLE_CHECKPOINT
     candidates = [path for path in CHECKPOINT_GLOB if path.is_file()]
     return max(candidates, key=lambda path: path.stat().st_mtime) if candidates else None
 
@@ -138,6 +144,16 @@ def retained_evidence() -> dict[str, Any]:
             "mesh_relative_error": ligament.get("mesh_relative_error"),
             "mesh_relative_limit": ligament.get("mesh_relative_limit"),
             "accepted_state_preserved": ligament.get("accepted_state_preserved"),
+            "current_code_role": (
+                "ACTUAL_KINETIC_RATE_ARGUMENT_FOR_CAVITY_INTERSECTING_CANDIDATE"
+            ),
+            "selected_local_incremental_conformance": False,
+            "classification": "COLLECTIVE_FINITE_LIGAMENT_ALTERNATIVE",
+            "consumer_source": (
+                "arrhenius_fracture.voiding_production_v5."
+                "dispatch_cavity_intersecting_candidate_drives -> "
+                "directional_sharp_front_rates"
+            ),
         },
         "finite_enabled_suppressed_interval": {
             "report": str(INTERACTION_REPORT.relative_to(ROOT)),
@@ -172,9 +188,9 @@ def qualification(checkpoint: Path | None) -> dict[str, Any]:
             "--checkpoint", connected["manifest"], "--output", "<new-output>",
         ]
     return {
-        "schema": "r10.local-incremental-native-cavity-qualification/1",
+        "schema": "r10.cavity-kinetic-role-and-restart-qualification/2",
         "status": (
-            "NATIVE_CONNECTED_RESTART_READY_CHILD_CONTINUATION_PENDING"
+            "COLLECTIVE_LIGAMENT_RESTART_READY_LOCAL_INCREMENTAL_PENDING"
             if connected is not None else "INCOMPLETE_NATIVE_CHECKPOINT_UNAVAILABLE"
         ),
         "production_execution_authorized": False,
@@ -189,6 +205,7 @@ def qualification(checkpoint: Path | None) -> dict[str, Any]:
         ),
         "not_claimed": [
             "No downstream child acceptance is claimed until the native continuation exits PASS.",
+            "The current complete-ligament rate does not qualify the selected local-incremental law.",
             "The recovered 0.2 s exporter failure does not identify individual event times.",
             "No production campaign or physical recalibration is authorized.",
         ],
@@ -217,7 +234,10 @@ def main(argv: list[str] | None = None) -> int:
         child_report = _load(args.continuation_output / "qualification_report.json")
         if child_report.get("status") != "PASS":
             raise RuntimeError("native R10 continuation did not report PASS")
-        report["status"] = "COMPLETE_NATIVE_CHILD_CONTINUATION_AND_RESTART"
+        report["status"] = (
+            "COLLECTIVE_LIGAMENT_CHILD_CONTINUATION_COMPLETE_"
+            "LOCAL_INCREMENTAL_PENDING"
+        )
         report["native_continuation_report"] = str(
             (args.continuation_output / "qualification_report.json").resolve()
         )

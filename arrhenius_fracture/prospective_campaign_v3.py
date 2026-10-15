@@ -712,6 +712,46 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                             else "AVAILABLE_VERSIONED_INPUTS"
                         ),
                     })
+                else:
+                    qualification_args = [
+                        "--bilinear-fit-registry", str((root / FIT_REGISTRY).resolve()),
+                        "--material-class", family,
+                        "--opening-model", law,
+                        "--temperature-K", f"{temperature:g}",
+                        "--temperature-policy", temperature_policy,
+                        "--constraint", "plane_strain",
+                        "--constructed-normal-stiffness-Pa-per-m",
+                        "2e17" if law == "activated_bilinear" else "2e19",
+                    ]
+                    if law == "autonomous_irreversible_bilinear":
+                        qualification_args.extend([
+                            "--constructed-separation-work-J-per-m2", "20",
+                        ])
+                    row["qualification_execution"] = {
+                        "repository_role": "current_fem_companion",
+                        "native_entrypoint": (
+                            "arrhenius_fracture.bilinear_cohesive_request_v1"
+                        ),
+                        "launcher": [
+                            "python", "-m",
+                            "arrhenius_fracture.bilinear_cohesive_request_v1",
+                            *qualification_args, "--out", "{qualification_output_dir}",
+                        ],
+                        "constructed_input_identity": (
+                            "CONSTRUCTED_BILINEAR_SPECIMEN_V1_NOT_PRODUCTION"
+                        ),
+                        "production_case_substitution": False,
+                    }
+                    row["readiness"].update({
+                        "implementation": (
+                            "IMPLEMENTED_CONSTITUTIVE_SPECIMEN_ADAPTER_"
+                            "MOVING_TIP_NOT_CONNECTED"
+                        ),
+                        "native_qualification": (
+                            "NATIVE_SPECIMEN_CONSUMER_RESTART_QUALIFIED_"
+                            "MOVING_TIP_PENDING"
+                        ),
+                    })
                 row["execution"] = _execution(row)
                 rows.append(row)
     return rows

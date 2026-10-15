@@ -91,8 +91,8 @@
     {
       "id": "R03",
       "goal_ids": ["FG-02", "FG-03", "FG-05", "FG-15"],
-      "status": "COMPLETE_AUTHORIZED_TAYLOR_REVISION_AND_NATIVE_COORDINATE_QUALIFICATION_SHARED_STRESS_SELECTION_PENDING",
-      "concrete_defect": "RESOLVED for the authorized Taylor-amplitude axis: all four selected families now have traceable 0.10, 0.25 and 0.50 eV continuous-domain versions. The distinct DBTT shared characteristic-stress defect has calculated explicit alternatives but no unauthorized production selection.",
+      "status": "CURRENT_PERSISTENT_DBTT_CANDIDATE_NATIVE_QUALIFIED_OLDER_LIFECYCLE_ADAPTER_PENDING_NO_SELECTION",
+      "concrete_defect": "The authorized Taylor-amplitude axis remains resolved. The paper-lineage minimal-stress DBTT qualification row now executes the current persistent native kinetic consumer at 300, 900, 1000, 1200 and 1300 K with finite nonnegative rates, exact selected-output replay and persistent reusable source identity. The older dbtt_primary alternative remains explicitly distinct and is not accepted by the current persistent adapter because its registry lacks rho_source0_m2 and carries a different refresh/recovery lineage. No production selection was made.",
       "owner_consumer": "material constructors, selection registry, PF/FEM native consumers",
       "authoritative_source": "full-precision selected rows and override chain",
       "dependencies": ["R02"],
@@ -104,9 +104,10 @@
         "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_selection.json",
         "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_dossier.json",
         "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_shared_stress_scale_candidates.json",
-        "fem-czm-current-pf-companion@b14497fc:tests/test_v10232_registry_option_bridge.py"
+        "fem-czm-current-pf-companion@b14497fc:tests/test_v10232_registry_option_bridge.py",
+        "fem-czm-current-pf-companion@4162181:integration_evidence/r03_dbtt_native_consumers_14a1a31/qualification_report.json"
       ],
-      "remaining_limitation": "These are constructed, not material-calibrated, choices. The selected DBTT parent retains a raw shared stress-scale crossing within 300-1300 K; its minimal-intercept and earlier 2-D-qualified dbtt_primary alternatives are implemented and explicitly unselected because either changes shared emission/Peierls/Taylor physics. Full specimen reruns with the prospective Taylor identities remain downstream qualification, not reused historical evidence."
+      "remaining_limitation": "These are constructed, not material-calibrated, choices. The selected DBTT parent retains a raw shared stress-scale crossing within 300-1300 K. The minimal-intercept candidate has current kinetic-consumer evidence but no full spatial event specimen; the older dbtt_primary lifecycle requires a deliberate adapter before current-law qualification. Both remain unselected because either changes shared emission/Peierls/Taylor physics."
     },
     {
       "id": "R04",
@@ -125,16 +126,16 @@
     {
       "id": "R05",
       "goal_ids": ["FG-11", "FG-12", "FG-16"],
-      "status": "COMPLETE_GENERIC_NATIVE_SPECIMEN_QUALIFIED_MATERIAL_SELECTION_PENDING",
-      "concrete_defect": "Closed for generic native implementation: a plane-strain cracked-body specimen now uses the independent FEM bulk assembler, duplicated interface nodes, an explicit precrack and native zero-thickness autonomous bilinear elements. It demonstrates damage initiation, irreversible unload, complete separation and exact active-state restart using a fully specified qualification-only material. The Peak, DBTT, weakT and ceramic fitted barriers are executable kinetically, but their physical autonomous mapping remains unavailable because activation area and separation work are null in the authoritative fit registry.",
+      "status": "NATIVE_SPECIMEN_PATHS_QUALIFIED_MOVING_TIP_BILINEAR_PENDING",
+      "concrete_defect": "The native cracked-body specimen now consumes both autonomous opening history and activated-bilinear interface traction/rate, commits damage or clock state, re-equilibrates and restarts exactly under fully specified qualification-only inputs. All 36 fitted campaign rows have typed specimen-qualification requests. The original moving-tip campaign route still accepts only EXP-floor activated opening, so the specimen evidence does not close that broader campaign-consumer chain.",
       "owner_consumer": "independent FEM interface assembly, state update, serializer and restart",
       "authoritative_source": "original FEM/CZM solver plus R04 fitted registry",
       "dependencies": ["R04", "R08"],
       "exact_next_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python scripts/qualify_bilinear_cohesive_specimen_v1.py --out <new-output> --bilinear-fit-registry <R04-fit-registry>",
       "input_output_identity": "three explicit opening-model IDs with common accommodation inputs",
       "numerical_criteria": "Consistent residual/tangent, autonomous separation, irreversible unload/reload, nonnegative dissipation and active-damage restart equality.",
-      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@0d7fca3:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@6db9cfc:integration_evidence/r05_bilinear_specimen_0d7fca3/qualification_report.json"],
-      "remaining_limitation": "No production material was selected. The constructed law is explicitly qualification-only and is not a tungsten calibration or default. Mapping any fitted Peak/DBTT/weakT/ceramic barrier to autonomous separation still requires authoritative activation area or separation work; this no longer blocks the generic native specimen implementation or its restart qualification."
+      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@1d9fc0b:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@254c30f:integration_evidence/r05_activated_bilinear_acceptance_1d9fc0b/qualification_report.json", "fem-czm-current-pf-companion@254c30f:integration_evidence/r05_autonomous_bilinear_acceptance_1d9fc0b/qualification_report.json", "common_framework_readiness/acceptance_review_20261015/CAMPAIGN_V3_ACCEPTANCE_AUDIT.json"],
+      "remaining_limitation": "No production material was selected. The constructed stiffness/work are qualification-only and are not a tungsten calibration or default. The 36 fitted rows remain blocked for physical cohesive support. The bilinear paths are not yet wired into moving-tip plastic accommodation, topology/remeshing and campaign restart; current evidence closes only their native cracked-specimen consumer/restart scope."
     },
     {
       "id": "R06",
@@ -169,7 +170,7 @@
     {
       "id": "R07",
       "goal_ids": ["FG-08", "FG-09", "FG-10"],
-      "status": "COMPLETE_NATIVE_2D_CRACKED_BODY_CONSTRAINT_AND_MIXITY",
+      "status": "NATIVE_CRACKED_BODY_CONTROLS_QUALIFIED_CAMPAIGN_ACTIVATED_PLASTIC_WIRING_PENDING",
       "concrete_defect": "The independent native cracked cohesive specimen now executes plane strain, plane stress, generalized prescribed epsilon_zz and generalized prescribed sigma_zz through the assembled bulk residual and cohesive equilibrium. It also executes signed mode II and mixed I-II grip loading. Both generalized controls are combined with mixed loading and the complete active displacement, cohesive-history and transverse-control state restarts exactly.",
       "owner_consumer": "PF/FEM cracked-body solvers and mechanism tensor projections",
       "authoritative_source": "mechanics constraint contract and native cracked-body fields",
@@ -178,7 +179,7 @@
       "input_output_identity": "plane strain, plane stress, generalized prescribed epsilon_zz or sigma_zz; signed mode II and mixed I-II",
       "numerical_criteria": "Nonuniform active state, tensor-consumer trace, response refinement and active-update restart.",
       "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@a0e5945:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@d6ea36d:integration_evidence/r05_r07_bilinear_constraints_a0e5945/qualification_report.json", "fem-czm-current-pf-companion@54e927e:arrhenius_fracture/fem.py", "fem-czm-current-pf-companion@7557ba8:integration_evidence/r05_r07_bilinear_constraints_54e927e/qualification_report.json"],
-      "remaining_limitation": "R07 is complete for the authorized two-dimensional framework. Uniform prescribed epsilon_zz and pointwise prescribed sigma_zz are distinct controls; neither is labeled a finite-thickness solution. Mode III and a three-dimensional surface/interior transition remain outside the 2-D model and are not claimed."
+      "remaining_limitation": "Uniform prescribed epsilon_zz and pointwise prescribed sigma_zz are distinct native cracked-body controls; neither is labeled a finite-thickness solution. The generic moving-tip route still rejects plane stress/generalized control, so full tensor propagation into its opening, emission and transport consumers and survival through moving-tip remesh/restart remain open. Mode III and a three-dimensional surface/interior transition remain outside the 2-D model."
     },
     {
       "id": "R08",
@@ -233,12 +234,12 @@
     {
       "id": "R10",
       "goal_ids": ["FG-14", "FG-16"],
-      "status": "NATIVE_CONNECTED_STATE_AND_EXECUTOR_BOUND_CHILD_CONTINUATION_RESOURCE_DEFERRED",
-      "concrete_defect": "The original native V5/V12 path already executes full-order vacancy/capture/growth, local crack-to-cavity connection, consistent complete-ligament candidate drive, conservative remesh transfer, downstream source recovery, child creation/continuation, rollback and checkpoint ownership. The missing R10 qualification entry point is now implemented and hash-bound to an accepted connected-cavity state. The independently executable single-front work no longer depends on recursive R09. The remaining current execution is the native downstream birth/continuation from that 57k-DOF occupied state.",
+      "status": "COLLECTIVE_LIGAMENT_PATH_IDENTIFIED_LOCAL_INCREMENTAL_AND_CHILD_CONTINUATION_PENDING",
+      "concrete_defect": "Source tracing demonstrates that dispatch_cavity_intersecting_candidate_drives replaces G_kinetic_used with the matched complete-ligament topology energy and directional_sharp_front_rates consumes that value. The retained result therefore qualifies the collective finite-ligament alternative, not the selected local-incremental front law. The accepted occupied checkpoint is now copied with its payload and verified hashes into a durable project root. Native downstream child continuation remains resource-deferred; a true increment-by-increment ligament approach with physical site support, multiplicity and persistent marks remains to be implemented.",
       "owner_consumer": "V5 vacancy/cavity scheduler, local candidate law, topology/remesh and combined executor",
       "authoritative_source": "original V5 native vacancy/cavity implementation",
       "dependencies": ["R01", "R03", "R07"],
-      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact --checkpoint /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/unified-one-void-tjyfvdbz/immediately-before-child-birth.json --execute --continuation-output <new-output> --output <new-report>",
+      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact --checkpoint common_framework_readiness/acceptance_review_20261015/r10_durable_checkpoint/immediately-before-child-birth.json --execute --continuation-output <new-output> --output <new-report>",
       "input_output_identity": "accepted V11/V12 connected-cavity payload ef5682e8fb1fc5d1a3a4764c5752bd7dcb7e1c4a6d59346c98fa7aef76d7fef3; matched complete-ligament topology energy; distinct enabled/suppressed native interval; combined branch/cavity owner state",
       "numerical_criteria": "New-solid accounting, conservative inventories, like-operation drives, coupled interval and occupied-state restart.",
       "executed_evidence": [
@@ -247,8 +248,9 @@
         "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
         "review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
         "tests/test_local_incremental_cavity_qualification.py"
+        ,"common_framework_readiness/acceptance_review_20261015/R10_CAVITY_ROLE_AND_DURABLE_RESTART.json"
       ],
-      "remaining_limitation": "The exact occupied-state continuation has not yet exited PASS. Its next topology remesh/equilibrium is approximately 57,252 DOF and is temporarily deferred because this machine has only about 1.0 GiB free swap and several unrelated 2.4-5.1 GiB resident scientific workers. This is a local execution-resource block, not an implementation or scientific-decision gate. The retained 0.2 s interaction proves a finite enabled/suppressed interval but its generic exporter failed after accepted state publication, so individual event times in that suffix remain unclaimed."
+      "remaining_limitation": "The selected local-incremental kinetic interpretation is not yet spatially implemented; this is a demonstrated implementation gap, not a material-choice gate. Separately, the exact occupied-state collective-path continuation has not exited PASS. Its next topology remesh/equilibrium is approximately 57,252 DOF and remains deferred under current memory pressure. The retained 0.2 s interaction proves a finite enabled/suppressed interval but its generic exporter failed after accepted state publication, so individual event times in that suffix remain unclaimed."
     },
     {
       "id": "R11",

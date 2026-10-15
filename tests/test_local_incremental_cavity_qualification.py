@@ -65,12 +65,17 @@ def test_retained_native_cavity_evidence_is_discriminating():
     assert result["complete_ligament"]["drive_source"] == (
         "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY"
     )
+    assert result["complete_ligament"]["selected_local_incremental_conformance"] is False
+    assert result["complete_ligament"]["current_code_role"].startswith("ACTUAL_KINETIC")
     assert result["finite_enabled_suppressed_interval"]["accepted_exposure_s"] > 0.0
     assert result["combined_branch_cavity"]["native_checkpoint_round_trips_exact"] is True
 
 
 def test_qualification_does_not_claim_unexecuted_child_acceptance(tmp_path):
     result = qualification(_checkpoint(tmp_path))
-    assert result["status"] == "NATIVE_CONNECTED_RESTART_READY_CHILD_CONTINUATION_PENDING"
-    assert "continue_unified_one_void_from_checkpoint.py" in result["next_native_command"]
+    assert result["status"] == "COLLECTIVE_LIGAMENT_RESTART_READY_LOCAL_INCREMENTAL_PENDING"
+    assert any(
+        item.endswith("continue_unified_one_void_from_checkpoint.py")
+        for item in result["next_native_command"]
+    )
     assert any("No downstream child acceptance" in item for item in result["not_claimed"])
