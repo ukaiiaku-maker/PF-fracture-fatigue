@@ -225,16 +225,22 @@
     {
       "id": "R10",
       "goal_ids": ["FG-14", "FG-16"],
-      "status": "INCOMPLETE",
-      "concrete_defect": "Local incremental cavity approach/connection and combined branch/cavity competition are not fully qualified through occupied-state restart.",
+      "status": "NATIVE_CONNECTED_STATE_AND_EXECUTOR_BOUND_CHILD_CONTINUATION_RESOURCE_DEFERRED",
+      "concrete_defect": "The original native V5/V12 path already executes full-order vacancy/capture/growth, local crack-to-cavity connection, consistent complete-ligament candidate drive, conservative remesh transfer, downstream source recovery, child creation/continuation, rollback and checkpoint ownership. The missing R10 qualification entry point is now implemented and hash-bound to an accepted connected-cavity state. The independently executable single-front work no longer depends on recursive R09. The remaining current execution is the native downstream birth/continuation from that 57k-DOF occupied state.",
       "owner_consumer": "V5 vacancy/cavity scheduler, local candidate law, topology/remesh and combined executor",
       "authoritative_source": "original V5 native vacancy/cavity implementation",
-      "dependencies": ["R01", "R03", "R07", "R09"],
-      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact",
-      "input_output_identity": "absent/small/distant and approach/contact/downstream states with declared event-size rule",
+      "dependencies": ["R01", "R03", "R07"],
+      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact --checkpoint /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/unified-one-void-tjyfvdbz/immediately-before-child-birth.json --execute --continuation-output <new-output> --output <new-report>",
+      "input_output_identity": "accepted V11/V12 connected-cavity payload ef5682e8fb1fc5d1a3a4764c5752bd7dcb7e1c4a6d59346c98fa7aef76d7fef3; matched complete-ligament topology energy; distinct enabled/suppressed native interval; combined branch/cavity owner state",
       "numerical_criteria": "New-solid accounting, conservative inventories, like-operation drives, coupled interval and occupied-state restart.",
-      "executed_evidence": [],
-      "remaining_limitation": "Prospective local-incremental direction is authorized but not yet native-qualified."
+      "executed_evidence": [
+        "integration_evidence/r10_local_incremental_cavity_6d0eab4c/qualification_report.json",
+        "review_packet/current_science_pilots_6abbf10/CAVITY_LIGAMENT_QUALIFICATION_v4.json",
+        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
+        "review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
+        "tests/test_local_incremental_cavity_qualification.py"
+      ],
+      "remaining_limitation": "The exact occupied-state continuation has not yet exited PASS. Its next topology remesh/equilibrium is approximately 57,252 DOF and is temporarily deferred because this machine has only about 1.0 GiB free swap and several unrelated 2.4-5.1 GiB resident scientific workers. This is a local execution-resource block, not an implementation or scientific-decision gate. The retained 0.2 s interaction proves a finite enabled/suppressed interval but its generic exporter failed after accepted state publication, so individual event times in that suffix remain unclaimed."
     },
     {
       "id": "R11",
@@ -299,5 +305,5 @@
       "remaining_limitation": "Production remains disabled. Cohesive comparison cells await physical activation-area/stiffness/work support and specimen adapter qualification; P6-P8 retain their separately reported native-adapter/convergence dependencies."
     }
   ],
-  "next_priority": "R08 is closed at the declared readiness scope: FEM observer identity, generic active-state restart, native opening-only ownership and the independently refined PF/FEM common-mechanics comparison are complete. Continue R07 cracked-body constraints, R09 recursive branch ownership and R10 local cavity transitions as independent implementation work; R05 still requires material authority for activation area and interface stiffness."
+  "next_priority": "R05-R08 and R11 generic/native implementation are closed at their declared scopes. R09 has native first birth, daughter evolution and restart but awaits physical owner detachment for recursive eligibility. R10 is independently bound to its native accepted connected state and exact continuation; run it when measured memory admission permits. Continue the R13 executable disabled-campaign bindings and final R12/release qualification without treating either resource-deferred native solve as a global block."
 }
