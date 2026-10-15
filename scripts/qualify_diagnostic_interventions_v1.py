@@ -28,6 +28,9 @@ from arrhenius_fracture.signed_kernel_family_v10214 import (
     ActiveOnlySigned2DShieldingKernelFamily,
 )
 from arrhenius_fracture.unified_mpz import UnifiedMPZState
+from arrhenius_fracture.tip_bulk_population_transfer_v1 import (
+    conservative_tip_bulk_transfer,
+)
 
 
 def _sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -137,6 +140,16 @@ def qualify(checkpoint,kernel_path,out):
         reset,reequilibrate=_mechanics_reequilibrator(directory,outer),
         accumulated_work={"W_emit_J_per_m":float(outer["history"]["hist"]["W_emit"][-1])},
     )
+    with np.load(directory/"state.npz",allow_pickle=False) as archive:
+        transfer_mesh=rebuild_tri_mesh(archive["mesh_nodes"],archive["mesh_elems"])
+    tip_transfer=np.asarray(base.retained_positive,float).ravel()
+    requested=.1*float(np.sum(tip_transfer))
+    _tip_after,_bulk_after,transfer_receipt=conservative_tip_bulk_transfer(
+        tip_transfer,np.zeros(transfer_mesh.ne),transfer_mesh.area_e,
+        direction="tip_to_bulk",requested_line_content=requested,
+        tip_support_weights=np.ones_like(tip_transfer),
+        bulk_support_weights=np.ones(transfer_mesh.ne),
+    )
     ledger=kinetic["ledgers"]
     checks={
         "checkpoint_is_populated":baseline["active_vector_nonzero_count"]>0 and baseline["mobile_count"]+baseline["retained_count"]>0,
@@ -152,6 +165,8 @@ def qualify(checkpoint,kernel_path,out):
         "history_reset_not_physical_recovery":reset_receipt["physical_loss_ledgers_unchanged"],
         "history_reset_native_reequilibrated":reset_receipt["native_reequilibration"]["converged"],
         "no_tip_bulk_transfer_added":all(r["tip_bulk_population_transfer_added"] is False for r in (shield_receipt,source_receipt,fixed_receipt,transport_receipt,reset_receipt)),
+        "parameterized_transfer_is_conservative":abs(transfer_receipt["conservation_residual_line_content"])<1e-12,
+        "parameterized_transfer_has_no_default_coefficient":transfer_receipt["physical_transfer_coefficient"] is None,
     }
     report={
         "schema":"r06-native-diagnostic-intervention-qualification/1",
@@ -166,7 +181,8 @@ def qualify(checkpoint,kernel_path,out):
                     "source_backstress_off":source_receipt,"blunting_fixed":fixed_receipt,
                     "transport_retention_off":transport_receipt,
                     "history_reset_reequilibrated":reset_receipt},
-        "transfer_status":"NOT_IMPLEMENTED_NO_SOURCE_SUPPORTED_COEFFICIENT",
+        "parameterized_transfer":transfer_receipt,
+        "transfer_status":"GENERIC_CONSERVATIVE_OPERATOR_QUALIFIED_PHYSICAL_COEFFICIENT_UNAVAILABLE",
         "scope":"populated accepted original spatial PF state; orthogonal diagnostic consumers; no production calibration or tip/bulk transfer",
     }
     out.mkdir(parents=True,exist_ok=False)
