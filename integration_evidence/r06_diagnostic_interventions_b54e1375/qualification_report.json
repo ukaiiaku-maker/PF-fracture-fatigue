@@ -1,0 +1,157 @@
+{
+  "baseline": {
+    "active_shielding_Pa_sqrt_m": -99852.97807043834,
+    "active_vector_nonzero_count": 461,
+    "mobile_count": 2.1084789289409756e-10,
+    "retained_count": 513.0898344561879,
+    "source_backstress_Pa": [
+      729531684.1642504,
+      720129962.9879804
+    ],
+    "tip_radius_m": 1.0974740731684242e-06
+  },
+  "checkpoint": {
+    "generation": "df5fc3bb5c0f0e1c5ddf464d",
+    "manifest_sha256": "c874fbd2fa4f9aabf93b1b8df381faf008acc7d3a9787a1d018072fd3d95b7c0",
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/f1_coupled_native_qualification_8982d422/uninterrupted_to_step64/checkpoint"
+  },
+  "checks": {
+    "checkpoint_is_populated": true,
+    "fixed_blunting_holds_developed_radius": true,
+    "history_reset_native_reequilibrated": true,
+    "history_reset_not_physical_recovery": true,
+    "history_reset_recorded_work": true,
+    "history_reset_removed_populated_state": true,
+    "no_tip_bulk_transfer_added": true,
+    "parameterized_transfer_has_no_default_coefficient": true,
+    "parameterized_transfer_is_conservative": true,
+    "retained_shielding_removed": true,
+    "shielding_population_preserved": true,
+    "source_backstress_removed": true,
+    "source_population_preserved": true,
+    "transport_install_preserves_population": true,
+    "transport_retention_terms_were_active": true
+  },
+  "kernel": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/family.json",
+    "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+  },
+  "parameterized_transfer": {
+    "bulk_count_after": 26.00368138083723,
+    "bulk_count_before": 0.0,
+    "conservation_residual_line_content": 0.0,
+    "constructed_qualification_parameter": true,
+    "direction": "tip_to_bulk",
+    "limited_by_available_population": false,
+    "physical_transfer_coefficient": null,
+    "production_default": false,
+    "requested_line_content": 26.003681380837225,
+    "schema": "conservative-tip-bulk-population-transfer/1",
+    "tip_count_after": 234.03313242753504,
+    "tip_count_before": 260.03681380837224,
+    "transferred_line_content": 26.003681380837225
+  },
+  "production_execution_authorized": false,
+  "receipts": {
+    "blunting_fixed": {
+      "fixed_blunting_radius_m": 1.0974740731684242e-06,
+      "intervention": "blunting_fixed",
+      "population_state_unchanged": true,
+      "production_default": false,
+      "qualification_only": true,
+      "removed_terms": {
+        "blunting_evolution": true,
+        "exchange_retention_transport": false,
+        "retained_shielding": false,
+        "source_backstress": false
+      },
+      "schema": "persistent-native-diagnostic-interventions/1",
+      "tip_bulk_population_transfer_added": false
+    },
+    "history_reset_reequilibrated": {
+      "counterfactual_removed_work": {
+        "W_emit_J_per_m": 0.05333239213737593
+      },
+      "intervention": "history_reset_reequilibrated",
+      "native_reequilibration": {
+        "converged": true,
+        "displacement_correction_norm_m": 4.795364442082265e-08,
+        "native_mechanics": true,
+        "reaction_N_per_m": 2792678.2349923947,
+        "residual_norm_N_per_m": 1.1496013030409813e-09
+      },
+      "physical_loss_ledgers_unchanged": true,
+      "post_reset_population_sha256": "4414ad40f395c2e580ec81925547dab456a1b8cecdd9421a7339c3835d908efe",
+      "pre_reset_population_sha256": "9d495ac608ad0ab406c8950dc0e27f92b43d3542cd49011688af54fdfed40e29",
+      "production_default": false,
+      "qualification_only": true,
+      "removed_population": {
+        "accumulated_slip_negative": 254.3188893649029,
+        "accumulated_slip_positive": 261.3322037728348,
+        "mobile_negative": 1.0398899493007318e-10,
+        "mobile_positive": 1.0685889796402439e-10,
+        "retained_negative": 253.05302064781563,
+        "retained_positive": 260.03681380837224,
+        "wake_mobile_negative": 0.022165160320580003,
+        "wake_mobile_positive": 0.022744834028684657,
+        "wake_retained_negative": 0.0002979254658070054,
+        "wake_retained_positive": 0.0003057025193249183,
+        "wake_slip_negative": 0.04981450070364012,
+        "wake_slip_positive": 0.05119829666049266
+      },
+      "removed_population_total": 1028.887454013835,
+      "schema": "persistent-native-diagnostic-interventions/1",
+      "tip_bulk_population_transfer_added": false
+    },
+    "retained_shielding_off": {
+      "fixed_blunting_radius_m": null,
+      "intervention": "retained_shielding_off",
+      "population_state_unchanged": true,
+      "production_default": false,
+      "qualification_only": true,
+      "removed_terms": {
+        "blunting_evolution": false,
+        "exchange_retention_transport": false,
+        "retained_shielding": true,
+        "source_backstress": false
+      },
+      "schema": "persistent-native-diagnostic-interventions/1",
+      "tip_bulk_population_transfer_added": false
+    },
+    "source_backstress_off": {
+      "fixed_blunting_radius_m": null,
+      "intervention": "source_backstress_off",
+      "population_state_unchanged": true,
+      "production_default": false,
+      "qualification_only": true,
+      "removed_terms": {
+        "blunting_evolution": false,
+        "exchange_retention_transport": false,
+        "retained_shielding": false,
+        "source_backstress": true
+      },
+      "schema": "persistent-native-diagnostic-interventions/1",
+      "tip_bulk_population_transfer_added": false
+    },
+    "transport_retention_off": {
+      "fixed_blunting_radius_m": null,
+      "intervention": "transport_retention_off",
+      "population_state_unchanged": true,
+      "production_default": false,
+      "qualification_only": true,
+      "removed_terms": {
+        "blunting_evolution": false,
+        "exchange_retention_transport": true,
+        "retained_shielding": false,
+        "source_backstress": false
+      },
+      "schema": "persistent-native-diagnostic-interventions/1",
+      "tip_bulk_population_transfer_added": false
+    }
+  },
+  "schema": "r06-native-diagnostic-intervention-qualification/1",
+  "scope": "populated accepted original spatial PF state; orthogonal diagnostic consumers; no production calibration or tip/bulk transfer",
+  "source_commit": "b54e13752b415947345e211696e0baaa95106ec9",
+  "status": "PASS",
+  "transfer_status": "GENERIC_CONSERVATIVE_OPERATOR_QUALIFIED_PHYSICAL_COEFFICIENT_UNAVAILABLE"
+}
