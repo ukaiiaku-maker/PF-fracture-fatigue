@@ -29,6 +29,7 @@ LEGACY = ROOT / "integration_evidence/new_full_pf_1000um_dbtt_300K/steps_0300K.c
 GEOMETRY_201 = ROOT / "integration_evidence/targeted_completion/current_single_front_1000um"
 NATIVE_203 = ROOT / "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3"
 RESTART = ROOT / "integration_evidence/f1_native_taylor_peierls_qualification_2276745b"
+LAW_MAP = ROOT / "common_framework_readiness/LAW_TO_RESULT_MAP_V3.json"
 EXPECTED_LEGACY_SHA = "3e67545d96d9dfe8c47d83e3e59813699ccf8135e83f849c1bbbec4f8dd028ea"
 
 
@@ -217,6 +218,48 @@ def _fem_lineage() -> list[dict[str, Any]]:
     return result
 
 
+def _producer_identity(result_root: Path) -> dict[str, Any]:
+    """Resolve one immutable producer-law record for an existing result root."""
+    relative = str(result_root.relative_to(ROOT))
+    law_map = json.loads(LAW_MAP.read_text())
+    matches = [
+        item for item in law_map["families"]
+        if item.get("result_root") == relative
+    ]
+    if len(matches) != 1:
+        raise RuntimeError(
+            f"expected one producer-law record for {relative}, found {len(matches)}"
+        )
+    artifacts = {}
+    for name in (
+        "steps_1200K.csv",
+        "fronts_1200K.csv",
+        "run_args.json",
+        "selected_material_manifest_v10_2_22.csv",
+        "v10_2_22_parameter_selection.json",
+        "v10_2_22_persistent_site_model.json",
+        "v10_1_7_5_transport_mode.json",
+        "shared_runtime_attestation.post.json",
+        "stochastic_avalanche_geometry_events.json",
+        "crack_path_1200K.csv",
+        "fracture_observations_online.jsonl",
+    ):
+        path = result_root / name
+        if path.is_file():
+            artifacts[name] = {"sha256": _sha(path), "bytes": path.stat().st_size}
+    return {
+        "law_map": str(LAW_MAP.relative_to(ROOT)),
+        "law_map_sha256": _sha(LAW_MAP),
+        "producer_law": matches[0],
+        "raw_artifacts": artifacts,
+        "interpretation": (
+            "The producer commit and producer-bound law describe the trajectory. "
+            "The analysis commit below only reads, queries, and renders that trajectory; "
+            "it does not retroactively apply the current constitutive law."
+        ),
+    }
+
+
 def build_receipt(plot_path: Path) -> dict[str, Any]:
     legacy, _ = _legacy_receipt()
     geometry_201, _ = _geometry_receipt(GEOMETRY_201, expected_events=201)
@@ -225,6 +268,16 @@ def build_receipt(plot_path: Path) -> dict[str, Any]:
         native_history, plot_path, quantity="K_J", stage="pre_event",
         coordinate="path_arclength",
     )
+    producer = _producer_identity(NATIVE_203)
+    provenance_path = plot_path.with_suffix(".provenance.json")
+    provenance = {
+        "schema": "k-length-figure-provenance/1",
+        "figure": str(plot_path.relative_to(ROOT)),
+        "figure_sha256": _sha(plot_path),
+        "analysis_commit": _git(ROOT, "rev-parse", "HEAD"),
+        "producer_identity": producer,
+    }
+    provenance_path.write_text(json.dumps(provenance, indent=2, sort_keys=True) + "\n")
     return {
         "schema": "k-length-analysis-port-qualification/1",
         "status": "PASS_CURRENT_NATIVE_AND_HISTORICAL_REPLAY",
@@ -238,6 +291,10 @@ def build_receipt(plot_path: Path) -> dict[str, Any]:
         "restart_chronology": _restart_receipt(),
         "plot_evidence": {
             "path": str(plot_path.relative_to(ROOT)), "sha256": _sha(plot_path),
+            "provenance_path": str(provenance_path.relative_to(ROOT)),
+            "provenance_sha256": _sha(provenance_path),
+            "analysis_commit": provenance["analysis_commit"],
+            "producer_identity": producer,
             "quantity": "K_J_Pa_sqrt_m", "stage": "pre_event",
             "coordinate": "path_arclength", "selected_rows": len(selected),
             "fallback_between_K_definitions": False,
