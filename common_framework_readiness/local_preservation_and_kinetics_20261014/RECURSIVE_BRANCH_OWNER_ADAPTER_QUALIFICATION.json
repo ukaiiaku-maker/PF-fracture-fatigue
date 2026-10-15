@@ -1,0 +1,61 @@
+{
+  "active_tips": [
+    "daughter-2",
+    "granddaughter-1",
+    "granddaughter-2"
+  ],
+  "capacity": {
+    "admitted": false,
+    "free_GiB": 20.316513061523438,
+    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1",
+    "peak_GiB": 24.0,
+    "reason": "DEFERRED_RESOURCE: peak plus reserve exceeds free space",
+    "reserve_GiB": 12.0
+  },
+  "checkpoint_exact": true,
+  "fixture_classification": "INJECTED_OWNER_TRANSITIONS_NOT_NATURAL_BRANCH_PREDICTION",
+  "mutable_independent_owner_aliasing": false,
+  "native_birth_demonstrated": false,
+  "native_birth_entry": "scripts/run_v11_branching_case.py",
+  "owner_registry": {
+    "owner_by_tip": {
+      "daughter-2": "daughter-2",
+      "granddaughter-1": "cluster-2",
+      "granddaughter-2": "cluster-2"
+    },
+    "owners": {
+      "cluster-2": {
+        "cluster_id": "cluster-2",
+        "junction_reservoir_id": null,
+        "owner_id": "cluster-2",
+        "owner_type": "unresolved_branch_cluster",
+        "process_engine_id": "cluster-2"
+      },
+      "daughter-2": {
+        "cluster_id": null,
+        "junction_reservoir_id": null,
+        "owner_id": "daughter-2",
+        "owner_type": "resolved_tip_engine",
+        "process_engine_id": "daughter-2"
+      },
+      "reservoir-1": {
+        "cluster_id": "cluster-1",
+        "junction_reservoir_id": "reservoir-1",
+        "owner_id": "reservoir-1",
+        "owner_type": "junction_reservoir",
+        "process_engine_id": null
+      }
+    },
+    "schema": "v11.process-state-owner-registry/1"
+  },
+  "production_execution_authorized": false,
+  "qualification": "Q-BRANCH-RECURSIVE",
+  "schema": "recursive-branch-owner-adapter-qualification/1",
+  "status": "PARTIAL_ADAPTER_QUALIFIED_NATIVE_BIRTH_PENDING",
+  "transitions": [
+    "single_owner_to_unresolved_first_generation_cluster",
+    "first_generation_cluster_to_independent_daughter_owners",
+    "resolved_daughter_to_unresolved_second_generation_cluster",
+    "checkpoint_round_trip"
+  ]
+}

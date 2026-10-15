@@ -201,16 +201,19 @@
     {
       "id": "R09",
       "goal_ids": ["FG-13", "FG-16"],
-      "status": "INCOMPLETE",
-      "concrete_defect": "Native spontaneous branch birth, daughter continuation, second-generation ownership and active topology restart are not jointly qualified.",
+      "status": "PARTIAL_SECOND_GENERATION_OWNER_ADAPTER_QUALIFIED_NATIVE_BIRTH_PENDING",
+      "concrete_defect": "The recursive ownership adapter now executes single-owner birth ownership, first-generation cluster resolution, independent daughter ownership, a resolved-daughter second-generation transition and exact checkpoint round-trip without mutable-owner aliasing. This is an explicitly injected ownership fixture, not a spontaneous native branch prediction. Native spontaneous birth, mechanical daughter continuation and active topology restart are not yet jointly qualified.",
       "owner_consumer": "branch scheduler, crack graph, topology transaction and checkpoint",
       "authoritative_source": "native V11/V12 branch implementations",
       "dependencies": ["R01", "R03", "R07"],
       "exact_next_command": "python scripts/run_recursive_branch_readiness.py --second-generation",
-      "input_output_identity": "documented qualification initial state; no forced event",
+      "input_output_identity": "injected ownership-transition fixture is labeled non-predictive; future native run requires a documented admissible initial state and no forced event",
       "numerical_criteria": "Actual eligible native birth, continuation, clocks/marks/state conservation and fresh-process topology restart.",
-      "executed_evidence": [],
-      "remaining_limitation": "Existing initialized two-front evidence cannot satisfy spontaneous birth."
+      "executed_evidence": [
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/RECURSIVE_BRANCH_OWNER_ADAPTER_QUALIFICATION.json",
+        "tests/test_recursive_branch_readiness.py"
+      ],
+      "remaining_limitation": "Existing initialized/injected ownership evidence cannot satisfy spontaneous birth. The 24 GiB qualification plus 12 GiB reserve is not admitted with the currently observed free space, and production execution remains disabled."
     },
     {
       "id": "R10",

@@ -93,7 +93,7 @@ def qualification_jobs() -> tuple[QualificationJob, ...]:
                          "second-generation native birth followed by one accepted continuation",
                          ("one worker", "capacity preflight", "checkpoint/resume same physics; no model-selection wall cap"),
                          ("birth", "owner", "cluster/local", "inherited clock", "restart"), 24.0, compact,
-                         "UNRESOLVED_SECOND_GENERATION_NATIVE_ADAPTER"),
+                         "PARTIAL_ADAPTER_QUALIFIED_NATIVE_BIRTH_PENDING"),
     )
 
 
