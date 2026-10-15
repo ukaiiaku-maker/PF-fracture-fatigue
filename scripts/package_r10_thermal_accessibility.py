@@ -32,7 +32,7 @@ def main(argv=None) -> int:
         "thermal_accessibility_decision.json", "accessibility_bound_audit.json",
         "thermal_accessibility_result.json",
         "full_state_case_table.csv", "causal_decomposition.csv",
-        "fatigue_case_table.csv", "fatigue_windows.csv",
+        "fatigue_case_table.csv", "fatigue_windows.csv", "fatigue_two_windows.csv",
     )
     for name in names:
         copy(iteration / name, args.out / "results" / name)
@@ -52,9 +52,8 @@ def main(argv=None) -> int:
         for name in ("campaign_summary.json", "production_preflight.json"):
             copy(root / name, args.out / "fatigue" / campaign / name)
     weak = iteration / "fatigue" / "weakt_seed4810"
-    copy(weak / "production_preflight.json", args.out / "fatigue" / "weakt_seed4810" / "production_preflight.json")
-    progress = weak / "Kmax_5p55555556" / "checkpoint" / "trajectory_progress.json"
-    copy(progress, args.out / "fatigue" / "weakt_seed4810" / "Kmax_5p55555556" / "trajectory_progress.json")
+    for source in sorted(x for x in weak.rglob("*") if x.is_file()):
+        copy(source, args.out / "fatigue" / "weakt_seed4810" / source.relative_to(weak))
     for campaign in ("r10j_dbtt_p40_lshift_036mev_seed4810", "r10j_dbtt_p40_lshift_036mev_seed9117"):
         for source in sorted((args.run_root / "bridges" / campaign).glob("Kmax_*/result.json")):
             copy(source, args.out / "fatigue" / "reused_dbtt_control" / campaign / source.parent.name / source.name)
@@ -70,11 +69,14 @@ def main(argv=None) -> int:
     ):
         copy(repository / "scripts" / name, args.out / "source" / "scripts" / name)
     for name in ("thermal_accessibility_r10.py", "retained_material_r10.py",
-                 "unified_fracture_material_v5.py"):
+                 "unified_fracture_material_v5.py", "paris_slope_r9.py",
+                 "persistent_site_first_passage_locator_v10230.py"):
         copy(repository / "arrhenius_fracture" / name,
              args.out / "source" / "arrhenius_fracture" / name)
     copy(repository / "tests" / "test_r10_thermal_accessibility.py",
          args.out / "source" / "tests" / "test_r10_thermal_accessibility.py")
+    copy(repository / "tests" / "test_paris_slope_r9.py",
+         args.out / "source" / "tests" / "test_paris_slope_r9.py")
 
     commands = """# Reproduction commands
 
@@ -95,7 +97,7 @@ python -m pytest -q
 
 This package continues the existing family-A search in the saved P3/P4 coordinates. It adds a certified, channel-local F0 opening bound; preserves exact 300 K process surfaces; enforces positive raw-domain endpoints on prospective rows; and records complete-state thermal and fatigue evidence without changing the barrier, event, or mechanics laws.
 
-Current selections are `{SELECTED[0]}` (resolved Peak-T and two-seed fatigue pass), `{SELECTED[1]}` (rising DBTT with increasing hot current-state contribution and exact-contract fatigue reuse), and `{SELECTED[2]}` (bounded compensated Weak-T fracture response). Weak-T fatigue remains unresolved because the mean-cycle accelerator failed its state-overlap check; this is a numerical censor, not a material failure. The ceramic rows remain controls without a Paris requirement.
+Current selections are `{SELECTED[0]}` (opening-dominated Peak-T topology and two-seed fatigue pass), `{SELECTED[1]}` (intrinsically rising DBTT with important hot current-state enhancement and exact-contract fatigue reuse), and `{SELECTED[2]}` (bounded compensated Weak-T fracture response). The Weak-T mean-cycle accelerator remains rejected, but the retained native phase-resolved engine completed all five requested developed trajectories. The five-point curve fails the established slope/width objective and returns to the existing class-specific selection loop; this is now a physical candidate result rather than a numerical censor. The ceramic rows remain controls without a Paris requirement.
 
 The selected DBTT row was passed through a narrow exact-row spatial binding that retains the qualified non-fracture owners; its current status is `{spatial_status}`. The sealed historical same-row controls are also copied under `spatial/`.
 

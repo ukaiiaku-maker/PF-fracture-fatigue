@@ -52,6 +52,8 @@ def fatigue_rows(root: Path) -> tuple[list[dict], list[dict]]:
     campaigns = [
         ("Peak-T", root / "fatigue" / "peak_seed4810", "fresh"),
         ("Peak-T", root / "fatigue" / "peak_seed9117", "fresh"),
+        ("Weak-T compensated", root / "fatigue" / "weakt_seed4810",
+         "fresh_native_phase_resolved"),
         ("DBTT", root.parents[0] / "bridges" / "r10j_dbtt_p40_lshift_036mev_seed4810", "reused_exact_300K_contract"),
         ("DBTT", root.parents[0] / "bridges" / "r10j_dbtt_p40_lshift_036mev_seed9117", "reused_exact_300K_contract"),
     ]
@@ -69,7 +71,8 @@ def fatigue_rows(root: Path) -> tuple[list[dict], list[dict]]:
                 "artifact": str(path.resolve()),
             })
     weak_progress = root / "fatigue" / "weakt_seed4810" / "Kmax_5p55555556" / "checkpoint" / "trajectory_progress.json"
-    if weak_progress.is_file():
+    weak_results = list((root / "fatigue" / "weakt_seed4810").glob("Kmax_*/result.json"))
+    if weak_progress.is_file() and not weak_results:
         result = read_json(weak_progress)
         cases.append({
             "class": "Weak-T compensated", "candidate_id": WEAK,
@@ -102,6 +105,34 @@ def fatigue_rows(root: Path) -> tuple[list[dict], list[dict]]:
             "moderate_two_decade_interval": width >= 2.0 and all(3.4 <= m <= 4.6 for m in slopes),
         })
     return cases, windows
+
+
+def two_window_rows(cases: list[dict]) -> list[dict]:
+    rows = []
+    keys = sorted({(x["class"], x["candidate_id"], x["seed"]) for x in cases})
+    for key in keys:
+        points = sorted(
+            (x for x in cases if (x["class"], x["candidate_id"], x["seed"]) == key
+             and x["rate_20_60_m_per_cycle"] is not None),
+            key=lambda x: x["DeltaK_MPa_sqrt_m"],
+        )
+        if len(points) != 5:
+            continue
+        for label, selected in (("low_3", points[:3]), ("high_3", points[-3:])):
+            x = np.log([p["DeltaK_MPa_sqrt_m"] for p in selected])
+            y = np.log([p["rate_20_60_m_per_cycle"] for p in selected])
+            local = [float((y[i+1]-y[i])/(x[i+1]-x[i]))
+                     for i in range(len(x)-1)]
+            rows.append({
+                "class": key[0], "candidate_id": key[1], "seed": key[2],
+                "window": label,
+                "DeltaK_min_MPa_sqrt_m": selected[0]["DeltaK_MPa_sqrt_m"],
+                "DeltaK_max_MPa_sqrt_m": selected[-1]["DeltaK_MPa_sqrt_m"],
+                "global_slope": float(np.polyfit(x, y, 1)[0]),
+                "growth_rate_width_decades": float((y[-1]-y[0])/math.log(10.0)),
+                "local_slope_min": min(local), "local_slope_max": max(local),
+            })
+    return rows
 
 
 def full_state_rows(root: Path) -> list[dict]:
@@ -155,15 +186,19 @@ def main(argv=None) -> int:
     registry = list(csv.DictReader((args.root / "thermal_state_candidates.csv").open()))
     full = full_state_rows(args.root); fatigue, windows = fatigue_rows(args.root)
     decomposition = selected_decomposition(args.root, registry, full)
+    two_windows = two_window_rows(fatigue)
     write_csv(args.root / "full_state_case_table.csv", full)
     write_csv(args.root / "causal_decomposition.csv", decomposition)
     write_csv(args.root / "fatigue_case_table.csv", fatigue)
     write_csv(args.root / "fatigue_windows.csv", windows)
+    write_csv(args.root / "fatigue_two_windows.csv", two_windows)
 
     peak_curve = [x for x in decomposition if x["candidate_id"] == PEAK]
     dbtt_curve = [x for x in decomposition if x["candidate_id"] == DBTT]
     weak_curve = [x for x in decomposition if x["candidate_id"] == WEAK]
     peak_windows = [x for x in windows if x["class"] == "Peak-T"]
+    weak_windows = [x for x in windows if x["class"] == "Weak-T compensated"]
+    weak_two_windows = [x for x in two_windows if x["class"] == "Weak-T compensated"]
     spatial_path = args.root / "spatial" / "dbtt_900K_current_backend" / "r8_current_backend_spatial.json"
     spatial_result = read_json(spatial_path) if spatial_path.is_file() else None
     decision = {
@@ -181,9 +216,22 @@ def main(argv=None) -> int:
             },
             "Weak-T compensated": {
                 "candidate_id": WEAK, "fracture_status": "PASS_BOUNDED_COMPENSATED_CURVE",
-                "fatigue_status": "UNRESOLVED_NUMERICAL_OVERLAP_CENSOR",
+                "fatigue_status": (
+                    "PASS_FIVE_POINT_DEVELOPED_INTERVAL"
+                    if len(weak_windows) == 1 and weak_windows[0]["moderate_two_decade_interval"]
+                    else ("FAIL_DEVELOPED_SLOPE_WIDTH_OBJECTIVE_RETURN_TO_SELECTION"
+                          if len(weak_windows) == 1 and weak_windows[0]["point_count"] == 5
+                          else "UNRESOLVED_NATIVE_FATIGUE")
+                ),
                 "Kinit_by_temperature": [x["complete_state_Kinit_MPa_sqrt_m"] for x in weak_curve],
-                "censor_definition": "mean-cycle accelerator rejected because state overlap error is 0.3599467703; no fatigue pass/fail inferred",
+                "numerical_status": "MEAN_CYCLE_REJECTED_NATIVE_PHASE_RESOLVED_COMPLETED",
+                "five_point_window": weak_windows[0] if weak_windows else None,
+                "two_window_diagnostic": weak_two_windows,
+                "independent_stream_status": (
+                    "NOT_TRIGGERED_OBJECTIVE_FAILED_IN_FIRST_STREAM"
+                    if weak_windows and not weak_windows[0]["moderate_two_decade_interval"]
+                    else "REQUIRED_IF_PROMOTED"
+                ),
             },
             "Ceramic-like": {"candidate_id": "retained ceramic controls", "status": "CONTROL_NO_PARIS_REQUIREMENT"},
         },
@@ -195,6 +243,32 @@ def main(argv=None) -> int:
             "reused_controls": "runs/r10_joint_search/reused_sealed_2d_terminal_summary.csv",
         },
         "controls_preserved": ["R10J_DBTT_P40_LSHIFT_036MEV_V1", "R10_DBTT_P40_THERMAL_ANCHOR_V1"],
+        "mechanism_classification": {
+            "DBTT": {
+                "achieved_topology": "rising full-state initiation curve",
+                "opening_A0_role": "dominant intrinsic rise: 15.24 MPa sqrt(m) of the tabulated 17.943907 end-to-end rise",
+                "state_role": "important hot-end enhancement; operational correction change 2.703907 MPa sqrt(m) and preserves the 1050-to-1200 rise",
+                "mechanism_status": "PLASTICITY_CREATED_DBTT_NOT_ESTABLISHED; retain as intrinsically rising hot-state-enhanced successful-fatigue control",
+                "root_difference_warning": "K_full-K_A0 is an operational state correction, not explicit K_shield or microscopic work partition",
+            },
+            "Peak-T": {
+                "achieved_topology": "interior sampled maximum at 600 K",
+                "opening_A0_role": "opening-dominated; A0 already peaks at 600 K",
+                "state_role": "modest correction, maximum relative full/A0 about 2.27 percent",
+                "mechanism_status": "PLASTICITY_GENERATED_PEAK_NOT_ESTABLISHED",
+                "resolution": "600-to-750 full-root difference 0.0249997 MPa sqrt(m), below the executed dK=0.05 MPa sqrt(m) scan step; precise peak location unresolved",
+            },
+            "Weak-T compensated": {
+                "achieved_topology": "bounded compensated curve, not perfectly flat",
+                "opening_A0_role": "A0 span 1.34945 and 300-to-1200 change -0.670 MPa sqrt(m)",
+                "state_role": "1050 K operational increase 31.49 percent; correction change +0.58255 MPa sqrt(m) opposes the intrinsic decline",
+                "mechanism_status": "COMPENSATION_SUPPORTED; cancellation is interval-dependent",
+            },
+            "Ceramic-like": {
+                "achieved_topology": "retained control",
+                "mechanism_status": "CONTROL_NO_PARIS_REQUIREMENT",
+            },
+        },
         "counts": {"analytical_rows": len(list(csv.DictReader((args.root / "thermal_accessibility_scan.csv").open()))), "full_state_cases": len(full), "fatigue_cases": len(fatigue)},
     }
     (args.root / "thermal_accessibility_result.json").write_text(json.dumps(decision, indent=2, sort_keys=True)+"\n")
@@ -207,11 +281,25 @@ def main(argv=None) -> int:
         if item not in state["completed"]: state["completed"].append(item)
     state["running_jobs"] = []
     state["thermal_accessibility_result"] = str((args.root / "thermal_accessibility_result.json").resolve())
-    state["queued_jobs"] = ["resolve Weak-T phase-exact fatigue overlap censor without changing the law"]
+    weak_failed = bool(
+        weak_windows and not weak_windows[0]["moderate_two_decade_interval"]
+    )
+    completed_item = "Weak-T five-point native phase-resolved developed fatigue screen"
+    if weak_windows and completed_item not in state["completed"]:
+        state["completed"].append(completed_item)
+    state["queued_jobs"] = ([
+        "return Weak-T fatigue failure to existing class-specific P3/P4 Pareto selection using retained bank"
+    ] if weak_failed else [
+        "run Weak-T independent stochastic stream for the promising developed interval"
+    ])
     if not spatial_result or not spatial_result["passed"]:
         state["queued_jobs"].append("complete exact-row DBTT current-backend spatial execution")
     state["next"] = state["queued_jobs"][0]
-    state["unresolved"] = list(dict.fromkeys([*state.get("unresolved", []), *state["queued_jobs"]]))
+    old_censor = "resolve Weak-T phase-exact fatigue overlap censor without changing the law"
+    state["unresolved"] = list(dict.fromkeys([
+        *(x for x in state.get("unresolved", []) if x != old_censor),
+        *state["queued_jobs"],
+    ]))
     temp = args.continuation_state.with_suffix(".json.tmp")
     temp.write_text(json.dumps(state, indent=2, sort_keys=True)+"\n"); temp.replace(args.continuation_state)
     print(json.dumps(decision, indent=2, sort_keys=True)); return 0
