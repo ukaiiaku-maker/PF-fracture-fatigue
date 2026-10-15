@@ -125,16 +125,16 @@
     {
       "id": "R05",
       "goal_ids": ["FG-11", "FG-12", "FG-16"],
-      "status": "PARTIAL_IMPLEMENTATION_AND_GENERIC_RESTART_WIRED_MATERIAL_SPECIMEN_SELECTION_PENDING",
-      "concrete_defect": "Autonomous classical bilinear and activated-bilinear constitutive paths with restartable damage are implemented, and the generic specimen checkpoint now preserves the native cohesive network. A material specimen selection remains unavailable because activation area and interface stiffness have not been authorized.",
+      "status": "COMPLETE_GENERIC_NATIVE_SPECIMEN_QUALIFIED_MATERIAL_SELECTION_PENDING",
+      "concrete_defect": "Closed for generic native implementation: a plane-strain cracked-body specimen now uses the independent FEM bulk assembler, duplicated interface nodes, an explicit precrack and native zero-thickness autonomous bilinear elements. It demonstrates damage initiation, irreversible unload, complete separation and exact active-state restart using a fully specified qualification-only material. The Peak, DBTT, weakT and ceramic fitted barriers are executable kinetically, but their physical autonomous mapping remains unavailable because activation area and separation work are null in the authoritative fit registry.",
       "owner_consumer": "independent FEM interface assembly, state update, serializer and restart",
       "authoritative_source": "original FEM/CZM solver plus R04 fitted registry",
       "dependencies": ["R04", "R08"],
-      "exact_next_command": "python -m pytest -q tests/test_bilinear_czm_native.py",
+      "exact_next_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python scripts/qualify_bilinear_cohesive_specimen_v1.py --out <new-output> --bilinear-fit-registry <R04-fit-registry>",
       "input_output_identity": "three explicit opening-model IDs with common accommodation inputs",
       "numerical_criteria": "Consistent residual/tangent, autonomous separation, irreversible unload/reload, nonnegative dissipation and active-damage restart equality.",
-      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json"],
-      "remaining_limitation": "Autonomous irreversible and activated-bilinear constitutive paths, unilateral contact and JSON-safe active-damage restart are implemented; generic native specimen restart is now complete on the adaptive atomic cohesive route. Bilinear specimen-level event/damage/energy evidence still awaits authoritative activation area and stiffness or an explicitly selected qualification-only fixture."
+      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@0d7fca3:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@6db9cfc:integration_evidence/r05_bilinear_specimen_0d7fca3/qualification_report.json"],
+      "remaining_limitation": "No production material was selected. The constructed law is explicitly qualification-only and is not a tungsten calibration or default. Mapping any fitted Peak/DBTT/weakT/ceramic barrier to autonomous separation still requires authoritative activation area or separation work; this no longer blocks the generic native specimen implementation or its restart qualification."
     },
     {
       "id": "R06",
@@ -153,8 +153,8 @@
         "tests/test_source_transport_axes_qualification.py",
         "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json",
         "common_framework_readiness/local_preservation_and_kinetics_20261014/EQUATION_AND_ACCURACY_CORRESPONDENCE.json",
-        "tests/test_cross_consumer_kinetic_lifecycle.py"
-        ,"integration_evidence/channel_transport_native_a0590e03/qualification_report.json"
+        "tests/test_cross_consumer_kinetic_lifecycle.py",
+        "integration_evidence/channel_transport_native_a0590e03/qualification_report.json"
       ],
       "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Source-backstress-off, transport-retention-off, fixed-blunting, isolated retained-shielding and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
     },
