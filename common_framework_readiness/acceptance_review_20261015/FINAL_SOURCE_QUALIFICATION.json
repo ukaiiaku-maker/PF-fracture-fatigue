@@ -1,0 +1,42 @@
+{
+  "schema": "final-source-qualification/1",
+  "date": "2026-10-15",
+  "pf": {
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "tested_commit": "0c05b050",
+    "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "focused_result": "21 passed in 1.61s",
+    "focused_command": "python -m pytest -q tests/test_local_incremental_cavity_qualification.py tests/test_campaign_v3_acceptance_audit.py tests/test_prospective_campaign_v3.py tests/test_candidate_drive_contract.py tests/test_v5_ligament_candidate_dispatch.py tests/test_common_framework_release_tools.py"
+  },
+  "fem": {
+    "branch": "codex/current-pf-companion",
+    "tested_commit": "4162181",
+    "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+    "focused_result": "19 passed in 0.93s",
+    "focused_command": "python -m pytest -q tests/test_bilinear_cohesive_request_v1.py tests/test_bilinear_cohesive_specimen_v1.py tests/test_bilinear_czm_native.py tests/test_v10232_registry_option_bridge.py tests/test_kinetic_campaign_czm_v10.py"
+  },
+  "full_suite": {
+    "status": "NOT_EXECUTED_RESOURCE_INADMISSIBLE",
+    "not_a_pass": true,
+    "snapshot": {
+      "vm_page_size_bytes": 16384,
+      "pages_free": 5345,
+      "approximate_free_page_bytes": 87572480,
+      "swap_total_MiB": 9216.0,
+      "swap_used_MiB": 8209.44,
+      "swap_free_MiB": 1006.56,
+      "largest_unrelated_worker_RSS_KiB": 4952160,
+      "other_unrelated_scientific_worker_RSS_KiB": [2575856, 2408352, 926736]
+    },
+    "pf_resume_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+    "fem_resume_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python -m pytest -q",
+    "admission_rule": "run one suite at a time only after unrelated workers release enough memory and swap for a clean interpreter; do not kill unrelated workers",
+    "base_environment_incident": "The unqualified base Python 3.13 pytest collection exited 139 under memory pressure; the qualified FEM environment completed the focused suite. This is recorded as an execution failure, not a test pass."
+  },
+  "external_evidence_and_backup": {
+    "status": "SEPARATE_FROM_SOURCE_TESTS",
+    "independent_backup_containers": "INCOMPLETE_AS_PREVIOUSLY_RECORDED",
+    "source_tests_do_not_override_missing_backup_content": true
+  },
+  "production_execution_authorized": false
+}
