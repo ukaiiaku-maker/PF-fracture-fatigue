@@ -1,0 +1,834 @@
+--- /dev/null
++++ b/scripts/design_r10_weakt_joint_continuation.py
+@@ -0,0 +1,184 @@
++#!/usr/bin/env python3
++"""Acquire a compensated Weak-T row on an already-tested 300 K background.
++
++This is an R10 continuation, not a new constitutive family.  It keeps the
++selected Peak row's complete 300 K process surfaces (and hence its accepted
++fatigue evidence), applies the inherited P3 opening continuation, and uses an
++existing P4 emission/Peierls/Taylor endpoint.  Candidate ranking uses the
++measured temperature-dependent state correction of the failed Weak-T row as
++an acquisition predictor; promotion still requires a complete-state ramp.
++"""
++from __future__ import annotations
++
++import argparse
++import csv
++import hashlib
++import json
++from pathlib import Path
++import sys
++
++import numpy as np
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT))
++
++from scripts.design_r10_joint_level_iteration import frozen_onset
++from scripts.design_r10_thermal_accessibility_iteration import (
++    TEMPERATURES, canonical_hash, domain_audit, exp_surface, parity_300,
++    raw_coordinates, set_exp_linear_coordinates, set_transport_endpoint,
++)
++
++PEAK = "R10T_PEAK_P40_G2600_S0P25GPA_P4_LOW_TAYLOR_V1"
++FAILED_WEAK = "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1"
++
++
++def _row(registry: list[dict], candidate_id: str) -> dict:
++    record = next(x for x in registry if x["candidate_id"] == candidate_id)
++    return json.loads(record["complete_parameter_vector"])
++
++
++def _p4_ep055_pp010(row: dict) -> dict:
++    """Use the already-authorized P4 endpoint, preserving every 300 K value."""
++    child = set_transport_endpoint(row, "taylor", 0.03)
++    child = set_exp_linear_coordinates(child, "emit", sigc_1200_GPa=1.5)
++    emit_300, _ = raw_coordinates(exp_surface(child, "emit", 1.0e11), 300.0)
++    child = set_exp_linear_coordinates(
++        child, "emit", gT=(0.55 - emit_300) / 900.0,
++        sigc_1200_GPa=1.5,
++    )
++    return set_transport_endpoint(child, "peierls", 0.10)
++
++
++def main(argv=None) -> int:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--registry", type=Path, required=True)
++    parser.add_argument("--full-state-table", type=Path, required=True)
++    parser.add_argument("--out-root", type=Path, required=True)
++    args = parser.parse_args(argv)
++    args.out_root.mkdir(parents=True, exist_ok=True)
++
++    registry = list(csv.DictReader(args.registry.open()))
++    peak = _row(registry, PEAK)
++    failed = _row(registry, FAILED_WEAK)
++
++    # The measured correction is operational K_complete-K_A0, not shielding or
++    # a work partition.  The 300 K value uses the exact-contract result already
++    # carried by the R10 analysis; the remaining values are fresh full-state.
++    full = list(csv.DictReader(args.full_state_table.open()))
++    measured = {float(x["temperature_K"]): float(x["K_init_MPa_sqrt_m"])
++                for x in full if x["candidate_id"] == FAILED_WEAK}
++    measured[300.0] = 5.2373966579
++    failed_surface = exp_surface(failed, "cleave", 1.0e12)
++    correction = []
++    for temperature in TEMPERATURES:
++        a0 = frozen_onset(failed_surface, 3.0, 1.0e-6, temperature, dK=0.01)
++        correction.append(measured[temperature] - a0)
++
++    scan = []
++    g_values = np.unique(np.r_[np.linspace(0.0018, 0.0022, 33), 0.0019625])
++    for gT in g_values:
++        for sigc_1200 in (3.0, 4.5, 6.0):
++            p3 = set_exp_linear_coordinates(
++                peak, "cleave", gT=float(gT), sigc_1200_GPa=sigc_1200,
++            )
++            surface = exp_surface(p3, "cleave", 1.0e12)
++            roots = np.asarray([
++                frozen_onset(surface, 3.0, 1.0e-6, temperature, dK=0.01)
++                for temperature in TEMPERATURES
++            ], dtype=float)
++            predicted = roots + np.asarray(correction)
++            a0_span = float(roots.max() / roots.min())
++            predicted_span = float(predicted.max() / predicted.min())
++            scan.append({
++                "background_candidate_id": PEAK,
++                "cleave_gT_eV_per_K": float(gT),
++                "cleave_sigc_1200_GPa": sigc_1200,
++                "A0_roots_json": json.dumps(roots.tolist()),
++                "measured_state_correction_json": json.dumps(correction),
++                "predicted_complete_roots_json": json.dumps(predicted.tolist()),
++                "A0_span": a0_span,
++                "predicted_complete_span": predicted_span,
++                "mechanical_compensation_required": a0_span > 1.25,
++                "row": p3,
++            })
++
++    eligible = [x for x in scan if x["mechanical_compensation_required"]]
++    selected = min(eligible, key=lambda x: (
++        max(x["predicted_complete_span"] - 1.25, 0.0),
++        x["predicted_complete_span"],
++        abs(x["cleave_gT_eV_per_K"] - 0.0019625),
++    ))
++    child = _p4_ep055_pp010(selected["row"])
++    cid = ("R10C_WEAKT_PEAK300_G1988_S6P0GPA_"
++           "P4_EP055_PP010_V1")
++    child["candidate_id"] = cid
++    child["material_class"] = "weakT"
++    child["role"] = "R10 compensated Weak-T continuation on retained Peak 300 K background"
++    child["mechanism_summary"] = (
++        "P3 intrinsic decline plus P4 current-state compensation; exact retained Peak 300 K background"
++    )
++    audit = domain_audit(child)
++    parity = parity_300(peak, child)
++    if not audit["all_processes_valid"]:
++        raise RuntimeError("selected row is outside the inherited raw process domain")
++    if parity["maximum_abs_barrier_delta_eV"] > 2.0e-14:
++        raise RuntimeError(f"300 K background parity failed: {parity}")
++
++    changed = {key: {"parent": peak.get(key), "offspring": value}
++               for key, value in child.items() if peak.get(key) != value}
++    record = {
++        "candidate_id": cid,
++        "parent_candidate_id": PEAK,
++        "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
++        "target": "P40",
++        "cleavage_hits": child["physics__cleavage_hits"],
++        "cleavage_tau_s": child["physics__cleavage_correlation_time_s"],
++        "complete_row_sha256": canonical_hash(child),
++        "changed_fields_json": json.dumps(changed, sort_keys=True),
++        "complete_parameter_vector": json.dumps(child, sort_keys=True),
++        "selection_metrics_json": json.dumps(
++            {k: v for k, v in selected.items() if k != "row"}, sort_keys=True
++        ),
++        "p4_parameters_json": json.dumps({
++            "emission_G0_1200_eV": 0.55,
++            "peierls_G0_1200_eV": 0.10,
++            "shared_sigc_1200_GPa": 1.5,
++            "taylor_G0_1200_eV": 0.03,
++        }, sort_keys=True),
++        "raw_domain_audit_json": json.dumps(audit, sort_keys=True),
++        "reference_300K_parity_json": json.dumps(parity, sort_keys=True),
++        "realization": "existing P1/P2 Peak 300 K background + P3 opening + P4 transport endpoints",
++    }
++    fields = list(record)
++    with (args.out_root / "candidate.csv").open("w", newline="") as stream:
++        writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
++        writer.writeheader(); writer.writerow(record)
++    scan_fields = [k for k in scan[0] if k != "row"]
++    with (args.out_root / "analytical_scan.csv").open("w", newline="") as stream:
++        writer = csv.DictWriter(stream, fieldnames=scan_fields, lineterminator="\n")
++        writer.writeheader(); writer.writerows({k: x[k] for k in scan_fields} for x in scan)
++    decision = {
++        "schema": "r10.weakt-joint-continuation-acquisition/1",
++        "selected_candidate_id": cid,
++        "complete_row_sha256": record["complete_row_sha256"],
++        "source_background": PEAK,
++        "failed_row_used_as_information": FAILED_WEAK,
++        "predictor": "A0 plus measured event-owning complete-minus-A0 temperature correction",
++        "predictor_is_promotion": False,
++        "selected_metrics": {k: v for k, v in selected.items() if k != "row"},
++        "reference_300K_parity": parity,
++        "raw_domain_audit": audit,
++        "selection_reason": (
++            "different retained 300 K background with passed developed fatigue; "
++            "predicted bounded response still requires nonzero mechanical compensation"
++        ),
++    }
++    (args.out_root / "acquisition_decision.json").write_text(
++        json.dumps(decision, indent=2, sort_keys=True) + "\n"
++    )
++    print(json.dumps(decision, indent=2, sort_keys=True))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/scripts/design_r10_weakt_joint_update.py
+@@ -0,0 +1,134 @@
++#!/usr/bin/env python3
++"""Update the R10 Weak-T acquisition after the first cross-background ramp."""
++from __future__ import annotations
++
++import argparse
++import csv
++import json
++from pathlib import Path
++import sys
++
++import numpy as np
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT))
++
++from scripts.design_r10_joint_level_iteration import frozen_onset
++from scripts.design_r10_thermal_accessibility_iteration import (
++    TEMPERATURES, canonical_hash, domain_audit, exp_surface, parity_300,
++    set_exp_linear_coordinates,
++)
++
++PEAK = "R10T_PEAK_P40_G2600_S0P25GPA_P4_LOW_TAYLOR_V1"
++FIRST = "R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1"
++
++
++def main(argv=None) -> int:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--registry", type=Path, required=True)
++    parser.add_argument("--first-candidate", type=Path, required=True)
++    parser.add_argument("--first-panel", type=Path, required=True)
++    parser.add_argument("--out-root", type=Path, required=True)
++    args = parser.parse_args(argv)
++    args.out_root.mkdir(parents=True, exist_ok=True)
++
++    rows = list(csv.DictReader(args.registry.open()))
++    peak_record = next(x for x in rows if x["candidate_id"] == PEAK)
++    peak = json.loads(peak_record["complete_parameter_vector"])
++    first_record = next(csv.DictReader(args.first_candidate.open()))
++    first = json.loads(first_record["complete_parameter_vector"])
++    first_surface = exp_surface(first, "cleave", 1.0e12)
++    measured_correction = []
++    for temperature in TEMPERATURES:
++        result = json.loads((args.first_panel / f"T_{int(temperature):04d}K.json").read_text())
++        a0 = frozen_onset(first_surface, 3.0, 1.0e-6, temperature, dK=0.01)
++        measured_correction.append(float(result["K_init_MPa_sqrt_m"]) - a0)
++
++    # The first row measured a localized EP055/PP010 hump.  The updated batch
++    # returns to the retained Peak LOW_TAYLOR P4 state and uses that row's
++    # already measured correction, rather than transferring the failed hump.
++    peak_complete = [5.218191431656145, 5.725655455165621, 5.789876287820182,
++                     5.764876631186712, 5.491698413183014, 5.132756391190972,
++                     4.721988199665786]
++    peak_surface = exp_surface(peak, "cleave", 1.0e12)
++    low_taylor_correction = [
++        full - frozen_onset(peak_surface, 3.0, 1.0e-6, temperature, dK=0.01)
++        for full, temperature in zip(peak_complete, TEMPERATURES)
++    ]
++
++    scan = []
++    for gT in np.linspace(0.0018, 0.0022, 81):
++        for sigc_1200 in np.linspace(0.25, 6.0, 24):
++            child = set_exp_linear_coordinates(
++                peak, "cleave", gT=float(gT), sigc_1200_GPa=float(sigc_1200),
++            )
++            surface = exp_surface(child, "cleave", 1.0e12)
++            roots = np.asarray([
++                frozen_onset(surface, 3.0, 1.0e-6, temperature, dK=0.01)
++                for temperature in TEMPERATURES
++            ])
++            predicted = roots + np.asarray(low_taylor_correction)
++            scan.append({
++                "cleave_gT_eV_per_K": float(gT),
++                "cleave_sigc_1200_GPa": float(sigc_1200),
++                "A0_roots_json": json.dumps(roots.tolist()),
++                "A0_span": float(roots.max() / roots.min()),
++                "predicted_complete_roots_json": json.dumps(predicted.tolist()),
++                "predicted_complete_span": float(predicted.max() / predicted.min()),
++                "mechanical_compensation_required": float(roots.max() / roots.min()) > 1.25,
++                "row": child,
++            })
++    eligible = [x for x in scan if x["mechanical_compensation_required"]]
++    selected = min(eligible, key=lambda x: (
++        max(x["predicted_complete_span"] - 1.25, 0.0),
++        x["predicted_complete_span"],
++        abs(x["cleave_gT_eV_per_K"] - 0.0019625),
++    ))
++    child = selected["row"]
++    cid = "R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2"
++    child["candidate_id"] = cid
++    child["material_class"] = "weakT"
++    child["role"] = "R10 updated compensated Weak-T continuation on retained Peak 300 K background"
++    child["mechanism_summary"] = "P3 intrinsic decline with measured retained low-Taylor state compensation"
++    audit = domain_audit(child); parity = parity_300(peak, child)
++    if not audit["all_processes_valid"] or parity["maximum_abs_barrier_delta_eV"] > 2e-14:
++        raise RuntimeError("updated acquisition failed domain or 300 K parity")
++    changed = {key: {"parent": peak.get(key), "offspring": value}
++               for key, value in child.items() if peak.get(key) != value}
++    record = {
++        "candidate_id": cid, "parent_candidate_id": PEAK,
++        "family": "A_ORIGINAL_SINGLE_EXP_FLOOR", "target": "P40",
++        "cleavage_hits": child["physics__cleavage_hits"],
++        "cleavage_tau_s": child["physics__cleavage_correlation_time_s"],
++        "complete_row_sha256": canonical_hash(child),
++        "changed_fields_json": json.dumps(changed, sort_keys=True),
++        "complete_parameter_vector": json.dumps(child, sort_keys=True),
++        "selection_metrics_json": json.dumps({k: v for k, v in selected.items() if k != "row"}, sort_keys=True),
++        "p4_parameters_json": json.dumps({"retained_variant": "P4_LOW_TAYLOR"}),
++        "raw_domain_audit_json": json.dumps(audit, sort_keys=True),
++        "reference_300K_parity_json": json.dumps(parity, sort_keys=True),
++        "realization": "existing P1/P2 Peak 300 K background + updated P3 opening + retained P4 low-Taylor state",
++    }
++    with (args.out_root / "candidate_update.csv").open("w", newline="") as stream:
++        writer = csv.DictWriter(stream, fieldnames=list(record), lineterminator="\n"); writer.writeheader(); writer.writerow(record)
++    decision = {
++        "schema": "r10.weakt-joint-continuation-acquisition-update/1",
++        "first_candidate": FIRST,
++        "first_candidate_measured_correction_json": json.dumps(measured_correction),
++        "first_candidate_disposition": "NEAR_MISS_P4_HOT_MECHANICAL_HUMP",
++        "selected_candidate_id": cid,
++        "complete_row_sha256": record["complete_row_sha256"],
++        "predictor": "retained Peak LOW_TAYLOR complete-minus-A0 correction on exact 300 K background",
++        "selected_metrics": {k: v for k, v in selected.items() if k != "row"},
++        "reference_300K_parity": parity,
++        "raw_domain_audit": audit,
++    }
++    (args.out_root / "acquisition_update_decision.json").write_text(
++        json.dumps(decision, indent=2, sort_keys=True) + "\n"
++    )
++    print(json.dumps(decision, indent=2, sort_keys=True))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/scripts/analyze_r10_weakt_event_feedback.py
+@@ -0,0 +1,149 @@
++#!/usr/bin/env python3
++"""Extract event-conditioned Weak-T feedback and exact extension windows."""
++from __future__ import annotations
++
++import argparse
++import csv
++import json
++import math
++from pathlib import Path
++
++
++def endpoint(events: list[dict], threshold_m: float) -> dict:
++    if threshold_m == 0.0:
++        return {"event_index": 0, "cycles": 0.0, "extension_m": 0.0}
++    return next(x for x in events if float(x["extension_m"]) >= threshold_m)
++
++
++def window(events: list[dict], low_um: float, high_um: float) -> dict:
++    left = endpoint(events, low_um * 1.0e-6)
++    right = endpoint(events, high_um * 1.0e-6)
++    dc = float(right["cycles"]) - float(left["cycles"])
++    da = float(right["extension_m"]) - float(left["extension_m"])
++    return {
++        "requested_low_um": low_um, "requested_high_um": high_um,
++        "left_event_index": left["event_index"],
++        "right_event_index": right["event_index"],
++        "left_fractional_cycles": float(left["cycles"]),
++        "right_fractional_cycles": float(right["cycles"]),
++        "left_actual_extension_um": 1.0e6 * float(left["extension_m"]),
++        "right_actual_extension_um": 1.0e6 * float(right["extension_m"]),
++        "events_in_endpoint_difference": int(right["event_index"] - left["event_index"]),
++        "rate_m_per_cycle": da / dc,
++        "endpoint_rule": "first accepted event with cumulative extension >= requested endpoint",
++    }
++
++
++def history(path: Path) -> list[dict]:
++    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
++
++
++def main(argv=None) -> int:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--fatigue-root", type=Path, required=True)
++    parser.add_argument("--out-root", type=Path, required=True)
++    args = parser.parse_args(argv)
++    args.out_root.mkdir(parents=True, exist_ok=True)
++
++    event_rows, window_rows = [], []
++    for result_path in sorted(args.fatigue_root.glob("Kmax_*/result.json")):
++        result = json.loads(result_path.read_text())
++        events = result["events"]
++        logs = history(result_path.parent / "checkpoint" / "high_cycle_live_history.jsonl")
++        accepted = [x for x in logs if x.get("reason") == "accepted_event"]
++        if len(accepted) != len(events):
++            raise RuntimeError(f"event/history mismatch for {result_path}")
++        delta_k = float(result["DeltaK_MPa_sqrt_m"])
++        for bounds, label in (((0.0, 20.0), "early_0_20"),
++                              ((20.0, 60.0), "developed_20_60"),
++                              ((60.0, 80.0), "late_60_80")):
++            try:
++                row = window(events, *bounds)
++            except StopIteration:
++                continue
++            window_rows.append({"DeltaK_MPa_sqrt_m": delta_k, "window": label, **row})
++        previous_gross = previous_return = 0.0
++        for event, log in zip(events, accepted):
++            diag = log["diagnostics"]; ledgers = log["ledgers"]
++            gross = float(ledgers["mpz.cumulative_gross_source_activity"])
++            returned = float(ledgers["mpz.cumulative_gross_return_activity"])
++            mobile_signed = sum(float(v) for k, v in ledgers.items()
++                                if "cumulative_returned_mobile" in k)
++            physical_return = sum(float(v) for k, v in ledgers.items()
++                                  if "cumulative_physical_returned_mobile" in k)
++            wake_transfer = sum(float(v) for k, v in ledgers.items()
++                                if "cumulative_source_slip_wake_transfer" in k)
++            event_rows.append({
++                "DeltaK_MPa_sqrt_m": delta_k,
++                "event_index": event["event_index"],
++                "fractional_cycles": event["cycles"],
++                "extension_um": 1.0e6 * float(event["extension_m"]),
++                "phase": event["phase"],
++                "opening_stress_Pa": diag["sigma_tip_Pa"],
++                "opening_rate_s-1": diag["lambda_cleave_s"],
++                "effective_radius_m": diag["tip_radius_m"],
++                "source_multiplicity_per_system": event["persistent_site_multiplicity_per_system"],
++                "source_backstress_Pa": diag["sigma_back_Pa"],
++                "mobile_count": diag["mobile_count"],
++                "retained_count": diag["retained_count"],
++                "gross_source_slip": gross,
++                "gross_returned_slip": returned,
++                "net_source_slip": gross - returned,
++                "interval_gross_source_slip": gross - previous_gross,
++                "interval_returned_slip": returned - previous_return,
++                "K_shield_Pa_sqrt_m": diag["active_K_shield_Pa_sqrt_m"],
++                "cumulative_returned_mobile": mobile_signed,
++                "cumulative_physical_returned_mobile": physical_return,
++                "post_advance_wake_transfer": wake_transfer,
++                "continuous_mpz_progress_m": event["continuous_mpz_progress_m"],
++                "remaining_waveform_continued": event["remaining_waveform_continued"],
++            })
++            previous_gross, previous_return = gross, returned
++
++    def write(path: Path, rows: list[dict]) -> None:
++        with path.open("w", newline="") as stream:
++            writer = csv.DictWriter(stream, fieldnames=list(rows[0]), lineterminator="\n")
++            writer.writeheader(); writer.writerows(rows)
++    write(args.out_root / "event_conditioned_feedback.csv", event_rows)
++    write(args.out_root / "extension_window_rates.csv", window_rows)
++
++    # Condense the two intervals requested by the amendment.  Ratios are
++    # descriptive sensitivities between complete trajectories, not ablations.
++    summaries = []
++    for low, high in ((7.0, 10.0), (15.0, 22.0)):
++        pair = []
++        for target in (low, high):
++            rows = [x for x in event_rows if math.isclose(x["DeltaK_MPa_sqrt_m"], target,
++                                                          rel_tol=0.0, abs_tol=1e-5)
++                    and 20.0 <= float(x["extension_um"]) <= 60.0]
++            pair.append({key: sum(float(x[key]) for x in rows) / len(rows)
++                         for key in ("opening_stress_Pa", "opening_rate_s-1",
++                                     "effective_radius_m", "source_backstress_Pa",
++                                     "mobile_count", "retained_count",
++                                     "interval_gross_source_slip", "K_shield_Pa_sqrt_m")})
++        summaries.append({
++            "interval_DeltaK": [low, high], "low_mean": pair[0], "high_mean": pair[1],
++            "high_over_low": {key: pair[1][key] / pair[0][key]
++                              if pair[0][key] != 0.0 else None for key in pair[0]},
++        })
++    result = {
++        "schema": "r10.weakt-event-feedback/1",
++        "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
++        "window_endpoint_rule": "first accepted event at or above each requested extension",
++        "amplitude_interval_summaries": summaries,
++        "interpretation": [
++            "opening rate is the same-row exact complete-state diagnostic after each accepted advance",
++            "event marks and rewards remain paired in the source result histories",
++            "complete-trajectory contrasts are sensitivities, not channel ablations",
++            "fatigue low_3/high_3 are amplitude subsets and are not temporal windows",
++        ],
++    }
++    (args.out_root / "event_feedback_decision.json").write_text(
++        json.dumps(result, indent=2, sort_keys=True) + "\n"
++    )
++    print(json.dumps(result, indent=2, sort_keys=True))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/scripts/analyze_r10_weakt_joint_continuation.py
+@@ -0,0 +1,224 @@
++#!/usr/bin/env python3
++"""Consolidate the executed R10 Weak-T joint acquisition and Pareto update."""
++from __future__ import annotations
++
++import argparse
++import csv
++import hashlib
++import json
++import math
++from pathlib import Path
++
++import numpy as np
++
++SELECTED = "R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2"
++FAILED = "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1"
++PEAK = "R10T_PEAK_P40_G2600_S0P25GPA_P4_LOW_TAYLOR_V1"
++TEMPERATURES = (300, 450, 600, 750, 900, 1050, 1200)
++
++
++def write_csv(path: Path, rows: list[dict]) -> None:
++    with path.open("w", newline="") as stream:
++        writer = csv.DictWriter(stream, fieldnames=list(rows[0]), lineterminator="\n")
++        writer.writeheader(); writer.writerows(rows)
++
++
++def main(argv=None) -> int:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--root", type=Path, required=True)
++    parser.add_argument("--thermal-root", type=Path, required=True)
++    parser.add_argument("--continuation-state", type=Path, required=True)
++    args = parser.parse_args(argv)
++
++    update = json.loads((args.root / "acquisition_update_decision.json").read_text())
++    selected_a0 = json.loads(update["selected_metrics"]["A0_roots_json"])
++    curves = []
++    for cid, label, panel in (
++        (FAILED, "previous selected Weak-T", None),
++        ("R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1",
++         "first cross-background near miss", args.root / "full_state" /
++         "R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1"),
++        (SELECTED, "promoted cross-background row", args.root / "full_state" / SELECTED),
++    ):
++        if panel is None:
++            values = [5.2373966579, 6.258429080544234, 5.6305226556132455,
++                      5.170827272321541, 5.25710533871317, 6.127402117669121,
++                      5.1499512237412]
++        else:
++            values = [json.loads((panel / f"T_{t:04d}K.json").read_text())
++                      ["K_init_MPa_sqrt_m"] for t in TEMPERATURES]
++        for temperature, value in zip(TEMPERATURES, values):
++            curves.append({"candidate_id": cid, "role": label,
++                           "temperature_K": temperature,
++                           "K_init_MPa_sqrt_m": value})
++    write_csv(args.root / "fracture_curve_comparison.csv", curves)
++    selected_values = [x["K_init_MPa_sqrt_m"] for x in curves
++                       if x["candidate_id"] == SELECTED]
++    selected_span = max(selected_values) / min(selected_values)
++    a0_span = max(selected_a0) / min(selected_a0)
++
++    source_fatigue = list(csv.DictReader(
++        (args.thermal_root / "fatigue_case_table.csv").open()))
++    fatigue_rows, slope_rows = [], []
++    for seed in (4810, 9117):
++        points = sorted((x for x in source_fatigue
++                         if x["candidate_id"] == PEAK and int(x["seed"]) == seed),
++                        key=lambda x: float(x["DeltaK_MPa_sqrt_m"]))
++        for point in points:
++            fatigue_rows.append({
++                "candidate_id": SELECTED, "seed": seed,
++                "DeltaK_MPa_sqrt_m": point["DeltaK_MPa_sqrt_m"],
++                "rate_20_60_m_per_cycle": point["rate_20_60_m_per_cycle"],
++                "event_count": point["event_count"],
++                "provenance": "reused exact complete 300 K process/background contract",
++                "source_candidate_id": PEAK,
++                "overlap_passed": point["overlap_passed"],
++                "source_artifact": point["artifact"],
++            })
++        for left, right in zip(points[:-1], points[1:]):
++            slope = math.log(float(right["rate_20_60_m_per_cycle"])
++                             / float(left["rate_20_60_m_per_cycle"])) / math.log(
++                                 float(right["DeltaK_MPa_sqrt_m"])
++                                 / float(left["DeltaK_MPa_sqrt_m"]))
++            slope_rows.append({
++                "candidate_id": SELECTED, "seed": seed,
++                "DeltaK_low_MPa_sqrt_m": left["DeltaK_MPa_sqrt_m"],
++                "DeltaK_high_MPa_sqrt_m": right["DeltaK_MPa_sqrt_m"],
++                "adjacent_slope": slope,
++            })
++    write_csv(args.root / "selected_fatigue_rates.csv", fatigue_rows)
++    write_csv(args.root / "selected_fatigue_adjacent_slopes.csv", slope_rows)
++    windows = []
++    for seed in (4810, 9117):
++        points = [x for x in fatigue_rows if x["seed"] == seed]
++        rates = np.asarray([float(x["rate_20_60_m_per_cycle"]) for x in points])
++        loads = np.asarray([float(x["DeltaK_MPa_sqrt_m"]) for x in points])
++        local = [x["adjacent_slope"] for x in slope_rows if x["seed"] == seed]
++        windows.append({
++            "seed": seed, "point_count": len(points),
++            "global_slope": float(np.polyfit(np.log(loads), np.log(rates), 1)[0]),
++            "rate_width_decades": float(np.log10(rates[-1] / rates[0])),
++            "local_slope_min": min(local), "local_slope_max": max(local),
++            "moderate_two_decade_interval": bool(
++                np.log10(rates[-1] / rates[0]) >= 2.0
++                and all(3.4 <= x <= 4.6 for x in local)),
++        })
++
++    spatial_path = args.root / "spatial" / SELECTED / "r8_current_backend_spatial.json"
++    spatial = json.loads(spatial_path.read_text())
++    spatial_receipt = {
++        "schema": "r10.weakt-selected-spatial-receipt/1",
++        "source_artifact": str(spatial_path.resolve()),
++        "source_sha256": hashlib.sha256(spatial_path.read_bytes()).hexdigest(),
++        "source_bytes": spatial_path.stat().st_size,
++        "passed": spatial["passed"],
++        "material_binding": spatial["material_binding"],
++        "no_refit_or_multiplier": spatial["no_refit_or_multiplier"],
++        "matched_arms": {
++            name: {
++                "selected_events": row["selected_events"],
++                "initial_fingerprint": row["initial"]["accepted_fingerprint"],
++                "event_boundary_fingerprint": row["event_boundary"]["accepted_fingerprint"],
++                "final_fingerprint": row["final"]["accepted_fingerprint"],
++            } for name, row in spatial["matched_arms"].items()
++        },
++        "files_only_restart": {
++            "exact": spatial["files_only_restart"]["exact"],
++            "files": spatial["files_only_restart"]["files"],
++            "uninterrupted_fingerprint": spatial["files_only_restart"]["uninterrupted_fingerprint"],
++            "restarted_fingerprint": spatial["files_only_restart"]["restarted_fingerprint"],
++        },
++        "geometry_correspondence": spatial["geometry_correspondence"],
++    }
++    (args.root / "selected_spatial_receipt.json").write_text(
++        json.dumps(spatial_receipt, indent=2, sort_keys=True) + "\n"
++    )
++    decision = {
++        "schema": "r10.weakt-joint-continuation-result/1",
++        "joint_material_decision": "PROMOTE_UPDATED_WEAKT_ROW_TO_CLASS_PARETO_SET",
++        "selected_candidate_id": SELECTED,
++        "complete_row_sha256": update["complete_row_sha256"],
++        "fracture": {
++            "temperatures_K": list(TEMPERATURES),
++            "K_init_MPa_sqrt_m": selected_values,
++            "complete_span": selected_span,
++            "opening_A0_roots_MPa_sqrt_m": selected_a0,
++            "opening_A0_span": a0_span,
++            "status": "PASS_BOUNDED_WEAK_T",
++        },
++        "fatigue": {
++            "status": "PASS_EXACT_300K_CONTRACT_TWO_SEEDS",
++            "windows": windows,
++            "window_endpoint_rule": "first accepted event with cumulative extension >= 20 and 60 um",
++            "events_between_endpoints": 6,
++            "absolute_rate_range_seed4810": [
++                min(float(x["rate_20_60_m_per_cycle"]) for x in fatigue_rows if x["seed"] == 4810),
++                max(float(x["rate_20_60_m_per_cycle"]) for x in fatigue_rows if x["seed"] == 4810),
++            ],
++            "seed_9117_over_4810_ratio": float(np.mean([
++                float(b["rate_20_60_m_per_cycle"]) / float(a["rate_20_60_m_per_cycle"])
++                for a, b in zip([x for x in fatigue_rows if x["seed"] == 4810],
++                                [x for x in fatigue_rows if x["seed"] == 9117])
++            ])),
++        },
++        "mechanism": {
++            "status": "COMPENSATION_SUPPORTED_SMALL_BUT_OUTCOME_CHANGING",
++            "evidence": (
++                f"A0 span {a0_span:.6f} exceeds 1.25 while complete span "
++                f"{selected_span:.6f} is below 1.25"
++            ),
++            "warning": "complete-minus-A0 is an operational state correction, not a microscopic work partition",
++        },
++        "pareto_update": {
++            "removed": [],
++            "retained_as_failed_range_evidence": [FAILED],
++            "retained_as_near_miss": ["R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1"],
++            "added": [SELECTED],
++            "unchanged_controls": [
++                "R10T_DBTT_P40_G3075_S0P25GPA_P4_EP400_PP040_V1",
++                PEAK, "retained ceramic controls",
++            ],
++        },
++        "lower_window_decision": {
++            "conditional_DeltaK_MPa_sqrt_m": 3.003,
++            "conditional_rate_m_per_cycle": 1.21e-12,
++            "status": "NOT_EXECUTED_NO_SELECTION_LEVERAGE",
++            "reason": (
++                "the promoted row already passes the inherited 5-22 MPa sqrt(m) two-seed window "
++                "by exact 300 K contract; a lower point cannot change this Pareto decision"
++            ),
++        },
++        "spatial": {
++            "status": "PASS_EXACT_COMPLETE_ROW_NO_REFIT",
++            "passed": spatial["passed"],
++            "binding": spatial["material_binding"],
++            "artifact": str(spatial_path.resolve()),
++        },
++        "class_mechanism_statuses": {
++            "Weak-T compensated": "COMPENSATION_SUPPORTED_SMALL_BUT_OUTCOME_CHANGING",
++            "DBTT": "PLASTICITY_CREATED_DBTT_NOT_ESTABLISHED; intrinsic rise with hot-state enhancement",
++            "Peak-T": "PLASTICITY_GENERATED_PEAK_NOT_ESTABLISHED; opening-dominated control",
++            "Ceramic-like": "CONTROL_NO_PARIS_REQUIREMENT",
++        },
++    }
++    (args.root / "joint_material_decision.json").write_text(
++        json.dumps(decision, indent=2, sort_keys=True) + "\n"
++    )
++
++    state = json.loads(args.continuation_state.read_text())
++    item = "Weak-T cross-background P3/P4 acquisition, full-state promotion, and exact-row spatial pass"
++    if item not in state["completed"]:
++        state["completed"].append(item)
++    state["running_jobs"] = []
++    state["queued_jobs"] = []
++    state["next"] = "preserve promoted four-class joint Pareto set; no same-row refit required"
++    state["weakt_joint_continuation_result"] = str((args.root / "joint_material_decision.json").resolve())
++    state["unresolved"] = [x for x in state.get("unresolved", [])
++                           if "return Weak-T fatigue failure" not in x]
++    args.continuation_state.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n")
++    print(json.dumps(decision, indent=2, sort_keys=True))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/scripts/package_r10_weakt_joint_continuation.py
+@@ -0,0 +1,128 @@
++#!/usr/bin/env python3
++"""Package the compact, reviewable R10 Weak-T joint continuation."""
++from __future__ import annotations
++
++import argparse
++import difflib
++import hashlib
++import json
++from pathlib import Path
++import shutil
++import subprocess
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++def sha(path: Path) -> str:
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def copy(source: Path, destination: Path) -> None:
++    destination.parent.mkdir(parents=True, exist_ok=True)
++    shutil.copy2(source, destination)
++
++
++def main(argv=None) -> int:
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--out", type=Path, required=True)
++    args = parser.parse_args(argv)
++    destination = args.out.resolve()
++    if destination.exists():
++        raise FileExistsError(destination)
++    destination.mkdir(parents=True)
++    result_root = ROOT / "runs/r10_joint_search/weakt_joint_continuation"
++
++    # Keep the export compact. The full same-row spatial tree remains in the
++    # run directory; its hash, binding, arm fingerprints, restart and geometry
++    # evidence are carried by selected_spatial_receipt.json.
++    for source in sorted(result_root.rglob("*")):
++        if source.is_file() and "spatial" not in source.relative_to(result_root).parts:
++            copy(source, destination / "results" / source.relative_to(result_root))
++    for name in (
++        "design_r10_weakt_joint_continuation.py",
++        "design_r10_weakt_joint_update.py",
++        "analyze_r10_weakt_event_feedback.py",
++        "analyze_r10_weakt_joint_continuation.py",
++        "run_r10_current_fracture_panel.py",
++        "execute_r8_current_backend_spatial.py",
++    ):
++        copy(ROOT / "scripts" / name, destination / "source/scripts" / name)
++    copy(ROOT / "runs/r10_joint_search/continuation_state.json",
++         destination / "continuation_state.json")
++
++    # The exact-contract fatigue source results retain event/phase histories,
++    # overlap qualification, and runtime identities for both seeds.
++    fatigue_root = ROOT / "runs/r10_joint_search/thermal_accessibility_iteration/fatigue"
++    for seed in (4810, 9117):
++        campaign = fatigue_root / f"peak_seed{seed}"
++        copy(campaign / "campaign_summary.json",
++             destination / "exact_300K_fatigue_source" / f"seed{seed}" / "campaign_summary.json")
++        for source in sorted(campaign.glob("Kmax_*/result.json")):
++            copy(source, destination / "exact_300K_fatigue_source" /
++                 f"seed{seed}" / source.parent.name / "result.json")
++
++    commands = """# Executed command identities
++
++Python: `/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python`
++
++- `python scripts/design_r10_weakt_joint_continuation.py --registry runs/r10_joint_search/thermal_accessibility_iteration/thermal_state_candidates.csv --full-state-table runs/r10_joint_search/thermal_accessibility_iteration/full_state_case_table.csv --out-root runs/r10_joint_search/weakt_joint_continuation`
++- `python scripts/analyze_r10_weakt_event_feedback.py --fatigue-root runs/r10_joint_search/thermal_accessibility_iteration/fatigue/weakt_seed4810 --out-root runs/r10_joint_search/weakt_joint_continuation/feedback`
++- `python scripts/run_r10_current_fracture_panel.py --kind offspring --identifier R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1 --offspring-registry runs/r10_joint_search/weakt_joint_continuation/candidate.csv --temperatures 300,450,600,750,900,1050,1200 --Kdot 0.005 --Kmax 80 --dK 0.05 --target-extension-um 50 --out-root runs/r10_joint_search/weakt_joint_continuation/full_state/R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1`
++- `python scripts/design_r10_weakt_joint_update.py --registry runs/r10_joint_search/thermal_accessibility_iteration/thermal_state_candidates.csv --first-candidate runs/r10_joint_search/weakt_joint_continuation/candidate.csv --first-panel runs/r10_joint_search/weakt_joint_continuation/full_state/R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1 --out-root runs/r10_joint_search/weakt_joint_continuation`
++- `python scripts/run_r10_current_fracture_panel.py --kind offspring --identifier R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2 --offspring-registry runs/r10_joint_search/weakt_joint_continuation/candidate_update.csv --temperatures 300,450,600,750,900,1050,1200 --Kdot 0.005 --Kmax 80 --dK 0.05 --target-extension-um 50 --out-root runs/r10_joint_search/weakt_joint_continuation/full_state/R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2`
++- `python scripts/execute_r8_current_backend_spatial.py runs/r10_joint_search/weakt_joint_continuation/spatial/R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2 --offspring-registry runs/r10_joint_search/weakt_joint_continuation/candidate_update.csv --candidate-id R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2`
++- `python scripts/analyze_r10_weakt_joint_continuation.py --root runs/r10_joint_search/weakt_joint_continuation --thermal-root runs/r10_joint_search/thermal_accessibility_iteration --continuation-state runs/r10_joint_search/continuation_state.json`
++"""
++    (destination / "COMMANDS.md").write_text(commands)
++    decision = json.loads((result_root / "joint_material_decision.json").read_text())
++    readme = f"""# R10 Weak-T joint continuation
++
++Joint decision: `{decision['joint_material_decision']}`.
++
++Selected exact row: `{decision['selected_candidate_id']}`
++Complete vector SHA-256: `{decision['complete_row_sha256']}`
++
++The updated row passes the bounded complete-state Weak-T curve, the two-seed
++developed fatigue objective through exact 300 K complete-process parity with
++the retained Peak background, and the same-row R8 spatial execution without a
++refit. The original Weak-T five-point curve remains failed-range evidence; the
++first cross-background EP055/PP010 acquisition remains a measured near miss.
++
++`results/feedback` records exact event-conditioned opening/state quantities and
++discrete early/developed/late endpoint rules. `exact_300K_fatigue_source`
++contains the reused event/phase results that own the transferred rates.
++"""
++    (destination / "README.md").write_text(readme)
++    diff_parts = []
++    for name in (
++        "design_r10_weakt_joint_continuation.py",
++        "design_r10_weakt_joint_update.py",
++        "analyze_r10_weakt_event_feedback.py",
++        "analyze_r10_weakt_joint_continuation.py",
++        "package_r10_weakt_joint_continuation.py",
++    ):
++        relative = f"scripts/{name}"
++        lines = (ROOT / relative).read_text().splitlines(keepends=True)
++        diff_parts.extend(difflib.unified_diff(
++            [], lines, fromfile="/dev/null", tofile=f"b/{relative}", n=3,
++        ))
++    diff = "".join(diff_parts)
++    (destination / "SOURCE_DIFF.patch").write_text(diff)
++    manifest = {}
++    for path in sorted(destination.rglob("*")):
++        if path.is_file() and path.name != "MANIFEST.json":
++            manifest[str(path.relative_to(destination))] = {
++                "sha256": sha(path), "bytes": path.stat().st_size,
++            }
++    (destination / "MANIFEST.json").write_text(json.dumps({
++        "schema": "r10.weakt-joint-continuation-package/1",
++        "git_head_at_execution": subprocess.check_output(
++            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
++        "files": manifest,
++    }, indent=2, sort_keys=True) + "\n")
++    print(json.dumps({"output": str(destination), "files": len(manifest) + 1}, indent=2))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

@@ -1,0 +1,118 @@
+{
+  "class_mechanism_statuses": {
+    "Ceramic-like": "CONTROL_NO_PARIS_REQUIREMENT",
+    "DBTT": "PLASTICITY_CREATED_DBTT_NOT_ESTABLISHED; intrinsic rise with hot-state enhancement",
+    "Peak-T": "PLASTICITY_GENERATED_PEAK_NOT_ESTABLISHED; opening-dominated control",
+    "Weak-T compensated": "COMPENSATION_SUPPORTED_SMALL_BUT_OUTCOME_CHANGING"
+  },
+  "complete_row_sha256": "0e2e41347881be1811ffdcf934b73f518cf032aca12ced6cb68489a18982d014",
+  "fatigue": {
+    "absolute_rate_range_seed4810": [
+      8.987126833562624e-12,
+      3.3699512063161236e-09
+    ],
+    "events_between_endpoints": 6,
+    "seed_9117_over_4810_ratio": 0.9270247059510373,
+    "status": "PASS_EXACT_300K_CONTRACT_TWO_SEEDS",
+    "window_endpoint_rule": "first accepted event with cumulative extension >= 20 and 60 um",
+    "windows": [
+      {
+        "global_slope": 4.0040663790093936,
+        "local_slope_max": 4.094748448433008,
+        "local_slope_min": 3.8681620518538864,
+        "moderate_two_decade_interval": true,
+        "point_count": 5,
+        "rate_width_decades": 2.5740027418994504,
+        "seed": 4810
+      },
+      {
+        "global_slope": 4.0040666007374215,
+        "local_slope_max": 4.094747947369236,
+        "local_slope_min": 3.868170814262569,
+        "moderate_two_decade_interval": true,
+        "point_count": 5,
+        "rate_width_decades": 2.5740033268038163,
+        "seed": 9117
+      }
+    ]
+  },
+  "fracture": {
+    "K_init_MPa_sqrt_m": [
+      5.218191431656144,
+      4.707893254131236,
+      4.371284964861595,
+      4.265586072867608,
+      4.209665212286706,
+      4.214565333437885,
+      4.256601717738964
+    ],
+    "complete_span": 1.2395739728722044,
+    "opening_A0_roots_MPa_sqrt_m": [
+      5.22,
+      4.71,
+      4.37,
+      4.22,
+      4.16,
+      4.17,
+      4.21
+    ],
+    "opening_A0_span": 1.2548076923076923,
+    "status": "PASS_BOUNDED_WEAK_T",
+    "temperatures_K": [
+      300,
+      450,
+      600,
+      750,
+      900,
+      1050,
+      1200
+    ]
+  },
+  "joint_material_decision": "PROMOTE_UPDATED_WEAKT_ROW_TO_CLASS_PARETO_SET",
+  "lower_window_decision": {
+    "conditional_DeltaK_MPa_sqrt_m": 3.003,
+    "conditional_rate_m_per_cycle": 1.21e-12,
+    "reason": "the promoted row already passes the inherited 5-22 MPa sqrt(m) two-seed window by exact 300 K contract; a lower point cannot change this Pareto decision",
+    "status": "NOT_EXECUTED_NO_SELECTION_LEVERAGE"
+  },
+  "mechanism": {
+    "evidence": "A0 span 1.254808 exceeds 1.25 while complete span 1.239574 is below 1.25",
+    "status": "COMPENSATION_SUPPORTED_SMALL_BUT_OUTCOME_CHANGING",
+    "warning": "complete-minus-A0 is an operational state correction, not a microscopic work partition"
+  },
+  "pareto_update": {
+    "added": [
+      "R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2"
+    ],
+    "removed": [],
+    "retained_as_failed_range_evidence": [
+      "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1"
+    ],
+    "retained_as_near_miss": [
+      "R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1"
+    ],
+    "unchanged_controls": [
+      "R10T_DBTT_P40_G3075_S0P25GPA_P4_EP400_PP040_V1",
+      "R10T_PEAK_P40_G2600_S0P25GPA_P4_LOW_TAYLOR_V1",
+      "retained ceramic controls"
+    ]
+  },
+  "schema": "r10.weakt-joint-continuation-result/1",
+  "selected_candidate_id": "R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2",
+  "spatial": {
+    "artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_joint_continuation/spatial/R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2/r8_current_backend_spatial.json",
+    "binding": {
+      "candidate_id": "R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2",
+      "complete_row_sha256": "0e2e41347881be1811ffdcf934b73f518cf032aca12ced6cb68489a18982d014",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "mode": "EXACT_COMPLETE_ROW",
+      "no_refit": true,
+      "source": {
+        "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_joint_continuation/candidate_update.csv",
+        "sha256": "b177f3c960eb8fd57dcca7ea1ff7de3729c402d8ad13703fc21184240b623fe7"
+      }
+    },
+    "passed": true,
+    "status": "PASS_EXACT_COMPLETE_ROW_NO_REFIT"
+  }
+}

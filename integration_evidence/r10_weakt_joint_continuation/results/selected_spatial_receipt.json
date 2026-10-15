@@ -1,0 +1,132 @@
+{
+  "files_only_restart": {
+    "exact": true,
+    "files": [
+      {
+        "path": "active_interrupted_checkpoint/accepted_state.json",
+        "sha256": "0cc93af059ea9e7bd0bd8b14c0f8888b4d238e4eefcaae3a5fb27d2493f86796"
+      },
+      {
+        "path": "active_interrupted_checkpoint/accepted_state.json.53329adc7148d05ab5616f9df8dd0f62aeb286a7d9e2834d537ab49c21accaf3.state.pkl.gz",
+        "sha256": "53329adc7148d05ab5616f9df8dd0f62aeb286a7d9e2834d537ab49c21accaf3"
+      }
+    ],
+    "restarted_fingerprint": "1546ee044d66741dd03bcc64cea0ed49d1d23240123b895606b2d5afd7fd9fff",
+    "uninterrupted_fingerprint": "1546ee044d66741dd03bcc64cea0ed49d1d23240123b895606b2d5afd7fd9fff"
+  },
+  "geometry_correspondence": {
+    "accepted_position_xy_m": [
+      0.0005775623019457314,
+      6.071373019427156e-07
+    ],
+    "accepted_tangent_deg": 6.974492530416284,
+    "accepted_tangent_xy": [
+      0.99260030821252,
+      0.12142746038853984
+    ],
+    "autonomous_population_relative_error": 0.0008371450928944941,
+    "autonomous_radius_relative_error": 3.95322618461862e-08,
+    "bitwise_native_numerical_state_after_event": false,
+    "common_pre_event_fingerprint": "3f7f9d049eaf70cdee6759b704395f65f643223202e8a209b9712dbb59bf009c",
+    "correspondence_tolerance": 1e-12,
+    "direct_native_geometry_events": [
+      {
+        "event_advance_m": 4.9999999999999996e-06,
+        "event_length_factor": 1.0,
+        "geometry_subsegment_fraction": 0.1,
+        "hazard_event_index": 0,
+        "hazard_seed": 0,
+        "threshold_action": 1.0
+      }
+    ],
+    "effective_radius_m": 1.0000001066538986e-06,
+    "material_fixed_wake_origin_preserved": true,
+    "material_frame": {
+      "_spatial_crystal_frame_angle_rad": 0.12172785831151509,
+      "_spatial_material_wake_origin_xy_m": [
+        0.0005725993004046688,
+        1.5602085896855586e-20
+      ],
+      "_spatial_tip_position_xy_m": [
+        0.0005775623019457314,
+        6.071373019427156e-07
+      ],
+      "_spatial_tip_tangent_xy": [
+        0.99260030821252,
+        0.12142746038854
+      ]
+    },
+    "native_active_state_maximum_relative_error": 6.776263578034403e-20,
+    "native_ledger_maximum_relative_error": 7.589415207398531e-19,
+    "native_micro_advance_m": 4.999999999999993e-06,
+    "native_stochastic_state_equal": true,
+    "next_actual_signed_tau_Pa": [
+      -1334.8002644388878,
+      1334.8002644388885
+    ],
+    "next_autonomous_signed_tau_Pa": [
+      292.1851696828481,
+      -292.18516968284627
+    ],
+    "operation_sequence": [
+      "signed_FEM_drive",
+      "native_source_transport_and_return",
+      "native_continuous_micro_translation",
+      "native_mark_and_reward",
+      "outer_geometry_admission",
+      "field_remap",
+      "fixed_load_reequilibrium",
+      "next_signed_source_evaluation"
+    ],
+    "path_extension_m": 5.000000000000006e-06,
+    "projected_extension_m": 4.963001541062606e-06,
+    "resolved_geometry_generation": 1,
+    "same_native_contract_after_event_within_tolerance": true,
+    "spatial_selected_event": "DIRECTIONAL_CLEAVAGE",
+    "tangent_error_deg": -1.1368683772161603e-13,
+    "target_tangent_deg": 6.974492530416398
+  },
+  "matched_arms": {
+    "active": {
+      "event_boundary_fingerprint": "3aad794f26e628049676b7d07e3c56abc7c57b23bc6ad2e9eb49824e26946202",
+      "final_fingerprint": "1546ee044d66741dd03bcc64cea0ed49d1d23240123b895606b2d5afd7fd9fff",
+      "initial_fingerprint": "71a5763558d3a4f678d3c1bfbce4c4d870c62c27a430ff77c2d846d43b4571aa",
+      "selected_events": [
+        "DIRECTIONAL_CLEAVAGE"
+      ]
+    },
+    "no_void": {
+      "event_boundary_fingerprint": "b4611bf619af13c10c4db92ca7cab8d6135dbfe19801aba6796d6b3e09ceccf0",
+      "final_fingerprint": "1b6981429a2a8db692fa43f42c941d9528749f6b86c8462141b1279ad4e0d24a",
+      "initial_fingerprint": "b60f90723a0df13606a8bb30c2737375ba8889c8d57e801ef5c082dd88202db6",
+      "selected_events": [
+        "DIRECTIONAL_CLEAVAGE"
+      ]
+    },
+    "passive": {
+      "event_boundary_fingerprint": "f269875745a0ea78b454f4951b7b19cc92bdbd16224c94e978e59c75cfac691c",
+      "final_fingerprint": "a76400424c243922b5c7dcaa3749d0ec9ecde07729986c66b06f63a1e20ca9d2",
+      "initial_fingerprint": "71a5763558d3a4f678d3c1bfbce4c4d870c62c27a430ff77c2d846d43b4571aa",
+      "selected_events": [
+        "DIRECTIONAL_CLEAVAGE"
+      ]
+    }
+  },
+  "material_binding": {
+    "candidate_id": "R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2",
+    "complete_row_sha256": "0e2e41347881be1811ffdcf934b73f518cf032aca12ced6cb68489a18982d014",
+    "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+    "mode": "EXACT_COMPLETE_ROW",
+    "no_refit": true,
+    "source": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_joint_continuation/candidate_update.csv",
+      "sha256": "b177f3c960eb8fd57dcca7ea1ff7de3729c402d8ad13703fc21184240b623fe7"
+    }
+  },
+  "no_refit_or_multiplier": true,
+  "passed": true,
+  "schema": "r10.weakt-selected-spatial-receipt/1",
+  "source_artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_joint_continuation/spatial/R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2/r8_current_backend_spatial.json",
+  "source_bytes": 6916261,
+  "source_sha256": "fddb2fd914e2079fbc0869fa067ab574231aee22b58dbba9dd27c6ae072dcf88"
+}

@@ -1,0 +1,193 @@
+{
+  "amendment_ledger": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/amendment/selection_ledger.json",
+  "backend": "R8 restored persistent/reversible current backend with R9 phase-exact stochastic fatigue",
+  "barrier_family_policy": {
+    "A": {
+      "allowed": "original single EXP_floor only",
+      "id": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "primary": true
+    },
+    "B": {
+      "allowed": "exact inherited V2 guard/entropy surfaces; cannot count as A",
+      "id": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION",
+      "primary": false
+    },
+    "C": {
+      "allowed": "comparison only; no optimization",
+      "id": "C_V3_V3_1_R9_BROAD_BASIS",
+      "primary": false
+    }
+  },
+  "base_head": "f691e0c2ef2dfa278de9f4f216f48c15d07f4a2e",
+  "branch": "codex/r10-joint-fracture-fatigue-continuation",
+  "bridge_case_table": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/current_bridge_case_table.csv",
+  "completed": [
+    "retained assets recovered and hashed",
+    "exact surfaces evaluated",
+    "A0 current-consumer amplitude screen",
+    "P25/P40/P55 historical physical-transfer evidence recovered",
+    "fresh four-class current-backend information batch",
+    "strict-family projected current-backend two-decade fatigue interval",
+    "R10 amendment terminal-state and action-convention audit",
+    "joint level-shift analytical iteration",
+    "DBTT joint descendant sparse and independent five-amplitude fatigue confirmation",
+    "DBTT joint descendant seven-temperature monotonic panel",
+    "certified F0 opening accessibility bound",
+    "P3/P4 thermal-accessibility analytical search",
+    "class-specific thermal full-state iteration",
+    "Peak-T developed fatigue confirmation with two independent seeds",
+    "Weak-T five-point native phase-resolved developed fatigue screen",
+    "Weak-T cross-background P3/P4 acquisition, full-state promotion, and exact-row spatial pass"
+  ],
+  "information_batch_decision": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/information_batch_decision.json",
+  "next": "preserve promoted four-class joint Pareto set; no same-row refit required",
+  "objective": "joint fracture classes plus developed moderate-slope fatigue for Weak-T, Peak-T, and DBTT",
+  "queued_jobs": [],
+  "retained_rows": [
+    {
+      "alias": "v913_paper_ceramic01_0077080_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0077080",
+      "complete_row_sha256": "d6abae369475fa80722bc3232603815a73f5ebc19433339dd73a2a84c0a1c3db",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR"
+    },
+    {
+      "alias": "ceramic_V2_P25",
+      "candidate_id": "P25_TJBSV2_S_004127",
+      "complete_row_sha256": "c794af3a2912fa91d587d06ae9177ba87af1da6d30e4ad7310d5f673edf741e3",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    },
+    {
+      "alias": "ceramic_V2_P40",
+      "candidate_id": "P40_TJBSV2_S_031027",
+      "complete_row_sha256": "d76e6a011ba83f762b5830c03c75571c851936677d213cfa1fb600a00a286cfa",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    },
+    {
+      "alias": "P25_TRANSFER_V1_RANK1",
+      "candidate_id": "P25_TRANSFER_V1_RANK1",
+      "complete_row_sha256": "6aad4fbcce5e9e9a6dcbcb52c954627226332e3e55d7daf8d995d50cecf3d88a",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR"
+    },
+    {
+      "alias": "P40_TRANSFER_CALIBRATED_GEN2",
+      "candidate_id": "P40_TRANSFER_CALIBRATED_GEN2",
+      "complete_row_sha256": "142e0c7dc0c00193d62aa1cb9c5120cea0261a0f41a7949071dac710ec97a729",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR"
+    },
+    {
+      "alias": "P55_TRANSFER_V1_RANK1",
+      "candidate_id": "P55_TRANSFER_V1_RANK1",
+      "complete_row_sha256": "6c43fd32c4c5e74d028b71441f07fad32d4cecd18cf6239e6897ab3290a093cd",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR"
+    },
+    {
+      "alias": "P25_control_064036",
+      "candidate_id": "P25_TJBSV2_S_064036",
+      "complete_row_sha256": "e9b7ad4446555e84c75b93fb9d80a7a1015b2b33e648fc8130a258dcec76f9f6",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    },
+    {
+      "alias": "P40_control_043821",
+      "candidate_id": "P40_TJBSV2_S_043821",
+      "complete_row_sha256": "8a3e2b1c5ab49546c9b350c2fe46a65ff00fd900509e6e86a32e1481f062e0a9",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    },
+    {
+      "alias": "v913_paper_dbtt01_0202500_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0202500",
+      "complete_row_sha256": "6d2d454e3c79e2171b8547c895a0ee2d42fa4897af90354efe906e7b27d044d4",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR"
+    },
+    {
+      "alias": "DBTT_V2",
+      "candidate_id": "P25_TJBSV2_S_002987",
+      "complete_row_sha256": "8a16415705c47c7708ec35385cde6c9a53bb6b9de6edf98b902a1f40626a9f72",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    },
+    {
+      "alias": "DBTT_V2_P40",
+      "candidate_id": "P40_TJBSV2_S_038503",
+      "complete_row_sha256": "be0343fd982eda89f7f7240bf599298a0e07e06eea87570ee34fa9935dabcbfa",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    },
+    {
+      "alias": "v913_paper_peak01_0242980_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0242980",
+      "complete_row_sha256": "83245aa3a01450f08d13820f6a042d1c01518748fbf790b6082879a9ed6fdeb1",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR"
+    },
+    {
+      "alias": "v913_paper_weakT01_0129902_persistent_sites",
+      "candidate_id": "v913_zeroD_sobol_0129902",
+      "complete_row_sha256": "cfc86642687cac968223e4d3ac202c9ff14648c37982d3f188326f0ff25da1e5",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR"
+    },
+    {
+      "alias": "weakT_V2_P25",
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "complete_row_sha256": "85f8d9d2ddbe1e7c7c0c34589883b886023507089d0fe423c1ce2c4eb60d0041",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    },
+    {
+      "alias": "weakT_V2_P40",
+      "candidate_id": "P40_TJBSV2_S_038278",
+      "complete_row_sha256": "98908d7eecb5916a86dc886900b6e4fd687f4d67daa2bd77e4d75ebaef06b3d6",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION"
+    }
+  ],
+  "running_jobs": [],
+  "schema": "r10.joint-search-continuation/1",
+  "source_inputs": [
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv",
+      "sha256": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-thermodynamic-joint-barrier-search/artifacts/thermodynamic_joint_barrier_search/source_fatigue_controls_registry.csv",
+      "sha256": "153dc913991c98dfb218fefcc254ca731ad1e995373d597050c177c71f4020a6"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv",
+      "sha256": "0db44ad0e46bae061088ab2be999930ad59df00dae00afa59e3c2cb25c2967a5"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_manifest.json",
+      "sha256": "76de79b0a784c4f60c9f5dc0c8f2d0b095aa1f4b4e26b0c7529d6027b66db995"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_1d_fracture_results.csv",
+      "sha256": "a8756a82f850caa6866280ecb572b24e905c8225347ee991960cc426c799c678"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_300K_fatigue_case_table.csv",
+      "sha256": "67e0a1d414bd0c58bf042e365e62565855b4f6c5ad7e9e15acdf7e9a65772d4e"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v2_2d_single_crack_300K_1200K/v2_2d_single_crack_terminal_summary.csv",
+      "sha256": "6eb567e0b2582922e01fd9c2f08964b2c4a8bd59b18bb2f7613ccdd737e8bdfa"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-thermodynamic-joint-barrier-search/artifacts/prospective_paris_candidates/final_candidate_parameter_rows.csv",
+      "sha256": "7c7cdc43a0d272a68b90c970414121eae2d7c4d6cabbd451451d0e67853e2b1c"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-thermodynamic-joint-barrier-search/artifacts/prospective_paris_candidates/final_candidate_selection.json",
+      "sha256": "87c949539938d484df82ddf00736dc304ca023703784673d3684a3b23938f27e"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-thermodynamic-joint-barrier-search/artifacts/prospective_paris_candidates/physical_developed_rates.csv",
+      "sha256": "1927a6db856f6175db684591948e81e24d1c056275e6ea2fa0cfdbbf4af59168"
+    },
+    {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-thermodynamic-joint-barrier-search/artifacts/prospective_paris_candidates/physical_local_slopes.csv",
+      "sha256": "c5a28ef15124b7c85bb3b22b1a84b3ee53a9c1d208d7fc45a637ab411248d204"
+    }
+  ],
+  "thermal_accessibility_result": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/thermal_accessibility_result.json",
+  "unresolved": [
+    "original four have no inherited V2 direct-surface extension",
+    "historical V2 fatigue pilots were resource/state-closure censored",
+    "same-row current 2D requires narrow complete-row binding after 1D selection"
+  ],
+  "weakt_joint_continuation_result": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_joint_continuation/joint_material_decision.json"
+}

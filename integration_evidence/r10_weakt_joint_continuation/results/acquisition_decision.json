@@ -1,0 +1,59 @@
+{
+  "complete_row_sha256": "b716f7fc50306d3be949f2436b4ecd1aa154fe50a8d97b648287ceba381babdc",
+  "failed_row_used_as_information": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+  "predictor": "A0 plus measured event-owning complete-minus-A0 temperature correction",
+  "predictor_is_promotion": false,
+  "raw_domain_audit": {
+    "all_processes_valid": true,
+    "emission": {
+      "G0_1200_eV": 0.5499999999999998,
+      "G0_300_eV": 1.87381949130891,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 1.5,
+      "sigc_300_GPa": 6.963576860995196
+    },
+    "opening": {
+      "G0_1200_eV": 2.5389746538100018,
+      "G0_300_eV": 0.7502246538100016,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 6.000000000000001,
+      "sigc_300_GPa": 0.43982506957277295
+    },
+    "peierls": {
+      "G0_1200_eV": 0.09999999999999964,
+      "G0_300_eV": 6.559436962185519,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 1.5,
+      "sigc_300_GPa": 6.963576860995196
+    },
+    "taylor": {
+      "G0_1200_eV": 0.029999999999999805,
+      "G0_300_eV": 2.299521850309075,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 1.5,
+      "sigc_300_GPa": 6.963576860995196
+    }
+  },
+  "reference_300K_parity": {
+    "emission": 0.0,
+    "maximum_abs_barrier_delta_eV": 8.881784197001252e-16,
+    "opening": 1.1102230246251565e-16,
+    "peierls": 8.881784197001252e-16,
+    "taylor": 0.0
+  },
+  "schema": "r10.weakt-joint-continuation-acquisition/1",
+  "selected_candidate_id": "R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1",
+  "selected_metrics": {
+    "A0_roots_json": "[5.22, 5.41, 4.92, 4.6000000000000005, 4.41, 4.3100000000000005, 4.26]",
+    "A0_span": 1.2699530516431925,
+    "background_candidate_id": "R10T_PEAK_P40_G2600_S0P25GPA_P4_LOW_TAYLOR_V1",
+    "cleave_gT_eV_per_K": 0.0019875,
+    "cleave_sigc_1200_GPa": 6.0,
+    "measured_state_correction_json": "[0.0173966579, 0.1184290805442334, 0.08052265561324567, 0.06082727232154106, 0.4271053387131696, 1.4674021176691205, 0.5999512237412006]",
+    "mechanical_compensation_required": true,
+    "predicted_complete_roots_json": "[5.2373966579, 5.5284290805442335, 5.000522655613246, 4.660827272321542, 4.83710533871317, 5.777402117669121, 4.8599512237412]",
+    "predicted_complete_span": 1.2395658066923851
+  },
+  "selection_reason": "different retained 300 K background with passed developed fatigue; predicted bounded response still requires nonzero mechanical compensation",
+  "source_background": "R10T_PEAK_P40_G2600_S0P25GPA_P4_LOW_TAYLOR_V1"
+}

@@ -1,0 +1,56 @@
+{
+  "complete_row_sha256": "0e2e41347881be1811ffdcf934b73f518cf032aca12ced6cb68489a18982d014",
+  "first_candidate": "R10C_WEAKT_PEAK300_G1988_S6P0GPA_P4_EP055_PP010_V1",
+  "first_candidate_disposition": "NEAR_MISS_P4_HOT_MECHANICAL_HUMP",
+  "first_candidate_measured_correction_json": "[-0.0018085683438462397, 0.0016885461650879563, 0.08309933129001745, 0.06318883295252054, 1.5527813032462356, 1.5495048868860941, 0.07929260319920228]",
+  "predictor": "retained Peak LOW_TAYLOR complete-minus-A0 correction on exact 300 K background",
+  "raw_domain_audit": {
+    "all_processes_valid": true,
+    "emission": {
+      "G0_1200_eV": 2.72161532784321,
+      "G0_300_eV": 1.87381949130891,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 8.162908138231465,
+      "sigc_300_GPa": 6.963576860995196
+    },
+    "opening": {
+      "G0_1200_eV": 2.5952246538100017,
+      "G0_300_eV": 0.7502246538100015,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 3.75,
+      "sigc_300_GPa": 0.43982506957277284
+    },
+    "peierls": {
+      "G0_1200_eV": 5.611193542865118,
+      "G0_300_eV": 6.5594369621855195,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 8.162908138231465,
+      "sigc_300_GPa": 6.963576860995196
+    },
+    "taylor": {
+      "G0_1200_eV": 0.029999999999999805,
+      "G0_300_eV": 2.299521850309075,
+      "raw_domain_valid": true,
+      "sigc_1200_GPa": 8.162908138231465,
+      "sigc_300_GPa": 6.963576860995196
+    }
+  },
+  "reference_300K_parity": {
+    "emission": 0.0,
+    "maximum_abs_barrier_delta_eV": 1.1102230246251565e-16,
+    "opening": 1.1102230246251565e-16,
+    "peierls": 0.0,
+    "taylor": 0.0
+  },
+  "schema": "r10.weakt-joint-continuation-acquisition-update/1",
+  "selected_candidate_id": "R10C_WEAKT_PEAK300_G2050_S3P75GPA_P4_LOW_TAYLOR_V2",
+  "selected_metrics": {
+    "A0_roots_json": "[5.22, 4.71, 4.37, 4.22, 4.16, 4.17, 4.21]",
+    "A0_span": 1.2548076923076923,
+    "cleave_gT_eV_per_K": 0.00205,
+    "cleave_sigc_1200_GPa": 3.75,
+    "mechanical_compensation_required": true,
+    "predicted_complete_roots_json": "[5.218191431656145, 4.705655455165621, 4.3698762878201824, 4.344876631186712, 4.2816984131830145, 4.262756391190972, 4.281988199665785]",
+    "predicted_complete_span": 1.224135501254444
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "amplitude_interval_summaries": [
+    {
+      "high_mean": {
+        "K_shield_Pa_sqrt_m": 9.885324412036811e-18,
+        "effective_radius_m": 1.1187207929813667e-06,
+        "interval_gross_source_slip": 17.22267272314529,
+        "mobile_count": 942.6553700560349,
+        "opening_rate_s-1": 0.08460716471240409,
+        "opening_stress_Pa": 4190899845.1736493,
+        "retained_count": 3.097462632945044e-19,
+        "source_backstress_Pa": 1249497023.2092435
+      },
+      "high_over_low": {
+        "K_shield_Pa_sqrt_m": 5.25239320542158e+24,
+        "effective_radius_m": 1.0597589529817641,
+        "interval_gross_source_slip": 1.600611671969608,
+        "mobile_count": 2.132870490924941,
+        "opening_rate_s-1": 3.7788102789787614,
+        "opening_stress_Pa": 1.387709867609256,
+        "retained_count": 5.447028912792154e+24,
+        "source_backstress_Pa": 1.4658125466589533
+      },
+      "interval_DeltaK": [
+        7.0,
+        10.0
+      ],
+      "low_mean": {
+        "K_shield_Pa_sqrt_m": 1.882061000656437e-42,
+        "effective_radius_m": 1.0556370293770163e-06,
+        "interval_gross_source_slip": 10.760056936203767,
+        "mobile_count": 441.9655924102746,
+        "opening_rate_s-1": 0.022389894825645896,
+        "opening_stress_Pa": 3020011562.2105675,
+        "retained_count": 5.686517700816242e-44,
+        "source_backstress_Pa": 852426202.8301226
+      }
+    },
+    {
+      "high_mean": {
+        "K_shield_Pa_sqrt_m": 1.443289303163131e-06,
+        "effective_radius_m": 3.7103320170669362e-06,
+        "interval_gross_source_slip": 190.37265476152302,
+        "mobile_count": 15443.67529031008,
+        "opening_rate_s-1": 0.18045402515370657,
+        "opening_stress_Pa": 5062794730.964202,
+        "retained_count": 4.5707994873659725e-08,
+        "source_backstress_Pa": 1516556425.693313
+      },
+      "high_over_low": {
+        "K_shield_Pa_sqrt_m": 6.485152148293106,
+        "effective_radius_m": 2.074617018293016,
+        "interval_gross_source_slip": 2.2056771773514,
+        "mobile_count": 3.0649131257914415,
+        "opening_rate_s-1": 1.0748532574256493,
+        "opening_stress_Pa": 1.0182704733589414,
+        "retained_count": 6.460500656884957,
+        "source_backstress_Pa": 1.020265354429318
+      },
+      "interval_DeltaK": [
+        15.0,
+        22.0
+      ],
+      "low_mean": {
+        "K_shield_Pa_sqrt_m": 2.2255288236267597e-07,
+        "effective_radius_m": 1.7884419072777963e-06,
+        "interval_gross_source_slip": 86.3102981326236,
+        "mobile_count": 5038.8623287069895,
+        "opening_rate_s-1": 0.16788712683060283,
+        "opening_stress_Pa": 4971954763.908353,
+        "retained_count": 7.074992682641199e-09,
+        "source_backstress_Pa": 1486433327.4764519
+      }
+    }
+  ],
+  "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+  "interpretation": [
+    "opening rate is the same-row exact complete-state diagnostic after each accepted advance",
+    "event marks and rewards remain paired in the source result histories",
+    "complete-trajectory contrasts are sensitivities, not channel ablations",
+    "fatigue low_3/high_3 are amplitude subsets and are not temporal windows"
+  ],
+  "schema": "r10.weakt-event-feedback/1",
+  "window_endpoint_rule": "first accepted event at or above each requested extension"
+}
