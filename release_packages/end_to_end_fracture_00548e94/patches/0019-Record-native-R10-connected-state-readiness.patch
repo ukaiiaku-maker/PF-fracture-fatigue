@@ -1,0 +1,157 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 10:22:43 -0700
+Subject: [PATCH 19/32] Record native R10 connected-state readiness
+
+---
+ CAPABILITY_PRESERVATION_MATRIX.csv            |  2 +-
+ FRAMEWORK_COMPLETION_LEDGER.json              | 22 +++--
+ .../qualification_report.json                 | 85 +++++++++++++++++++
+ 3 files changed, 100 insertions(+), 9 deletions(-)
+ create mode 100644 integration_evidence/r10_local_incremental_cavity_6d0eab4c/qualification_report.json
+
+diff --git a/CAPABILITY_PRESERVATION_MATRIX.csv b/CAPABILITY_PRESERVATION_MATRIX.csv
+index 29ea3efa..4db0d0d6 100644
+--- a/CAPABILITY_PRESERVATION_MATRIX.csv
++++ b/CAPABILITY_PRESERVATION_MATRIX.csv
+@@ -17,7 +17,7 @@ STATE01,"signed mobile/retained/wake state","signed_burgers_shared_v1025","signe
+ STATE02,"mobile return/net slip","reversible fatigue modules","true signed drive","94871be","return/net ledgers","fatigue return plots","signed transport; restart","reversible strategy adapter","test_v10_2_30_reversible_transport.py",PASS,"48-test contract group"
+ EVENT01,"hazard/proposal/energy/commit transaction","hazard_energy_event_gate_v10230","energy gated","9e884","gate/event ledger","event analysis","RNG; mechanics; rollback","existing gate plus one-owner audit","event growth/gate/transaction tests",PASS,"71-test cyclic group"
+ BR01,"branching/multifront","v11/v12/v13 branch launchers","branching enabled","9e2c43e through a8620304","front owner/topology clocks","branch summaries/plots","full provider; owner RNG","branch strategy compatibility adapter, native V11/V12 occupied-state evidence and recursive owner transition fixture","V11/V12 branch/provider tests; test_recursive_branch_readiness.py; r09_native_branch_a8620304",PRESERVED_CONNECTED_NATIVE_FIRST_BIRTH,"exact theta40 family contains a native binary birth, 30um/300um generation-1 daughters, a later accepted 5um event, positive rates on both tips and exact fresh-process restart; both tips still share an unresolved physical owner so second-generation birth remains unqualified; injected recursive ownership is not promoted to physical evidence"
+-VOID01,"full-order vacancy/cavity","voiding_production_v5","voiding enabled","9e2c43e","vacancy/cavity/topology state","cavity summaries/native fields","V12/V13 scheduler/full provider","physical paired-arm adapter; immutable pair generations; explicit test-only lifecycle fixture","test_shared_void_restart_contract.py; test_shared_v5_refinement_checkpoint.py",PARTIAL_NUMERICAL_STOP,"matched arms accepted through 0.52002s; next transport attempt is a lower-positivity failure in two cells, not the dilute upper limit; accepted refined prefix and rollback retained; functional fixture grows 25-to-55um and remeshes, but is not a nucleation prediction"
++VOID01,"full-order vacancy/cavity","voiding_production_v5","voiding enabled","9e2c43e through 6d0eab4c","vacancy/cavity/topology state plus r10.local-incremental-native-cavity-qualification/1","cavity summaries/native fields","V12/V13 scheduler/full provider","physical paired-arm adapter; immutable pair generations; hash-bound accepted connected-state continuation; explicit test-only lifecycle fixture retained separately","test_shared_void_restart_contract.py; test_shared_v5_refinement_checkpoint.py; test_local_incremental_cavity_qualification.py",PRESERVED_CONNECTED_NATIVE_CHILD_CONTINUATION_RESOURCE_DEFERRED,"matched finite enabled/suppressed interval, complete-ligament topology drive, conservative remesh/length ledgers and accepted CONNECTED_VOID checkpoint are verified; exact child-birth/continuation runner is bound to payload ef5682e8; its approximately 57k-DOF equilibrium is not yet claimed and is deferred only by measured live-memory pressure"
+ COMB01,"combined branch and cavity ownership","shared_branch_cavity_adapter","pf_branching_void_v5","bb0c21d9","V11 full-state checkpoint + compatibility audit","analyze_branch_cavity_compatibility.py","source-conforming full FEM; V5 cavity; V11 crack network","public current-row bounded adapter","test_shared_execution.py; test_shared_void_restart_contract.py; test_analyze_branch_cavity_compatibility.py",PASS_BOUNDED_COMPATIBILITY,"root+downstream child+cavity owners; ligament, child birth and subsequent child advance; exact fresh-process restart; recursive branch kinetics remain uncalibrated"
+ PROP01,"developed long propagation","v10.2.27 long R-curve launcher","approximately 1000um","historical producer d77abff plus analysis 09437482","chronological crack/event/work records","explicit-quantity K versus projected/path coordinate plots plus immutable provenance sidecar","full PF; state inheritance","long-growth execution plus schema-2 observer and current analysis replay","full suite; test_final_developed_growth.py; K_LENGTH_ANALYSIS_PORT_QUALIFICATION.json",PASS_CURRENT_ANALYSIS_OF_HISTORICAL_PRODUCER,"historical 201-event history retained; distinct 203-event curve has exact raw hashes and law-map identity, is labeled HISTORICAL_RETAINED_NOT_CURRENT_LAW_PREDICTION, and is not relabeled by its later analysis commit"
+ OBS01,"K/J/G at crack length","existing K/J/energy plotters","observer-specific","v10.2.27/V12 fixes plus 5891fee7","fracture-observation-history/2; fracture-event-associated-length-query/1","query_k_at_crack_length.py; explicit-quantity plot adapter","same front/stage/segment/coordinate/validity; linked committed geometry","chronological native-quantity adapter, named event-associated view and online accepted-state overlay","test_fracture_observation_history.py; test_observation_plotting_smoke.py; test_v10222_rcurve_interval_semantics.py",PASS_CURRENT_NATIVE_AND_HISTORICAL_REPLAY,"2085-row legacy replay preserved; current 203-event native-stage replay; stage-filtered path jumps work; gaps and final-event carry-forward remain unavailable; restart chronology exact except source pathname"
+diff --git a/FRAMEWORK_COMPLETION_LEDGER.json b/FRAMEWORK_COMPLETION_LEDGER.json
+index 979184dc..c73affa7 100644
+--- a/FRAMEWORK_COMPLETION_LEDGER.json
++++ b/FRAMEWORK_COMPLETION_LEDGER.json
+@@ -225,16 +225,22 @@
+     {
+       "id": "R10",
+       "goal_ids": ["FG-14", "FG-16"],
+-      "status": "INCOMPLETE",
+-      "concrete_defect": "Local incremental cavity approach/connection and combined branch/cavity competition are not fully qualified through occupied-state restart.",
++      "status": "NATIVE_CONNECTED_STATE_AND_EXECUTOR_BOUND_CHILD_CONTINUATION_RESOURCE_DEFERRED",
++      "concrete_defect": "The original native V5/V12 path already executes full-order vacancy/capture/growth, local crack-to-cavity connection, consistent complete-ligament candidate drive, conservative remesh transfer, downstream source recovery, child creation/continuation, rollback and checkpoint ownership. The missing R10 qualification entry point is now implemented and hash-bound to an accepted connected-cavity state. The independently executable single-front work no longer depends on recursive R09. The remaining current execution is the native downstream birth/continuation from that 57k-DOF occupied state.",
+       "owner_consumer": "V5 vacancy/cavity scheduler, local candidate law, topology/remesh and combined executor",
+       "authoritative_source": "original V5 native vacancy/cavity implementation",
+-      "dependencies": ["R01", "R03", "R07", "R09"],
+-      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact",
+-      "input_output_identity": "absent/small/distant and approach/contact/downstream states with declared event-size rule",
++      "dependencies": ["R01", "R03", "R07"],
++      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact --checkpoint /private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/unified-one-void-tjyfvdbz/immediately-before-child-birth.json --execute --continuation-output <new-output> --output <new-report>",
++      "input_output_identity": "accepted V11/V12 connected-cavity payload ef5682e8fb1fc5d1a3a4764c5752bd7dcb7e1c4a6d59346c98fa7aef76d7fef3; matched complete-ligament topology energy; distinct enabled/suppressed native interval; combined branch/cavity owner state",
+       "numerical_criteria": "New-solid accounting, conservative inventories, like-operation drives, coupled interval and occupied-state restart.",
+-      "executed_evidence": [],
+-      "remaining_limitation": "Prospective local-incremental direction is authorized but not yet native-qualified."
++      "executed_evidence": [
++        "integration_evidence/r10_local_incremental_cavity_6d0eab4c/qualification_report.json",
++        "review_packet/current_science_pilots_6abbf10/CAVITY_LIGAMENT_QUALIFICATION_v4.json",
++        "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
++        "review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
++        "tests/test_local_incremental_cavity_qualification.py"
++      ],
++      "remaining_limitation": "The exact occupied-state continuation has not yet exited PASS. Its next topology remesh/equilibrium is approximately 57,252 DOF and is temporarily deferred because this machine has only about 1.0 GiB free swap and several unrelated 2.4-5.1 GiB resident scientific workers. This is a local execution-resource block, not an implementation or scientific-decision gate. The retained 0.2 s interaction proves a finite enabled/suppressed interval but its generic exporter failed after accepted state publication, so individual event times in that suffix remain unclaimed."
+     },
+     {
+       "id": "R11",
+@@ -299,5 +305,5 @@
+       "remaining_limitation": "Production remains disabled. Cohesive comparison cells await physical activation-area/stiffness/work support and specimen adapter qualification; P6-P8 retain their separately reported native-adapter/convergence dependencies."
+     }
+   ],
+-  "next_priority": "R08 is closed at the declared readiness scope: FEM observer identity, generic active-state restart, native opening-only ownership and the independently refined PF/FEM common-mechanics comparison are complete. Continue R07 cracked-body constraints, R09 recursive branch ownership and R10 local cavity transitions as independent implementation work; R05 still requires material authority for activation area and interface stiffness."
++  "next_priority": "R05-R08 and R11 generic/native implementation are closed at their declared scopes. R09 has native first birth, daughter evolution and restart but awaits physical owner detachment for recursive eligibility. R10 is independently bound to its native accepted connected state and exact continuation; run it when measured memory admission permits. Continue the R13 executable disabled-campaign bindings and final R12/release qualification without treating either resource-deferred native solve as a global block."
+ }
+diff --git a/integration_evidence/r10_local_incremental_cavity_6d0eab4c/qualification_report.json b/integration_evidence/r10_local_incremental_cavity_6d0eab4c/qualification_report.json
+new file mode 100644
+index 00000000..086e58b9
+--- /dev/null
++++ b/integration_evidence/r10_local_incremental_cavity_6d0eab4c/qualification_report.json
+@@ -0,0 +1,85 @@
++{
++  "connected_checkpoint": {
++    "active_tip_ids": [],
++    "cavity": {
++      "connection_entry_m": [
++        0.000645,
++        1.5602085896855586e-20
++      ],
++      "connection_exit_m": [
++        0.000755,
++        0.0
++      ],
++      "id": "void:site-1",
++      "phase": "CONNECTED_VOID",
++      "radius_m": 5.5e-05
++    },
++    "equilibrium": {
++      "energy_identity_residual": 4.436052080779698e-16,
++      "free_dof_residual_relative": 5.712828099821375e-14,
++      "total_opening_m": 7.999999999999998e-07
++    },
++    "length_ledgers": {
++      "active_front_coordinate_advance_m": 7.240069959533113e-05,
++      "connected_void_free_span_m": 0.00011000000000000007,
++      "fractured_ligament_length_m": 7.240069959533113e-05,
++      "preexisting_void_free_span_m": 0.00011000000000000007
++    },
++    "manifest": "/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/unified-one-void-tjyfvdbz/immediately-before-child-birth.json",
++    "mesh_generation": 5,
++    "payload": "/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/unified-one-void-tjyfvdbz/immediately-before-child-birth.json.ef5682e8fb1fc5d1a3a4764c5752bd7dcb7e1c4a6d59346c98fa7aef76d7fef3.state.pkl",
++    "payload_sha256": "ef5682e8fb1fc5d1a3a4764c5752bd7dcb7e1c4a6d59346c98fa7aef76d7fef3",
++    "payload_size_bytes": 20072004,
++    "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
++    "source_commit": "81b6a5f8154ed4011443a1a098b7c2f1b5871431",
++    "status": "NATIVE_CONNECTED_ACCEPTED_STATE_VERIFIED",
++    "topology_actions": 1,
++    "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1"
++  },
++  "execution_boundary": "The next command restores the exact occupied accepted state and performs native downstream birth, ordinary continuation, post-event equilibrium, rollback injections and exact active-state checkpoint round trips.",
++  "next_native_command": [
++    "/opt/homebrew/Caskroom/miniconda/base/bin/python",
++    "scripts/continue_unified_one_void_from_checkpoint.py",
++    "--checkpoint",
++    "/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/unified-one-void-tjyfvdbz/immediately-before-child-birth.json",
++    "--output",
++    "<new-output>"
++  ],
++  "not_claimed": [
++    "No downstream child acceptance is claimed until the native continuation exits PASS.",
++    "The recovered 0.2 s exporter failure does not identify individual event times.",
++    "No production campaign or physical recalibration is authorized."
++  ],
++  "production_execution_authorized": false,
++  "qualification_only_constructed_inputs": false,
++  "retained_native_evidence": {
++    "combined_branch_cavity": {
++      "active_tip_ids": [
++        "void-front-1"
++      ],
++      "native_checkpoint_round_trips_exact": true,
++      "report": "review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
++      "source_commit": "bb0c21d9",
++      "status": "PASS",
++      "terminal_void_phase": "DOWNSTREAM_FRONT_ACTIVE"
++    },
++    "complete_ligament": {
++      "G_ligament_J_per_m2": 40.4943938223355,
++      "accepted_state_preserved": true,
++      "drive_source": "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY",
++      "mesh_relative_error": 0.08771391032970505,
++      "mesh_relative_limit": 0.1,
++      "report": "review_packet/current_science_pilots_6abbf10/CAVITY_LIGAMENT_QUALIFICATION_v4.json"
++    },
++    "finite_enabled_suppressed_interval": {
++      "accepted_exposure_s": 0.20000000000000107,
++      "classification": "ACCEPTED_PHYSICS_AUDIT_EXPORT_FAILURE",
++      "disabled_topology_action_change": 4,
++      "enabled_topology_action_change": 0,
++      "native_checkpoint_round_trip_exact": true,
++      "report": "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json"
++    }
++  },
++  "schema": "r10.local-incremental-native-cavity-qualification/1",
++  "status": "NATIVE_CONNECTED_RESTART_READY_CHILD_CONTINUATION_PENDING"
++}

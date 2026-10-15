@@ -1,0 +1,562 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@Shens-MBP.lan>
+Date: Thu, 15 Oct 2026 08:32:09 -0700
+Subject: [PATCH 01/32] Connect channel transport as typed native option
+
+---
+ CAPABILITY_PRESERVATION_MATRIX.csv            |  2 +-
+ FRAMEWORK_COMPLETION_LEDGER.json              |  8 +--
+ .../persistent_runtime_contract.py            | 53 +++++++++++++------
+ .../persistent_site_source_v10221.py          | 11 +++-
+ arrhenius_fracture/shared_execution.py        | 14 ++++-
+ arrhenius_fracture/shared_execution_worker.py |  6 +++
+ arrhenius_fracture/shared_options.py          | 33 +++++++++++-
+ arrhenius_fracture/shared_runtime.py          | 11 +++-
+ arrhenius_fracture/sharp_front_v10_2_17.py    |  9 +++-
+ tests/test_f1_no_physics_fallback.py          | 48 ++++++++++++++---
+ tests/test_shared_execution.py                | 12 +++++
+ tests/test_shared_options_resolution.py       | 17 +++++-
+ tests/test_v10217_stage3_final_stack.py       | 20 +++++++
+ 13 files changed, 210 insertions(+), 34 deletions(-)
+
+diff --git a/CAPABILITY_PRESERVATION_MATRIX.csv b/CAPABILITY_PRESERVATION_MATRIX.csv
+index ab5b6469..45c19acf 100644
+--- a/CAPABILITY_PRESERVATION_MATRIX.csv
++++ b/CAPABILITY_PRESERVATION_MATRIX.csv
+@@ -8,7 +8,7 @@ SRC03,"persistent/reusable lifecycle","persistent_site_source_v10221","persisten
+ SRC04,"finite inventory/depletion/refresh","sharp_front_v10_1 finite_sites","finite_inventory","base ancestry","inventory/refresh fields","source ablation tools","source geometry/refresh","source_lifecycle=finite_inventory","test_v10_1_1_source_runner.py; test_shared_execution.py",PASS_EXECUTED,"public full-spatial compact execution reports depletable capacity with native advance refresh"
+ KIN01,"forward active persistent kinetics","signed_burgers_shared_v1025._signed_evolve_scalar","validated_scalar + joint_ctmc","current PF 4217810b","signed active populations and gross/net fate ledgers","persistent runtime binding receipt","persistent source; selected Taylor/Peierls surfaces","closed current-source binding plus joint source/exchange/transport","test_f1_no_physics_fallback.py; test_coupled_transport_exchange.py; test_cross_consumer_kinetic_lifecycle.py",PRESERVED_CONNECTED,"actual post-installer callable and inner joint operator verified; finite-source fallback remains forbidden"
+ KIN02,"occupied signed wake kinetics","signed_burgers_shared_v1025._signed_evolve_wake","internal wake consumer","current PF 2d62e3bd","positive/negative wake populations; recovery and discard fates","cross-consumer kinetic and equation-accuracy receipts","native cancellation-stable transport surfaces at zero applied wake stress","unchanged internal consumer called by scalar/channel/reversible paths","test_cross_consumer_kinetic_lifecycle.py",CURRENT_LAW_QUALIFIED_DECLARED_SCOPE,"PRESERVED_CONNECTED is connection only; populated current-law state proves exactly zero exchange/glide at zero supplied drive and analytic mobile/retained recovery; injected-coefficient fixture remains lifecycle evidence only"
+-KIN03,"channel-resolved transport","signed_burgers_shared_v1025._signed_evolve_channel","channel_resolved","v10.1.7.5 lineage plus current binding registry","per-system active and wake state","cross-consumer kinetic receipt","per-system emission drive and density support","closed current-source restore registry; no typed shared preset","test_transport_comparison_v10175.py; test_cross_consumer_kinetic_lifecycle.py",PRESERVED_NATIVE_UNWIRED,"distinct historical/current physical body restored by model ID; not forced equal to validated scalar"
++KIN03,"channel-resolved transport","signed_burgers_shared_v1025._signed_evolve_channel","transport=channel_resolved","v10.1.7.5 lineage plus current binding registry","per-system active and wake state","cross-consumer kinetic and persistent runtime receipts","per-system emission drive and density support","typed shared preset plus distinct provider/execution/runtime-contract binding","test_transport_comparison_v10175.py; test_cross_consumer_kinetic_lifecycle.py; test_f1_no_physics_fallback.py; test_shared_execution.py",PRESERVED_CONNECTED_NATIVE_EXECUTION_PENDING,"distinct historical/current physical body restored by model ID and selected through ANISOTROPIC_TRANSPORT_MODE; scalar joint CTMC and channel per-system contracts cannot satisfy each other; not forced equal to validated scalar"
+ KIN04,"reversible source-linked surface return","persistent_site_reversible_transport_v10230","reversible_signed","current PF 2d62e3bd","raw/physical return escape recovery cancellation and transfer ledgers","reversible binding and equation-accuracy receipts","validated scalar base plus signed finite-tip drive","exactly-once reversible overlay","test_v10_2_30_reversible_transport.py",CURRENT_LAW_QUALIFIED_DECLARED_SCOPE,"PRESERVED_CONNECTED is connection only; populated state matches per-bin finite-tip signed rate, density jump, weighted velocity and opposite-sign finite-volume advection; retained content is not erased"
+ KIN05,"full-field bulk constitutive and density update","bulk_plasticity_v104.accepted_bulk_load_step","full_field fixed/evolving rho","v10.4 lineage plus current PF","element-GP ep/rho and rate audit","native bulk model audit","selected material bundle and full FEM stress","typed bulk-only and tip-plus-bulk consumers","test_bulk_plasticity_v104.py; test_f1_no_physics_fallback.py",PRESERVED_CONNECTED,"separate material-point consumer; not equated to tip kinetics"
+ KIN06,"direct tip/bulk density transport and population transfer","none","requested independent axis","no current implementation","none","source transport axes receipt","physical transfer support/normalization unresolved","none","test_source_transport_axes_qualification.py",INCOMPLETE,"qualified states explicitly report bulk_density_transport=false and direct_tip_bulk_population_exchange=false; no coefficient invented"
+diff --git a/FRAMEWORK_COMPLETION_LEDGER.json b/FRAMEWORK_COMPLETION_LEDGER.json
+index 66521da1..5c957ee5 100644
+--- a/FRAMEWORK_COMPLETION_LEDGER.json
++++ b/FRAMEWORK_COMPLETION_LEDGER.json
+@@ -139,12 +139,12 @@
+     {
+       "id": "R06",
+       "goal_ids": ["FG-04", "FG-05", "FG-16"],
+-      "status": "PARTIAL_CROSS_CONSUMER_KINETICS_QUALIFIED_TRANSFER_ADAPTERS_UNRESOLVED",
+-      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. PRESERVED_CONNECTED is now explicitly connection status rather than automatic current-law qualification. The occupied-wake consumer has equation-level and populated-state correspondence for its current zero-applied-drive plus recovery scope, and the reversible consumer has equation-level and populated-state correspondence for finite signed bias, population-weighted velocity and species advection. The distinct forward, reversible and channel operators are not forced to agree. Channel-resolved transport is preserved native but unwired through the typed shared presets. Density transport and conservative tip/bulk transfer remain unavailable axes. Four requested intervention adapters are not implemented, and the existing shielding toggle is not isolated enough to qualify the requested retained-shielding intervention.",
++      "status": "PARTIAL_CHANNEL_TYPED_AND_CONTRACT_QUALIFIED_NATIVE_EXECUTION_PENDING",
++      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. PRESERVED_CONNECTED remains a connection status rather than automatic current-law qualification. Channel-resolved transport is now an independent typed shared option with a distinct provider, execution binding and truthful persistent runtime contract; the scalar path still requires the simultaneous joint CTMC, whereas the channel path requires its per-system exchange/advection operator. Focused tests and the complete 973-test portable suite pass. Native nonzero channel execution/restart, density transport, conservative tip/bulk transfer and the planned intervention adapters remain unfinished.",
+       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
+       "authoritative_source": "native geography audits and existing positive transport implementation",
+       "dependencies": ["R01", "R03"],
+-      "exact_next_command": "python scripts/qualify_source_transport_axes.py --output common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json",
++      "exact_next_command": "execute the pf_monotonic_tip_persistent_channel shared preset on the retained event-probe inputs, then fresh-process restart and compare its active state",
+       "input_output_identity": "retained tip-only history plus native V10.4 bulk-only and tip-plus-bulk histories; exact evidence-file hashes recorded in the receipt",
+       "numerical_criteria": "Nonzero activity, full mechanics, ledgers, support exclusions and fresh-process restart.",
+       "executed_evidence": [
+@@ -155,7 +155,7 @@
+         "common_framework_readiness/local_preservation_and_kinetics_20261014/EQUATION_AND_ACCURACY_CORRESPONDENCE.json",
+         "tests/test_cross_consumer_kinetic_lifecycle.py"
+       ],
+-      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Channel-resolved kinetics has no typed shared preset. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
++      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Channel-resolved transport is typed and fail-closed but still needs native nonzero execution/restart evidence. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
+     },
+     {
+       "id": "R07",
+diff --git a/arrhenius_fracture/persistent_runtime_contract.py b/arrhenius_fracture/persistent_runtime_contract.py
+index eafa1bf1..6aa7222f 100644
+--- a/arrhenius_fracture/persistent_runtime_contract.py
++++ b/arrhenius_fracture/persistent_runtime_contract.py
+@@ -18,7 +18,9 @@ from .persistent_site_source_v10221 import (
+ )
+ from .coupled_transport_exchange import joint_transport_exchange
+ from .signed_burgers_shared_v1025 import (
+-    JOINT_CTMC_EXCHANGE_TRANSPORT, _signed_evolve_scalar,
++    CHANNEL_RESOLVED_TRANSPORT, JOINT_CTMC_EXCHANGE_TRANSPORT,
++    LEGACY_SPLIT_EXCHANGE_TRANSPORT, VALIDATED_SCALAR_TRANSPORT,
++    _signed_evolve_channel, _signed_evolve_scalar,
+ )
+ from .taylor_release import completion_rate, runtime_selection
+ from .unified_mpz import UnifiedMPZState
+@@ -47,10 +49,15 @@ def _identity(function: Any) -> dict[str, Any]:
+ 
+ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
+     reversible = bool(getattr(mpz, "_reversible_transport_installed", False))
++    transport_mode = str(getattr(mpz, "_signed_transport_mode", ""))
++    expected_evolve = {
++        VALIDATED_SCALAR_TRANSPORT: _signed_evolve_scalar,
++        CHANNEL_RESOLVED_TRANSPORT: _signed_evolve_channel,
++    }.get(transport_mode)
+     expected = {
+         "emit": _persistent_emit,
+         "advance": _persistent_advance,
+-        "evolve": _signed_evolve_scalar,
++        "evolve": expected_evolve,
+         "coupled_source_transport": _coupled_persistent_source_transport,
+     }
+     # Reversible transport intentionally wraps evolve/advance after the base
+@@ -70,7 +77,7 @@ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
+     else:
+         reversible_receipt = None
+         matches = {
+-            name: _function(getattr(
++            name: fn is not None and _function(getattr(
+                 mpz,
+                 "_emit" if name == "emit" else
+                 "_coupled_persistent_source_transport" if name == "coupled_source_transport" else
+@@ -80,6 +87,30 @@ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
+             for name, fn in expected.items()
+         }
+     inventory = bool(getattr(mpz, "persistent_source_inventory_active", False))
++    expected_exchange_mode = {
++        VALIDATED_SCALAR_TRANSPORT: JOINT_CTMC_EXCHANGE_TRANSPORT,
++        CHANNEL_RESOLVED_TRANSPORT: LEGACY_SPLIT_EXCHANGE_TRANSPORT,
++    }.get(transport_mode)
++    if transport_mode == VALIDATED_SCALAR_TRANSPORT:
++        physical_contract = {
++            "injection": "continuous mobile source inside the coupled CTMC with an implicit persistent-site backstress/end-state root",
++            "transport": "signed finite-volume Peierls transport in the same CTMC generator",
++            "exchange_release": "simultaneous encounter/Taylor release/recapture, transport, escape, and gross/net ledgers",
++            "backstress": "unsigned active mobile plus retained line content",
++            "shielding": "signed retained line content",
++            "advance": "signed moving-frame wake inheritance with persistent sites not consumed",
++            "time_unit": "s",
++        }
++    else:
++        physical_contract = {
++            "injection": "persistent-site implicit backstress root followed by signed per-system population injection",
++            "transport": "per-slip-system Peierls/Taylor rates and channel-resolved signed finite-volume advection",
++            "exchange_release": "per-channel encounter/Taylor exchange followed by recovery and escape",
++            "backstress": "unsigned active mobile plus retained line content",
++            "shielding": "signed retained line content",
++            "advance": "signed moving-frame wake inheritance with persistent sites not consumed",
++            "time_unit": "s",
++        }
+     observed = {
+         "emit": _identity(getattr(mpz, "_emit", None)),
+         "evolve": _identity(getattr(mpz, "evolve", None)),
+@@ -91,7 +122,7 @@ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
+         "schema": MODEL_ID,
+         "object_type": f"{type(mpz).__module__}.{type(mpz).__qualname__}",
+         "source_model": str(getattr(mpz, "source_model", "")),
+-        "signed_transport_mode": str(getattr(mpz, "_signed_transport_mode", "")),
++        "signed_transport_mode": transport_mode,
+         "exchange_transport_mode": str(getattr(mpz, "_exchange_transport_mode", "")),
+         "persistent_source_inventory_active": inventory,
+         "available_sites_are_diagnostic_only": True,
+@@ -105,19 +136,11 @@ def persistent_binding_receipt(mpz: Any) -> dict[str, Any]:
+             ("mode", "window_s", "hard_cap"), runtime_selection()
+         )),
+         "reversible_overlay": reversible_receipt,
+-        "physical_contract": {
+-            "injection": "continuous mobile source inside the coupled CTMC with an implicit persistent-site backstress/end-state root",
+-            "transport": "signed finite-volume Peierls transport in the same CTMC generator",
+-            "exchange_release": "simultaneous encounter/Taylor release/recapture, transport, escape, and gross/net ledgers",
+-            "backstress": "unsigned active mobile plus retained line content",
+-            "shielding": "signed retained line content",
+-            "advance": "signed moving-frame wake inheritance with persistent sites not consumed",
+-            "time_unit": "s",
+-        },
++        "physical_contract": physical_contract,
+         "all_expected_methods_bound": (
+             str(getattr(mpz, "source_model", "")) == SOURCE_MODEL
+-            and str(getattr(mpz, "_signed_transport_mode", "")) == "validated_scalar"
+-            and str(getattr(mpz, "_exchange_transport_mode", "")) == JOINT_CTMC_EXCHANGE_TRANSPORT
++            and expected_evolve is not None
++            and str(getattr(mpz, "_exchange_transport_mode", "")) == expected_exchange_mode
+             and not inventory and all(matches.values())
+         ),
+     }
+diff --git a/arrhenius_fracture/persistent_site_source_v10221.py b/arrhenius_fracture/persistent_site_source_v10221.py
+index cb12e929..6bbf6bcf 100644
+--- a/arrhenius_fracture/persistent_site_source_v10221.py
++++ b/arrhenius_fracture/persistent_site_source_v10221.py
+@@ -33,7 +33,7 @@ from .anisotropic_emission_v10174 import _drive_factors_for_state
+ from .campaign_calibrated_tip import _campaign_backstress, _campaign_local_density_m2
+ from .coupled_transport_exchange import joint_transport_exchange
+ from .signed_burgers_shared_v1025 import (
+-    JOINT_CTMC_EXCHANGE_TRANSPORT,
++    JOINT_CTMC_EXCHANGE_TRANSPORT, LEGACY_SPLIT_EXCHANGE_TRANSPORT,
+     _signed_advance,
+     _sync_active,
+ )
+@@ -940,7 +940,14 @@ def install_persistent_site_source(
+         raise RuntimeError("invalid active tip-arc factor")
+ 
+     state.source_model = SOURCE_MODEL
+-    state._exchange_transport_mode = JOINT_CTMC_EXCHANGE_TRANSPORT
++    # The scalar law consumes the fully coupled source/exchange/transport CTMC.
++    # The preserved channel-resolved law performs its per-system exchange and
++    # advection explicitly, so do not mislabel it as the joint scalar operator.
++    state._exchange_transport_mode = (
++        JOINT_CTMC_EXCHANGE_TRANSPORT
++        if str(getattr(state, "_signed_transport_mode", "")) == "validated_scalar"
++        else LEGACY_SPLIT_EXCHANGE_TRANSPORT
++    )
+     state._persistent_site_cfg = cfg
+     state._persistent_r0_m = r0
+     state._persistent_b = float(b_m)
+diff --git a/arrhenius_fracture/shared_execution.py b/arrhenius_fracture/shared_execution.py
+index 0fcbc7bb..d92d2216 100644
+--- a/arrhenius_fracture/shared_execution.py
++++ b/arrhenius_fracture/shared_execution.py
+@@ -21,7 +21,7 @@ from .fem_backend_adapter import ENTRY_MODULE, resolve_fem_backend_metadata
+ from .shared_options import (
+     CavityMode, CrackPathMode, IntegrationStrategy, KineticsStrategy,
+     LoadingMode, MechanicsBackend, OutputProfile, PlasticityMode, SharedOptions,
+-    SourceLifecycle, SourceLocation,
++    SourceLifecycle, SourceLocation, TransportStrategy,
+ )
+ 
+ _BUNDLED_V104_MANIFEST = (
+@@ -244,6 +244,17 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+         KineticsStrategy.OPERATOR_CONSISTENT_V3_6: ("arrhenius_fracture.operator_consistent_projection_v10230", "OperatorConsistentProjection", "V3.6 projection strategy"),
+     }
+     bindings.append(_binding("kinetics", options.kinetics, *kinetics_map[options.kinetics]))
++    transport_map = {
++        TransportStrategy.VALIDATED_SCALAR: (
++            "arrhenius_fracture.signed_burgers_shared_v1025", "_signed_evolve_scalar",
++            "validated scalar joint source/exchange/transport operator",
++        ),
++        TransportStrategy.CHANNEL_RESOLVED: (
++            "arrhenius_fracture.signed_burgers_shared_v1025", "_signed_evolve_channel",
++            "per-slip-system Peierls/Taylor transport operator",
++        ),
++    }
++    bindings.append(_binding("transport", options.transport, *transport_map[options.transport]))
+     topology_map = {
+         CrackPathMode.SINGLE_FRONT: ("arrhenius_fracture.sharp_front", "run_2d", "single-front topology"),
+         CrackPathMode.BRANCHING_MULTIFRONT: ("arrhenius_fracture.sharp_front_v11_branching", "main", "multifront ownership graph"),
+@@ -436,6 +447,7 @@ def execute_shared(
+         "PYTHONDONTWRITEBYTECODE": "1",
+         "GIT_OPTIONAL_LOCKS": "0",
+         "CLEAVAGE_HAZARD_SEED": str(options.random_seed),
++        "ANISOTROPIC_TRANSPORT_MODE": options.transport.value,
+     })
+     pythonpath = environment.get("PYTHONPATH", "")
+     environment["PYTHONPATH"] = str(root) + (os.pathsep + pythonpath if pythonpath else "")
+diff --git a/arrhenius_fracture/shared_execution_worker.py b/arrhenius_fracture/shared_execution_worker.py
+index 0eef760e..9572329c 100644
+--- a/arrhenius_fracture/shared_execution_worker.py
++++ b/arrhenius_fracture/shared_execution_worker.py
+@@ -168,6 +168,12 @@ def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict
+     payload = json.loads(path.read_text())
+     if not payload.get("all_expected_methods_bound", False):
+         raise RuntimeError("executed persistent-source binding does not match the request")
++    if payload.get("signed_transport_mode") != options.transport.value:
++        raise RuntimeError(
++            "executed transport does not match the request: "
++            f"expected {options.transport.value!r}, observed "
++            f"{payload.get('signed_transport_mode')!r}"
++        )
+     if payload.get("finite_inventory_substitute_started") is not False:
+         raise RuntimeError("finite-inventory substitution detected for persistent request")
+     return payload
+diff --git a/arrhenius_fracture/shared_options.py b/arrhenius_fracture/shared_options.py
+index 2f997547..186335ed 100644
+--- a/arrhenius_fracture/shared_options.py
++++ b/arrhenius_fracture/shared_options.py
+@@ -70,6 +70,13 @@ class KineticsStrategy(_ValueEnum):
+     OPERATOR_CONSISTENT_V3_6 = "operator_consistent_v3_6"
+ 
+ 
++class TransportStrategy(_ValueEnum):
++    """Spatial transport operator, independent of the source/release kinetics."""
++
++    VALIDATED_SCALAR = "validated_scalar"
++    CHANNEL_RESOLVED = "channel_resolved"
++
++
+ class IntegrationStrategy(_ValueEnum):
+     ADAPTIVE_TRANSACTIONAL = "adaptive_transactional"
+     EXPLICIT_EVENT = "explicit_event"
+@@ -92,6 +99,7 @@ class SharedOptions:
+     crack_path: CrackPathMode = CrackPathMode.SINGLE_FRONT
+     cavity: CavityMode = CavityMode.DISABLED
+     kinetics: KineticsStrategy = KineticsStrategy.NATIVE_SIGNED
++    transport: TransportStrategy = TransportStrategy.VALIDATED_SCALAR
+     integration: IntegrationStrategy = IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
+     output: OutputProfile = OutputProfile.COMPACT_SMOKE
+     material_manifest: str | None = None
+@@ -142,6 +150,25 @@ class SharedOptions:
+                 errors.append("operator_consistent_v3_6 currently owns one fixed crack front")
+             if self.source_location is not SourceLocation.TIP_SURFACE:
+                 errors.append("operator_consistent_v3_6 uses material tip-slip patches")
++        if self.transport is TransportStrategy.CHANNEL_RESOLVED:
++            if self.mechanics is not MechanicsBackend.SPATIAL_PF:
++                errors.append("channel_resolved transport is a spatial-PF strategy")
++            if self.loading is not LoadingMode.MONOTONIC:
++                errors.append("channel_resolved transport is qualified only for monotonic loading")
++            if self.source_location is not SourceLocation.TIP_SURFACE:
++                errors.append("channel_resolved transport is qualified only for tip/surface sources")
++            if self.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE:
++                errors.append("channel_resolved shared execution requires persistent reusable sources")
++            if self.plasticity is not PlasticityMode.TIP_PROCESS_ONLY:
++                errors.append("channel_resolved transport is qualified only for tip-process plasticity")
++            if self.crack_path is not CrackPathMode.SINGLE_FRONT:
++                errors.append("channel_resolved transport is qualified only for the single-front path")
++            if self.cavity is not CavityMode.DISABLED:
++                errors.append("channel_resolved transport has no qualified cavity composition")
++            if self.kinetics is not KineticsStrategy.NATIVE_SIGNED:
++                errors.append("channel_resolved transport requires native_signed kinetics")
++            if self.integration is not IntegrationStrategy.ADAPTIVE_TRANSACTIONAL:
++                errors.append("channel_resolved transport requires adaptive transactional integration")
+         if self.mechanics is MechanicsBackend.FULL_FEM_CZM:
+             if self.cavity is not CavityMode.DISABLED:
+                 errors.append("the selected clean FEM/CZM pair has no qualified V5 cavity adapter")
+@@ -185,6 +212,7 @@ _ENUM_FIELDS = {
+     "crack_path": CrackPathMode,
+     "cavity": CavityMode,
+     "kinetics": KineticsStrategy,
++    "transport": TransportStrategy,
+     "integration": IntegrationStrategy,
+     "output": OutputProfile,
+ }
+@@ -192,6 +220,9 @@ _ENUM_FIELDS = {
+ 
+ PRESETS: dict[str, SharedOptions] = {
+     "pf_monotonic_tip_persistent": SharedOptions(),
++    "pf_monotonic_tip_persistent_channel": SharedOptions(
++        transport=TransportStrategy.CHANNEL_RESOLVED,
++    ),
+     "pf_cyclic_tip_persistent": SharedOptions(
+         loading=LoadingMode.EXPLICIT_CYCLIC,
+         kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
+@@ -263,6 +294,6 @@ PRESETS: dict[str, SharedOptions] = {
+ __all__ = [
+     "SCHEMA", "MechanicsBackend", "LoadingMode", "SourceLocation",
+     "SourceLifecycle", "PlasticityMode", "CrackPathMode", "CavityMode",
+-    "KineticsStrategy", "IntegrationStrategy", "OutputProfile",
++    "KineticsStrategy", "TransportStrategy", "IntegrationStrategy", "OutputProfile",
+     "SharedOptions", "PRESETS",
+ ]
+diff --git a/arrhenius_fracture/shared_runtime.py b/arrhenius_fracture/shared_runtime.py
+index 125faae6..1718b141 100644
+--- a/arrhenius_fracture/shared_runtime.py
++++ b/arrhenius_fracture/shared_runtime.py
+@@ -14,7 +14,7 @@ from typing import Any
+ from .shared_options import (
+     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode,
+     MechanicsBackend, PlasticityMode, SharedOptions, SourceLifecycle,
+-    SourceLocation,
++    SourceLocation, TransportStrategy,
+ )
+ 
+ 
+@@ -209,6 +209,15 @@ def resolve_runtime(options: SharedOptions) -> RuntimeReceipt:
+             "current_source_v12_runtime", None),
+     }[options.source_lifecycle]
+     providers.append(lifecycle)
++    transport = {
++        TransportStrategy.VALIDATED_SCALAR: ProviderBinding(
++            "transport", "arrhenius_fracture.signed_burgers_shared_v1025",
++            "validated_scalar_joint_current", "_signed_evolve_scalar"),
++        TransportStrategy.CHANNEL_RESOLVED: ProviderBinding(
++            "transport", "arrhenius_fracture.signed_burgers_shared_v1025",
++            "channel_resolved_peierls_taylor", "_signed_evolve_channel"),
++    }[options.transport]
++    providers.append(transport)
+     if options.plasticity is not PlasticityMode.TIP_PROCESS_ONLY:
+         providers.append(ProviderBinding(
+             "bulk_plasticity", "arrhenius_fracture.bulk_plasticity_v104",
+diff --git a/arrhenius_fracture/sharp_front_v10_2_17.py b/arrhenius_fracture/sharp_front_v10_2_17.py
+index 05c34c1d..22bebb87 100644
+--- a/arrhenius_fracture/sharp_front_v10_2_17.py
++++ b/arrhenius_fracture/sharp_front_v10_2_17.py
+@@ -177,9 +177,14 @@ def _force_stage3_validity_envelope(args: list[str]) -> int:
+     _require_env_value(
+         "CLEAVAGE_EVENT_LENGTH_MODE", "threshold_scaled", "threshold_scaled"
+     )
+-    _require_env_value(
+-        "ANISOTROPIC_TRANSPORT_MODE", "validated_scalar", "validated_scalar"
++    selected_transport = _transport.normalize_transport_mode(
++        os.environ.get("ANISOTROPIC_TRANSPORT_MODE")
+     )
++    if selected_transport not in {"validated_scalar", "channel_resolved"}:
++        raise SystemExit(
++            "v10.2.17 requires ANISOTROPIC_TRANSPORT_MODE to select an installed "
++            "signed transport operator"
++        )
+     if not _bool_env("ANISOTROPIC_USE_AVALANCHE_BACKEND", True):
+         raise SystemExit("v10.2.17 requires ANISOTROPIC_USE_AVALANCHE_BACKEND=1")
+     return _require_stochastic_seed()
+diff --git a/tests/test_f1_no_physics_fallback.py b/tests/test_f1_no_physics_fallback.py
+index f4b0e29d..7b163148 100644
+--- a/tests/test_f1_no_physics_fallback.py
++++ b/tests/test_f1_no_physics_fallback.py
+@@ -14,21 +14,28 @@ from arrhenius_fracture.shared_execution import (
+     build_execution_plan, construct_and_attest, execute_shared,
+ )
+ from arrhenius_fracture.shared_execution_worker import _verify_executed_physics
+-from arrhenius_fracture.shared_options import PRESETS, SharedOptions
+-from arrhenius_fracture.signed_burgers_shared_v1025 import _signed_evolve_scalar
++from arrhenius_fracture.shared_options import PRESETS, SharedOptions, TransportStrategy
++from arrhenius_fracture.signed_burgers_shared_v1025 import (
++    _signed_evolve_channel, _signed_evolve_scalar,
++)
+ 
+ 
+-def _bound_state():
++def _bound_state(transport="validated_scalar"):
+     state = SimpleNamespace(
+-        source_model=SOURCE_MODEL, _signed_transport_mode="validated_scalar",
+-        _exchange_transport_mode="joint_ctmc",
++        source_model=SOURCE_MODEL, _signed_transport_mode=transport,
++        _exchange_transport_mode=(
++            "joint_ctmc" if transport == "validated_scalar" else "legacy_split"
++        ),
+         persistent_source_inventory_active=False,
+     )
+     state._emit = MethodType(_persistent_emit, state)
+     state._coupled_persistent_source_transport = MethodType(
+         _coupled_persistent_source_transport, state
+     )
+-    state.evolve = MethodType(_signed_evolve_scalar, state)
++    state.evolve = MethodType(
++        _signed_evolve_scalar if transport == "validated_scalar" else _signed_evolve_channel,
++        state,
++    )
+     state.advance = MethodType(_persistent_advance, state)
+     state._exchange = lambda *a: None
+     state.emission_rate_per_site = lambda *a: None
+@@ -43,6 +50,15 @@ def test_actual_bound_object_is_checked_and_corruption_fails_closed():
+         require_persistent_binding(state, stage="after_remesh")
+ 
+ 
++def test_channel_resolved_bound_object_has_its_own_truthful_contract():
++    state = _bound_state("channel_resolved")
++    receipt = require_persistent_binding(state, stage="channel")
++    assert receipt["all_expected_methods_bound"]
++    assert receipt["signed_transport_mode"] == "channel_resolved"
++    assert receipt["exchange_transport_mode"] == "legacy_split"
++    assert "per-slip-system" in receipt["physical_contract"]["transport"]
++
++
+ def test_split_exchange_selection_fails_closed_even_when_outer_wrapper_matches():
+     state = _bound_state()
+     state._exchange_transport_mode = "legacy_split"
+@@ -65,10 +81,30 @@ def test_missing_executed_binding_receipt_is_failure_not_fallback(tmp_path):
+     (tmp_path / "persistent_native_runtime_binding.json").write_text(json.dumps({
+         "all_expected_methods_bound": True,
+         "finite_inventory_substitute_started": False,
++        "signed_transport_mode": "validated_scalar",
+     }))
+     assert _verify_executed_physics(tmp_path, options, plan)["all_expected_methods_bound"]
+ 
+ 
++def test_executed_transport_must_match_typed_request(tmp_path):
++    options = PRESETS["pf_monotonic_tip_persistent_channel"]
++    plan = build_execution_plan(options)
++    (tmp_path / "persistent_native_runtime_binding.json").write_text(json.dumps({
++        "all_expected_methods_bound": True,
++        "finite_inventory_substitute_started": False,
++        "signed_transport_mode": "validated_scalar",
++    }))
++    with pytest.raises(RuntimeError, match="transport does not match"):
++        _verify_executed_physics(tmp_path, options, plan)
++    payload = {
++        "all_expected_methods_bound": True,
++        "finite_inventory_substitute_started": False,
++        "signed_transport_mode": TransportStrategy.CHANNEL_RESOLVED.value,
++    }
++    (tmp_path / "persistent_native_runtime_binding.json").write_text(json.dumps(payload))
++    assert _verify_executed_physics(tmp_path, options, plan)["signed_transport_mode"] == "channel_resolved"
++
++
+ @pytest.mark.parametrize(
+     ("preset", "geography", "tip_enabled"),
+     [
+diff --git a/tests/test_shared_execution.py b/tests/test_shared_execution.py
+index 720f1be9..8fc94f2d 100644
+--- a/tests/test_shared_execution.py
++++ b/tests/test_shared_execution.py
+@@ -12,6 +12,7 @@ from arrhenius_fracture.shared_execution_worker import _multifront_restart_flag
+ from arrhenius_fracture.shared_options import (
+     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
+     PlasticityMode, SharedOptions, SourceLifecycle, SourceLocation,
++    TransportStrategy,
+ )
+ from arrhenius_fracture.branch_cluster_v11 import BranchClusterState
+ from arrhenius_fracture.stateful_multifront_production_v12 import _json_compatible_state
+@@ -81,6 +82,17 @@ def test_monotonic_reversible_uses_effective_native_executor():
+     assert by_role(plan)["kinetics"].attribute == "install_reversible_transport"
+ 
+ 
++def test_channel_transport_is_an_independent_executable_binding():
++    scalar = build_execution_plan(PRESETS["pf_monotonic_tip_persistent"])
++    channel = build_execution_plan(PRESETS["pf_monotonic_tip_persistent_channel"])
++    assert channel.executable
++    assert channel.executor_module == scalar.executor_module
++    assert by_role(channel)["kinetics"].requested == "native_signed"
++    assert by_role(channel)["transport"].requested == "channel_resolved"
++    assert by_role(channel)["transport"].attribute == "_signed_evolve_channel"
++    assert channel.options_sha256 != scalar.options_sha256
++
++
+ def test_finite_inventory_maps_to_native_finite_site_driver():
+     options = SharedOptions(source_lifecycle=SourceLifecycle.FINITE_INVENTORY)
+     plan = build_execution_plan(options)
+diff --git a/tests/test_shared_options_resolution.py b/tests/test_shared_options_resolution.py
+index fae1b76b..273cffd9 100644
+--- a/tests/test_shared_options_resolution.py
++++ b/tests/test_shared_options_resolution.py
+@@ -5,7 +5,7 @@ import pytest
+ from arrhenius_fracture.shared_options import (
+     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode,
+     MechanicsBackend, PlasticityMode, PRESETS, SharedOptions,
+-    SourceLifecycle, SourceLocation,
++    SourceLifecycle, SourceLocation, TransportStrategy,
+ )
+ from arrhenius_fracture.shared_runtime import (
+     FEM_COMMIT, require_restart_compatible, resolve_runtime,
+@@ -62,6 +62,21 @@ def test_unsupported_combinations_fail_before_solver_execution():
+             crack_path=CrackPathMode.BRANCHING_MULTIFRONT,
+             cavity=CavityMode.FULL_ORDER_V5,
+         )
++    with pytest.raises(ValueError, match="requires native_signed kinetics"):
++        SharedOptions(
++            transport=TransportStrategy.CHANNEL_RESOLVED,
++            kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
++        )
++
++
++def test_scalar_and_channel_transport_resolve_distinct_providers():
++    scalar = SharedOptions()
++    channel = SharedOptions(transport=TransportStrategy.CHANNEL_RESOLVED)
++    assert scalar.fingerprint != channel.fingerprint
++    scalar_provider = {p.role: p for p in resolve_runtime(scalar).providers}["transport"]
++    channel_provider = {p.role: p for p in resolve_runtime(channel).providers}["transport"]
++    assert scalar_provider.required_attribute == "_signed_evolve_scalar"
++    assert channel_provider.required_attribute == "_signed_evolve_channel"
+ 
+ 
+ def test_pf_monotonic_cyclic_branch_void_and_bulk_bindings_are_distinct():
+diff --git a/tests/test_v10217_stage3_final_stack.py b/tests/test_v10217_stage3_final_stack.py
+index 05583858..0abae3b0 100644
+--- a/tests/test_v10217_stage3_final_stack.py
++++ b/tests/test_v10217_stage3_final_stack.py
+@@ -120,6 +120,26 @@ def test_deterministic_or_fixed_modes_fail_closed(monkeypatch, tmp_path):
+         entry.main(_base_args(tmp_path))
+ 
+ 
++def test_channel_resolved_transport_passes_stage3_envelope(monkeypatch, tmp_path):
++    family = _family()
++    _install(monkeypatch, family)
++    monkeypatch.setattr(entry._transport, "normalize_transport_mode", lambda value: value)
++    monkeypatch.setenv("CLEAVAGE_HAZARD_MODE", "exponential")
++    monkeypatch.setenv("CLEAVAGE_EVENT_LENGTH_MODE", "threshold_scaled")
++    monkeypatch.setenv("CLEAVAGE_HAZARD_SEED", "2020")
++    monkeypatch.setenv("ANISOTROPIC_TRANSPORT_MODE", "channel_resolved")
++    monkeypatch.setenv("ANISOTROPIC_USE_AVALANCHE_BACKEND", "1")
++    observed = {}
++    monkeypatch.setattr(
++        entry.StateResolvedSignedBurgersTipEngine,
++        "configure_state_resolved_physics",
++        classmethod(lambda cls, supplied, mode, **kwargs: observed.update(mode=mode)),
++    )
++    monkeypatch.setattr(entry._transport, "main", lambda args: "ok")
++    assert entry.main(_base_args(tmp_path)) == "ok"
++    assert observed["mode"] == "channel_resolved"
++
++
+ def test_stage3_shell_launchers_parse():
+     root = Path(__file__).resolve().parents[1]
+     for relative in (

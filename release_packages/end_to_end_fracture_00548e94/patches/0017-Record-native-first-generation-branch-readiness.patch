@@ -1,0 +1,274 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 10:17:10 -0700
+Subject: [PATCH 17/32] Record native first-generation branch readiness
+
+---
+ CAPABILITY_PRESERVATION_MATRIX.csv            |   2 +-
+ FRAMEWORK_COMPLETION_LEDGER.json              |  11 +-
+ .../qualification_report.json                 | 213 ++++++++++++++++++
+ 3 files changed, 220 insertions(+), 6 deletions(-)
+ create mode 100644 integration_evidence/r09_native_branch_a8620304/qualification_report.json
+
+diff --git a/CAPABILITY_PRESERVATION_MATRIX.csv b/CAPABILITY_PRESERVATION_MATRIX.csv
+index 9f2adf24..29ea3efa 100644
+--- a/CAPABILITY_PRESERVATION_MATRIX.csv
++++ b/CAPABILITY_PRESERVATION_MATRIX.csv
+@@ -16,7 +16,7 @@ KIN07,"orthogonal source/accommodation diagnostic interventions","diagnostic_int
+ STATE01,"signed mobile/retained/wake state","signed_burgers_shared_v1025","signed state","9e884","signed active/wake fields","signed-state plots","kernel family","existing engine plus provider receipt","signed/persistent and runtime-grid regressions",PASS,"71-test cyclic group; 22-test source group"
+ STATE02,"mobile return/net slip","reversible fatigue modules","true signed drive","94871be","return/net ledgers","fatigue return plots","signed transport; restart","reversible strategy adapter","test_v10_2_30_reversible_transport.py",PASS,"48-test contract group"
+ EVENT01,"hazard/proposal/energy/commit transaction","hazard_energy_event_gate_v10230","energy gated","9e884","gate/event ledger","event analysis","RNG; mechanics; rollback","existing gate plus one-owner audit","event growth/gate/transaction tests",PASS,"71-test cyclic group"
+-BR01,"branching/multifront","v11/v12/v13 branch launchers","branching enabled","9e2c43e","front owner/topology clocks","branch summaries/plots","full provider; owner RNG","branch strategy compatibility adapter plus recursive owner transition fixture","V11/V12 branch/provider tests; test_recursive_branch_readiness.py",PRESERVED_CONNECTED,"exact theta40 family completes compact two-front accepted event; clean interrupted/uninterrupted V12 state is exact; injected second-generation owner/checkpoint adapter is exact; spontaneous predictive recursive branching remains unvalidated"
++BR01,"branching/multifront","v11/v12/v13 branch launchers","branching enabled","9e2c43e through a8620304","front owner/topology clocks","branch summaries/plots","full provider; owner RNG","branch strategy compatibility adapter, native V11/V12 occupied-state evidence and recursive owner transition fixture","V11/V12 branch/provider tests; test_recursive_branch_readiness.py; r09_native_branch_a8620304",PRESERVED_CONNECTED_NATIVE_FIRST_BIRTH,"exact theta40 family contains a native binary birth, 30um/300um generation-1 daughters, a later accepted 5um event, positive rates on both tips and exact fresh-process restart; both tips still share an unresolved physical owner so second-generation birth remains unqualified; injected recursive ownership is not promoted to physical evidence"
+ VOID01,"full-order vacancy/cavity","voiding_production_v5","voiding enabled","9e2c43e","vacancy/cavity/topology state","cavity summaries/native fields","V12/V13 scheduler/full provider","physical paired-arm adapter; immutable pair generations; explicit test-only lifecycle fixture","test_shared_void_restart_contract.py; test_shared_v5_refinement_checkpoint.py",PARTIAL_NUMERICAL_STOP,"matched arms accepted through 0.52002s; next transport attempt is a lower-positivity failure in two cells, not the dilute upper limit; accepted refined prefix and rollback retained; functional fixture grows 25-to-55um and remeshes, but is not a nucleation prediction"
+ COMB01,"combined branch and cavity ownership","shared_branch_cavity_adapter","pf_branching_void_v5","bb0c21d9","V11 full-state checkpoint + compatibility audit","analyze_branch_cavity_compatibility.py","source-conforming full FEM; V5 cavity; V11 crack network","public current-row bounded adapter","test_shared_execution.py; test_shared_void_restart_contract.py; test_analyze_branch_cavity_compatibility.py",PASS_BOUNDED_COMPATIBILITY,"root+downstream child+cavity owners; ligament, child birth and subsequent child advance; exact fresh-process restart; recursive branch kinetics remain uncalibrated"
+ PROP01,"developed long propagation","v10.2.27 long R-curve launcher","approximately 1000um","historical producer d77abff plus analysis 09437482","chronological crack/event/work records","explicit-quantity K versus projected/path coordinate plots plus immutable provenance sidecar","full PF; state inheritance","long-growth execution plus schema-2 observer and current analysis replay","full suite; test_final_developed_growth.py; K_LENGTH_ANALYSIS_PORT_QUALIFICATION.json",PASS_CURRENT_ANALYSIS_OF_HISTORICAL_PRODUCER,"historical 201-event history retained; distinct 203-event curve has exact raw hashes and law-map identity, is labeled HISTORICAL_RETAINED_NOT_CURRENT_LAW_PREDICTION, and is not relabeled by its later analysis commit"
+diff --git a/FRAMEWORK_COMPLETION_LEDGER.json b/FRAMEWORK_COMPLETION_LEDGER.json
+index 1da443e3..979184dc 100644
+--- a/FRAMEWORK_COMPLETION_LEDGER.json
++++ b/FRAMEWORK_COMPLETION_LEDGER.json
+@@ -207,19 +207,20 @@
+     {
+       "id": "R09",
+       "goal_ids": ["FG-13", "FG-16"],
+-      "status": "PARTIAL_SECOND_GENERATION_OWNER_ADAPTER_QUALIFIED_NATIVE_BIRTH_PENDING",
+-      "concrete_defect": "The recursive ownership adapter now executes single-owner birth ownership, first-generation cluster resolution, independent daughter ownership, a resolved-daughter second-generation transition and exact checkpoint round-trip without mutable-owner aliasing. This is an explicitly injected ownership fixture, not a spontaneous native branch prediction. Native spontaneous birth, mechanical daughter continuation and active topology restart are not yet jointly qualified.",
++      "status": "NATIVE_FIRST_BIRTH_DAUGHTER_RESTART_QUALIFIED_SECOND_GENERATION_OWNER_GATE_PENDING",
++      "concrete_defect": "The injected recursive-owner fixture remains a transaction regression. Separately, the source-bound theta40 V11/V12 path now proves a native binary birth, two mechanically evolved generation-1 daughters, a later accepted 5 um daughter advance, positive native rates on both active tips and exact fresh-process V12 checkpoint loading. The 30 um and 300 um daughters still share one unresolved process region, so the authorized shared-region policy correctly vetoes recursive birth until physical connectivity detaches an independent owner.",
+       "owner_consumer": "branch scheduler, crack graph, topology transaction and checkpoint",
+       "authoritative_source": "native V11/V12 branch implementations",
+       "dependencies": ["R01", "R03", "R07"],
+-      "exact_next_command": "python scripts/run_recursive_branch_readiness.py --second-generation",
+-      "input_output_identity": "injected ownership-transition fixture is labeled non-predictive; future native run requires a documented admissible initial state and no forced event",
++      "exact_next_command": "python scripts/run_recursive_branch_readiness.py --second-generation --native-checkpoint integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl --accepted-interval integration_evidence/targeted_completion/theta40_v12_qualified_restarted/accepted_intervals/transactions/interval-00002184 --output <new-report>",
++      "input_output_identity": "accepted V12 payload d10ec7af6a78dddc923107ced700a8f847676f8353d2cd02a17365acef8f2430 at step 2184; immutable V11 native-birth prefix; current exact-loader validation; four-front continuation command retained in the report; injected ownership fixture remains labeled non-predictive",
+       "numerical_criteria": "Actual eligible native birth, continuation, clocks/marks/state conservation and fresh-process topology restart.",
+       "executed_evidence": [
+         "common_framework_readiness/local_preservation_and_kinetics_20261014/RECURSIVE_BRANCH_OWNER_ADAPTER_QUALIFICATION.json",
++        "integration_evidence/r09_native_branch_a8620304/qualification_report.json",
+         "tests/test_recursive_branch_readiness.py"
+       ],
+-      "remaining_limitation": "Existing initialized/injected ownership evidence cannot satisfy spontaneous birth. The 24 GiB qualification plus 12 GiB reserve is not admitted with the currently observed free space, and production execution remains disabled."
++      "remaining_limitation": "A second-generation physical birth has not yet occurred. The exact continuation is configured for four fronts and preserves all clocks/marks/state, but the current checkpoint is not yet recursively eligible because its owner region remains physically unresolved. Disk admission passes; launch is temporarily deferred because current machine swap is 9.4/10 GiB with multiple unrelated scientific workers active. Production execution remains disabled."
+     },
+     {
+       "id": "R10",
+diff --git a/integration_evidence/r09_native_branch_a8620304/qualification_report.json b/integration_evidence/r09_native_branch_a8620304/qualification_report.json
+new file mode 100644
+index 00000000..374875bd
+--- /dev/null
++++ b/integration_evidence/r09_native_branch_a8620304/qualification_report.json
+@@ -0,0 +1,213 @@
++{
++  "active_tips": [
++    "daughter-2",
++    "granddaughter-1",
++    "granddaughter-2"
++  ],
++  "capacity": {
++    "admitted": true,
++    "free_GiB": 40.77610397338867,
++    "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1",
++    "peak_GiB": 24.0,
++    "reason": "capacity admitted",
++    "reserve_GiB": 12.0
++  },
++  "checkpoint_exact": true,
++  "fixture_classification": "INJECTED_OWNER_TRANSITIONS_NOT_NATURAL_BRANCH_PREDICTION",
++  "mutable_independent_owner_aliasing": false,
++  "native_birth_demonstrated": false,
++  "native_birth_entry": "scripts/run_v11_branching_case.py",
++  "native_evidence": {
++    "accepted_one_arm_advances": 1,
++    "active_front_ids": [
++      "b0fa22bb892937f8",
++      "b7d5efe0822562b9"
++    ],
++    "active_fronts": [
++      {
++        "front_id": "b0fa22bb892937f8",
++        "generation": 1,
++        "path_length_um": 30.00000000000015,
++        "tip_xy_um": [
++          595.536822860576,
++          -43.84877966040878
++        ]
++      },
++      {
++        "front_id": "b7d5efe0822562b9",
++        "generation": 1,
++        "path_length_um": 300.0000000000008,
++        "tip_xy_um": [
++          806.0665275056739,
++          171.9688365391225
++        ]
++      }
++    ],
++    "checkpoint": {
++      "exact_current_loader_validation": true,
++      "path": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl",
++      "payload_sha256": "e4ff3c761a2ed87da64821069b8879a19c66443d344ec5c5d73803bae52eb4ff",
++      "sha256": "42669902e1742bfe6de96ef94af5f30201529dcca88e212c0fc892674a0561ee",
++      "step": 2184
++    },
++    "cumulative_branch_births": 1,
++    "mechanically_evolved_daughters_demonstrated": true,
++    "native_birth_evidence_origin": "immutable_v11_native_birth_imported_with_exact_v12_prefix",
++    "native_first_birth_demonstrated": true,
++    "next_native_command": [
++      "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
++      "-m",
++      "arrhenius_fracture.sharp_front_current_source_multifront_physical_v12",
++      "--maximum-fronts",
++      "4",
++      "--v12-restart-checkpoint",
++      "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/targeted_completion/theta40_v12_qualified_restarted/checkpoint/latest.v12.pkl",
++      "--v12-stop-after-total-births",
++      "2",
++      "--v12-post-birth-events",
++      "3",
++      "--signed-kernel-family",
++      "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_theta40_signed_kernel_append_only_v5_3_20260901T120000Z_repro/family.json",
++      "--mode",
++      "2d",
++      "--parameter-option",
++      "v913_paper_weakT01_0129902_persistent_sites",
++      "--temperatures",
++      "700",
++      "--steps",
++      "10000",
++      "--nx",
++      "36",
++      "--ny",
++      "72",
++      "--dU",
++      "2e-7",
++      "--dt",
++      "1e-6",
++      "--n-stagger",
++      "2",
++      "--tip-h-fine",
++      "1e-6",
++      "--tip-ratio",
++      "1.2",
++      "--da-phys",
++      "5e-6",
++      "--target-crack-extension-um",
++      "1000",
++      "--mpz-length-um",
++      "50",
++      "--mpz-n-bins",
++      "80",
++      "--front-state-model",
++      "moving_pz",
++      "--tip-source-model",
++      "continuum",
++      "--tip-kinetics-mode",
++      "moving_velocity",
++      "--bulk-plasticity-mode",
++      "tip_only",
++      "--directional-j-mode",
++      "root_signed",
++      "--tip-plasticity",
++      "--active-shielding",
++      "--signed-active-shielding",
++      "--mobile-shield-fraction",
++      "0",
++      "--no-wake-shielding",
++      "--crystal-aniso",
++      "--crystal-compete",
++      "--crystal-theta-deg",
++      "40",
++      "--crystal-material",
++      "w",
++      "--j-decomposition",
++      "cluster",
++      "--crack-backend",
++      "sharp_wake",
++      "--adaptive-events",
++      "--adaptive-event-target",
++      "0.15",
++      "--print-every",
++      "1",
++      "--out",
++      "{new_output_directory}"
++    ],
++    "positive_rate_active_fronts": {
++      "b0fa22bb892937f8": 1000000.0,
++      "b7d5efe0822562b9": 1000000.0
++    },
++    "production_execution_authorized": false,
++    "recursive_eligible_front_ids": [],
++    "schema": "recursive-native-branch-readiness/2",
++    "second_generation_birth_demonstrated": false,
++    "status": "NATIVE_FIRST_BIRTH_DAUGHTER_RESTART_QUALIFIED_SECOND_GENERATION_PHYSICAL_OWNER_GATE_PENDING",
++    "unresolved_owner_gates": [
++      {
++        "front_id": "b0fa22bb892937f8",
++        "member_front_ids": [
++          "b0fa22bb892937f8",
++          "b7d5efe0822562b9"
++        ],
++        "owner_id": "owner:v11:jc9ec4d7327bde23",
++        "reason": "parent_process_zone_still_unresolved",
++        "unresolved_junction_ids": [
++          "jc9ec4d7327bde23"
++        ]
++      },
++      {
++        "front_id": "b7d5efe0822562b9",
++        "member_front_ids": [
++          "b0fa22bb892937f8",
++          "b7d5efe0822562b9"
++        ],
++        "owner_id": "owner:v11:jc9ec4d7327bde23",
++        "reason": "parent_process_zone_still_unresolved",
++        "unresolved_junction_ids": [
++          "jc9ec4d7327bde23"
++        ]
++      }
++    ]
++  },
++  "owner_registry": {
++    "owner_by_tip": {
++      "daughter-2": "daughter-2",
++      "granddaughter-1": "cluster-2",
++      "granddaughter-2": "cluster-2"
++    },
++    "owners": {
++      "cluster-2": {
++        "cluster_id": "cluster-2",
++        "junction_reservoir_id": null,
++        "owner_id": "cluster-2",
++        "owner_type": "unresolved_branch_cluster",
++        "process_engine_id": "cluster-2"
++      },
++      "daughter-2": {
++        "cluster_id": null,
++        "junction_reservoir_id": null,
++        "owner_id": "daughter-2",
++        "owner_type": "resolved_tip_engine",
++        "process_engine_id": "daughter-2"
++      },
++      "reservoir-1": {
++        "cluster_id": "cluster-1",
++        "junction_reservoir_id": "reservoir-1",
++        "owner_id": "reservoir-1",
++        "owner_type": "junction_reservoir",
++        "process_engine_id": null
++      }
++    },
++    "schema": "v11.process-state-owner-registry/1"
++  },
++  "production_execution_authorized": false,
++  "qualification": "Q-BRANCH-RECURSIVE",
++  "schema": "recursive-branch-owner-adapter-qualification/1",
++  "source_commit": "a8620304",
++  "status": "PARTIAL_ADAPTER_QUALIFIED_NATIVE_BIRTH_PENDING",
++  "transitions": [
++    "single_owner_to_unresolved_first_generation_cluster",
++    "first_generation_cluster_to_independent_daughter_owners",
++    "resolved_daughter_to_unresolved_second_generation_cluster",
++    "checkpoint_round_trip"
++  ]
++}

@@ -1,0 +1,327 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 10:30:20 -0700
+Subject: [PATCH 22/32] Connect generic current FEM backend
+
+---
+ arrhenius_fracture/fem_backend_adapter.py     | 77 ++++++++++++++++++-
+ arrhenius_fracture/shared_execution.py        | 32 +++++---
+ .../shared_fem_execution_worker.py            | 11 ++-
+ arrhenius_fracture/shared_options.py          | 37 ++++++++-
+ tests/test_shared_execution.py                | 18 ++++-
+ 5 files changed, 159 insertions(+), 16 deletions(-)
+
+diff --git a/arrhenius_fracture/fem_backend_adapter.py b/arrhenius_fracture/fem_backend_adapter.py
+index 80247c54..53a5f61d 100644
+--- a/arrhenius_fracture/fem_backend_adapter.py
++++ b/arrhenius_fracture/fem_backend_adapter.py
+@@ -20,6 +20,13 @@ ENTRY_RELATIVE = Path(
+     "mode_i_first_passage_v10_0_5_18_4_0_theta0_pf_parity.py"
+ )
+ ENTRY_MODULE = "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_4_0_theta0_pf_parity"
++GENERIC_FEM_ROOT = Path(
++    "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion"
++)
++GENERIC_ENTRY_RELATIVE = Path("arrhenius_fracture/generic_current_pf_companion.py")
++GENERIC_ENTRY_MODULE = "arrhenius_fracture.generic_current_pf_companion"
++GENERIC_FEM_COMMIT = "7557ba8fc37e0466ee56fd60f6370275c8146245"
++GENERIC_FEM_BRANCH = "codex/current-pf-companion"
+ DEFAULT_FEM_PYTHON = Path(
+     "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"
+ )
+@@ -123,12 +130,80 @@ def inspect_fem_backend(
+         str(interpreter), available, False,
+         "available and source-verified; not yet executed" if available else "; ".join(problems))
+ 
++
++def inspect_generic_fem_backend(
++    root: str | Path | None = None, *, probe_import: bool = False,
++) -> FEMBackendReceipt:
++    """Verify the current generic companion while preserving untracked evidence.
++
++    Only tracked changes can alter calculation source.  Untracked qualification
++    outputs are deliberately retained and therefore are not treated as a source
++    mutation.
++    """
++    root = Path(root or os.environ.get("FRACTURE_GENERIC_FEM_ROOT", GENERIC_FEM_ROOT)).resolve()
++    entry = root / GENERIC_ENTRY_RELATIVE
++    interpreter = Path(os.environ.get("FRACTURE_FEM_PYTHON", DEFAULT_FEM_PYTHON)).resolve()
++    try:
++        observed_commit = _run(root, "git", "rev-parse", "HEAD")
++        observed_branch = _run(root, "git", "branch", "--show-current")
++        tracked_clean = not bool(_run(
++            root, "git", "--no-optional-locks", "status", "--porcelain",
++            "--untracked-files=no",
++        ))
++    except (OSError, RuntimeError) as exc:
++        return FEMBackendReceipt(
++            "fem-backend-receipt/2", str(root), str(root), GENERIC_FEM_COMMIT,
++            None, GENERIC_FEM_BRANCH, None, None, str(entry), None,
++            f"{GENERIC_ENTRY_MODULE}:main", str(interpreter), False, False,
++            f"repository unavailable: {exc}",
++        )
++    problems = []
++    if observed_commit != GENERIC_FEM_COMMIT:
++        problems.append(f"commit mismatch: {observed_commit}")
++    if observed_branch != GENERIC_FEM_BRANCH:
++        problems.append(f"branch mismatch: {observed_branch}")
++    if not tracked_clean:
++        problems.append("checkout has an undeclared tracked patch")
++    if not entry.is_file():
++        problems.append("mapped generic current entry file is absent")
++    if not interpreter.is_file():
++        problems.append(f"configured FEM interpreter is absent: {interpreter}")
++    elif entry.is_file() and probe_import:
++        environment = dict(os.environ)
++        environment.update({"PYTHONDONTWRITEBYTECODE": "1", "GIT_OPTIONAL_LOCKS": "0"})
++        probe = subprocess.run(
++            [str(interpreter), "-c",
++             f"import {GENERIC_ENTRY_MODULE} as backend; assert callable(backend.main)"],
++            cwd=root, env=environment, text=True, stdout=subprocess.PIPE,
++            stderr=subprocess.PIPE,
++        )
++        if probe.returncode:
++            problems.append(f"FEM constructor import failed: {probe.stderr.strip()}")
++    available = not problems
++    return FEMBackendReceipt(
++        "fem-backend-receipt/2", str(root), str(root), GENERIC_FEM_COMMIT,
++        observed_commit, GENERIC_FEM_BRANCH, observed_branch, tracked_clean,
++        str(entry), _sha256(entry) if entry.is_file() else None,
++        f"{GENERIC_ENTRY_MODULE}:main", str(interpreter), available, False,
++        "available; tracked source verified and preserved untracked evidence allowed; not yet executed"
++        if available else "; ".join(problems),
++    )
++
+ def require_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
+     receipt = inspect_fem_backend(root, probe_import=True)
+     if not receipt.available:
+         raise RuntimeError(f"full FEM/CZM backend unavailable: {receipt.reason}")
+     return receipt
+ 
++
++def require_generic_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
++    receipt = inspect_generic_fem_backend(root, probe_import=True)
++    if not receipt.available:
++        raise RuntimeError(f"generic full FEM/CZM backend unavailable: {receipt.reason}")
++    return receipt
++
+ __all__ = ["DEFAULT_FEM_ROOT", "DEFAULT_FEM_PYTHON", "ENTRY_MODULE", "ENTRY_RELATIVE",
+-           "FEMBackendReceipt", "inspect_fem_backend", "require_fem_backend",
++           "GENERIC_FEM_ROOT", "GENERIC_ENTRY_MODULE", "GENERIC_ENTRY_RELATIVE",
++           "FEMBackendReceipt", "inspect_fem_backend", "inspect_generic_fem_backend",
++           "require_fem_backend", "require_generic_fem_backend",
+            "resolve_fem_backend_metadata"]
+diff --git a/arrhenius_fracture/shared_execution.py b/arrhenius_fracture/shared_execution.py
+index d92d2216..47577339 100644
+--- a/arrhenius_fracture/shared_execution.py
++++ b/arrhenius_fracture/shared_execution.py
+@@ -17,9 +17,11 @@ import subprocess
+ import sys
+ from typing import Any, Sequence
+ 
+-from .fem_backend_adapter import ENTRY_MODULE, resolve_fem_backend_metadata
++from .fem_backend_adapter import (
++    ENTRY_MODULE, GENERIC_ENTRY_MODULE, resolve_fem_backend_metadata,
++)
+ from .shared_options import (
+-    CavityMode, CrackPathMode, IntegrationStrategy, KineticsStrategy,
++    CavityMode, CrackPathMode, FEMEntryMode, IntegrationStrategy, KineticsStrategy,
+     LoadingMode, MechanicsBackend, OutputProfile, PlasticityMode, SharedOptions,
+     SourceLifecycle, SourceLocation, TransportStrategy,
+ )
+@@ -59,13 +61,23 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
+     options.validate()
+     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
+         receipt = resolve_fem_backend_metadata()
+-        bindings = (_binding("mechanics", options.mechanics, ENTRY_MODULE, "main",
+-                             f"verified external entry {receipt.entry_file}"),)
++        reference = options.fem_entry is FEMEntryMode.HISTORICAL_THETA0_REFERENCE
++        module = ENTRY_MODULE if reference else GENERIC_ENTRY_MODULE
++        bindings = (
++            _binding("mechanics", options.mechanics, module, "main",
++                     "historical exact theta-zero reference" if reference
++                     else "registry-driven current PF companion"),
++            _binding("fem_entry", options.fem_entry, module, "main",
++                     f"verified external entry {receipt.entry_file}" if reference
++                     else "current source-bound generic FEM entry"),
++        )
+         exact = (options == __import__("arrhenius_fracture.shared_options", fromlist=["PRESETS"]).PRESETS["fem_czm_theta0"])
++        executable = exact or not reference
+         return ExecutionPlan("shared-execution-plan/1", options.fingerprint, bindings,
+-                             ENTRY_MODULE if exact else None, "main" if exact else None,
+-                             "external_fem_native", exact,
+-                             None if exact else "only the exact fem_czm_theta0 preset is mapped")
++                             module if executable else None, "main" if executable else None,
++                             "external_fem_native" if reference
++                             else "external_fem_generic_current", executable,
++                             None if executable else "only the exact historical fem_czm_theta0 preset is mapped")
+ 
+     operator_exact = (
+         options.loading is LoadingMode.EXPLICIT_CYCLIC
+@@ -468,8 +480,10 @@ def execute_shared(
+     worker_command = [str(interpreter), "-m", "arrhenius_fracture.shared_execution_worker",
+                       str(request_path)]
+     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
+-        from .fem_backend_adapter import require_fem_backend
+-        backend = require_fem_backend()
++        from .fem_backend_adapter import require_fem_backend, require_generic_fem_backend
++        backend = (require_generic_fem_backend()
++                   if options.fem_entry is FEMEntryMode.GENERIC_CURRENT_PF_COMPANION
++                   else require_fem_backend())
+         if source_policy != "qualified":
+             raise RuntimeError("external FEM execution requires source_policy='qualified'")
+         request["executor_module"] = plan.executor_module
+diff --git a/arrhenius_fracture/shared_fem_execution_worker.py b/arrhenius_fracture/shared_fem_execution_worker.py
+index 48afcc6a..bd86c024 100644
+--- a/arrhenius_fracture/shared_fem_execution_worker.py
++++ b/arrhenius_fracture/shared_fem_execution_worker.py
+@@ -41,6 +41,9 @@ def execute(request_path: str | Path) -> dict:
+     observed_commit = _git(root, "rev-parse", "HEAD")
+     observed_branch = _git(root, "branch", "--show-current")
+     status = _git(root, "--no-optional-locks", "status", "--porcelain")
++    tracked_status = _git(
++        root, "--no-optional-locks", "status", "--porcelain", "--untracked-files=no",
++    )
+     if observed_commit != backend["expected_commit"]:
+         raise RuntimeError(
+             f"FEM commit changed before execution: {observed_commit}"
+@@ -49,8 +52,8 @@ def execute(request_path: str | Path) -> dict:
+         raise RuntimeError(
+             f"FEM branch changed before execution: {observed_branch}"
+         )
+-    if status:
+-        raise RuntimeError("FEM checkout became dirty before execution")
++    if tracked_status:
++        raise RuntimeError("FEM tracked calculation source became dirty before execution")
+ 
+     module = importlib.import_module(request["executor_module"])
+     executor = getattr(module, request["executor_attribute"])
+@@ -75,10 +78,10 @@ def execute(request_path: str | Path) -> dict:
+         "python": {"executable": sys.executable, "version": sys.version},
+         "source_policy": {
+             "policy": "qualified",
+-            "qualification": "pinned_clean_external_backend",
++            "qualification": "pinned_tracked_clean_external_backend",
+             "commit": observed_commit,
+             "branch": observed_branch,
+-            "global_dirty": False,
++            "global_dirty": bool(status),
+             "calculation_source_dirty": False,
+         },
+         "executor": {
+diff --git a/arrhenius_fracture/shared_options.py b/arrhenius_fracture/shared_options.py
+index 186335ed..b5bcdf00 100644
+--- a/arrhenius_fracture/shared_options.py
++++ b/arrhenius_fracture/shared_options.py
+@@ -28,6 +28,13 @@ class MechanicsBackend(_ValueEnum):
+     FULL_FEM_CZM = "full_fem_czm"
+ 
+ 
++class FEMEntryMode(_ValueEnum):
++    """Select an explicit FEM producer without conflating historical parity and current use."""
++
++    HISTORICAL_THETA0_REFERENCE = "historical_theta0_reference"
++    GENERIC_CURRENT_PF_COMPANION = "generic_current_pf_companion"
++
++
+ class LoadingMode(_ValueEnum):
+     MONOTONIC = "monotonic"
+     EXPLICIT_CYCLIC = "explicit_cyclic"
+@@ -92,6 +99,7 @@ class OutputProfile(_ValueEnum):
+ @dataclass(frozen=True)
+ class SharedOptions:
+     mechanics: MechanicsBackend = MechanicsBackend.SPATIAL_PF
++    fem_entry: FEMEntryMode = FEMEntryMode.HISTORICAL_THETA0_REFERENCE
+     loading: LoadingMode = LoadingMode.MONOTONIC
+     source_location: SourceLocation = SourceLocation.TIP_SURFACE
+     source_lifecycle: SourceLifecycle = SourceLifecycle.PERSISTENT_REUSABLE
+@@ -174,6 +182,25 @@ class SharedOptions:
+                 errors.append("the selected clean FEM/CZM pair has no qualified V5 cavity adapter")
+             if self.kinetics is KineticsStrategy.OPERATOR_CONSISTENT_V3_6:
+                 errors.append("the V3.6 fixed-support projection is PF-only")
++            if self.fem_entry is FEMEntryMode.GENERIC_CURRENT_PF_COMPANION:
++                generic_axes = (
++                    self.loading is LoadingMode.MONOTONIC
++                    and self.source_location is SourceLocation.TIP_SURFACE
++                    and self.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE
++                    and self.plasticity is PlasticityMode.TIP_PROCESS_ONLY
++                    and self.crack_path is CrackPathMode.SINGLE_FRONT
++                    and self.cavity is CavityMode.DISABLED
++                    and self.kinetics is KineticsStrategy.NATIVE_SIGNED
++                    and self.transport is TransportStrategy.VALIDATED_SCALAR
++                    and self.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
++                )
++                if not generic_axes:
++                    errors.append(
++                        "generic_current_pf_companion currently supports only the "
++                        "qualified monotonic tip-only single-front option axes"
++                    )
++        elif self.fem_entry is not FEMEntryMode.HISTORICAL_THETA0_REFERENCE:
++            errors.append("generic_current_pf_companion is meaningful only for full_fem_czm")
+         if errors:
+             raise ValueError("incompatible shared options: " + "; ".join(errors))
+ 
+@@ -205,6 +232,7 @@ class SharedOptions:
+ 
+ _ENUM_FIELDS = {
+     "mechanics": MechanicsBackend,
++    "fem_entry": FEMEntryMode,
+     "loading": LoadingMode,
+     "source_location": SourceLocation,
+     "source_lifecycle": SourceLifecycle,
+@@ -288,11 +316,18 @@ PRESETS: dict[str, SharedOptions] = {
+         output=OutputProfile.PUBLICATION_RESTART,
+         random_seed=8666,
+     ),
++    "fem_czm_generic_current": SharedOptions(
++        mechanics=MechanicsBackend.FULL_FEM_CZM,
++        fem_entry=FEMEntryMode.GENERIC_CURRENT_PF_COMPANION,
++        source_lifecycle=SourceLifecycle.PERSISTENT_REUSABLE,
++        output=OutputProfile.PUBLICATION_RESTART,
++        random_seed=8666,
++    ),
+ }
+ 
+ 
+ __all__ = [
+-    "SCHEMA", "MechanicsBackend", "LoadingMode", "SourceLocation",
++    "SCHEMA", "MechanicsBackend", "FEMEntryMode", "LoadingMode", "SourceLocation",
+     "SourceLifecycle", "PlasticityMode", "CrackPathMode", "CavityMode",
+     "KineticsStrategy", "TransportStrategy", "IntegrationStrategy", "OutputProfile",
+     "SharedOptions", "PRESETS",
+diff --git a/tests/test_shared_execution.py b/tests/test_shared_execution.py
+index 8fc94f2d..5d6ad440 100644
+--- a/tests/test_shared_execution.py
++++ b/tests/test_shared_execution.py
+@@ -4,7 +4,9 @@ from types import SimpleNamespace
+ 
+ import pytest
+ 
+-from arrhenius_fracture.fem_backend_adapter import inspect_fem_backend, require_fem_backend
++from arrhenius_fracture.fem_backend_adapter import (
++    inspect_fem_backend, inspect_generic_fem_backend, require_fem_backend,
++)
+ from arrhenius_fracture.shared_execution import (
+     build_execution_plan, construct_and_attest, execute_shared,
+ )
+@@ -182,6 +184,20 @@ def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path)
+         require_fem_backend(tmp_path)
+ 
+ 
++def test_generic_fem_route_is_distinct_and_accepts_preserved_untracked_evidence():
++    reference = build_execution_plan(PRESETS["fem_czm_theta0"])
++    generic = build_execution_plan(PRESETS["fem_czm_generic_current"])
++    receipt = inspect_generic_fem_backend()
++    assert reference.executor_module.endswith("theta0_pf_parity")
++    assert reference.restart_family == "external_fem_native"
++    assert generic.executor_module.endswith("generic_current_pf_companion")
++    assert generic.restart_family == "external_fem_generic_current"
++    assert generic.options_sha256 != reference.options_sha256
++    assert receipt.available
++    assert receipt.clean is True
++    assert receipt.observed_commit == receipt.expected_commit
++
++
+ def test_external_fem_worker_request_contains_executor_and_compact_output(
+     tmp_path, monkeypatch,
+ ):

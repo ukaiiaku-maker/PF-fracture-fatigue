@@ -1,0 +1,188 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 09:33:21 -0700
+Subject: [PATCH 06/32] Bound native cavity certificate memory
+
+---
+ .../cavity_boundary_fitted_source_v1.py       | 50 +++++++++++++++----
+ .../mechanically_separating_sharp_wake_v12.py | 13 ++++-
+ .../test_cavity_boundary_fitted_source_v1.py  | 30 +++++++++++
+ .../test_v12_mechanically_separating_wake.py  | 15 ++++++
+ 4 files changed, 97 insertions(+), 11 deletions(-)
+ create mode 100644 tests/test_cavity_boundary_fitted_source_v1.py
+
+diff --git a/arrhenius_fracture/cavity_boundary_fitted_source_v1.py b/arrhenius_fracture/cavity_boundary_fitted_source_v1.py
+index bdf7c3a9..f4668607 100644
+--- a/arrhenius_fracture/cavity_boundary_fitted_source_v1.py
++++ b/arrhenius_fracture/cavity_boundary_fitted_source_v1.py
+@@ -16,6 +16,7 @@ from .cavity_source_recovery_v3 import (
+ 
+ SCHEMA = "v5.cavity-boundary-fitted-source/1"
+ RECOVERY_ID = "CAVITY_BOUNDARY_FITTED_PHYSICAL_PATCH_V1"
++MAXIMUM_POINT_FACET_PAIRS_PER_BLOCK = 1_048_576
+ 
+ 
+ class CavityBoundaryFittedSourceUnavailable(RuntimeError):
+@@ -54,6 +55,42 @@ def _ordered_cycle(edges, source_node: int) -> tuple[int, ...]:
+     return tuple(ordered)
+ 
+ 
++def _nearest_polygon_coordinates(points, polygon, vectors, lengths):
++    """Exact nearest-facet coordinates with bounded temporary storage.
++
++    The production cavity cycle can contain O(10^3) refined facets while the
++    mechanics mesh contains O(10^5) elements.  Broadcasting both complete
++    axes creates multiple gigabyte arrays.  Blocking only the point axis does
++    not change the calculation or tie-breaking order used by ``argmin``.
++    """
++    samples=np.asarray(points,float); facets=np.asarray(polygon,float)
++    directions=np.asarray(vectors,float); facet_lengths=np.asarray(lengths,float)
++    if samples.ndim!=2 or samples.shape[1]!=2 or facets.ndim!=2 or facets.shape[1]!=2:
++        raise ValueError("points and polygon must be planar coordinate arrays")
++    if len(facets)!=len(directions) or len(facets)!=len(facet_lengths) or not len(facets):
++        raise ValueError("polygon facet arrays must be nonempty and aligned")
++    block=max(1,MAXIMUM_POINT_FACET_PAIRS_PER_BLOCK//len(facets))
++    nearest=np.empty(len(samples),dtype=int)
++    nearest_fraction=np.empty(len(samples),dtype=float)
++    nearest_projection=np.empty((len(samples),2),dtype=float)
++    denominator=np.maximum(facet_lengths**2,1.0e-300)
++    for start in range(0,len(samples),block):
++        stop=min(start+block,len(samples)); current=samples[start:stop]
++        relative=current[:,None,:]-facets[None,:,:]
++        fraction=np.clip(
++            np.einsum("nki,ki->nk",relative,directions)/denominator[None,:],
++            0.0,1.0,
++        )
++        projection=facets[None,:,:]+fraction[:,:,None]*directions[None,:,:]
++        squared=np.einsum("nki,nki->nk",current[:,None,:]-projection,
++                          current[:,None,:]-projection)
++        local=np.argmin(squared,axis=1); rows=np.arange(stop-start)
++        nearest[start:stop]=local
++        nearest_fraction[start:stop]=fraction[rows,local]
++        nearest_projection[start:stop]=projection[rows,local]
++    return nearest,nearest_fraction,nearest_projection
++
++
+ def recover_boundary_fitted_physical_patch_v1(
+     *, nodes, elements, stress_Pa, boundary_node: int, cavity_id: str,
+     cavity_center_m, cavity_radius_m: float, process_length_m: float,
+@@ -102,20 +139,13 @@ def recover_boundary_fitted_physical_patch_v1(
+         source_normal *= -1.0
+ 
+     points = xy[tri]; centroids = points.mean(axis=1)
+-    relative = centroids[:, None, :] - polygon[None, :, :]
+-    fraction = np.clip(
+-        np.einsum("nki,ki->nk", relative, vectors)
+-        / np.maximum(lengths[None, :]**2, 1.0e-300), 0.0, 1.0,
++    nearest,nearest_fraction,nearest_projection=_nearest_polygon_coordinates(
++        centroids,polygon,vectors,lengths,
+     )
+-    projections = polygon[None, :, :] + fraction[:, :, None] * vectors[None, :, :]
+-    distances = np.linalg.norm(centroids[:, None, :] - projections, axis=2)
+-    nearest = np.argmin(distances, axis=1)
+-    rows = np.arange(len(centroids))
+-    nearest_projection = projections[rows, nearest]
+     point_normals = normals[nearest]
+     point_tangents = tangents[nearest]
+     n_all = np.einsum("ij,ij->i", centroids-nearest_projection, point_normals)
+-    arc = cumulative[nearest] + fraction[rows, nearest]*lengths[nearest]
++    arc = cumulative[nearest] + nearest_fraction*lengths[nearest]
+     s_all = (arc + 0.5*perimeter) % perimeter - 0.5*perimeter
+ 
+     physical_scale = min(radius, process)
+diff --git a/arrhenius_fracture/mechanically_separating_sharp_wake_v12.py b/arrhenius_fracture/mechanically_separating_sharp_wake_v12.py
+index e2ed7e72..54d17a54 100644
+--- a/arrhenius_fracture/mechanically_separating_sharp_wake_v12.py
++++ b/arrhenius_fracture/mechanically_separating_sharp_wake_v12.py
+@@ -339,10 +339,21 @@ def _minimum_component_separation(mesh,selected,labels):
+     ids=np.asarray(sorted(map(int,np.asarray(selected,int))),int); unique=sorted(set(labels))
+     if len(unique)<2: return math.inf
+     nodes={label:np.unique(mesh.elems[ids[np.asarray(labels)==label]]) for label in unique}; result=math.inf
++    # Do not materialize ``a[:,None,:]-b[None,:,:]`` here.  Production crack
++    # supports can contain O(10^4) nodes on each disconnected component, so
++    # that otherwise exact expression has quadratic storage and can exhaust
++    # memory before the topology trial reaches its equilibrium solve.  A
++    # cKDTree query returns the same Euclidean nearest-neighbour minimum with
++    # storage linear in the component sizes.
++    from scipy.spatial import cKDTree
+     for index,left in enumerate(unique):
+         for right in unique[index+1:]:
+             a=mesh.nodes[nodes[left]]; b=mesh.nodes[nodes[right]]
+-            result=min(result,float(np.min(np.linalg.norm(a[:,None,:]-b[None,:,:],axis=2))))
++            # Build the tree on the larger component so the temporary query
++            # result is bounded by the smaller component.
++            tree_points, query_points = (a, b) if len(a) >= len(b) else (b, a)
++            distance, _ = cKDTree(tree_points).query(query_points, k=1)
++            result=min(result,float(np.min(distance)))
+     return result
+ 
+ def junction_sector_certificates(mesh,network,selected,tolerance=1e-12):
+diff --git a/tests/test_cavity_boundary_fitted_source_v1.py b/tests/test_cavity_boundary_fitted_source_v1.py
+new file mode 100644
+index 00000000..99c74e22
+--- /dev/null
++++ b/tests/test_cavity_boundary_fitted_source_v1.py
+@@ -0,0 +1,30 @@
++import numpy as np
++
++import arrhenius_fracture.cavity_boundary_fitted_source_v1 as recovery
++
++
++def test_blocked_nearest_polygon_coordinates_match_direct_operator(monkeypatch):
++    polygon=np.asarray(((0.,0.),(1.,0.),(1.,1.),(0.,1.)))
++    vectors=np.roll(polygon,-1,axis=0)-polygon
++    lengths=np.linalg.norm(vectors,axis=1)
++    points=np.asarray(((-.2,.3),(.4,-.1),(1.2,.8),(.7,1.3),(.25,.25),(.5,.5)))
++
++    relative=points[:,None,:]-polygon[None,:,:]
++    fraction=np.clip(
++        np.einsum("nki,ki->nk",relative,vectors)/(lengths[None,:]**2),0.,1.,
++    )
++    projections=polygon[None,:,:]+fraction[:,:,None]*vectors[None,:,:]
++    distance2=np.einsum(
++        "nki,nki->nk",points[:,None,:]-projections,points[:,None,:]-projections,
++    )
++    expected_nearest=np.argmin(distance2,axis=1)
++    rows=np.arange(len(points))
++
++    monkeypatch.setattr(recovery,"MAXIMUM_POINT_FACET_PAIRS_PER_BLOCK",8)
++    nearest,nearest_fraction,nearest_projection=(
++        recovery._nearest_polygon_coordinates(points,polygon,vectors,lengths)
++    )
++
++    assert np.array_equal(nearest,expected_nearest)
++    assert np.array_equal(nearest_fraction,fraction[rows,expected_nearest])
++    assert np.array_equal(nearest_projection,projections[rows,expected_nearest])
+diff --git a/tests/test_v12_mechanically_separating_wake.py b/tests/test_v12_mechanically_separating_wake.py
+index e1fbe1c8..c9eb6a11 100644
+--- a/tests/test_v12_mechanically_separating_wake.py
++++ b/tests/test_v12_mechanically_separating_wake.py
+@@ -5,6 +5,7 @@ import pytest
+ 
+ from arrhenius_fracture.causal_sharp_wake_v11 import CRACK_REPRESENTATION as V11_ID, causal_segment_support
+ from arrhenius_fracture.crack_network_v11 import CrackBranchState, CrackNetworkState
++import arrhenius_fracture.mechanically_separating_sharp_wake_v12 as wake_v12
+ from arrhenius_fracture.mechanically_separating_sharp_wake_v12 import (
+     MODEL_ID, apply_mechanically_separating_graph, certification_arcs, classify_graph_vertices,
+     graph_component_count, independent_intact_path_certificate, mechanically_separating_graph_support as _graph_support,
+@@ -15,6 +16,20 @@ def mechanically_separating_graph_support(*args,**kwargs):
+     kwargs.setdefault("allow_offgrid_active_tips_for_screen",True)
+     return _graph_support(*args,**kwargs)
+ 
++
++def test_component_separation_is_exact_without_quadratic_pairwise_array(monkeypatch):
++    nodes=np.asarray(((0.,0.),(0.,1.),(1.,0.),(10.,0.),(10.,1.),(11.,0.)))
++    specimen=SimpleNamespace(nodes=nodes,elems=np.asarray(((0,1,2),(3,4,5)),int))
++    original_norm=np.linalg.norm
++    def reject_pairwise_tensor(values,*args,**kwargs):
++        if np.asarray(values).ndim>=3:
++            raise AssertionError("quadratic pairwise displacement tensor was allocated")
++        return original_norm(values,*args,**kwargs)
++    monkeypatch.setattr(wake_v12.np.linalg,"norm",reject_pairwise_tensor)
++    measured=wake_v12._minimum_component_separation(specimen,(0,1),(1,2))
++    expected=min(original_norm(nodes[i]-nodes[j]) for i in (0,1,2) for j in (3,4,5))
++    assert measured==pytest.approx(expected,rel=0.,abs=1.e-15)
++
+ def mesh(n=9,perturb=False):
+     x=np.linspace(0,1,n); y=np.linspace(-.5,.5,n); X,Y=np.meshgrid(x,y); nodes=np.c_[X.ravel(),Y.ravel()]; elems=[]
+     if perturb:

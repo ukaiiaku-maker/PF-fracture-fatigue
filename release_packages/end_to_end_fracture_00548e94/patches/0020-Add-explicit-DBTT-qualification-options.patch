@@ -1,0 +1,748 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 10:25:41 -0700
+Subject: [PATCH 20/32] Add explicit DBTT qualification options
+
+---
+ .../constructor_manifest_0.csv                |   2 +
+ .../constructor_manifest_1.csv                |   2 +
+ ...t_paper_minimal_qualification_registry.csv |   2 +
+ .../dbtt_primary_qualification_registry.csv   |   2 +
+ .../qualification_report.json                 | 467 ++++++++++++++++++
+ scripts/build_dbtt_qualification_options.py   | 182 +++++++
+ tests/test_dbtt_qualification_options.py      |  27 +
+ 7 files changed, 684 insertions(+)
+ create mode 100644 arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_0.csv
+ create mode 100644 arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_1.csv
+ create mode 100644 arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv
+ create mode 100644 arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv
+ create mode 100644 arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/qualification_report.json
+ create mode 100644 scripts/build_dbtt_qualification_options.py
+ create mode 100644 tests/test_dbtt_qualification_options.py
+
+diff --git a/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_0.csv b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_0.csv
+new file mode 100644
+index 00000000..6ae1d2a1
+--- /dev/null
++++ b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_0.csv
+@@ -0,0 +1,2 @@
++L_pz_um_recommended,Tref_K,c_blunt,candidate_id,cleave_G00_eV,cleave_exp_a,cleave_exp_n,cleave_floor_frac,cleave_gT_eV_per_K,cleave_sT_GPa_per_K,cleave_sigc0_GPa,emit_G00_eV,emit_exp_a,emit_exp_n,emit_floor_frac,emit_gT_eV_per_K,emit_sT_GPa_per_K,emit_sigc0_GPa,encounter_efficiency,explicit_recovery_active,legacy_source_refresh_active,legacy_source_sites_active,material_class,mechanism_summary,mobile_shield_fraction,n_bins_recommended,n_slip_channels,option_key,peierls_H0_eV,peierls_activation_entropy_kB,peierls_exp_a,peierls_exp_n,peierls_nu0_s,peierls_stress_fraction,recovery_H0_eV,recovery_activation_entropy_kB,recovery_nu0_s,reference_front_width_um,reference_source_area_um2,retained_recovery_rate_s,rho_forest_floor_m2,rho_source0_m2,role,source_recovery_rate_s,source_refresh_length_um,source_sites_per_system,source_zone_length_um,taylor_H0_eV,taylor_activation_entropy_kB,taylor_corr_rho_c_m2,taylor_corr_scale,taylor_exp_a,taylor_exp_n,taylor_nu0_s,taylor_stress_fraction,validation_status,qualification_parent_option_key,qualification_taylor_construction,target_class,max_K_shield_MPa_sqrt_m
++50.0,481.33,2.929164256900549,dbtt_paper_minimal_sigc_taylor_0p10eV_qualification__candidate,2.357721022795886,0.4968366474844515,2.618804107885808,0.026239358201278,0.0056085130451247,-0.0012041387008503,6.7501407796517015,3.344896922819316,0.1572539726179093,0.5156166724395007,0.0103682254353579,0.0061668124636635,-0.0052233074344694,4.2761650983770645,9.160246308716648,0,0,0,DBTT,"Preferred classical DBTT example: low-temperature shelf, sharp transition near 1000 K, and stable upper shelf.",0.0,80,2,dbtt_paper_minimal_sigc_taylor_0p10eV_qualification,3.525720003992319,-36.33932862430811,1.448395521938801,1.871259921230376,1000000000000.0,0.5773502691896258,0.0,0.0,0.0,10.0,25.0,0.0,5000000000000.0,523948859759023.8,explicit DBTT numerical qualification alternative,0.0,0.0,141.0590567476921,2.0,2.3127889714162735,31.365934647619724,22042481205294.297,1.2690231726199324,0.7048910272121429,0.5389550719410181,100000000000.0,0.5773502691896258,constructed qualification option; not calibrated; not a production default,v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept,"{""calibration_status"":""CONSTRUCTED_NOT_MATERIAL_CALIBRATED"",""declared_margin_eV"":0.1,""material_class"":""DBTT"",""parameter_changes"":{""candidate_id"":{""parent"":""v913_zeroD_sobol_0202500__shared_sigc_minimal_intercept"",""revised"":""v913_zeroD_sobol_0202500__shared_sigc_minimal_intercept__taylor_margin_0p10eV""},""option_key"":{""parent"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept"",""revised"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept__taylor_margin_0p10eV""},""role"":{""parent"":""paper primary DBTT 1"",""revised"":""prospective Taylor amplitude margin 0.10 eV""},""taylor_H0_eV"":{""parent"":""1.4998139148950578"",""revised"":""2.3127889714162735""},""validation_status"":{""parent"":""v10.2.25 paper campaign selection; exact active parameters transferred from v10.2.24; persistent sites, no finite source inventory, no source refresh, and no explicit recovery."",""revised"":""constructed amplitude-only domain candidate; not material calibrated; native qualification required""}},""parent_minimum_at_K"":1300.0,""parent_minimum_eV"":-0.7129750565212156,""parent_option_key"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept"",""parent_reference_eV"":1.4998139148950578,""physics_change"":""taylor_H0_eV amplitude only"",""required_increase_eV"":0.8129750565212157,""revised_minimum_eV"":0.10000000000000009,""revised_reference_eV"":2.3127889714162735,""variant_option_key"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept__taylor_margin_0p10eV""}",dbtt_paper_minimal_sigc_taylor_0p10eV_qualification,0.0
+diff --git a/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_1.csv b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_1.csv
+new file mode 100644
+index 00000000..4572bed7
+--- /dev/null
++++ b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/constructor_manifest_1.csv
+@@ -0,0 +1,2 @@
++L_pz_um_recommended,Tref_K,c_blunt,candidate_id,cleave_G00_eV,cleave_exp_a,cleave_exp_n,cleave_floor_frac,cleave_gT_eV_per_K,cleave_sT_GPa_per_K,cleave_sigc0_GPa,emit_G00_eV,emit_exp_a,emit_exp_n,emit_floor_frac,emit_gT_eV_per_K,emit_sT_GPa_per_K,emit_sigc0_GPa,encounter_efficiency,material_class,mechanism_summary,mobile_shield_fraction,n_bins_recommended,n_slip_channels,option_key,peierls_H0_eV,peierls_activation_entropy_kB,peierls_exp_a,peierls_exp_n,peierls_gT_eV_per_K_derived,peierls_nu0_s,peierls_stress_fraction,retained_recovery_rate_s,rho_forest_floor_m2,role,source_recovery_rate_s,source_refresh_length_um,source_sites_per_system,taylor_H0_eV,taylor_activation_entropy_kB,taylor_corr_length_um_derived,taylor_corr_rho_c_m2,taylor_corr_scale,taylor_exp_a,taylor_exp_n,taylor_gT_eV_per_K_derived,taylor_nu0_s,taylor_stress_fraction,validation_status,qualification_parent_option_key,qualification_taylor_construction,target_class,max_K_shield_MPa_sqrt_m
++50.0,481.33,1.411283192139077,dbtt_primary_taylor_0p10eV_qualification__candidate,3.412309742899366,0.4846029535103278,2.115325382808986,0.0543870261570049,0.0085569133975694,0.004399175167258,4.178054527802145,4.804158361201251,0.2784130973036495,0.8357097011358764,0.068706727639919,0.000510626931826,-0.0045302835171498,5.224677563435593,9.160246308716648,DBTT,Sharp high-temperature onset of retained MPZ state and explicit unresolved crack-tip shielding; selected for the bulk of production simulations.,0.0,80,2,dbtt_primary_taylor_0p10eV_qualification,0.6928874809631047,-7.76042543981287,1.14391738514239,1.7640893795753347,0.0006687417227089568,1000000000000.0,0.5773502691896258,0.0033565530672129,5000000000000.0,explicit DBTT numerical qualification alternative,0.0,7.609822781953753,141.0590567476921,4.075232029371465,23.01015327204936,0.10785831671344367,37842272551529.86,1.3270040200432451,0.1601883464066985,1.5292178333131945,-0.001982861591582856,100000000000.0,0.5773502691896258,constructed qualification option; not calibrated; not a production default,dbtt_primary,"{""calibration_status"":""CONSTRUCTED_NOT_MATERIAL_CALIBRATED"",""declared_margin_eV"":0.1,""material_class"":""DBTT"",""parameter_changes"":{""candidate_id"":{""parent"":""DBTT_restart04_candidate03"",""revised"":""DBTT_restart04_candidate03__taylor_margin_0p10eV""},""option_key"":{""parent"":""dbtt_primary"",""revised"":""dbtt_primary__taylor_margin_0p10eV""},""role"":{""parent"":""Primary production DBTT"",""revised"":""prospective Taylor amplitude margin 0.10 eV""},""validation_status"":{""parent"":""Current primary DBTT after complete 2-D four-temperature comparison."",""revised"":""constructed amplitude-only domain candidate; not material calibrated; native qualification required""}},""parent_minimum_at_K"":1300.0,""parent_minimum_eV"":2.4519227301903284,""parent_option_key"":""dbtt_primary"",""parent_reference_eV"":4.075232029371465,""physics_change"":""none; parent already exceeds the declared margin"",""required_increase_eV"":0.0,""revised_minimum_eV"":2.4519227301903284,""revised_reference_eV"":4.075232029371465,""variant_option_key"":""dbtt_primary__taylor_margin_0p10eV""}",dbtt_primary_taylor_0p10eV_qualification,0.0
+diff --git a/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv
+new file mode 100644
+index 00000000..a1e846e2
+--- /dev/null
++++ b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv
+@@ -0,0 +1,2 @@
++L_pz_um_recommended,Tref_K,c_blunt,candidate_id,cleave_G00_eV,cleave_exp_a,cleave_exp_n,cleave_floor_frac,cleave_gT_eV_per_K,cleave_sT_GPa_per_K,cleave_sigc0_GPa,emit_G00_eV,emit_exp_a,emit_exp_n,emit_floor_frac,emit_gT_eV_per_K,emit_sT_GPa_per_K,emit_sigc0_GPa,encounter_efficiency,explicit_recovery_active,legacy_source_refresh_active,legacy_source_sites_active,material_class,mechanism_summary,mobile_shield_fraction,n_bins_recommended,n_slip_channels,option_key,peierls_H0_eV,peierls_activation_entropy_kB,peierls_exp_a,peierls_exp_n,peierls_nu0_s,peierls_stress_fraction,recovery_H0_eV,recovery_activation_entropy_kB,recovery_nu0_s,reference_front_width_um,reference_source_area_um2,retained_recovery_rate_s,rho_forest_floor_m2,rho_source0_m2,role,source_recovery_rate_s,source_refresh_length_um,source_sites_per_system,source_zone_length_um,taylor_H0_eV,taylor_activation_entropy_kB,taylor_corr_rho_c_m2,taylor_corr_scale,taylor_exp_a,taylor_exp_n,taylor_nu0_s,taylor_stress_fraction,validation_status,qualification_parent_option_key,qualification_taylor_construction
++50.0,481.33,2.929164256900549,dbtt_paper_minimal_sigc_taylor_0p10eV_qualification__candidate,2.357721022795886,0.4968366474844515,2.618804107885808,0.026239358201278,0.0056085130451247,-0.0012041387008503,6.7501407796517015,3.344896922819316,0.1572539726179093,0.5156166724395007,0.0103682254353579,0.0061668124636635,-0.0052233074344694,4.2761650983770645,9.160246308716648,0,0,0,DBTT,"Preferred classical DBTT example: low-temperature shelf, sharp transition near 1000 K, and stable upper shelf.",0.0,80,2,dbtt_paper_minimal_sigc_taylor_0p10eV_qualification,3.525720003992319,-36.33932862430811,1.448395521938801,1.871259921230376,1000000000000.0,0.5773502691896258,0.0,0.0,0.0,10.0,25.0,0.0,5000000000000.0,523948859759023.8,explicit DBTT numerical qualification alternative,0.0,0.0,141.0590567476921,2.0,2.3127889714162735,31.365934647619724,22042481205294.297,1.2690231726199324,0.7048910272121429,0.5389550719410181,100000000000.0,0.5773502691896258,constructed qualification option; not calibrated; not a production default,v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept,"{""calibration_status"":""CONSTRUCTED_NOT_MATERIAL_CALIBRATED"",""declared_margin_eV"":0.1,""material_class"":""DBTT"",""parameter_changes"":{""candidate_id"":{""parent"":""v913_zeroD_sobol_0202500__shared_sigc_minimal_intercept"",""revised"":""v913_zeroD_sobol_0202500__shared_sigc_minimal_intercept__taylor_margin_0p10eV""},""option_key"":{""parent"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept"",""revised"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept__taylor_margin_0p10eV""},""role"":{""parent"":""paper primary DBTT 1"",""revised"":""prospective Taylor amplitude margin 0.10 eV""},""taylor_H0_eV"":{""parent"":""1.4998139148950578"",""revised"":""2.3127889714162735""},""validation_status"":{""parent"":""v10.2.25 paper campaign selection; exact active parameters transferred from v10.2.24; persistent sites, no finite source inventory, no source refresh, and no explicit recovery."",""revised"":""constructed amplitude-only domain candidate; not material calibrated; native qualification required""}},""parent_minimum_at_K"":1300.0,""parent_minimum_eV"":-0.7129750565212156,""parent_option_key"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept"",""parent_reference_eV"":1.4998139148950578,""physics_change"":""taylor_H0_eV amplitude only"",""required_increase_eV"":0.8129750565212157,""revised_minimum_eV"":0.10000000000000009,""revised_reference_eV"":2.3127889714162735,""variant_option_key"":""v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept__taylor_margin_0p10eV""}"
+diff --git a/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv
+new file mode 100644
+index 00000000..aff80075
+--- /dev/null
++++ b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv
+@@ -0,0 +1,2 @@
++L_pz_um_recommended,Tref_K,c_blunt,candidate_id,cleave_G00_eV,cleave_exp_a,cleave_exp_n,cleave_floor_frac,cleave_gT_eV_per_K,cleave_sT_GPa_per_K,cleave_sigc0_GPa,emit_G00_eV,emit_exp_a,emit_exp_n,emit_floor_frac,emit_gT_eV_per_K,emit_sT_GPa_per_K,emit_sigc0_GPa,encounter_efficiency,material_class,mechanism_summary,mobile_shield_fraction,n_bins_recommended,n_slip_channels,option_key,peierls_H0_eV,peierls_activation_entropy_kB,peierls_exp_a,peierls_exp_n,peierls_gT_eV_per_K_derived,peierls_nu0_s,peierls_stress_fraction,retained_recovery_rate_s,rho_forest_floor_m2,role,source_recovery_rate_s,source_refresh_length_um,source_sites_per_system,taylor_H0_eV,taylor_activation_entropy_kB,taylor_corr_length_um_derived,taylor_corr_rho_c_m2,taylor_corr_scale,taylor_exp_a,taylor_exp_n,taylor_gT_eV_per_K_derived,taylor_nu0_s,taylor_stress_fraction,validation_status,qualification_parent_option_key,qualification_taylor_construction
++50.0,481.33,1.411283192139077,dbtt_primary_taylor_0p10eV_qualification__candidate,3.412309742899366,0.4846029535103278,2.115325382808986,0.0543870261570049,0.0085569133975694,0.004399175167258,4.178054527802145,4.804158361201251,0.2784130973036495,0.8357097011358764,0.068706727639919,0.000510626931826,-0.0045302835171498,5.224677563435593,9.160246308716648,DBTT,Sharp high-temperature onset of retained MPZ state and explicit unresolved crack-tip shielding; selected for the bulk of production simulations.,0.0,80,2,dbtt_primary_taylor_0p10eV_qualification,0.6928874809631047,-7.76042543981287,1.14391738514239,1.7640893795753347,0.0006687417227089568,1000000000000.0,0.5773502691896258,0.0033565530672129,5000000000000.0,explicit DBTT numerical qualification alternative,0.0,7.609822781953753,141.0590567476921,4.075232029371465,23.01015327204936,0.10785831671344367,37842272551529.86,1.3270040200432451,0.1601883464066985,1.5292178333131945,-0.001982861591582856,100000000000.0,0.5773502691896258,constructed qualification option; not calibrated; not a production default,dbtt_primary,"{""calibration_status"":""CONSTRUCTED_NOT_MATERIAL_CALIBRATED"",""declared_margin_eV"":0.1,""material_class"":""DBTT"",""parameter_changes"":{""candidate_id"":{""parent"":""DBTT_restart04_candidate03"",""revised"":""DBTT_restart04_candidate03__taylor_margin_0p10eV""},""option_key"":{""parent"":""dbtt_primary"",""revised"":""dbtt_primary__taylor_margin_0p10eV""},""role"":{""parent"":""Primary production DBTT"",""revised"":""prospective Taylor amplitude margin 0.10 eV""},""validation_status"":{""parent"":""Current primary DBTT after complete 2-D four-temperature comparison."",""revised"":""constructed amplitude-only domain candidate; not material calibrated; native qualification required""}},""parent_minimum_at_K"":1300.0,""parent_minimum_eV"":2.4519227301903284,""parent_option_key"":""dbtt_primary"",""parent_reference_eV"":4.075232029371465,""physics_change"":""none; parent already exceeds the declared margin"",""required_increase_eV"":0.0,""revised_minimum_eV"":2.4519227301903284,""revised_reference_eV"":4.075232029371465,""variant_option_key"":""dbtt_primary__taylor_margin_0p10eV""}"
+diff --git a/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/qualification_report.json b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/qualification_report.json
+new file mode 100644
+index 00000000..85a7d8d6
+--- /dev/null
++++ b/arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/qualification_report.json
+@@ -0,0 +1,467 @@
++{
++  "options": [
++    {
++      "candidate_id": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification__candidate",
++      "constructor_candidate_id": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification__candidate",
++      "domain": {
++        "all_declared_points_admissible": true,
++        "continuous_domain_K": [
++          300.0,
++          1300.0
++        ],
++        "declared_points": [
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 1.340729352323424,
++              "cleavage_sigc_Pa": 6968487250.276886,
++              "emission_G0_eV": 2.2266688187832138,
++              "emission_sigc_Pa": 5223307435.469401,
++              "peierls_G0_eV": 2.9578885446912357,
++              "peierls_projected_equivalent_sigc_Pa": 3015677953.928433,
++              "peierls_surface_sigc_Pa": 5223307435.469401,
++              "taylor_G0_eV": 2.802907119371998,
++              "taylor_projected_equivalent_sigc_Pa": 3015677953.928433,
++              "taylor_surface_sigc_Pa": 5223307435.469401
++            },
++            "temperature_K": 300.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 3.023283265860834,
++              "cleavage_sigc_Pa": 6607245640.021796,
++              "emission_G0_eV": 4.076712557882264,
++              "emission_sigc_Pa": 3656315205.128581,
++              "peierls_G0_eV": 3.89733286052604,
++              "peierls_projected_equivalent_sigc_Pa": 2110974567.9231083,
++              "peierls_surface_sigc_Pa": 3656315205.128581,
++              "taylor_G0_eV": 1.9920349835603985,
++              "taylor_projected_equivalent_sigc_Pa": 2110974567.9231083,
++              "taylor_surface_sigc_Pa": 3656315205.128581
++            },
++            "temperature_K": 600.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 4.144985874885774,
++              "cleavage_sigc_Pa": 6366417899.851736,
++              "emission_G0_eV": 5.310075050614963,
++              "emission_sigc_Pa": 2611653718.2347007,
++              "peierls_G0_eV": 4.523629071082576,
++              "peierls_projected_equivalent_sigc_Pa": 1507838977.2528918,
++              "peierls_surface_sigc_Pa": 2611653718.2347007,
++              "taylor_G0_eV": 1.451453559685999,
++              "taylor_projected_equivalent_sigc_Pa": 1507838977.2528918,
++              "taylor_surface_sigc_Pa": 2611653718.2347007
++            },
++            "temperature_K": 800.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 4.7058371793982445,
++              "cleavage_sigc_Pa": 6246004029.766706,
++              "emission_G0_eV": 5.9267562969813135,
++              "emission_sigc_Pa": 2089322974.787761,
++              "peierls_G0_eV": 4.836777176360845,
++              "peierls_projected_equivalent_sigc_Pa": 1206271181.9177837,
++              "peierls_surface_sigc_Pa": 2089322974.787761,
++              "taylor_G0_eV": 1.1811628477487992,
++              "taylor_projected_equivalent_sigc_Pa": 1206271181.9177837,
++              "taylor_surface_sigc_Pa": 2089322974.787761
++            },
++            "temperature_K": 900.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 4.986262831654479,
++              "cleavage_sigc_Pa": 6185797094.724191,
++              "emission_G0_eV": 6.235096920164489,
++              "emission_sigc_Pa": 1828157603.064291,
++              "peierls_G0_eV": 4.993351228999979,
++              "peierls_projected_equivalent_sigc_Pa": 1055487284.2502296,
++              "peierls_surface_sigc_Pa": 1828157603.064291,
++              "taylor_G0_eV": 1.0460174917801994,
++              "taylor_projected_equivalent_sigc_Pa": 1055487284.2502296,
++              "taylor_surface_sigc_Pa": 1828157603.064291
++            },
++            "temperature_K": 950.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 5.266688483910714,
++              "cleavage_sigc_Pa": 6125590159.681677,
++              "emission_G0_eV": 6.543437543347664,
++              "emission_sigc_Pa": 1566992231.3408206,
++              "peierls_G0_eV": 5.149925281639113,
++              "peierls_projected_equivalent_sigc_Pa": 904703386.5826752,
++              "peierls_surface_sigc_Pa": 1566992231.3408206,
++              "taylor_G0_eV": 0.9108721358115992,
++              "taylor_projected_equivalent_sigc_Pa": 904703386.5826752,
++              "taylor_surface_sigc_Pa": 1566992231.3408206
++            },
++            "temperature_K": 1000.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 5.547114136166949,
++              "cleavage_sigc_Pa": 6065383224.639161,
++              "emission_G0_eV": 6.851778166530838,
++              "emission_sigc_Pa": 1305826859.6173508,
++              "peierls_G0_eV": 5.3064993342782465,
++              "peierls_projected_equivalent_sigc_Pa": 753919488.9151212,
++              "peierls_surface_sigc_Pa": 1305826859.6173508,
++              "taylor_G0_eV": 0.7757267798429994,
++              "taylor_projected_equivalent_sigc_Pa": 753919488.9151212,
++              "taylor_surface_sigc_Pa": 1305826859.6173508
++            },
++            "temperature_K": 1050.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 5.827539788423184,
++              "cleavage_sigc_Pa": 6005176289.596646,
++              "emission_G0_eV": 7.160118789714014,
++              "emission_sigc_Pa": 1044661487.8938805,
++              "peierls_G0_eV": 5.463073386917381,
++              "peierls_projected_equivalent_sigc_Pa": 603135591.2475669,
++              "peierls_surface_sigc_Pa": 1044661487.8938805,
++              "taylor_G0_eV": 0.6405814238743996,
++              "taylor_projected_equivalent_sigc_Pa": 603135591.2475669,
++              "taylor_surface_sigc_Pa": 1044661487.8938805
++            },
++            "temperature_K": 1100.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 6.107965440679419,
++              "cleavage_sigc_Pa": 5944969354.5541315,
++              "emission_G0_eV": 7.4684594128971895,
++              "emission_sigc_Pa": 783496116.1704106,
++              "peierls_G0_eV": 5.619647439556515,
++              "peierls_projected_equivalent_sigc_Pa": 452351693.5800129,
++              "peierls_surface_sigc_Pa": 783496116.1704106,
++              "taylor_G0_eV": 0.5054360679057996,
++              "taylor_projected_equivalent_sigc_Pa": 452351693.5800129,
++              "taylor_surface_sigc_Pa": 783496116.1704106
++            },
++            "temperature_K": 1150.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 6.388391092935654,
++              "cleavage_sigc_Pa": 5884762419.511616,
++              "emission_G0_eV": 7.776800036080363,
++              "emission_sigc_Pa": 522330744.4469407,
++              "peierls_G0_eV": 5.776221492195649,
++              "peierls_projected_equivalent_sigc_Pa": 301567795.9124589,
++              "peierls_surface_sigc_Pa": 522330744.4469407,
++              "taylor_G0_eV": 0.37029071193719987,
++              "taylor_projected_equivalent_sigc_Pa": 301567795.9124589,
++              "taylor_surface_sigc_Pa": 522330744.4469407
++            },
++            "temperature_K": 1200.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 6.668816745191889,
++              "cleavage_sigc_Pa": 5824555484.469102,
++              "emission_G0_eV": 8.085140659263539,
++              "emission_sigc_Pa": 261165372.72347084,
++              "peierls_G0_eV": 5.932795544834783,
++              "peierls_projected_equivalent_sigc_Pa": 150783898.24490485,
++              "peierls_surface_sigc_Pa": 261165372.72347084,
++              "taylor_G0_eV": 0.2351453559686001,
++              "taylor_projected_equivalent_sigc_Pa": 150783898.24490485,
++              "taylor_surface_sigc_Pa": 261165372.72347084
++            },
++            "temperature_K": 1250.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 6.949242397448124,
++              "cleavage_sigc_Pa": 5764348549.426586,
++              "emission_G0_eV": 8.393481282446714,
++              "emission_sigc_Pa": 1.0000009709187907,
++              "peierls_G0_eV": 6.089369597473917,
++              "peierls_projected_equivalent_sigc_Pa": 0.577350829749851,
++              "peierls_surface_sigc_Pa": 1.0000009709187907,
++              "taylor_G0_eV": 0.10000000000000009,
++              "taylor_projected_equivalent_sigc_Pa": 0.577350829749851,
++              "taylor_surface_sigc_Pa": 1.0000009709187907
++            },
++            "temperature_K": 1300.0
++          }
++        ],
++        "emission_stress_extrema": {
++          "maximum_Pa": 5223307435.4694,
++          "maximum_at_K": 300.0,
++          "minimum_Pa": 1.0000004768371582,
++          "minimum_at_K": 1300.0
++        },
++        "taylor_barrier_extrema_eV": {
++          "maximum": 2.802907119371998,
++          "maximum_at_K": 300.0,
++          "minimum": 0.10000000000000009,
++          "minimum_at_K": 1300.0
++        }
++      },
++      "manifest_sha256": "13bea171506146740a343c94ff1f2f69ee01e94f2739e5fcbb3b5e4896aaf8c2",
++      "option_key": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification",
++      "parent_option_key": "v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept",
++      "registry": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv",
++      "registry_sha256": "ff1aa20b2eb135b64aa55ff34859d7d1cd83e2a948251393c287e74ba5ec340e",
++      "source_lifecycle_provenance": "current_persistent_paper_lineage"
++    },
++    {
++      "candidate_id": "dbtt_primary_taylor_0p10eV_qualification__candidate",
++      "constructor_candidate_id": "dbtt_primary_taylor_0p10eV_qualification__candidate",
++      "domain": {
++        "all_declared_points_admissible": true,
++        "continuous_domain_K": [
++          300.0,
++          1300.0
++        ],
++        "declared_points": [
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 1.860684636518107,
++              "cleavage_sigc_Pa": 3380352094.723252,
++              "emission_G0_eV": 4.7115663796532425,
++              "emission_sigc_Pa": 6046153873.600367,
++              "peierls_G0_eV": 0.5716245443842896,
++              "peierls_projected_equivalent_sigc_Pa": 3490748566.4850707,
++              "peierls_surface_sigc_Pa": 6046153873.600367,
++              "taylor_G0_eV": 4.434784321773185,
++              "taylor_projected_equivalent_sigc_Pa": 3490748566.4850707,
++              "taylor_surface_sigc_Pa": 6046153873.600367
++            },
++            "temperature_K": 300.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 4.427758655788927,
++              "cleavage_sigc_Pa": 4700104644.900652,
++              "emission_G0_eV": 4.864754459201043,
++              "emission_sigc_Pa": 4687068818.455426,
++              "peierls_G0_eV": 0.7722470611969766,
++              "peierls_projected_equivalent_sigc_Pa": 2706080444.045542,
++              "peierls_surface_sigc_Pa": 4687068818.455426,
++              "taylor_G0_eV": 3.8399258442983273,
++              "taylor_projected_equivalent_sigc_Pa": 2706080444.045542,
++              "taylor_surface_sigc_Pa": 4687068818.455426
++            },
++            "temperature_K": 600.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 6.139141335302806,
++              "cleavage_sigc_Pa": 5579939678.352251,
++              "emission_G0_eV": 4.966879845566242,
++              "emission_sigc_Pa": 3781012115.025466,
++              "peierls_G0_eV": 0.905995405738768,
++              "peierls_projected_equivalent_sigc_Pa": 2182968362.4191895,
++              "peierls_surface_sigc_Pa": 3781012115.025466,
++              "taylor_G0_eV": 3.443353525981756,
++              "taylor_projected_equivalent_sigc_Pa": 2182968362.4191895,
++              "taylor_surface_sigc_Pa": 3781012115.025466
++            },
++            "temperature_K": 800.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 6.994832675059747,
++              "cleavage_sigc_Pa": 6019857195.078052,
++              "emission_G0_eV": 5.0179425387488426,
++              "emission_sigc_Pa": 3327983763.3104863,
++              "peierls_G0_eV": 0.9728695780096637,
++              "peierls_projected_equivalent_sigc_Pa": 1921412321.6060133,
++              "peierls_surface_sigc_Pa": 3327983763.3104863,
++              "taylor_G0_eV": 3.245067366823471,
++              "taylor_projected_equivalent_sigc_Pa": 1921412321.6060133,
++              "taylor_surface_sigc_Pa": 3327983763.3104863
++            },
++            "temperature_K": 900.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 7.422678344938218,
++              "cleavage_sigc_Pa": 6239815953.440951,
++              "emission_G0_eV": 5.043473885340143,
++              "emission_sigc_Pa": 3101469587.4529963,
++              "peierls_G0_eV": 1.0063066641451115,
++              "peierls_projected_equivalent_sigc_Pa": 1790634301.1994252,
++              "peierls_surface_sigc_Pa": 3101469587.4529963,
++              "taylor_G0_eV": 3.145924287244328,
++              "taylor_projected_equivalent_sigc_Pa": 1790634301.1994252,
++              "taylor_surface_sigc_Pa": 3101469587.4529963
++            },
++            "temperature_K": 950.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 7.850524014816688,
++              "cleavage_sigc_Pa": 6459774711.803852,
++              "emission_G0_eV": 5.069005231931443,
++              "emission_sigc_Pa": 2874955411.595506,
++              "peierls_G0_eV": 1.0397437502805595,
++              "peierls_projected_equivalent_sigc_Pa": 1659856280.7928371,
++              "peierls_surface_sigc_Pa": 2874955411.595506,
++              "taylor_G0_eV": 3.046781207665185,
++              "taylor_projected_equivalent_sigc_Pa": 1659856280.7928371,
++              "taylor_surface_sigc_Pa": 2874955411.595506
++            },
++            "temperature_K": 1000.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 8.278369684695157,
++              "cleavage_sigc_Pa": 6679733470.166753,
++              "emission_G0_eV": 5.094536578522742,
++              "emission_sigc_Pa": 2648441235.7380157,
++              "peierls_G0_eV": 1.0731808364160074,
++              "peierls_projected_equivalent_sigc_Pa": 1529078260.3862486,
++              "peierls_surface_sigc_Pa": 2648441235.7380157,
++              "taylor_G0_eV": 2.947638128086042,
++              "taylor_projected_equivalent_sigc_Pa": 1529078260.3862486,
++              "taylor_surface_sigc_Pa": 2648441235.7380157
++            },
++            "temperature_K": 1050.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 8.706215354573628,
++              "cleavage_sigc_Pa": 6899692228.529652,
++              "emission_G0_eV": 5.120067925114043,
++              "emission_sigc_Pa": 2421927059.880526,
++              "peierls_G0_eV": 1.1066179225514552,
++              "peierls_projected_equivalent_sigc_Pa": 1398300239.9796607,
++              "peierls_surface_sigc_Pa": 2421927059.880526,
++              "taylor_G0_eV": 2.8484950485068996,
++              "taylor_projected_equivalent_sigc_Pa": 1398300239.9796607,
++              "taylor_surface_sigc_Pa": 2421927059.880526
++            },
++            "temperature_K": 1100.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 9.134061024452098,
++              "cleavage_sigc_Pa": 7119650986.892551,
++              "emission_G0_eV": 5.1455992717053425,
++              "emission_sigc_Pa": 2195412884.0230365,
++              "peierls_G0_eV": 1.140055008686903,
++              "peierls_projected_equivalent_sigc_Pa": 1267522219.573073,
++              "peierls_surface_sigc_Pa": 2195412884.0230365,
++              "taylor_G0_eV": 2.7493519689277566,
++              "taylor_projected_equivalent_sigc_Pa": 1267522219.573073,
++              "taylor_surface_sigc_Pa": 2195412884.0230365
++            },
++            "temperature_K": 1150.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 9.561906694330567,
++              "cleavage_sigc_Pa": 7339609745.255451,
++              "emission_G0_eV": 5.171130618296643,
++              "emission_sigc_Pa": 1968898708.165546,
++              "peierls_G0_eV": 1.1734920948223508,
++              "peierls_projected_equivalent_sigc_Pa": 1136744199.1664846,
++              "peierls_surface_sigc_Pa": 1968898708.165546,
++              "taylor_G0_eV": 2.6502088893486135,
++              "taylor_projected_equivalent_sigc_Pa": 1136744199.1664846,
++              "taylor_surface_sigc_Pa": 1968898708.165546
++            },
++            "temperature_K": 1200.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 9.989752364209037,
++              "cleavage_sigc_Pa": 7559568503.618351,
++              "emission_G0_eV": 5.196661964887943,
++              "emission_sigc_Pa": 1742384532.308056,
++              "peierls_G0_eV": 1.2069291809577987,
++              "peierls_projected_equivalent_sigc_Pa": 1005966178.7598965,
++              "peierls_surface_sigc_Pa": 1742384532.308056,
++              "taylor_G0_eV": 2.551065809769471,
++              "taylor_projected_equivalent_sigc_Pa": 1005966178.7598965,
++              "taylor_surface_sigc_Pa": 1742384532.308056
++            },
++            "temperature_K": 1250.0
++          },
++          {
++            "admissible": true,
++            "raw_scales": {
++              "cleavage_G0_eV": 10.417598034087508,
++              "cleavage_sigc_Pa": 7779527261.981252,
++              "emission_G0_eV": 5.222193311479243,
++              "emission_sigc_Pa": 1515870356.450566,
++              "peierls_G0_eV": 1.2403662670932465,
++              "peierls_projected_equivalent_sigc_Pa": 875188158.3533084,
++              "peierls_surface_sigc_Pa": 1515870356.450566,
++              "taylor_G0_eV": 2.4519227301903284,
++              "taylor_projected_equivalent_sigc_Pa": 875188158.3533084,
++              "taylor_surface_sigc_Pa": 1515870356.450566
++            },
++            "temperature_K": 1300.0
++          }
++        ],
++        "emission_stress_extrema": {
++          "maximum_Pa": 6046153873.600366,
++          "maximum_at_K": 300.0,
++          "minimum_Pa": 1515870356.4505658,
++          "minimum_at_K": 1300.0
++        },
++        "taylor_barrier_extrema_eV": {
++          "maximum": 4.434784321773185,
++          "maximum_at_K": 300.0,
++          "minimum": 2.4519227301903284,
++          "minimum_at_K": 1300.0
++        }
++      },
++      "manifest_sha256": "887c329efe6af3ccc058cdc2c2fbed12d8faed1c1d0f9ecbd706bfb3c0395e98",
++      "option_key": "dbtt_primary_taylor_0p10eV_qualification",
++      "parent_option_key": "dbtt_primary",
++      "registry": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv",
++      "registry_sha256": "c440193d8b0eeb89ce4f0da3ee9ed639e8f32e7f58b40a1ea45c240fd60fde4b",
++      "source_lifecycle_provenance": "older_approved_finite_source_refresh_and_recovery_lineage"
++    }
++  ],
++  "physical_calibration_claimed": false,
++  "production_selection": null,
++  "registries": [
++    {
++      "path": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv",
++      "sha256": "ff1aa20b2eb135b64aa55ff34859d7d1cd83e2a948251393c287e74ba5ec340e"
++    },
++    {
++      "path": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv",
++      "sha256": "c440193d8b0eeb89ce4f0da3ee9ed639e8f32e7f58b40a1ea45c240fd60fde4b"
++    }
++  ],
++  "schema": "dbtt-explicit-qualification-options/1",
++  "selection_boundary": "Both rows are complete numerical qualification inputs. The paper-lineage minimal-stress row changes the shared emission/Peierls/Taylor stress scale; the earlier dbtt_primary row changes the complete material/source family. Neither is selected for production.",
++  "source_candidates": "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_shared_stress_scale_candidates.json",
++  "source_candidates_sha256": "a424e8a6a992d4c7862823ada310bb7509edd1bba6b38d2b6854d62cd47f9547",
++  "status": "PASS"
++}
+diff --git a/scripts/build_dbtt_qualification_options.py b/scripts/build_dbtt_qualification_options.py
+new file mode 100644
+index 00000000..83fb58b9
+--- /dev/null
++++ b/scripts/build_dbtt_qualification_options.py
+@@ -0,0 +1,182 @@
++#!/usr/bin/env python3
++"""Build and evaluate explicit, unselected DBTT qualification alternatives."""
++from __future__ import annotations
++
++import argparse
++import csv
++import hashlib
++import json
++from pathlib import Path
++import sys
++
++
++ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(ROOT))
++
++from arrhenius_fracture.material_manifest import MaterialManifest
++from arrhenius_fracture.parameter_registry_v9111 import (
++    select_option, write_compatibility_manifest,
++)
++from arrhenius_fracture.taylor_domain_revision import (
++    T_MAX_K, T_MIN_K, construct_amplitude_rows, raw_emission_stress_extrema,
++    raw_taylor_extrema, read_rows,
++)
++from arrhenius_fracture.taylor_factorization import raw_scales
++
++
++PARENT_REGISTRY = ROOT / (
++    "arrhenius_fracture/data/materials/"
++    "v10_2_27_v913_four_class_paper_registry.csv"
++)
++STRESS_CANDIDATES = ROOT / (
++    "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/"
++    "v10_2_32_shared_stress_scale_candidates.json"
++)
++TEMPERATURES_K = (300.0, 600.0, 800.0, 900.0, 950.0, 1000.0,
++                  1050.0, 1100.0, 1150.0, 1200.0, 1250.0, 1300.0)
++
++
++def _sha(path: Path) -> str:
++    return hashlib.sha256(path.read_bytes()).hexdigest()
++
++
++def _display(path: Path) -> str:
++    try:
++        return str(path.relative_to(ROOT))
++    except ValueError:
++        return str(path)
++
++
++def _variant(base: dict[str, str], identity: str) -> dict[str, str]:
++    variants, records = construct_amplitude_rows([base], (0.10,))
++    row = variants[0]
++    row["option_key"] = identity
++    row["candidate_id"] = identity + "__candidate"
++    row["role"] = "explicit DBTT numerical qualification alternative"
++    row["validation_status"] = (
++        "constructed qualification option; not calibrated; not a production default"
++    )
++    row["qualification_parent_option_key"] = base["option_key"]
++    row["qualification_taylor_construction"] = json.dumps(
++        records[0], sort_keys=True, separators=(",", ":")
++    )
++    return row
++
++
++def construct_rows() -> list[dict[str, str]]:
++    _parent_fields, parents = read_rows(PARENT_REGISTRY)
++    parent_dbtt = next(row for row in parents if row["material_class"] == "DBTT")
++    candidates = json.loads(STRESS_CANDIDATES.read_text())
++    minimal = dict(candidates["minimal_intercept_candidates"][0]["row"])
++    approved = dict(candidates["existing_approved_alternative"]["row"])
++
++    rows = [
++        _variant(minimal, "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification"),
++        _variant(approved, "dbtt_primary_taylor_0p10eV_qualification"),
++    ]
++    # Demonstrate that the minimal alternative is the paper lineage and the
++    # approved alternative remains a distinct historical parameter family.
++    if rows[0]["qualification_parent_option_key"] == rows[1]["qualification_parent_option_key"]:
++        raise RuntimeError("DBTT qualification alternatives lost distinct ancestry")
++    if not rows[0]["qualification_parent_option_key"].startswith(
++        parent_dbtt["option_key"] + "__shared_sigc_minimal_intercept"
++    ):
++        raise RuntimeError("minimal-stress DBTT candidate lost paper-parent identity")
++    return rows
++
++
++def _domain(row: dict[str, str]) -> dict:
++    raw = []
++    for temperature in TEMPERATURES_K:
++        values = raw_scales(row, temperature)
++        raw.append({
++            "temperature_K": temperature,
++            "raw_scales": values,
++            "admissible": all(value > 0.0 for value in values.values()),
++        })
++    emission = raw_emission_stress_extrema(row)
++    taylor = raw_taylor_extrema(row)
++    return {
++        "continuous_domain_K": [T_MIN_K, T_MAX_K],
++        "emission_stress_extrema": emission,
++        "taylor_barrier_extrema_eV": taylor,
++        "all_declared_points_admissible": all(item["admissible"] for item in raw),
++        "declared_points": raw,
++    }
++
++
++def build(output: Path) -> dict:
++    if output.exists():
++        raise FileExistsError(f"refusing to overwrite {output}")
++    output.mkdir(parents=True)
++    rows = construct_rows()
++    constructor_rows = []
++    for index, row in enumerate(rows):
++        registry = output / (
++            "dbtt_paper_minimal_qualification_registry.csv" if index == 0 else
++            "dbtt_primary_qualification_registry.csv"
++        )
++        with registry.open("w", newline="") as stream:
++            writer = csv.DictWriter(stream, fieldnames=list(row))
++            writer.writeheader()
++            writer.writerow(row)
++        selected = select_option(row["option_key"], registry)
++        manifest_path = output / f"constructor_manifest_{index}.csv"
++        write_compatibility_manifest(selected, manifest_path)
++        manifest = MaterialManifest.from_csv(manifest_path)
++        constructor_rows.append({
++            "option_key": row["option_key"],
++            "candidate_id": row["candidate_id"],
++            "parent_option_key": row["qualification_parent_option_key"],
++            "registry_sha256": selected.registry_sha256,
++            "registry": _display(registry),
++            "manifest_sha256": _sha(manifest_path),
++            "constructor_candidate_id": manifest.candidate_id,
++            "domain": _domain(row),
++            "source_lifecycle_provenance": (
++                "current_persistent_paper_lineage"
++                if index == 0 else
++                "older_approved_finite_source_refresh_and_recovery_lineage"
++            ),
++        })
++    report = {
++        "schema": "dbtt-explicit-qualification-options/1",
++        "status": "PASS" if all(
++            row["domain"]["all_declared_points_admissible"]
++            and row["domain"]["emission_stress_extrema"]["minimum_Pa"] > 0.0
++            and row["domain"]["taylor_barrier_extrema_eV"]["minimum"] >= 0.10
++            for row in constructor_rows
++        ) else "FAIL",
++        "production_selection": None,
++        "physical_calibration_claimed": False,
++        "registries": [
++            {"path": row["registry"], "sha256": row["registry_sha256"]}
++            for row in constructor_rows
++        ],
++        "source_candidates": _display(STRESS_CANDIDATES),
++        "source_candidates_sha256": _sha(STRESS_CANDIDATES),
++        "options": constructor_rows,
++        "selection_boundary": (
++            "Both rows are complete numerical qualification inputs. The paper-lineage "
++            "minimal-stress row changes the shared emission/Peierls/Taylor stress scale; "
++            "the earlier dbtt_primary row changes the complete material/source family. "
++            "Neither is selected for production."
++        ),
++    }
++    (output / "qualification_report.json").write_text(
++        json.dumps(report, indent=2, sort_keys=True) + "\n"
++    )
++    return report
++
++
++def main(argv: list[str] | None = None) -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--output", type=Path, required=True)
++    args = parser.parse_args(argv)
++    report = build(args.output.resolve())
++    print(json.dumps(report, indent=2, sort_keys=True))
++    return 0 if report["status"] == "PASS" else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tests/test_dbtt_qualification_options.py b/tests/test_dbtt_qualification_options.py
+new file mode 100644
+index 00000000..72cafe52
+--- /dev/null
++++ b/tests/test_dbtt_qualification_options.py
+@@ -0,0 +1,27 @@
++from pathlib import Path
++
++from scripts.build_dbtt_qualification_options import build, construct_rows
++
++
++def test_dbtt_qualification_rows_preserve_distinct_lineages():
++    rows = construct_rows()
++    assert len(rows) == 2
++    assert rows[0]["qualification_parent_option_key"].startswith(
++        "v913_paper_dbtt01"
++    )
++    assert rows[1]["qualification_parent_option_key"] == "dbtt_primary"
++    assert rows[0]["option_key"] != rows[1]["option_key"]
++    assert all("taylor_0p10eV_qualification" in row["option_key"] for row in rows)
++
++
++def test_dbtt_qualification_options_are_constructor_valid_and_unselected(tmp_path: Path):
++    report = build(tmp_path / "options")
++    assert report["status"] == "PASS"
++    assert report["production_selection"] is None
++    assert report["physical_calibration_claimed"] is False
++    assert len(report["options"]) == 2
++    assert all(row["domain"]["all_declared_points_admissible"] for row in report["options"])
++    assert {row["source_lifecycle_provenance"] for row in report["options"]} == {
++        "current_persistent_paper_lineage",
++        "older_approved_finite_source_refresh_and_recovery_lineage",
++    }

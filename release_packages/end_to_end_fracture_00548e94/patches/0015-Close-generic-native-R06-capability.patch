@@ -1,0 +1,161 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 10:08:37 -0700
+Subject: [PATCH 15/32] Close generic native R06 capability
+
+---
+ CAPABILITY_PRESERVATION_MATRIX.csv            |  3 ++-
+ FRAMEWORK_COMPLETION_LEDGER.json              | 13 +++++++-----
+ .../SOURCE_TRANSPORT_AXES_QUALIFICATION.json  | 20 ++++++++++---------
+ scripts/qualify_source_transport_axes.py      | 20 ++++++++++---------
+ ...est_source_transport_axes_qualification.py |  8 +++++---
+ 5 files changed, 37 insertions(+), 27 deletions(-)
+
+diff --git a/CAPABILITY_PRESERVATION_MATRIX.csv b/CAPABILITY_PRESERVATION_MATRIX.csv
+index 6fef90f4..9f2adf24 100644
+--- a/CAPABILITY_PRESERVATION_MATRIX.csv
++++ b/CAPABILITY_PRESERVATION_MATRIX.csv
+@@ -11,7 +11,8 @@ KIN02,"occupied signed wake kinetics","signed_burgers_shared_v1025._signed_evolv
+ KIN03,"channel-resolved transport","signed_burgers_shared_v1025._signed_evolve_channel","transport=channel_resolved","v10.1.7.5 lineage plus current binding registry","per-system active and wake state","native qualification plus cross-consumer kinetic and persistent runtime receipts","per-system emission drive and density support","typed shared preset plus distinct provider/execution/runtime-contract binding","test_transport_comparison_v10175.py; test_cross_consumer_kinetic_lifecycle.py; test_f1_no_physics_fallback.py; test_shared_execution.py",CURRENT_LAW_NATIVE_QUALIFIED_DECLARED_SCOPE,"nonzero two-step original spatial PF execution; channel operator and legacy-split exchange attested after accepted states; fresh-process restart exact across 11 arrays and outer/kinetic JSON; not forced equal to validated scalar"
+ KIN04,"reversible source-linked surface return","persistent_site_reversible_transport_v10230","reversible_signed","current PF 2d62e3bd","raw/physical return escape recovery cancellation and transfer ledgers","reversible binding and equation-accuracy receipts","validated scalar base plus signed finite-tip drive","exactly-once reversible overlay","test_v10_2_30_reversible_transport.py",CURRENT_LAW_QUALIFIED_DECLARED_SCOPE,"PRESERVED_CONNECTED is connection only; populated state matches per-bin finite-tip signed rate, density jump, weighted velocity and opposite-sign finite-volume advection; retained content is not erased"
+ KIN05,"full-field bulk constitutive and density update","bulk_plasticity_v104.accepted_bulk_load_step","full_field fixed/evolving rho","v10.4 lineage plus current PF","element-GP ep/rho and rate audit","native bulk model audit","selected material bundle and full FEM stress","typed bulk-only and tip-plus-bulk consumers","test_bulk_plasticity_v104.py; test_f1_no_physics_fallback.py",PRESERVED_CONNECTED,"separate material-point consumer; not equated to tip kinetics"
+-KIN06,"direct tip/bulk density transport and population transfer","none","requested independent axis","no current implementation","none","source transport axes receipt","physical transfer support/normalization unresolved","none","test_source_transport_axes_qualification.py",INCOMPLETE,"qualified states explicitly report bulk_density_transport=false and direct_tip_bulk_population_exchange=false; no coefficient invented"
++KIN06,"direct tip/bulk density transport and population transfer","tip_bulk_population_transfer_v1.conservative_tip_bulk_transfer","explicit requested line content; separate signed species; both directions","PF b54e1375","conservative-tip-bulk-population-transfer/1","populated-state R06 qualification","explicit tip and bulk support weights; no implicit coefficient","generic operator only; production requires authoritative coefficient and scheduling","test_tip_bulk_population_transfer_v1.py; test_source_transport_axes_qualification.py",GENERIC_OPERATOR_QUALIFIED_PHYSICAL_SELECTION_INCOMPLETE,"positive conservative map passes both directions and available-population limiting; no coefficient or production default invented"
++KIN07,"orthogonal source/accommodation diagnostic interventions","diagnostic_interventions_v1","retained shielding off; source backstress off; fixed developed blunting; transport/retention off; history reset plus native re-equilibration","PF d386038b through 7104e097","persistent-native-diagnostic-interventions/1","r06_diagnostic_interventions_b54e1375","existing populated persistent state and native FEM equilibrium","qualification-only flags preserve baseline bindings and remove only named terms","test_v10221_persistent_site_source.py",PASS_POPULATED_NATIVE_STATE,"all five planned consumers qualified on the 64-step accepted spatial state; reset inventories removed population/work and is not booked as recovery; production remains disabled"
+ STATE01,"signed mobile/retained/wake state","signed_burgers_shared_v1025","signed state","9e884","signed active/wake fields","signed-state plots","kernel family","existing engine plus provider receipt","signed/persistent and runtime-grid regressions",PASS,"71-test cyclic group; 22-test source group"
+ STATE02,"mobile return/net slip","reversible fatigue modules","true signed drive","94871be","return/net ledgers","fatigue return plots","signed transport; restart","reversible strategy adapter","test_v10_2_30_reversible_transport.py",PASS,"48-test contract group"
+ EVENT01,"hazard/proposal/energy/commit transaction","hazard_energy_event_gate_v10230","energy gated","9e884","gate/event ledger","event analysis","RNG; mechanics; rollback","existing gate plus one-owner audit","event growth/gate/transaction tests",PASS,"71-test cyclic group"
+diff --git a/FRAMEWORK_COMPLETION_LEDGER.json b/FRAMEWORK_COMPLETION_LEDGER.json
+index e130e2eb..1da443e3 100644
+--- a/FRAMEWORK_COMPLETION_LEDGER.json
++++ b/FRAMEWORK_COMPLETION_LEDGER.json
+@@ -139,12 +139,12 @@
+     {
+       "id": "R06",
+       "goal_ids": ["FG-04", "FG-05", "FG-16"],
+-      "status": "PARTIAL_CHANNEL_NATIVE_QUALIFIED_TRANSFER_AND_INTERVENTIONS_UNRESOLVED",
+-      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. Channel-resolved transport is an independent typed shared option with a distinct provider, execution binding and truthful persistent runtime contract. A compact original spatial PF run produced nonzero persistent emission/work; every accepted-state receipt bound the channel operator and legacy-split exchange, and fresh-process restart matched uninterrupted execution exactly across 11 state arrays plus both normalized JSON states. Density transport, conservative tip/bulk transfer and the planned intervention adapters remain unfinished.",
++      "status": "COMPLETE_NATIVE_OPTIONS_PHYSICAL_TRANSFER_COEFFICIENT_UNAVAILABLE",
++      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. Channel-resolved transport has a distinct provider, execution binding and exact fresh-process restart. The five planned diagnostic interventions are orthogonal native consumers and pass on the populated original 64-step spatial state. A positive conservative parameterized tip/bulk map is qualified in both directions without installing a coefficient or production default.",
+       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
+       "authoritative_source": "native geography audits and existing positive transport implementation",
+       "dependencies": ["R01", "R03"],
+-      "exact_next_command": "recover and implement the planned intervention definitions, then qualify each on a populated original spatial state; continue source-supported transport/parameterized transfer without inventing a coefficient",
++      "exact_next_command": "no remaining generic R06 implementation; select a physical tip/bulk transfer coefficient only if authoritative support becomes available",
+       "input_output_identity": "retained tip-only history plus native V10.4 bulk-only and tip-plus-bulk histories; exact evidence-file hashes recorded in the receipt",
+       "numerical_criteria": "Nonzero activity, full mechanics, ledgers, support exclusions and fresh-process restart.",
+       "executed_evidence": [
+@@ -154,9 +154,12 @@
+         "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json",
+         "common_framework_readiness/local_preservation_and_kinetics_20261014/EQUATION_AND_ACCURACY_CORRESPONDENCE.json",
+         "tests/test_cross_consumer_kinetic_lifecycle.py",
+-        "integration_evidence/channel_transport_native_a0590e03/qualification_report.json"
++        "integration_evidence/channel_transport_native_a0590e03/qualification_report.json",
++        "integration_evidence/r06_diagnostic_interventions_b54e1375/qualification_report.json",
++        "tests/test_v10221_persistent_site_source.py",
++        "tests/test_tip_bulk_population_transfer_v1.py"
+       ],
+-      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Source-backstress-off, transport-retention-off, fixed-blunting, isolated retained-shielding and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
++      "remaining_limitation": "No physical tip/bulk population-transfer coefficient or production transfer default is identified by the available source. The generic conservative operator therefore requires an explicit requested line content and remains production-disabled. Native vacancy transport is a separate cavity capability and is not relabeled as dislocation transfer."
+     },
+     {
+       "id": "R07",
+diff --git a/common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json b/common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json
+index 5517500d..56f96973 100644
+--- a/common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json
++++ b/common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json
+@@ -20,21 +20,23 @@
+       "transport": "positive conservative vacancy transport"
+     },
+     {
+-      "classification": "NOT_IMPLEMENTED_NO_PHYSICAL_TRANSFER_COEFFICIENT_INVENTED",
+-      "executable": false,
++      "classification": "GENERIC_OPERATOR_QUALIFIED_PHYSICAL_COEFFICIENT_UNAVAILABLE",
++      "executable": true,
+       "owner": "conservative tip/bulk dislocation population transfer",
+-      "transport": null
++      "physical_transfer_coefficient": null,
++      "production_executable": false,
++      "transport": "parameterized positive conservative line-content map"
+     }
+   ],
+-  "decision": "PARTIAL_REQUIRED_INTERVENTION_ADAPTERS_UNRESOLVED",
++  "decision": "COMPLETE_GENERIC_NATIVE_OPTIONS_PHYSICAL_TRANSFER_SELECTION_PENDING",
+   "interpretation": "Source support and transport are now reported as independent axes. The active support evidence cannot be promoted into nonexistent bulk density transport or conservative tip/bulk population exchange.",
+   "planned_interventions": {
+-    "blunting_fixed": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
+-    "history_reset_reequilibrated": "UNRESOLVED_STATE_PREPARATION_ADAPTER",
++    "blunting_fixed": "QUALIFIED_DEVELOPED_RADIUS_CONSUMER",
++    "history_reset_reequilibrated": "QUALIFIED_COUNTERFACTUAL_RESET_AND_NATIVE_REEQUILIBRATION",
+     "native": "EXECUTABLE",
+-    "retained_shielding_off": "PARTIAL_EXISTING_COARSE_TOGGLE_NOT_ISOLATED",
+-    "source_backstress_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
+-    "transport_retention_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER"
++    "retained_shielding_off": "QUALIFIED_ORTHOGONAL_NATIVE_CONSUMER",
++    "source_backstress_off": "QUALIFIED_ORTHOGONAL_NATIVE_CONSUMER",
++    "transport_retention_off": "QUALIFIED_SOURCE_PRESERVING_NATIVE_CONSUMER"
+   },
+   "production_execution_authorized": false,
+   "schema": "source-transport-axis-qualification/1",
+diff --git a/scripts/qualify_source_transport_axes.py b/scripts/qualify_source_transport_axes.py
+index 3bda12bc..108877fa 100644
+--- a/scripts/qualify_source_transport_axes.py
++++ b/scripts/qualify_source_transport_axes.py
+@@ -95,7 +95,7 @@ def qualify() -> dict[str, Any]:
+         support[geography]["fresh_process_restart"] = "PASS_COMPLETE_TERMINAL_STATE_EQUAL"
+     return {
+         "schema": "source-transport-axis-qualification/1",
+-        "decision": "PARTIAL_REQUIRED_INTERVENTION_ADAPTERS_UNRESOLVED",
++        "decision": "COMPLETE_GENERIC_NATIVE_OPTIONS_PHYSICAL_TRANSFER_SELECTION_PENDING",
+         "production_execution_authorized": False,
+         "support_qualification": support,
+         "capability_matrix": [
+@@ -114,18 +114,20 @@ def qualify() -> dict[str, Any]:
+                 "executable": True,
+             },
+             {
+-                "owner": "conservative tip/bulk dislocation population transfer", "transport": None,
+-                "classification": "NOT_IMPLEMENTED_NO_PHYSICAL_TRANSFER_COEFFICIENT_INVENTED",
+-                "executable": False,
++                "owner": "conservative tip/bulk dislocation population transfer",
++                "transport": "parameterized positive conservative line-content map",
++                "classification": "GENERIC_OPERATOR_QUALIFIED_PHYSICAL_COEFFICIENT_UNAVAILABLE",
++                "executable": True,"production_executable":False,
++                "physical_transfer_coefficient":None,
+             },
+         ],
+         "planned_interventions": {
+             "native": "EXECUTABLE",
+-            "retained_shielding_off": "PARTIAL_EXISTING_COARSE_TOGGLE_NOT_ISOLATED",
+-            "source_backstress_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
+-            "blunting_fixed": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
+-            "transport_retention_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
+-            "history_reset_reequilibrated": "UNRESOLVED_STATE_PREPARATION_ADAPTER",
++            "retained_shielding_off": "QUALIFIED_ORTHOGONAL_NATIVE_CONSUMER",
++            "source_backstress_off": "QUALIFIED_ORTHOGONAL_NATIVE_CONSUMER",
++            "blunting_fixed": "QUALIFIED_DEVELOPED_RADIUS_CONSUMER",
++            "transport_retention_off": "QUALIFIED_SOURCE_PRESERVING_NATIVE_CONSUMER",
++            "history_reset_reequilibrated": "QUALIFIED_COUNTERFACTUAL_RESET_AND_NATIVE_REEQUILIBRATION",
+         },
+         "interpretation": (
+             "Source support and transport are now reported as independent axes. "
+diff --git a/tests/test_source_transport_axes_qualification.py b/tests/test_source_transport_axes_qualification.py
+index 59d7650a..b5ad2e23 100644
+--- a/tests/test_source_transport_axes_qualification.py
++++ b/tests/test_source_transport_axes_qualification.py
+@@ -22,10 +22,12 @@ def test_source_transport_axes_use_active_native_histories():
+     assert all(row["full_mechanics_history_present"] for row in support.values())
+ 
+ 
+-def test_missing_transfer_is_not_promoted_to_an_executable_model():
++def test_generic_transfer_is_distinct_from_missing_physical_coefficient():
+     if not TIP_ONLY.is_dir() or not GEOGRAPHY.is_dir():
+         pytest.skip("manifest-backed source geography evidence is absent")
+     report = qualify()
+     transfer = report["capability_matrix"][-1]
+-    assert transfer["executable"] is False
+-    assert transfer["classification"].startswith("NOT_IMPLEMENTED")
++    assert transfer["executable"] is True
++    assert transfer["production_executable"] is False
++    assert transfer["physical_transfer_coefficient"] is None
++    assert transfer["classification"].endswith("PHYSICAL_COEFFICIENT_UNAVAILABLE")

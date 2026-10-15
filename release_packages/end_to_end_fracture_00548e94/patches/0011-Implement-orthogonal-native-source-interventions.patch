@@ -1,0 +1,481 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 10:04:20 -0700
+Subject: [PATCH 11/32] Implement orthogonal native source interventions
+
+---
+ .../diagnostic_interventions_v1.py            | 128 ++++++++++++++++++
+ .../persistent_site_source_v10221.py          |  38 +++++-
+ .../signed_burgers_shared_v1025.py            |  57 ++++++--
+ arrhenius_fracture/unified_mpz.py             |   2 +
+ tests/test_v10221_persistent_site_source.py   |  98 +++++++++++++-
+ 5 files changed, 304 insertions(+), 19 deletions(-)
+ create mode 100644 arrhenius_fracture/diagnostic_interventions_v1.py
+
+diff --git a/arrhenius_fracture/diagnostic_interventions_v1.py b/arrhenius_fracture/diagnostic_interventions_v1.py
+new file mode 100644
+index 00000000..73ba2084
+--- /dev/null
++++ b/arrhenius_fracture/diagnostic_interventions_v1.py
+@@ -0,0 +1,128 @@
++"""Orthogonal diagnostic interventions for the persistent native tip state.
++
++These switches are counterfactual study operators.  They never become a
++production default and each removes only its named coupling.  Population
++transfer between bulk and tip is deliberately absent because no physical
++coefficient has been authorized.
++"""
++from __future__ import annotations
++
++import hashlib
++import json
++from typing import Any, Callable, Mapping
++
++import numpy as np
++
++from .signed_burgers_shared_v1025 import _sync_active, _sync_wake
++
++
++MODEL_ID="persistent-native-diagnostic-interventions/1"
++INTERVENTIONS=frozenset({
++    "native","retained_shielding_off","source_backstress_off",
++    "blunting_fixed","transport_retention_off","history_reset_reequilibrated",
++})
++
++
++def _population_arrays(state):
++    names=(
++        "mobile_positive","mobile_negative","retained_positive","retained_negative",
++        "accumulated_slip_positive","accumulated_slip_negative",
++        "wake_mobile_positive","wake_mobile_negative","wake_retained_positive",
++        "wake_retained_negative","wake_slip_positive","wake_slip_negative",
++    )
++    return {name:np.asarray(getattr(state,name),float) for name in names if hasattr(state,name)}
++
++
++def _fingerprint(state) -> str:
++    digest=hashlib.sha256()
++    for name,value in sorted(_population_arrays(state).items()):
++        digest.update(name.encode()); digest.update(np.ascontiguousarray(value).tobytes())
++    return digest.hexdigest()
++
++
++def install_diagnostic_intervention(state,intervention: str,*,r0_m=None,b_m=None) -> dict[str,Any]:
++    """Install one named intervention without replacing native method bodies."""
++    name=str(intervention)
++    if name not in INTERVENTIONS:
++        raise ValueError(f"unknown diagnostic intervention {name!r}")
++    if name=="history_reset_reequilibrated":
++        raise ValueError("history reset requires apply_history_reset_reequilibrated")
++    before=_fingerprint(state)
++    state._diagnostic_intervention=name
++    state._diagnostic_retained_shielding_enabled=name!="retained_shielding_off"
++    state._diagnostic_source_backstress_off=name=="source_backstress_off"
++    state._diagnostic_transport_retention_off=name=="transport_retention_off"
++    state._diagnostic_fixed_blunting=name=="blunting_fixed"
++    fixed=None
++    if name=="blunting_fixed":
++        r0=float(state._persistent_r0_m if r0_m is None else r0_m)
++        b=float(state._persistent_b if b_m is None else b_m)
++        # Capture the developed radius before enabling the switch.
++        state._diagnostic_fixed_blunting=False
++        fixed=float(state.blunted_radius(r0,b))
++        state._diagnostic_fixed_blunting_radius_m=fixed
++        state._diagnostic_fixed_blunting=True
++    receipt={
++        "schema":MODEL_ID,"intervention":name,"qualification_only":True,
++        "production_default":False,"population_state_unchanged":before==_fingerprint(state),
++        "fixed_blunting_radius_m":fixed,
++        "removed_terms":{
++            "retained_shielding":name=="retained_shielding_off",
++            "source_backstress":name=="source_backstress_off",
++            "blunting_evolution":name=="blunting_fixed",
++            "exchange_retention_transport":name=="transport_retention_off",
++        },
++        "tip_bulk_population_transfer_added":False,
++    }
++    state.diagnostic_intervention_receipt=receipt
++    return receipt
++
++
++def apply_history_reset_reequilibrated(
++    state,*,reequilibrate:Callable[[],Mapping[str,Any]],
++    accumulated_work:Mapping[str,float]|None=None,
++) -> dict[str,Any]:
++    """Reset process history, inventory what was removed, then re-equilibrate.
++
++    The reset is explicitly counterfactual: it does not increment recovery or
++    escape ledgers, and historical work is recorded rather than erased.
++    """
++    if not callable(reequilibrate):
++        raise TypeError("history reset requires a native re-equilibration callback")
++    arrays=_population_arrays(state)
++    before=_fingerprint(state)
++    removed={name:float(np.sum(value)) for name,value in arrays.items()}
++    ledgers={name:float(getattr(state,name)) for name in (
++        "recovered_total","escaped_total","wake_discarded_mobile_total",
++        "wake_discarded_retained_total","wake_discarded_slip_total",
++    ) if hasattr(state,name)}
++    for value in arrays.values():
++        value[...] = 0.0
++    _sync_active(state); _sync_wake(state)
++    after_reset=_fingerprint(state)
++    equilibrium=dict(reequilibrate())
++    if not equilibrium.get("converged",False):
++        raise RuntimeError("native post-reset re-equilibration did not converge")
++    for name,value in ledgers.items():
++        if float(getattr(state,name))!=value:
++            raise RuntimeError("diagnostic reset was incorrectly booked as physical loss")
++    receipt={
++        "schema":MODEL_ID,"intervention":"history_reset_reequilibrated",
++        "qualification_only":True,"production_default":False,
++        "pre_reset_population_sha256":before,"post_reset_population_sha256":after_reset,
++        "removed_population":removed,
++        "removed_population_total":float(sum(removed.values())),
++        "counterfactual_removed_work":dict(accumulated_work or {}),
++        "physical_loss_ledgers_unchanged":True,
++        "native_reequilibration":equilibrium,
++        "tip_bulk_population_transfer_added":False,
++    }
++    # Ensure the receipt itself is immediately serialization-safe.
++    json.dumps(receipt,sort_keys=True)
++    state._diagnostic_intervention="history_reset_reequilibrated"
++    state.diagnostic_intervention_receipt=receipt
++    return receipt
++
++
++__all__=["INTERVENTIONS","MODEL_ID","apply_history_reset_reequilibrated",
++         "install_diagnostic_intervention"]
+diff --git a/arrhenius_fracture/persistent_site_source_v10221.py b/arrhenius_fracture/persistent_site_source_v10221.py
+index 6bbf6bcf..149a948a 100644
+--- a/arrhenius_fracture/persistent_site_source_v10221.py
++++ b/arrhenius_fracture/persistent_site_source_v10221.py
+@@ -44,6 +44,15 @@ MODEL_ID = "v10.2.21_persistent_site_backstress_blunting"
+ SOURCE_MODEL = "persistent_areal_sites_backstress_limited_no_inventory"
+ 
+ 
++def _source_backstress(state):
++    """Backstress consumed by the source, with its isolated diagnostic switch."""
++    rho,tau,sigma=_campaign_backstress(state)
++    if bool(getattr(state,"_diagnostic_source_backstress_off",False)):
++        state.diagnostic_counterfactual_source_backstress_Pa=np.asarray(sigma,float).copy()
++        return rho,np.zeros_like(tau),np.zeros_like(sigma)
++    return rho,tau,sigma
++
++
+ @dataclass(frozen=True)
+ class PersistentSiteConfig:
+     """Physical and numerical controls for the persistent-site closure."""
+@@ -322,7 +331,7 @@ def _persistent_emit(
+         tau_signed = np.pad(tau_signed, (0, self.n_systems - tau_signed.size))
+     signs = np.sign(tau_signed[: self.n_systems])
+ 
+-    rho0, tau_back0, sigma_back0 = _campaign_backstress(self)
++    rho0, tau_back0, sigma_back0 = _source_backstress(self)
+     opening = max(float(stress_Pa), 0.0)
+     drive = np.maximum(np.asarray(factors, dtype=float) * opening, 0.0)
+     geometry = _source_geometry(self)
+@@ -366,6 +375,20 @@ def _persistent_emit(
+ 
+         sigma_initial = max(float(drive[system] - sigma_back0[system]), 0.0)
+         rates_initial[system] = rate_at(sigma_initial)
++        if bool(getattr(self,"_diagnostic_source_backstress_off",False)):
++            activations[system]=multiplicity*rates_initial[system]*dt
++            root=PersistentActivationRootDiagnostic(
++                activations=float(activations[system]),lower_bound=float(activations[system]),
++                upper_bound=float(activations[system]),residual=0.0,iteration_count=0,
++                converged=True,initial_rate_per_s=float(rates_initial[system]),
++            )
++            root_lower[system]=root.lower_bound; root_upper[system]=root.upper_bound
++            root_residual[system]=0.0; root_iterations[system]=0
++            root_converged[system]=True
++            line_by_system[system]=activations[system]*conversion[system]
++            sigma_final[system]=float(drive[system])
++            rates_final[system]=rates_initial[system]
++            continue
+         activations[system] = solve_backstress_limited_activations(
+             multiplicity=multiplicity,
+             dt_s=dt,
+@@ -600,7 +623,7 @@ def _coupled_persistent_source_transport(
+         _sync_active(self)
+ 
+     def source_target() -> np.ndarray:
+-        _, _, sigma_back = _campaign_backstress(self)
++        _, _, sigma_back = _source_backstress(self)
+         geometry = _source_geometry(self)
+         effective = np.maximum(drive - sigma_back, 0.0)
+         values = np.asarray([
+@@ -727,7 +750,7 @@ def _coupled_persistent_source_transport(
+         coefficient_error = coefficient_relative_error(
+             consumed_coefficients, candidate_coefficients
+         )
+-        _, _, sigma_iteration = _campaign_backstress(self)
++        _, _, sigma_iteration = _source_backstress(self)
+         target_iteration = source_target()
+         equation_iteration = np.abs(target_iteration - activation_rate) / np.maximum(
+             np.maximum(target_iteration, activation_rate), 1.0
+@@ -765,7 +788,7 @@ def _coupled_persistent_source_transport(
+             f"iterations={cfg.coupled_max_iterations}"
+         )
+ 
+-    _, _, sigma_check = _campaign_backstress(self)
++    _, _, sigma_check = _source_backstress(self)
+     target = source_target()
+     equation_error = np.abs(target - activation_rate) / np.maximum(
+         np.maximum(target, activation_rate), 1.0
+@@ -799,7 +822,7 @@ def _coupled_persistent_source_transport(
+     self.signed_last_line_content = emitted_lines
+     self.signed_last_line_content_by_system = line_by_system.copy()
+     self.signed_last_burgers_sign_by_system = signs.copy()
+-    rho_final, tau_final, sigma_final = _campaign_backstress(self)
++    rho_final, tau_final, sigma_final = _source_backstress(self)
+     geometry = _source_geometry(self)
+     effective_final = np.maximum(drive - sigma_final, 0.0)
+     rate_final = np.asarray(
+@@ -883,7 +906,7 @@ def _persistent_advance(self, distance_m: float) -> dict[str, float]:
+ def _persistent_diagnostics(self, G=None, nu=None, b=None, r0=None) -> dict[str, Any]:
+     data = dict(self._persistent_base_diagnostics(G, nu, b, r0))
+     geometry = _source_geometry(self)
+-    rho, tau, sigma = _campaign_backstress(self)
++    rho, tau, sigma = _source_backstress(self)
+     drive = np.asarray(
+         getattr(self, "persistent_site_last_drive_Pa", np.zeros(self.n_systems)),
+         dtype=float,
+@@ -910,6 +933,9 @@ def _persistent_diagnostics(self, G=None, nu=None, b=None, r0=None) -> dict[str,
+             "persistent_source_zone_bins": int(_source_zone_bin_count(self)),
+             "persistent_rho_back_mean_m2": float(np.mean(rho)),
+             "persistent_sigma_back_mean_Pa": float(np.mean(sigma)),
++            "persistent_counterfactual_source_backstress_mean_Pa": float(np.mean(
++                np.asarray(getattr(self,"diagnostic_counterfactual_source_backstress_Pa",sigma))
++            )),
+             "persistent_backstress_drive_ratio_max": float(np.max(ratio)),
+             "legacy_source_sites_per_system_active": False,
+             "legacy_source_refresh_length_active": False,
+diff --git a/arrhenius_fracture/signed_burgers_shared_v1025.py b/arrhenius_fracture/signed_burgers_shared_v1025.py
+index e38e48cc..88d50d13 100644
+--- a/arrhenius_fracture/signed_burgers_shared_v1025.py
++++ b/arrhenius_fracture/signed_burgers_shared_v1025.py
+@@ -263,21 +263,50 @@ def _sync_wake(state) -> None:
+ 
+ 
+ def _signed_active_content(state) -> np.ndarray:
+-    return (
+-        state.retained_positive
+-        - state.retained_negative
+-        + float(state.cfg.mobile_shield_fraction)
+-        * (state.mobile_positive - state.mobile_negative)
+-    )
++    retained = (state.retained_positive-state.retained_negative)
++    if not bool(getattr(state,"_diagnostic_retained_shielding_enabled",True)):
++        retained=np.zeros_like(retained)
++    return retained+float(state.cfg.mobile_shield_fraction)*(state.mobile_positive-state.mobile_negative)
+ 
+ 
+ def _signed_wake_content(state) -> np.ndarray:
+-    return (
+-        state.wake_retained_positive
+-        - state.wake_retained_negative
+-        + float(state.cfg.mobile_shield_fraction)
+-        * (state.wake_mobile_positive - state.wake_mobile_negative)
+-    )
++    retained=(state.wake_retained_positive-state.wake_retained_negative)
++    if not bool(getattr(state,"_diagnostic_retained_shielding_enabled",True)):
++        retained=np.zeros_like(retained)
++    return retained+float(state.cfg.mobile_shield_fraction)*(state.wake_mobile_positive-state.wake_mobile_negative)
++
++
++def _transport_retention_off_step(self,dt,stress_Pa,T_K,b,system_weights):
++    """Emit natively while disabling only exchange, retention and transport."""
++    emitted=self._emit(dt,stress_Pa,T_K,system_weights)
++    self.scalar_transport_velocity_m_s=0.0
++    self.scalar_transport_displacement_m=0.0
++    self.anisotropic_last_transport_velocity_by_system_m_s=np.zeros(self.n_systems)
++    self.time_s+=dt
++    return {
++        "dN_emit":emitted,"dN_source_activations":float(self.signed_last_source_activations),
++        "dN_trapped":0.0,"dN_released":0.0,"dN_recovered":0.0,"dN_escaped":0.0,
++        "dN_gross_trapping":0.0,"dN_gross_release":0.0,
++        "mobile_distance_population_m":0.0,
++        "transport_invariant_roundoff_correction":0.0,"transport_base_map_correction":0.0,
++        "transport_positivity_correction":0.0,"transport_complete_numerical_correction":0.0,
++        "transport_affine_invariant_defect":0.0,"transport_affine_retry_discrepancy":0.0,
++        "transport_error_controlled_stiff_solve":False,
++        "transport_stiff_solver_method":"diagnostic_transport_retention_off",
++        "scalar_transport_velocity_m_s":0.0,"scalar_transport_displacement_m":0.0,
++        "exchange_transport_mode":"diagnostic_transport_retention_off",
++        "coupled_source_state_iterations":0.0,
++        "coupled_source_activation_rate_s":emitted/dt if dt>0.0 else 0.0,
++        "coupled_source_coefficient_residual":0.0,"coupled_source_state_residual":0.0,
++        "coupled_source_complementarity_residual":0.0,"coupled_source_affine_direct_residual":0.0,
++        "peierls_rate_s":0.0,"taylor_completion_rate_s":0.0,
++        "encounter_rate_s":0.0,"taylor_m_eff":0.0,
++        "available_site_fraction":self.available_site_fraction,
++        "anisotropic_transport_active":0.0,"signed_burgers_transport":0.0,
++        "wake_dN_trapped":0.0,"wake_dN_released":0.0,"wake_dN_recovered":0.0,
++        "wake_dN_mobile_transport_loss":0.0,
++        "diagnostic_intervention":"transport_retention_off",
++    }
+ 
+ 
+ def _active_K(self, G=None, nu=None, b=None) -> float:
+@@ -489,6 +518,8 @@ def _signed_evolve_scalar(
+     self, dt_s: float, T_K: float, stress_Pa: float, b: float, system_weights=None
+ ) -> dict[str, float]:
+     dt = max(float(dt_s), 0.0)
++    if bool(getattr(self,"_diagnostic_transport_retention_off",False)):
++        return _transport_retention_off_step(self,dt,stress_Pa,T_K,b,system_weights)
+     mode = _exchange_transport_mode(self)
+     coupled_source = getattr(self, "_coupled_persistent_source_transport", None)
+     if mode == JOINT_CTMC_EXCHANGE_TRANSPORT and coupled_source is not None:
+@@ -667,6 +698,8 @@ def _signed_evolve_channel(
+     self, dt_s: float, T_K: float, stress_Pa: float, b: float, system_weights=None
+ ) -> dict[str, float]:
+     dt = max(float(dt_s), 0.0)
++    if bool(getattr(self,"_diagnostic_transport_retention_off",False)):
++        return _transport_retention_off_step(self,dt,stress_Pa,T_K,b,system_weights)
+     emitted = self._emit(dt, stress_Pa, T_K, system_weights)
+     sigma_system = np.asarray(
+         getattr(
+diff --git a/arrhenius_fracture/unified_mpz.py b/arrhenius_fracture/unified_mpz.py
+index 5699ca02..8a8b016f 100644
+--- a/arrhenius_fracture/unified_mpz.py
++++ b/arrhenius_fracture/unified_mpz.py
+@@ -167,6 +167,8 @@ class UnifiedMPZState:
+         return float(np.sum(self.accumulated_slip * w[None, :]))
+ 
+     def blunted_radius(self, r0: float, b: float) -> float:
++        if bool(getattr(self,"_diagnostic_fixed_blunting",False)):
++            return float(getattr(self,"_diagnostic_fixed_blunting_radius_m",r0))
+         return max(float(r0) + max(self.manifest.c_blunt, 0.0) * abs(float(b)) * self.local_slip_count(), float(r0))
+ 
+     def local_forest_density_m2(self, wake: bool = False) -> np.ndarray:
+diff --git a/tests/test_v10221_persistent_site_source.py b/tests/test_v10221_persistent_site_source.py
+index 51d1c309..35456cfd 100644
+--- a/tests/test_v10221_persistent_site_source.py
++++ b/tests/test_v10221_persistent_site_source.py
+@@ -7,6 +7,9 @@ import numpy as np
+ import pytest
+ 
+ from arrhenius_fracture.parameter_registry_v9111 import select_option
++from arrhenius_fracture.diagnostic_interventions_v1 import (
++    apply_history_reset_reequilibrated,install_diagnostic_intervention,
++)
+ from arrhenius_fracture.persistent_site_source_v10221 import (
+     PersistentSiteConfig,
+     PersistentSiteStateResolvedTipEngine,
+@@ -16,7 +19,8 @@ from arrhenius_fracture.persistent_site_source_v10221 import (
+     install_persistent_site_source,
+ )
+ from arrhenius_fracture.signed_burgers_shared_v1025 import (
+-    KERNEL_SCHEMA, SignedShieldingKernel, install_signed_burgers_population,
++    KERNEL_SCHEMA,SignedShieldingKernel,_sync_active,_sync_wake,
++    install_signed_burgers_population,
+ )
+ from arrhenius_fracture.unified_mpz import UnifiedMPZState
+ 
+@@ -149,6 +153,8 @@ def _coupled_test_state():
+             return float(np.sum(self.available_sites) / np.sum(self.site_capacity))
+ 
+         def blunted_radius(self, r0, b):
++            if getattr(self,"_diagnostic_fixed_blunting",False):
++                return float(self._diagnostic_fixed_blunting_radius_m)
+             return float(r0 + 0.1 * abs(b) * np.sum(self.accumulated_slip))
+ 
+         def local_stress_profile_Pa(self, stress):
+@@ -229,6 +235,96 @@ def _coupled_test_state():
+     return state
+ 
+ 
++def test_diagnostic_interventions_are_orthogonal_on_populated_native_state():
++    retained=_coupled_test_state()
++    retained.retained_positive[0,0]=3.0
++    retained.retained_negative[0,1]=1.0
++    retained.accumulated_slip_positive[0,0]=4.0
++    retained.accumulated_slip_negative[0,1]=1.0
++    _sync_active(retained)
++    baseline_shield=retained.shielding_K()
++    population_before=retained.retained.copy()
++    receipt=install_diagnostic_intervention(retained,"retained_shielding_off")
++    assert baseline_shield!=0.0 and retained.shielding_K()==0.0
++    np.testing.assert_array_equal(retained.retained,population_before)
++    assert receipt["population_state_unchanged"]
++
++    fixed=_coupled_test_state()
++    fixed.accumulated_slip_positive[0,0]=4.0
++    _sync_active(fixed)
++    fixed_receipt=install_diagnostic_intervention(fixed,"blunting_fixed")
++    radius=fixed.blunted_radius(fixed._persistent_r0_m,fixed._persistent_b)
++    fixed.accumulated_slip_positive[0,0]+=100.0
++    _sync_active(fixed)
++    assert fixed.blunted_radius(fixed._persistent_r0_m,fixed._persistent_b)==radius
++    assert fixed_receipt["fixed_blunting_radius_m"]==radius
++
++    native=object.__new__(UnifiedMPZState)
++    native.cfg=SimpleNamespace(blunting_length_m=1.0)
++    native.manifest=SimpleNamespace(c_blunt=0.5)
++    native.x=np.array([0.5,1.5]); native.dx=1.0
++    native.accumulated_slip=np.array([[2.0,1.0]])
++    native._diagnostic_fixed_blunting=False
++    developed=UnifiedMPZState.blunted_radius(native,1.0,0.1)
++    native._diagnostic_fixed_blunting=True
++    native._diagnostic_fixed_blunting_radius_m=developed
++    native.accumulated_slip*=10.0
++    assert UnifiedMPZState.blunted_radius(native,1.0,0.1)==developed
++
++
++def test_source_backstress_and_transport_retention_switches_remove_only_named_terms():
++    from arrhenius_fracture.persistent_site_source_v10221 import _source_backstress
++
++    source=_coupled_test_state()
++    source.retained_positive[0,0]=3.0
++    _sync_active(source)
++    rho0,tau0,sigma0=_source_backstress(source)
++    install_diagnostic_intervention(source,"source_backstress_off")
++    rho,tau,sigma=_source_backstress(source)
++    np.testing.assert_array_equal(rho,rho0)
++    assert np.any(sigma0>0.0)
++    np.testing.assert_array_equal(tau,np.zeros_like(tau))
++    np.testing.assert_array_equal(sigma,np.zeros_like(sigma))
++    np.testing.assert_array_equal(source.diagnostic_counterfactual_source_backstress_Pa,sigma0)
++
++    transport=_coupled_test_state()
++    install_diagnostic_intervention(transport,"transport_retention_off")
++    retained_before=transport.retained.copy()
++    result=transport.evolve(0.01,900.0,2.0e9,1.0e-9)
++    assert result["dN_emit"]>0.0
++    assert result["dN_trapped"]==result["dN_released"]==0.0
++    assert result["dN_escaped"]==result["dN_recovered"]==0.0
++    assert result["mobile_distance_population_m"]==0.0
++    np.testing.assert_array_equal(transport.retained,retained_before)
++
++
++def test_history_reset_records_removed_state_and_requires_reequilibration():
++    state=_coupled_test_state()
++    state.mobile_positive[0,:2]=[2.0,1.0]
++    state.retained_negative[0,2]=4.0
++    state.accumulated_slip_positive[0,0]=5.0
++    state.wake_mobile_negative[0,1]=6.0
++    _sync_active(state); _sync_wake(state)
++    ledgers=(state.recovered_total,state.escaped_total,state.wake_discarded_mobile_total)
++    calls=[]
++    receipt=apply_history_reset_reequilibrated(
++        state,reequilibrate=lambda:(calls.append(True) or {
++            "converged":True,"residual_norm":0.0,"native_mechanics":True,
++        }),accumulated_work={"W_emit_J_per_m":12.5},
++    )
++    assert calls==[True]
++    assert receipt["removed_population_total"]==18.0
++    assert receipt["counterfactual_removed_work"]["W_emit_J_per_m"]==12.5
++    assert all(np.count_nonzero(value)==0 for value in _population_arrays_for_test(state))
++    assert ledgers==(state.recovered_total,state.escaped_total,state.wake_discarded_mobile_total)
++
++
++def _population_arrays_for_test(state):
++    return [value for name,value in vars(state).items() if isinstance(value,np.ndarray)
++            and any(token in name for token in ("mobile","retained","slip"))
++            and not name.startswith("persistent_site_last")]
++
++
+ def _populate_coupled_test_state(state):
+     state.mobile_positive[0, 1] = 0.7
+     state.mobile_negative[0, 3] = 0.2

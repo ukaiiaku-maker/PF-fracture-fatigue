@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 09:41:44 -0700
+Subject: [PATCH 08/32] Bind FEM readiness to qualified ancestry
+
+---
+ arrhenius_fracture/readiness_fem_backend.py | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/arrhenius_fracture/readiness_fem_backend.py b/arrhenius_fracture/readiness_fem_backend.py
+index 5a63abe3..da9f25a2 100644
+--- a/arrhenius_fracture/readiness_fem_backend.py
++++ b/arrhenius_fracture/readiness_fem_backend.py
+@@ -12,7 +12,7 @@ import subprocess
+ 
+ 
+ ROOT = Path("/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion")
+-COMMIT = "784c57f"
++COMMIT = "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
+ BRANCH = "codex/current-pf-companion"
+ ENTRY = Path("arrhenius_fracture/mode_i_first_passage_v10_0_5_18_4_0_current_pf_companion.py")
+ GENERIC_ENTRY = Path("arrhenius_fracture/generic_current_pf_companion.py")
+@@ -41,6 +41,19 @@ def _git(*args: str) -> str:
+     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
+ 
+ 
++def _baseline_is_ancestor(observed: str | None) -> bool:
++    if observed is None:
++        return False
++    try:
++        return subprocess.run(
++            ["git", "merge-base", "--is-ancestor", COMMIT, observed],
++            cwd=ROOT, check=False, stdout=subprocess.DEVNULL,
++            stderr=subprocess.DEVNULL,
++        ).returncode == 0
++    except OSError:
++        return False
++
++
+ def inspect_current_companion() -> CurrentCompanionBinding:
+     observed = branch = None
+     tracked_clean = False
+@@ -50,7 +63,10 @@ def inspect_current_companion() -> CurrentCompanionBinding:
+         tracked_clean = not bool(_git("status", "--porcelain", "--untracked-files=no"))
+     except (OSError, subprocess.CalledProcessError):
+         pass
+-    bound = bool(observed and observed.startswith(COMMIT) and branch == BRANCH
++    # COMMIT is the qualified baseline, not a reset target.  Authorized native
++    # implementation commits remain source-bound only when that exact baseline
++    # is an ancestor on the expected branch and the tracked tree is clean.
++    bound = bool(_baseline_is_ancestor(observed) and branch == BRANCH
+                  and tracked_clean and (ROOT / ENTRY).is_file()
+                  and (ROOT / GENERIC_ENTRY).is_file())
+     return CurrentCompanionBinding(

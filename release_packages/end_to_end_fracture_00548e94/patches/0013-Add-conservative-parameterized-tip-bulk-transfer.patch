@@ -1,0 +1,198 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 10:07:25 -0700
+Subject: [PATCH 13/32] Add conservative parameterized tip bulk transfer
+
+---
+ .../tip_bulk_population_transfer_v1.py        | 79 +++++++++++++++++++
+ .../qualify_diagnostic_interventions_v1.py    | 18 ++++-
+ tests/test_tip_bulk_population_transfer_v1.py | 44 +++++++++++
+ 3 files changed, 140 insertions(+), 1 deletion(-)
+ create mode 100644 arrhenius_fracture/tip_bulk_population_transfer_v1.py
+ create mode 100644 tests/test_tip_bulk_population_transfer_v1.py
+
+diff --git a/arrhenius_fracture/tip_bulk_population_transfer_v1.py b/arrhenius_fracture/tip_bulk_population_transfer_v1.py
+new file mode 100644
+index 00000000..32fa6615
+--- /dev/null
++++ b/arrhenius_fracture/tip_bulk_population_transfer_v1.py
+@@ -0,0 +1,79 @@
++"""Conservative parameterized transfer between tip line content and bulk density.
++
++The operator supplies the missing numerical map but intentionally owns no
++physical transfer coefficient.  Callers must provide a nonnegative requested
++line content and explicit support weights; there is no automatic default.
++"""
++from __future__ import annotations
++
++import numpy as np
++
++
++MODEL_ID="conservative-tip-bulk-population-transfer/1"
++
++
++def _weights(values,name):
++    result=np.asarray(values,float)
++    if result.ndim!=1 or not np.all(np.isfinite(result)) or np.any(result<0.0):
++        raise ValueError(f"{name} must be a finite nonnegative vector")
++    if float(np.sum(result))<=0.0:
++        raise ValueError(f"{name} must have positive support")
++    return result
++
++
++def conservative_tip_bulk_transfer(
++    tip_line_content,bulk_density_m2,bulk_area_m2,*,direction,
++    requested_line_content,tip_support_weights,bulk_support_weights,
++):
++    """Apply one signed-species transfer and return updated arrays plus receipt."""
++    tip=np.asarray(tip_line_content,float).copy()
++    bulk=np.asarray(bulk_density_m2,float).copy()
++    area=np.asarray(bulk_area_m2,float)
++    if tip.ndim!=1 or bulk.ndim!=1 or area.shape!=bulk.shape:
++        raise ValueError("tip, bulk density and bulk area must be compatible vectors")
++    if np.any(~np.isfinite(tip)) or np.any(tip<0.0) or np.any(~np.isfinite(bulk)) or np.any(bulk<0.0):
++        raise ValueError("population state must be finite and nonnegative")
++    if np.any(~np.isfinite(area)) or np.any(area<=0.0):
++        raise ValueError("bulk areas must be positive and finite")
++    tip_w=_weights(tip_support_weights,"tip_support_weights")
++    bulk_w=_weights(bulk_support_weights,"bulk_support_weights")
++    if tip_w.shape!=tip.shape or bulk_w.shape!=bulk.shape:
++        raise ValueError("support weights must match their population arrays")
++    requested=float(requested_line_content)
++    if not np.isfinite(requested) or requested<0.0:
++        raise ValueError("requested_line_content must be finite and nonnegative")
++    tip_before=float(np.sum(tip)); bulk_before=float(np.sum(bulk*area))
++    if direction=="tip_to_bulk":
++        capacity=tip*tip_w
++        amount=min(requested,float(np.sum(capacity)))
++        removal=np.zeros_like(tip) if amount==0.0 else amount*capacity/np.sum(capacity)
++        addition_weights=bulk_w/np.sum(bulk_w)
++        tip-=removal; bulk+=amount*addition_weights/area
++    elif direction=="bulk_to_tip":
++        capacity=bulk*area*bulk_w
++        amount=min(requested,float(np.sum(capacity)))
++        removal_count=np.zeros_like(bulk) if amount==0.0 else amount*capacity/np.sum(capacity)
++        addition_weights=tip_w/np.sum(tip_w)
++        bulk-=removal_count/area; tip+=amount*addition_weights
++    else:
++        raise ValueError("direction must be tip_to_bulk or bulk_to_tip")
++    tip_after=float(np.sum(tip)); bulk_after=float(np.sum(bulk*area))
++    residual=(tip_after+bulk_after)-(tip_before+bulk_before)
++    tolerance=1e-12*max(tip_before+bulk_before,amount,1.0)
++    if np.any(tip<-tolerance) or np.any(bulk<-tolerance) or abs(residual)>tolerance:
++        raise RuntimeError("tip/bulk transfer violated positivity or conservation")
++    tip=np.maximum(tip,0.0); bulk=np.maximum(bulk,0.0)
++    return tip,bulk,{
++        "schema":MODEL_ID,"direction":direction,
++        "requested_line_content":requested,"transferred_line_content":amount,
++        "limited_by_available_population":amount<requested,
++        "tip_count_before":tip_before,"tip_count_after":tip_after,
++        "bulk_count_before":bulk_before,"bulk_count_after":bulk_after,
++        "conservation_residual_line_content":residual,
++        "physical_transfer_coefficient":None,
++        "constructed_qualification_parameter":True,
++        "production_default":False,
++    }
++
++
++__all__=["MODEL_ID","conservative_tip_bulk_transfer"]
+diff --git a/scripts/qualify_diagnostic_interventions_v1.py b/scripts/qualify_diagnostic_interventions_v1.py
+index 84f9e359..ae991845 100644
+--- a/scripts/qualify_diagnostic_interventions_v1.py
++++ b/scripts/qualify_diagnostic_interventions_v1.py
+@@ -28,6 +28,9 @@ from arrhenius_fracture.signed_kernel_family_v10214 import (
+     ActiveOnlySigned2DShieldingKernelFamily,
+ )
+ from arrhenius_fracture.unified_mpz import UnifiedMPZState
++from arrhenius_fracture.tip_bulk_population_transfer_v1 import (
++    conservative_tip_bulk_transfer,
++)
+ 
+ 
+ def _sha(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+@@ -137,6 +140,16 @@ def qualify(checkpoint,kernel_path,out):
+         reset,reequilibrate=_mechanics_reequilibrator(directory,outer),
+         accumulated_work={"W_emit_J_per_m":float(outer["history"]["hist"]["W_emit"][-1])},
+     )
++    with np.load(directory/"state.npz",allow_pickle=False) as archive:
++        transfer_mesh=rebuild_tri_mesh(archive["mesh_nodes"],archive["mesh_elems"])
++    tip_transfer=np.asarray(base.retained_positive,float).ravel()
++    requested=.1*float(np.sum(tip_transfer))
++    _tip_after,_bulk_after,transfer_receipt=conservative_tip_bulk_transfer(
++        tip_transfer,np.zeros(transfer_mesh.ne),transfer_mesh.area_e,
++        direction="tip_to_bulk",requested_line_content=requested,
++        tip_support_weights=np.ones_like(tip_transfer),
++        bulk_support_weights=np.ones(transfer_mesh.ne),
++    )
+     ledger=kinetic["ledgers"]
+     checks={
+         "checkpoint_is_populated":baseline["active_vector_nonzero_count"]>0 and baseline["mobile_count"]+baseline["retained_count"]>0,
+@@ -152,6 +165,8 @@ def qualify(checkpoint,kernel_path,out):
+         "history_reset_not_physical_recovery":reset_receipt["physical_loss_ledgers_unchanged"],
+         "history_reset_native_reequilibrated":reset_receipt["native_reequilibration"]["converged"],
+         "no_tip_bulk_transfer_added":all(r["tip_bulk_population_transfer_added"] is False for r in (shield_receipt,source_receipt,fixed_receipt,transport_receipt,reset_receipt)),
++        "parameterized_transfer_is_conservative":abs(transfer_receipt["conservation_residual_line_content"])<1e-12,
++        "parameterized_transfer_has_no_default_coefficient":transfer_receipt["physical_transfer_coefficient"] is None,
+     }
+     report={
+         "schema":"r06-native-diagnostic-intervention-qualification/1",
+@@ -166,7 +181,8 @@ def qualify(checkpoint,kernel_path,out):
+                     "source_backstress_off":source_receipt,"blunting_fixed":fixed_receipt,
+                     "transport_retention_off":transport_receipt,
+                     "history_reset_reequilibrated":reset_receipt},
+-        "transfer_status":"NOT_IMPLEMENTED_NO_SOURCE_SUPPORTED_COEFFICIENT",
++        "parameterized_transfer":transfer_receipt,
++        "transfer_status":"GENERIC_CONSERVATIVE_OPERATOR_QUALIFIED_PHYSICAL_COEFFICIENT_UNAVAILABLE",
+         "scope":"populated accepted original spatial PF state; orthogonal diagnostic consumers; no production calibration or tip/bulk transfer",
+     }
+     out.mkdir(parents=True,exist_ok=False)
+diff --git a/tests/test_tip_bulk_population_transfer_v1.py b/tests/test_tip_bulk_population_transfer_v1.py
+new file mode 100644
+index 00000000..5240fc59
+--- /dev/null
++++ b/tests/test_tip_bulk_population_transfer_v1.py
+@@ -0,0 +1,44 @@
++import numpy as np
++import pytest
++
++from arrhenius_fracture.tip_bulk_population_transfer_v1 import (
++    conservative_tip_bulk_transfer,
++)
++
++
++def test_parameterized_tip_to_bulk_transfer_is_positive_and_conservative():
++    tip=np.array([4.0,3.0,2.0,1.0]); bulk=np.array([2.0e12,1.0e12])
++    area=np.array([1.0e-12,2.0e-12])
++    new_tip,new_bulk,row=conservative_tip_bulk_transfer(
++        tip,bulk,area,direction="tip_to_bulk",requested_line_content=5.0,
++        tip_support_weights=np.ones(4),bulk_support_weights=np.array([1.0,3.0]),
++    )
++    assert row["transferred_line_content"]==5.0
++    assert np.sum(new_tip)+np.sum(new_bulk*area)==pytest.approx(
++        np.sum(tip)+np.sum(bulk*area),abs=1e-13,
++    )
++    assert np.all(new_tip>=0.0) and np.all(new_bulk>=0.0)
++    assert row["physical_transfer_coefficient"] is None
++
++
++def test_parameterized_bulk_to_tip_transfer_caps_at_available_support():
++    tip=np.zeros(3); bulk=np.array([2.0,4.0]); area=np.array([1.0,1.0])
++    new_tip,new_bulk,row=conservative_tip_bulk_transfer(
++        tip,bulk,area,direction="bulk_to_tip",requested_line_content=20.0,
++        tip_support_weights=np.array([1.0,2.0,1.0]),bulk_support_weights=np.ones(2),
++    )
++    assert row["limited_by_available_population"]
++    assert row["transferred_line_content"]==6.0
++    assert np.sum(new_tip)==pytest.approx(6.0)
++    assert np.sum(new_bulk*area)==pytest.approx(0.0,abs=1e-15)
++
++
++@pytest.mark.parametrize("direction",["tip_to_bulk","bulk_to_tip"])
++def test_zero_transfer_is_exact_noop(direction):
++    tip=np.array([1.0,2.0]); bulk=np.array([3.0]); area=np.array([2.0])
++    a,b,row=conservative_tip_bulk_transfer(
++        tip,bulk,area,direction=direction,requested_line_content=0.0,
++        tip_support_weights=np.ones(2),bulk_support_weights=np.ones(1),
++    )
++    np.testing.assert_array_equal(a,tip); np.testing.assert_array_equal(b,bulk)
++    assert row["conservation_residual_line_content"]==0.0

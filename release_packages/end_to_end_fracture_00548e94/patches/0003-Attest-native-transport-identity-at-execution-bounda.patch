@@ -1,0 +1,104 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@Shens-MBP.lan>
+Date: Thu, 15 Oct 2026 08:34:13 -0700
+Subject: [PATCH 03/32] Attest native transport identity at execution boundary
+
+---
+ .../sharp_front_v10_2_27_audited.py           | 39 +++++++++++++++----
+ tests/test_f1_no_physics_fallback.py          | 19 +++++++++
+ 2 files changed, 50 insertions(+), 8 deletions(-)
+
+diff --git a/arrhenius_fracture/sharp_front_v10_2_27_audited.py b/arrhenius_fracture/sharp_front_v10_2_27_audited.py
+index 37565e84..6df7c9c3 100644
+--- a/arrhenius_fracture/sharp_front_v10_2_27_audited.py
++++ b/arrhenius_fracture/sharp_front_v10_2_27_audited.py
+@@ -37,6 +37,32 @@ def _option_value(args: list[str], name: str) -> str | None:
+     return None
+ 
+ 
++def _persistent_execution_binding(records: list[dict]) -> dict:
++    transport_modes = sorted({
++        str(row.get("signed_transport_mode", "")) for row in records
++    })
++    exchange_modes = sorted({
++        str(row.get("exchange_transport_mode", "")) for row in records
++    })
++    return {
++        "schema": "persistent-native-execution-binding/1",
++        "requested_lifecycle": "persistent_reusable",
++        "finite_inventory_substitute_started": False,
++        "all_expected_methods_bound": bool(records) and all(
++            row["all_expected_methods_bound"] for row in records
++        ),
++        "signed_transport_mode": (
++            transport_modes[0] if len(transport_modes) == 1 else None
++        ),
++        "observed_signed_transport_modes": transport_modes,
++        "exchange_transport_mode": (
++            exchange_modes[0] if len(exchange_modes) == 1 else None
++        ),
++        "observed_exchange_transport_modes": exchange_modes,
++        "records": records,
++    }
++
++
+ def main(argv=None):
+     args = list(sys.argv[1:] if argv is None else argv)
+     install_front_direction_fix()
+@@ -56,14 +82,11 @@ def main(argv=None):
+             write_energy_ledger_audit(Path(out))
+             records = AuditedPersistentSiteStateResolvedTipEngine.persistent_runtime_binding_records
+             (Path(out) / "persistent_native_runtime_binding.json").write_text(
+-                json.dumps({
+-                    "schema": "persistent-native-execution-binding/1",
+-                    "requested_lifecycle": "persistent_reusable",
+-                    "finite_inventory_substitute_started": False,
+-                    "all_expected_methods_bound": bool(records) and all(
+-                        row["all_expected_methods_bound"] for row in records),
+-                    "records": records,
+-                }, indent=2, sort_keys=True) + "\n"
++                json.dumps(
++                    _persistent_execution_binding(records),
++                    indent=2,
++                    sort_keys=True,
++                ) + "\n"
+             )
+         return result
+     finally:
+diff --git a/tests/test_f1_no_physics_fallback.py b/tests/test_f1_no_physics_fallback.py
+index 7b163148..7761d37c 100644
+--- a/tests/test_f1_no_physics_fallback.py
++++ b/tests/test_f1_no_physics_fallback.py
+@@ -18,6 +18,9 @@ from arrhenius_fracture.shared_options import PRESETS, SharedOptions, TransportS
+ from arrhenius_fracture.signed_burgers_shared_v1025 import (
+     _signed_evolve_channel, _signed_evolve_scalar,
+ )
++from arrhenius_fracture.sharp_front_v10_2_27_audited import (
++    _persistent_execution_binding,
++)
+ 
+ 
+ def _bound_state(transport="validated_scalar"):
+@@ -59,6 +62,22 @@ def test_channel_resolved_bound_object_has_its_own_truthful_contract():
+     assert "per-slip-system" in receipt["physical_contract"]["transport"]
+ 
+ 
++def test_outer_execution_receipt_preserves_unique_nested_transport_identity():
++    records = [
++        {"all_expected_methods_bound": True,
++         "signed_transport_mode": "channel_resolved",
++         "exchange_transport_mode": "legacy_split"},
++        {"all_expected_methods_bound": True,
++         "signed_transport_mode": "channel_resolved",
++         "exchange_transport_mode": "legacy_split"},
++    ]
++    receipt = _persistent_execution_binding(records)
++    assert receipt["signed_transport_mode"] == "channel_resolved"
++    assert receipt["exchange_transport_mode"] == "legacy_split"
++    records[1]["signed_transport_mode"] = "validated_scalar"
++    assert _persistent_execution_binding(records)["signed_transport_mode"] is None
++
++
+ def test_split_exchange_selection_fails_closed_even_when_outer_wrapper_matches():
+     state = _bound_state()
+     state._exchange_transport_mode = "legacy_split"

@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Shen <shen@dhcp009035.mobile.eng.uci.edu>
+Date: Thu, 15 Oct 2026 09:48:09 -0700
+Subject: [PATCH 09/32] Record native cracked-body plane-stress qualification
+
+---
+ CAPABILITY_PRESERVATION_MATRIX.csv |  2 +-
+ FRAMEWORK_COMPLETION_LEDGER.json   | 10 +++++-----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/CAPABILITY_PRESERVATION_MATRIX.csv b/CAPABILITY_PRESERVATION_MATRIX.csv
+index fc31c4cc..c82ff385 100644
+--- a/CAPABILITY_PRESERVATION_MATRIX.csv
++++ b/CAPABILITY_PRESERVATION_MATRIX.csv
+@@ -26,5 +26,5 @@ FEM02,"historical elastic FEM/J reference","run_v10_0_5_11_same_mesh_energy_audi
+ FEM03,"controlled current pre-event FEM support and observer convergence","run_fem_baseline_reconciliation_v1.py","path-envelope support h/Lpz=0.245,0.18,0.12; 180/240/300um J domains","current FEM continuation of 14bc458/a015a36 native baseline","fem-baseline-reconciliation-v1 plus matched virtual extension","projected killed-band G retained separately; centered total-energy material-coordinate derivative matched to native full-energy J","v10.0.5.18.3.4 physical path-envelope provider","three independently solved physical-support levels; no constitutive or consumed-drive change","test_fem_baseline_reconciliation_v1.py",PASS_SUPPORT_AND_MATCHED_OPERATION,"medium-to-fine reaction/energy=0.2276%; projected-band G=1.5871%; J=0.4172%; matched outer virtual G=0.1319%; maximum outer J/G mismatch=0.8618%; old fine projected-band J/G=0.82294 remains explicitly a different operation"
+ FEM04,"moving-tip cohesive topology and state lifecycle","v10.0.5.18.3.9 atomic path corridor and native state classes","actual event plus discriminating transition tests and generic --restart-from","current FEM line plus retained historical transition evidence","fem-czm-specimen-checkpoint/1; atomic corridor/event/state/restart receipts","event and state audit modules","triangle==20250106 in dedicated FEM package; verified refinement-provider attestation","native-owner serializers connected through generic specimen entry; persisted provider fallback verified fail-closed","test_atomic_path_corridor_v10051839.py; test_event_driven_remesh_v914.py; test_bulk_remesh_transfer_v911.py; test_moving_tip_coupling_v100515.py; test_bilinear_czm_native.py; test_specimen_restart_v1.py; test_generic_current_pf_companion.py",PASS_GENERIC_NATIVE_LOAD_CONTINUE,"current-law checkpoint at step121 resumes in a fresh process through two physical atomic events at steps140/142, six numerical cohesive subsegments, remeshed equilibrium to step145, and active post-event restart to step146; retained four-event historical evidence and failed receipts preserved"
+ FEM05,"native opening-only channel ownership and independent PF/FEM comparison","generic_current_pf_companion plus sharp_front_v10_1 mechanics reference","accommodation_mode=opening_only; three independent support levels per backend; total opening 2e-7 m","PF preserved native mechanics plus FEM 784c57f","generic companion contract; pf-fem-common-mechanics-comparison/1","qualify_pf_fem_common_mechanics.py","native emission/transport owners; FEM observer receipt","FEM generic adapter disables accommodation at the most-derived stochastic owner; PF/FEM observers are compared without scaling","test_opening_only_native_v1.py; test_pf_fem_common_mechanics_qualification.py",PASS_CONVERGED_DISTINCT_REPRESENTATIONS,"FEM opening-only execution has exact zero accommodation state; PF medium-to-fine reaction/K changes 0.02014%/0.00113%; FEM reaction/J changes 0.22764%/0.41724%; fine PF/FEM reaction and energy ratio 1.118727 retained as representation offset"
+-FEM06,"autonomous bilinear native cracked-body specimen","bilinear_cohesive_specimen_v1","constructed qualification material; autonomous irreversible bilinear; initial precrack","FEM 0d7fca3/6db9cfc plus R04 fit registry","native-plane-strain-autonomous-bilinear-specimen-v1/checkpoint-1","qualify_bilinear_cohesive_specimen_v1.py","native bulk/cohesive assemblers; explicit interface work and stiffness","opt-in duplicated-interface specimen; no production default or fitted-material substitution","test_bilinear_cohesive_specimen_v1.py; test_bilinear_czm_native.py",PASS_NATIVE_SPECIMEN_RESTART,"damage initiation, irreversible unloading, terminal separation and exact active-state restart pass; Peak/DBTT/weakT/ceramic barriers are kinetically evaluable, while autonomous physical mapping remains incomplete because activation area and separation work are absent"
++FEM06,"autonomous bilinear native cracked-body specimen and plane-state consumer","bilinear_cohesive_specimen_v1","constructed qualification material; autonomous irreversible bilinear; initial precrack; plane strain or plane stress","FEM 0d7fca3 through f748cfa plus R04 fit registry","native-plane-strain-autonomous-bilinear-specimen-v1/checkpoint-1","qualify_bilinear_cohesive_specimen_v1.py","native bulk/cohesive assemblers; explicit interface work and stiffness","opt-in duplicated-interface specimen; native plane-state assembly; no production default or fitted-material substitution","test_bilinear_cohesive_specimen_v1.py; test_bilinear_czm_native.py",PASS_NATIVE_SPECIMEN_AND_PLANE_STATE_RESTART,"damage initiation, irreversible unloading, terminal separation and exact active-state restart pass; plane stress is a distinct more-compliant cracked-body response and restarts exactly; generalized/mixity remain pending; Peak/DBTT/weakT/ceramic barriers are kinetically evaluable while autonomous physical mapping lacks activation area/work"
+ PLOT01,"scalar and native-field plotting","existing scripts","presentation and diagnostics","existing plotters + donors","legacy/new schema loaders","propagation/fatigue/branch/cavity figures","matplotlib; field fixtures","schema adapters and plot smoke","test_observation_plotting_smoke.py",PASS,"new_full_pf_1000um_K_history.png; protected plot"
+diff --git a/FRAMEWORK_COMPLETION_LEDGER.json b/FRAMEWORK_COMPLETION_LEDGER.json
+index f9b3d119..597c2bac 100644
+--- a/FRAMEWORK_COMPLETION_LEDGER.json
++++ b/FRAMEWORK_COMPLETION_LEDGER.json
+@@ -161,16 +161,16 @@
+     {
+       "id": "R07",
+       "goal_ids": ["FG-08", "FG-09", "FG-10"],
+-      "status": "PARTIAL_NUMERICAL_QUALIFICATION",
+-      "concrete_defect": "Affine transverse control is correct, and the retained native mixed-mode control tests pass in the FEM environment together with cohesive/remesh/restart transitions. Cracked-body constitutive state, hazards, observers and restart still do not carry all declared plane-stress/generalized-constraint and mixity paths, so the focused pass does not close R07.",
++      "status": "PARTIAL_NATIVE_CRACKED_BODY_PLANE_STRESS_QUALIFIED_GENERALIZED_AND_MIXITY_PENDING",
++      "concrete_defect": "Plane stress is now consumed by the independent native cracked cohesive specimen rather than remaining a patch-only tensor option. On the same mesh, cohesive law and opening it produces a distinct, more compliant reaction than plane strain, and its complete active state restarts exactly. Affine generalized transverse controls and retained native mixed-mode component tests still pass, but generalized transverse control and mode-I/mode-II mixity are not yet carried together through the cracked-body constitutive, hazard, observer and restart path.",
+       "owner_consumer": "PF/FEM cracked-body solvers and mechanism tensor projections",
+       "authoritative_source": "mechanics constraint contract and native cracked-body fields",
+       "dependencies": ["R01", "R03"],
+-      "exact_next_command": "python scripts/qualify_cracked_body_constraints.py --compact --output integration_evidence/cracked_constraint_<commit>",
++      "exact_next_command": "extend the native cracked-specimen state with explicit generalized transverse work/control and mode-I/mode-II grip loading, then run the same active-state restart and tensor-consumer trace",
+       "input_output_identity": "plane strain, plane stress and explicit generalized control; mode I/II separate",
+       "numerical_criteria": "Nonuniform active state, tensor-consumer trace, response refinement and active-update restart.",
+-      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json"],
+-      "remaining_limitation": "Cracked-body path incomplete; no 3-D claim."
++      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@889f334:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@f748cfa:integration_evidence/r05_r07_bilinear_constraints_889f334/qualification_report.json"],
++      "remaining_limitation": "The native cracked-body plane-strain and plane-stress mode-I paths are qualified. Generalized prescribed epsilon_zz/sigma_zz, mode II and mixed I/II remain patch/component capabilities not yet connected to the cracked specimen; no mode III or 3-D claim is made."
+     },
+     {
+       "id": "R08",

@@ -1,0 +1,29 @@
+{
+  "schema": "end-to-end-fracture-review-package/1",
+  "created_date": "2026-10-15",
+  "production_execution_authorized": false,
+  "manuscript_modification_authorized": false,
+  "pf": {
+    "branch": "codex/shared-fracture-fatigue-options-v1",
+    "reference_commit": "9a2e35b50baa9effb15bf0f65bbd9e088660f29a",
+    "packaged_commit": "00548e94",
+    "archive": "pf_source_00548e94.tar.gz",
+    "archive_sha256": "5afd8bf0e8e3e04773f9afcca290e502de99fc60819e9e9bcea8a4d0447bd449",
+    "patch_count_from_reference": 32,
+    "patch_directory": "patches"
+  },
+  "fem_czm": {
+    "branch": "codex/current-pf-companion",
+    "packaged_commit": "7557ba8fc37e0466ee56fd60f6370275c8146245",
+    "archive": "fem_source_7557ba8.tar.gz",
+    "archive_sha256": "e5a187a675cfa370bc2511b07bc561489594230ac6da7576209e63b03d7ac974"
+  },
+  "framework_records": [
+    "../../FRAMEWORK_COMPLETION_LEDGER.json",
+    "../../CAPABILITY_PRESERVATION_MATRIX.csv",
+    "../../common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
+    "../../common_framework_readiness/CAMPAIGN_V3_SUMMARY.json",
+    "../../common_framework_readiness/p3_history_reset_qualification_073e0e88/LIFECYCLE_QUALIFICATION.json"
+  ],
+  "scope": "Reviewable local source pair and PF patch series. Large production execution, manuscript changes, remote writes and scientific-data deletion are excluded."
+}
