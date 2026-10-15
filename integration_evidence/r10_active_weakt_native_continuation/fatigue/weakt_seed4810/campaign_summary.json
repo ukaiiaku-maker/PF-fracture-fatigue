@@ -1,0 +1,188 @@
+{
+  "cases": [
+    {
+      "DeltaK_MPa_sqrt_m": 5.000000004,
+      "Kmax_MPa_sqrt_m": 5.55555556,
+      "event_count": 12,
+      "final_cycles": 9581294.972801886,
+      "final_extension_m": 8.054507770624631e-05,
+      "overlap": {
+        "explicit_hazard_action": 1.8107030056824967e-06,
+        "hazard_relative_error": 0.0014029152646202225,
+        "mean_hazard_action": 1.8132468373491381e-06,
+        "mean_inputs": {
+          "cycles": 1,
+          "emission_weighted_stress_Pa": 2136936502.092764,
+          "hazard_action_per_cycle": 1.8132468373491381e-06,
+          "mean_cleavage_rate_s-1": 0.001813246837349138,
+          "sigma_max_Pa": 2215144645.3814178,
+          "sigma_min_Pa": 222835959.0221667
+        },
+        "micro_translation_relative_error": 4.675237187436657e-84,
+        "passed": false,
+        "phase_count": 64,
+        "state_relative_max_error": 0.35994677032563277
+      },
+      "result": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/fatigue/weakt_seed4810/Kmax_5p55555556/result.json",
+      "status": "developed_target_completed"
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 7.000000002,
+      "Kmax_MPa_sqrt_m": 7.77777778,
+      "event_count": 12,
+      "final_cycles": 2554528.7876193775,
+      "final_extension_m": 8.054507770624631e-05,
+      "overlap": {
+        "explicit_hazard_action": 7.104695351408116e-06,
+        "hazard_relative_error": 0.012058862583459786,
+        "mean_hazard_action": 7.191415644445022e-06,
+        "mean_inputs": {
+          "cycles": 1,
+          "emission_weighted_stress_Pa": 2970801584.3648353,
+          "hazard_action_per_cycle": 7.191415644445022e-06,
+          "mean_cleavage_rate_s-1": 0.007191415644445021,
+          "sigma_max_Pa": 3101202501.93908,
+          "sigma_min_Pa": 311970342.4705914
+        },
+        "micro_translation_relative_error": 1.593808050384122e-82,
+        "passed": false,
+        "phase_count": 64,
+        "state_relative_max_error": 0.5723847618148552
+      },
+      "result": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/fatigue/weakt_seed4810/Kmax_7p77777778/result.json",
+      "status": "developed_target_completed"
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 9.999999990000001,
+      "Kmax_MPa_sqrt_m": 11.1111111,
+      "event_count": 12,
+      "final_cycles": 672280.1401710184,
+      "final_extension_m": 8.054507770624631e-05,
+      "overlap": {
+        "explicit_hazard_action": 2.8843378993194095e-05,
+        "hazard_relative_error": 0.05885134088440718,
+        "mean_hazard_action": 3.064699578948401e-05,
+        "mean_inputs": {
+          "cycles": 1,
+          "emission_weighted_stress_Pa": 4180582946.9556785,
+          "hazard_action_per_cycle": 3.064699578948401e-05,
+          "mean_cleavage_rate_s-1": 0.030646995789484013,
+          "sigma_max_Pa": 4430289282.788315,
+          "sigma_min_Pa": 445671917.24212354
+        },
+        "micro_translation_relative_error": 3.31481694660745e-81,
+        "passed": false,
+        "phase_count": 64,
+        "state_relative_max_error": 0.38766200589025374
+      },
+      "result": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/fatigue/weakt_seed4810/Kmax_11p1111111/result.json",
+      "status": "developed_target_completed"
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 15.00000003,
+      "Kmax_MPa_sqrt_m": 16.6666667,
+      "event_count": 12,
+      "final_cycles": 334564.86093608,
+      "final_extension_m": 8.054507770624631e-05,
+      "overlap": {
+        "explicit_hazard_action": 8.185045081237537e-05,
+        "hazard_relative_error": 0.47038674292182714,
+        "mean_hazard_action": 0.00015454758678802095,
+        "mean_inputs": {
+          "cycles": 1,
+          "emission_weighted_stress_Pa": 6064847096.883046,
+          "hazard_action_per_cycle": 0.00015454758678802095,
+          "mean_cleavage_rate_s-1": 0.15454758678802094,
+          "sigma_max_Pa": 6645433944.118773,
+          "sigma_min_Pa": 668507877.8687096
+        },
+        "micro_translation_relative_error": 1.336080362511552e-79,
+        "passed": false,
+        "phase_count": 64,
+        "state_relative_max_error": 1.0
+      },
+      "result": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/fatigue/weakt_seed4810/Kmax_16p6666667/result.json",
+      "status": "developed_target_completed"
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 21.99999996,
+      "Kmax_MPa_sqrt_m": 24.4444444,
+      "event_count": 12,
+      "final_cycles": 310880.91796795744,
+      "final_extension_m": 8.054507770624631e-05,
+      "overlap": {
+        "explicit_hazard_action": 0.0002125206097334722,
+        "hazard_relative_error": 0.6874421073903074,
+        "mean_hazard_action": 0.0006799399879460342,
+        "mean_inputs": {
+          "cycles": 1,
+          "emission_weighted_stress_Pa": 8427406848.877989,
+          "hazard_action_per_cycle": 0.0006799399879460342,
+          "mean_cleavage_rate_s-1": 0.6799399879460342,
+          "sigma_max_Pa": 9746636414.15977,
+          "sigma_min_Pa": 980478217.1304641
+        },
+        "micro_translation_relative_error": 8.590570232318126e-79,
+        "passed": false,
+        "phase_count": 64,
+        "state_relative_max_error": 1.0
+      },
+      "result": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/fatigue/weakt_seed4810/Kmax_24p4444444/result.json",
+      "status": "developed_target_completed"
+    }
+  ],
+  "preflight": {
+    "backend": "R8_RESTORED_PERSISTENT_REVERSIBLE_CURRENT_BACKEND",
+    "binding": {
+      "barrier_changed": false,
+      "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "complete_row_sha256": "8ffdbb1084e3465b3ded48e223b72546e42985d4f7716e209a27517b5f1fac44",
+      "event_law_changed": false,
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "historical_engine_loaded": false,
+      "mechanics_changed": false,
+      "source": {
+        "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/thermal_state_candidates.csv",
+        "sha256": "b3a6c897ef9216931c950065579ce57817abe444c25c8333a03bc80aef1b704b"
+      },
+      "translation": "EXACT_RETAINED_ROW_TO_CURRENT_PERSISTENT_REVERSIBLE_INTERFACES"
+    },
+    "kernel": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+      "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+    },
+    "loading": {
+      "Kmax_MPa_sqrt_m": [
+        5.55555556,
+        7.77777778,
+        11.1111111,
+        16.6666667,
+        24.4444444
+      ],
+      "R": 0.1,
+      "frequency_Hz": 1000.0,
+      "phase_count": 64,
+      "temperature_K": 300.0
+    },
+    "local_strength_Pa": 30000000000.0,
+    "local_strength_role": "independent qualified mechanical coordinate; not barrier knee",
+    "native_numerical_controls": {
+      "DMD_chain_growth_factor": 8.0,
+      "all_projected_segments_require_existing_state_hazard_ledger_positivity_and_event_guard_validation": true
+    },
+    "schema": "r10.retained-current-bridge/1",
+    "stochastic": {
+      "mark": "unit_exponential",
+      "owner": "PCG64_SeedSequence_[seed,1]",
+      "reward": "threshold_scaled_bounded",
+      "seed": 4810
+    },
+    "stops": {
+      "maximum_cycles": 1000000000000.0,
+      "maximum_events": 40,
+      "target_events": 12,
+      "target_extension_um": 70.0
+    },
+    "trajectory": "R9_PHASE_EXACT_STOCHASTIC_WITH_TRANSACTIONAL_MEAN_OR_NATIVE_HIGH_CYCLE_BLOCKS"
+  }
+}

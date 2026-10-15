@@ -1,0 +1,26 @@
+{
+  "branch": "codex/r10-joint-fracture-fatigue-continuation",
+  "export_reconciled_commit": "13c13bbe58a3fe1eca34a7a135232e28258882e3",
+  "package_source_commit": "d30a6d5e",
+  "continuation_commits": [
+    "88ab74ec",
+    "b65b728a",
+    "e344e6b4",
+    "d30a6d5e"
+  ],
+  "initial_live_state": {
+    "active_job_owner": null,
+    "selected_candidate": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+    "accepted_checkpoint_cycles": 0,
+    "accepted_checkpoint_events": 0,
+    "mean_cycle_overlap_state_error": 0.35994677032563277,
+    "continuation_already_executed": false
+  },
+  "preservation": {
+    "previous_export_modified": false,
+    "parameter_search_restarted": false,
+    "barrier_family_changed": false,
+    "mechanics_formulation_changed": false,
+    "completed_DBTT_or_Peak_ladder_repeated": false
+  }
+}
