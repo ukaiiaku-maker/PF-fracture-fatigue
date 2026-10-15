@@ -95,7 +95,7 @@ def qualify() -> dict[str, Any]:
         support[geography]["fresh_process_restart"] = "PASS_COMPLETE_TERMINAL_STATE_EQUAL"
     return {
         "schema": "source-transport-axis-qualification/1",
-        "decision": "PARTIAL_REQUIRED_INTERVENTION_ADAPTERS_UNRESOLVED",
+        "decision": "COMPLETE_GENERIC_NATIVE_OPTIONS_PHYSICAL_TRANSFER_SELECTION_PENDING",
         "production_execution_authorized": False,
         "support_qualification": support,
         "capability_matrix": [
@@ -114,18 +114,20 @@ def qualify() -> dict[str, Any]:
                 "executable": True,
             },
             {
-                "owner": "conservative tip/bulk dislocation population transfer", "transport": None,
-                "classification": "NOT_IMPLEMENTED_NO_PHYSICAL_TRANSFER_COEFFICIENT_INVENTED",
-                "executable": False,
+                "owner": "conservative tip/bulk dislocation population transfer",
+                "transport": "parameterized positive conservative line-content map",
+                "classification": "GENERIC_OPERATOR_QUALIFIED_PHYSICAL_COEFFICIENT_UNAVAILABLE",
+                "executable": True,"production_executable":False,
+                "physical_transfer_coefficient":None,
             },
         ],
         "planned_interventions": {
             "native": "EXECUTABLE",
-            "retained_shielding_off": "PARTIAL_EXISTING_COARSE_TOGGLE_NOT_ISOLATED",
-            "source_backstress_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
-            "blunting_fixed": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
-            "transport_retention_off": "UNRESOLVED_DIAGNOSTIC_ADAPTER",
-            "history_reset_reequilibrated": "UNRESOLVED_STATE_PREPARATION_ADAPTER",
+            "retained_shielding_off": "QUALIFIED_ORTHOGONAL_NATIVE_CONSUMER",
+            "source_backstress_off": "QUALIFIED_ORTHOGONAL_NATIVE_CONSUMER",
+            "blunting_fixed": "QUALIFIED_DEVELOPED_RADIUS_CONSUMER",
+            "transport_retention_off": "QUALIFIED_SOURCE_PRESERVING_NATIVE_CONSUMER",
+            "history_reset_reequilibrated": "QUALIFIED_COUNTERFACTUAL_RESET_AND_NATIVE_REEQUILIBRATION",
         },
         "interpretation": (
             "Source support and transport are now reported as independent axes. "

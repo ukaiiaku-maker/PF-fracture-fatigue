@@ -22,10 +22,12 @@ def test_source_transport_axes_use_active_native_histories():
     assert all(row["full_mechanics_history_present"] for row in support.values())
 
 
-def test_missing_transfer_is_not_promoted_to_an_executable_model():
+def test_generic_transfer_is_distinct_from_missing_physical_coefficient():
     if not TIP_ONLY.is_dir() or not GEOGRAPHY.is_dir():
         pytest.skip("manifest-backed source geography evidence is absent")
     report = qualify()
     transfer = report["capability_matrix"][-1]
-    assert transfer["executable"] is False
-    assert transfer["classification"].startswith("NOT_IMPLEMENTED")
+    assert transfer["executable"] is True
+    assert transfer["production_executable"] is False
+    assert transfer["physical_transfer_coefficient"] is None
+    assert transfer["classification"].endswith("PHYSICAL_COEFFICIENT_UNAVAILABLE")
