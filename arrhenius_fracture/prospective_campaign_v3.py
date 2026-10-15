@@ -7,6 +7,7 @@ It is a construction/audit artifact: production permission is always false.
 from __future__ import annotations
 
 import csv
+from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
@@ -14,6 +15,7 @@ from typing import Any
 
 from .prospective_campaign import build_cases
 from .prospective_campaign_v2 import build_cases_v2
+from .shared_options import PRESETS
 
 
 SCHEMA = "prospective-common-fracture-campaign/3"
@@ -25,6 +27,13 @@ DBTT_QUALIFICATION_REGISTRY = (
 )
 DBTT_QUALIFICATION_OPTION = (
     "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification"
+)
+SIGNED_KERNEL_FAMILY = (
+    "/Volumes/Data/Data/Nanopillar_calculation/"
+    "PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/"
+    "v10_2_28_kernel_cache/"
+    "4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873/"
+    "family.json"
 )
 ALL_GOALS = tuple(f"FG-{index:02d}" for index in range(1, 19))
 STATUS_AXES = (
@@ -100,7 +109,7 @@ def _execution(row: dict[str, Any]) -> dict[str, Any]:
         status["implementation"] == "IMPLEMENTED"
         and status["input_availability"].startswith("AVAILABLE_")
     )
-    return {
+    execution = {
         "launcher": [
             "python", "-m", "arrhenius_fracture.shared_execution_worker",
             "{case_request_json}",
@@ -118,6 +127,77 @@ def _execution(row: dict[str, Any]) -> dict[str, Any]:
             if value.startswith(("PENDING", "BLOCKED", "DENIED", "UNRESOLVED"))
         ],
     }
+    if row.get("shared_options") is not None:
+        execution["shared_options"] = row["shared_options"]
+    return execution
+
+
+def _fem_native_args(
+    root: Path, row: dict[str, Any], *, registry: str, option: str,
+) -> list[str]:
+    """Construct the already-qualified generic native FEM/CZM request shape."""
+    target_um = float(row["target_extension_um"])
+    rate = float(row["rate_factor"])
+    accommodation = (
+        "active_tip" if row["arm"] == "accommodation" else "opening_only"
+    )
+    return [
+        "--material-registry", str((root / registry).resolve()),
+        "--parameter-option", option,
+        "--constraint", "plane_strain",
+        "--source-scope", "tip_only",
+        "--accommodation-mode", accommodation,
+        "--opening-model", "exp_floor_activated_native",
+        "--signed-kernel-family", SIGNED_KERNEL_FAMILY,
+        "--mode", "2d",
+        "--temperatures", f"{float(row['temperature_K']):g}",
+        "--steps", "200000" if target_um >= 1000.0 else "1000",
+        "--nx", "36", "--ny", "72",
+        "--tip-h-fine", "1e-6", "--tip-ratio", "1.20",
+        "--dU", "1e-7", "--dt", f"{4.2 / rate:.17g}",
+        "--n-stagger", "2", "--print-every", "200",
+        "--adaptive-events", "--adaptive-event-target", "0.15",
+        "--adaptive-min-frac", "1e-8", "--adaptive-grow", "4",
+        "--da-phys", "5e-6",
+        "--target-crack-extension-um", f"{target_um:g}",
+        "--crystal-aniso", "--crystal-compete",
+        "--crystal-theta-deg", f"{float(row['orientation_deg']):g}",
+        "--min-global-forward", "0.05",
+        "--crystal-C11", "523e9", "--crystal-C12", "203e9",
+        "--crystal-C44", "160e9", "--cleave-gamma-aniso", "0.3",
+        "--crystal-material", "w", "--max-fronts", "1",
+        "--crack-backend", "adaptive_czm",
+        "--czm-max-angle-error-deg", "35", "--j-decomposition", "cluster",
+        "--mpz-length-m", "50e-6", "--mpz-n-bins", "80",
+    ]
+
+
+def _bind_generic_fem(root: Path, converted: dict[str, Any]) -> None:
+    """Bind P8 to current generic FEM source without authorizing production."""
+    registry = str(converted["parameter_registry"])
+    option = str(converted["parameter_option"])
+    if converted["family"] == "DBTT" and converted["eligibility"] != "ELIGIBLE":
+        converted["requested_parameter_option"] = option
+        registry = DBTT_QUALIFICATION_REGISTRY
+        option = DBTT_QUALIFICATION_OPTION
+        converted["parameter_registry"] = registry
+        converted["parameter_option"] = option
+        converted["material_selection_scope"] = "QUALIFICATION_ONLY"
+        converted["production_parameter_option"] = None
+        converted["qualification_material_provenance"] = (
+            "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/"
+            "qualification_report.json"
+        )
+    converted["native_entrypoint"] = (
+        "arrhenius_fracture.generic_current_pf_companion"
+    )
+    converted["native_args"] = _fem_native_args(
+        root, converted, registry=registry, option=option,
+    )
+    converted["shared_options"] = replace(
+        PRESETS["fem_czm_generic_current"], random_seed=int(converted["seed"]),
+    ).to_dict()
+    converted["command_status"] = "RESOLVED_DISABLED"
 
 
 def _convert_v2(
@@ -157,6 +237,8 @@ def _convert_v2(
     else:
         converted["material_selection_scope"] = "PROSPECTIVE_OR_PARENT"
         converted["parameter_registry"] = REGISTRY
+    if converted.get("block") == "P8":
+        _bind_generic_fem(root, converted)
     converted["cohesive_law"] = {
         "kind": "original_activated_opening",
         "temperature_policy": "native_temperature_matched",
@@ -181,6 +263,18 @@ def _convert_v2(
         "dense_movie_required": False,
     }
     converted["readiness"] = _statuses(converted)
+    if converted.get("block") == "P8":
+        converted["readiness"].update({
+            "implementation": "IMPLEMENTED",
+            "native_qualification": "GENERIC_ENTRY_DRY_RUN_QUALIFIED_CASE_LEVEL_PENDING",
+            "kernel_validity": "BOUND_NATIVE_KERNEL_COMMON_OBSERVER_CONVERGENCE_PENDING",
+            "numerical_convergence": "PENDING_THREE_LEVEL_CASE_GRID",
+            "input_availability": (
+                "AVAILABLE_QUALIFICATION_INPUT_PRODUCTION_SELECTION_PENDING"
+                if converted.get("material_selection_scope") == "QUALIFICATION_ONLY"
+                else "AVAILABLE_VERSIONED_INPUTS"
+            ),
+        })
     converted["execution"] = _execution(converted)
     converted["production_execution_authorized"] = False
     return converted

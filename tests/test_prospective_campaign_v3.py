@@ -39,7 +39,8 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         row for row in rows
         if row.get("material_selection_scope") == "QUALIFICATION_ONLY"
     ]
-    assert len(dbtt_qualification) == 66
+    # 66 PF cells plus the two formerly inadmissible 1000 K P8 cells.
+    assert len(dbtt_qualification) == 68
     assert all(row["native_args"] for row in dbtt_qualification)
     assert all(row["production_parameter_option"] is None for row in dbtt_qualification)
     assert {row["parameter_option"] for row in dbtt_qualification} == {
@@ -50,6 +51,25 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         and row["readiness"]["input_availability"].startswith("AVAILABLE_")
         for row in dbtt_qualification
     )
+
+    fem = [row for row in rows if row["block"] == "P8"]
+    assert len(fem) == 22
+    assert all(row["native_args"] for row in fem)
+    assert all(
+        row["native_entrypoint"]
+        == "arrhenius_fracture.generic_current_pf_companion"
+        for row in fem
+    )
+    assert all(
+        row["shared_options"]["fem_entry"] == "generic_current_pf_companion"
+        for row in fem
+    )
+    assert all(row["command_status"] == "RESOLVED_DISABLED" for row in fem)
+    assert all(row["readiness"]["implementation"] == "IMPLEMENTED" for row in fem)
+    assert sum(
+        row.get("material_selection_scope") == "QUALIFICATION_ONLY"
+        for row in fem
+    ) == 2
 
 
 def test_v3_summary_has_all_goal_records_and_distinct_digests():
