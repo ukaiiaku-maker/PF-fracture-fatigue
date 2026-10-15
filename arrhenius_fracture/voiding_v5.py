@@ -374,6 +374,58 @@ def create_subgrid_cavity(state: ProductionVoidState, site_id: str,
     return result
 
 
+def initialize_preexisting_resolved_cavity(
+    state: ProductionVoidState, site_id: str, radius_m: float, *, seed: int = 84731,
+) -> ProductionVoidState:
+    """Install an imposed initial cavity without booking fictitious vacancy capture.
+
+    The cavity area is an initial-geometry contribution, not material created by
+    the vacancy-growth law.  Subsequent growth remains owned by the ordinary
+    embryo/cavity process state and must debit its normal physical inventories.
+    """
+    radius = float(radius_m)
+    if not math.isfinite(radius) or radius <= 0.0:
+        raise ValueError("preexisting cavity radius must be finite and positive")
+    site = next(item for item in state.sites if item.site_id == site_id)
+    if site.phase is not VoidPhase.AVAILABLE_SITE:
+        raise ValueError("preexisting cavity requires an unused predefined site")
+    if any(item.parent_site_id == site_id for item in state.cavities):
+        raise ValueError("preexisting cavity site already owns a cavity")
+    cavity_id = "void:" + site_id
+    area = math.pi * radius**2
+    from .embryo_growth_v1 import RESOLVED, initialize_embryo_growth_state
+    growth = initialize_embryo_growth_state(
+        site_id=site_id, radius_m=radius, initial_area_m2=area,
+        vacancy_derived_area_m2=0.0, dislocation_derived_area_m2=0.0,
+        seed=int(seed), representation=RESOLVED, cavity_id=cavity_id,
+        emission_enabled=False,
+    )
+    cavity = Cavity2D(
+        cavity_id, site_id, site.center_m, radius, area, 0.0,
+        VoidPhase.RESOLVED_VOID, geometry_generation=1,
+        lineage=(site_id, "PREEXISTING_INITIAL_GEOMETRY"),
+    )
+    sites = tuple(
+        replace(item, phase=VoidPhase.RESOLVED_VOID)
+        if item.site_id == site_id else item for item in state.sites
+    )
+    ledgers = dict(state.length_ledgers)
+    ledgers["preexisting_void_free_span_m"] = (
+        float(ledgers.get("preexisting_void_free_span_m", 0.0)) + 2.0 * radius
+    )
+    return replace(
+        state, sites=sites, cavities=state.cavities + (cavity,),
+        embryo_growth_states=state.embryo_growth_states + (growth,),
+        length_ledgers=ledgers,
+        event_history=state.event_history + ({
+            "event": "PREEXISTING_CAVITY_INITIAL_CONDITION",
+            "cavity_id": cavity_id,
+            "area_m2": area,
+            "vacancy_inventory_debit_area_m2": 0.0,
+        },),
+    )
+
+
 def grow_cavity_2d(cavity: Cavity2D, delta_radius_m: float) -> Cavity2D:
     radius = float(cavity.radius_m) + float(delta_radius_m)
     if radius <= 0.0:

@@ -135,6 +135,21 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     assert {
         row["shared_options"]["cavity"] for row in p7_native
     } == {"disabled", "full_order_v5"}
+    p7_preexisting = [
+        row for row in rows
+        if row["block"] == "P7" and row["study"] != "native_void_nucleation"
+    ]
+    assert len(p7_preexisting) == 28
+    assert all(row["native_args"] for row in p7_preexisting)
+    assert all(
+        row["cavity_geometry"]["preparation"]
+        == "native_preexisting_resolved_zero_vacancy_debit"
+        for row in p7_preexisting
+    )
+    rate = [row for row in p7_preexisting if row["study"] == "conditional_void_rate"]
+    assert len(rate) == 4
+    assert all(row["cavity_geometry"]["qualification_geometry_selection"] for row in rate)
+    assert all(row["cavity_geometry"]["production_geometry_selection"] is None for row in rate)
 
 
 def test_v3_summary_has_all_goal_records_and_distinct_digests():

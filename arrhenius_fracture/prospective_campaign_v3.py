@@ -11,6 +11,7 @@ from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
+import re
 from types import SimpleNamespace
 from typing import Any
 
@@ -346,6 +347,52 @@ def _bind_p7_native_void_pair(converted: dict[str, Any]) -> None:
     converted["qualification_interval_s"] = 0.2
 
 
+def _bind_p7_preexisting_pair(converted: dict[str, Any]) -> None:
+    """Bind a declared conditional cavity geometry to the native V5 owner."""
+    match = re.search(r"_d([0-9.]+)_r([0-9.]+)", str(converted["study"]))
+    qualification_geometry = False
+    if match:
+        separation_pz, radius_pz = map(float, match.groups())
+    else:
+        # Central member of the already-declared geometry grid, used only to
+        # exercise the independent rate axis; it is not a production default.
+        separation_pz, radius_pz = 1.0, 0.25
+        qualification_geometry = True
+    enabled = converted["cavity_mode"] == "preexisting_equilibrated"
+    preset = (
+        "pf_cavity_v5_single_front" if enabled
+        else "pf_cavity_v5_disabled_control"
+    )
+    converted["native_args"] = [
+        "--duration-s", "0.2", "--steps", "1",
+        "--transport-refinement-min-duration-s", "1e-8",
+        "--opening-rate-m-per-s", f"{1.0e-6 * float(converted['rate_factor']):.17g}",
+        "--material-class", str(converted["family"]),
+        "--temperature-K", f"{float(converted['temperature_K']):g}",
+        "--vacancy-energy-variant", "reference",
+        "--preexisting-cavity-separation-pz", f"{separation_pz:g}",
+        "--preexisting-cavity-radius-pz", f"{radius_pz:g}",
+        "--process-zone-length-um", "50",
+        "--initial-crack-length-um", f"{float(converted['initial_crack_length_m']) * 1e6:g}",
+    ]
+    converted["native_entrypoint"] = "arrhenius_fracture.shared_v5_cavity_adapter"
+    converted["shared_options"] = replace(
+        PRESETS[preset], random_seed=int(converted["seed"]),
+    ).to_dict()
+    converted["command_status"] = "RESOLVED_DISABLED"
+    converted["paired_arms_evolved_in_one_native_execution"] = True
+    converted["cavity_geometry"] = {
+        "radius": radius_pz,
+        "surface_to_tip_distance": separation_pz,
+        "unit": "process_zone_length",
+        "reference_scale": "declared L_pz=50 um",
+        "preparation": "native_preexisting_resolved_zero_vacancy_debit",
+        "qualification_geometry_selection": qualification_geometry,
+        "production_geometry_selection": None if qualification_geometry else "declared_grid_cell",
+    }
+    converted["cavity_material_bundle"] = "unified_fracture_material_v5:DBTT"
+
+
 def _convert_v2(
     root: Path, row: dict[str, Any], options: dict[str, str], original,
 ) -> dict[str, Any]:
@@ -408,6 +455,9 @@ def _convert_v2(
     if (converted.get("block") == "P7"
             and converted.get("study") == "native_void_nucleation"):
         _bind_p7_native_void_pair(converted)
+    if (converted.get("block") == "P7"
+            and converted.get("study") != "native_void_nucleation"):
+        _bind_p7_preexisting_pair(converted)
     converted["cohesive_law"] = {
         "kind": "original_activated_opening",
         "temperature_policy": "native_temperature_matched",
@@ -479,6 +529,18 @@ def _convert_v2(
             "kernel_validity": "BOUND_NATIVE_V5_DIRECTIONAL_PROVIDER",
             "numerical_convergence": "ACCEPTED_PREFIX_QUALIFIED_CASE_ENDPOINT_PENDING",
             "input_availability": "AVAILABLE_VERSIONED_INPUTS",
+        })
+    if (converted.get("block") == "P7"
+            and converted.get("study") != "native_void_nucleation"):
+        converted["readiness"].update({
+            "implementation": "IMPLEMENTED",
+            "native_qualification": (
+                "PREEXISTING_GEOMETRY_CONSTRUCTOR_QUALIFIED_"
+                "CASE_CONTINUATION_PENDING"
+            ),
+            "kernel_validity": "BOUND_NATIVE_V5_DIRECTIONAL_PROVIDER",
+            "numerical_convergence": "CONSTRUCTOR_EQUILIBRIUM_PASS_CASE_ENDPOINT_PENDING",
+            "input_availability": "AVAILABLE_CONSTRUCTED_QUALIFICATION_INPUTS",
         })
     if (converted.get("block") == "P4"
             and converted.get("source_location") in {"bulk_uniform", "tip_plus_bulk"}):

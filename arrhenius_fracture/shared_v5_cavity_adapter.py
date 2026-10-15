@@ -30,8 +30,9 @@ from .unified_fracture_material_v5 import material_bundle
 from .voiding_production_v5 import (
     build_production_void_state, crack_tip_tensor, deterministic_trajectory,
     directional_sharp_front_rates, dispatch_cavity_intersecting_candidate_drives,
-    observables, sharp_front_load_provider,
+    observables, remesh_cavity, sharp_front_load_provider,
 )
+from .voiding_v5 import initialize_preexisting_resolved_cavity
 
 MODEL_ID = "shared.native_v5_physical_paired_cavity/2"
 FIXTURE_MODEL_ID = "shared.test_only_v5_extreme_reservoir_lifecycle_fixture/1"
@@ -173,8 +174,51 @@ def _build_pair(args):
         bulk_initial_density_m2=float(bundle.fracture_row["rho_forest_floor_m2"]),
         initial_plastic_strain_gp=0.0,
     )
+    preexisting = args.preexisting_cavity_radius_pz is not None
+    if preexisting:
+        if args.preexisting_cavity_separation_pz is None:
+            raise SystemExit(
+                "preexisting cavity radius and surface-to-tip separation must be supplied together"
+            )
+        pz = float(args.process_zone_length_um) * 1.0e-6
+        radius = float(args.preexisting_cavity_radius_pz) * pz
+        separation = float(args.preexisting_cavity_separation_pz) * pz
+        if not all(math.isfinite(value) and value > 0.0 for value in (pz, radius, separation)):
+            raise SystemExit("preexisting cavity geometry must be finite and positive")
+        tip_x = float(args.initial_crack_length_um) * 1.0e-6
+        center = (tip_x + separation + radius, 0.0)
+        if center[0] + radius >= 1.0e-3:
+            raise SystemExit("preexisting cavity lies outside the native specimen")
+        common.update({
+            "cavity_center_m": center,
+            "void_site_centers_m": (center,),
+            "crack_path_m": ((0.0, 0.0), (tip_x, 0.0)),
+            "cavity_geometry_radius_m": radius,
+        })
     disabled, _ = build_production_void_state(enabled=False, **common)
-    enabled, _ = build_production_void_state(enabled=True, **common)
+    enabled, hole = build_production_void_state(enabled=True, **common)
+    if preexisting:
+        voids = initialize_preexisting_resolved_cavity(
+            enabled.void_state, "site-1", radius, seed=int(args.seed) + 84731,
+        )
+        enabled = remesh_cavity(
+            enabled, hole, voids, "preexisting-cavity-initial-condition",
+        )
+        disabled = equilibrate_fixed_load_with_production_fem(disabled)
+        enabled = equilibrate_fixed_load_with_production_fem(enabled)
+        audit = {
+            "conditional_preexisting_geometry": True,
+            "preexisting_radius_m": radius,
+            "surface_to_tip_separation_m": separation,
+            "initial_crack_tip_x_m": tip_x,
+            "preexisting_geometry_vacancy_debit_zero": (
+                enabled.void_state.event_history[-1].get(
+                    "vacancy_inventory_debit_area_m2"
+                ) == 0.0
+            ),
+            "both_arms_native_fixed_load_equilibrated": True,
+        }
+        return disabled, enabled, audit
     return disabled, enabled, _common_start_audit(disabled, enabled)
 
 
@@ -555,6 +599,10 @@ def main(argv=None):
     parser.add_argument("--transport-refinement-min-duration-s", type=float, default=1.0e-8)
     parser.add_argument("--steps", type=int, default=1)
     parser.add_argument("--vacancy-energy-variant", default="reference")
+    parser.add_argument("--preexisting-cavity-radius-pz", type=float)
+    parser.add_argument("--preexisting-cavity-separation-pz", type=float)
+    parser.add_argument("--process-zone-length-um", type=float, default=50.0)
+    parser.add_argument("--initial-crack-length-um", type=float, default=500.0)
     parser.add_argument("--save-snapshots")
     parser.add_argument("--no-plots", action="store_true")
     args, unknown = parser.parse_known_args(argv)
