@@ -51,8 +51,8 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         row for row in rows
         if row.get("material_selection_scope") == "QUALIFICATION_ONLY"
     ]
-    # 66 PF cells, two P8 cells, and the inadmissible 1200 K DBTT P9 specimen.
-    assert len(dbtt_qualification) == 69
+    # 66 PF baseline cells, six P4 orientation cells, two P8 cells, and one P9 specimen.
+    assert len(dbtt_qualification) == 75
     assert all(row["native_args"] for row in dbtt_qualification)
     assert all(row["production_parameter_option"] is None for row in dbtt_qualification)
     assert {row["parameter_option"] for row in dbtt_qualification} == {
@@ -82,6 +82,18 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         row.get("material_selection_scope") == "QUALIFICATION_ONLY"
         for row in fem
     ) == 2
+
+    p4_tip = [
+        row for row in rows
+        if row["block"] == "P4" and row["source_location"] == "tip_surface"
+    ]
+    assert len(p4_tip) == 40
+    assert all(row["native_args"] for row in p4_tip)
+    assert all(
+        row["shared_options"]["mechanics"] == "spatial_pf"
+        and row["readiness"]["implementation"] == "IMPLEMENTED"
+        for row in p4_tip
+    )
 
 
 def test_v3_summary_has_all_goal_records_and_distinct_digests():

@@ -11,9 +11,10 @@ from dataclasses import replace
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
-from .prospective_campaign import build_cases, load_material_rows
+from .prospective_campaign import _base_args, build_cases, load_material_rows
 from .prospective_campaign_v2 import build_cases_v2
 from .shared_options import PRESETS
 
@@ -200,6 +201,35 @@ def _bind_generic_fem(root: Path, converted: dict[str, Any]) -> None:
     converted["command_status"] = "RESOLVED_DISABLED"
 
 
+def _bind_p4_tip_surface(
+    converted: dict[str, Any], original, *, registry: str, option: str,
+) -> None:
+    """Connect qualified orientation/tip-support cells to the native PF entry."""
+    args = list(original.native_args)
+    if not args:
+        # The v1 gate suppressed emission of arguments, but the original case
+        # remains fully specified; reconstruct through the same native builder.
+        args = list(_base_args(
+            SimpleNamespace(option_key=original.parameter_option),
+            float(converted["temperature_K"]),
+            float(converted["rate_factor"]), str(converted["arm"]),
+            target_um=float(converted["target_extension_um"]),
+            theta=float(converted["orientation_deg"]),
+            a0_m=float(converted["initial_crack_length_m"]),
+        ))
+    args = _replace_arg(args, "--parameter-registry", registry)
+    args = _replace_arg(args, "--parameter-option", option)
+    converted["native_args"] = args
+    converted["native_entrypoint"] = (
+        "arrhenius_fracture.sharp_front_v10_2_27_audited"
+    )
+    converted["shared_options"] = replace(
+        PRESETS["pf_monotonic_tip_persistent"],
+        random_seed=int(converted["seed"]),
+    ).to_dict()
+    converted["command_status"] = "RESOLVED_DISABLED"
+
+
 def _convert_v2(
     root: Path, row: dict[str, Any], options: dict[str, str], original,
 ) -> dict[str, Any]:
@@ -214,7 +244,7 @@ def _convert_v2(
         converted["native_args"] = args
     needs_dbtt_qualification = (
         family == "DBTT" and converted.get("eligibility") != "ELIGIBLE"
-        and converted.get("block") in {"P1", "P2", "P5"}
+        and converted.get("block") in {"P1", "P2", "P4", "P5"}
     )
     if needs_dbtt_qualification:
         # Preserve the original scientific cell, but make its separately
@@ -239,6 +269,13 @@ def _convert_v2(
         converted["parameter_registry"] = REGISTRY
     if converted.get("block") == "P8":
         _bind_generic_fem(root, converted)
+    if (converted.get("block") == "P4"
+            and converted.get("source_location") == "tip_surface"):
+        _bind_p4_tip_surface(
+            converted, original,
+            registry=str(converted["parameter_registry"]),
+            option=str(converted["parameter_option"]),
+        )
     converted["cohesive_law"] = {
         "kind": "original_activated_opening",
         "temperature_policy": "native_temperature_matched",
@@ -269,6 +306,18 @@ def _convert_v2(
             "native_qualification": "GENERIC_ENTRY_DRY_RUN_QUALIFIED_CASE_LEVEL_PENDING",
             "kernel_validity": "BOUND_NATIVE_KERNEL_COMMON_OBSERVER_CONVERGENCE_PENDING",
             "numerical_convergence": "PENDING_THREE_LEVEL_CASE_GRID",
+            "input_availability": (
+                "AVAILABLE_QUALIFICATION_INPUT_PRODUCTION_SELECTION_PENDING"
+                if converted.get("material_selection_scope") == "QUALIFICATION_ONLY"
+                else "AVAILABLE_VERSIONED_INPUTS"
+            ),
+        })
+    if (converted.get("block") == "P4"
+            and converted.get("source_location") == "tip_surface"):
+        converted["readiness"].update({
+            "implementation": "IMPLEMENTED",
+            "native_qualification": "ORIENTATION_AND_TIP_SUPPORT_NATIVE_QUALIFIED",
+            "kernel_validity": "BOUND_NATIVE_ORIENTATION_RESOLVER",
             "input_availability": (
                 "AVAILABLE_QUALIFICATION_INPUT_PRODUCTION_SELECTION_PENDING"
                 if converted.get("material_selection_scope") == "QUALIFICATION_ONLY"
