@@ -173,6 +173,49 @@ def test_installed_actual_state_reverses_mobile_and_bounds_net_blunting():
     assert state.blunted_radius(1.0e-6, 1.0e-10) <= before_radius
 
 
+def test_populated_reversible_state_matches_declared_bin_rate_and_advection():
+    """Numerical correspondence for the enabled finite-bias consumer."""
+    state = evolvable_actual_mpz()
+    state._anisotropic_tau_signed_Pa = np.array([1.0])
+    state.mobile_positive[0] = np.array([0.2, 0.8, 1.5, 0.5])
+    state.mobile_negative[0] = np.array([0.1, 0.4, 0.3, 0.2])
+    state.mobile = state.mobile_positive + state.mobile_negative
+    state._reversible_transport_K_signed_Pa_sqrt_m = 2.0e6
+    state._reversible_tip_radius_m = 1.0e-6
+    dt = 1.0e-4
+
+    stresses = resolved_mobile_stress_profiles(state, 2.0e6, 1.0e-6)
+    expected_rate = signed_arrhenius_rate(
+        LinearSurface(), stresses["total_Pa"], 300.0
+    )
+    rho = state.local_forest_density_m2(False)
+    spacing = 1.0 / (2.0 * np.sqrt(np.maximum(rho, 1.0)))
+    expected_profile = spacing[None, :] * expected_rate
+    expected_velocity = float(
+        np.sum(expected_profile[0] * state.mobile[0]) / np.sum(state.mobile[0])
+    )
+    positive_before = state.mobile_positive.copy()
+    negative_before = state.mobile_negative.copy()
+    expected_positive, positive_escape = state._advect_forward(
+        positive_before, expected_velocity * dt, state.dx
+    )
+    reversed_negative, negative_return = state._advect_forward(
+        negative_before[:, ::-1], expected_velocity * dt, state.dx
+    )
+    expected_negative = reversed_negative[:, ::-1]
+
+    result = state.evolve(dt, 300.0, 0.0, 1.0e-10)
+
+    assert result["reversible_mobile_velocity_m_s"] == pytest.approx(
+        expected_velocity, rel=2e-15
+    )
+    np.testing.assert_allclose(state.mobile_positive, expected_positive, rtol=2e-15)
+    np.testing.assert_allclose(state.mobile_negative, expected_negative, rtol=2e-15)
+    assert result["dN_escaped"] == pytest.approx(positive_escape)
+    assert result["dN_returned"] == pytest.approx(negative_return)
+    assert result["dN_physical_returned"] == 0.0
+
+
 def test_installed_reversible_wrapper_consumes_nonzero_native_recovery_rates():
     state = evolvable_actual_mpz()
     state.mobile_positive[0, 1] = 2.0

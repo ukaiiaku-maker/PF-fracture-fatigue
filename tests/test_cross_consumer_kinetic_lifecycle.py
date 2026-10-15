@@ -1,4 +1,4 @@
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 
 import numpy as np
 import pytest
@@ -134,3 +134,67 @@ def test_occupied_wake_keeps_signed_species_and_closes_fate_balance():
     assert state.wake_discarded_mobile_total == pytest.approx(
         result["wake_dN_mobile_transport_loss"]
     )
+
+
+class _PositiveZeroBiasSurface:
+    @staticmethod
+    def rate(stress, _temperature):
+        return 2.0 + 1.0e-9 * np.asarray(stress, dtype=float)
+
+
+def test_occupied_wake_current_zero_drive_has_only_analytic_recovery():
+    """Current-law correspondence, distinct from the wiring fixture above."""
+    state = _occupied_wake_fixture()
+    state.cfg = SimpleNamespace(
+        mobile_recovery_rate_s=0.4,
+        peierls_stress_fraction=1.0,
+        taylor_stress_fraction=1.0,
+        jump_fraction=1.0,
+    )
+    state.manifest = SimpleNamespace(
+        retained_recovery_rate_s=0.2,
+        encounter_efficiency=1.0,
+        taylor_corr_scale=0.0,
+        taylor_corr_rho_c_m2=1.0,
+        emission=SimpleNamespace(),
+        peierls=SimpleNamespace(
+            as_surface=lambda _emission: _PositiveZeroBiasSurface()
+        ),
+        taylor=SimpleNamespace(
+            as_surface=lambda _emission: _PositiveZeroBiasSurface()
+        ),
+    )
+    state._transport_rates = MethodType(UnifiedMPZState._transport_rates, state)
+    mobile_before = {
+        suffix: getattr(state, f"wake_mobile_{suffix}").copy()
+        for suffix in ("positive", "negative")
+    }
+    retained_before = {
+        suffix: getattr(state, f"wake_retained_{suffix}").copy()
+        for suffix in ("positive", "negative")
+    }
+
+    result = _signed_evolve_wake(state, 0.5, 900.0, 2.5e-10)
+
+    for suffix in ("positive", "negative"):
+        np.testing.assert_allclose(
+            getattr(state, f"wake_mobile_{suffix}"),
+            mobile_before[suffix] * np.exp(-0.4 * 0.5),
+            rtol=2e-15,
+            atol=1e-15,
+        )
+        np.testing.assert_allclose(
+            getattr(state, f"wake_retained_{suffix}"),
+            retained_before[suffix] * np.exp(-0.2 * 0.5),
+            rtol=2e-15,
+            atol=1e-15,
+        )
+    assert result["wake_dN_trapped"] == 0.0
+    assert result["wake_dN_released"] == 0.0
+    assert result["wake_dN_mobile_transport_loss"] == 0.0
+    expected_recovery = sum(
+        np.sum(value) * (1.0 - np.exp(-rate * 0.5))
+        for collection, rate in ((mobile_before, 0.4), (retained_before, 0.2))
+        for value in collection.values()
+    )
+    assert result["wake_dN_recovered"] == pytest.approx(expected_recovery)
