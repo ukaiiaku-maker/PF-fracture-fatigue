@@ -1,0 +1,51 @@
+{
+  "schema": "independent-native-transition-continuation/1",
+  "date": "2026-10-14",
+  "fem_source": "784c57f2b48172c6bd5b22f6892faff623cbb1f3",
+  "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python",
+  "dependency": {
+    "triangle_version": "20250106",
+    "status": "AVAILABLE"
+  },
+  "execution": {
+    "tests": [
+      "tests/test_cohesive_trial_state_v10.py",
+      "tests/test_kinetic_cohesive_stepper_v10.py",
+      "tests/test_native_potential_cohesive_interface.py",
+      "tests/test_event_driven_remesh_v914.py",
+      "tests/test_bulk_remesh_transfer_v911.py",
+      "tests/test_mixed_mode_control_v2.py",
+      "tests/test_specimen_restart_v1.py"
+    ],
+    "result": "23 passed in 1.33 s"
+  },
+  "verified_scopes": [
+    "cohesive trial full-state rollback and accepted-state ownership",
+    "kinetic cohesive stepping and native potential interface behavior",
+    "event-driven topology remeshing",
+    "bulk and cohesive state transfer across remeshing",
+    "native mixed-mode control semantics",
+    "specimen checkpoint serialization, fail-closed identity, and restart"
+  ],
+  "linked_executed_active_state_evidence": {
+    "qualification": "../fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json",
+    "accepted_pre_event_checkpoint": "../fem_observer_restart_continuation_20261014/evidence/specimen_restart_checkpoint_step121",
+    "accepted_post_event_checkpoint": "../fem_observer_restart_continuation_20261014/evidence/specimen_restart_checkpoint_postevent_femenv",
+    "uninterrupted": "../fem_observer_restart_continuation_20261014/evidence/specimen_restart_uninterrupted_to145_femenv",
+    "fresh_process_resumed": "../fem_observer_restart_continuation_20261014/evidence/specimen_restart_resumed_to145_femenv",
+    "post_event_continuation": "../fem_observer_restart_continuation_20261014/evidence/specimen_restart_postevent_to146_femenv",
+    "status": "LINKED_NOT_RERUN"
+  },
+  "matched_fem_observer_evidence": {
+    "receipt": "../fem_observer_restart_continuation_20261014/evidence/fem_baseline_reconciliation_v2.json",
+    "maximum_matched_J_G_relative_error": 0.008617808334910215,
+    "status": "LINKED_EXISTING_PASS_NOT_RERUN"
+  },
+  "limits": [
+    "This focused execution verifies native transition mechanics and lifecycle behavior; it is not a new spontaneous branching prediction.",
+    "It does not select an unapproved cohesive activation area, interface stiffness, or bilinear production material.",
+    "Cracked-body plane-stress/generalized-constraint qualification beyond the retained native mixed-mode control tests remains R07 work.",
+    "No production execution or manuscript modification was performed."
+  ],
+  "status": "PASS_INDEPENDENT_NATIVE_TRANSITION_CONTINUATION"
+}

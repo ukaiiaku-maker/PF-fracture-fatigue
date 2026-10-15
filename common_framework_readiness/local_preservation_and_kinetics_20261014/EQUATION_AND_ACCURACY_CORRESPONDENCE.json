@@ -1,0 +1,89 @@
+{
+  "schema": "enabled-consumer-equation-accuracy-correspondence/1",
+  "date": "2026-10-14",
+  "source_pair": {
+    "pf_analysis": "0943748268d68624b03565d886cebf2b8502625d",
+    "pf_kinetics": "2d62e3bd",
+    "fem": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
+  },
+  "status_semantics": {
+    "PRESERVED_CONNECTED": "The native implementation is present and reachable through the stated lifecycle. This status alone is not current-law qualification.",
+    "CURRENT_LAW_QUALIFIED": "The executed consumer has a discriminating equation-level and populated-state numerical correspondence at the declared scope.",
+    "INCOMPLETE": "Required physical evidence, selection, or execution remains unavailable; no fallback law is authorized."
+  },
+  "enabled_consumers": [
+    {
+      "id": "occupied_wake",
+      "connection_status": "PRESERVED_CONNECTED",
+      "qualification_status": "CURRENT_LAW_QUALIFIED_ZERO_APPLIED_DRIVE_AND_RECOVERY_SCOPE",
+      "implementation": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_wake",
+      "equation_correspondence": {
+        "applied_wake_stress": "sigma_wake,j = 0",
+        "signed_elementary_rate": "Gamma(0,T) = r(0,T) - r(0,T) = 0",
+        "taylor_completion": "k_T = max(Gamma_T,0)/m(rho) = 0",
+        "peierls_velocity": "v_j = f_jump [2 sqrt(rho_j)]^-1 Gamma_P = 0",
+        "encounter": "k_enc,j = eta |v_j| sqrt(rho_j) = 0",
+        "recovery": "N_m(t+dt)=N_m(t) exp(-k_m dt); N_r(t+dt)=N_r(t) exp(-k_r dt)"
+      },
+      "physical_interpretation": "Wake content is retained as signed state and may contribute through the separately configured wake mechanics. The wake evolution step does not invent a new applied opening drive; with the current cancellation-stable signed rate its zero-drive exchange and glide rates are exactly zero. Explicit recovery remains active when configured.",
+      "numerical_correspondence": {
+        "test": "tests/test_cross_consumer_kinetic_lifecycle.py::test_occupied_wake_current_zero_drive_has_only_analytic_recovery",
+        "populated_state": true,
+        "checks": [
+          "positive and negative mobile arrays against analytic exponential recovery",
+          "positive and negative retained arrays against analytic exponential recovery",
+          "zero trapping, release, transport velocity and boundary loss",
+          "closed total recovery ledger"
+        ],
+        "result": "PASS"
+      },
+      "retained_lifecycle_fixture": "tests/test_cross_consumer_kinetic_lifecycle.py::test_occupied_wake_keeps_signed_species_and_closes_fate_balance",
+      "retained_lifecycle_fixture_scope": "wiring/fate closure with injected coefficients; not current-law qualification"
+    },
+    {
+      "id": "reversible_surface_return",
+      "connection_status": "PRESERVED_CONNECTED",
+      "qualification_status": "CURRENT_LAW_QUALIFIED_FINITE_BIAS_POPULATED_STATE_SCOPE",
+      "implementation": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+      "equation_correspondence": {
+        "finite_tip_stress": "sigma_tip = K_signed / sqrt(2 pi r_tip)",
+        "resolved_profile": "sigma_sj = q_s sigma_tip sqrt(l_ref/(l_ref+x_j)) + sigma_internal,sj",
+        "signed_rate": "Gamma_sj = sign(tau_sj) max[R(|tau_sj|,T)-R(0,T),0]",
+        "bin_velocity": "v_sj = f_jump [2 sqrt(rho_j)]^-1 Gamma_sj",
+        "system_velocity": "vbar_s = sum_j(v_sj N_mobile,sj)/sum_j(N_mobile,sj)",
+        "species_advection": "positive Burgers content uses +vbar_s and negative Burgers content uses -vbar_s"
+      },
+      "physically_justified_difference": "Opening stress remains the source-emission and Taylor exchange drive. Signed K and orientation act on already-mobile content. This separation is retained rather than forcing the forward scalar and reversible overlay into an identical update operator.",
+      "numerical_correspondence": {
+        "test": "tests/test_v10_2_30_reversible_transport.py::test_populated_reversible_state_matches_declared_bin_rate_and_advection",
+        "populated_state": true,
+        "checks": [
+          "finite-tip and attenuated per-bin stresses",
+          "baseline-subtracted signed Arrhenius rate",
+          "density-based jump distance and per-bin velocity",
+          "population-weighted system velocity",
+          "finite-volume positive escape and negative return with source eligibility kept separate"
+        ],
+        "result": "PASS"
+      }
+    }
+  ],
+  "focused_execution": {
+    "command": "python -m pytest -q tests/test_cross_consumer_kinetic_lifecycle.py tests/test_v10_2_30_reversible_transport.py",
+    "environment": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "result": "21 passed in 0.84 s"
+  },
+  "matched_operation_fem_evidence": {
+    "receipt": "../fem_observer_restart_continuation_20261014/evidence/fem_baseline_reconciliation_v2.json",
+    "comparison": "../fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json",
+    "matched_operation": "centered total stored-energy derivative under the identical plateau virtual material-coordinate extension used by J",
+    "maximum_relative_error": 0.008617808334910215,
+    "status": "LINKED_EXISTING_PASS_NOT_RERUN"
+  },
+  "scope_limits": [
+    "PRESERVED_CONNECTED consumers not listed with CURRENT_LAW_QUALIFIED remain connection evidence only.",
+    "The wake result does not assign a nonzero local residual-stress glide law that the current implementation does not contain.",
+    "The reversible result does not qualify a spontaneous cyclic fracture trajectory.",
+    "No production trajectory, FEM benchmark, or manuscript was rerun or modified."
+  ]
+}

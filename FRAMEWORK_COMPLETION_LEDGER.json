@@ -133,14 +133,14 @@
       "exact_next_command": "python -m pytest -q tests/test_bilinear_czm_native.py",
       "input_output_identity": "three explicit opening-model IDs with common accommodation inputs",
       "numerical_criteria": "Consistent residual/tangent, autonomous separation, irreversible unload/reload, nonnegative dissipation and active-damage restart equality.",
-      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py"],
+      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json"],
       "remaining_limitation": "Autonomous irreversible and activated-bilinear constitutive paths, unilateral contact and JSON-safe active-damage restart are implemented; generic native specimen restart is now complete on the adaptive atomic cohesive route. Bilinear specimen-level event/damage/energy evidence still awaits authoritative activation area and stiffness or an explicitly selected qualification-only fixture."
     },
     {
       "id": "R06",
       "goal_ids": ["FG-04", "FG-05", "FG-16"],
       "status": "PARTIAL_CROSS_CONSUMER_KINETICS_QUALIFIED_TRANSFER_ADAPTERS_UNRESOLVED",
-      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. The actual post-installer forward-active, occupied-wake, reversible-return and bulk consumers are now traced separately, and scalar/channel checkpoint rehydration is discriminated without forcing the distinct laws to agree. Channel-resolved transport is preserved native but unwired through the typed shared presets. Density transport and conservative tip/bulk transfer remain unavailable axes. Four requested intervention adapters are not implemented, and the existing shielding toggle is not isolated enough to qualify the requested retained-shielding intervention.",
+      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. PRESERVED_CONNECTED is now explicitly connection status rather than automatic current-law qualification. The occupied-wake consumer has equation-level and populated-state correspondence for its current zero-applied-drive plus recovery scope, and the reversible consumer has equation-level and populated-state correspondence for finite signed bias, population-weighted velocity and species advection. The distinct forward, reversible and channel operators are not forced to agree. Channel-resolved transport is preserved native but unwired through the typed shared presets. Density transport and conservative tip/bulk transfer remain unavailable axes. Four requested intervention adapters are not implemented, and the existing shielding toggle is not isolated enough to qualify the requested retained-shielding intervention.",
       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
       "authoritative_source": "native geography audits and existing positive transport implementation",
       "dependencies": ["R01", "R03"],
@@ -152,6 +152,7 @@
         "common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json",
         "tests/test_source_transport_axes_qualification.py",
         "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json",
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/EQUATION_AND_ACCURACY_CORRESPONDENCE.json",
         "tests/test_cross_consumer_kinetic_lifecycle.py"
       ],
       "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Channel-resolved kinetics has no typed shared preset. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
@@ -160,14 +161,14 @@
       "id": "R07",
       "goal_ids": ["FG-08", "FG-09", "FG-10"],
       "status": "PARTIAL_NUMERICAL_QUALIFICATION",
-      "concrete_defect": "Affine transverse control is correct, but cracked-body constitutive state, hazards, observers and restart do not yet carry all declared constraint/mixity paths.",
+      "concrete_defect": "Affine transverse control is correct, and the retained native mixed-mode control tests pass in the FEM environment together with cohesive/remesh/restart transitions. Cracked-body constitutive state, hazards, observers and restart still do not carry all declared plane-stress/generalized-constraint and mixity paths, so the focused pass does not close R07.",
       "owner_consumer": "PF/FEM cracked-body solvers and mechanism tensor projections",
       "authoritative_source": "mechanics constraint contract and native cracked-body fields",
       "dependencies": ["R01", "R03"],
       "exact_next_command": "python scripts/qualify_cracked_body_constraints.py --compact --output integration_evidence/cracked_constraint_<commit>",
       "input_output_identity": "plane strain, plane stress and explicit generalized control; mode I/II separate",
       "numerical_criteria": "Nonuniform active state, tensor-consumer trace, response refinement and active-update restart.",
-      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json"],
+      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json"],
       "remaining_limitation": "Cracked-body path incomplete; no 3-D claim."
     },
     {
@@ -194,7 +195,8 @@
         "common_framework_readiness/fem_observer_restart_continuation_20261014/GENERIC_OPENING_ONLY_QUALIFICATION.json",
         "common_framework_readiness/fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json",
         "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_LINEAGE.md",
-        "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json"
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json",
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json"
       ],
       "remaining_limitation": "The retained projected killed-band result still has fine J/G=0.8229384 because it is a different finite crack/removal operation; it is not renamed or scaled. The converged PF/FEM common response differs by 11.8727%, consistent with their distinct discrete notch/damage representations; native PF K/J, native FEM J and matched FEM virtual G remain noninterchangeable. Plane stress/generalized transverse control, generic full-field source scope and production bilinear selection remain independent gaps."
     },
@@ -233,7 +235,7 @@
       "id": "R11",
       "goal_ids": ["FG-07", "FG-10", "FG-16"],
       "status": "COMPLETE_CURRENT_NATIVE_AND_HISTORICAL_K_LENGTH_PORT_QUALIFIED",
-      "concrete_defect": "Closed: retained 300 K/1200 K native 1 mm histories have a fail-closed current regression and output-policy independence. The historical 2085-row/201-event CSV, its 201-segment geometry-aware history, a distinct current 203-event native history, and uninterrupted/fresh-process restart chronology were replayed quantity-by-quantity. Stage-filtered path jumps retain linked committed geometry, event-associated K is explicitly named, and plotters no longer blend K quantities or fill event gaps.",
+      "concrete_defect": "Closed: retained 300 K/1200 K native 1 mm histories have a fail-closed current regression and output-policy independence. The historical 2085-row/201-event CSV, its 201-segment geometry-aware history, a distinct current 203-event native history, and uninterrupted/fresh-process restart chronology were replayed quantity-by-quantity. Stage-filtered path jumps retain linked committed geometry, event-associated K is explicitly named, and plotters no longer blend K quantities or fill event gaps. The 203-event curve is now bound to the exact historical producer-law record at d77abff138f9a7f23bbabba7b3ba582cde35ce68 and separately identifies analysis commit 0943748268d68624b03565d886cebf2b8502625d; it remains labeled HISTORICAL_RETAINED_NOT_CURRENT_LAW_PREDICTION.",
       "owner_consumer": "long-growth driver, observer/query and compact retention",
       "authoritative_source": "retained native developed histories and current observer code",
       "dependencies": ["R01"],
@@ -253,7 +255,7 @@
       "id": "R12",
       "goal_ids": ["FG-16", "FG-17"],
       "status": "PORTABLE_CLEAN_CURRENT_COMPLETE_FULL_MANDATORY_PROFILE_INCOMPLETE",
-      "concrete_defect": "Portable/core selection, a current clean-worktree pass at c5ae81fc, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are complete. The portable profile passes 966 tests with 15 explicit external-evidence deselections. The full profile verifies option_completion_v2 but reports 12 mandatory archive/directory items missing rather than skipping them.",
+      "concrete_defect": "Portable/core selection, a current clean-worktree pass at c5ae81fc, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are complete. The portable profile passes 966 tests with 15 explicit external-evidence deselections. The prior clean-root audit correctly reported 12 absent paths in that isolated checkout. A new hash-verifying audit against the explicit main workspace root verifies all 10 mandatory evidence directories byte-for-byte; only the two independent archive files remain genuinely missing.",
       "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
       "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
       "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],
@@ -268,9 +270,10 @@
         "common_framework_readiness/LAW_TO_RESULT_MAP_V3.json",
         "common_framework_readiness/CLEAN_CHECKOUT_TEST_RECEIPT.json",
         "common_framework_readiness/LOCAL_EXTERNAL_TEST_RECEIPT.json",
-        "common_framework_readiness/local_preservation_and_kinetics_20261014/CLEAN_CHECKOUT_AND_MANDATORY_EVIDENCE_RECEIPT.json"
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/CLEAN_CHECKOUT_AND_MANDATORY_EVIDENCE_RECEIPT.json",
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/FULL_EVIDENCE_AUDIT_MAIN_ROOT.json"
       ],
-      "remaining_limitation": "At commit c5ae81fc, a detached clean worktree passes 966 portable tests and deselects 15 explicitly marked external tests. The full manifest profile is intentionally INCOMPLETE: 12 mandatory items are absent, including both independent archives; only option_completion_v2 verifies in the clean checkout."
+      "remaining_limitation": "At commit c5ae81fc, a detached clean worktree passes 966 portable tests and deselects 15 explicitly marked external tests. Its 12-path report is a clean-root omission, not a claim that the main workspace lacks those directories. The explicit main-root full audit is still INCOMPLETE solely because the two required independent archives under /Users/shen/Fracture_Backups are genuinely unavailable; the 10 directory records are VERIFIED."
     },
     {
       "id": "R13",

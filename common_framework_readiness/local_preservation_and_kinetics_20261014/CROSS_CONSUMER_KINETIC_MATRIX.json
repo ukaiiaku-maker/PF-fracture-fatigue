@@ -2,9 +2,16 @@
   "schema": "cross-consumer-kinetic-preservation/1",
   "date": "2026-10-14",
   "source_pair": {
-    "pf": "4217810b87e19d1cb013c3a4dfbe79a22ca15b8c",
+    "pf": "2d62e3bd",
     "fem": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
   },
+  "status_semantics": {
+    "PRESERVED_CONNECTED": "implementation is present and reachable; this is not automatic current-law qualification",
+    "PRESERVED_NATIVE_UNWIRED": "native implementation is retained but no current typed shared preset selects it",
+    "CURRENT_LAW_QUALIFIED": "equation-level and populated-state numerical correspondence passed at the explicitly stated scope",
+    "INCOMPLETE": "required evidence or implementation remains absent; no fallback is permitted"
+  },
+  "equation_accuracy_receipt": "EQUATION_AND_ACCURACY_CORRESPONDENCE.json",
   "local_census": {
     "directory": "/private/tmp/fracture-preservation-census-20261014T173500PDT",
     "manifest_status": "CENSUS_COMPLETE_NOT_PHYSICS_CERTIFICATION",
@@ -20,6 +27,7 @@
     {
       "id": "forward_active_validated_scalar",
       "category": "PRESERVED_CONNECTED",
+      "qualification_status": "QUALIFIED_BY_EXISTING_NATIVE_TAYLOR_PEIERLS_AND_JOINT_OPERATOR_EVIDENCE",
       "constructor": "install_signed_burgers_population(..., validated_scalar) followed by install_persistent_site_source",
       "post_installer_callable": "signed_burgers_shared_v1025._signed_evolve_scalar",
       "surface_and_temperature": "manifest Peierls/Taylor surfaces evaluated at the passed T_K; EXP-floor behavior belongs to those unchanged surfaces",
@@ -33,6 +41,7 @@
     {
       "id": "occupied_wake",
       "category": "PRESERVED_CONNECTED",
+      "qualification_status": "CURRENT_LAW_QUALIFIED_ZERO_APPLIED_DRIVE_AND_RECOVERY_SCOPE",
       "constructor": "installed signed state; called internally by scalar, channel and reversible evolution",
       "post_installer_callable": "signed_burgers_shared_v1025._signed_evolve_wake",
       "surface_and_temperature": "same native transport-rate constructor at passed T_K, evaluated at zero applied wake stress and wake forest density",
@@ -46,6 +55,7 @@
     {
       "id": "channel_resolved_transport",
       "category": "PRESERVED_NATIVE_UNWIRED",
+      "qualification_status": "NOT_CURRENT_SHARED_INTERFACE_QUALIFIED",
       "constructor": "install_signed_burgers_population(..., channel_resolved)",
       "post_installer_callable": "signed_burgers_shared_v1025._signed_evolve_channel",
       "surface_and_temperature": "native per-system transport-rate construction at passed T_K",
@@ -60,6 +70,7 @@
     {
       "id": "reversible_surface_return",
       "category": "PRESERVED_CONNECTED",
+      "qualification_status": "CURRENT_LAW_QUALIFIED_FINITE_BIAS_POPULATED_STATE_SCOPE",
       "constructor": "install_reversible_transport on an initialized validated-scalar signed state",
       "post_installer_callable": "persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
       "surface_and_temperature": "same unchanged Peierls surface; signed forward-minus-zero-bias rate at passed temperature",
@@ -73,6 +84,7 @@
     {
       "id": "full_field_bulk_constitutive",
       "category": "PRESERVED_CONNECTED",
+      "qualification_status": "PRESERVED_CONNECTION_ONLY_IN_THIS_MATRIX",
       "constructor": "bulk_plasticity_v104.production_bulk_configuration",
       "post_installer_callable": "bulk_plasticity_v104.accepted_bulk_load_step",
       "surface_and_temperature": "selected material-manifest Peierls/Taylor bulk law at passed temperature",
@@ -85,7 +97,8 @@
     },
     {
       "id": "direct_tip_bulk_density_transfer",
-      "category": "EVIDENCE_UNAVAILABLE",
+      "category": "INCOMPLETE",
+      "qualification_status": "INCOMPLETE_NO_IMPLEMENTATION_OR_PHYSICAL_TRANSFER_COEFFICIENT",
       "constructor": null,
       "post_installer_callable": null,
       "surface_and_temperature": null,
@@ -100,6 +113,7 @@
     {
       "id": "daughter_remesh_and_current_source_restore",
       "category": "PRESERVED_CONNECTED",
+      "qualification_status": "PRESERVED_CONNECTION_AND_METHOD_REHYDRATION_ONLY",
       "constructor": "current-source multifront hooks plus branch checkpoint restoration",
       "post_installer_callable": "current_source_runtime_bindings.rehydrate_current_source_runtime_bindings",
       "surface_and_temperature": "no new law; serialized source/state/transport model IDs select a closed method registry",

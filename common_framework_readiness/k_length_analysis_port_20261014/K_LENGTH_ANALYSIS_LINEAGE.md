@@ -70,6 +70,18 @@ smoothing, no grid, and no title. The machine-readable receipt records every
 input hash, query status, endpoint, quantity count, restart comparison, and
 FEM historical blob mapping.
 
+The plot's adjacent `current_native_203_event_KJ_vs_path.provenance.json`
+resolves its result root to exactly one `LAW_TO_RESULT_MAP_V3.json` record.
+The trajectory producer is historical commit
+`d77abff138f9a7f23bbabba7b3ba582cde35ce68`, using the producer-bound
+persistent-site adaptive transactional operator that predates the current
+mean-net-rate-over-density-order repair.  It is therefore explicitly
+`HISTORICAL_RETAINED_NOT_CURRENT_LAW_PREDICTION`.  Analysis commit
+`0943748268d68624b03565d886cebf2b8502625d` only reads, queries, and renders
+the existing trajectory; it is not substituted for the producer identity.
+The sidecar and qualification receipt bind the law-map hash and eleven raw
+artifact hashes.  No trajectory was rerun to add this provenance.
+
 ## Scope and unavailable evidence
 
 This qualifies monotonic native K_J history and analysis transport. It does

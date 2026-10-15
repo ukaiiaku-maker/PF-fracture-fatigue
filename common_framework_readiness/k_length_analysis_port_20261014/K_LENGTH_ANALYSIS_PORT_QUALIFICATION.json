@@ -1166,9 +1166,169 @@
   "paired_analysis_policy": "Mechanism-on/off differences remain descriptive paired contrasts. Geometry, load, stage, observer and support matching must be reported; no subtraction is fed back as an empirical constitutive or K(a) correction.",
   "physics_advanced": false,
   "plot_evidence": {
+    "analysis_commit": "0943748268d68624b03565d886cebf2b8502625d",
     "coordinate": "path_arclength",
     "fallback_between_K_definitions": false,
     "path": "common_framework_readiness/k_length_analysis_port_20261014/current_native_203_event_KJ_vs_path.png",
+    "producer_identity": {
+      "interpretation": "The producer commit and producer-bound law describe the trajectory. The analysis commit below only reads, queries, and renders that trajectory; it does not retroactively apply the current constitutive law.",
+      "law_map": "common_framework_readiness/LAW_TO_RESULT_MAP_V3.json",
+      "law_map_sha256": "57bee4832f2cf2b2f372c35fa25e23c6acf4c00bb401c855d5f50d041b95e8bf",
+      "producer_law": {
+        "completion_mapping": "producer-bound historical persistent-site operator; predates the qualified current mean-net-rate-over-density-order repair",
+        "density_order": {
+          "correlation_density_m2": 22042481205294.297,
+          "current_formula_not_back_applied": "1 + scale*sqrt(rho_f/rho_c)",
+          "scale": 1.2690231726199324
+        },
+        "family": "developed_growth",
+        "figures": [
+          "Figure_5_developed_physical_history",
+          "Figure_7_native_fields"
+        ],
+        "frozen_status": "HISTORICAL_RETAINED_NOT_CURRENT_LAW_PREDICTION",
+        "input_identity": {
+          "native_argv": [
+            "--signed-kernel-family",
+            "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_v10_2_21_persistent_sites_top1/runs/v10_2_28_kernel_cache/1447653d199f0b43cb475951092d69444c9b785f6fdf518c723792abb3b1f5e5/family.json",
+            "--mode",
+            "2d",
+            "--parameter-registry",
+            "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv",
+            "--steps",
+            "2000000",
+            "--nx",
+            "36",
+            "--ny",
+            "72",
+            "--dU",
+            "2e-7",
+            "--dt",
+            "8.4",
+            "--n-stagger",
+            "2",
+            "--tip-h-fine",
+            "1e-6",
+            "--tip-ratio",
+            "1.20",
+            "--da-phys",
+            "5e-6",
+            "--target-crack-extension-um",
+            "1000",
+            "--front-state-model",
+            "moving_pz",
+            "--tip-source-model",
+            "continuum",
+            "--tip-kinetics-mode",
+            "moving_velocity",
+            "--bulk-plasticity-mode",
+            "tip_only",
+            "--directional-j-mode",
+            "root_signed",
+            "--signed-active-shielding",
+            "--mobile-shield-fraction",
+            "0",
+            "--no-wake-shielding",
+            "--crystal-aniso",
+            "--crystal-compete",
+            "--crystal-theta-deg",
+            "0",
+            "--crystal-material",
+            "w",
+            "--j-decomposition",
+            "cluster",
+            "--max-fronts",
+            "1",
+            "--crack-backend",
+            "sharp_wake",
+            "--adaptive-events",
+            "--adaptive-event-target",
+            "0.15",
+            "--print-every",
+            "400",
+            "--no-mpz-state-output",
+            "--parameter-option",
+            "v913_paper_dbtt01_0202500_persistent_sites",
+            "--temperatures",
+            "1200",
+            "--tip-plasticity",
+            "--active-shielding",
+            "--out",
+            "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3",
+            "--save-snapshots",
+            "4"
+          ],
+          "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites",
+          "parameter_registry": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/data/materials/v10_2_27_paper_four_class_registry.csv",
+          "registry_sha256": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760",
+          "temperature_K": "1200"
+        },
+        "mechanical_backend": "original spatial PF/sharp-front FEM",
+        "operator": {
+          "integration": "adaptive_transactional",
+          "lifecycle_attribute": "install_persistent_site_source",
+          "lifecycle_module": "arrhenius_fracture.persistent_site_source_v10221"
+        },
+        "phi_policy": {
+          "mobile_shield_fraction_cli": "0",
+          "peierls_stress_fraction": 0.5773502691896258,
+          "taylor_stress_fraction": 0.5773502691896258
+        },
+        "producer_commit": "d77abff138f9a7f23bbabba7b3ba582cde35ce68",
+        "raw_domain_and_clamps": "historical producer-bound parameter domain; current v10.2.32 Taylor-domain revisions are not retroactively applied",
+        "result_root": "integration_evidence/current_science_pilots_6abbf10/pf/DBTT_1200K/developed_1000um_current_v2_run3",
+        "source_lifecycle": "persistent_reusable",
+        "source_location": "tip_surface"
+      },
+      "raw_artifacts": {
+        "crack_path_1200K.csv": {
+          "bytes": 10315,
+          "sha256": "d14595128c0c85092f3e393daec3856e06bd4f358d3e67fa3a9decbc08c15c94"
+        },
+        "fracture_observations_online.jsonl": {
+          "bytes": 2473954,
+          "sha256": "8b5c81979b9c2c6bedfd8cb886f8ae87f29699aeedea64e8a2cca0ab5e703798"
+        },
+        "fronts_1200K.csv": {
+          "bytes": 2525644,
+          "sha256": "4b32752e1f860ed2af369971b93f32d11de2df082f5d5c7d40ec55a674a77f86"
+        },
+        "run_args.json": {
+          "bytes": 8454,
+          "sha256": "c35f01973972fa3a199139ff0d31effadbe4feee7bf5ed914101267560f0e94e"
+        },
+        "selected_material_manifest_v10_2_22.csv": {
+          "bytes": 2153,
+          "sha256": "ed4b3d3ad82d0f24cb53113e1471f5ce93a3beaa54b62c485a5b4f2d06fa049e"
+        },
+        "shared_runtime_attestation.post.json": {
+          "bytes": 12597,
+          "sha256": "e155310253240a3273b6c4e6df07973600a557b0e514191bc24e9f8ff45e09b0"
+        },
+        "steps_1200K.csv": {
+          "bytes": 2731742,
+          "sha256": "0ed0176a8ce5757cc2802cfde4f556d61694e103deb80684de186a14810d6b9b"
+        },
+        "stochastic_avalanche_geometry_events.json": {
+          "bytes": 285940,
+          "sha256": "8d52d31c513e62659167efacdf40c16b0b70ce26b5907c2bcbb2992026cdd165"
+        },
+        "v10_1_7_5_transport_mode.json": {
+          "bytes": 432,
+          "sha256": "c3230c36b85901dd3320e41ffc02cb1a3ff790d3e1e994256ae11147ddeb127a"
+        },
+        "v10_2_22_parameter_selection.json": {
+          "bytes": 5182,
+          "sha256": "362b470e02c07382c8a91984a8e1837891748e5fa632367d0e639d3d3ec903c2"
+        },
+        "v10_2_22_persistent_site_model.json": {
+          "bytes": 549,
+          "sha256": "cac5c1daf78105eead6e5402a25624a3d41970ebd3ff6d5b1634b81d8f5a0d99"
+        }
+      }
+    },
+    "provenance_path": "common_framework_readiness/k_length_analysis_port_20261014/current_native_203_event_KJ_vs_path.provenance.json",
+    "provenance_sha256": "15aa02d3fcad2adf1fb9cef3871dc7df61a4dcd221992c29772a31ffbe1ebba3",
     "quantity": "K_J_Pa_sqrt_m",
     "selected_rows": 203,
     "sha256": "0589efd41fc1047991cb6e87e7ede7e9daa644c0b0a315ab08fd9460aa8e919a",
@@ -1194,7 +1354,7 @@
   "schema": "k-length-analysis-port-qualification/1",
   "source_heads": {
     "fem_czm": "784c57f2b48172c6bd5b22f6892faff623cbb1f3",
-    "pf_common": "92876ebac985bb14c460365f149e80a7129b9a64"
+    "pf_common": "0943748268d68624b03565d886cebf2b8502625d"
   },
   "status": "PASS_CURRENT_NATIVE_AND_HISTORICAL_REPLAY"
 }
