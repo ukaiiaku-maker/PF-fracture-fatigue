@@ -32,6 +32,19 @@ numbers, and record `event_multiplicity`.
    `out_of_range`.
 6. Never extrapolate beyond achieved growth.
 
+`--event-associated` is the explicitly named exception for reporting the
+activation/load attached to the event that crossed a target.  Its result keeps
+two roles: `measured_pre_event` contains the actual K/J observation at the
+lower coordinate, while `committed_geometry` contains the upper coordinate
+and no invented post-commit mechanics.  It is never described as an
+equilibrium K at the target.  This linkage remains available when the query is
+filtered to `stage=pre_event`, including path-arclength jumps.
+
+Plots require one explicit `--quantity` (`K_J`, `K_I`, `K_II`, `K_effective`,
+`K_probe`, or `K_applied`).  Missing values are omitted, never replaced by a
+different K field.  Stage, validity, front, segment, and coordinate filters are
+applied before plotting, so the figure and query can select the same records.
+
 The legacy steps adapter retains every input row. Because the historical CSV
 does not record observation stage or contour-validity status, both remain
 unknown. `KJ_Pa_sqrtm` maps only to `K_J_Pa_sqrt_m`; `KJ_probe_Pa_sqrtm` maps
@@ -41,6 +54,12 @@ only to probe K. `n_fire` is retained as an aggregate event count and its
 ```bash
 python -m scripts.query_k_at_crack_length steps_0300K.csv \
   --legacy-steps --target-um 1000 --coordinate extension
+
+python -m scripts.query_k_at_crack_length native_history.jsonl \
+  --target-um 500 --coordinate path_arclength --event-associated
+
+python -m scripts.plot_fracture_observation_history native_history.jsonl KJ.png \
+  --quantity K_J --stage pre_event --coordinate path_arclength
 ```
 
 ## Corrected reanalysis

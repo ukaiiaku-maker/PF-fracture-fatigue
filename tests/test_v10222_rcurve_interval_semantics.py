@@ -71,3 +71,18 @@ def test_short_smoke_does_not_fabricate_10_25_50um_values():
                 pre, post, resistance, target, 8.269426
             )
         )
+
+
+def test_resistance_query_does_not_interpolate_gaps_or_extend_last_event():
+    pre = np.array([0.0, 10.0, 30.0])
+    post = np.array([5.0, 15.0, 40.0])
+    resistance = np.array([20.0, 25.0, 30.0])
+    assert math.isnan(PLOTTER._resistance_at_extension(
+        pre, post, resistance, 7.0, 55.0
+    ))
+    assert math.isnan(PLOTTER._resistance_at_extension(
+        pre, post, resistance, 50.0, 55.0
+    ))
+    assert PLOTTER._resistance_at_extension(
+        pre, post, resistance, 12.0, 55.0
+    ) == pytest.approx(25.0)

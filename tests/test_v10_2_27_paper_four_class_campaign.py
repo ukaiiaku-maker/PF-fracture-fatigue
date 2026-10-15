@@ -207,6 +207,12 @@ def test_plotter_target_checkpoints_and_event_interval_semantics() -> None:
     assert module._resistance_at_extension(
         pre, post, resistance, 300.0, 600.0
     ) == 40.0
+    assert np.isnan(module._resistance_at_extension(
+        pre, post, resistance, 200.0, 600.0
+    ))
+    assert np.isnan(module._resistance_at_extension(
+        pre, post, resistance, 650.0, 700.0
+    ))
 
 
 def test_audited_entry_installs_required_corrections_and_energy_ledger() -> None:

@@ -245,3 +245,44 @@ def test_native_geometry_events_attach_deflected_stage_arclength():
     assert [item.stage.value for item in bracket.crossing] == [
         "pre_event", "committed",
     ]
+
+
+def test_pre_event_stage_filter_retains_linked_geometry_for_path_jump():
+    pre = FractureObservation(
+        **{
+            **row(0, 0, stage="pre_event", K=12).to_dict(),
+            "event_id": "physical-7", "path_arclength_m": 0.0,
+        }
+    )
+    committed = FractureObservation.from_dict(
+        {
+            **row(1, 4, stage="committed", pre_um=0, K=math.nan).to_dict(),
+            "event_id": "physical-7", "path_arclength_m": 5e-6,
+        }
+    )
+    history = ObservationHistory([pre, committed])
+    result = history.at_length(
+        2.5e-6, stage="pre_event", coordinate="path_arclength"
+    )
+    assert result.status == "discrete_jump_bracket"
+    assert [item.stage for item in result.crossing] == [
+        ObservationStage.PRE_EVENT, ObservationStage.COMMITTED,
+    ]
+    assert result.crossing[0].K_I_Pa_sqrt_m == pytest.approx(12e6)
+    assert math.isnan(result.crossing[1].K_I_Pa_sqrt_m)
+
+
+def test_named_event_associated_view_does_not_invent_target_equilibrium():
+    pre = FractureObservation(
+        **{**row(0, 8, stage="pre_event", K=14).to_dict(), "event_id": "e"}
+    )
+    committed = FractureObservation.from_dict(
+        {**row(1, 20, stage="committed", pre_um=8, K=math.nan).to_dict(), "event_id": "e"}
+    )
+    result = ObservationHistory([pre, committed]).event_associated_at_length(12e-6)
+    payload = result.to_dict()
+    assert payload["status"] == "event_associated_bracket"
+    assert payload["interpolation_performed"] is False
+    assert payload["brackets"][0]["measured_pre_event"]["K_I_Pa_sqrt_m"] == pytest.approx(14e6)
+    assert payload["brackets"][0]["committed_geometry"]["K_I_Pa_sqrt_m"] is None
+    assert "not an equilibrium measurement at target" in payload["value_role"]

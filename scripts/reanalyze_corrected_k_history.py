@@ -63,8 +63,8 @@ def main(argv=None):
         "accepted outer rows retain cyclic target envelopes and event cycles, but do not "
         "contain the within-cycle unload/reload samples needed for a phase-resolved K(a) curve"
     )
-    plot_history(long_history, args.out / "long_growth_complete_history.png")
-    plot_history(cyclic_history, args.out / "cyclic_accepted_outer_history.png")
+    plot_history(long_history, args.out / "long_growth_complete_history.png", quantity="K_J")
+    plot_history(cyclic_history, args.out / "cyclic_accepted_outer_history.png", quantity="K_probe")
     payload = {"schema": "corrected-k-history-reanalysis/1",
                "source_files_modified": False, "long_growth": long_summary,
                "cyclic_reload_case": cyclic_summary}

@@ -24,17 +24,28 @@ def main(argv=None) -> int:
     parser.add_argument("--stage", choices=[item.value for item in ObservationStage])
     parser.add_argument("--legacy-steps", action="store_true")
     parser.add_argument("--validity", choices=[item.value for item in ValidityStatus])
+    parser.add_argument("--event-associated", action="store_true",
+                        help="return the pre-event measurement linked to the geometry jump crossing target")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
     history = (from_legacy_steps_csv(args.history, front_id=args.front_id or "primary",
                                      segment_id=args.segment_id or "legacy",
                                      initial_length_m=args.initial_length_um * 1e-6)
                if args.legacy_steps else ObservationHistory.load(args.history))
-    result = history.at_length(
-        args.target_um * 1e-6, front_id=args.front_id,
-        segment_id=args.segment_id, stage=args.stage,
-        coordinate=args.coordinate, validity=args.validity,
-    ).to_dict()
+    if args.event_associated:
+        if args.stage not in (None, ObservationStage.PRE_EVENT.value):
+            parser.error("--event-associated permits only --stage pre_event")
+        result = history.event_associated_at_length(
+            args.target_um * 1e-6, front_id=args.front_id,
+            segment_id=args.segment_id, coordinate=args.coordinate,
+            validity=args.validity,
+        ).to_dict()
+    else:
+        result = history.at_length(
+            args.target_um * 1e-6, front_id=args.front_id,
+            segment_id=args.segment_id, stage=args.stage,
+            coordinate=args.coordinate, validity=args.validity,
+        ).to_dict()
     rendered = json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n"
     if args.output:
         args.output.write_text(rendered)

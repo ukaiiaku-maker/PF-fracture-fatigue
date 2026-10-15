@@ -179,6 +179,45 @@ class LengthQueryResult:
                 "upper": None if self.upper is None else self.upper.to_dict(),
                 "interpolation_performed": self.interpolation_performed}
 
+
+@dataclass(frozen=True)
+class EventAssociatedBracket:
+    """A measured activation state linked to its committed geometry only."""
+
+    measured_pre_event: FractureObservation
+    committed_geometry: FractureObservation
+
+    def to_dict(self) -> dict:
+        return {
+            "measured_pre_event": self.measured_pre_event.to_dict(),
+            "committed_geometry": self.committed_geometry.to_dict(),
+            "measurement_role": "activation/load measured at the pre-event coordinate",
+            "geometry_role": "committed upper coordinate; no post-commit K/J is implied",
+        }
+
+
+@dataclass(frozen=True)
+class EventAssociatedLengthResult:
+    schema: str
+    target_length_m: float
+    coordinate: LengthCoordinate
+    status: str
+    brackets: tuple[EventAssociatedBracket, ...]
+    interpolation_performed: bool = False
+
+    def to_dict(self) -> dict:
+        return {
+            "schema": self.schema,
+            "target_length_m": self.target_length_m,
+            "coordinate": self.coordinate.value,
+            "status": self.status,
+            "brackets": [item.to_dict() for item in self.brackets],
+            "value_role": (
+                "event-associated activation/load; not an equilibrium measurement at target"
+            ),
+            "interpolation_performed": self.interpolation_performed,
+        }
+
 class ObservationHistory:
     def __init__(self, rows: Iterable[FractureObservation]):
         self.rows = tuple(sorted(rows, key=lambda row: row.sequence))
@@ -218,7 +257,17 @@ class ObservationHistory:
         position = lambda row: row.length_m(coordinate)
         exact = tuple(row for row in rows if abs(position(row) - target) <= atol_m)
         offset = lambda row: row.initial_length_m if coordinate is LengthCoordinate.ABSOLUTE_PROJECTED else 0.0
-        if coordinate is LengthCoordinate.PATH_ARCLENGTH:
+        if stage is not None and ObservationStage(stage) is ObservationStage.PRE_EVENT:
+            associated = self.event_associated_at_length(
+                target, front_id=front_id, segment_id=segment_id,
+                coordinate=coordinate, validity=validity,
+                valid_only=valid_only, atol_m=atol_m,
+            )
+            crossing = tuple(
+                row for bracket in associated.brackets
+                for row in (bracket.measured_pre_event, bracket.committed_geometry)
+            )
+        elif coordinate is LengthCoordinate.PATH_ARCLENGTH:
             crossing_rows = []
             for lower_row, upper_row in zip(rows, rows[1:]):
                 if (
@@ -254,6 +303,52 @@ class ObservationHistory:
             status = "out_of_range"
         return LengthQueryResult("fracture-length-query/2", target, coordinate, status,
                                  exact, crossing, lower, upper)
+
+    def event_associated_at_length(
+        self, target_length_m: float, *, front_id: str | None = None,
+        segment_id: str | None = None,
+        coordinate: LengthCoordinate | str = LengthCoordinate.EXTENSION,
+        validity: ValidityStatus | str | None = None,
+        valid_only: bool | None = None, atol_m: float = 1e-12,
+    ) -> EventAssociatedLengthResult:
+        """Return the event whose measured pre-state and geometry bracket target.
+
+        This named view never assigns the pre-event K/J to the target or to the
+        committed coordinate.  It only exposes the native event association.
+        """
+        target = float(target_length_m)
+        coordinate = LengthCoordinate(coordinate)
+        measurements = self.filtered(
+            front_id=front_id, segment_id=segment_id,
+            stage=ObservationStage.PRE_EVENT, validity=validity,
+            valid_only=valid_only,
+        )
+        geometry = self.filtered(
+            front_id=front_id, segment_id=segment_id,
+            stage=ObservationStage.COMMITTED,
+        )
+        committed_by_event = {
+            (row.front_id, row.segment_id, row.event_id): row
+            for row in geometry if row.event_id
+        }
+        brackets: list[EventAssociatedBracket] = []
+        for measured in measurements:
+            committed = committed_by_event.get(
+                (measured.front_id, measured.segment_id, measured.event_id)
+            )
+            if committed is None:
+                continue
+            lower = measured.length_m(coordinate)
+            upper = committed.length_m(coordinate)
+            if not (math.isfinite(lower) and math.isfinite(upper)):
+                continue
+            if lower + atol_m < target < upper - atol_m:
+                brackets.append(EventAssociatedBracket(measured, committed))
+        status = "event_associated_bracket" if brackets else "no_event_crossing"
+        return EventAssociatedLengthResult(
+            "fracture-event-associated-length-query/1", target, coordinate,
+            status, tuple(brackets), False,
+        )
 
     def write_jsonl(self, path: str | Path) -> None:
         with Path(path).open("w") as stream:
@@ -388,5 +483,6 @@ def with_geometry_event_arclength(
 
 __all__ = ["SCHEMA", "ObservationStage", "LoadDirection", "ValidityStatus",
            "LengthCoordinate", "FractureObservation", "LengthQueryResult",
+           "EventAssociatedBracket", "EventAssociatedLengthResult",
            "ObservationHistory", "from_legacy_steps_csv",
            "with_geometry_event_arclength"]

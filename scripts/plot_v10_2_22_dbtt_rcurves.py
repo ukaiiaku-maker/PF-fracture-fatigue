@@ -68,11 +68,10 @@ def _resistance_at_extension(
     target_um: float,
     achieved_um: float,
 ) -> float:
-    """Return resistance supported by the realized discrete crack path.
+    """Return event-associated K only inside a recorded event interval.
 
-    Each accepted cleavage event carries its initiation resistance over the
-    extension interval produced by that event. Requests beyond the achieved
-    crack extension return NaN rather than silently repeating the last value.
+    This is not an equilibrium interpolation at the target. Gaps and the
+    region after the final event interval remain unavailable.
     """
     if pre.size == 0 or not np.isfinite(achieved_um):
         return float("nan")
@@ -80,23 +79,9 @@ def _resistance_at_extension(
     tol = 1.0e-9 * max(abs(achieved_um), abs(target), 1.0)
     if target < -tol or target > achieved_um + tol:
         return float("nan")
-    if target <= pre[0] + tol:
-        return float(resistance[0])
-
     for index in range(pre.size):
         if pre[index] - tol <= target <= post[index] + tol:
             return float(resistance[index])
-        if index + 1 < pre.size and post[index] < target < pre[index + 1]:
-            return float(
-                np.interp(
-                    target,
-                    [post[index], pre[index + 1]],
-                    [resistance[index], resistance[index + 1]],
-                )
-            )
-
-    if target <= achieved_um + tol:
-        return float(resistance[-1])
     return float("nan")
 
 
