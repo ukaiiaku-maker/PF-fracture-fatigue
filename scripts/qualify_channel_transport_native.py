@@ -1,0 +1,149 @@
+#!/usr/bin/env python3
+"""Run a compact nonzero native channel-transport/restart qualification."""
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+from dataclasses import replace
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from arrhenius_fracture.shared_execution import execute_shared
+from arrhenius_fracture.shared_options import OutputProfile, PRESETS
+from scripts.analyze_f1_current_restart import compare
+
+
+def native_args(kernel_family: Path, steps: int) -> list[str]:
+    return [
+        "--signed-kernel-family", str(kernel_family.resolve()),
+        "--mode", "2d",
+        "--parameter-option", "v913_paper_peak01_0242980_persistent_sites",
+        "--temperatures", "900",
+        "--steps", str(int(steps)),
+        "--dU", "1e-6",
+        "--dt", "8.4",
+        "--n-stagger", "1",
+        "--da-phys", "5e-6",
+        "--target-crack-extension-um", "5",
+        "--front-state-model", "moving_pz",
+        "--tip-source-model", "continuum",
+        "--tip-kinetics-mode", "moving_velocity",
+        "--bulk-plasticity-mode", "tip_only",
+        "--directional-j-mode", "root_signed",
+        "--tip-plasticity",
+        "--active-shielding",
+        "--signed-active-shielding",
+        "--mobile-shield-fraction", "0",
+        "--no-wake-shielding",
+        "--crystal-aniso",
+        "--crystal-compete",
+        "--crystal-theta-deg", "30",
+        "--crystal-material", "w",
+        "--j-decomposition", "cluster",
+        "--max-fronts", "1",
+        "--crack-backend", "sharp_wake",
+        "--print-every", "1",
+    ]
+
+
+def _terminal(path: Path) -> dict[str, float]:
+    with (path / "steps_0900K.csv").open(newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    if not rows:
+        raise RuntimeError(f"native execution produced no accepted rows: {path}")
+    row = rows[-1]
+    keys = (
+        "N_em", "W_emit_J_per_m", "mpz_mobile_count", "mpz_retained_count",
+        "mpz_local_slip_count", "mpz_escaped_total", "mpz_recovered_total",
+    )
+    return {key: float(row[key]) for key in keys}
+
+
+def _binding(path: Path) -> dict:
+    receipt = json.loads((path / "shared_runtime_attestation.post.json").read_text())
+    binding = receipt["executed_physics_binding"]
+    if not binding.get("all_expected_methods_bound", False):
+        raise RuntimeError(f"failed persistent runtime contract: {path}")
+    if binding.get("signed_transport_mode") != "channel_resolved":
+        raise RuntimeError(f"wrong executed transport binding: {path}")
+    return binding
+
+
+def qualify(output: Path, kernel_family: Path) -> dict:
+    if not kernel_family.is_file():
+        raise FileNotFoundError(kernel_family)
+    output.mkdir(parents=True, exist_ok=False)
+    options = replace(
+        PRESETS["pf_monotonic_tip_persistent_channel"],
+        output=OutputProfile.PUBLICATION_RESTART,
+    )
+    initial = output / "initial_step1"
+    restarted = output / "restart_to_step2"
+    uninterrupted = output / "uninterrupted_to_step2"
+    execute_shared(options, native_args(kernel_family, 1), initial, source_policy="qualified")
+    execute_shared(
+        options, native_args(kernel_family, 2), restarted,
+        source_policy="qualified", restart_from=initial / "checkpoint",
+    )
+    execute_shared(
+        options, native_args(kernel_family, 2), uninterrupted,
+        source_policy="qualified",
+    )
+    restart = compare(uninterrupted / "checkpoint", restarted / "checkpoint")
+    terminals = {
+        "initial": _terminal(initial),
+        "restarted": _terminal(restarted),
+        "uninterrupted": _terminal(uninterrupted),
+    }
+    bindings = {
+        "initial": _binding(initial),
+        "restarted": _binding(restarted),
+        "uninterrupted": _binding(uninterrupted),
+    }
+    nonzero = all(
+        row["N_em"] > 0.0 and row["W_emit_J_per_m"] > 0.0
+        for row in terminals.values()
+    )
+    passed = restart["status"] == "PASS" and nonzero
+    report = {
+        "schema": "native-channel-transport-qualification/1",
+        "status": "PASS" if passed else "FAIL",
+        "classification": "compact native readiness qualification",
+        "production_execution_authorized": False,
+        "source_option": options.to_dict(),
+        "options_sha256": options.fingerprint,
+        "kernel_family": str(kernel_family.resolve()),
+        "executed_bindings": bindings,
+        "terminal_activity": terminals,
+        "nonzero_source_and_work": nonzero,
+        "restart_comparison": restart,
+        "scope": (
+            "two-step original spatial PF channel-resolved transport with "
+            "persistent source, full mechanics, active state and fresh-process restart"
+        ),
+    }
+    (output / "qualification_report.json").write_text(
+        json.dumps(report, indent=2, sort_keys=True) + "\n"
+    )
+    if not passed:
+        raise RuntimeError("native channel transport qualification failed")
+    return report
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--kernel-family", type=Path, required=True)
+    args = parser.parse_args(argv)
+    report = qualify(args.output.resolve(), args.kernel_family.resolve())
+    print(json.dumps(report, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
