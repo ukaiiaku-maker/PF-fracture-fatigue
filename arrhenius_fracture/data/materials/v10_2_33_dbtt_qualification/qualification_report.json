@@ -1,0 +1,467 @@
+{
+  "options": [
+    {
+      "candidate_id": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification__candidate",
+      "constructor_candidate_id": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification__candidate",
+      "domain": {
+        "all_declared_points_admissible": true,
+        "continuous_domain_K": [
+          300.0,
+          1300.0
+        ],
+        "declared_points": [
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 1.340729352323424,
+              "cleavage_sigc_Pa": 6968487250.276886,
+              "emission_G0_eV": 2.2266688187832138,
+              "emission_sigc_Pa": 5223307435.469401,
+              "peierls_G0_eV": 2.9578885446912357,
+              "peierls_projected_equivalent_sigc_Pa": 3015677953.928433,
+              "peierls_surface_sigc_Pa": 5223307435.469401,
+              "taylor_G0_eV": 2.802907119371998,
+              "taylor_projected_equivalent_sigc_Pa": 3015677953.928433,
+              "taylor_surface_sigc_Pa": 5223307435.469401
+            },
+            "temperature_K": 300.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 3.023283265860834,
+              "cleavage_sigc_Pa": 6607245640.021796,
+              "emission_G0_eV": 4.076712557882264,
+              "emission_sigc_Pa": 3656315205.128581,
+              "peierls_G0_eV": 3.89733286052604,
+              "peierls_projected_equivalent_sigc_Pa": 2110974567.9231083,
+              "peierls_surface_sigc_Pa": 3656315205.128581,
+              "taylor_G0_eV": 1.9920349835603985,
+              "taylor_projected_equivalent_sigc_Pa": 2110974567.9231083,
+              "taylor_surface_sigc_Pa": 3656315205.128581
+            },
+            "temperature_K": 600.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 4.144985874885774,
+              "cleavage_sigc_Pa": 6366417899.851736,
+              "emission_G0_eV": 5.310075050614963,
+              "emission_sigc_Pa": 2611653718.2347007,
+              "peierls_G0_eV": 4.523629071082576,
+              "peierls_projected_equivalent_sigc_Pa": 1507838977.2528918,
+              "peierls_surface_sigc_Pa": 2611653718.2347007,
+              "taylor_G0_eV": 1.451453559685999,
+              "taylor_projected_equivalent_sigc_Pa": 1507838977.2528918,
+              "taylor_surface_sigc_Pa": 2611653718.2347007
+            },
+            "temperature_K": 800.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 4.7058371793982445,
+              "cleavage_sigc_Pa": 6246004029.766706,
+              "emission_G0_eV": 5.9267562969813135,
+              "emission_sigc_Pa": 2089322974.787761,
+              "peierls_G0_eV": 4.836777176360845,
+              "peierls_projected_equivalent_sigc_Pa": 1206271181.9177837,
+              "peierls_surface_sigc_Pa": 2089322974.787761,
+              "taylor_G0_eV": 1.1811628477487992,
+              "taylor_projected_equivalent_sigc_Pa": 1206271181.9177837,
+              "taylor_surface_sigc_Pa": 2089322974.787761
+            },
+            "temperature_K": 900.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 4.986262831654479,
+              "cleavage_sigc_Pa": 6185797094.724191,
+              "emission_G0_eV": 6.235096920164489,
+              "emission_sigc_Pa": 1828157603.064291,
+              "peierls_G0_eV": 4.993351228999979,
+              "peierls_projected_equivalent_sigc_Pa": 1055487284.2502296,
+              "peierls_surface_sigc_Pa": 1828157603.064291,
+              "taylor_G0_eV": 1.0460174917801994,
+              "taylor_projected_equivalent_sigc_Pa": 1055487284.2502296,
+              "taylor_surface_sigc_Pa": 1828157603.064291
+            },
+            "temperature_K": 950.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 5.266688483910714,
+              "cleavage_sigc_Pa": 6125590159.681677,
+              "emission_G0_eV": 6.543437543347664,
+              "emission_sigc_Pa": 1566992231.3408206,
+              "peierls_G0_eV": 5.149925281639113,
+              "peierls_projected_equivalent_sigc_Pa": 904703386.5826752,
+              "peierls_surface_sigc_Pa": 1566992231.3408206,
+              "taylor_G0_eV": 0.9108721358115992,
+              "taylor_projected_equivalent_sigc_Pa": 904703386.5826752,
+              "taylor_surface_sigc_Pa": 1566992231.3408206
+            },
+            "temperature_K": 1000.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 5.547114136166949,
+              "cleavage_sigc_Pa": 6065383224.639161,
+              "emission_G0_eV": 6.851778166530838,
+              "emission_sigc_Pa": 1305826859.6173508,
+              "peierls_G0_eV": 5.3064993342782465,
+              "peierls_projected_equivalent_sigc_Pa": 753919488.9151212,
+              "peierls_surface_sigc_Pa": 1305826859.6173508,
+              "taylor_G0_eV": 0.7757267798429994,
+              "taylor_projected_equivalent_sigc_Pa": 753919488.9151212,
+              "taylor_surface_sigc_Pa": 1305826859.6173508
+            },
+            "temperature_K": 1050.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 5.827539788423184,
+              "cleavage_sigc_Pa": 6005176289.596646,
+              "emission_G0_eV": 7.160118789714014,
+              "emission_sigc_Pa": 1044661487.8938805,
+              "peierls_G0_eV": 5.463073386917381,
+              "peierls_projected_equivalent_sigc_Pa": 603135591.2475669,
+              "peierls_surface_sigc_Pa": 1044661487.8938805,
+              "taylor_G0_eV": 0.6405814238743996,
+              "taylor_projected_equivalent_sigc_Pa": 603135591.2475669,
+              "taylor_surface_sigc_Pa": 1044661487.8938805
+            },
+            "temperature_K": 1100.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 6.107965440679419,
+              "cleavage_sigc_Pa": 5944969354.5541315,
+              "emission_G0_eV": 7.4684594128971895,
+              "emission_sigc_Pa": 783496116.1704106,
+              "peierls_G0_eV": 5.619647439556515,
+              "peierls_projected_equivalent_sigc_Pa": 452351693.5800129,
+              "peierls_surface_sigc_Pa": 783496116.1704106,
+              "taylor_G0_eV": 0.5054360679057996,
+              "taylor_projected_equivalent_sigc_Pa": 452351693.5800129,
+              "taylor_surface_sigc_Pa": 783496116.1704106
+            },
+            "temperature_K": 1150.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 6.388391092935654,
+              "cleavage_sigc_Pa": 5884762419.511616,
+              "emission_G0_eV": 7.776800036080363,
+              "emission_sigc_Pa": 522330744.4469407,
+              "peierls_G0_eV": 5.776221492195649,
+              "peierls_projected_equivalent_sigc_Pa": 301567795.9124589,
+              "peierls_surface_sigc_Pa": 522330744.4469407,
+              "taylor_G0_eV": 0.37029071193719987,
+              "taylor_projected_equivalent_sigc_Pa": 301567795.9124589,
+              "taylor_surface_sigc_Pa": 522330744.4469407
+            },
+            "temperature_K": 1200.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 6.668816745191889,
+              "cleavage_sigc_Pa": 5824555484.469102,
+              "emission_G0_eV": 8.085140659263539,
+              "emission_sigc_Pa": 261165372.72347084,
+              "peierls_G0_eV": 5.932795544834783,
+              "peierls_projected_equivalent_sigc_Pa": 150783898.24490485,
+              "peierls_surface_sigc_Pa": 261165372.72347084,
+              "taylor_G0_eV": 0.2351453559686001,
+              "taylor_projected_equivalent_sigc_Pa": 150783898.24490485,
+              "taylor_surface_sigc_Pa": 261165372.72347084
+            },
+            "temperature_K": 1250.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 6.949242397448124,
+              "cleavage_sigc_Pa": 5764348549.426586,
+              "emission_G0_eV": 8.393481282446714,
+              "emission_sigc_Pa": 1.0000009709187907,
+              "peierls_G0_eV": 6.089369597473917,
+              "peierls_projected_equivalent_sigc_Pa": 0.577350829749851,
+              "peierls_surface_sigc_Pa": 1.0000009709187907,
+              "taylor_G0_eV": 0.10000000000000009,
+              "taylor_projected_equivalent_sigc_Pa": 0.577350829749851,
+              "taylor_surface_sigc_Pa": 1.0000009709187907
+            },
+            "temperature_K": 1300.0
+          }
+        ],
+        "emission_stress_extrema": {
+          "maximum_Pa": 5223307435.4694,
+          "maximum_at_K": 300.0,
+          "minimum_Pa": 1.0000004768371582,
+          "minimum_at_K": 1300.0
+        },
+        "taylor_barrier_extrema_eV": {
+          "maximum": 2.802907119371998,
+          "maximum_at_K": 300.0,
+          "minimum": 0.10000000000000009,
+          "minimum_at_K": 1300.0
+        }
+      },
+      "manifest_sha256": "13bea171506146740a343c94ff1f2f69ee01e94f2739e5fcbb3b5e4896aaf8c2",
+      "option_key": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification",
+      "parent_option_key": "v913_paper_dbtt01_0202500_persistent_sites__shared_sigc_minimal_intercept",
+      "registry": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv",
+      "registry_sha256": "ff1aa20b2eb135b64aa55ff34859d7d1cd83e2a948251393c287e74ba5ec340e",
+      "source_lifecycle_provenance": "current_persistent_paper_lineage"
+    },
+    {
+      "candidate_id": "dbtt_primary_taylor_0p10eV_qualification__candidate",
+      "constructor_candidate_id": "dbtt_primary_taylor_0p10eV_qualification__candidate",
+      "domain": {
+        "all_declared_points_admissible": true,
+        "continuous_domain_K": [
+          300.0,
+          1300.0
+        ],
+        "declared_points": [
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 1.860684636518107,
+              "cleavage_sigc_Pa": 3380352094.723252,
+              "emission_G0_eV": 4.7115663796532425,
+              "emission_sigc_Pa": 6046153873.600367,
+              "peierls_G0_eV": 0.5716245443842896,
+              "peierls_projected_equivalent_sigc_Pa": 3490748566.4850707,
+              "peierls_surface_sigc_Pa": 6046153873.600367,
+              "taylor_G0_eV": 4.434784321773185,
+              "taylor_projected_equivalent_sigc_Pa": 3490748566.4850707,
+              "taylor_surface_sigc_Pa": 6046153873.600367
+            },
+            "temperature_K": 300.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 4.427758655788927,
+              "cleavage_sigc_Pa": 4700104644.900652,
+              "emission_G0_eV": 4.864754459201043,
+              "emission_sigc_Pa": 4687068818.455426,
+              "peierls_G0_eV": 0.7722470611969766,
+              "peierls_projected_equivalent_sigc_Pa": 2706080444.045542,
+              "peierls_surface_sigc_Pa": 4687068818.455426,
+              "taylor_G0_eV": 3.8399258442983273,
+              "taylor_projected_equivalent_sigc_Pa": 2706080444.045542,
+              "taylor_surface_sigc_Pa": 4687068818.455426
+            },
+            "temperature_K": 600.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 6.139141335302806,
+              "cleavage_sigc_Pa": 5579939678.352251,
+              "emission_G0_eV": 4.966879845566242,
+              "emission_sigc_Pa": 3781012115.025466,
+              "peierls_G0_eV": 0.905995405738768,
+              "peierls_projected_equivalent_sigc_Pa": 2182968362.4191895,
+              "peierls_surface_sigc_Pa": 3781012115.025466,
+              "taylor_G0_eV": 3.443353525981756,
+              "taylor_projected_equivalent_sigc_Pa": 2182968362.4191895,
+              "taylor_surface_sigc_Pa": 3781012115.025466
+            },
+            "temperature_K": 800.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 6.994832675059747,
+              "cleavage_sigc_Pa": 6019857195.078052,
+              "emission_G0_eV": 5.0179425387488426,
+              "emission_sigc_Pa": 3327983763.3104863,
+              "peierls_G0_eV": 0.9728695780096637,
+              "peierls_projected_equivalent_sigc_Pa": 1921412321.6060133,
+              "peierls_surface_sigc_Pa": 3327983763.3104863,
+              "taylor_G0_eV": 3.245067366823471,
+              "taylor_projected_equivalent_sigc_Pa": 1921412321.6060133,
+              "taylor_surface_sigc_Pa": 3327983763.3104863
+            },
+            "temperature_K": 900.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 7.422678344938218,
+              "cleavage_sigc_Pa": 6239815953.440951,
+              "emission_G0_eV": 5.043473885340143,
+              "emission_sigc_Pa": 3101469587.4529963,
+              "peierls_G0_eV": 1.0063066641451115,
+              "peierls_projected_equivalent_sigc_Pa": 1790634301.1994252,
+              "peierls_surface_sigc_Pa": 3101469587.4529963,
+              "taylor_G0_eV": 3.145924287244328,
+              "taylor_projected_equivalent_sigc_Pa": 1790634301.1994252,
+              "taylor_surface_sigc_Pa": 3101469587.4529963
+            },
+            "temperature_K": 950.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 7.850524014816688,
+              "cleavage_sigc_Pa": 6459774711.803852,
+              "emission_G0_eV": 5.069005231931443,
+              "emission_sigc_Pa": 2874955411.595506,
+              "peierls_G0_eV": 1.0397437502805595,
+              "peierls_projected_equivalent_sigc_Pa": 1659856280.7928371,
+              "peierls_surface_sigc_Pa": 2874955411.595506,
+              "taylor_G0_eV": 3.046781207665185,
+              "taylor_projected_equivalent_sigc_Pa": 1659856280.7928371,
+              "taylor_surface_sigc_Pa": 2874955411.595506
+            },
+            "temperature_K": 1000.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 8.278369684695157,
+              "cleavage_sigc_Pa": 6679733470.166753,
+              "emission_G0_eV": 5.094536578522742,
+              "emission_sigc_Pa": 2648441235.7380157,
+              "peierls_G0_eV": 1.0731808364160074,
+              "peierls_projected_equivalent_sigc_Pa": 1529078260.3862486,
+              "peierls_surface_sigc_Pa": 2648441235.7380157,
+              "taylor_G0_eV": 2.947638128086042,
+              "taylor_projected_equivalent_sigc_Pa": 1529078260.3862486,
+              "taylor_surface_sigc_Pa": 2648441235.7380157
+            },
+            "temperature_K": 1050.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 8.706215354573628,
+              "cleavage_sigc_Pa": 6899692228.529652,
+              "emission_G0_eV": 5.120067925114043,
+              "emission_sigc_Pa": 2421927059.880526,
+              "peierls_G0_eV": 1.1066179225514552,
+              "peierls_projected_equivalent_sigc_Pa": 1398300239.9796607,
+              "peierls_surface_sigc_Pa": 2421927059.880526,
+              "taylor_G0_eV": 2.8484950485068996,
+              "taylor_projected_equivalent_sigc_Pa": 1398300239.9796607,
+              "taylor_surface_sigc_Pa": 2421927059.880526
+            },
+            "temperature_K": 1100.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 9.134061024452098,
+              "cleavage_sigc_Pa": 7119650986.892551,
+              "emission_G0_eV": 5.1455992717053425,
+              "emission_sigc_Pa": 2195412884.0230365,
+              "peierls_G0_eV": 1.140055008686903,
+              "peierls_projected_equivalent_sigc_Pa": 1267522219.573073,
+              "peierls_surface_sigc_Pa": 2195412884.0230365,
+              "taylor_G0_eV": 2.7493519689277566,
+              "taylor_projected_equivalent_sigc_Pa": 1267522219.573073,
+              "taylor_surface_sigc_Pa": 2195412884.0230365
+            },
+            "temperature_K": 1150.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 9.561906694330567,
+              "cleavage_sigc_Pa": 7339609745.255451,
+              "emission_G0_eV": 5.171130618296643,
+              "emission_sigc_Pa": 1968898708.165546,
+              "peierls_G0_eV": 1.1734920948223508,
+              "peierls_projected_equivalent_sigc_Pa": 1136744199.1664846,
+              "peierls_surface_sigc_Pa": 1968898708.165546,
+              "taylor_G0_eV": 2.6502088893486135,
+              "taylor_projected_equivalent_sigc_Pa": 1136744199.1664846,
+              "taylor_surface_sigc_Pa": 1968898708.165546
+            },
+            "temperature_K": 1200.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 9.989752364209037,
+              "cleavage_sigc_Pa": 7559568503.618351,
+              "emission_G0_eV": 5.196661964887943,
+              "emission_sigc_Pa": 1742384532.308056,
+              "peierls_G0_eV": 1.2069291809577987,
+              "peierls_projected_equivalent_sigc_Pa": 1005966178.7598965,
+              "peierls_surface_sigc_Pa": 1742384532.308056,
+              "taylor_G0_eV": 2.551065809769471,
+              "taylor_projected_equivalent_sigc_Pa": 1005966178.7598965,
+              "taylor_surface_sigc_Pa": 1742384532.308056
+            },
+            "temperature_K": 1250.0
+          },
+          {
+            "admissible": true,
+            "raw_scales": {
+              "cleavage_G0_eV": 10.417598034087508,
+              "cleavage_sigc_Pa": 7779527261.981252,
+              "emission_G0_eV": 5.222193311479243,
+              "emission_sigc_Pa": 1515870356.450566,
+              "peierls_G0_eV": 1.2403662670932465,
+              "peierls_projected_equivalent_sigc_Pa": 875188158.3533084,
+              "peierls_surface_sigc_Pa": 1515870356.450566,
+              "taylor_G0_eV": 2.4519227301903284,
+              "taylor_projected_equivalent_sigc_Pa": 875188158.3533084,
+              "taylor_surface_sigc_Pa": 1515870356.450566
+            },
+            "temperature_K": 1300.0
+          }
+        ],
+        "emission_stress_extrema": {
+          "maximum_Pa": 6046153873.600366,
+          "maximum_at_K": 300.0,
+          "minimum_Pa": 1515870356.4505658,
+          "minimum_at_K": 1300.0
+        },
+        "taylor_barrier_extrema_eV": {
+          "maximum": 4.434784321773185,
+          "maximum_at_K": 300.0,
+          "minimum": 2.4519227301903284,
+          "minimum_at_K": 1300.0
+        }
+      },
+      "manifest_sha256": "887c329efe6af3ccc058cdc2c2fbed12d8faed1c1d0f9ecbd706bfb3c0395e98",
+      "option_key": "dbtt_primary_taylor_0p10eV_qualification",
+      "parent_option_key": "dbtt_primary",
+      "registry": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv",
+      "registry_sha256": "c440193d8b0eeb89ce4f0da3ee9ed639e8f32e7f58b40a1ea45c240fd60fde4b",
+      "source_lifecycle_provenance": "older_approved_finite_source_refresh_and_recovery_lineage"
+    }
+  ],
+  "physical_calibration_claimed": false,
+  "production_selection": null,
+  "registries": [
+    {
+      "path": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_paper_minimal_qualification_registry.csv",
+      "sha256": "ff1aa20b2eb135b64aa55ff34859d7d1cd83e2a948251393c287e74ba5ec340e"
+    },
+    {
+      "path": "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/dbtt_primary_qualification_registry.csv",
+      "sha256": "c440193d8b0eeb89ce4f0da3ee9ed639e8f32e7f58b40a1ea45c240fd60fde4b"
+    }
+  ],
+  "schema": "dbtt-explicit-qualification-options/1",
+  "selection_boundary": "Both rows are complete numerical qualification inputs. The paper-lineage minimal-stress row changes the shared emission/Peierls/Taylor stress scale; the earlier dbtt_primary row changes the complete material/source family. Neither is selected for production.",
+  "source_candidates": "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_shared_stress_scale_candidates.json",
+  "source_candidates_sha256": "a424e8a6a992d4c7862823ada310bb7509edd1bba6b38d2b6854d62cd47f9547",
+  "status": "PASS"
+}
