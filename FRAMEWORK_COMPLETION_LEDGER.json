@@ -161,16 +161,16 @@
     {
       "id": "R07",
       "goal_ids": ["FG-08", "FG-09", "FG-10"],
-      "status": "PARTIAL_NUMERICAL_QUALIFICATION",
-      "concrete_defect": "Affine transverse control is correct, and the retained native mixed-mode control tests pass in the FEM environment together with cohesive/remesh/restart transitions. Cracked-body constitutive state, hazards, observers and restart still do not carry all declared plane-stress/generalized-constraint and mixity paths, so the focused pass does not close R07.",
+      "status": "PARTIAL_NATIVE_CRACKED_BODY_PLANE_STRESS_QUALIFIED_GENERALIZED_AND_MIXITY_PENDING",
+      "concrete_defect": "Plane stress is now consumed by the independent native cracked cohesive specimen rather than remaining a patch-only tensor option. On the same mesh, cohesive law and opening it produces a distinct, more compliant reaction than plane strain, and its complete active state restarts exactly. Affine generalized transverse controls and retained native mixed-mode component tests still pass, but generalized transverse control and mode-I/mode-II mixity are not yet carried together through the cracked-body constitutive, hazard, observer and restart path.",
       "owner_consumer": "PF/FEM cracked-body solvers and mechanism tensor projections",
       "authoritative_source": "mechanics constraint contract and native cracked-body fields",
       "dependencies": ["R01", "R03"],
-      "exact_next_command": "python scripts/qualify_cracked_body_constraints.py --compact --output integration_evidence/cracked_constraint_<commit>",
+      "exact_next_command": "extend the native cracked-specimen state with explicit generalized transverse work/control and mode-I/mode-II grip loading, then run the same active-state restart and tensor-consumer trace",
       "input_output_identity": "plane strain, plane stress and explicit generalized control; mode I/II separate",
       "numerical_criteria": "Nonuniform active state, tensor-consumer trace, response refinement and active-update restart.",
-      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json"],
-      "remaining_limitation": "Cracked-body path incomplete; no 3-D claim."
+      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@889f334:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@f748cfa:integration_evidence/r05_r07_bilinear_constraints_889f334/qualification_report.json"],
+      "remaining_limitation": "The native cracked-body plane-strain and plane-stress mode-I paths are qualified. Generalized prescribed epsilon_zz/sigma_zz, mode II and mixed I/II remain patch/component capabilities not yet connected to the cracked specimen; no mode III or 3-D claim is made."
     },
     {
       "id": "R08",
