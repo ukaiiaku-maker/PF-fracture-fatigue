@@ -9,7 +9,8 @@ from arrhenius_fracture.archived_fatigue_material_r9 import (
 from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY
 from arrhenius_fracture.fatigue_v1 import FatigueWaveform
 from arrhenius_fracture.paris_slope_r9 import (
-    configure_stochastic_engine, mean_cycle_inputs, qualify_mean_cycle_overlap,
+    PhaseCursor, _set_cursor_cycles, configure_stochastic_engine,
+    mean_cycle_inputs, qualify_mean_cycle_overlap,
 )
 
 
@@ -63,3 +64,15 @@ def test_high_load_overlap_fails_closed_to_exact_phase_execution():
     overlap = qualify_mean_cycle_overlap(engine, waveform, 300.0, 64)
     assert overlap["passed"] is False
     assert overlap["state_relative_max_error"] > 2.0e-3
+
+
+def test_native_fractional_return_maps_to_restartable_phase_cursor():
+    waveform = FatigueWaveform(Kmax=5.0e6, R=0.1, frequency_Hz=1000.0)
+    cursor = PhaseCursor()
+    _set_cursor_cycles(cursor, 17.0 + 11.25/64.0, waveform, 64)
+    assert cursor.completed_cycles == 17
+    assert cursor.phase_index == 11
+    assert cursor.remaining_phase_s == waveform.period_s/64.0 * 0.75
+
+    _set_cursor_cycles(cursor, 18.0, waveform, 64)
+    assert cursor == PhaseCursor(completed_cycles=18)

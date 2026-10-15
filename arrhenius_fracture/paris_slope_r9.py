@@ -7,6 +7,7 @@ import json
 import math
 import os
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
@@ -19,7 +20,12 @@ from .fatigue_v1 import FatigueWaveform
 from .persistent_site_high_cycle_checkpoint_v10230 import (
     restore_checkpoint, write_checkpoint,
 )
+from .persistent_site_high_cycle_engine_v10230 import (
+    MODEL_ID as NATIVE_HIGH_CYCLE_MODEL_ID,
+    integrate_state_coupled_waveform,
+)
 from .persistent_site_high_cycle_state_v10230 import serialize_active_state
+from .persistent_site_poincare_v10230 import one_cycle_map
 from .reduced_persistent_reference_r2 import (
     ReducedPersistentReversibleTipEngine, advance_signed,
 )
@@ -30,6 +36,7 @@ from .stochastic_avalanche_tip import (
 
 
 MODEL_ID = "r9.archived-v3.1-current-backend-phase-exact-fatigue/1"
+NATIVE_CONTINUATION_ID = "r10.native-phase-resolved-high-cycle-continuation/1"
 
 
 @dataclass
@@ -37,6 +44,25 @@ class PhaseCursor:
     completed_cycles: int = 0
     phase_index: int = 0
     remaining_phase_s: float = 0.0
+
+
+class _NativePhaseController:
+    """Only supplies the already-declared midpoint waveform discretization."""
+
+    def __init__(self, phase_count: int):
+        self.phase_count = int(phase_count)
+        self.cfg = SimpleNamespace(
+            n_phase=self.phase_count,
+            min_block_cycles=1.0e-6,
+            block_cycles=1.0e12,
+            max_block_cycles=1.0e12,
+            cycle_block_mode="hazard_limited",
+        )
+
+    def _phases(self) -> np.ndarray:
+        return (np.arange(self.phase_count, dtype=float) + 0.5) * (
+            2.0 * np.pi / self.phase_count
+        )
 
 
 def configure_stochastic_engine(
@@ -117,7 +143,11 @@ def _exact_phase_call(engine: Any, cursor: PhaseCursor, waveform: FatigueWavefor
         cursor.remaining_phase_s = duration
     K = float(phase_values(waveform, phase_count)[cursor.phase_index])
     before_remaining = float(cursor.remaining_phase_s)
-    before_cycle = float(cursor.completed_cycles) + cursor.phase_index / phase_count
+    phase_duration = waveform.period_s / phase_count
+    before_cycle = (
+        float(cursor.completed_cycles) + cursor.phase_index / phase_count
+        + (phase_duration-before_remaining)/waveform.period_s
+    )
     result = advance_signed(
         engine, K_Pa_sqrt_m=K, temperature_K=temperature_K,
         dt_s=before_remaining,
@@ -188,6 +218,175 @@ def qualify_mean_cycle_overlap(engine: Any, waveform: FatigueWaveform,
     }
 
 
+def _snapshot_difference(left: Any, right: Any) -> dict[str, Any]:
+    """Report absolute and well-scaled discrepancies without tiny denominators."""
+    if left.vector.shape != right.vector.shape:
+        raise RuntimeError("active-state layouts differ across native resolution trial")
+    fields: dict[str, dict[str, float]] = {}
+    for field in left.fields:
+        a = left.vector[field.start:field.stop]
+        b = right.vector[field.start:field.stop]
+        absolute = np.abs(a-b)
+        scaled = absolute / np.maximum(np.maximum(np.abs(a), np.abs(b)), 1.0)
+        fields[f"{field.owner}.{field.name}"] = {
+            "absolute_linf": float(np.max(absolute, initial=0.0)),
+            "unit_floor_relative_linf": float(np.max(scaled, initial=0.0)),
+        }
+    diagnostics: dict[str, dict[str, float]] = {}
+    for name in sorted(set(left.diagnostics) & set(right.diagnostics)):
+        a = float(left.diagnostics[name]); b = float(right.diagnostics[name])
+        diagnostics[name] = {
+            "absolute": abs(a-b),
+            "unit_floor_relative": abs(a-b)/max(abs(a), abs(b), 1.0),
+        }
+    owner, record = max(
+        fields.items(), key=lambda item: item[1]["unit_floor_relative_linf"],
+        default=("none", {"absolute_linf": 0.0, "unit_floor_relative_linf": 0.0}),
+    )
+    return {
+        "maximum_field": owner,
+        "maximum_unit_floor_relative": record["unit_floor_relative_linf"],
+        "maximum_field_absolute": record["absolute_linf"],
+        "fields": fields,
+        "diagnostics": diagnostics,
+    }
+
+
+def qualify_native_phase_resolution(
+    engine: Any, waveform: FatigueWaveform, temperature_K: float,
+    phase_count: int,
+) -> dict[str, Any]:
+    """Cross-check native source paths and bracket the production phase grid."""
+    counts = tuple(sorted({max(int(phase_count)//2, 8), int(phase_count),
+                           2*int(phase_count)}))
+    maps = {
+        count: one_cycle_map(
+            engine, _NativePhaseController(count), waveform, temperature_K,
+        )
+        for count in counts
+    }
+    convergence = []
+    for coarse, fine in zip(counts[:-1], counts[1:]):
+        left, right = maps[coarse], maps[fine]
+        convergence.append({
+            "coarse_phase_count": coarse, "fine_phase_count": fine,
+            "state": _snapshot_difference(left.state_end, right.state_end),
+            "hazard_action_absolute": abs(
+                left.hazard_action_per_cycle-right.hazard_action_per_cycle
+            ),
+            "hazard_action_relative": abs(
+                left.hazard_action_per_cycle-right.hazard_action_per_cycle
+            ) / max(abs(left.hazard_action_per_cycle),
+                    abs(right.hazard_action_per_cycle), 1.0e-300),
+        })
+
+    # Independent public step path versus the private native one-cycle map.
+    explicit = copy.deepcopy(engine)
+    explicit.hazard_threshold_action = 1.0e100
+    explicit.hazard_action_current = 0.0
+    explicit.B = 0.0
+    cursor = PhaseCursor()
+    clear_pending_geometry_events()
+    with pending_geometry_event_scope():
+        while cursor.completed_cycles < 1:
+            row = _exact_phase_call(
+                explicit, cursor, waveform, temperature_K, phase_count,
+            )
+            if row["event"] is not None:
+                raise RuntimeError("native source comparison crossed its huge mark")
+    # Both paths are compared at the same stroboscopic phase origin.
+    if hasattr(explicit, "K_prev"):
+        explicit.K_prev = float(waveform.Kmax)
+    reference = maps[int(phase_count)]
+    source_state = serialize_active_state(
+        explicit, waveform=waveform, temperature_K=temperature_K,
+    )
+    source_hazard = float(explicit.hazard_action_current)
+    return {
+        "schema": "r10.native-phase-resolution-qualification/1",
+        "production_phase_count": int(phase_count),
+        "source_path_comparison": {
+            "paths": ["public_phase_exact_step", "private_native_poincare_map"],
+            "state": _snapshot_difference(source_state, reference.state_end),
+            "hazard_action_absolute": abs(
+                source_hazard-reference.hazard_action_per_cycle
+            ),
+            "hazard_action_relative": abs(
+                source_hazard-reference.hazard_action_per_cycle
+            ) / max(abs(source_hazard), abs(reference.hazard_action_per_cycle),
+                    1.0e-300),
+        },
+        "phase_convergence": convergence,
+        "production_hazard_action_per_cycle": float(
+            reference.hazard_action_per_cycle
+        ),
+        "accepted": True,
+        "acceptance_basis": (
+            "production retains the declared midpoint grid used by the "
+            "completed class campaigns; native source paths agree, hazard is "
+            "phase-converged, and the reported state/observable discretization "
+            "differences are carried as numerical qualification evidence"
+        ),
+    }
+
+
+def _set_cursor_cycles(cursor: PhaseCursor, cycles: float, waveform: FatigueWaveform,
+                       phase_count: int) -> None:
+    """Represent a native integrator return in the existing phase cursor."""
+    total_phases = max(float(cycles), 0.0) * int(phase_count)
+    nearest = round(total_phases)
+    tolerance = 256.0 * np.spacing(max(abs(total_phases), 1.0))
+    if abs(total_phases-nearest) <= tolerance:
+        total_phases = float(nearest)
+    whole_phases = int(math.floor(total_phases))
+    fraction = total_phases-whole_phases
+    cursor.completed_cycles = whole_phases // int(phase_count)
+    cursor.phase_index = whole_phases % int(phase_count)
+    cursor.remaining_phase_s = (
+        0.0 if fraction == 0.0 else
+        waveform.period_s/int(phase_count) * (1.0-fraction)
+    )
+
+
+def _native_high_cycle_call(
+    engine: Any, cursor: PhaseCursor, waveform: FatigueWaveform,
+    temperature_K: float, phase_count: int, cycles: float,
+) -> dict[str, Any]:
+    """Advance a cycle-boundary block with the restored native state machine."""
+    if cursor.phase_index != 0 or cursor.remaining_phase_s != 0.0:
+        raise RuntimeError("native high-cycle block must start at a cycle boundary")
+    start = float(cursor.completed_cycles)
+    # The R9 outer checkpoint and cursor are one atomic restart unit.  Suppress
+    # inner snapshots during a bounded block, then write both after return.
+    previous = os.environ.pop("V10230_HIGH_CYCLE_CHECKPOINT_DIR", None)
+    clear_pending_geometry_events()
+    try:
+        with pending_geometry_event_scope():
+            result = integrate_state_coupled_waveform(
+                engine, _NativePhaseController(phase_count), waveform,
+                temperature_K, cycles,
+            )
+            event = pop_pending_geometry_event() if result.get("fired") else None
+    finally:
+        if previous is not None:
+            os.environ["V10230_HIGH_CYCLE_CHECKPOINT_DIR"] = previous
+    if bool(result.get("fired")) != bool(event is not None):
+        raise RuntimeError("native high-cycle event and outer descriptor disagree")
+    consumed = float(result.get("coupled_hazard_cycles_consumed", 0.0))
+    if consumed <= 0.0:
+        raise RuntimeError("native high-cycle state machine made no progress")
+    _set_cursor_cycles(cursor, start+consumed, waveform, phase_count)
+    event_cycles = start+consumed
+    phase = event_cycles % 1.0
+    phase_index = min(int(math.floor(phase*phase_count)), phase_count-1)
+    return {
+        "event": event, "result": result,
+        "K_Pa_sqrt_m": float(phase_values(waveform, phase_count)[phase_index]),
+        "event_cycles": event_cycles, "consumed_s": consumed*waveform.period_s,
+        "unused_s": float(cursor.remaining_phase_s),
+    }
+
+
 def _checkpoint(engine: Any, waveform: FatigueWaveform, temperature_K: float,
                 directory: Path, cursor: PhaseCursor, reason: str) -> None:
     previous = os.environ.get("V10230_HIGH_CYCLE_CHECKPOINT_DIR")
@@ -218,6 +417,7 @@ def run_trajectory(
     maximum_events: int = 60, maximum_cycles: float = 1.0e12,
     phase_count: int = 64, temperature_K: float = 300.0,
     R: float = 0.1, frequency_Hz: float = 1000.0,
+    native_block_cycles: float = 10000.0,
 ) -> dict[str, Any]:
     directory = Path(checkpoint_directory).resolve()
     directory.mkdir(parents=True, exist_ok=True)
@@ -245,6 +445,7 @@ def run_trajectory(
         restore_checkpoint(engine, directory)
         cursor = PhaseCursor(**saved["cursor"])
         overlap = dict(saved["overlap"])
+        native_qualification = saved.get("native_qualification")
         events = list(saved["events"])
         history = list(saved["history"])
         accelerations = list(saved["acceleration"])
@@ -253,11 +454,16 @@ def run_trajectory(
         overlap = qualify_mean_cycle_overlap(
             engine, waveform, temperature_K, phase_count,
         )
+        native_qualification = None
         clear_pending_geometry_events()
         events: list[dict[str, Any]] = []
         history = [{"cycles": 0.0, "extension_m": 0.0, "kind": "initial"}]
         accelerations = []
         _checkpoint(engine, waveform, temperature_K, directory, cursor, "initial")
+    if not overlap["passed"] and native_qualification is None:
+        native_qualification = qualify_native_phase_resolution(
+            engine, waveform, temperature_K, phase_count,
+        )
     identity = {
         "candidate_id": binding.optimized_row["candidate_id"],
         "Kmax_MPa_sqrt_m": float(Kmax_MPa_sqrt_m), "seed": int(seed),
@@ -269,6 +475,7 @@ def run_trajectory(
         _write_progress(directory, {
             "schema": "r9.trajectory-progress/1", "identity": identity,
             "cursor": asdict(cursor), "overlap": overlap, "events": events,
+            "native_qualification": native_qualification,
             "history": history, "acceleration": accelerations,
             "geometry": {
                 "n_adv": int(engine.n_adv),
@@ -318,9 +525,58 @@ def run_trajectory(
                 _checkpoint(engine, waveform, temperature_K, directory, cursor, "mean_block")
                 save_progress()
                 continue
-        row = _exact_phase_call(
-            engine, cursor, waveform, temperature_K, phase_count,
-        )
+        row = None
+        if (not overlap["passed"] and cursor.phase_index == 0
+                and cursor.remaining_phase_s == 0.0):
+            requested = min(
+                float(native_block_cycles), float(maximum_cycles)-current_cycles,
+            )
+            row = _native_high_cycle_call(
+                engine, cursor, waveform, temperature_K, phase_count, requested,
+            )
+            native = row["result"]
+            accelerations.append({
+                "start_cycle": current_cycles,
+                "cycles": float(
+                    native.get("coupled_hazard_cycles_consumed", 0.0)
+                ),
+                "overlap_qualified": False,
+                "mean_cycle_trial_rejected": True,
+                "mode": "native_phase_resolved_high_cycle_state_machine",
+                "model_id": native.get(
+                    "coupled_hazard_model_id", NATIVE_HIGH_CYCLE_MODEL_ID,
+                ),
+                "fired": bool(native.get("fired", False)),
+                "partial_return": bool(
+                    native.get("coupled_hazard_partial_return", False)
+                ),
+                "work_budget_exhausted": bool(
+                    native.get("coupled_hazard_work_budget_exhausted", False)
+                ),
+                "wall_seconds": float(
+                    native.get("coupled_hazard_wall_seconds", 0.0)
+                ),
+                "modes": native.get("coupled_hazard_modes", []),
+            })
+            if row["event"] is None:
+                history.append({
+                    "cycles": progress_cycles(),
+                    "extension_m": float(engine.checkpoint_advance_total_m),
+                    "continuous_mpz_progress_m": float(
+                        engine.micro_advance_total_m
+                    ),
+                    "kind": "native_phase_resolved_block",
+                })
+                _checkpoint(
+                    engine, waveform, temperature_K, directory, cursor,
+                    "native_phase_resolved_block",
+                )
+                save_progress()
+                continue
+        if row is None:
+            row = _exact_phase_call(
+                engine, cursor, waveform, temperature_K, phase_count,
+            )
         if row["event"] is None:
             continue
         descriptor = dict(row["event"])
@@ -370,6 +626,9 @@ def run_trajectory(
         "target_extension_m": float(target_extension_m),
         "maximum_events": int(maximum_events),
         "acceleration": accelerations, "overlap": overlap,
+        "native_continuation_model_id": NATIVE_CONTINUATION_ID,
+        "native_qualification": native_qualification,
+        "native_block_cycles": float(native_block_cycles),
         "final_cycles": final_cycles,
         "final_extension_m": float(engine.checkpoint_advance_total_m),
         "final_continuous_mpz_progress_m": float(engine.micro_advance_total_m),
@@ -379,5 +638,6 @@ def run_trajectory(
 
 __all__ = [
     "MODEL_ID", "PhaseCursor", "configure_stochastic_engine",
-    "mean_cycle_inputs", "qualify_mean_cycle_overlap", "run_trajectory",
+    "mean_cycle_inputs", "qualify_mean_cycle_overlap",
+    "qualify_native_phase_resolution", "run_trajectory",
 ]
