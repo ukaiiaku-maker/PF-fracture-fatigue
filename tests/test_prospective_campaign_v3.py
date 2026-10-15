@@ -122,6 +122,20 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         for row in controls
     )
 
+    p7_native = [
+        row for row in rows
+        if row["block"] == "P7" and row["study"] == "native_void_nucleation"
+    ]
+    assert len(p7_native) == 16 and all(row["native_args"] for row in p7_native)
+    assert all(
+        row["native_entrypoint"].endswith("shared_v5_cavity_adapter")
+        and row["paired_arms_evolved_in_one_native_execution"] is True
+        for row in p7_native
+    )
+    assert {
+        row["shared_options"]["cavity"] for row in p7_native
+    } == {"disabled", "full_order_v5"}
+
 
 def test_v3_summary_has_all_goal_records_and_distinct_digests():
     rows = build_cases_v3(ROOT)

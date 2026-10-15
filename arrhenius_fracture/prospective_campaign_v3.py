@@ -319,6 +319,33 @@ def _bind_p6_branch_pair(
     converted["command_status"] = "RESOLVED_DISABLED"
 
 
+def _bind_p7_native_void_pair(converted: dict[str, Any]) -> None:
+    """Bind native vacancy nucleation to the paired accepted-state V5 scheduler."""
+    enabled = converted["cavity_mode"] == "nucleation_growth"
+    preset = (
+        "pf_cavity_v5_single_front" if enabled
+        else "pf_cavity_v5_disabled_control"
+    )
+    converted["native_args"] = [
+        "--duration-s", "0.2",
+        "--steps", "1",
+        "--transport-refinement-min-duration-s", "1e-8",
+        "--opening-rate-m-per-s", "1e-6",
+        "--material-class", str(converted["family"]),
+        "--temperature-K", f"{float(converted['temperature_K']):g}",
+        "--vacancy-energy-variant", "reference",
+    ]
+    converted["native_entrypoint"] = (
+        "arrhenius_fracture.shared_v5_cavity_adapter"
+    )
+    converted["shared_options"] = replace(
+        PRESETS[preset], random_seed=int(converted["seed"]),
+    ).to_dict()
+    converted["command_status"] = "RESOLVED_DISABLED"
+    converted["paired_arms_evolved_in_one_native_execution"] = True
+    converted["qualification_interval_s"] = 0.2
+
+
 def _convert_v2(
     root: Path, row: dict[str, Any], options: dict[str, str], original,
 ) -> dict[str, Any]:
@@ -378,6 +405,9 @@ def _convert_v2(
             registry=str(converted["parameter_registry"]),
             option=str(converted["parameter_option"]),
         )
+    if (converted.get("block") == "P7"
+            and converted.get("study") == "native_void_nucleation"):
+        _bind_p7_native_void_pair(converted)
     converted["cohesive_law"] = {
         "kind": "original_activated_opening",
         "temperature_policy": "native_temperature_matched",
@@ -436,6 +466,18 @@ def _convert_v2(
                 else "NATIVE_SINGLE_FRONT_CONTROL_QUALIFIED"
             ),
             "kernel_validity": "BOUND_NATIVE_ORIENTATION_RESOLVER",
+            "input_availability": "AVAILABLE_VERSIONED_INPUTS",
+        })
+    if (converted.get("block") == "P7"
+            and converted.get("study") == "native_void_nucleation"):
+        converted["readiness"].update({
+            "implementation": "IMPLEMENTED",
+            "native_qualification": (
+                "NATIVE_PAIRED_V5_CONNECTED_STATE_QUALIFIED_"
+                "CASE_CONTINUATION_PENDING"
+            ),
+            "kernel_validity": "BOUND_NATIVE_V5_DIRECTIONAL_PROVIDER",
+            "numerical_convergence": "ACCEPTED_PREFIX_QUALIFIED_CASE_ENDPOINT_PENDING",
             "input_availability": "AVAILABLE_VERSIONED_INPUTS",
         })
     if (converted.get("block") == "P4"
