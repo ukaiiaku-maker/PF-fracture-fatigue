@@ -139,8 +139,8 @@
     {
       "id": "R06",
       "goal_ids": ["FG-04", "FG-05", "FG-16"],
-      "status": "PARTIAL_ACTIVE_SUPPORT_QUALIFIED_INTERVENTION_AND_TRANSFER_ADAPTERS_UNRESOLVED",
-      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active, but density transport and conservative tip/bulk transfer remain distinct unavailable axes. Four requested intervention adapters are not implemented, and the existing shielding toggle is not isolated enough to qualify the requested retained-shielding intervention.",
+      "status": "PARTIAL_CROSS_CONSUMER_KINETICS_QUALIFIED_TRANSFER_ADAPTERS_UNRESOLVED",
+      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. The actual post-installer forward-active, occupied-wake, reversible-return and bulk consumers are now traced separately, and scalar/channel checkpoint rehydration is discriminated without forcing the distinct laws to agree. Channel-resolved transport is preserved native but unwired through the typed shared presets. Density transport and conservative tip/bulk transfer remain unavailable axes. Four requested intervention adapters are not implemented, and the existing shielding toggle is not isolated enough to qualify the requested retained-shielding intervention.",
       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
       "authoritative_source": "native geography audits and existing positive transport implementation",
       "dependencies": ["R01", "R03"],
@@ -150,9 +150,11 @@
       "executed_evidence": [
         "common_framework_readiness/NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json",
         "common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json",
-        "tests/test_source_transport_axes_qualification.py"
+        "tests/test_source_transport_axes_qualification.py",
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json",
+        "tests/test_cross_consumer_kinetic_lifecycle.py"
       ],
-      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
+      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Channel-resolved kinetics has no typed shared preset. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
     },
     {
       "id": "R07",
@@ -191,7 +193,8 @@
         "common_framework_readiness/fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json",
         "common_framework_readiness/fem_observer_restart_continuation_20261014/GENERIC_OPENING_ONLY_QUALIFICATION.json",
         "common_framework_readiness/fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json",
-        "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_LINEAGE.md"
+        "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_LINEAGE.md",
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json"
       ],
       "remaining_limitation": "The retained projected killed-band result still has fine J/G=0.8229384 because it is a different finite crack/removal operation; it is not renamed or scaled. The converged PF/FEM common response differs by 11.8727%, consistent with their distinct discrete notch/damage representations; native PF K/J, native FEM J and matched FEM virtual G remain noninterchangeable. Plane stress/generalized transverse control, generic full-field source scope and production bilinear selection remain independent gaps."
     },

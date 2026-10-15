@@ -1,0 +1,131 @@
+{
+  "schema": "cross-consumer-kinetic-preservation/1",
+  "date": "2026-10-14",
+  "source_pair": {
+    "pf": "4217810b87e19d1cb013c3a4dfbe79a22ca15b8c",
+    "fem": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
+  },
+  "local_census": {
+    "directory": "/private/tmp/fracture-preservation-census-20261014T173500PDT",
+    "manifest_status": "CENSUS_COMPLETE_NOT_PHYSICS_CERTIFICATION",
+    "pf_census_sha256": "b1dc9de1bfb6df002674a2fadbf9754ffd6cd878973fc9e776fc96403a9ddf7b",
+    "fem_census_sha256": "993b6d53291c3adc433693d0760e6b4a2fb88ea3fa4395f5fc7490dc390f028f",
+    "pf_tracked_source_dirty": false,
+    "fem_tracked_source_dirty": false,
+    "pf_untracked_calculation_source_count": 0,
+    "fem_untracked_calculation_source_count": 0,
+    "interpretation": "Read-only inventory only; runtime claims below require source tracing and tests."
+  },
+  "consumers": [
+    {
+      "id": "forward_active_validated_scalar",
+      "category": "PRESERVED_CONNECTED",
+      "constructor": "install_signed_burgers_population(..., validated_scalar) followed by install_persistent_site_source",
+      "post_installer_callable": "signed_burgers_shared_v1025._signed_evolve_scalar",
+      "surface_and_temperature": "manifest Peierls/Taylor surfaces evaluated at the passed T_K; EXP-floor behavior belongs to those unchanged surfaces",
+      "drive_and_sign": "active local stress; signed Burgers populations retained; forward spatial velocity is nonnegative in this historical scalar operator",
+      "support_and_normalization": "system-by-bin active MPZ; persistent source normalization is owned by persistent_site_source_v10221",
+      "rate_velocity_order": "Peierls rate, Taylor completion rate, encounter rate, then coupled source/exchange/transport action when joint_ctmc is selected",
+      "update_operator": "joint_transport_exchange for the authorized persistent path",
+      "source_recovery_fates": "continuous source, trapping/release, mobile and retained recovery, escape, gross/net ledgers and distance-population ledger",
+      "lifecycle": ["construction", "accepted step", "moving-frame advance", "checkpoint restore"]
+    },
+    {
+      "id": "occupied_wake",
+      "category": "PRESERVED_CONNECTED",
+      "constructor": "installed signed state; called internally by scalar, channel and reversible evolution",
+      "post_installer_callable": "signed_burgers_shared_v1025._signed_evolve_wake",
+      "surface_and_temperature": "same native transport-rate constructor at passed T_K, evaluated at zero applied wake stress and wake forest density",
+      "drive_and_sign": "positive and negative species remain separate; no new applied opening drive is invented in the wake",
+      "support_and_normalization": "system-by-bin occupied wake",
+      "rate_velocity_order": "exchange, recovery, then population-weighted forward wake transport",
+      "update_operator": "native per-species exchange plus finite-volume advection",
+      "source_recovery_fates": "trapped, released, recovered and discarded-mobile loss returned explicitly; discarded total accumulated",
+      "lifecycle": ["occupied-state fixture", "moving wake", "signed-species conservation"]
+    },
+    {
+      "id": "channel_resolved_transport",
+      "category": "PRESERVED_NATIVE_UNWIRED",
+      "constructor": "install_signed_burgers_population(..., channel_resolved)",
+      "post_installer_callable": "signed_burgers_shared_v1025._signed_evolve_channel",
+      "surface_and_temperature": "native per-system transport-rate construction at passed T_K",
+      "drive_and_sign": "per-system emission stress and optional per-system forest density; distinct historical operator",
+      "support_and_normalization": "system-by-bin active MPZ",
+      "rate_velocity_order": "per-system exchange/recovery/advection; not forced equal to validated-scalar joint CTMC",
+      "update_operator": "channel-resolved historical body",
+      "source_recovery_fates": "active and wake fates retained; it does not acquire scalar-only ledgers by assertion",
+      "lifecycle": ["construction", "current-source method rehydration"],
+      "shared_interface_status": "not exposed by a current typed shared preset"
+    },
+    {
+      "id": "reversible_surface_return",
+      "category": "PRESERVED_CONNECTED",
+      "constructor": "install_reversible_transport on an initialized validated-scalar signed state",
+      "post_installer_callable": "persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+      "surface_and_temperature": "same unchanged Peierls surface; signed forward-minus-zero-bias rate at passed temperature",
+      "drive_and_sign": "opening stress remains the emission drive; signed K and slip orientation drive existing mobile content in either spatial direction",
+      "support_and_normalization": "system-by-bin active state with source-linked return eligibility",
+      "rate_velocity_order": "signed finite-tip stress, per-bin signed rate/velocity, exchange/recovery, signed advection, then source-slip cancellation",
+      "update_operator": "reversible overlay with exactly-once binding receipt",
+      "source_recovery_fates": "raw return, physical source-linked return, escape, recovery and cancelled source slip remain distinct; retained content is not erased on return",
+      "lifecycle": ["installation", "finite-bias reversal", "moving-frame transfer", "active-state checkpoint"]
+    },
+    {
+      "id": "full_field_bulk_constitutive",
+      "category": "PRESERVED_CONNECTED",
+      "constructor": "bulk_plasticity_v104.production_bulk_configuration",
+      "post_installer_callable": "bulk_plasticity_v104.accepted_bulk_load_step",
+      "surface_and_temperature": "selected material-manifest Peierls/Taylor bulk law at passed temperature",
+      "drive_and_sign": "full FEM stress tensor and bulk constitutive update; separate consumer from the tip MPZ",
+      "support_and_normalization": "element Gauss-point material measure",
+      "rate_velocity_order": "mechanical equilibrium and constitutive fixed point with accepted ep/rho state",
+      "update_operator": "explicit-rate bulk plasticity inside staggered mechanics coupling",
+      "source_recovery_fates": "bulk density storage/annihilation/recovery audit fields; no direct tip/bulk population exchange",
+      "lifecycle": ["bulk-only", "tip-plus-bulk", "accepted state", "restart"]
+    },
+    {
+      "id": "direct_tip_bulk_density_transfer",
+      "category": "EVIDENCE_UNAVAILABLE",
+      "constructor": null,
+      "post_installer_callable": null,
+      "surface_and_temperature": null,
+      "drive_and_sign": null,
+      "support_and_normalization": null,
+      "rate_velocity_order": null,
+      "update_operator": null,
+      "source_recovery_fates": "current qualified audits explicitly report bulk_density_transport=false and direct_tip_bulk_population_exchange=false",
+      "lifecycle": [],
+      "interpretation": "No coefficient or adapter was invented. This remains R06 implementation work."
+    },
+    {
+      "id": "daughter_remesh_and_current_source_restore",
+      "category": "PRESERVED_CONNECTED",
+      "constructor": "current-source multifront hooks plus branch checkpoint restoration",
+      "post_installer_callable": "current_source_runtime_bindings.rehydrate_current_source_runtime_bindings",
+      "surface_and_temperature": "no new law; serialized source/state/transport model IDs select a closed method registry",
+      "drive_and_sign": "restores the serialized scalar or channel method without changing arrays",
+      "support_and_normalization": "per-owner MPZ; full-state topology/remesh mapping remains separately owned",
+      "rate_velocity_order": "unchanged selected implementation",
+      "update_operator": "fail-closed method-only rehydration",
+      "source_recovery_fates": "all serialized positive/negative active and wake arrays are preserved byte-for-byte by the binding step",
+      "lifecycle": ["new owner", "checkpoint restore", "idempotent rebinding"]
+    }
+  ],
+  "geometry_veto_obligation": {
+    "historical_commit": "c81c3763101ade9e1b4299fc5d6623c91ab89da3",
+    "historical_object_available_locally": false,
+    "category": "PRESERVED_CONNECTED",
+    "current_consumer": "fem-czm-current-pf-companion/arrhenius_fracture/sharp_front.py",
+    "current_policy": "failed geometry realization restores the completed renewal/wake bookkeeping while retaining accepted emission/time evolution",
+    "full_state_supersession": "cohesive_trial_state.KineticCZMTransactionSnapshot restores backend, front engine and bulk history for rejected cohesive trials",
+    "tests": "20 passed across moving-process-zone rollback, moving-tip veto, cohesive full-state rollback and active-event renewal rollback",
+    "interpretation": "The obligation is tested in current code; the unavailable donor patch was not blindly replayed."
+  },
+  "tests": {
+    "pf_cross_consumer_focused": "38 passed",
+    "pf_full_suite": "963 passed, 15 deselected in 80.43 s",
+    "fem_veto_and_transaction_focused": "20 passed",
+    "default_base_interpreter": "INCOMPLETE_DEPENDENCY: SciPy Python-3.13 _spropack import is broken; qualification used the established project environments"
+  },
+  "status": "QUALIFIED_CONNECTED_AND_EXPLICITLY_UNWIRED_CONSUMERS"
+}
