@@ -37,6 +37,32 @@ def _option_value(args: list[str], name: str) -> str | None:
     return None
 
 
+def _persistent_execution_binding(records: list[dict]) -> dict:
+    transport_modes = sorted({
+        str(row.get("signed_transport_mode", "")) for row in records
+    })
+    exchange_modes = sorted({
+        str(row.get("exchange_transport_mode", "")) for row in records
+    })
+    return {
+        "schema": "persistent-native-execution-binding/1",
+        "requested_lifecycle": "persistent_reusable",
+        "finite_inventory_substitute_started": False,
+        "all_expected_methods_bound": bool(records) and all(
+            row["all_expected_methods_bound"] for row in records
+        ),
+        "signed_transport_mode": (
+            transport_modes[0] if len(transport_modes) == 1 else None
+        ),
+        "observed_signed_transport_modes": transport_modes,
+        "exchange_transport_mode": (
+            exchange_modes[0] if len(exchange_modes) == 1 else None
+        ),
+        "observed_exchange_transport_modes": exchange_modes,
+        "records": records,
+    }
+
+
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     install_front_direction_fix()
@@ -56,14 +82,11 @@ def main(argv=None):
             write_energy_ledger_audit(Path(out))
             records = AuditedPersistentSiteStateResolvedTipEngine.persistent_runtime_binding_records
             (Path(out) / "persistent_native_runtime_binding.json").write_text(
-                json.dumps({
-                    "schema": "persistent-native-execution-binding/1",
-                    "requested_lifecycle": "persistent_reusable",
-                    "finite_inventory_substitute_started": False,
-                    "all_expected_methods_bound": bool(records) and all(
-                        row["all_expected_methods_bound"] for row in records),
-                    "records": records,
-                }, indent=2, sort_keys=True) + "\n"
+                json.dumps(
+                    _persistent_execution_binding(records),
+                    indent=2,
+                    sort_keys=True,
+                ) + "\n"
             )
         return result
     finally:

@@ -18,6 +18,9 @@ from arrhenius_fracture.shared_options import PRESETS, SharedOptions, TransportS
 from arrhenius_fracture.signed_burgers_shared_v1025 import (
     _signed_evolve_channel, _signed_evolve_scalar,
 )
+from arrhenius_fracture.sharp_front_v10_2_27_audited import (
+    _persistent_execution_binding,
+)
 
 
 def _bound_state(transport="validated_scalar"):
@@ -57,6 +60,22 @@ def test_channel_resolved_bound_object_has_its_own_truthful_contract():
     assert receipt["signed_transport_mode"] == "channel_resolved"
     assert receipt["exchange_transport_mode"] == "legacy_split"
     assert "per-slip-system" in receipt["physical_contract"]["transport"]
+
+
+def test_outer_execution_receipt_preserves_unique_nested_transport_identity():
+    records = [
+        {"all_expected_methods_bound": True,
+         "signed_transport_mode": "channel_resolved",
+         "exchange_transport_mode": "legacy_split"},
+        {"all_expected_methods_bound": True,
+         "signed_transport_mode": "channel_resolved",
+         "exchange_transport_mode": "legacy_split"},
+    ]
+    receipt = _persistent_execution_binding(records)
+    assert receipt["signed_transport_mode"] == "channel_resolved"
+    assert receipt["exchange_transport_mode"] == "legacy_split"
+    records[1]["signed_transport_mode"] = "validated_scalar"
+    assert _persistent_execution_binding(records)["signed_transport_mode"] is None
 
 
 def test_split_exchange_selection_fails_closed_even_when_outer_wrapper_matches():
