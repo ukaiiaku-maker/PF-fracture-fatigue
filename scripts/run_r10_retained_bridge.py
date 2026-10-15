@@ -52,7 +52,7 @@ def main(argv=None):
         "backend":"R8_RESTORED_PERSISTENT_REVERSIBLE_CURRENT_BACKEND",
         "trajectory":"R9_PHASE_EXACT_STOCHASTIC_WITH_TRANSACTIONAL_MEAN_OR_NATIVE_HIGH_CYCLE_BLOCKS",
         "native_numerical_controls":{
-            "DMD_chain_growth_factor":float(os.environ.get("V10230_DMD_CHAIN_GROWTH_FACTOR","2")),
+            "current_invocation_DMD_chain_growth_factor":float(os.environ.get("V10230_DMD_CHAIN_GROWTH_FACTOR","2")),
             "all_projected_segments_require_existing_state_hazard_ledger_positivity_and_event_guard_validation":True,
         },
         "kernel":{"path":str(R4_KERNEL_FAMILY.resolve()),"sha256":sha(R4_KERNEL_FAMILY)},
