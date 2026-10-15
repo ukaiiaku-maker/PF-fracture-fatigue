@@ -417,7 +417,7 @@ def run_trajectory(
     maximum_events: int = 60, maximum_cycles: float = 1.0e12,
     phase_count: int = 64, temperature_K: float = 300.0,
     R: float = 0.1, frequency_Hz: float = 1000.0,
-    native_block_cycles: float = 10000.0,
+    native_block_cycles: float = 1000000.0,
 ) -> dict[str, Any]:
     directory = Path(checkpoint_directory).resolve()
     directory.mkdir(parents=True, exist_ok=True)
