@@ -51,6 +51,25 @@ def _finite_counts(history: ObservationHistory) -> dict[str, int]:
             for field in fields}
 
 
+def _observation_snapshot(row, coordinate: LengthCoordinate) -> dict[str, Any]:
+    def finite_or_none(value: float) -> float | None:
+        return float(value) if math.isfinite(value) else None
+    return {
+        "sequence": row.sequence, "stage": row.stage.value,
+        "event_id": row.event_id, "coordinate_m": finite_or_none(row.length_m(coordinate)),
+        "K_J_Pa_sqrt_m": finite_or_none(row.K_J_Pa_sqrt_m),
+        "K_I_Pa_sqrt_m": finite_or_none(row.K_I_Pa_sqrt_m),
+        "K_II_Pa_sqrt_m": finite_or_none(row.K_II_Pa_sqrt_m),
+        "K_probe_Pa_sqrt_m": finite_or_none(row.K_probe_Pa_sqrt_m),
+        "K_applied_Pa_sqrt_m": finite_or_none(row.K_applied_Pa_sqrt_m),
+        "K_effective_Pa_sqrt_m": finite_or_none(row.K_effective_Pa_sqrt_m),
+        "J_J_per_m2": finite_or_none(row.J_J_per_m2),
+        "J_signed_J_per_m2": finite_or_none(row.J_signed_J_per_m2),
+        "G_J_per_m2": finite_or_none(row.G_J_per_m2),
+        "validity": row.validity_status.value,
+    }
+
+
 def _query_summary(history: ObservationHistory, targets_um: tuple[float, ...],
                    coordinate: LengthCoordinate) -> dict[str, Any]:
     result = {}
@@ -59,7 +78,7 @@ def _query_summary(history: ObservationHistory, targets_um: tuple[float, ...],
         associated = history.event_associated_at_length(
             target * 1e-6, coordinate=coordinate
         )
-        result[f"{target:g}_um"] = {
+        item = {
             "strict_status": query.status,
             "exact_count": len(query.exact),
             "crossing_count": len(query.crossing),
@@ -67,6 +86,26 @@ def _query_summary(history: ObservationHistory, targets_um: tuple[float, ...],
             "event_associated_count": len(associated.brackets),
             "interpolation_performed": False,
         }
+        if query.exact:
+            item["exact_observations"] = [
+                _observation_snapshot(row, coordinate) for row in query.exact
+            ]
+        if associated.brackets:
+            bracket = associated.brackets[0]
+            item["event_associated_roles"] = {
+                "measured_pre_event": _observation_snapshot(
+                    bracket.measured_pre_event, coordinate
+                ),
+                "committed_geometry": _observation_snapshot(
+                    bracket.committed_geometry, coordinate
+                ),
+                "interpretation": "activation/load at lower state; no equilibrium mechanics at target or upper geometry",
+            }
+        elif query.crossing:
+            item["legacy_crossing_observations"] = [
+                _observation_snapshot(row, coordinate) for row in query.crossing
+            ]
+        result[f"{target:g}_um"] = item
     return result
 
 
