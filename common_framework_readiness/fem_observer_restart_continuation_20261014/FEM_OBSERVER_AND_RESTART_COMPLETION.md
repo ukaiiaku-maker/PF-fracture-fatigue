@@ -127,7 +127,7 @@ The executed FEM source tree is committed as
 attestation, restart, stochastic-ownership, historical-reference, and physical
 refinement group passes 41 tests.  The complete FEM repository passes 713 tests
 plus 16 subtests.  After advancing the source-bound external binding, the
-complete PF/shared repository passes 956 tests with 15 intentionally
+complete PF/shared repository passes 960 tests with 15 intentionally
 deselected tests.
 
 ## Opening-only execution and common PF/FEM comparison

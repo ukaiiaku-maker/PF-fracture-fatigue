@@ -7,7 +7,7 @@
     "fem_czm": "14bc458498e92f1f1c7bcaf0fdd9e6046232ee1b"
   },
   "source_pair_at_handoff": {
-    "pf_common": "cf258090035b6d1f0cf1b54cd5f826e219f43e31",
+    "pf_common": "92876ebac985bb14c460365f149e80a7129b9a64",
     "fem_czm": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
   },
   "continuation_changes": [
@@ -55,7 +55,7 @@
       "current_implementation": "Native spatial assembly, equilibrium, anisotropic elasticity, physical envelope support and domain J remain live; matched material-coordinate G is diagnostic-only.",
       "current_wiring": "Native and generic FEM entries exercised.",
       "meaningful_activity": "Three controlled support levels, three contours per level, historical same-mesh reproduction and active cohesive remeshing.",
-      "qualification_scope": "FEM internal observer identity and the independent opening-only PF/FEM comparison are complete; the systematic representation offset is reported rather than tuned away.",
+      "qualification_scope": "FEM internal observer identity and the independent opening-only PF/FEM comparison are complete; historical caller/energy/support lineage is mapped to current runtime producers, and the systematic representation offset is reported rather than tuned away.",
       "affected_items": ["R07", "R08"]
     },
     {
@@ -143,9 +143,9 @@
       "name": "long growth, observations and output",
       "source_preservation": "PRESERVED_AND_RUNTIME_QUALIFIED",
       "current_implementation": "Long-growth, stage-aware K/J-at-length, native fields and output thinning remain unchanged.",
-      "current_wiring": "Observer correction adds diagnostics and does not alter accepted mechanics or drives.",
-      "meaningful_activity": "Existing 1002.9 micrometre/201-event evidence retained; new FEM run supplies active native fields through step 146.",
-      "qualification_scope": "No historical campaign was rerun and no manuscript was modified.",
+      "current_wiring": "Current native online histories feed strict chronological queries and explicit-quantity plots. The named event-associated view links measured pre-event mechanics to committed geometry without assigning K/J to the committed state.",
+      "meaningful_activity": "The exact 2085-row legacy CSV, 201-event geometry-aware history, distinct 203-event current-native history and 64-row restart pair were replayed; no fracture specimen was rerun.",
+      "qualification_scope": "K_J, modal/probe/applied/effective K, signed/direct J and independent G remain distinct; missing quantities remain absent. Historical gap interpolation and final-event carry-forward were corrected. No manuscript was modified.",
       "affected_items": ["R11"]
     },
     {

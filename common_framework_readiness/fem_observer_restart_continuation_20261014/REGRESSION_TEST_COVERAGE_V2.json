@@ -2,7 +2,7 @@
   "schema": "fem-observer-restart-regression-coverage/2",
   "date": "2026-10-14",
   "source_pair_during_test": {
-    "pf_common": "cf258090035b6d1f0cf1b54cd5f826e219f43e31",
+    "pf_common": "92876ebac985bb14c460365f149e80a7129b9a64",
     "fem_czm": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
   },
   "focused_fem_group": {
@@ -35,12 +35,33 @@
     "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"
   },
   "full_pf_shared_suite": {
-    "passed": 956,
+    "passed": 960,
     "deselected": 15,
     "failed": 0,
-    "duration_s": 81.28,
+    "duration_s": 83.79,
     "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
-    "note": "The complete suite passed with the external binding advanced to FEM 784c57f and the new opening-only/common-mechanics regressions included."
+    "note": "The complete suite passed with FEM 784c57f bound and the opening-only, common-mechanics and K-versus-length port regressions included."
+  },
+  "k_length_analysis_port": {
+    "focused_passed": 28,
+    "deselected": 2,
+    "failed": 0,
+    "tests": [
+      "tests/test_fracture_observation_history.py",
+      "tests/test_observation_plotting_smoke.py",
+      "tests/test_v10222_rcurve_interval_semantics.py",
+      "tests/test_v10_2_27_paper_four_class_campaign.py",
+      "tests/test_final_developed_growth.py"
+    ],
+    "discriminates": [
+      "stage-filtered path jump with linked committed geometry",
+      "named event-associated activation/load versus equilibrium-at-target semantics",
+      "one explicit K quantity per plot with no fallback",
+      "unavailable event gaps and no final-event carry-forward",
+      "legacy 201-event versus distinct current 203-event history",
+      "restart chronology equality without boundary duplication"
+    ],
+    "executed_evidence": "../k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_PORT_QUALIFICATION.json"
   },
   "opening_only_and_common_comparison": {
     "focused_passed": 6,

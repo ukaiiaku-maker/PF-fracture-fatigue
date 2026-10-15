@@ -190,7 +190,8 @@
         "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/fem_baseline_reconciliation_v2.json",
         "common_framework_readiness/fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json",
         "common_framework_readiness/fem_observer_restart_continuation_20261014/GENERIC_OPENING_ONLY_QUALIFICATION.json",
-        "common_framework_readiness/fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json"
+        "common_framework_readiness/fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json",
+        "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_LINEAGE.md"
       ],
       "remaining_limitation": "The retained projected killed-band result still has fine J/G=0.8229384 because it is a different finite crack/removal operation; it is not renamed or scaled. The converged PF/FEM common response differs by 11.8727%, consistent with their distinct discrete notch/damage representations; native PF K/J, native FEM J and matched FEM virtual G remain noninterchangeable. Plane stress/generalized transverse control, generic full-field source scope and production bilinear selection remain independent gaps."
     },
@@ -225,20 +226,22 @@
     {
       "id": "R11",
       "goal_ids": ["FG-07", "FG-10", "FG-16"],
-      "status": "COMPLETE_PRESERVED_CAPABILITY",
-      "concrete_defect": "Closed: retained 300 K/1200 K native 1 mm histories now have a fail-closed current regression, and a fresh native sparse/full-output pair establishes state independence from field/diagnostic retention.",
+      "status": "COMPLETE_CURRENT_NATIVE_AND_HISTORICAL_K_LENGTH_PORT_QUALIFIED",
+      "concrete_defect": "Closed: retained 300 K/1200 K native 1 mm histories have a fail-closed current regression and output-policy independence. The historical 2085-row/201-event CSV, its 201-segment geometry-aware history, a distinct current 203-event native history, and uninterrupted/fresh-process restart chronology were replayed quantity-by-quantity. Stage-filtered path jumps retain linked committed geometry, event-associated K is explicitly named, and plotters no longer blend K quantities or fill event gaps.",
       "owner_consumer": "long-growth driver, observer/query and compact retention",
       "authoritative_source": "retained native developed histories and current observer code",
       "dependencies": ["R01"],
-      "exact_next_command": "python scripts/qualify_long_growth_analysis_contract.py --output common_framework_readiness/LONG_GROWTH_ANALYSIS_QUALIFICATION.json",
+      "exact_next_command": "python scripts/qualify_k_length_analysis_port.py",
       "input_output_identity": "historical law labeled historical; rerun only code-affected intervals",
       "numerical_criteria": "No fabricated equilibrium; restart-continuous chronology/resistance and K/J-at-length queries; identical state under output profiles.",
       "executed_evidence": [
         "common_framework_readiness/LONG_GROWTH_ANALYSIS_QUALIFICATION.json",
         "common_framework_readiness/OUTPUT_POLICY_INDEPENDENCE_QUALIFICATION.json",
-        "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_GROWTH_RESISTANCE.json"
+        "review_packet/final_fracture_campaign_a5a5883/DEVELOPED_GROWTH_RESISTANCE.json",
+        "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_PORT_QUALIFICATION.json",
+        "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_LINEAGE.md"
       ],
-      "remaining_limitation": "The retained developed histories are historical-law, monotonic common-mark trajectories; they do not provide independent unload/reload R-curve points or mixed-mode specimen evidence, and the qualifier states those scopes explicitly."
+      "remaining_limitation": "The qualified histories are monotonic K_J trajectories. They do not provide independent within-cycle unload/reload points, modal K, mixed-mode specimen evidence or independently evaluated G. The exact PR50 object and four named Library markdown files were unavailable locally; no conclusions were invented from them."
     },
     {
       "id": "R12",

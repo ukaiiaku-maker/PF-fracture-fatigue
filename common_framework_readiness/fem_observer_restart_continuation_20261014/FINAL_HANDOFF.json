@@ -3,7 +3,7 @@
   "date": "2026-10-14",
   "status": "IMPLEMENTATION_AND_QUALIFICATION_COMPLETE_AT_DECLARED_SCOPE",
   "source_pair": {
-    "pf_common": "cf258090035b6d1f0cf1b54cd5f826e219f43e31",
+    "pf_common": "92876ebac985bb14c460365f149e80a7129b9a64",
     "fem_czm": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
   },
   "resolved": [
@@ -13,7 +13,8 @@
     "The generic FEM entry restores a full native specimen checkpoint and continues through active cohesive remeshing and post-event equilibrium.",
     "Uninterrupted and fresh-process resumed histories are byte-identical through two physical events and six numerical cohesive subsegments.",
     "The generic opening-only option now disables accommodation at the most-derived native channel owner and executes with exact zero emission/transport state.",
-    "Independent three-level PF and FEM support series converge below 2%; the fine common reaction/energy ratio 1.118727 is retained as a representation offset without fitting."
+    "Independent three-level PF and FEM support series converge below 2%; the fine common reaction/energy ratio 1.118727 is retained as a representation offset without fitting.",
+    "The PF K-versus-length port preserves all 2085 legacy rows, distinguishes the 201-event and current 203-event histories, provides named event-associated queries, and forbids plot fallback across K definitions."
   ],
   "preserved_current_physics": [
     "authorized Taylor-Peierls completion",
@@ -27,7 +28,7 @@
   "tests": {
     "focused_fem": "41 passed",
     "full_fem": "713 passed, 16 subtests passed",
-    "full_pf_common": "956 passed, 15 deselected",
+    "full_pf_common": "960 passed, 15 deselected",
     "post_update_pf_targeted": "6 passed"
   },
   "principal_evidence": [
@@ -36,6 +37,8 @@
     "SPECIMEN_RESTART_QUALIFICATION.json",
     "GENERIC_OPENING_ONLY_QUALIFICATION.json",
     "PF_FEM_COMMON_MECHANICS_COMPARISON.json",
+    "../k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_PORT_QUALIFICATION.json",
+    "../k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_LINEAGE.md",
     "REGRESSION_TEST_COVERAGE_V2.json",
     "DEVELOPMENT_LINEAGE_AND_COVERAGE_V2.json",
     "../../CAPABILITY_PRESERVATION_MATRIX.csv",
@@ -54,6 +57,7 @@
     "No authoritative activation area or interface stiffness is available for a physical bilinear specimen selection.",
     "No DBTT shared characteristic-stress alternative has been authorized.",
     "Some historical PF Git objects remain unavailable in the partial clone and were not represented as inspected.",
+    "The exact FEM PR50 commit and four named Library markdown files were not present locally; their supplied summaries were not promoted to current-source evidence.",
     "Archival evidence not presently mounted remains intentionally unverified."
   ],
   "remaining_independent_readiness_work": [
