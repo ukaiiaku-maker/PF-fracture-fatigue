@@ -1,6 +1,6 @@
 {
   "schema": "fracture-framework-completion-ledger/1",
-  "date": "2026-10-14",
+  "date": "2026-10-15",
   "mission_status": "ACTIVE_READINESS_IMPLEMENTATION",
   "production_execution_authorized": false,
   "manuscript_modification_authorized": false,
@@ -139,8 +139,8 @@
     {
       "id": "R06",
       "goal_ids": ["FG-04", "FG-05", "FG-16"],
-      "status": "COMPLETE_NATIVE_OPTIONS_PHYSICAL_TRANSFER_COEFFICIENT_UNAVAILABLE",
-      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. Channel-resolved transport has a distinct provider, execution binding and exact fresh-process restart. The five planned diagnostic interventions are orthogonal native consumers and pass on the populated original 64-step spatial state. A positive conservative parameterized tip/bulk map is qualified in both directions without installing a coefficient or production default.",
+      "status": "COMPLETE_NATIVE_OPTIONS_PERSISTED_DIAGNOSTIC_RESTART_PHYSICAL_TRANSFER_COEFFICIENT_UNAVAILABLE",
+      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. Channel-resolved transport has a distinct provider, execution binding and exact fresh-process restart. All five planned diagnostic interventions are typed orthogonal native consumers. The four in-run operators install only after a physically populated accepted state. History reset now writes a distinct atomic checkpoint, preserves physical-loss ledgers and counterfactual work, clears stale propagation cache state, performs native fixed-load mechanics re-equilibration, and continues through the shared driver in a fresh process. A positive conservative parameterized tip/bulk map remains qualified in both directions without installing a coefficient or production default.",
       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
       "authoritative_source": "native geography audits and existing positive transport implementation",
       "dependencies": ["R01", "R03"],
@@ -156,6 +156,11 @@
         "tests/test_cross_consumer_kinetic_lifecycle.py",
         "integration_evidence/channel_transport_native_a0590e03/qualification_report.json",
         "integration_evidence/r06_diagnostic_interventions_b54e1375/qualification_report.json",
+        "common_framework_readiness/p3_history_reset_qualification_073e0e88/qualification_report.json",
+        "common_framework_readiness/p3_history_reset_qualification_073e0e88/LIFECYCLE_QUALIFICATION.json",
+        "common_framework_readiness/p3_history_reset_qualification_073e0e88/continued_step49/shared_runtime_attestation.post.json",
+        "tests/test_history_reset_checkpoint_v1.py",
+        "tests/test_shared_diagnostic_intervention_adapter.py",
         "tests/test_v10221_persistent_site_source.py",
         "tests/test_tip_bulk_population_transfer_v1.py"
       ],
@@ -181,7 +186,7 @@
       "status": "COMPLETE_MATCHED_FEM_OBSERVER_RESTART_AND_COMMON_PF_FEM_COMPARISON",
       "concrete_defect": "The historical v10.0.5.11 FEM/J reference is exactly reproducible. The old path-envelope G advanced a finite-height killed-node band and divided by projected damaged-node length, so it did not differentiate the same virtual operation as domain J. The new fixed-topology material-coordinate derivative uses the identical plateau weight and converges to native full-energy J within 0.8618% across the controlled support series. Generic current-law specimen restart is connected and exercised through active remeshing. The new opening-only comparison uses independent PF and FEM support refinements at the same total grip opening: both converge below 2%, while the fine PF/FEM reaction and global-energy ratio remains 1.118727. This is retained as a representation-dependent result without fitting or observer substitution.",
       "owner_consumer": "fem-czm-current-pf-companion native constructor and isolated shared worker",
-      "authoritative_source": "FEM 784c57f continuation, preserved PF v10.1 mechanics entry and registry-driven generic FEM entry",
+      "authoritative_source": "FEM 7557ba8 continuation, preserved PF native mechanics entries and PF 073e0e88 registry-driven shared execution",
       "dependencies": ["R03", "R07"],
       "exact_next_command": "python scripts/qualify_pf_fem_common_mechanics.py",
       "input_output_identity": "independent package paths and constructor-visible coefficient receipts",
@@ -201,6 +206,9 @@
         "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_LINEAGE.md",
         "common_framework_readiness/local_preservation_and_kinetics_20261014/CROSS_CONSUMER_KINETIC_MATRIX.json",
         "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json"
+        ,"PF 1d27bdb9: typed current generic FEM backend"
+        ,"PF 2d217c20: P8 generic native FEM campaign binding"
+        ,"PF 698e2a7a: native-opening P9 specimen campaign binding"
       ],
       "remaining_limitation": "The retained projected killed-band result still has fine J/G=0.8229384 because it is a different finite crack/removal operation; it is not renamed or scaled. The converged PF/FEM common response differs by 11.8727%, consistent with their distinct discrete notch/damage representations; native PF K/J, native FEM J and matched FEM virtual G remain noninterchangeable. Plane stress/generalized transverse control, generic full-field source scope and production bilinear selection remain independent gaps."
     },
@@ -289,21 +297,21 @@
     {
       "id": "R13",
       "goal_ids": ["FG-01", "FG-02", "FG-03", "FG-04", "FG-05", "FG-06", "FG-07", "FG-08", "FG-09", "FG-10", "FG-11", "FG-12", "FG-13", "FG-14", "FG-15", "FG-16", "FG-17", "FG-18"],
-      "status": "COMPLETE_IMPLEMENTATION_ACCEPTANCE_DEPENDENCIES_EXPLICIT",
-      "concrete_defect": "Closed at the planning layer: v3 preserves all 644 v2 cells, adds 48 deliberate cohesive comparisons, binds v10.2.32 prospective options, and records nine independent readiness axes. Cases blocked by physical support, adapters, convergence, target resources or production permission remain explicit rather than omitted.",
+      "status": "COMPLETE_DISABLED_NATIVE_BINDING_PHYSICAL_AND_RESOURCE_DEPENDENCIES_EXPLICIT",
+      "concrete_defect": "The 692-cell v3 campaign preserves all 644 v2 cells and adds 48 deliberate cohesive comparisons. All 656 cells with an implemented native model now carry nonempty source-bound commands, typed options, endpoints and nine independent readiness axes: P3 diagnostics, P4 orientation/source geography, P6 branch/control pairs, P7 native/preexisting cavity pairs, P8 current generic FEM and the 12 native-opening P9 specimens. The 36 fitted-bilinear P9 cells remain explicit because their physical cohesive support is genuinely unassigned.",
       "owner_consumer": "prospective campaign schema, launcher, audit/resume and all-goal records",
       "authoritative_source": "unchanged charter plus completed R01-R12 registries",
       "dependencies": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R11", "R12"],
       "exact_next_command": "python scripts/build_prospective_campaign_v3.py --disabled --audit --dry-run",
       "input_output_identity": "frozen model/parameter/fit IDs; target machine/output root intentionally unset",
-      "numerical_criteria": "All required cells have typed parameters, endpoints, nonempty native commands and independent readiness axes; production launch remains disabled.",
+      "numerical_criteria": "Every implemented cell has typed parameters, endpoints, nonempty source-bound native commands and independent readiness axes; unsupported fitted-material cells remain fail-closed; production launch remains disabled.",
       "executed_evidence": [
         "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V2.jsonl",
         "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
         "common_framework_readiness/CAMPAIGN_V3_SUMMARY.json"
       ],
-      "remaining_limitation": "Production remains disabled. Cohesive comparison cells await physical activation-area/stiffness/work support and specimen adapter qualification; P6-P8 retain their separately reported native-adapter/convergence dependencies."
+      "remaining_limitation": "Production remains disabled. The 36 fitted-bilinear comparison cells await authoritative activation-area/stiffness/work support and therefore have no fabricated commands. Three history-reset campaign cells require their same-case naturally populated accepted checkpoints before execution. Case-level convergence remains pending where recorded; R09 second-generation ownership and R10 occupied-state child continuation retain their separate physical/resource statuses."
     }
   ],
-  "next_priority": "R05-R08 and R11 generic/native implementation are closed at their declared scopes. R09 has native first birth, daughter evolution and restart but awaits physical owner detachment for recursive eligibility. R10 is independently bound to its native accepted connected state and exact continuation; run it when measured memory admission permits. Continue the R13 executable disabled-campaign bindings and final R12/release qualification without treating either resource-deferred native solve as a global block."
+  "next_priority": "All independently implementable R05-R08 and disabled-campaign adapter work is source-bound. Remaining work is evidence- or input-dependent: admit the exact R09 recursive-owner and R10 occupied-cavity continuations when measured memory permits; retain the 36 fitted-bilinear P9 cells until authoritative cohesive support is supplied; acquire the two genuinely missing R12 external archives if available; and generate each P3 history-reset source checkpoint naturally within its same case before production execution. Production remains disabled."
 }

@@ -1,0 +1,52 @@
+{
+  "schema": "p3-history-reset-lifecycle-qualification/1",
+  "status": "PASS",
+  "production_execution_authorized": false,
+  "source_commit": "073e0e8821fad0c19f25839f0c3db63b0cc14e5b",
+  "source_checkpoint_step": 48,
+  "continued_checkpoint_step": 49,
+  "intervention": "history_reset_reequilibrated",
+  "checks": {
+    "source_checkpoint_immutable": true,
+    "reset_generation_atomic_and_readable": true,
+    "declared_mpz_process_fields_zero_after_reset": true,
+    "physical_loss_ledgers_unchanged": true,
+    "counterfactual_work_retained": true,
+    "stale_high_cycle_cache_cleared": true,
+    "native_fixed_load_reequilibrium_converged": true,
+    "fresh_process_shared_restart_continued": true,
+    "shared_execution_verified": true,
+    "persistent_native_runtime_binding_verified": true,
+    "requested_diagnostic_runtime_binding_verified": true,
+    "no_forced_stochastic_event": true
+  },
+  "native_reequilibration": {
+    "opening_m": 9.599999999999993e-06,
+    "reaction_N_per_m": 2094508.6762442975,
+    "residual_norm_N_per_m": 1.0913936421275139e-09,
+    "displacement_correction_norm_m": 3.5965233315618435e-08
+  },
+  "population": {
+    "removed_total": 99.37949516950893,
+    "pre_reset_sha256": "6a6f37dbd99be1a11b3bc3ac1567185bece16adb34c13696beaf1d5abb501905",
+    "post_reset_sha256": "30d3c511447d6541cbb7bdd2a8f0f9793c9deb30254cb6b5d19781b46ed9fd1c"
+  },
+  "reset_generation": "c158942af14609f965fdef2a",
+  "continued_generation": "105c5fe191cad044d9040591",
+  "continued_state": {
+    "temperature_K": 950.0,
+    "accepted_fracture_events": 0,
+    "event_status": "no_accepted_events",
+    "active_front_count": 1,
+    "finite_inventory_substitute_started": false
+  },
+  "primary_evidence": [
+    "qualification_report.json",
+    "continued_step49/shared_runtime_attestation.post.json",
+    "continued_step49/diagnostic_intervention_runtime_binding.json",
+    "continued_step49/persistent_native_runtime_binding.json",
+    "continued_step49/diagnostic_history_reset_checkpoint/run_state_checkpoint.json",
+    "continued_step49/checkpoint/run_state_checkpoint.json"
+  ],
+  "scope": "Qualification-only native P3 reset and continuation; no production calibration, material selection, campaign launch, or forced event."
+}

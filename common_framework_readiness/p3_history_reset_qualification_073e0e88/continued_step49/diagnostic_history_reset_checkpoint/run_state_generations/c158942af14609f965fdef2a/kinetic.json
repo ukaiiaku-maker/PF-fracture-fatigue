@@ -1,0 +1,258 @@
+{
+  "cycles_from_engine_time": null,
+  "diagnostics": {
+    "active_K_shield_Pa_sqrt_m": -11001.582652972178,
+    "emission_hazard_s": 1.2163158161565661,
+    "mobile_count": 1.9881730501532824e-11,
+    "retained_count": 48.381368659876046,
+    "sigma_back_Pa": 210833204.8700043,
+    "tip_radius_m": 1.0096385839779585e-06
+  },
+  "engine_time_s": 403.1999999999997,
+  "fields": [
+    {
+      "floor": 1.0,
+      "name": "mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 0,
+      "stop": 160
+    },
+    {
+      "floor": 1.0,
+      "name": "mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 160,
+      "stop": 320
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 320,
+      "stop": 480
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 480,
+      "stop": 640
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 640,
+      "stop": 800
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 800,
+      "stop": 960
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 960,
+      "stop": 1280
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1280,
+      "stop": 1600
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1600,
+      "stop": 1920
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1920,
+      "stop": 2240
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2240,
+      "stop": 2560
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2560,
+      "stop": 2880
+    },
+    {
+      "floor": 1.0,
+      "name": "W_emit",
+      "owner": "engine",
+      "shape": [],
+      "start": 2880,
+      "stop": 2881
+    },
+    {
+      "floor": 1.0,
+      "name": "K_prev",
+      "owner": "engine",
+      "shape": [],
+      "start": 2881,
+      "stop": 2882
+    }
+  ],
+  "geometry_signature": [
+    0,
+    0.0,
+    4.973371847276317e-28,
+    0.0,
+    4.973371847276317e-28,
+    80,
+    160,
+    [
+      2,
+      80
+    ]
+  ],
+  "high_cycle_cache": {},
+  "ledgers": {
+    "engine.N_em": 48.38136865989593,
+    "mpz.emitted_total": 50.998126509613,
+    "mpz.escaped_total": 4.154747084695342e-06,
+    "mpz.gross_release_total": 1594.7463898845779,
+    "mpz.gross_trapping_total": 1645.7445122394229,
+    "mpz.mobile_distance_population_total_m": 4.954108913811356e-05,
+    "mpz.net_retained_gain_total": 50.99812235733872,
+    "mpz.net_retained_loss_total": 2.493718569823393e-09,
+    "mpz.recovered_total": 0.0,
+    "mpz.signed_line_content_emitted_total": 50.998126509613,
+    "mpz.signed_source_activations_total": 55.893946654535824,
+    "mpz.wake_discarded_mobile_total": 0.0,
+    "mpz.wake_discarded_retained_total": 0.0,
+    "mpz.wake_discarded_slip_total": 0.0
+  },
+  "metadata": {
+    "diagnostic_history_reset": {
+      "counterfactual_removed_work": {
+        "W_emit_J_per_m": 0.004200969443321694
+      },
+      "intervention": "history_reset_reequilibrated",
+      "native_reequilibration": {
+        "converged": true,
+        "displacement_correction_norm_m": 3.5965233315618435e-08,
+        "native_mechanics": true,
+        "opening_m": 9.599999999999993e-06,
+        "reaction_N_per_m": 2094508.6762442975,
+        "residual_norm_N_per_m": 1.0913936421275139e-09
+      },
+      "physical_loss_ledgers_unchanged": true,
+      "post_reset_population_sha256": "30d3c511447d6541cbb7bdd2a8f0f9793c9deb30254cb6b5d19781b46ed9fd1c",
+      "pre_reset_population_sha256": "6a6f37dbd99be1a11b3bc3ac1567185bece16adb34c13696beaf1d5abb501905",
+      "production_default": false,
+      "qualification_only": true,
+      "removed_population": {
+        "accumulated_slip_negative": 25.083582054986795,
+        "accumulated_slip_positive": 25.914544454626203,
+        "mobile_negative": 9.776357663327912e-12,
+        "mobile_positive": 1.010537283820491e-11,
+        "retained_negative": 23.79036192635072,
+        "retained_positive": 24.59100673352533,
+        "wake_mobile_negative": 0.0,
+        "wake_mobile_positive": 0.0,
+        "wake_retained_negative": 0.0,
+        "wake_retained_positive": 0.0,
+        "wake_slip_negative": 0.0,
+        "wake_slip_positive": 0.0
+      },
+      "removed_population_total": 99.37949516950893,
+      "schema": "p3-history-reset-reequilibrated-checkpoint/1",
+      "source_checkpoint": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/f1_coupled_native_qualification_8982d422/initial_to_step48/checkpoint",
+      "tip_bulk_population_transfer_added": false
+    }
+  },
+  "reason": "p3_history_reset_reequilibrated",
+  "schema": "v10.2.30_atomic_live_high_cycle_checkpoint_v1",
+  "stochastic": {
+    "B": 9.946743694552635e-23,
+    "avalanche_base_checkpoint_m": 5e-06,
+    "avalanche_checkpoint_synchronized": true,
+    "avalanche_event_advance_m": 5e-06,
+    "avalanche_event_length_factor": 1.0,
+    "avalanche_event_length_history": [],
+    "avalanche_last_completed_advance_m": 0.0,
+    "avalanche_last_completed_factor": 0.0,
+    "hazard_action_current": 9.946743694552635e-23,
+    "hazard_event_index": 0,
+    "hazard_threshold_action": 1.0,
+    "hazard_threshold_history": [],
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 222229090236551723204222316689071405021,
+        "state": 230317702640256494996665814194295132893
+      },
+      "uinteger": 0
+    }
+  },
+  "temperature_K": 950.0,
+  "timestamp_unix_s": 1791855265.4274628
+}

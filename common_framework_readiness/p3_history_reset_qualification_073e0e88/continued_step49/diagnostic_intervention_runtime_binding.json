@@ -1,0 +1,56 @@
+{
+  "finite_inventory_substitute_started": false,
+  "installed": true,
+  "records": [
+    {
+      "counterfactual_removed_work": {
+        "W_emit_J_per_m": 0.004200969443321694
+      },
+      "destination_checkpoint": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/common_framework_readiness/p3_history_reset_qualification_073e0e88/continued_step49/diagnostic_history_reset_checkpoint",
+      "intervention": "history_reset_reequilibrated",
+      "manifest": {
+        "created_unix_s": 1792087550.019202,
+        "files": {
+          "kinetic.json": "520aa6dc9932f72d071bbd0c0c7399fbb7fbe86f11bbb957428be9bebe29af0f",
+          "outer.json": "34ada4a95d15163708054472b69d6d9eeb77c7c24a522d2849263f774325a506",
+          "state.npz": "e1bac141ad66486c7b193e859089fc5e686bd9185746d594d4ec34aaef386610"
+        },
+        "generation": "c158942af14609f965fdef2a",
+        "schema": "v10.2.30_combined_outer_kinetic_run_state_v2"
+      },
+      "native_reequilibration": {
+        "converged": true,
+        "displacement_correction_norm_m": 3.5965233315618435e-08,
+        "native_mechanics": true,
+        "opening_m": 9.599999999999993e-06,
+        "reaction_N_per_m": 2094508.6762442975,
+        "residual_norm_N_per_m": 1.0913936421275139e-09
+      },
+      "physical_loss_ledgers_unchanged": true,
+      "post_reset_population_sha256": "30d3c511447d6541cbb7bdd2a8f0f9793c9deb30254cb6b5d19781b46ed9fd1c",
+      "pre_reset_population_sha256": "6a6f37dbd99be1a11b3bc3ac1567185bece16adb34c13696beaf1d5abb501905",
+      "production_default": false,
+      "qualification_only": true,
+      "removed_population": {
+        "accumulated_slip_negative": 25.083582054986795,
+        "accumulated_slip_positive": 25.914544454626203,
+        "mobile_negative": 9.776357663327912e-12,
+        "mobile_positive": 1.010537283820491e-11,
+        "retained_negative": 23.79036192635072,
+        "retained_positive": 24.59100673352533,
+        "wake_mobile_negative": 0.0,
+        "wake_mobile_positive": 0.0,
+        "wake_retained_negative": 0.0,
+        "wake_retained_positive": 0.0,
+        "wake_slip_negative": 0.0,
+        "wake_slip_positive": 0.0
+      },
+      "removed_population_total": 99.37949516950893,
+      "schema": "p3-history-reset-reequilibrated-checkpoint/1",
+      "source_checkpoint": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/f1_coupled_native_qualification_8982d422/initial_to_step48/checkpoint",
+      "tip_bulk_population_transfer_added": false
+    }
+  ],
+  "requested_intervention": "history_reset_reequilibrated",
+  "schema": "shared-diagnostic-intervention-runtime-binding/1"
+}

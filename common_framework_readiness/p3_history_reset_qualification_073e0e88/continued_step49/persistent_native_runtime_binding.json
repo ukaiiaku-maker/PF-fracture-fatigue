@@ -1,0 +1,182 @@
+{
+  "all_expected_methods_bound": true,
+  "exchange_transport_mode": "joint_ctmc",
+  "finite_inventory_substitute_started": false,
+  "observed_exchange_transport_modes": [
+    "joint_ctmc"
+  ],
+  "observed_signed_transport_modes": [
+    "validated_scalar"
+  ],
+  "records": [
+    {
+      "all_expected_methods_bound": true,
+      "available_sites_are_diagnostic_only": true,
+      "bindings": {
+        "advance": {
+          "body_sha256": "ddf23aab25f1d6454992dd0d08b5821a04d762341b0a3fa37ebed7e464bf9f12",
+          "callable": "arrhenius_fracture.persistent_site_source_v10221._persistent_advance",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/persistent_site_source_v10221.py",
+          "source_sha256": "289288b6bd9900725a5f8a9b3888f0e2c0f56d67b60877ffe43e1fe8eb4d7671"
+        },
+        "emission_rate_per_site": {
+          "body_sha256": "9931222d6bb4aadc44732637e082e1590d8fc74360ad5614768e7314264e2943",
+          "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState.emission_rate_per_site",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/unified_mpz.py",
+          "source_sha256": "75082c3f1fb8b3fbc2984e43c62c1f6218220320136a7cb7ea758fd9568dd19f"
+        },
+        "emit": {
+          "body_sha256": "38b88cee5a0de54d573c16ce6cb0acc2db70a287be935480852f07f26cbb20dd",
+          "callable": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/persistent_site_source_v10221.py",
+          "source_sha256": "289288b6bd9900725a5f8a9b3888f0e2c0f56d67b60877ffe43e1fe8eb4d7671"
+        },
+        "evolve": {
+          "body_sha256": "2605f2cde33791e6deb435a4f6fd1f1a7a1a7d0fdb2cdd91c4d00e5553eace5d",
+          "callable": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_scalar",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/signed_burgers_shared_v1025.py",
+          "source_sha256": "87a392989a20725655b6ad5586cbee5f3cf23a9b0fcee12150b1c71fd4b3429e"
+        },
+        "exchange": {
+          "body_sha256": "9386264402c5a5b451e69bbfb68734e37cbc0e2b9be672b973c279e71acd9848",
+          "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._exchange",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/unified_mpz.py",
+          "source_sha256": "75082c3f1fb8b3fbc2984e43c62c1f6218220320136a7cb7ea758fd9568dd19f"
+        }
+      },
+      "exchange_transport_mode": "joint_ctmc",
+      "expected_method_match": {
+        "advance": true,
+        "coupled_source_transport": true,
+        "emit": true,
+        "evolve": true
+      },
+      "inner_operator_identities": {
+        "joint_transport_exchange": {
+          "body_sha256": "1c9120ce46db0d29b8ed9a722041ec636ea17c00d68acad6cb169af1768f89a7",
+          "callable": "arrhenius_fracture.coupled_transport_exchange.joint_transport_exchange",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/coupled_transport_exchange.py",
+          "source_sha256": "8cd4238805281310798250e87fb5e4cccc8f6ff4081b57e0567c9dde40001d03"
+        },
+        "taylor_completion_rate": {
+          "body_sha256": "e6bce5d26caea9a02337abfcc43fa282465999347294a98417313efdc16e6a46",
+          "callable": "arrhenius_fracture.taylor_release.completion_rate",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/taylor_release.py",
+          "source_sha256": "ac1ee259112d217d57133c80713ed47453e84366f756c8a2f71ff91b8cc74b28"
+        },
+        "transport_rate_constructor": {
+          "body_sha256": "df2563a116a004b102a69bffc1505144739ba7f237972f01a373e571de47850a",
+          "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/unified_mpz.py",
+          "source_sha256": "75082c3f1fb8b3fbc2984e43c62c1f6218220320136a7cb7ea758fd9568dd19f"
+        }
+      },
+      "object_type": "arrhenius_fracture.unified_mpz.UnifiedMPZState",
+      "persistent_source_inventory_active": false,
+      "physical_contract": {
+        "advance": "signed moving-frame wake inheritance with persistent sites not consumed",
+        "backstress": "unsigned active mobile plus retained line content",
+        "exchange_release": "simultaneous encounter/Taylor release/recapture, transport, escape, and gross/net ledgers",
+        "injection": "continuous mobile source inside the coupled CTMC with an implicit persistent-site backstress/end-state root",
+        "shielding": "signed retained line content",
+        "time_unit": "s",
+        "transport": "signed finite-volume Peierls transport in the same CTMC generator"
+      },
+      "reversible_overlay": null,
+      "schema": "persistent-native-runtime-contract/1",
+      "signed_transport_mode": "validated_scalar",
+      "source_model": "persistent_areal_sites_backstress_limited_no_inventory",
+      "taylor_completion_constructor": {
+        "hard_cap": null,
+        "mode": "mean_net_rate_over_density_order",
+        "window_s": null
+      }
+    },
+    {
+      "all_expected_methods_bound": true,
+      "available_sites_are_diagnostic_only": true,
+      "bindings": {
+        "advance": {
+          "body_sha256": "ddf23aab25f1d6454992dd0d08b5821a04d762341b0a3fa37ebed7e464bf9f12",
+          "callable": "arrhenius_fracture.persistent_site_source_v10221._persistent_advance",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/persistent_site_source_v10221.py",
+          "source_sha256": "289288b6bd9900725a5f8a9b3888f0e2c0f56d67b60877ffe43e1fe8eb4d7671"
+        },
+        "emission_rate_per_site": {
+          "body_sha256": "9931222d6bb4aadc44732637e082e1590d8fc74360ad5614768e7314264e2943",
+          "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState.emission_rate_per_site",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/unified_mpz.py",
+          "source_sha256": "75082c3f1fb8b3fbc2984e43c62c1f6218220320136a7cb7ea758fd9568dd19f"
+        },
+        "emit": {
+          "body_sha256": "38b88cee5a0de54d573c16ce6cb0acc2db70a287be935480852f07f26cbb20dd",
+          "callable": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/persistent_site_source_v10221.py",
+          "source_sha256": "289288b6bd9900725a5f8a9b3888f0e2c0f56d67b60877ffe43e1fe8eb4d7671"
+        },
+        "evolve": {
+          "body_sha256": "2605f2cde33791e6deb435a4f6fd1f1a7a1a7d0fdb2cdd91c4d00e5553eace5d",
+          "callable": "arrhenius_fracture.signed_burgers_shared_v1025._signed_evolve_scalar",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/signed_burgers_shared_v1025.py",
+          "source_sha256": "87a392989a20725655b6ad5586cbee5f3cf23a9b0fcee12150b1c71fd4b3429e"
+        },
+        "exchange": {
+          "body_sha256": "9386264402c5a5b451e69bbfb68734e37cbc0e2b9be672b973c279e71acd9848",
+          "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._exchange",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/unified_mpz.py",
+          "source_sha256": "75082c3f1fb8b3fbc2984e43c62c1f6218220320136a7cb7ea758fd9568dd19f"
+        }
+      },
+      "exchange_transport_mode": "joint_ctmc",
+      "expected_method_match": {
+        "advance": true,
+        "coupled_source_transport": true,
+        "emit": true,
+        "evolve": true
+      },
+      "inner_operator_identities": {
+        "joint_transport_exchange": {
+          "body_sha256": "1c9120ce46db0d29b8ed9a722041ec636ea17c00d68acad6cb169af1768f89a7",
+          "callable": "arrhenius_fracture.coupled_transport_exchange.joint_transport_exchange",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/coupled_transport_exchange.py",
+          "source_sha256": "8cd4238805281310798250e87fb5e4cccc8f6ff4081b57e0567c9dde40001d03"
+        },
+        "taylor_completion_rate": {
+          "body_sha256": "e6bce5d26caea9a02337abfcc43fa282465999347294a98417313efdc16e6a46",
+          "callable": "arrhenius_fracture.taylor_release.completion_rate",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/taylor_release.py",
+          "source_sha256": "ac1ee259112d217d57133c80713ed47453e84366f756c8a2f71ff91b8cc74b28"
+        },
+        "transport_rate_constructor": {
+          "body_sha256": "df2563a116a004b102a69bffc1505144739ba7f237972f01a373e571de47850a",
+          "callable": "arrhenius_fracture.unified_mpz.UnifiedMPZState._transport_rates",
+          "source_file": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/arrhenius_fracture/unified_mpz.py",
+          "source_sha256": "75082c3f1fb8b3fbc2984e43c62c1f6218220320136a7cb7ea758fd9568dd19f"
+        }
+      },
+      "object_type": "arrhenius_fracture.unified_mpz.UnifiedMPZState",
+      "persistent_source_inventory_active": false,
+      "physical_contract": {
+        "advance": "signed moving-frame wake inheritance with persistent sites not consumed",
+        "backstress": "unsigned active mobile plus retained line content",
+        "exchange_release": "simultaneous encounter/Taylor release/recapture, transport, escape, and gross/net ledgers",
+        "injection": "continuous mobile source inside the coupled CTMC with an implicit persistent-site backstress/end-state root",
+        "shielding": "signed retained line content",
+        "time_unit": "s",
+        "transport": "signed finite-volume Peierls transport in the same CTMC generator"
+      },
+      "reversible_overlay": null,
+      "schema": "persistent-native-runtime-contract/1",
+      "signed_transport_mode": "validated_scalar",
+      "source_model": "persistent_areal_sites_backstress_limited_no_inventory",
+      "taylor_completion_constructor": {
+        "hard_cap": null,
+        "mode": "mean_net_rate_over_density_order",
+        "window_s": null
+      }
+    }
+  ],
+  "requested_lifecycle": "persistent_reusable",
+  "schema": "persistent-native-execution-binding/1",
+  "signed_transport_mode": "validated_scalar"
+}
