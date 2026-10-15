@@ -13,7 +13,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .prospective_campaign import build_cases
+from .prospective_campaign import build_cases, load_material_rows
 from .prospective_campaign_v2 import build_cases_v2
 from .shared_options import PRESETS
 
@@ -176,7 +176,7 @@ def _bind_generic_fem(root: Path, converted: dict[str, Any]) -> None:
     """Bind P8 to current generic FEM source without authorizing production."""
     registry = str(converted["parameter_registry"])
     option = str(converted["parameter_option"])
-    if converted["family"] == "DBTT" and converted["eligibility"] != "ELIGIBLE":
+    if converted["family"] == "DBTT" and converted.get("eligibility") != "ELIGIBLE":
         converted["requested_parameter_option"] = option
         registry = DBTT_QUALIFICATION_REGISTRY
         option = DBTT_QUALIFICATION_OPTION
@@ -287,6 +287,7 @@ def _fit_by_family(root: Path) -> dict[str, dict[str, Any]]:
 
 def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]:
     fits = _fit_by_family(root)
+    domain_rows = load_material_rows(root)
     conditions = (
         ("cold_nominal_accommodation", 300.0, 1.0, "accommodation"),
         ("transition_slow_opening", 950.0, 0.01, "opening_only"),
@@ -326,6 +327,7 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                     "goal_ids": ["FG-04", "FG-11", "FG-12", "FG-18"],
                     "family": family, "parameter_option": option,
                     "parameter_registry": REGISTRY, "temperature_K": temperature,
+                    "eligibility": domain_rows[family].domain(temperature)["domain_status"],
                     "rate_factor": rate, "arm": arm, "seed": 8666,
                     "orientation_deg": 0.0, "initial_crack_length_m": 5e-4,
                     "target_extension_um": 10.0,
@@ -360,10 +362,26 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                     },
                     "production_execution_authorized": False,
                 }
+                row["material_selection_scope"] = "PROSPECTIVE_OR_PARENT"
+                if law == "original_activated_opening":
+                    _bind_generic_fem(root, row)
                 row["readiness"] = _statuses(row, cohesive=law != "original_activated_opening")
                 if law == "original_activated_opening":
-                    row["readiness"]["implementation"] = "UNRESOLVED_GENERIC_FEM_ADAPTER"
-                    row["readiness"]["native_qualification"] = "PENDING_THREE_LEVEL_SPECIMEN"
+                    row["readiness"].update({
+                        "implementation": "IMPLEMENTED",
+                        "native_qualification": (
+                            "GENERIC_ENTRY_DRY_RUN_QUALIFIED_CASE_LEVEL_PENDING"
+                        ),
+                        "kernel_validity": (
+                            "BOUND_NATIVE_KERNEL_COMMON_OBSERVER_CONVERGENCE_PENDING"
+                        ),
+                        "numerical_convergence": "PENDING_THREE_LEVEL_CASE_GRID",
+                        "input_availability": (
+                            "AVAILABLE_QUALIFICATION_INPUT_PRODUCTION_SELECTION_PENDING"
+                            if row.get("material_selection_scope") == "QUALIFICATION_ONLY"
+                            else "AVAILABLE_VERSIONED_INPUTS"
+                        ),
+                    })
                 row["execution"] = _execution(row)
                 rows.append(row)
     return rows

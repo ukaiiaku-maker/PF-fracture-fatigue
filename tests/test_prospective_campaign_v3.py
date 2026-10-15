@@ -34,13 +34,25 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     fitted = [row for row in cohesive if row["cohesive_law"]["fit"] is not None]
     assert all(row["readiness"]["input_availability"] == "BLOCKED_PHYSICAL_COHESIVE_SUPPORT" for row in fitted)
     assert all(row["cohesive_law"]["fit"]["unassigned_physical_quantities"] for row in fitted)
+    native_opening = [
+        row for row in cohesive
+        if row["cohesive_law"]["kind"] == "original_activated_opening"
+    ]
+    assert len(native_opening) == 12
+    assert all(row["native_args"] for row in native_opening)
+    assert all(
+        row["native_entrypoint"]
+        == "arrhenius_fracture.generic_current_pf_companion"
+        for row in native_opening
+    )
+    assert all(row["readiness"]["implementation"] == "IMPLEMENTED" for row in native_opening)
 
     dbtt_qualification = [
         row for row in rows
         if row.get("material_selection_scope") == "QUALIFICATION_ONLY"
     ]
-    # 66 PF cells plus the two formerly inadmissible 1000 K P8 cells.
-    assert len(dbtt_qualification) == 68
+    # 66 PF cells, two P8 cells, and the inadmissible 1200 K DBTT P9 specimen.
+    assert len(dbtt_qualification) == 69
     assert all(row["native_args"] for row in dbtt_qualification)
     assert all(row["production_parameter_option"] is None for row in dbtt_qualification)
     assert {row["parameter_option"] for row in dbtt_qualification} == {
