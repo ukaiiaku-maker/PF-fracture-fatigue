@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""Continue the native one-void qualification from a connected checkpoint."""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from arrhenius_fracture.checkpoint_v11 import restore_checkpoint, write_checkpoint
+from arrhenius_fracture.topology_transaction_v11 import complete_accepted_state_fingerprint
+from arrhenius_fracture.unified_fracture_material_v5 import require_bound_identity
+from arrhenius_fracture.voiding_production_v5 import downstream_front_transaction
+from scripts.run_unified_one_void_end_to_end import _require, _rollback_matrix
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--checkpoint", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args(argv)
+    args.output.mkdir(parents=True, exist_ok=False)
+
+    connected = restore_checkpoint(args.checkpoint.resolve())
+    connected_fingerprint = complete_accepted_state_fingerprint(connected)
+    identity = dict(require_bound_identity(connected))
+    before_actions = int(connected.event_counters.get("topology_actions", 0))
+    before_branches = len(connected.crack_network.branches)
+    before_history = len(connected.void_state.event_history)
+
+    child, birth, birth_operations, birth_causal = downstream_front_transaction(connected)
+    _require(birth is not None and birth.accepted, "downstream child birth was not accepted")
+    _require(len(child.crack_network.branches) == before_branches + 1,
+             "child birth did not create exactly one front")
+    _require(child.crack_network.active_tip_ids == ("void-front-1",),
+             "child birth did not leave one active downstream front")
+    _require(int(child.event_counters.get("topology_actions", 0)) == before_actions + 1,
+             "child birth did not consume exactly one topology action")
+    _require(len(child.void_state.event_history) == before_history + 1,
+             "child birth did not append exactly one event")
+    _require(dict(require_bound_identity(child)) == identity,
+             "child birth changed material/core identity")
+    child_checkpoint = args.output / "after-child-birth.json"
+    write_checkpoint(child, child_checkpoint)
+    child_restored = restore_checkpoint(child_checkpoint)
+    _require(complete_accepted_state_fingerprint(child_restored)
+             == complete_accepted_state_fingerprint(child),
+             "child checkpoint round trip changed state")
+
+    path_size = len(child_restored.crack_network.branch("void-front-1").path)
+    child_actions = int(child_restored.event_counters.get("topology_actions", 0))
+    terminal, continuation, continuation_operations, continuation_causal = (
+        downstream_front_transaction(child_restored, continuation=True)
+    )
+    _require(continuation is not None and continuation.accepted,
+             "downstream child continuation was not accepted")
+    _require(len(terminal.crack_network.branch("void-front-1").path) == path_size + 1,
+             "continuation did not extend the child exactly once")
+    _require(int(terminal.event_counters.get("topology_actions", 0)) == child_actions + 1,
+             "continuation did not consume exactly one topology action")
+    _require(terminal.crack_network.active_tip_ids == ("void-front-1",),
+             "continuation did not retain the downstream owner")
+    _require(dict(require_bound_identity(terminal)) == identity,
+             "continuation changed material/core identity")
+    terminal_checkpoint = args.output / "after-child-continuation.json"
+    write_checkpoint(terminal, terminal_checkpoint)
+    terminal_restored = restore_checkpoint(terminal_checkpoint)
+    terminal_fingerprint = complete_accepted_state_fingerprint(terminal)
+    _require(complete_accepted_state_fingerprint(terminal_restored) == terminal_fingerprint,
+             "terminal checkpoint round trip changed state")
+
+    rollback_count = _rollback_matrix(connected, args.output / "rollback")
+    report = {
+        "schema": "unified-one-void-fresh-process-continuation/1",
+        "status": "PASS",
+        "production_execution_authorized": False,
+        "input_checkpoint": str(args.checkpoint.resolve()),
+        "connected_fingerprint": connected_fingerprint,
+        "child_fingerprint": complete_accepted_state_fingerprint(child),
+        "terminal_fingerprint": terminal_fingerprint,
+        "birth_operations": birth_operations,
+        "continuation_operations": continuation_operations,
+        "birth_causal_record": birth_causal,
+        "continuation_causal_record": continuation_causal,
+        "rollback_injections_passed": rollback_count,
+        "active_tip_ids": list(terminal.crack_network.active_tip_ids),
+        "length_ledgers": dict(terminal.void_state.length_ledgers),
+        "scope": (
+            "fresh-process continuation from a native connected-cavity accepted "
+            "state through downstream birth, ordinary continuation and occupied restart"
+        ),
+    }
+    (args.output / "qualification_report.json").write_text(
+        json.dumps(report, indent=2, sort_keys=True, default=str) + "\n"
+    )
+    print(json.dumps(report, indent=2, sort_keys=True, default=str))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
