@@ -255,7 +255,7 @@
       "id": "R12",
       "goal_ids": ["FG-16", "FG-17"],
       "status": "PORTABLE_CLEAN_CURRENT_COMPLETE_FULL_MANDATORY_PROFILE_INCOMPLETE",
-      "concrete_defect": "Portable/core selection, a current clean-worktree pass at c5ae81fc, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are complete. The portable profile passes 966 tests with 15 explicit external-evidence deselections. The prior clean-root audit correctly reported 12 absent paths in that isolated checkout. A new hash-verifying audit against the explicit main workspace root verifies all 10 mandatory evidence directories byte-for-byte; only the two independent archive files remain genuinely missing.",
+      "concrete_defect": "Portable/core selection, a current clean-worktree pass at c5ae81fc, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are complete. The portable profile passes 966 tests with 15 explicit external-evidence deselections. The prior clean-root audit correctly reported 12 absent paths in that isolated checkout. A new hash-verifying audit against the explicit main workspace root verifies all 11 mandatory evidence directories byte-for-byte; only the two independent archive files remain genuinely missing.",
       "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
       "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
       "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],
@@ -273,7 +273,7 @@
         "common_framework_readiness/local_preservation_and_kinetics_20261014/CLEAN_CHECKOUT_AND_MANDATORY_EVIDENCE_RECEIPT.json",
         "common_framework_readiness/local_preservation_and_kinetics_20261014/FULL_EVIDENCE_AUDIT_MAIN_ROOT.json"
       ],
-      "remaining_limitation": "At commit c5ae81fc, a detached clean worktree passes 966 portable tests and deselects 15 explicitly marked external tests. Its 12-path report is a clean-root omission, not a claim that the main workspace lacks those directories. The explicit main-root full audit is still INCOMPLETE solely because the two required independent archives under /Users/shen/Fracture_Backups are genuinely unavailable; the 10 directory records are VERIFIED."
+      "remaining_limitation": "At commit c5ae81fc, a detached clean worktree passes 966 portable tests and deselects 15 explicitly marked external tests. Its 12-path report is a clean-root omission, not a claim that the main workspace lacks those directories. The explicit main-root full audit is still INCOMPLETE solely because the two required independent archives under /Users/shen/Fracture_Backups are genuinely unavailable; the 11 directory records are VERIFIED."
     },
     {
       "id": "R13",
