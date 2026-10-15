@@ -302,18 +302,9 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
     if simple and options.crack_path is CrackPathMode.SINGLE_FRONT and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE:
         if (options.loading is LoadingMode.MONOTONIC
                 and options.kinetics is KineticsStrategy.NATIVE_SIGNED
-                and options.diagnostic_intervention not in {
-                    DiagnosticIntervention.NATIVE,
-                    DiagnosticIntervention.HISTORY_RESET_REEQUILIBRATED,
-                }):
+                and options.diagnostic_intervention is not DiagnosticIntervention.NATIVE):
             executor = "arrhenius_fracture.shared_diagnostic_intervention_adapter"
             restart = "single_front_diagnostic_outer_checkpoint"
-        elif (options.loading is LoadingMode.MONOTONIC
-              and options.diagnostic_intervention is DiagnosticIntervention.HISTORY_RESET_REEQUILIBRATED):
-            limitation = (
-                "history_reset_reequilibrated requires a populated-checkpoint "
-                "transformer with persisted native mechanics re-equilibrium"
-            )
         elif options.loading is LoadingMode.MONOTONIC and options.kinetics in {KineticsStrategy.NATIVE_SIGNED, KineticsStrategy.REVERSIBLE_SIGNED}:
             executor = (
                 "arrhenius_fracture.sharp_front_v10_2_27_reversible_audited"

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -10,6 +11,7 @@ import numpy as np
 from . import sharp_front_v10_2_27 as _entry
 from . import sharp_front_v10_2_27_audited as _audited
 from .diagnostic_interventions_v1 import install_diagnostic_intervention
+from .history_reset_checkpoint_v1 import transform_history_reset_checkpoint
 from .persistent_site_audited_engine_v10221 import (
     AuditedPersistentSiteStateResolvedTipEngine,
 )
@@ -19,6 +21,7 @@ SUPPORTED = frozenset({
     "retained_shielding_off", "source_backstress_off", "blunting_fixed",
     "transport_retention_off",
 })
+HISTORY_RESET = "history_reset_reequilibrated"
 
 
 def _extract_option(args: list[str], name: str) -> str | None:
@@ -85,12 +88,36 @@ def _engine(base, intervention: str):
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
     intervention = _extract_option(args, "--diagnostic-intervention")
-    if intervention not in SUPPORTED:
+    if intervention not in SUPPORTED | {HISTORY_RESET}:
         raise ValueError(
             "the populated-state diagnostic adapter requires exactly one of "
-            + ", ".join(sorted(SUPPORTED))
+            + ", ".join(sorted(SUPPORTED | {HISTORY_RESET}))
         )
     out = _audited._option_value(args, "--out")
+    if intervention == HISTORY_RESET:
+        if not out:
+            raise ValueError("history reset requires a native --out directory")
+        source = os.environ.get("V10230_RESTART_CHECKPOINT_DIR", "").strip()
+        if not source:
+            raise ValueError(
+                "history_reset_reequilibrated requires restart_from pointing to "
+                "a populated combined native checkpoint"
+            )
+        reset_root = Path(out).resolve() / "diagnostic_history_reset_checkpoint"
+        receipt = transform_history_reset_checkpoint(source, reset_root)
+        os.environ["V10230_RESTART_CHECKPOINT_DIR"] = str(reset_root)
+        result = _audited.main(args)
+        payload = {
+            "schema": "shared-diagnostic-intervention-runtime-binding/1",
+            "requested_intervention": intervention,
+            "installed": True,
+            "records": [receipt],
+            "finite_inventory_substitute_started": False,
+        }
+        (Path(out) / "diagnostic_intervention_runtime_binding.json").write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        )
+        return result
     engine = _engine(AuditedPersistentSiteStateResolvedTipEngine, intervention)
     original = _entry.PersistentSiteStateResolvedTipEngine
     engine.reset_runtime_binding_records()

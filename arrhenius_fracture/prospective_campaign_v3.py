@@ -398,16 +398,6 @@ def _bind_p3_diagnostic(
 ) -> None:
     """Bind native and populated-state P3 consumers; leave history reset honest."""
     intervention = str(converted["study"])
-    if intervention == "history_reset_reequilibrated":
-        converted["native_args"] = []
-        converted["native_entrypoint"] = None
-        converted["shared_options"] = replace(
-            PRESETS["pf_monotonic_tip_persistent"],
-            diagnostic_intervention=intervention,
-            random_seed=int(converted["seed"]),
-        ).to_dict()
-        converted["command_status"] = "UNRESOLVED_CHECKPOINT_TRANSFORMER_GATE"
-        return
     args = list(_base_args(
         SimpleNamespace(option_key=original.parameter_option),
         float(converted["temperature_K"]), float(converted["rate_factor"]),
@@ -430,6 +420,11 @@ def _bind_p3_diagnostic(
         random_seed=int(converted["seed"]),
     ).to_dict()
     converted["command_status"] = "RESOLVED_DISABLED"
+    if intervention == "history_reset_reequilibrated":
+        converted["requires_populated_restart_checkpoint"] = True
+        converted["restart_checkpoint_requirement"] = (
+            "same-case accepted combined native checkpoint with nonzero MPZ population"
+        )
 
 
 def _convert_v2(
@@ -542,17 +537,17 @@ def _convert_v2(
     if converted.get("block") == "P3":
         history_reset = converted["study"] == "history_reset_reequilibrated"
         converted["readiness"].update({
-            "implementation": (
-                "UNRESOLVED_POPULATED_CHECKPOINT_TRANSFORMER"
-                if history_reset else "IMPLEMENTED"
-            ),
+            "implementation": "IMPLEMENTED",
             "native_qualification": (
-                "POPULATED_STATE_OPERATOR_QUALIFIED_PERSISTED_RESET_PENDING"
+                "PERSISTED_RESET_REEQUILIBRATION_QUALIFIED_MATCHED_CASE_CHECKPOINT_PENDING"
                 if history_reset else
                 "POPULATED_STATE_CONSUMER_QUALIFIED_CASE_LEVEL_PENDING"
             ),
             "kernel_validity": "BOUND_NATIVE_SIGNED_KERNEL_FAMILY",
-            "input_availability": "AVAILABLE_VERSIONED_INPUTS",
+            "input_availability": (
+                "PENDING_MATCHED_POPULATED_CHECKPOINT"
+                if history_reset else "AVAILABLE_VERSIONED_INPUTS"
+            ),
         })
     if (converted.get("block") == "P4"
             and converted.get("source_location") == "tip_surface"):

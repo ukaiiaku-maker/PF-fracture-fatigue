@@ -109,13 +109,13 @@ def test_populated_state_diagnostic_maps_to_dedicated_native_adapter(interventio
     assert by_role(plan)["diagnostic_intervention"].requested == intervention.value
 
 
-def test_history_reset_fails_closed_until_persisted_reequilibrium_transformer():
+def test_history_reset_maps_to_persisted_reequilibrium_adapter():
     plan = build_execution_plan(SharedOptions(
         diagnostic_intervention=DiagnosticIntervention.HISTORY_RESET_REEQUILIBRATED,
     ))
-    assert not plan.executable
-    assert plan.executor_module is None
-    assert "checkpoint transformer" in plan.limitation
+    assert plan.executable
+    assert plan.executor_module.endswith("shared_diagnostic_intervention_adapter")
+    assert plan.restart_family == "single_front_diagnostic_outer_checkpoint"
 
 
 def test_finite_inventory_maps_to_native_finite_site_driver():

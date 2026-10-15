@@ -160,7 +160,7 @@ def test_v3_summary_has_all_goal_records_and_distinct_digests():
     assert report["target_machine"] is None and report["output_root"] is None
 
 
-def test_p3_native_and_populated_state_operators_are_bound_but_reset_stays_closed():
+def test_all_p3_operators_are_bound_and_reset_declares_populated_checkpoint_dependency():
     rows = build_cases_v3(ROOT)
     p3 = [row for row in rows if row["block"] == "P3"]
     runnable = [
@@ -169,13 +169,16 @@ def test_p3_native_and_populated_state_operators_are_bound_but_reset_stays_close
     resets = [
         row for row in p3 if row["study"] == "history_reset_reequilibrated"
     ]
-    assert len(runnable) == 15 and all(row["native_args"] for row in runnable)
-    assert all(row["command_status"] == "RESOLVED_DISABLED" for row in runnable)
+    assert len(runnable) == 15
+    assert len(resets) == 3
+    assert all(row["native_args"] for row in p3)
+    assert all(row["command_status"] == "RESOLVED_DISABLED" for row in p3)
     assert all(row["shared_options"]["diagnostic_intervention"] == row["study"]
-               for row in runnable)
-    counterfactual = [row for row in runnable if row["study"] != "native"]
+               for row in p3)
+    counterfactual = [row for row in p3 if row["study"] != "native"]
     assert all("--diagnostic-intervention" in row["native_args"]
                for row in counterfactual)
-    assert len(resets) == 3 and all(not row["native_args"] for row in resets)
-    assert all(row["command_status"] == "UNRESOLVED_CHECKPOINT_TRANSFORMER_GATE"
-               for row in resets)
+    assert all(row["requires_populated_restart_checkpoint"] for row in resets)
+    assert all(row["readiness"]["implementation"] == "IMPLEMENTED" for row in resets)
+    assert all(row["readiness"]["input_availability"]
+               == "PENDING_MATCHED_POPULATED_CHECKPOINT" for row in resets)
