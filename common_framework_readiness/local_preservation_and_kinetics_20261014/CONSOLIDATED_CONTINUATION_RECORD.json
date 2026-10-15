@@ -1,0 +1,51 @@
+{
+  "schema": "fracture-framework-consolidated-continuation/1",
+  "date": "2026-10-14",
+  "qualified_source_pair": {
+    "pf": "c5ae81fc",
+    "fem": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
+  },
+  "mission_status": "INCOMPLETE_REMAINING_PHYSICAL_AND_NATIVE_QUALIFICATION_WORK",
+  "preservation_coverage": {
+    "persistent_forward_active": "PRESERVED_CONNECTED",
+    "occupied_signed_wake": "PRESERVED_CONNECTED",
+    "channel_resolved_transport": "PRESERVED_NATIVE_UNWIRED",
+    "reversible_surface_return": "PRESERVED_CONNECTED",
+    "full_field_bulk_constitutive": "PRESERVED_CONNECTED",
+    "direct_tip_bulk_population_transfer": "EVIDENCE_UNAVAILABLE",
+    "current_source_scalar_and_channel_restore": "PRESERVED_CONNECTED",
+    "fem_geometry_veto_and_full_state_rollback": "PRESERVED_CONNECTED",
+    "recursive_second_generation_owner_adapter": "NEW_EXTENSION",
+    "spontaneous_recursive_native_birth": "EVIDENCE_UNAVAILABLE",
+    "local_incremental_physical_cavity_transition": "EVIDENCE_UNAVAILABLE"
+  },
+  "native_qualification": {
+    "pf_focused_cross_consumer": "38 passed",
+    "fem_veto_transaction": "20 passed",
+    "recursive_owner_adapter": "3 passed; injected lifecycle fixture, not a natural branch prediction",
+    "clean_portable_suite": "966 passed, 15 deselected",
+    "full_mandatory_evidence": "INCOMPLETE with 12 mandatory missing items"
+  },
+  "dependency_restoration": {
+    "project_python_312": "AVAILABLE_AND_USED",
+    "default_base_python_313_scipy": "INCOMPLETE_BROKEN_SPROPACK_IMPORT",
+    "historical_c81_object": "EVIDENCE_UNAVAILABLE",
+    "independent_archives": "EVIDENCE_UNAVAILABLE_NOT_MOUNTED"
+  },
+  "law_to_result_map": "../LAW_TO_RESULT_MAP_V3.json",
+  "disabled_campaign": {
+    "production": true,
+    "manuscript": true,
+    "remote_push": true,
+    "historical_law_fallback": true
+  },
+  "remaining": [
+    "R04/R05 physical cohesive activation support, stiffness and specimen selection",
+    "R06 direct density transport and conservative tip/bulk transfer plus requested interventions",
+    "R07 cracked-body constraint/mixity lifecycle beyond the affine patch",
+    "R09 spontaneous native branch birth, mechanical continuation and active restart",
+    "R10 local-incremental physical cavity approach/connection and occupied-state combined restart",
+    "authorized DBTT shared-stress-law selection",
+    "mounting and hash verification of the 12 mandatory full-profile evidence items"
+  ]
+}

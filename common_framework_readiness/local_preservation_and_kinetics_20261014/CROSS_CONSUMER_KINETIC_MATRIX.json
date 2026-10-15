@@ -123,7 +123,7 @@
   },
   "tests": {
     "pf_cross_consumer_focused": "38 passed",
-    "pf_full_suite": "963 passed, 15 deselected in 80.43 s",
+    "pf_full_suite": "966 passed, 15 deselected; clean checkout 66.06 s",
     "fem_veto_and_transaction_focused": "20 passed",
     "default_base_interpreter": "INCOMPLETE_DEPENDENCY: SciPy Python-3.13 _spropack import is broken; qualification used the established project environments"
   },

@@ -40,7 +40,7 @@ is `CROSS_CONSUMER_KINETIC_MATRIX.json`.
   tests demonstrate that both scalar and channel model IDs restore the exact
   selected body, preserve all active/wake arrays, and remain idempotent.
 
-The focused PF qualification is 38 passed, and the complete PF suite is 963
+The focused PF qualification is 38 passed, and the final clean-checkout suite is 966
 passed with 15 explicitly deselected external-evidence tests. The default base Python environment
 has a broken SciPy 3.13 `_spropack` import and is recorded as an incomplete
 dependency; tests were run with the established
@@ -69,3 +69,8 @@ branching, local-incremental physical cavity qualification, direct tip/bulk
 density transfer, shared DBTT stress-scale selection and physical cohesive
 support/stiffness remain open under their existing ledger items. Production,
 manuscript work, remote writes, source resets and data deletion remain disabled.
+
+The recursive owner adapter was subsequently exercised through first-generation
+resolution, a resolved-daughter second-generation transition and exact JSON
+checkpoint restoration. It is explicitly an injected ownership fixture. Native
+spontaneous branch selection remains pending and is not promoted by that test.

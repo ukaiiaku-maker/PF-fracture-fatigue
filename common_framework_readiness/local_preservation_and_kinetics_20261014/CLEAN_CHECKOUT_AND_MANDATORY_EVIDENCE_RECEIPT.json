@@ -1,0 +1,37 @@
+{
+  "schema": "clean-checkout-and-mandatory-evidence/1",
+  "date": "2026-10-14",
+  "source_commit": "c5ae81fc",
+  "checkout": "/private/tmp/fracture-clean-worktree-c5ae81fc",
+  "checkout_git_status": "",
+  "portable_evidence_profile": {
+    "decision": "COMPLETE",
+    "interpretation": "portable/core tests intentionally do not require external evidence"
+  },
+  "portable_test": {
+    "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "result": "966 passed, 15 deselected",
+    "elapsed_s": 66.06
+  },
+  "full_mandatory_evidence_profile": {
+    "decision": "INCOMPLETE",
+    "manifest_sha256": "58d2a3d1c5bfb10ec5788c162edeae50d17810055c706a20acbb6660c52974aa",
+    "verified": ["integration_evidence__option_completion_v2"],
+    "mandatory_incomplete": [
+      "integration_evidence__final_fracture_campaign",
+      "integration_evidence__current_science_pilots_6abbf10",
+      "integration_evidence__branch_cavity_bb0c21d9",
+      "integration_evidence__v36_active_restart_340727f7",
+      "integration_evidence__active_fracture_comparisons_0a5d55e",
+      "integration_evidence__native_restart_transport_a30a78c",
+      "integration_evidence__native_restart_transport_f4ba118",
+      "integration_evidence__native_restart_transport_f766285",
+      "integration_evidence__positive_transport_854d32d",
+      "integration_evidence__targeted_completion",
+      "independent_primary_archive",
+      "independent_supplement_archive"
+    ]
+  },
+  "production_execution_authorized": false,
+  "manuscript_modification_authorized": false
+}

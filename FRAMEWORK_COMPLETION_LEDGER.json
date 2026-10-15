@@ -252,8 +252,8 @@
     {
       "id": "R12",
       "goal_ids": ["FG-16", "FG-17"],
-      "status": "PORTABLE_CLEAN_COMPLETE_FULL_ARCHIVE_AUDIT_PENDING",
-      "concrete_defect": "Portable/core selection, a real clean-worktree pass, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are complete. Complete verification of every mandatory independent archive item remains open.",
+      "status": "PORTABLE_CLEAN_CURRENT_COMPLETE_FULL_MANDATORY_PROFILE_INCOMPLETE",
+      "concrete_defect": "Portable/core selection, a current clean-worktree pass at c5ae81fc, selective manifest verification, intentional INCOMPLETE restoration reporting, and the release-level frozen law-to-result map are complete. The portable profile passes 966 tests with 15 explicit external-evidence deselections. The full profile verifies option_completion_v2 but reports 12 mandatory archive/directory items missing rather than skipping them.",
       "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
       "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
       "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],
@@ -267,9 +267,10 @@
         "common_framework_readiness/FULL_EVIDENCE_AVAILABILITY_AUDIT.json",
         "common_framework_readiness/LAW_TO_RESULT_MAP_V3.json",
         "common_framework_readiness/CLEAN_CHECKOUT_TEST_RECEIPT.json",
-        "common_framework_readiness/LOCAL_EXTERNAL_TEST_RECEIPT.json"
+        "common_framework_readiness/LOCAL_EXTERNAL_TEST_RECEIPT.json",
+        "common_framework_readiness/local_preservation_and_kinetics_20261014/CLEAN_CHECKOUT_AND_MANDATORY_EVIDENCE_RECEIPT.json"
       ],
-      "remaining_limitation": "At commit 412082a5, a real clean worktree with no current-science root passes 953 portable tests and deselects 13 explicitly marked external tests; all 13 external tests pass locally. The current-science root is hash-verified, but the entire mandatory independent archive set is not currently mounted/verified."
+      "remaining_limitation": "At commit c5ae81fc, a detached clean worktree passes 966 portable tests and deselects 15 explicitly marked external tests. The full manifest profile is intentionally INCOMPLETE: 12 mandatory items are absent, including both independent archives; only option_completion_v2 verifies in the clean checkout."
     },
     {
       "id": "R13",
