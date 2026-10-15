@@ -1,0 +1,16 @@
+{
+  "candidate_ids": [
+    "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+    "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+    "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+    "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_V2",
+    "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1925_V2",
+    "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_V2"
+  ],
+  "cold_contract_preserved": true,
+  "parent_candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_V1",
+  "parent_complete_row_sha256": "d7359b657ab9723ab20fc95a3ef291f555adffc39565db7b9a7c7650e4ff8eb1",
+  "schema": "r10.active-weakt-thermal-refinement/1",
+  "selection": "execute refined 1050/1200 K first-event roots; expand only if bracket fails",
+  "trigger": "dK=0.01 hot-root refinement invalidated the coarse S3.0 Weak-T span"
+}

@@ -1,0 +1,53 @@
+{
+  "candidate_count": 4,
+  "candidates": [
+    {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S0P9GPA_V1",
+      "changed_fields_json": "{\"candidate_id\": {\"offspring\": \"R10A_WEAKT_ACTIVE_EMIT_S0P9GPA_V1\", \"parent\": \"R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1\"}, \"emit_sT_GPa_per_K\": {\"offspring\": 0.0006666666666666666, \"parent\": 0.0008651616614272865}, \"emit_sigc0_GPa\": {\"offspring\": 1.0208866666666667, \"parent\": 0.878234268782052}, \"mechanism_summary\": {\"offspring\": \"retained active Weak-T opening/transport row with permitted P4 300 K emission characteristic-stress leverage\", \"parent\": \"Strict 100 um 1-D weak-temperature/FCC-like primary selected by minimum class score.\"}, \"role\": {\"offspring\": \"R10 active Weak-T emission-knee acquisition\", \"parent\": \"paper primary weak-temperature/FCC-like\"}}",
+      "complete_row_sha256": "8f52dfa175ae6284e3b85f447011fd0a3ae446f3df43f4651b86cd82c7f51b32",
+      "emit_sigc_1200_GPa": 1.5,
+      "emit_sigc_300_GPa": 0.9,
+      "saved_state_emission_rate_probes_json": "{\"3.02\": {\"rate_s-1\": 24200998.542907935, \"relative_to_parent\": 0.08879928828242513}, \"4.19\": {\"rate_s-1\": 748194379.2699888, \"relative_to_parent\": 0.17273128118645628}, \"4.97\": {\"rate_s-1\": 3025629739.832981, \"relative_to_parent\": 0.24971743815882888}, \"5.06\": {\"rate_s-1\": 3446623908.9483366, \"relative_to_parent\": 0.25942487937393993}}"
+    },
+    {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S1P2GPA_V1",
+      "changed_fields_json": "{\"candidate_id\": {\"offspring\": \"R10A_WEAKT_ACTIVE_EMIT_S1P2GPA_V1\", \"parent\": \"R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1\"}, \"emit_sT_GPa_per_K\": {\"offspring\": 0.0003333333333333334, \"parent\": 0.0008651616614272865}, \"emit_sigc0_GPa\": {\"offspring\": 1.2604433333333334, \"parent\": 0.878234268782052}, \"mechanism_summary\": {\"offspring\": \"retained active Weak-T opening/transport row with permitted P4 300 K emission characteristic-stress leverage\", \"parent\": \"Strict 100 um 1-D weak-temperature/FCC-like primary selected by minimum class score.\"}, \"role\": {\"offspring\": \"R10 active Weak-T emission-knee acquisition\", \"parent\": \"paper primary weak-temperature/FCC-like\"}}",
+      "complete_row_sha256": "71e4e1b951439e756fb70244d2243c2c5664a9f8fbdbc19e3c5a0f0151da0304",
+      "emit_sigc_1200_GPa": 1.5,
+      "emit_sigc_300_GPa": 1.2,
+      "saved_state_emission_rate_probes_json": "{\"3.02\": {\"rate_s-1\": 620532.9018738416, \"relative_to_parent\": 0.002276884565094646}, \"4.19\": {\"rate_s-1\": 38497599.221685745, \"relative_to_parent\": 0.00888771664210126}, \"4.97\": {\"rate_s-1\": 244547087.73439977, \"relative_to_parent\": 0.020183458489407793}, \"5.06\": {\"rate_s-1\": 292708936.919502, \"relative_to_parent\": 0.02203198917493329}}"
+    },
+    {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S1P5GPA_V1",
+      "changed_fields_json": "{\"candidate_id\": {\"offspring\": \"R10A_WEAKT_ACTIVE_EMIT_S1P5GPA_V1\", \"parent\": \"R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1\"}, \"emit_sT_GPa_per_K\": {\"offspring\": 0.0, \"parent\": 0.0008651616614272865}, \"emit_sigc0_GPa\": {\"offspring\": 1.5, \"parent\": 0.878234268782052}, \"mechanism_summary\": {\"offspring\": \"retained active Weak-T opening/transport row with permitted P4 300 K emission characteristic-stress leverage\", \"parent\": \"Strict 100 um 1-D weak-temperature/FCC-like primary selected by minimum class score.\"}, \"role\": {\"offspring\": \"R10 active Weak-T emission-knee acquisition\", \"parent\": \"paper primary weak-temperature/FCC-like\"}}",
+      "complete_row_sha256": "1579744df182d704e2e0d44a207540b68240bb82cd4e17e583214986f12d5c5a",
+      "emit_sigc_1200_GPa": 1.5,
+      "emit_sigc_300_GPa": 1.5,
+      "saved_state_emission_rate_probes_json": "{\"3.02\": {\"rate_s-1\": 27992.305509574, \"relative_to_parent\": 0.00010271050602425693}, \"4.19\": {\"rate_s-1\": 2473528.808835862, \"relative_to_parent\": 0.0005710491979620322}, \"4.97\": {\"rate_s-1\": 20824085.86417427, \"relative_to_parent\": 0.0017186958818986673}, \"5.06\": {\"rate_s-1\": 25758402.816690262, \"relative_to_parent\": 0.0019388162793846017}}"
+    },
+    {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S2P0GPA_V1",
+      "changed_fields_json": "{\"candidate_id\": {\"offspring\": \"R10A_WEAKT_ACTIVE_EMIT_S2P0GPA_V1\", \"parent\": \"R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1\"}, \"emit_sT_GPa_per_K\": {\"offspring\": -0.0005555555555555556, \"parent\": 0.0008651616614272865}, \"emit_sigc0_GPa\": {\"offspring\": 1.899261111111111, \"parent\": 0.878234268782052}, \"mechanism_summary\": {\"offspring\": \"retained active Weak-T opening/transport row with permitted P4 300 K emission characteristic-stress leverage\", \"parent\": \"Strict 100 um 1-D weak-temperature/FCC-like primary selected by minimum class score.\"}, \"role\": {\"offspring\": \"R10 active Weak-T emission-knee acquisition\", \"parent\": \"paper primary weak-temperature/FCC-like\"}}",
+      "complete_row_sha256": "55fce38081d4edc7fd71e04e9d9027439d68637219bd68de016229711b56e3a2",
+      "emit_sigc_1200_GPa": 1.5,
+      "emit_sigc_300_GPa": 2.0,
+      "saved_state_emission_rate_probes_json": "{\"3.02\": {\"rate_s-1\": 457.86551485623096, \"relative_to_parent\": 1.680018771796268e-06}, \"4.19\": {\"rate_s-1\": 49115.55661681407, \"relative_to_parent\": 1.1339022659974856e-05}, \"4.97\": {\"rate_s-1\": 522839.9029127333, \"relative_to_parent\": 4.315208811035345e-05}, \"5.06\": {\"rate_s-1\": 666380.4531111006, \"relative_to_parent\": 5.0157972912759146e-05}}"
+    }
+  ],
+  "expensive_selection": "run the moderate and strong bracket endpoints through same-row fracture; then use developed native fatigue at the measured 15/22 DeltaK discrepancy",
+  "parent_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+  "parent_complete_row_sha256": "8ffdbb1084e3465b3ded48e223b72546e42985d4f7716e209a27517b5f1fac44",
+  "schema": "r10.active-weakt-reference-state-acquisition/1",
+  "scientific_decision": "retain the opening-dominated positive control; resume the active Weak-T lane by bracketing the permitted cold emission knee that directly controls the measured high-load blunting and loss of stress transmission",
+  "unchanged_contract": [
+    "opening surface",
+    "emission G0/alpha/exponent/floor and attempt frequency",
+    "Peierls and Taylor surfaces",
+    "source density and multiplicity",
+    "geometry-to-slip normalization",
+    "return and retention laws",
+    "blunting law",
+    "event/reward/completion law",
+    "mechanical kernel"
+  ]
+}
