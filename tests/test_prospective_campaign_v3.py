@@ -107,6 +107,21 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     } == {"bulk_uniform", "tip_plus_bulk"}
     assert all(row["readiness"]["implementation"] == "IMPLEMENTED" for row in p4_bulk)
 
+    p6 = [row for row in rows if row["block"] == "P6"]
+    assert len(p6) == 64 and all(row["native_args"] for row in p6)
+    branch = [row for row in p6 if row["crack_path"] == "branching_multifront"]
+    controls = [row for row in p6 if row["crack_path"] == "single_front"]
+    assert len(branch) == len(controls) == 32
+    assert all("--mechanistic-branching" in row["native_args"] for row in branch)
+    assert all(
+        row["native_entrypoint"].endswith("sharp_front_v11_branching_audited")
+        for row in branch
+    )
+    assert all(
+        row["native_entrypoint"].endswith("sharp_front_v10_2_27_audited")
+        for row in controls
+    )
+
 
 def test_v3_summary_has_all_goal_records_and_distinct_digests():
     rows = build_cases_v3(ROOT)

@@ -271,6 +271,54 @@ def _bind_p4_bulk(
     converted["command_status"] = "RESOLVED_DISABLED"
 
 
+def _bind_p6_branch_pair(
+    converted: dict[str, Any], original, *, registry: str, option: str,
+) -> None:
+    """Bind persistent single-front controls and native V11 branch arms."""
+    args = list(original.native_args)
+    if not args:
+        args = list(_base_args(
+            SimpleNamespace(option_key=original.parameter_option),
+            float(converted["temperature_K"]), float(converted["rate_factor"]),
+            str(converted["arm"]), target_um=float(converted["target_extension_um"]),
+            theta=float(converted["orientation_deg"]),
+            a0_m=float(converted["initial_crack_length_m"]),
+        ))
+    args = _replace_arg(args, "--parameter-registry", registry)
+    args = _replace_arg(args, "--parameter-option", option)
+    branch = converted["crack_path"] == "branching_multifront"
+    output = str(converted["output_profile"])
+    if branch:
+        index = 0
+        while index < len(args):
+            if args[index] == "--max-fronts":
+                del args[index:index + 2]
+            elif args[index].startswith("--max-fronts="):
+                del args[index]
+            else:
+                index += 1
+        args.extend(["--mechanistic-branching", "--maximum-fronts", "16"])
+        options = replace(
+            PRESETS["pf_monotonic_tip_persistent"],
+            crack_path="branching_multifront", output=output,
+            random_seed=int(converted["seed"]),
+        )
+        converted["native_entrypoint"] = (
+            "arrhenius_fracture.sharp_front_v11_branching_audited"
+        )
+    else:
+        options = replace(
+            PRESETS["pf_monotonic_tip_persistent"], output=output,
+            random_seed=int(converted["seed"]),
+        )
+        converted["native_entrypoint"] = (
+            "arrhenius_fracture.sharp_front_v10_2_27_audited"
+        )
+    converted["native_args"] = args
+    converted["shared_options"] = options.to_dict()
+    converted["command_status"] = "RESOLVED_DISABLED"
+
+
 def _convert_v2(
     root: Path, row: dict[str, Any], options: dict[str, str], original,
 ) -> dict[str, Any]:
@@ -324,6 +372,12 @@ def _convert_v2(
             registry=str(converted["parameter_registry"]),
             option=str(converted["parameter_option"]),
         )
+    if converted.get("block") == "P6":
+        _bind_p6_branch_pair(
+            converted, original,
+            registry=str(converted["parameter_registry"]),
+            option=str(converted["parameter_option"]),
+        )
     converted["cohesive_law"] = {
         "kind": "original_activated_opening",
         "temperature_policy": "native_temperature_matched",
@@ -371,6 +425,18 @@ def _convert_v2(
                 if converted.get("material_selection_scope") == "QUALIFICATION_ONLY"
                 else "AVAILABLE_VERSIONED_INPUTS"
             ),
+        })
+    if converted.get("block") == "P6":
+        converted["readiness"].update({
+            "implementation": "IMPLEMENTED",
+            "native_qualification": (
+                "NATIVE_FIRST_BIRTH_DAUGHTER_RESTART_QUALIFIED_"
+                "SECOND_GENERATION_OWNER_GATE_PENDING"
+                if converted["crack_path"] == "branching_multifront"
+                else "NATIVE_SINGLE_FRONT_CONTROL_QUALIFIED"
+            ),
+            "kernel_validity": "BOUND_NATIVE_ORIENTATION_RESOLVER",
+            "input_availability": "AVAILABLE_VERSIONED_INPUTS",
         })
     if (converted.get("block") == "P4"
             and converted.get("source_location") in {"bulk_uniform", "tip_plus_bulk"}):
