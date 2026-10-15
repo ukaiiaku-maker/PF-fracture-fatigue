@@ -177,9 +177,14 @@ def _force_stage3_validity_envelope(args: list[str]) -> int:
     _require_env_value(
         "CLEAVAGE_EVENT_LENGTH_MODE", "threshold_scaled", "threshold_scaled"
     )
-    _require_env_value(
-        "ANISOTROPIC_TRANSPORT_MODE", "validated_scalar", "validated_scalar"
+    selected_transport = _transport.normalize_transport_mode(
+        os.environ.get("ANISOTROPIC_TRANSPORT_MODE")
     )
+    if selected_transport not in {"validated_scalar", "channel_resolved"}:
+        raise SystemExit(
+            "v10.2.17 requires ANISOTROPIC_TRANSPORT_MODE to select an installed "
+            "signed transport operator"
+        )
     if not _bool_env("ANISOTROPIC_USE_AVALANCHE_BACKEND", True):
         raise SystemExit("v10.2.17 requires ANISOTROPIC_USE_AVALANCHE_BACKEND=1")
     return _require_stochastic_seed()

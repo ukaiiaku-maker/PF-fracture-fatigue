@@ -168,6 +168,12 @@ def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict
     payload = json.loads(path.read_text())
     if not payload.get("all_expected_methods_bound", False):
         raise RuntimeError("executed persistent-source binding does not match the request")
+    if payload.get("signed_transport_mode") != options.transport.value:
+        raise RuntimeError(
+            "executed transport does not match the request: "
+            f"expected {options.transport.value!r}, observed "
+            f"{payload.get('signed_transport_mode')!r}"
+        )
     if payload.get("finite_inventory_substitute_started") is not False:
         raise RuntimeError("finite-inventory substitution detected for persistent request")
     return payload

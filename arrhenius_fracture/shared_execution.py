@@ -21,7 +21,7 @@ from .fem_backend_adapter import ENTRY_MODULE, resolve_fem_backend_metadata
 from .shared_options import (
     CavityMode, CrackPathMode, IntegrationStrategy, KineticsStrategy,
     LoadingMode, MechanicsBackend, OutputProfile, PlasticityMode, SharedOptions,
-    SourceLifecycle, SourceLocation,
+    SourceLifecycle, SourceLocation, TransportStrategy,
 )
 
 _BUNDLED_V104_MANIFEST = (
@@ -244,6 +244,17 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         KineticsStrategy.OPERATOR_CONSISTENT_V3_6: ("arrhenius_fracture.operator_consistent_projection_v10230", "OperatorConsistentProjection", "V3.6 projection strategy"),
     }
     bindings.append(_binding("kinetics", options.kinetics, *kinetics_map[options.kinetics]))
+    transport_map = {
+        TransportStrategy.VALIDATED_SCALAR: (
+            "arrhenius_fracture.signed_burgers_shared_v1025", "_signed_evolve_scalar",
+            "validated scalar joint source/exchange/transport operator",
+        ),
+        TransportStrategy.CHANNEL_RESOLVED: (
+            "arrhenius_fracture.signed_burgers_shared_v1025", "_signed_evolve_channel",
+            "per-slip-system Peierls/Taylor transport operator",
+        ),
+    }
+    bindings.append(_binding("transport", options.transport, *transport_map[options.transport]))
     topology_map = {
         CrackPathMode.SINGLE_FRONT: ("arrhenius_fracture.sharp_front", "run_2d", "single-front topology"),
         CrackPathMode.BRANCHING_MULTIFRONT: ("arrhenius_fracture.sharp_front_v11_branching", "main", "multifront ownership graph"),
@@ -436,6 +447,7 @@ def execute_shared(
         "PYTHONDONTWRITEBYTECODE": "1",
         "GIT_OPTIONAL_LOCKS": "0",
         "CLEAVAGE_HAZARD_SEED": str(options.random_seed),
+        "ANISOTROPIC_TRANSPORT_MODE": options.transport.value,
     })
     pythonpath = environment.get("PYTHONPATH", "")
     environment["PYTHONPATH"] = str(root) + (os.pathsep + pythonpath if pythonpath else "")

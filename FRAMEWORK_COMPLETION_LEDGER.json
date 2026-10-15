@@ -139,12 +139,12 @@
     {
       "id": "R06",
       "goal_ids": ["FG-04", "FG-05", "FG-16"],
-      "status": "PARTIAL_CROSS_CONSUMER_KINETICS_QUALIFIED_TRANSFER_ADAPTERS_UNRESOLVED",
-      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. PRESERVED_CONNECTED is now explicitly connection status rather than automatic current-law qualification. The occupied-wake consumer has equation-level and populated-state correspondence for its current zero-applied-drive plus recovery scope, and the reversible consumer has equation-level and populated-state correspondence for finite signed bias, population-weighted velocity and species advection. The distinct forward, reversible and channel operators are not forced to agree. Channel-resolved transport is preserved native but unwired through the typed shared presets. Density transport and conservative tip/bulk transfer remain unavailable axes. Four requested intervention adapters are not implemented, and the existing shielding toggle is not isolated enough to qualify the requested retained-shielding intervention.",
+      "status": "PARTIAL_CHANNEL_TYPED_AND_CONTRACT_QUALIFIED_NATIVE_EXECUTION_PENDING",
+      "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. PRESERVED_CONNECTED remains a connection status rather than automatic current-law qualification. Channel-resolved transport is now an independent typed shared option with a distinct provider, execution binding and truthful persistent runtime contract; the scalar path still requires the simultaneous joint CTMC, whereas the channel path requires its per-system exchange/advection operator. Focused tests and the complete 973-test portable suite pass. Native nonzero channel execution/restart, density transport, conservative tip/bulk transfer and the planned intervention adapters remain unfinished.",
       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
       "authoritative_source": "native geography audits and existing positive transport implementation",
       "dependencies": ["R01", "R03"],
-      "exact_next_command": "python scripts/qualify_source_transport_axes.py --output common_framework_readiness/SOURCE_TRANSPORT_AXES_QUALIFICATION.json",
+      "exact_next_command": "execute the pf_monotonic_tip_persistent_channel shared preset on the retained event-probe inputs, then fresh-process restart and compare its active state",
       "input_output_identity": "retained tip-only history plus native V10.4 bulk-only and tip-plus-bulk histories; exact evidence-file hashes recorded in the receipt",
       "numerical_criteria": "Nonzero activity, full mechanics, ledgers, support exclusions and fresh-process restart.",
       "executed_evidence": [
@@ -155,7 +155,7 @@
         "common_framework_readiness/local_preservation_and_kinetics_20261014/EQUATION_AND_ACCURACY_CORRESPONDENCE.json",
         "tests/test_cross_consumer_kinetic_lifecycle.py"
       ],
-      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Channel-resolved kinetics has no typed shared preset. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
+      "remaining_limitation": "Current V10.4 qualified states explicitly have no density transport or direct population exchange. Native vacancy transport is a separate cavity capability and cannot satisfy dislocation-population transport. Channel-resolved transport is typed and fail-closed but still needs native nonzero execution/restart evidence. Source-backstress-off, transport-retention-off, fixed-blunting and history-reset/reequilibration adapters remain unresolved; no transfer coefficient has been invented."
     },
     {
       "id": "R07",

@@ -12,6 +12,7 @@ from arrhenius_fracture.shared_execution_worker import _multifront_restart_flag
 from arrhenius_fracture.shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode, PRESETS,
     PlasticityMode, SharedOptions, SourceLifecycle, SourceLocation,
+    TransportStrategy,
 )
 from arrhenius_fracture.branch_cluster_v11 import BranchClusterState
 from arrhenius_fracture.stateful_multifront_production_v12 import _json_compatible_state
@@ -79,6 +80,17 @@ def test_monotonic_reversible_uses_effective_native_executor():
     assert plan.executable
     assert plan.executor_module.endswith("sharp_front_v10_2_27_reversible_audited")
     assert by_role(plan)["kinetics"].attribute == "install_reversible_transport"
+
+
+def test_channel_transport_is_an_independent_executable_binding():
+    scalar = build_execution_plan(PRESETS["pf_monotonic_tip_persistent"])
+    channel = build_execution_plan(PRESETS["pf_monotonic_tip_persistent_channel"])
+    assert channel.executable
+    assert channel.executor_module == scalar.executor_module
+    assert by_role(channel)["kinetics"].requested == "native_signed"
+    assert by_role(channel)["transport"].requested == "channel_resolved"
+    assert by_role(channel)["transport"].attribute == "_signed_evolve_channel"
+    assert channel.options_sha256 != scalar.options_sha256
 
 
 def test_finite_inventory_maps_to_native_finite_site_driver():

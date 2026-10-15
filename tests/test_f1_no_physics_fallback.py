@@ -14,21 +14,28 @@ from arrhenius_fracture.shared_execution import (
     build_execution_plan, construct_and_attest, execute_shared,
 )
 from arrhenius_fracture.shared_execution_worker import _verify_executed_physics
-from arrhenius_fracture.shared_options import PRESETS, SharedOptions
-from arrhenius_fracture.signed_burgers_shared_v1025 import _signed_evolve_scalar
+from arrhenius_fracture.shared_options import PRESETS, SharedOptions, TransportStrategy
+from arrhenius_fracture.signed_burgers_shared_v1025 import (
+    _signed_evolve_channel, _signed_evolve_scalar,
+)
 
 
-def _bound_state():
+def _bound_state(transport="validated_scalar"):
     state = SimpleNamespace(
-        source_model=SOURCE_MODEL, _signed_transport_mode="validated_scalar",
-        _exchange_transport_mode="joint_ctmc",
+        source_model=SOURCE_MODEL, _signed_transport_mode=transport,
+        _exchange_transport_mode=(
+            "joint_ctmc" if transport == "validated_scalar" else "legacy_split"
+        ),
         persistent_source_inventory_active=False,
     )
     state._emit = MethodType(_persistent_emit, state)
     state._coupled_persistent_source_transport = MethodType(
         _coupled_persistent_source_transport, state
     )
-    state.evolve = MethodType(_signed_evolve_scalar, state)
+    state.evolve = MethodType(
+        _signed_evolve_scalar if transport == "validated_scalar" else _signed_evolve_channel,
+        state,
+    )
     state.advance = MethodType(_persistent_advance, state)
     state._exchange = lambda *a: None
     state.emission_rate_per_site = lambda *a: None
@@ -41,6 +48,15 @@ def test_actual_bound_object_is_checked_and_corruption_fails_closed():
     state._emit = MethodType(lambda self, *a: 0.0, state)
     with pytest.raises(RuntimeError, match="no substitute"):
         require_persistent_binding(state, stage="after_remesh")
+
+
+def test_channel_resolved_bound_object_has_its_own_truthful_contract():
+    state = _bound_state("channel_resolved")
+    receipt = require_persistent_binding(state, stage="channel")
+    assert receipt["all_expected_methods_bound"]
+    assert receipt["signed_transport_mode"] == "channel_resolved"
+    assert receipt["exchange_transport_mode"] == "legacy_split"
+    assert "per-slip-system" in receipt["physical_contract"]["transport"]
 
 
 def test_split_exchange_selection_fails_closed_even_when_outer_wrapper_matches():
@@ -65,8 +81,28 @@ def test_missing_executed_binding_receipt_is_failure_not_fallback(tmp_path):
     (tmp_path / "persistent_native_runtime_binding.json").write_text(json.dumps({
         "all_expected_methods_bound": True,
         "finite_inventory_substitute_started": False,
+        "signed_transport_mode": "validated_scalar",
     }))
     assert _verify_executed_physics(tmp_path, options, plan)["all_expected_methods_bound"]
+
+
+def test_executed_transport_must_match_typed_request(tmp_path):
+    options = PRESETS["pf_monotonic_tip_persistent_channel"]
+    plan = build_execution_plan(options)
+    (tmp_path / "persistent_native_runtime_binding.json").write_text(json.dumps({
+        "all_expected_methods_bound": True,
+        "finite_inventory_substitute_started": False,
+        "signed_transport_mode": "validated_scalar",
+    }))
+    with pytest.raises(RuntimeError, match="transport does not match"):
+        _verify_executed_physics(tmp_path, options, plan)
+    payload = {
+        "all_expected_methods_bound": True,
+        "finite_inventory_substitute_started": False,
+        "signed_transport_mode": TransportStrategy.CHANNEL_RESOLVED.value,
+    }
+    (tmp_path / "persistent_native_runtime_binding.json").write_text(json.dumps(payload))
+    assert _verify_executed_physics(tmp_path, options, plan)["signed_transport_mode"] == "channel_resolved"
 
 
 @pytest.mark.parametrize(

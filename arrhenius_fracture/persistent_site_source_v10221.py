@@ -33,7 +33,7 @@ from .anisotropic_emission_v10174 import _drive_factors_for_state
 from .campaign_calibrated_tip import _campaign_backstress, _campaign_local_density_m2
 from .coupled_transport_exchange import joint_transport_exchange
 from .signed_burgers_shared_v1025 import (
-    JOINT_CTMC_EXCHANGE_TRANSPORT,
+    JOINT_CTMC_EXCHANGE_TRANSPORT, LEGACY_SPLIT_EXCHANGE_TRANSPORT,
     _signed_advance,
     _sync_active,
 )
@@ -940,7 +940,14 @@ def install_persistent_site_source(
         raise RuntimeError("invalid active tip-arc factor")
 
     state.source_model = SOURCE_MODEL
-    state._exchange_transport_mode = JOINT_CTMC_EXCHANGE_TRANSPORT
+    # The scalar law consumes the fully coupled source/exchange/transport CTMC.
+    # The preserved channel-resolved law performs its per-system exchange and
+    # advection explicitly, so do not mislabel it as the joint scalar operator.
+    state._exchange_transport_mode = (
+        JOINT_CTMC_EXCHANGE_TRANSPORT
+        if str(getattr(state, "_signed_transport_mode", "")) == "validated_scalar"
+        else LEGACY_SPLIT_EXCHANGE_TRANSPORT
+    )
     state._persistent_site_cfg = cfg
     state._persistent_r0_m = r0
     state._persistent_b = float(b_m)

@@ -5,7 +5,7 @@ import pytest
 from arrhenius_fracture.shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode,
     MechanicsBackend, PlasticityMode, PRESETS, SharedOptions,
-    SourceLifecycle, SourceLocation,
+    SourceLifecycle, SourceLocation, TransportStrategy,
 )
 from arrhenius_fracture.shared_runtime import (
     FEM_COMMIT, require_restart_compatible, resolve_runtime,
@@ -62,6 +62,21 @@ def test_unsupported_combinations_fail_before_solver_execution():
             crack_path=CrackPathMode.BRANCHING_MULTIFRONT,
             cavity=CavityMode.FULL_ORDER_V5,
         )
+    with pytest.raises(ValueError, match="requires native_signed kinetics"):
+        SharedOptions(
+            transport=TransportStrategy.CHANNEL_RESOLVED,
+            kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
+        )
+
+
+def test_scalar_and_channel_transport_resolve_distinct_providers():
+    scalar = SharedOptions()
+    channel = SharedOptions(transport=TransportStrategy.CHANNEL_RESOLVED)
+    assert scalar.fingerprint != channel.fingerprint
+    scalar_provider = {p.role: p for p in resolve_runtime(scalar).providers}["transport"]
+    channel_provider = {p.role: p for p in resolve_runtime(channel).providers}["transport"]
+    assert scalar_provider.required_attribute == "_signed_evolve_scalar"
+    assert channel_provider.required_attribute == "_signed_evolve_channel"
 
 
 def test_pf_monotonic_cyclic_branch_void_and_bulk_bindings_are_distinct():

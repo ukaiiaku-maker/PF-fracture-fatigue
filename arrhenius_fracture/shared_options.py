@@ -70,6 +70,13 @@ class KineticsStrategy(_ValueEnum):
     OPERATOR_CONSISTENT_V3_6 = "operator_consistent_v3_6"
 
 
+class TransportStrategy(_ValueEnum):
+    """Spatial transport operator, independent of the source/release kinetics."""
+
+    VALIDATED_SCALAR = "validated_scalar"
+    CHANNEL_RESOLVED = "channel_resolved"
+
+
 class IntegrationStrategy(_ValueEnum):
     ADAPTIVE_TRANSACTIONAL = "adaptive_transactional"
     EXPLICIT_EVENT = "explicit_event"
@@ -92,6 +99,7 @@ class SharedOptions:
     crack_path: CrackPathMode = CrackPathMode.SINGLE_FRONT
     cavity: CavityMode = CavityMode.DISABLED
     kinetics: KineticsStrategy = KineticsStrategy.NATIVE_SIGNED
+    transport: TransportStrategy = TransportStrategy.VALIDATED_SCALAR
     integration: IntegrationStrategy = IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
     output: OutputProfile = OutputProfile.COMPACT_SMOKE
     material_manifest: str | None = None
@@ -142,6 +150,25 @@ class SharedOptions:
                 errors.append("operator_consistent_v3_6 currently owns one fixed crack front")
             if self.source_location is not SourceLocation.TIP_SURFACE:
                 errors.append("operator_consistent_v3_6 uses material tip-slip patches")
+        if self.transport is TransportStrategy.CHANNEL_RESOLVED:
+            if self.mechanics is not MechanicsBackend.SPATIAL_PF:
+                errors.append("channel_resolved transport is a spatial-PF strategy")
+            if self.loading is not LoadingMode.MONOTONIC:
+                errors.append("channel_resolved transport is qualified only for monotonic loading")
+            if self.source_location is not SourceLocation.TIP_SURFACE:
+                errors.append("channel_resolved transport is qualified only for tip/surface sources")
+            if self.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE:
+                errors.append("channel_resolved shared execution requires persistent reusable sources")
+            if self.plasticity is not PlasticityMode.TIP_PROCESS_ONLY:
+                errors.append("channel_resolved transport is qualified only for tip-process plasticity")
+            if self.crack_path is not CrackPathMode.SINGLE_FRONT:
+                errors.append("channel_resolved transport is qualified only for the single-front path")
+            if self.cavity is not CavityMode.DISABLED:
+                errors.append("channel_resolved transport has no qualified cavity composition")
+            if self.kinetics is not KineticsStrategy.NATIVE_SIGNED:
+                errors.append("channel_resolved transport requires native_signed kinetics")
+            if self.integration is not IntegrationStrategy.ADAPTIVE_TRANSACTIONAL:
+                errors.append("channel_resolved transport requires adaptive transactional integration")
         if self.mechanics is MechanicsBackend.FULL_FEM_CZM:
             if self.cavity is not CavityMode.DISABLED:
                 errors.append("the selected clean FEM/CZM pair has no qualified V5 cavity adapter")
@@ -185,6 +212,7 @@ _ENUM_FIELDS = {
     "crack_path": CrackPathMode,
     "cavity": CavityMode,
     "kinetics": KineticsStrategy,
+    "transport": TransportStrategy,
     "integration": IntegrationStrategy,
     "output": OutputProfile,
 }
@@ -192,6 +220,9 @@ _ENUM_FIELDS = {
 
 PRESETS: dict[str, SharedOptions] = {
     "pf_monotonic_tip_persistent": SharedOptions(),
+    "pf_monotonic_tip_persistent_channel": SharedOptions(
+        transport=TransportStrategy.CHANNEL_RESOLVED,
+    ),
     "pf_cyclic_tip_persistent": SharedOptions(
         loading=LoadingMode.EXPLICIT_CYCLIC,
         kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
@@ -263,6 +294,6 @@ PRESETS: dict[str, SharedOptions] = {
 __all__ = [
     "SCHEMA", "MechanicsBackend", "LoadingMode", "SourceLocation",
     "SourceLifecycle", "PlasticityMode", "CrackPathMode", "CavityMode",
-    "KineticsStrategy", "IntegrationStrategy", "OutputProfile",
+    "KineticsStrategy", "TransportStrategy", "IntegrationStrategy", "OutputProfile",
     "SharedOptions", "PRESETS",
 ]

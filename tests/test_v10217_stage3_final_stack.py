@@ -120,6 +120,26 @@ def test_deterministic_or_fixed_modes_fail_closed(monkeypatch, tmp_path):
         entry.main(_base_args(tmp_path))
 
 
+def test_channel_resolved_transport_passes_stage3_envelope(monkeypatch, tmp_path):
+    family = _family()
+    _install(monkeypatch, family)
+    monkeypatch.setattr(entry._transport, "normalize_transport_mode", lambda value: value)
+    monkeypatch.setenv("CLEAVAGE_HAZARD_MODE", "exponential")
+    monkeypatch.setenv("CLEAVAGE_EVENT_LENGTH_MODE", "threshold_scaled")
+    monkeypatch.setenv("CLEAVAGE_HAZARD_SEED", "2020")
+    monkeypatch.setenv("ANISOTROPIC_TRANSPORT_MODE", "channel_resolved")
+    monkeypatch.setenv("ANISOTROPIC_USE_AVALANCHE_BACKEND", "1")
+    observed = {}
+    monkeypatch.setattr(
+        entry.StateResolvedSignedBurgersTipEngine,
+        "configure_state_resolved_physics",
+        classmethod(lambda cls, supplied, mode, **kwargs: observed.update(mode=mode)),
+    )
+    monkeypatch.setattr(entry._transport, "main", lambda args: "ok")
+    assert entry.main(_base_args(tmp_path)) == "ok"
+    assert observed["mode"] == "channel_resolved"
+
+
 def test_stage3_shell_launchers_parse():
     root = Path(__file__).resolve().parents[1]
     for relative in (

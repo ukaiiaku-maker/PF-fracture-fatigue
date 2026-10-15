@@ -14,7 +14,7 @@ from typing import Any
 from .shared_options import (
     CavityMode, CrackPathMode, KineticsStrategy, LoadingMode,
     MechanicsBackend, PlasticityMode, SharedOptions, SourceLifecycle,
-    SourceLocation,
+    SourceLocation, TransportStrategy,
 )
 
 
@@ -209,6 +209,15 @@ def resolve_runtime(options: SharedOptions) -> RuntimeReceipt:
             "current_source_v12_runtime", None),
     }[options.source_lifecycle]
     providers.append(lifecycle)
+    transport = {
+        TransportStrategy.VALIDATED_SCALAR: ProviderBinding(
+            "transport", "arrhenius_fracture.signed_burgers_shared_v1025",
+            "validated_scalar_joint_current", "_signed_evolve_scalar"),
+        TransportStrategy.CHANNEL_RESOLVED: ProviderBinding(
+            "transport", "arrhenius_fracture.signed_burgers_shared_v1025",
+            "channel_resolved_peierls_taylor", "_signed_evolve_channel"),
+    }[options.transport]
+    providers.append(transport)
     if options.plasticity is not PlasticityMode.TIP_PROCESS_ONLY:
         providers.append(ProviderBinding(
             "bulk_plasticity", "arrhenius_fracture.bulk_plasticity_v104",
