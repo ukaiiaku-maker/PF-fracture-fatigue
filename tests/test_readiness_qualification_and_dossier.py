@@ -22,8 +22,8 @@ def test_qualification_manifest_is_separate_and_fail_closed():
     assert mechanics.native_entrypoint == "scripts/qualify_mechanics_constraint_patch.py"
     with pytest.raises(PermissionError):
         assert_qualification_launch("Q-MECH-PATCH", production_execution_authorized=True)
-    with pytest.raises(RuntimeError, match="OPENING_ONLY_ADAPTER_UNRESOLVED"):
-        assert_qualification_launch("Q-PF-FEM-3LEVEL")
+    comparison = assert_qualification_launch("Q-PF-FEM-3LEVEL")
+    assert comparison.evidence_status == "QUALIFIED_COMPACT_INDEPENDENT_SUPPORTS_REPRESENTATION_OFFSET"
     with pytest.raises(KeyError):
         assert_qualification_launch("P1_temperature_rate")
 

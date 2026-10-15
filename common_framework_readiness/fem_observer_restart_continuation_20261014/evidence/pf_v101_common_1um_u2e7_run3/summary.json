@@ -1,0 +1,38 @@
+[
+  {
+    "T": 900.0,
+    "Kc_first_MPa_sqrt_m": null,
+    "a_final_mm": 0.5,
+    "n_advances": 0,
+    "n_advances_primary": 0,
+    "n_advances_branch": 0,
+    "n_fronts": 1,
+    "n_active_fronts_final": 1,
+    "n_coalesced": 0,
+    "n_stagnant_retired": 0,
+    "branch_length_dx_mm": 0.0,
+    "N_em_final": 0.0,
+    "W_emit_J_per_m": 0.0,
+    "sigma_back_init_GPa": 0.0,
+    "r_eff_over_r0_init": 1.0,
+    "N_em_init": 0.0,
+    "hbar_tip_m": 1.3061963761397321e-06,
+    "n_nodes": 1240,
+    "deflection_deg": 0.0,
+    "path_span_dy_mm": 0.0,
+    "branched": false,
+    "mode": "no-fracture",
+    "shelf": {
+      "lambda_c_max": 1000000.0,
+      "lambda_e_max": 76475288.77743497,
+      "t_min_fire_s": 1e-06,
+      "clock_completable": true,
+      "lambda_e_shelf": 76475288.77743497,
+      "lambda_c_shelf": 1000000.0,
+      "t_emit_min": 1.307611930580984e-08,
+      "t_cleave_min": 1e-06,
+      "t_total": 1.0,
+      "material_class": "ceramic"
+    }
+  }
+]

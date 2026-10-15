@@ -12,7 +12,7 @@ import subprocess
 
 
 ROOT = Path("/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion")
-COMMIT = "2c34559"
+COMMIT = "784c57f"
 BRANCH = "codex/current-pf-companion"
 ENTRY = Path("arrhenius_fracture/mode_i_first_passage_v10_0_5_18_4_0_current_pf_companion.py")
 GENERIC_ENTRY = Path("arrhenius_fracture/generic_current_pf_companion.py")
@@ -58,7 +58,7 @@ def inspect_current_companion() -> CurrentCompanionBinding:
         str(ROOT / ENTRY), str(ROOT / GENERIC_ENTRY), bound,
         "SOURCE_BOUND_PEAK_1000K_CURRENT_KERNEL" if bound else "UNAVAILABLE",
         "IMPLEMENTED_REGISTRY_DRIVEN_NATIVE_PLANE_STRAIN_TIP_ONLY_ENTRY",
-        "UNRESOLVED_FAIL_CLOSED_AT_GENERIC_ENTRY",
+        "IMPLEMENTED_NATIVE_CHANNEL_OWNER_AND_EXECUTED",
     )
 
 

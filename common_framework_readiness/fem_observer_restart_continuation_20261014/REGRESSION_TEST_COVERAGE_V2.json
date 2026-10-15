@@ -2,8 +2,8 @@
   "schema": "fem-observer-restart-regression-coverage/2",
   "date": "2026-10-14",
   "source_pair_during_test": {
-    "pf_common": "ef7399c2b7ddc3471a0ec5495fa6aeac3cc1275a plus readiness-document working tree",
-    "fem_czm": "2c34559d5ce9bba51f599780e7315565720b7386"
+    "pf_common": "working tree after 1dd29627 pending final evidence commit",
+    "fem_czm": "784c57f2b48172c6bd5b22f6892faff623cbb1f3"
   },
   "focused_fem_group": {
     "passed": 41,
@@ -28,19 +28,34 @@
     ]
   },
   "full_fem_suite": {
-    "passed": 709,
+    "passed": 713,
     "subtests_passed": 16,
     "failed": 0,
-    "duration_s": 73.97,
+    "duration_s": 69.65,
     "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"
   },
   "full_pf_shared_suite": {
-    "passed": 954,
+    "passed": 956,
     "deselected": 15,
     "failed": 0,
-    "duration_s": 88.15,
+    "duration_s": 81.28,
     "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
-    "note": "A preceding run correctly failed only the external source-binding sentinel while the FEM checkout was dirty. After the FEM source was committed and the binding advanced to 2c34559, the complete suite passed."
+    "note": "The complete suite passed with the external binding advanced to FEM 784c57f and the new opening-only/common-mechanics regressions included."
+  },
+  "opening_only_and_common_comparison": {
+    "focused_passed": 6,
+    "failed": 0,
+    "tests": [
+      "fem-czm-current-pf-companion:tests/test_opening_only_native_v1.py",
+      "fem-czm-current-pf-companion:tests/test_generic_current_pf_companion.py",
+      "tests/test_readiness_fem_backend.py",
+      "tests/test_readiness_qualification_and_dossier.py",
+      "tests/test_pf_fem_common_mechanics_qualification.py"
+    ],
+    "executed_evidence": [
+      "GENERIC_OPENING_ONLY_QUALIFICATION.json",
+      "PF_FEM_COMMON_MECHANICS_COMPARISON.json"
+    ]
   },
   "executed_transition": "SPECIMEN_RESTART_QUALIFICATION.json",
   "external_evidence_scope": "The dedicated FEM dependency was present and exercised. Missing PF Git objects already recorded for the partial clone and unmounted archival evidence were not reclassified as verified."

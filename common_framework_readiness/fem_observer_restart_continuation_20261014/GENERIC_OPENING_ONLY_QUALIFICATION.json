@@ -1,0 +1,56 @@
+{
+  "schema": "generic-fem-opening-only-qualification/1",
+  "date": "2026-10-14",
+  "status": "PASS_NATIVE_CHANNEL_OWNER_AND_EXECUTED",
+  "source": {
+    "repository": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
+    "branch": "codex/current-pf-companion",
+    "commit": "784c57f2b48172c6bd5b22f6892faff623cbb1f3",
+    "generic_entry": "arrhenius_fracture.generic_current_pf_companion",
+    "native_entry": "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_3_9_atomic_path_corridor"
+  },
+  "request": {
+    "accommodation_mode": "opening_only",
+    "temperature_K": 900.0,
+    "steps": 2,
+    "displacement_increment_m": 1e-07,
+    "constraint": "plane_strain",
+    "source_scope": "tip_only"
+  },
+  "native_mapping": {
+    "flag": "--disable-tip-accommodation",
+    "owner": "most-derived persistent stochastic emission and transport update",
+    "preserved": "cleavage clock, native spatial mechanics, mesh/provider and constitutive identities",
+    "not_used": "zeroing only the base emission prefactor; the derived owner was explicitly gated"
+  },
+  "executed_observations": [
+    {
+      "step": 1,
+      "total_grip_opening_m": 1e-07,
+      "top_reaction_N_per_unit_thickness": 19532.200112046306,
+      "native_KJ_Pa_sqrt_m": 462029.54362488136
+    },
+    {
+      "step": 2,
+      "total_grip_opening_m": 2e-07,
+      "top_reaction_N_per_unit_thickness": 39064.4002240926,
+      "native_KJ_Pa_sqrt_m": 924059.087249763
+    }
+  ],
+  "exact_zero_channels_at_every_step": [
+    "lambda_e",
+    "N_em",
+    "pz_store_total",
+    "pz_mobile_total",
+    "pz_escape_total",
+    "W_emit_J_per_m"
+  ],
+  "evidence": {
+    "root": "evidence/generic_opening_only_native_2step_run3",
+    "scalar_history": "evidence/generic_opening_only_native_2step_run3/steps_0900K.csv",
+    "contract": "evidence/generic_opening_only_native_2step_run3/generic_current_pf_companion_contract_v1.json",
+    "run_arguments": "evidence/generic_opening_only_native_2step_run3/run_args.json",
+    "failed_predecessor_preserved": "evidence/generic_opening_only_native_2step_run2"
+  },
+  "scope": "This qualifies native opening-only state ownership and execution. It does not authorize production, select a bilinear law, or make PF and FEM native J definitions interchangeable."
+}

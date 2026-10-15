@@ -1,0 +1,165 @@
+{
+  "FEM": {
+    "entry": "qualified v10.0.5.18.3.4 path-aware physical reachable-envelope provider",
+    "levels": [
+      {
+        "matched_virtual_extension_G_J_per_m2": 1.9381985019543968,
+        "native_domain_J_J_per_m2": 1.9317922455092986,
+        "node_count": 1539,
+        "stored_energy_J_per_m": 0.003906435074214766,
+        "support_h_over_L_pz": 0.245,
+        "support_spacing_m": 1.225e-05,
+        "top_reaction_N_per_unit_thickness": 39064.350742148235,
+        "total_grip_opening_m": 2e-07,
+        "triangle_count": 2952
+      },
+      {
+        "matched_virtual_extension_G_J_per_m2": 1.9525004344182404,
+        "native_domain_J_J_per_m2": 1.9453330899522177,
+        "node_count": 2653,
+        "stored_energy_J_per_m": 0.003904400811921725,
+        "support_h_over_L_pz": 0.18,
+        "support_spacing_m": 9e-06,
+        "top_reaction_N_per_unit_thickness": 39044.008119218386,
+        "total_grip_opening_m": 2e-07,
+        "triangle_count": 5136
+      },
+      {
+        "matched_virtual_extension_G_J_per_m2": 1.9499277439764817,
+        "native_domain_J_J_per_m2": 1.9372500338123593,
+        "node_count": 5724,
+        "stored_energy_J_per_m": 0.00389553317489194,
+        "support_h_over_L_pz": 0.12,
+        "support_spacing_m": 6e-06,
+        "top_reaction_N_per_unit_thickness": 38955.33174892638,
+        "total_grip_opening_m": 2e-07,
+        "triangle_count": 11194
+      }
+    ],
+    "observer_correspondence": {
+      "matched_operation": "centered total stored-energy derivative under the identical plateau virtual material-coordinate extension used by J",
+      "matched_outer_radius_m": 0.0003,
+      "maximum_J_over_virtual_G_relative_error": 0.008617808334910215,
+      "passed": true,
+      "projected_max_x_damage_band_derivative_matches_J_operation": false,
+      "projected_max_x_role": "finite nodal-band growth diagnostic; actual stiffness-loss area is not proportional to maximum damaged-node x on this mesh",
+      "relative_tolerance": 0.02
+    },
+    "refinement_axis": "path-envelope support spacing",
+    "relative_changes": {
+      "native_J_medium_to_fine": 0.004172438249466202,
+      "reaction_medium_to_fine": 0.002276360290384409,
+      "stored_energy_medium_to_fine": 0.0022763602905347827
+    },
+    "support_converged_below_2_percent": true
+  },
+  "PF": {
+    "entry": "arrhenius_fracture.sharp_front_v10_1",
+    "levels": [
+      {
+        "accommodation_state": {
+          "N_em": 0.0,
+          "W_emit_J_per_m": 0.0,
+          "lambda_e": 0.0,
+          "pz_emit_total": 0.0,
+          "pz_escape_total": 0.0,
+          "pz_mobile_total": 0.0,
+          "pz_store_total": 0.0
+        },
+        "global_linear_elastic_energy_from_boundary_work_J_per_m": 0.004357069131553484,
+        "measured_tip_h_m": 1.9390653285891536e-06,
+        "native_J_provenance": "PF native domain-J, reported by its K_J=sqrt(Eprime*J) channel",
+        "native_KJ_Pa_sqrt_m": 358390.27058284375,
+        "node_count": 1169,
+        "path": "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/pf_v101_common_1p5um_u2e7_run3",
+        "requested_tip_h_m": 1.5e-06,
+        "top_reaction_N_per_unit_thickness": 43570.691315534845,
+        "total_grip_opening_m": 2e-07
+      },
+      {
+        "accommodation_state": {
+          "N_em": 0.0,
+          "W_emit_J_per_m": 0.0,
+          "lambda_e": 0.0,
+          "pz_emit_total": 0.0,
+          "pz_escape_total": 0.0,
+          "pz_mobile_total": 0.0,
+          "pz_store_total": 0.0
+        },
+        "global_linear_elastic_energy_from_boundary_work_J_per_m": 0.0043571611695909646,
+        "measured_tip_h_m": 1.3061963761397321e-06,
+        "native_J_provenance": "PF native domain-J, reported by its K_J=sqrt(Eprime*J) channel",
+        "native_KJ_Pa_sqrt_m": 358330.3951020302,
+        "node_count": 1240,
+        "path": "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/pf_v101_common_1um_u2e7_run3",
+        "requested_tip_h_m": 1e-06,
+        "top_reaction_N_per_unit_thickness": 43571.61169590965,
+        "total_grip_opening_m": 2e-07
+      },
+      {
+        "accommodation_state": {
+          "N_em": 0.0,
+          "W_emit_J_per_m": 0.0,
+          "lambda_e": 0.0,
+          "pz_emit_total": 0.0,
+          "pz_escape_total": 0.0,
+          "pz_mobile_total": 0.0,
+          "pz_store_total": 0.0
+        },
+        "global_linear_elastic_energy_from_boundary_work_J_per_m": 0.004358038908612838,
+        "measured_tip_h_m": 9.87888927746738e-07,
+        "native_J_provenance": "PF native domain-J, reported by its K_J=sqrt(Eprime*J) channel",
+        "native_KJ_Pa_sqrt_m": 358334.4400157124,
+        "node_count": 1314,
+        "path": "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/pf_v101_common_0p75um_u2e7_run3",
+        "requested_tip_h_m": 7.5e-07,
+        "top_reaction_N_per_unit_thickness": 43580.38908612838,
+        "total_grip_opening_m": 2e-07
+      }
+    ],
+    "refinement_axis": "graded PF tip element size",
+    "relative_changes": {
+      "global_energy_medium_to_fine": 0.00020140688054398707,
+      "native_KJ_medium_to_fine": 1.1288096343840564e-05,
+      "reaction_medium_to_fine": 0.00020140688054404274
+    },
+    "role": "preserved native mechanics refinement entry; pre-event opening-only mechanics only",
+    "support_converged_below_2_percent": true
+  },
+  "common_conditions": {
+    "accommodation": "disabled; all emission, retained, mobile, escaped, and emitted-work states zero",
+    "constraint": "plane_strain",
+    "crack_m": 0.0005,
+    "elasticity": "cubic C11=523 GPa, C12=203 GPa, C44=160 GPa; Zener A=1",
+    "height_m": 0.004,
+    "notch_half_thickness_m": 8e-05,
+    "process_zone_m": 5e-05,
+    "total_grip_opening_m": 2e-07,
+    "width_m": 0.002
+  },
+  "fine_level_common_observer_comparison": {
+    "PF_over_FEM_global_energy": 1.1187271967549672,
+    "PF_over_FEM_reaction": 1.118727196754767,
+    "global_energy_relative_difference": 0.1061270317726725,
+    "reaction_relative_difference": 0.10612703177251244
+  },
+  "interpretation": {
+    "common_observers": [
+      "top reaction",
+      "global linear-elastic stored energy"
+    ],
+    "finding": "Each backend is support-converged, but PF remains about 11.9% stiffer in the common global observers. This is a resolved comparison result, not a convergence failure and not permission to tune or substitute either native crack representation.",
+    "noninterchangeable_native_observers": [
+      "PF native domain-J/K_J",
+      "FEM native full-energy domain J",
+      "FEM matched material-coordinate virtual-extension G"
+    ],
+    "representation_difference": "PF and FEM use independently qualified meshes and distinct discrete notch/damage supports; native J/K channels retain their own domain and field definitions."
+  },
+  "physics_advanced": false,
+  "schema": "pf-fem-common-mechanics-comparison/1",
+  "source_receipts": {
+    "FEM": "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/fem_baseline_reconciliation_v2.json"
+  },
+  "status": "QUALIFIED_INDEPENDENT_SUPPORTS_SYSTEMATIC_REPRESENTATION_OFFSET"
+}

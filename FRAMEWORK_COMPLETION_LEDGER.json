@@ -171,12 +171,12 @@
     {
       "id": "R08",
       "goal_ids": ["FG-12", "FG-16"],
-      "status": "PARTIAL_MATCHED_FEM_OBSERVER_AND_GENERIC_RESTART_COMPLETE_PF_FEM_COMPARISON_PENDING",
-      "concrete_defect": "The historical v10.0.5.11 FEM/J reference is exactly reproducible. The old path-envelope G advanced a finite-height killed-node band and divided by projected damaged-node length, so it did not differentiate the same virtual operation as domain J. The new fixed-topology material-coordinate derivative uses the identical plateau weight and converges to native full-energy J within 0.8618% across the controlled support series. Both quantities are observer-only. Generic current-law specimen restart is now connected and exercised through active remeshing. A new cross-backend PF/FEM scientific comparison remains separate and must not be manufactured from unlike crack representations.",
+      "status": "COMPLETE_MATCHED_FEM_OBSERVER_RESTART_AND_COMMON_PF_FEM_COMPARISON",
+      "concrete_defect": "The historical v10.0.5.11 FEM/J reference is exactly reproducible. The old path-envelope G advanced a finite-height killed-node band and divided by projected damaged-node length, so it did not differentiate the same virtual operation as domain J. The new fixed-topology material-coordinate derivative uses the identical plateau weight and converges to native full-energy J within 0.8618% across the controlled support series. Generic current-law specimen restart is connected and exercised through active remeshing. The new opening-only comparison uses independent PF and FEM support refinements at the same total grip opening: both converge below 2%, while the fine PF/FEM reaction and global-energy ratio remains 1.118727. This is retained as a representation-dependent result without fitting or observer substitution.",
       "owner_consumer": "fem-czm-current-pf-companion native constructor and isolated shared worker",
-      "authoritative_source": "FEM 14bc458 continuation, preserved source-bound entry and registry-driven generic entry",
+      "authoritative_source": "FEM 784c57f continuation, preserved PF v10.1 mechanics entry and registry-driven generic FEM entry",
       "dependencies": ["R03", "R07"],
-      "exact_next_command": "Define and execute the remaining PF/FEM common-mechanics comparison only on independently qualified native discretizations, retaining native J, common energy measure and J-derived K as distinct observations.",
+      "exact_next_command": "python scripts/qualify_pf_fem_common_mechanics.py",
       "input_output_identity": "independent package paths and constructor-visible coefficient receipts",
       "numerical_criteria": "Medium-to-fine reaction, stored energy, projected-band diagnostic, matched material-coordinate G and native full-energy J below 2%; matched-operation J/G within 2% at every support without fitted scale factor; historical production benchmark exactly reproduced.",
       "executed_evidence": [
@@ -188,9 +188,11 @@
         "fem-czm-current-pf-companion@14bc458:tests/test_fem_baseline_reconciliation_v1.py",
         "fem-czm-current-pf-companion@a015a36:tests/test_generic_current_pf_companion.py",
         "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/fem_baseline_reconciliation_v2.json",
-        "common_framework_readiness/fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json"
+        "common_framework_readiness/fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json",
+        "common_framework_readiness/fem_observer_restart_continuation_20261014/GENERIC_OPENING_ONLY_QUALIFICATION.json",
+        "common_framework_readiness/fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json"
       ],
-      "remaining_limitation": "The retained projected killed-band result still has fine J/G=0.8229384 because it is a different finite crack/removal operation; it is not renamed or scaled. Plane stress/generalized transverse control, opening-only, generic full-field source scope, production bilinear selection and the new PF/FEM common-mechanics comparison remain explicit independent gaps."
+      "remaining_limitation": "The retained projected killed-band result still has fine J/G=0.8229384 because it is a different finite crack/removal operation; it is not renamed or scaled. The converged PF/FEM common response differs by 11.8727%, consistent with their distinct discrete notch/damage representations; native PF K/J, native FEM J and matched FEM virtual G remain noninterchangeable. Plane stress/generalized transverse control, generic full-field source scope and production bilinear selection remain independent gaps."
     },
     {
       "id": "R09",

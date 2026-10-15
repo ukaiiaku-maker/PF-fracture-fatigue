@@ -123,17 +123,37 @@ was required.  The comparison, hashes, and active post-event continuation are
 recorded in `SPECIMEN_RESTART_QUALIFICATION.json`.
 
 The executed FEM source tree is committed as
-`2c34559d5ce9bba51f599780e7315565720b7386`.  The focused observer,
+`784c57f2b48172c6bd5b22f6892faff623cbb1f3`.  The focused observer,
 attestation, restart, stochastic-ownership, historical-reference, and physical
-refinement group passes 41 tests.  The complete FEM repository passes 709 tests
+refinement group passes 41 tests.  The complete FEM repository passes 713 tests
 plus 16 subtests.  After advancing the source-bound external binding, the
-complete PF/shared repository passes 954 tests with 15 intentionally
+complete PF/shared repository passes 956 tests with 15 intentionally
 deselected tests.
+
+## Opening-only execution and common PF/FEM comparison
+
+The generic FEM adapter now maps `accommodation_mode=opening_only` to the
+native `--disable-tip-accommodation` control.  The control is enforced by the
+most-derived persistent stochastic owner, not merely by zeroing a base
+prefactor.  A real two-step spatial run retained mechanics and cleavage-clock
+evolution while emission, mobile, retained, escaped, and emitted-work channels
+were exactly zero at both steps.
+
+An independent three-level PF mechanics sequence and the qualified FEM
+path-envelope sequence were then compared at the same 0.2 micrometre total
+grip opening.  PF medium-to-fine reaction and native K changes are 0.02014%
+and 0.00113%; FEM reaction and native-J changes are 0.22764% and 0.41724%.
+The fine PF/FEM reaction and global stored-energy ratio is 1.118727.  This is
+a converged representation-dependent offset, not a remaining mesh-convergence
+failure and not authority to scale either backend.  PF native domain-J/K,
+FEM native full-energy J, and FEM matched material-coordinate G remain
+separately identified in `PF_FEM_COMMON_MECHANICS_COMPARISON.json`.
 
 ## Scope remaining
 
-This closes the generic tip-only active-accommodation specimen restart gap and
-the R08 matched-operation observer identity.  It does not select a physical
+This closes the generic tip-only active-accommodation specimen restart gap,
+the opening-only state-owner gap, the R08 matched-operation observer identity,
+and the scoped independently refined common-mechanics comparison.  It does not select a physical
 activation area/interface stiffness for the bilinear law, add plane-stress or
 generalized transverse cracked-body execution, connect generic full-field
 source scope, validate spontaneous recursive branching, or complete the local

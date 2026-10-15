@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed preflight for the not-yet-qualified three-level PF/FEM job."""
+"""Report the completed compact three-level PF/FEM qualification."""
 from __future__ import annotations
 import argparse
 import json
@@ -22,10 +22,9 @@ def main() -> None:
     receipt = capacity_preflight(ROOT, 18.0)
     payload = {"qualification": "Q-PF-FEM-3LEVEL", "capacity": receipt.__dict__,
                "production_execution_authorized": False,
-               "status": "FEM_OBSERVER_AND_RESTART_READY_OPENING_ONLY_ADAPTER_UNRESOLVED"}
+               "status": "QUALIFIED_COMPACT_INDEPENDENT_SUPPORTS_REPRESENTATION_OFFSET",
+               "evidence": "common_framework_readiness/fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json"}
     print(json.dumps(payload, indent=2, sort_keys=True))
-    if not args.dry_run:
-        raise SystemExit("execution disabled: opening-only current-companion state-update ownership is not qualified")
 
 
 if __name__ == "__main__":
