@@ -41,6 +41,9 @@ def execute(request_path: str | Path) -> dict:
     observed_commit = _git(root, "rev-parse", "HEAD")
     observed_branch = _git(root, "branch", "--show-current")
     status = _git(root, "--no-optional-locks", "status", "--porcelain")
+    tracked_status = _git(
+        root, "--no-optional-locks", "status", "--porcelain", "--untracked-files=no",
+    )
     if observed_commit != backend["expected_commit"]:
         raise RuntimeError(
             f"FEM commit changed before execution: {observed_commit}"
@@ -49,8 +52,8 @@ def execute(request_path: str | Path) -> dict:
         raise RuntimeError(
             f"FEM branch changed before execution: {observed_branch}"
         )
-    if status:
-        raise RuntimeError("FEM checkout became dirty before execution")
+    if tracked_status:
+        raise RuntimeError("FEM tracked calculation source became dirty before execution")
 
     module = importlib.import_module(request["executor_module"])
     executor = getattr(module, request["executor_attribute"])
@@ -75,10 +78,10 @@ def execute(request_path: str | Path) -> dict:
         "python": {"executable": sys.executable, "version": sys.version},
         "source_policy": {
             "policy": "qualified",
-            "qualification": "pinned_clean_external_backend",
+            "qualification": "pinned_tracked_clean_external_backend",
             "commit": observed_commit,
             "branch": observed_branch,
-            "global_dirty": False,
+            "global_dirty": bool(status),
             "calculation_source_dirty": False,
         },
         "executor": {

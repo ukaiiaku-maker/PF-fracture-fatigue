@@ -17,9 +17,11 @@ import subprocess
 import sys
 from typing import Any, Sequence
 
-from .fem_backend_adapter import ENTRY_MODULE, resolve_fem_backend_metadata
+from .fem_backend_adapter import (
+    ENTRY_MODULE, GENERIC_ENTRY_MODULE, resolve_fem_backend_metadata,
+)
 from .shared_options import (
-    CavityMode, CrackPathMode, IntegrationStrategy, KineticsStrategy,
+    CavityMode, CrackPathMode, FEMEntryMode, IntegrationStrategy, KineticsStrategy,
     LoadingMode, MechanicsBackend, OutputProfile, PlasticityMode, SharedOptions,
     SourceLifecycle, SourceLocation, TransportStrategy,
 )
@@ -59,13 +61,23 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
     options.validate()
     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
         receipt = resolve_fem_backend_metadata()
-        bindings = (_binding("mechanics", options.mechanics, ENTRY_MODULE, "main",
-                             f"verified external entry {receipt.entry_file}"),)
+        reference = options.fem_entry is FEMEntryMode.HISTORICAL_THETA0_REFERENCE
+        module = ENTRY_MODULE if reference else GENERIC_ENTRY_MODULE
+        bindings = (
+            _binding("mechanics", options.mechanics, module, "main",
+                     "historical exact theta-zero reference" if reference
+                     else "registry-driven current PF companion"),
+            _binding("fem_entry", options.fem_entry, module, "main",
+                     f"verified external entry {receipt.entry_file}" if reference
+                     else "current source-bound generic FEM entry"),
+        )
         exact = (options == __import__("arrhenius_fracture.shared_options", fromlist=["PRESETS"]).PRESETS["fem_czm_theta0"])
+        executable = exact or not reference
         return ExecutionPlan("shared-execution-plan/1", options.fingerprint, bindings,
-                             ENTRY_MODULE if exact else None, "main" if exact else None,
-                             "external_fem_native", exact,
-                             None if exact else "only the exact fem_czm_theta0 preset is mapped")
+                             module if executable else None, "main" if executable else None,
+                             "external_fem_native" if reference
+                             else "external_fem_generic_current", executable,
+                             None if executable else "only the exact historical fem_czm_theta0 preset is mapped")
 
     operator_exact = (
         options.loading is LoadingMode.EXPLICIT_CYCLIC
@@ -468,8 +480,10 @@ def execute_shared(
     worker_command = [str(interpreter), "-m", "arrhenius_fracture.shared_execution_worker",
                       str(request_path)]
     if options.mechanics is MechanicsBackend.FULL_FEM_CZM:
-        from .fem_backend_adapter import require_fem_backend
-        backend = require_fem_backend()
+        from .fem_backend_adapter import require_fem_backend, require_generic_fem_backend
+        backend = (require_generic_fem_backend()
+                   if options.fem_entry is FEMEntryMode.GENERIC_CURRENT_PF_COMPANION
+                   else require_fem_backend())
         if source_policy != "qualified":
             raise RuntimeError("external FEM execution requires source_policy='qualified'")
         request["executor_module"] = plan.executor_module

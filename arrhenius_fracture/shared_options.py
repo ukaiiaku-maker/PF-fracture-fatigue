@@ -28,6 +28,13 @@ class MechanicsBackend(_ValueEnum):
     FULL_FEM_CZM = "full_fem_czm"
 
 
+class FEMEntryMode(_ValueEnum):
+    """Select an explicit FEM producer without conflating historical parity and current use."""
+
+    HISTORICAL_THETA0_REFERENCE = "historical_theta0_reference"
+    GENERIC_CURRENT_PF_COMPANION = "generic_current_pf_companion"
+
+
 class LoadingMode(_ValueEnum):
     MONOTONIC = "monotonic"
     EXPLICIT_CYCLIC = "explicit_cyclic"
@@ -92,6 +99,7 @@ class OutputProfile(_ValueEnum):
 @dataclass(frozen=True)
 class SharedOptions:
     mechanics: MechanicsBackend = MechanicsBackend.SPATIAL_PF
+    fem_entry: FEMEntryMode = FEMEntryMode.HISTORICAL_THETA0_REFERENCE
     loading: LoadingMode = LoadingMode.MONOTONIC
     source_location: SourceLocation = SourceLocation.TIP_SURFACE
     source_lifecycle: SourceLifecycle = SourceLifecycle.PERSISTENT_REUSABLE
@@ -174,6 +182,25 @@ class SharedOptions:
                 errors.append("the selected clean FEM/CZM pair has no qualified V5 cavity adapter")
             if self.kinetics is KineticsStrategy.OPERATOR_CONSISTENT_V3_6:
                 errors.append("the V3.6 fixed-support projection is PF-only")
+            if self.fem_entry is FEMEntryMode.GENERIC_CURRENT_PF_COMPANION:
+                generic_axes = (
+                    self.loading is LoadingMode.MONOTONIC
+                    and self.source_location is SourceLocation.TIP_SURFACE
+                    and self.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE
+                    and self.plasticity is PlasticityMode.TIP_PROCESS_ONLY
+                    and self.crack_path is CrackPathMode.SINGLE_FRONT
+                    and self.cavity is CavityMode.DISABLED
+                    and self.kinetics is KineticsStrategy.NATIVE_SIGNED
+                    and self.transport is TransportStrategy.VALIDATED_SCALAR
+                    and self.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
+                )
+                if not generic_axes:
+                    errors.append(
+                        "generic_current_pf_companion currently supports only the "
+                        "qualified monotonic tip-only single-front option axes"
+                    )
+        elif self.fem_entry is not FEMEntryMode.HISTORICAL_THETA0_REFERENCE:
+            errors.append("generic_current_pf_companion is meaningful only for full_fem_czm")
         if errors:
             raise ValueError("incompatible shared options: " + "; ".join(errors))
 
@@ -205,6 +232,7 @@ class SharedOptions:
 
 _ENUM_FIELDS = {
     "mechanics": MechanicsBackend,
+    "fem_entry": FEMEntryMode,
     "loading": LoadingMode,
     "source_location": SourceLocation,
     "source_lifecycle": SourceLifecycle,
@@ -288,11 +316,18 @@ PRESETS: dict[str, SharedOptions] = {
         output=OutputProfile.PUBLICATION_RESTART,
         random_seed=8666,
     ),
+    "fem_czm_generic_current": SharedOptions(
+        mechanics=MechanicsBackend.FULL_FEM_CZM,
+        fem_entry=FEMEntryMode.GENERIC_CURRENT_PF_COMPANION,
+        source_lifecycle=SourceLifecycle.PERSISTENT_REUSABLE,
+        output=OutputProfile.PUBLICATION_RESTART,
+        random_seed=8666,
+    ),
 }
 
 
 __all__ = [
-    "SCHEMA", "MechanicsBackend", "LoadingMode", "SourceLocation",
+    "SCHEMA", "MechanicsBackend", "FEMEntryMode", "LoadingMode", "SourceLocation",
     "SourceLifecycle", "PlasticityMode", "CrackPathMode", "CavityMode",
     "KineticsStrategy", "TransportStrategy", "IntegrationStrategy", "OutputProfile",
     "SharedOptions", "PRESETS",

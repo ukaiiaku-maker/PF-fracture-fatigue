@@ -4,7 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from arrhenius_fracture.fem_backend_adapter import inspect_fem_backend, require_fem_backend
+from arrhenius_fracture.fem_backend_adapter import (
+    inspect_fem_backend, inspect_generic_fem_backend, require_fem_backend,
+)
 from arrhenius_fracture.shared_execution import (
     build_execution_plan, construct_and_attest, execute_shared,
 )
@@ -180,6 +182,20 @@ def test_fem_adapter_verifies_real_pinned_checkout_and_rejects_missing(tmp_path)
     assert receipt.execution_verified is False
     with pytest.raises(RuntimeError, match="backend unavailable"):
         require_fem_backend(tmp_path)
+
+
+def test_generic_fem_route_is_distinct_and_accepts_preserved_untracked_evidence():
+    reference = build_execution_plan(PRESETS["fem_czm_theta0"])
+    generic = build_execution_plan(PRESETS["fem_czm_generic_current"])
+    receipt = inspect_generic_fem_backend()
+    assert reference.executor_module.endswith("theta0_pf_parity")
+    assert reference.restart_family == "external_fem_native"
+    assert generic.executor_module.endswith("generic_current_pf_companion")
+    assert generic.restart_family == "external_fem_generic_current"
+    assert generic.options_sha256 != reference.options_sha256
+    assert receipt.available
+    assert receipt.clean is True
+    assert receipt.observed_commit == receipt.expected_commit
 
 
 def test_external_fem_worker_request_contains_executor_and_compact_output(

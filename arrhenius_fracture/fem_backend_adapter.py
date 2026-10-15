@@ -20,6 +20,13 @@ ENTRY_RELATIVE = Path(
     "mode_i_first_passage_v10_0_5_18_4_0_theta0_pf_parity.py"
 )
 ENTRY_MODULE = "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_4_0_theta0_pf_parity"
+GENERIC_FEM_ROOT = Path(
+    "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion"
+)
+GENERIC_ENTRY_RELATIVE = Path("arrhenius_fracture/generic_current_pf_companion.py")
+GENERIC_ENTRY_MODULE = "arrhenius_fracture.generic_current_pf_companion"
+GENERIC_FEM_COMMIT = "7557ba8fc37e0466ee56fd60f6370275c8146245"
+GENERIC_FEM_BRANCH = "codex/current-pf-companion"
 DEFAULT_FEM_PYTHON = Path(
     "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"
 )
@@ -123,12 +130,80 @@ def inspect_fem_backend(
         str(interpreter), available, False,
         "available and source-verified; not yet executed" if available else "; ".join(problems))
 
+
+def inspect_generic_fem_backend(
+    root: str | Path | None = None, *, probe_import: bool = False,
+) -> FEMBackendReceipt:
+    """Verify the current generic companion while preserving untracked evidence.
+
+    Only tracked changes can alter calculation source.  Untracked qualification
+    outputs are deliberately retained and therefore are not treated as a source
+    mutation.
+    """
+    root = Path(root or os.environ.get("FRACTURE_GENERIC_FEM_ROOT", GENERIC_FEM_ROOT)).resolve()
+    entry = root / GENERIC_ENTRY_RELATIVE
+    interpreter = Path(os.environ.get("FRACTURE_FEM_PYTHON", DEFAULT_FEM_PYTHON)).resolve()
+    try:
+        observed_commit = _run(root, "git", "rev-parse", "HEAD")
+        observed_branch = _run(root, "git", "branch", "--show-current")
+        tracked_clean = not bool(_run(
+            root, "git", "--no-optional-locks", "status", "--porcelain",
+            "--untracked-files=no",
+        ))
+    except (OSError, RuntimeError) as exc:
+        return FEMBackendReceipt(
+            "fem-backend-receipt/2", str(root), str(root), GENERIC_FEM_COMMIT,
+            None, GENERIC_FEM_BRANCH, None, None, str(entry), None,
+            f"{GENERIC_ENTRY_MODULE}:main", str(interpreter), False, False,
+            f"repository unavailable: {exc}",
+        )
+    problems = []
+    if observed_commit != GENERIC_FEM_COMMIT:
+        problems.append(f"commit mismatch: {observed_commit}")
+    if observed_branch != GENERIC_FEM_BRANCH:
+        problems.append(f"branch mismatch: {observed_branch}")
+    if not tracked_clean:
+        problems.append("checkout has an undeclared tracked patch")
+    if not entry.is_file():
+        problems.append("mapped generic current entry file is absent")
+    if not interpreter.is_file():
+        problems.append(f"configured FEM interpreter is absent: {interpreter}")
+    elif entry.is_file() and probe_import:
+        environment = dict(os.environ)
+        environment.update({"PYTHONDONTWRITEBYTECODE": "1", "GIT_OPTIONAL_LOCKS": "0"})
+        probe = subprocess.run(
+            [str(interpreter), "-c",
+             f"import {GENERIC_ENTRY_MODULE} as backend; assert callable(backend.main)"],
+            cwd=root, env=environment, text=True, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        if probe.returncode:
+            problems.append(f"FEM constructor import failed: {probe.stderr.strip()}")
+    available = not problems
+    return FEMBackendReceipt(
+        "fem-backend-receipt/2", str(root), str(root), GENERIC_FEM_COMMIT,
+        observed_commit, GENERIC_FEM_BRANCH, observed_branch, tracked_clean,
+        str(entry), _sha256(entry) if entry.is_file() else None,
+        f"{GENERIC_ENTRY_MODULE}:main", str(interpreter), available, False,
+        "available; tracked source verified and preserved untracked evidence allowed; not yet executed"
+        if available else "; ".join(problems),
+    )
+
 def require_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
     receipt = inspect_fem_backend(root, probe_import=True)
     if not receipt.available:
         raise RuntimeError(f"full FEM/CZM backend unavailable: {receipt.reason}")
     return receipt
 
+
+def require_generic_fem_backend(root: str | Path | None = None) -> FEMBackendReceipt:
+    receipt = inspect_generic_fem_backend(root, probe_import=True)
+    if not receipt.available:
+        raise RuntimeError(f"generic full FEM/CZM backend unavailable: {receipt.reason}")
+    return receipt
+
 __all__ = ["DEFAULT_FEM_ROOT", "DEFAULT_FEM_PYTHON", "ENTRY_MODULE", "ENTRY_RELATIVE",
-           "FEMBackendReceipt", "inspect_fem_backend", "require_fem_backend",
+           "GENERIC_FEM_ROOT", "GENERIC_ENTRY_MODULE", "GENERIC_ENTRY_RELATIVE",
+           "FEMBackendReceipt", "inspect_fem_backend", "inspect_generic_fem_backend",
+           "require_fem_backend", "require_generic_fem_backend",
            "resolve_fem_backend_metadata"]
