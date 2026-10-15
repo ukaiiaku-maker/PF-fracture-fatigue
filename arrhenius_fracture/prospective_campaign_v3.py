@@ -393,6 +393,45 @@ def _bind_p7_preexisting_pair(converted: dict[str, Any]) -> None:
     converted["cavity_material_bundle"] = "unified_fracture_material_v5:DBTT"
 
 
+def _bind_p3_diagnostic(
+    converted: dict[str, Any], original, *, registry: str, option: str,
+) -> None:
+    """Bind native and populated-state P3 consumers; leave history reset honest."""
+    intervention = str(converted["study"])
+    if intervention == "history_reset_reequilibrated":
+        converted["native_args"] = []
+        converted["native_entrypoint"] = None
+        converted["shared_options"] = replace(
+            PRESETS["pf_monotonic_tip_persistent"],
+            diagnostic_intervention=intervention,
+            random_seed=int(converted["seed"]),
+        ).to_dict()
+        converted["command_status"] = "UNRESOLVED_CHECKPOINT_TRANSFORMER_GATE"
+        return
+    args = list(_base_args(
+        SimpleNamespace(option_key=original.parameter_option),
+        float(converted["temperature_K"]), float(converted["rate_factor"]),
+        str(converted["arm"]), target_um=float(converted["target_extension_um"]),
+        theta=float(converted["orientation_deg"]),
+        a0_m=float(converted["initial_crack_length_m"]),
+    ))
+    args = _replace_arg(args, "--parameter-registry", registry)
+    args = _replace_arg(args, "--parameter-option", option)
+    if intervention != "native":
+        args.extend(["--diagnostic-intervention", intervention])
+        entry = "arrhenius_fracture.shared_diagnostic_intervention_adapter"
+    else:
+        entry = "arrhenius_fracture.sharp_front_v10_2_27_audited"
+    converted["native_args"] = args
+    converted["native_entrypoint"] = entry
+    converted["shared_options"] = replace(
+        PRESETS["pf_monotonic_tip_persistent"],
+        diagnostic_intervention=intervention,
+        random_seed=int(converted["seed"]),
+    ).to_dict()
+    converted["command_status"] = "RESOLVED_DISABLED"
+
+
 def _convert_v2(
     root: Path, row: dict[str, Any], options: dict[str, str], original,
 ) -> dict[str, Any]:
@@ -432,6 +471,12 @@ def _convert_v2(
         converted["parameter_registry"] = REGISTRY
     if converted.get("block") == "P8":
         _bind_generic_fem(root, converted)
+    if converted.get("block") == "P3":
+        _bind_p3_diagnostic(
+            converted, original,
+            registry=str(converted["parameter_registry"]),
+            option=str(converted["parameter_option"]),
+        )
     if (converted.get("block") == "P4"
             and converted.get("source_location") == "tip_surface"):
         _bind_p4_tip_surface(
@@ -493,6 +538,21 @@ def _convert_v2(
                 if converted.get("material_selection_scope") == "QUALIFICATION_ONLY"
                 else "AVAILABLE_VERSIONED_INPUTS"
             ),
+        })
+    if converted.get("block") == "P3":
+        history_reset = converted["study"] == "history_reset_reequilibrated"
+        converted["readiness"].update({
+            "implementation": (
+                "UNRESOLVED_POPULATED_CHECKPOINT_TRANSFORMER"
+                if history_reset else "IMPLEMENTED"
+            ),
+            "native_qualification": (
+                "POPULATED_STATE_OPERATOR_QUALIFIED_PERSISTED_RESET_PENDING"
+                if history_reset else
+                "POPULATED_STATE_CONSUMER_QUALIFIED_CASE_LEVEL_PENDING"
+            ),
+            "kernel_validity": "BOUND_NATIVE_SIGNED_KERNEL_FAMILY",
+            "input_availability": "AVAILABLE_VERSIONED_INPUTS",
         })
     if (converted.get("block") == "P4"
             and converted.get("source_location") == "tip_surface"):

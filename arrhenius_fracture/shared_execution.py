@@ -21,7 +21,8 @@ from .fem_backend_adapter import (
     ENTRY_MODULE, GENERIC_ENTRY_MODULE, resolve_fem_backend_metadata,
 )
 from .shared_options import (
-    CavityMode, CrackPathMode, FEMEntryMode, IntegrationStrategy, KineticsStrategy,
+    CavityMode, CrackPathMode, DiagnosticIntervention, FEMEntryMode,
+    IntegrationStrategy, KineticsStrategy,
     LoadingMode, MechanicsBackend, OutputProfile, PlasticityMode, SharedOptions,
     SourceLifecycle, SourceLocation, TransportStrategy,
 )
@@ -267,6 +268,12 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
         ),
     }
     bindings.append(_binding("transport", options.transport, *transport_map[options.transport]))
+    bindings.append(_binding(
+        "diagnostic_intervention", options.diagnostic_intervention,
+        "arrhenius_fracture.diagnostic_interventions_v1",
+        "install_diagnostic_intervention",
+        "qualification-only populated-state counterfactual",
+    ))
     topology_map = {
         CrackPathMode.SINGLE_FRONT: ("arrhenius_fracture.sharp_front", "run_2d", "single-front topology"),
         CrackPathMode.BRANCHING_MULTIFRONT: ("arrhenius_fracture.sharp_front_v11_branching", "main", "multifront ownership graph"),
@@ -293,7 +300,21 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
               and options.cavity is CavityMode.DISABLED
               and options.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL)
     if simple and options.crack_path is CrackPathMode.SINGLE_FRONT and options.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE:
-        if options.loading is LoadingMode.MONOTONIC and options.kinetics in {KineticsStrategy.NATIVE_SIGNED, KineticsStrategy.REVERSIBLE_SIGNED}:
+        if (options.loading is LoadingMode.MONOTONIC
+                and options.kinetics is KineticsStrategy.NATIVE_SIGNED
+                and options.diagnostic_intervention not in {
+                    DiagnosticIntervention.NATIVE,
+                    DiagnosticIntervention.HISTORY_RESET_REEQUILIBRATED,
+                }):
+            executor = "arrhenius_fracture.shared_diagnostic_intervention_adapter"
+            restart = "single_front_diagnostic_outer_checkpoint"
+        elif (options.loading is LoadingMode.MONOTONIC
+              and options.diagnostic_intervention is DiagnosticIntervention.HISTORY_RESET_REEQUILIBRATED):
+            limitation = (
+                "history_reset_reequilibrated requires a populated-checkpoint "
+                "transformer with persisted native mechanics re-equilibrium"
+            )
+        elif options.loading is LoadingMode.MONOTONIC and options.kinetics in {KineticsStrategy.NATIVE_SIGNED, KineticsStrategy.REVERSIBLE_SIGNED}:
             executor = (
                 "arrhenius_fracture.sharp_front_v10_2_27_reversible_audited"
                 if options.kinetics is KineticsStrategy.REVERSIBLE_SIGNED
@@ -346,7 +367,7 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
             if options.source_location is SourceLocation.BULK_UNIFORM else
             "v10_4_tip_plus_bulk_combined_outer"
         )
-    if executor is None:
+    if executor is None and limitation is None:
         limitation = ("accepted components resolve, but this composed combination has no qualified "
                       "shared native executor; use its preserved legacy launcher until an adapter is completed")
     return ExecutionPlan("shared-execution-plan/1", options.fingerprint, tuple(bindings),

@@ -176,6 +176,18 @@ def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict
         )
     if payload.get("finite_inventory_substitute_started") is not False:
         raise RuntimeError("finite-inventory substitution detected for persistent request")
+    if options.diagnostic_intervention.value != "native":
+        diagnostic_path = output / "diagnostic_intervention_runtime_binding.json"
+        if not diagnostic_path.is_file():
+            raise RuntimeError(
+                "requested diagnostic intervention produced no populated-state receipt"
+            )
+        diagnostic = json.loads(diagnostic_path.read_text())
+        if (diagnostic.get("installed") is not True
+                or diagnostic.get("requested_intervention")
+                != options.diagnostic_intervention.value):
+            raise RuntimeError("executed diagnostic intervention does not match request")
+        payload = {**payload, "diagnostic_intervention": diagnostic}
     return payload
 
 

@@ -84,6 +84,17 @@ class TransportStrategy(_ValueEnum):
     CHANNEL_RESOLVED = "channel_resolved"
 
 
+class DiagnosticIntervention(_ValueEnum):
+    """Qualification-only counterfactual applied to the populated native tip state."""
+
+    NATIVE = "native"
+    RETAINED_SHIELDING_OFF = "retained_shielding_off"
+    SOURCE_BACKSTRESS_OFF = "source_backstress_off"
+    BLUNTING_FIXED = "blunting_fixed"
+    TRANSPORT_RETENTION_OFF = "transport_retention_off"
+    HISTORY_RESET_REEQUILIBRATED = "history_reset_reequilibrated"
+
+
 class IntegrationStrategy(_ValueEnum):
     ADAPTIVE_TRANSACTIONAL = "adaptive_transactional"
     EXPLICIT_EVENT = "explicit_event"
@@ -108,6 +119,7 @@ class SharedOptions:
     cavity: CavityMode = CavityMode.DISABLED
     kinetics: KineticsStrategy = KineticsStrategy.NATIVE_SIGNED
     transport: TransportStrategy = TransportStrategy.VALIDATED_SCALAR
+    diagnostic_intervention: DiagnosticIntervention = DiagnosticIntervention.NATIVE
     integration: IntegrationStrategy = IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
     output: OutputProfile = OutputProfile.COMPACT_SMOKE
     material_manifest: str | None = None
@@ -177,6 +189,24 @@ class SharedOptions:
                 errors.append("channel_resolved transport requires native_signed kinetics")
             if self.integration is not IntegrationStrategy.ADAPTIVE_TRANSACTIONAL:
                 errors.append("channel_resolved transport requires adaptive transactional integration")
+        if self.diagnostic_intervention is not DiagnosticIntervention.NATIVE:
+            diagnostic_axes = (
+                self.mechanics is MechanicsBackend.SPATIAL_PF
+                and self.loading is LoadingMode.MONOTONIC
+                and self.source_location is SourceLocation.TIP_SURFACE
+                and self.source_lifecycle is SourceLifecycle.PERSISTENT_REUSABLE
+                and self.plasticity is PlasticityMode.TIP_PROCESS_ONLY
+                and self.crack_path is CrackPathMode.SINGLE_FRONT
+                and self.cavity is CavityMode.DISABLED
+                and self.kinetics is KineticsStrategy.NATIVE_SIGNED
+                and self.transport is TransportStrategy.VALIDATED_SCALAR
+                and self.integration is IntegrationStrategy.ADAPTIVE_TRANSACTIONAL
+            )
+            if not diagnostic_axes:
+                errors.append(
+                    "diagnostic interventions require the qualified monotonic "
+                    "persistent single-front native-tip option axes"
+                )
         if self.mechanics is MechanicsBackend.FULL_FEM_CZM:
             if self.cavity is not CavityMode.DISABLED:
                 errors.append("the selected clean FEM/CZM pair has no qualified V5 cavity adapter")
@@ -241,6 +271,7 @@ _ENUM_FIELDS = {
     "cavity": CavityMode,
     "kinetics": KineticsStrategy,
     "transport": TransportStrategy,
+    "diagnostic_intervention": DiagnosticIntervention,
     "integration": IntegrationStrategy,
     "output": OutputProfile,
 }
@@ -329,6 +360,7 @@ PRESETS: dict[str, SharedOptions] = {
 __all__ = [
     "SCHEMA", "MechanicsBackend", "FEMEntryMode", "LoadingMode", "SourceLocation",
     "SourceLifecycle", "PlasticityMode", "CrackPathMode", "CavityMode",
-    "KineticsStrategy", "TransportStrategy", "IntegrationStrategy", "OutputProfile",
+    "KineticsStrategy", "TransportStrategy", "DiagnosticIntervention",
+    "IntegrationStrategy", "OutputProfile",
     "SharedOptions", "PRESETS",
 ]

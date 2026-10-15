@@ -158,3 +158,24 @@ def test_v3_summary_has_all_goal_records_and_distinct_digests():
     assert [row["goal_id"] for row in report["goal_records"]] == list(ALL_GOALS)
     assert report["canonical_semantic_sha256"] != report["raw_jsonl_sha256"]
     assert report["target_machine"] is None and report["output_root"] is None
+
+
+def test_p3_native_and_populated_state_operators_are_bound_but_reset_stays_closed():
+    rows = build_cases_v3(ROOT)
+    p3 = [row for row in rows if row["block"] == "P3"]
+    runnable = [
+        row for row in p3 if row["study"] != "history_reset_reequilibrated"
+    ]
+    resets = [
+        row for row in p3 if row["study"] == "history_reset_reequilibrated"
+    ]
+    assert len(runnable) == 15 and all(row["native_args"] for row in runnable)
+    assert all(row["command_status"] == "RESOLVED_DISABLED" for row in runnable)
+    assert all(row["shared_options"]["diagnostic_intervention"] == row["study"]
+               for row in runnable)
+    counterfactual = [row for row in runnable if row["study"] != "native"]
+    assert all("--diagnostic-intervention" in row["native_args"]
+               for row in counterfactual)
+    assert len(resets) == 3 and all(not row["native_args"] for row in resets)
+    assert all(row["command_status"] == "UNRESOLVED_CHECKPOINT_TRANSFORMER_GATE"
+               for row in resets)
