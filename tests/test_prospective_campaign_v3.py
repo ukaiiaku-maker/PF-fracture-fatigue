@@ -17,7 +17,13 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     assert all(row["execution"]["launcher"] for row in rows)
     assert all(row["resource_estimate"]["peak_transient_GiB"] > 0 for row in rows)
     assert all(row["output_validation"]["dense_movie_required"] is False for row in rows)
-    assert all(row["parameter_registry"].endswith("v10_2_32_taylor_domain_registry.csv") for row in rows)
+    assert all(
+        row["parameter_registry"].endswith((
+            "v10_2_32_taylor_domain_registry.csv",
+            "dbtt_paper_minimal_qualification_registry.csv",
+        ))
+        for row in rows
+    )
 
     cohesive = [row for row in rows if row["block"] == "P9"]
     assert len(cohesive) == 48
@@ -28,6 +34,22 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     fitted = [row for row in cohesive if row["cohesive_law"]["fit"] is not None]
     assert all(row["readiness"]["input_availability"] == "BLOCKED_PHYSICAL_COHESIVE_SUPPORT" for row in fitted)
     assert all(row["cohesive_law"]["fit"]["unassigned_physical_quantities"] for row in fitted)
+
+    dbtt_qualification = [
+        row for row in rows
+        if row.get("material_selection_scope") == "QUALIFICATION_ONLY"
+    ]
+    assert len(dbtt_qualification) == 66
+    assert all(row["native_args"] for row in dbtt_qualification)
+    assert all(row["production_parameter_option"] is None for row in dbtt_qualification)
+    assert {row["parameter_option"] for row in dbtt_qualification} == {
+        "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification"
+    }
+    assert all(
+        row["readiness"]["implementation"] == "IMPLEMENTED"
+        and row["readiness"]["input_availability"].startswith("AVAILABLE_")
+        for row in dbtt_qualification
+    )
 
 
 def test_v3_summary_has_all_goal_records_and_distinct_digests():

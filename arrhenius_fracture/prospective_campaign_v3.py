@@ -12,12 +12,20 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .prospective_campaign import build_cases
 from .prospective_campaign_v2 import build_cases_v2
 
 
 SCHEMA = "prospective-common-fracture-campaign/3"
 REGISTRY = "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_registry.csv"
 FIT_REGISTRY = "arrhenius_fracture/data/materials/v10_2_32_bilinear_opening/v10_2_32_bilinear_opening_fit_registry.json"
+DBTT_QUALIFICATION_REGISTRY = (
+    "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/"
+    "dbtt_paper_minimal_qualification_registry.csv"
+)
+DBTT_QUALIFICATION_OPTION = (
+    "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification"
+)
 ALL_GOALS = tuple(f"FG-{index:02d}" for index in range(1, 19))
 STATUS_AXES = (
     "material_domain", "fit_quality", "implementation", "native_qualification",
@@ -47,9 +55,12 @@ def _replace_arg(args: list[str], flag: str, value: str) -> list[str]:
 
 def _statuses(row: dict[str, Any], *, cohesive: bool = False) -> dict[str, str]:
     unresolved = row.get("command_status") != "RESOLVED_DISABLED"
+    qualification_material = row.get("material_selection_scope") == "QUALIFICATION_ONLY"
     fem = row.get("backend") == "full_fem_czm"
     return {
         "material_domain": (
+            "CONSTRUCTED_QUALIFICATION_ADMISSIBLE_NOT_PRODUCTION_SELECTED"
+            if qualification_material else
             "CONSTRUCTED_PROSPECTIVE_NOT_PRODUCTION_SELECTED"
             if row.get("eligibility") == "ELIGIBLE" else str(row.get("eligibility"))
         ),
@@ -59,10 +70,13 @@ def _statuses(row: dict[str, Any], *, cohesive: bool = False) -> dict[str, str]:
         ),
         "implementation": (
             "IMPLEMENTED_CONSTITUTIVE_SPECIMEN_ADAPTER_PENDING" if cohesive
+            else "IMPLEMENTED" if qualification_material
             else "UNRESOLVED_ADAPTER" if unresolved else "IMPLEMENTED"
         ),
         "native_qualification": (
-            "PENDING_SPECIMEN_LEVEL" if cohesive or unresolved else "COMPACT_PATH_QUALIFIED"
+            "PENDING_CASE_LEVEL_QUALIFICATION" if qualification_material
+            else "PENDING_SPECIMEN_LEVEL" if cohesive or unresolved
+            else "COMPACT_PATH_QUALIFIED"
         ),
         "kernel_validity": (
             "PENDING_THREE_LEVEL_COMMON_OBSERVER" if fem else "BOUND_NATIVE_KERNEL"
@@ -71,7 +85,9 @@ def _statuses(row: dict[str, Any], *, cohesive: bool = False) -> dict[str, str]:
             "PENDING_THREE_LEVEL" if fem else "CASE_LEVEL_PRODUCTION_CONVERGENCE_PENDING"
         ),
         "input_availability": (
-            "BLOCKED_PHYSICAL_COHESIVE_SUPPORT" if cohesive else "AVAILABLE_VERSIONED_INPUTS"
+            "BLOCKED_PHYSICAL_COHESIVE_SUPPORT" if cohesive
+            else "AVAILABLE_QUALIFICATION_INPUT_PRODUCTION_SELECTION_PENDING"
+            if qualification_material else "AVAILABLE_VERSIONED_INPUTS"
         ),
         "resource_admission": "PENDING_AUTHORIZED_TARGET_MACHINE_AND_OUTPUT_ROOT",
         "production_permission": "DENIED_CURRENT_MACHINE",
@@ -82,7 +98,7 @@ def _execution(row: dict[str, Any]) -> dict[str, Any]:
     status = row["readiness"]
     executable = (
         status["implementation"] == "IMPLEMENTED"
-        and status["input_availability"] == "AVAILABLE_VERSIONED_INPUTS"
+        and status["input_availability"].startswith("AVAILABLE_")
     )
     return {
         "launcher": [
@@ -104,7 +120,9 @@ def _execution(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _convert_v2(root: Path, row: dict[str, Any], options: dict[str, str]) -> dict[str, Any]:
+def _convert_v2(
+    root: Path, row: dict[str, Any], options: dict[str, str], original,
+) -> dict[str, Any]:
     converted = dict(row)
     converted["schema"] = SCHEMA
     family = converted.get("family")
@@ -114,7 +132,31 @@ def _convert_v2(root: Path, row: dict[str, Any], options: dict[str, str]) -> dic
         args = _replace_arg(args, "--parameter-registry", REGISTRY)
         args = _replace_arg(args, "--parameter-option", options[family])
         converted["native_args"] = args
-    converted["parameter_registry"] = REGISTRY
+    needs_dbtt_qualification = (
+        family == "DBTT" and converted.get("eligibility") != "ELIGIBLE"
+        and converted.get("block") in {"P1", "P2", "P5"}
+    )
+    if needs_dbtt_qualification:
+        # Preserve the original scientific cell, but make its separately
+        # authorized numerical-qualification route complete.  This is not a
+        # production material selection.
+        converted["requested_parameter_option"] = options["DBTT"]
+        converted["parameter_option"] = DBTT_QUALIFICATION_OPTION
+        converted["parameter_registry"] = DBTT_QUALIFICATION_REGISTRY
+        args = list(original.native_args)
+        args = _replace_arg(args, "--parameter-registry", DBTT_QUALIFICATION_REGISTRY)
+        args = _replace_arg(args, "--parameter-option", DBTT_QUALIFICATION_OPTION)
+        converted["native_args"] = args
+        converted["command_status"] = "RESOLVED_QUALIFICATION_DISABLED"
+        converted["material_selection_scope"] = "QUALIFICATION_ONLY"
+        converted["production_parameter_option"] = None
+        converted["qualification_material_provenance"] = (
+            "arrhenius_fracture/data/materials/v10_2_33_dbtt_qualification/"
+            "qualification_report.json"
+        )
+    else:
+        converted["material_selection_scope"] = "PROSPECTIVE_OR_PARENT"
+        converted["parameter_registry"] = REGISTRY
     converted["cohesive_law"] = {
         "kind": "original_activated_opening",
         "temperature_policy": "native_temperature_matched",
@@ -236,7 +278,11 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
 def build_cases_v3(root: str | Path) -> list[dict[str, Any]]:
     root = Path(root)
     options = _readiness_options(root)
-    rows = [_convert_v2(root, row, options) for row in build_cases_v2(root)]
+    originals = {row.case_id: row for row in build_cases(root)}
+    rows = [
+        _convert_v2(root, row, options, originals[row["case_id"]])
+        for row in build_cases_v2(root)
+    ]
     rows.extend(_cohesive_cases(root, options))
     ids = [row["case_id"] for row in rows]
     if len(ids) != len(set(ids)):
