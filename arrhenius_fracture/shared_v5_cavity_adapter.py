@@ -26,10 +26,14 @@ from .topology_transaction_v11 import (
     complete_accepted_state_fingerprint,
     equilibrate_fixed_load_with_production_fem,
 )
-from .unified_fracture_material_v5 import material_bundle
+from .unified_fracture_material_v5 import (
+    material_bundle, registry_material_bundle, require_bound_identity,
+)
 from .voiding_production_v5 import (
-    build_production_void_state, crack_tip_tensor, deterministic_trajectory,
+    _bundle_from_state, build_production_void_state, crack_tip_tensor,
+    deterministic_trajectory,
     directional_sharp_front_rates, dispatch_cavity_intersecting_candidate_drives,
+    fresh_sharp_front_engine, local_incremental_cavity_candidate_drives,
     observables, remesh_cavity, sharp_front_load_provider,
 )
 from .voiding_v5 import initialize_preexisting_resolved_cavity
@@ -130,13 +134,22 @@ def _directional_provider(temperature_K: float):
                 virtual_mechanical_trial_transport="deferred_read_only",
                 mechanical_refinement_policy="legacy_accumulated_generations",
             )
+        physical_event_advance_m = float(
+            fresh_sharp_front_engine(state.material, _bundle_from_state(state)).f.da
+        )
+        local_incremental = local_incremental_cavity_candidate_drives(
+            state, branch_id=ROOT_BRANCH_ID,
+            maximum_event_advance_m=physical_event_advance_m,
+            refinement_levels=(3, 4),
+        )
         provider["directional"] = list(
             dispatch_cavity_intersecting_candidate_drives(
                 state,
                 branch_id=ROOT_BRANCH_ID,
                 directional_rows=provider["directional"],
-                maximum_event_advance_m=3.0e-5,
+                maximum_event_advance_m=physical_event_advance_m,
                 refinement_levels=(3, 4),
+                local_incremental_rows=local_incremental,
             )
         )
         rates = directional_sharp_front_rates(
@@ -162,8 +175,28 @@ def _directional_provider(temperature_K: float):
     return observe
 
 
-def _build_pair(args):
-    bundle = material_bundle(args.material_class)
+def _requested_bundle(args):
+    registry = getattr(args, "material_registry", None)
+    option = getattr(args, "parameter_option", None)
+    historical = bool(getattr(args, "historical_v5_material", False))
+    if historical:
+        if registry is not None or option is not None:
+            raise SystemExit(
+                "historical V5 material is mutually exclusive with a current registry request"
+            )
+        return material_bundle(args.material_class)
+    if registry is None or option is None:
+        raise SystemExit(
+            "physical V5 execution requires --material-registry and --parameter-option; "
+            "use --historical-v5-material only for the named retained alternative"
+        )
+    return registry_material_bundle(
+        registry, option, material_class=args.material_class,
+    )
+
+
+def _build_pair(args, bundle=None):
+    bundle = _requested_bundle(args) if bundle is None else bundle
     common = dict(
         bundle=bundle, temperature_K=float(args.temperature_K),
         vacancy_energy_variant=args.vacancy_energy_variant,
@@ -173,6 +206,12 @@ def _build_pair(args):
         interaction_population_partition=DEFAULT_PARTITION,
         bulk_initial_density_m2=float(bundle.fracture_row["rho_forest_floor_m2"]),
         initial_plastic_strain_gp=0.0,
+        boundary_segments=int(getattr(args, "boundary_segments", 32)),
+        radial_layers=int(getattr(args, "radial_layers", 12)),
+        shape_regular_local_level=getattr(args, "shape_regular_local_level", None),
+        source_conforming_geometry=bool(getattr(
+            args, "source_conforming_geometry", False
+        )),
     )
     preexisting = args.preexisting_cavity_radius_pz is not None
     if preexisting:
@@ -373,13 +412,22 @@ def _advance_paired_with_refinement(
 def _physical_main(args):
     out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
+    requested_bundle = _requested_bundle(args)
     if args.restart_checkpoint:
         states, ancestry = _restore_pair(args.restart_checkpoint)
+        observed_hashes = {
+            arm: require_bound_identity(state)["material_bundle_sha256"]
+            for arm, state in states.items()
+        }
+        if set(observed_hashes.values()) != {requested_bundle.bundle_hash}:
+            raise ValueError(
+                "paired restart material does not match requested registry option"
+            )
         common_start = ancestry.get("common_start")
         physical_time = float(ancestry["physical_time_s"])
         interval_index = int(ancestry["interval_count"])
     else:
-        disabled, enabled, common_start = _build_pair(args)
+        disabled, enabled, common_start = _build_pair(args, requested_bundle)
         if not all(common_start.values()):
             raise RuntimeError("V5 enabled/suppressed common start failed")
         states = {"disabled": disabled, "enabled": enabled}
@@ -390,9 +438,25 @@ def _physical_main(args):
     duration = float(args.duration_s)
     if not math.isfinite(duration) or duration <= 0.0:
         raise SystemExit("--duration-s must be finite and positive")
-    intervals = int(args.steps) + int(bool(args.continue_one))
-    if intervals < 1:
-        raise SystemExit("--steps must be at least one")
+    endpoint_controller = (
+        args.target_extension_um is not None or args.exposure_limit_s is not None
+    )
+    if endpoint_controller:
+        if args.target_extension_um is None or args.exposure_limit_s is None:
+            raise SystemExit(
+                "endpoint control requires both --target-extension-um and --exposure-limit-s"
+            )
+        if not math.isfinite(args.target_extension_um) or args.target_extension_um <= 0.0:
+            raise SystemExit("--target-extension-um must be finite and positive")
+        if not math.isfinite(args.exposure_limit_s) or args.exposure_limit_s <= 0.0:
+            raise SystemExit("--exposure-limit-s must be finite and positive")
+        intervals = int(args.endpoint_max_intervals)
+        if intervals < 1:
+            raise SystemExit("--endpoint-max-intervals must be at least one")
+    else:
+        intervals = int(args.steps) + int(bool(args.continue_one))
+        if intervals < 1:
+            raise SystemExit("--steps must be at least one")
     observer = _directional_provider(float(args.temperature_K))
     history = {"disabled": [], "enabled": []}
     minimum_duration = float(args.transport_refinement_min_duration_s)
@@ -400,8 +464,80 @@ def _physical_main(args):
         raise SystemExit("--transport-refinement-min-duration-s must be positive")
     requested_interval_count = 0
     terminal_rejection = None
-    requested_exposure = duration * intervals
+    call_start_time = physical_time
+    selected_arm = "enabled" if args.cavity_enabled else "disabled"
+    if ancestry is None:
+        initial_graph_lengths = {
+            arm: float(state.crack_network.total_physical_crack_length_m)
+            for arm, state in states.items()
+        }
+    else:
+        initial_graph_lengths = dict(
+            ancestry.get("configuration", {}).get(
+                "endpoint_initial_graph_length_m_by_arm", {}
+            )
+        )
+        if endpoint_controller and set(initial_graph_lengths) != {"disabled", "enabled"}:
+            raise ValueError("endpoint restart lacks initial paired crack lengths")
+
+    target_extension_m = (
+        None if not endpoint_controller else float(args.target_extension_um) * 1.0e-6
+    )
+    exposure_limit_s = (
+        None if not endpoint_controller else float(args.exposure_limit_s)
+    )
+
+    if ancestry is not None:
+        prior_configuration = ancestry.get("configuration", {})
+        requested_restart_configuration = {
+            "material_bundle_sha256": requested_bundle.bundle_hash,
+            "material_class": args.material_class,
+            "temperature_K": float(args.temperature_K),
+            "vacancy_energy_variant": args.vacancy_energy_variant,
+            "opening_rate_m_per_s": float(args.opening_rate_m_per_s),
+            "endpoint_controller": endpoint_controller,
+            "target_extension_m": target_extension_m,
+            "exposure_limit_s": exposure_limit_s,
+        }
+        disagreements = {
+            key: {"checkpoint": prior_configuration.get(key), "request": value}
+            for key, value in requested_restart_configuration.items()
+            if prior_configuration.get(key) != value
+        }
+        if disagreements:
+            raise ValueError(
+                "paired restart changes immutable physical request: "
+                + json.dumps(disagreements, sort_keys=True)
+            )
+
+    def endpoint_status():
+        if not endpoint_controller:
+            return None
+        extensions = {
+            arm: (
+                float(state.crack_network.total_physical_crack_length_m)
+                - float(initial_graph_lengths[arm])
+            )
+            for arm, state in states.items()
+        }
+        if all(
+            extension >= float(target_extension_m) * (1.0 - 1.0e-12)
+            for extension in extensions.values()
+        ):
+            return "paired_developed_extension_reached"
+        if physical_time >= float(exposure_limit_s) - max(1.0e-12, 1.0e-12 * float(exposure_limit_s)):
+            return "declared_exposure_censor_reached"
+        return None
+
+    requested_exposure = (
+        duration * intervals if not endpoint_controller
+        else max(float(exposure_limit_s) - physical_time, 0.0)
+    )
+    terminal_endpoint = endpoint_status()
     for _ in range(intervals):
+        terminal_endpoint = endpoint_status()
+        if terminal_endpoint is not None:
+            break
         requested_interval_count += 1
         starts = {
             arm: complete_accepted_state_fingerprint(state)
@@ -414,9 +550,17 @@ def _physical_main(args):
                 directional_observation_provider=observer,
                 opening_rate_m_per_s=float(args.opening_rate_m_per_s),
             )
+        interval_duration = duration
+        if endpoint_controller:
+            interval_duration = min(
+                duration, max(float(exposure_limit_s) - physical_time, 0.0)
+            )
+            if interval_duration <= 0.0:
+                terminal_endpoint = "declared_exposure_censor_reached"
+                break
         try:
             states, accepted_segments = _advance_paired_with_refinement(
-                states, duration, advance, minimum_duration_s=minimum_duration,
+                states, interval_duration, advance, minimum_duration_s=minimum_duration,
             )
         except _PairedRefinementFailure as rejection:
             states = rejection.states
@@ -458,8 +602,7 @@ def _physical_main(args):
                 "rejected_interval_end_s": physical_time + float(
                     terminal_rejection["actual_subinterval_s"]),
                 "unused_requested_duration_s": max(
-                    requested_exposure-(physical_time-float(
-                        0.0 if ancestry is None else ancestry["physical_time_s"])), 0.0),
+                    requested_exposure-(physical_time-call_start_time), 0.0),
             })
             break
 
@@ -483,6 +626,17 @@ def _physical_main(args):
                 "test_only_extreme_reservoir": False,
                 "full_field_plasticity": True,
                 "earliest_event_and_remainder_scheduler": True,
+                "material_registry": (
+                    None if args.material_registry is None
+                    else str(Path(args.material_registry).expanduser().resolve())
+                ),
+                "parameter_option": args.parameter_option,
+                "material_bundle_sha256": requested_bundle.bundle_hash,
+                "historical_v5_material": bool(args.historical_v5_material),
+                "endpoint_controller": endpoint_controller,
+                "target_extension_m": target_extension_m,
+                "exposure_limit_s": exposure_limit_s,
+                "endpoint_initial_graph_length_m_by_arm": initial_graph_lengths,
             },
         },
     )
@@ -492,21 +646,35 @@ def _physical_main(args):
         == complete_accepted_state_fingerprint(states[arm])
         for arm in states
     )
-    selected_arm = "enabled" if args.cavity_enabled else "disabled"
+    terminal_endpoint = endpoint_status() if terminal_rejection is None else None
+    extensions = {
+        arm: (
+            float(state.crack_network.total_physical_crack_length_m)
+            - float(initial_graph_lengths[arm])
+        )
+        for arm, state in states.items()
+    }
     payload = _finite({
         "schema": MODEL_ID,
         "production_eligible": True,
         "selected_arm": selected_arm,
         "both_arms_evolved": True,
-        "status": ("transport_rejected_after_accepted_prefix"
-                   if terminal_rejection is not None else "requested_exposure_completed"),
-        "physical_exposure_s_per_arm_this_call": (
-            physical_time-float(0.0 if ancestry is None else ancestry["physical_time_s"])
+        "status": (
+            "transport_rejected_after_accepted_prefix"
+            if terminal_rejection is not None else terminal_endpoint
+            if terminal_endpoint is not None else
+            "endpoint_iteration_guard_reached" if endpoint_controller else
+            "requested_exposure_completed"
         ),
+        "endpoint_controller_active": endpoint_controller,
+        "selected_arm_extension_m": extensions[selected_arm],
+        "arm_extensions_m": extensions,
+        "target_extension_m": target_extension_m,
+        "declared_exposure_limit_s": exposure_limit_s,
+        "physical_exposure_s_per_arm_this_call": physical_time-call_start_time,
         "requested_physical_exposure_s_per_arm_this_call": requested_exposure,
         "unused_requested_duration_s": max(
-            requested_exposure-(physical_time-float(
-                0.0 if ancestry is None else ancestry["physical_time_s"])), 0.0),
+            requested_exposure-(physical_time-call_start_time), 0.0),
         "physical_time_s": physical_time,
         "interval_count": interval_index,
         "requested_interval_count_this_call": requested_interval_count,
@@ -592,12 +760,18 @@ def main(argv=None):
     parser.add_argument("--continue-one", action="store_true")
     parser.add_argument("--test-lifecycle-fixture", action="store_true")
     parser.add_argument("--material-class", default="DBTT")
+    parser.add_argument("--material-registry")
+    parser.add_argument("--parameter-option")
+    parser.add_argument("--historical-v5-material", action="store_true")
     parser.add_argument("--temperature-K", type=float, default=1200.0)
     parser.add_argument("--seed", type=int, default=3621)
     parser.add_argument("--duration-s", type=float, default=1.0e-5)
     parser.add_argument("--opening-rate-m-per-s", type=float, default=0.0)
     parser.add_argument("--transport-refinement-min-duration-s", type=float, default=1.0e-8)
     parser.add_argument("--steps", type=int, default=1)
+    parser.add_argument("--target-extension-um", type=float)
+    parser.add_argument("--exposure-limit-s", type=float)
+    parser.add_argument("--endpoint-max-intervals", type=int, default=1000000)
     parser.add_argument("--vacancy-energy-variant", default="reference")
     parser.add_argument("--preexisting-cavity-radius-pz", type=float)
     parser.add_argument("--preexisting-cavity-separation-pz", type=float)

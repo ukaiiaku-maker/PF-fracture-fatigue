@@ -66,14 +66,21 @@ def test_retained_native_cavity_evidence_is_discriminating():
         "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY"
     )
     assert result["complete_ligament"]["selected_local_incremental_conformance"] is False
-    assert result["complete_ligament"]["current_code_role"].startswith("ACTUAL_KINETIC")
+    assert result["complete_ligament"]["current_code_role"] == (
+        "EXPLICIT_DIAGNOSTIC_ALTERNATIVE_NOT_SELECTED_BY_DEFAULT"
+    )
     assert result["finite_enabled_suppressed_interval"]["accepted_exposure_s"] > 0.0
     assert result["combined_branch_cavity"]["native_checkpoint_round_trips_exact"] is True
 
 
-def test_qualification_does_not_claim_unexecuted_child_acceptance(tmp_path):
+def test_qualification_reports_selected_local_contact_but_not_unexecuted_child(tmp_path):
     result = qualification(_checkpoint(tmp_path))
-    assert result["status"] == "COLLECTIVE_LIGAMENT_RESTART_READY_LOCAL_INCREMENTAL_PENDING"
+    assert result["status"] == (
+        "LOCAL_INCREMENTAL_CONTACT_AND_RESTART_COMPLETE_DOWNSTREAM_PENDING"
+    )
+    assert result["retained_native_evidence"]["selected_local_incremental"][
+        "status"
+    ] == "PASS"
     assert any(
         item.endswith("continue_unified_one_void_from_checkpoint.py")
         for item in result["next_native_command"]

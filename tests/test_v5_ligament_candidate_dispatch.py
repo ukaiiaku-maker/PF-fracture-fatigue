@@ -18,7 +18,7 @@ def test_polygon_open_interior_excludes_terminal_boundary_contact(polygon):
     assert not check((-1.0, 0.0), (0.5, 0.0), polygon)
 
 
-def test_only_intersecting_candidate_uses_complete_ligament_observation(monkeypatch):
+def test_only_intersecting_candidate_uses_selected_local_incremental_observation(monkeypatch):
     candidates = (
         SimpleNamespace(candidate_id="contact", direction_xy=(1.0, 0.0)),
         SimpleNamespace(candidate_id="solid", direction_xy=(0.0, 1.0)),
@@ -35,15 +35,6 @@ def test_only_intersecting_candidate_uses_complete_ligament_observation(monkeypa
         "_first_ray_cavity_intersection",
         lambda state, start, direction: (2.0, 0.0) if direction == (1.0, 0.0) else None,
     )
-    monkeypatch.setattr(
-        production,
-        "matched_ligament_energy_observation",
-        lambda *args, **kwargs: {
-            "status": "AVAILABLE",
-            "G_ligament_J_per_m2": 4.0,
-            "schema": "test",
-        },
-    )
     source_rows = (
         {"candidate_id": "contact", "directional_drive_status": "DIRECTIONAL_DRIVE_UNAVAILABLE"},
         {"candidate_id": "solid", "directional_drive_status": "AVAILABLE", "sentinel": 7},
@@ -53,13 +44,51 @@ def test_only_intersecting_candidate_uses_complete_ligament_observation(monkeypa
         branch_id="root",
         directional_rows=source_rows,
         maximum_event_advance_m=3.0,
+        local_incremental_rows=({
+            "candidate_id": "contact",
+            "directional_drive_status": "AVAILABLE",
+            "drive_source": "EXACT_FIXED_VOID_FINITE_INCREMENT_G",
+            "G_kinetic_used_J_per_m2": 5.0,
+            "complete_ligament_energy_used_as_rate_argument": False,
+        },),
     )
     assert rows[0]["directional_drive_status"] == "AVAILABLE"
+    assert rows[0]["drive_source"] == "EXACT_FIXED_VOID_FINITE_INCREMENT_G"
+    assert rows[0]["G_kinetic_used_J_per_m2"] == 5.0
+    assert rows[0]["complete_ligament_energy_used_as_rate_argument"] is False
+    assert rows[1] == source_rows[1]
+
+
+def test_collective_complete_ligament_remains_explicit_alternative(monkeypatch):
+    candidate = SimpleNamespace(candidate_id="contact", direction_xy=(1.0, 0.0))
+    state = SimpleNamespace(
+        competition=SimpleNamespace(candidates=(candidate,)),
+        crack_network=SimpleNamespace(
+            branch=lambda branch_id: SimpleNamespace(tip=(0.0, 0.0))
+        ),
+        material=SimpleNamespace(Eprime=9.0),
+        void_state=SimpleNamespace(cavities=(object(),)),
+    )
+    monkeypatch.setattr(
+        production, "_first_ray_cavity_intersection",
+        lambda *args, **kwargs: (2.0, 0.0),
+    )
+    monkeypatch.setattr(
+        production, "matched_ligament_energy_observation",
+        lambda *args, **kwargs: {
+            "status": "AVAILABLE", "G_ligament_J_per_m2": 4.0, "schema": "test",
+        },
+    )
+    rows = production.dispatch_cavity_intersecting_candidate_drives(
+        state, branch_id="root",
+        directional_rows=({"candidate_id": "contact"},),
+        maximum_event_advance_m=3.0,
+        interpretation="collective_finite_ligament",
+    )
     assert rows[0]["drive_source"] == "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY"
     assert rows[0]["G_kinetic_used_J_per_m2"] == 4.0
     assert rows[0]["K_directional_Pa_sqrt_m"] == 6.0
-    assert rows[0]["local_J_substituted"] is False
-    assert rows[1] == source_rows[1]
+    assert rows[0]["complete_ligament_energy_used_as_rate_argument"] is True
 
 
 def test_suppressed_arm_without_cavity_preserves_native_rows(monkeypatch):
@@ -111,6 +140,7 @@ def test_unconverged_complete_ligament_observation_remains_fail_closed(monkeypat
         branch_id="root",
         directional_rows=({"candidate_id": "contact"},),
         maximum_event_advance_m=2.0,
+        interpretation="collective_finite_ligament",
     )
     assert rows[0]["directional_drive_status"] == "DIRECTIONAL_DRIVE_UNAVAILABLE"
     assert rows[0]["directional_drive_unavailable_reason"] == (

@@ -34,11 +34,16 @@ DATA_PATH = Path(__file__).resolve().parent / "data/materials/unified_v5/fractur
 _METADATA = frozenset({
     "material_class", "candidate_id", "source_or_search_provenance",
     "parameter_decision", "reduced_selection_status", "same_material_row_both_providers",
+    "option_key", "role", "mechanism_summary", "validation_status",
+    "qualification_parent_option_key", "qualification_taylor_construction",
+    "target_class",
 })
 _ZERO_DISABLED = frozenset({
     "mobile_shield_fraction", "source_recovery_rate_s", "retained_recovery_rate_s",
     "source_refresh_length_um", "recovery_nu0_s", "recovery_H0_eV",
     "recovery_activation_entropy_kB",
+    "legacy_source_sites_active", "legacy_source_refresh_active",
+    "explicit_recovery_active",
 })
 
 
@@ -154,6 +159,55 @@ def material_bundle(material_class: str) -> UnifiedFractureMaterialBundle:
     )
 
 
+def registry_material_bundle(
+    registry_path: str | Path,
+    option_key: str,
+    *,
+    material_class: str | None = None,
+) -> UnifiedFractureMaterialBundle:
+    """Bind one explicitly requested current registry row to native V5 owners.
+
+    Only the fracture/MPZ row is replaced.  Elasticity, vacancy kinetics,
+    cavity/site population and loading retain their independent pinned V5
+    identities.  The historical :func:`material_bundle` remains available as
+    an explicit alternative and is never an automatic fallback here.
+    """
+    source = Path(registry_path).expanduser().resolve()
+    if not source.is_file():
+        raise FileNotFoundError(source)
+    with source.open(newline="") as stream:
+        matches = [row for row in csv.DictReader(stream)
+                   if row.get("option_key") == str(option_key)]
+    if len(matches) != 1:
+        raise ValueError(
+            f"expected exactly one fracture option {option_key!r}; found {len(matches)}"
+        )
+    row = matches[0]
+    family = str(row.get("material_class", ""))
+    if material_class is not None and family != str(material_class):
+        raise ValueError(
+            f"requested material class {material_class!r} disagrees with registry {family!r}"
+        )
+    candidate_id = str(row.get("candidate_id", ""))
+    if not candidate_id:
+        raise ValueError("current fracture registry row has no candidate_id")
+    bundle = UnifiedFractureMaterialBundle(
+        fracture_material_row_id=candidate_id,
+        void_kinetics_row_id=COMMON_VOID_KINETICS_ROW_ID,
+        elastic_row_id=COMMON_ELASTIC_ROW_ID,
+        site_population_row_id=COMMON_SITE_POPULATION_ROW_ID,
+        specimen_loading_row_id=COMMON_SPECIMEN_LOADING_ROW_ID,
+        vacancy_row_id=COMMON_VACANCY_ROW_ID,
+        material_class=family,
+        fracture_row_items=tuple((key, str(value)) for key, value in row.items()),
+    )
+    # Force construction and mapping now so an unconsumed active field cannot
+    # survive until a long native run.
+    material_manifest(bundle)
+    active_field_mapping(bundle)
+    return bundle
+
+
 def all_material_bundles() -> Mapping[str, UnifiedFractureMaterialBundle]:
     return MappingProxyType({family: material_bundle(family) for family in FRACTURE_ROWS})
 
@@ -222,7 +276,10 @@ def material_manifest(bundle: UnifiedFractureMaterialBundle) -> MaterialManifest
         c_blunt=_number(row, "c_blunt"),
         # The pinned rows explicitly disable mobile shielding. No independent
         # fitted K cap is introduced by the dimensional-transfer wrapper.
-        max_K_shield_MPa_sqrt_m=0.0,
+        max_K_shield_MPa_sqrt_m=(
+            _number(row, "max_K_shield_MPa_sqrt_m")
+            if "max_K_shield_MPa_sqrt_m" in row else 0.0
+        ),
     )
 
 
@@ -242,8 +299,19 @@ def front_config(bundle: UnifiedFractureMaterialBundle) -> FrontConfig:
 
 def mpz_config(bundle: UnifiedFractureMaterialBundle) -> MPZConfig:
     row = bundle.fracture_row
+    n_bins = int(_number(row, "n_bins_recommended")) if "n_bins_recommended" in row else 200
+    n_systems = int(_number(row, "n_slip_channels")) if "n_slip_channels" in row else 2
+    source_bins = 2
+    if "n_bins_recommended" in row:
+        source_bins = max(int(round(
+            _number(row, "source_zone_length_um")
+            / _number(row, "L_pz_um_recommended") * n_bins
+        )), 1)
     return MPZConfig(
         length_m=_number(row, "L_pz_um_recommended") * 1.0e-6,
+        n_bins=n_bins,
+        n_systems=n_systems,
+        source_bin_count=source_bins,
         forest_density_floor_m2=_number(row, "rho_forest_floor_m2"),
         peierls_stress_fraction=_number(row, "peierls_stress_fraction"),
         taylor_stress_fraction=_number(row, "taylor_stress_fraction"),
@@ -370,6 +438,9 @@ def active_field_mapping(bundle: UnifiedFractureMaterialBundle) -> Mapping[str, 
         "reference_source_area_um2": "process_zone_fingerprint.reference_source_area_um2",
         "reference_front_width_um": "process_zone_fingerprint.reference_front_width_um",
         "source_zone_length_um": "process_geometry_fingerprint.source_zone_length_um",
+        "n_bins_recommended": "MPZConfig.n_bins",
+        "n_slip_channels": "MPZConfig.n_systems",
+        "max_K_shield_MPa_sqrt_m": "MaterialManifest.max_K_shield_MPa_sqrt_m",
     }
     for prefix in ("cleave", "emit"):
         for suffix in ("G00_eV", "gT_eV_per_K", "sigc0_GPa", "sT_GPa_per_K", "exp_a", "exp_n", "floor_frac"):
@@ -389,4 +460,5 @@ __all__ = [
     "active_field_mapping", "all_material_bundles", "benchmark_material_bundle", "bind_identity",
     "canonical_front_engine", "elastic_material", "front_config", "identity_record", "material_bundle",
     "material_manifest", "mpz_config", "require_bound_identity",
+    "registry_material_bundle",
 ]

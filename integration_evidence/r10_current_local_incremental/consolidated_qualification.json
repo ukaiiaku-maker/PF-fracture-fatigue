@@ -1,0 +1,115 @@
+{
+  "connected_checkpoint": {
+    "active_tip_ids": [],
+    "cavity": {
+      "connection_entry_m": [
+        0.000505,
+        0.0
+      ],
+      "connection_exit_m": [
+        0.0005300000000000001,
+        0.0
+      ],
+      "id": "void:site-1",
+      "phase": "CONNECTED_VOID",
+      "radius_m": 1.2499999999999999e-05
+    },
+    "equilibrium": {
+      "energy_identity_residual": 2.2163159293824181e-16,
+      "free_dof_residual_relative": 3.077622356081222e-15,
+      "total_opening_m": 8e-06
+    },
+    "length_ledgers": {
+      "active_front_coordinate_advance_m": 5.000000000000013e-06,
+      "connected_void_free_span_m": 2.5000000000000066e-05,
+      "fractured_ligament_length_m": 5.000000000000013e-06,
+      "preexisting_void_free_span_m": 5.000000000000006e-05
+    },
+    "manifest": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/r10_current_local_incremental/local_incremental_connected_checkpoint.json",
+    "mesh_generation": 2,
+    "payload": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/r10_current_local_incremental/local_incremental_connected_checkpoint.json.33511270bdbba2b09030ac4f50ffeba09f119d1075c24355604b470e6e83b7c4.state.pkl.gz",
+    "payload_sha256": "33511270bdbba2b09030ac4f50ffeba09f119d1075c24355604b470e6e83b7c4",
+    "payload_size_bytes": 268501,
+    "sharp_wake_model_id": "sharp_wake_mechanically_separating_v12",
+    "source_commit": "f00c9bcd3c8000aed866f081ff002697265e131d",
+    "status": "NATIVE_CONNECTED_ACCEPTED_STATE_VERIFIED",
+    "topology_actions": 1,
+    "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1"
+  },
+  "execution_boundary": "The next command restores the exact occupied accepted state and performs native downstream birth, ordinary continuation, post-event equilibrium, rollback injections and exact active-state checkpoint round trips.",
+  "native_continuation_report": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/r10_current_local_incremental/downstream_continuation_run2/qualification_report.json",
+  "next_native_command": [
+    "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "scripts/continue_unified_one_void_from_checkpoint.py",
+    "--checkpoint",
+    "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/r10_current_local_incremental/local_incremental_connected_checkpoint.json",
+    "--output",
+    "<new-output>"
+  ],
+  "not_claimed": [
+    "No downstream child acceptance is claimed until the native continuation exits PASS.",
+    "The retained complete-ligament rate is a diagnostic alternative, not the selected law.",
+    "The recovered 0.2 s exporter failure does not identify individual event times.",
+    "No production campaign or physical recalibration is authorized."
+  ],
+  "production_execution_authorized": false,
+  "qualification_only_constructed_inputs": false,
+  "qualification_source_commit": "f00c9bcd3c8000aed866f081ff002697265e131d",
+  "retained_native_evidence": {
+    "combined_branch_cavity": {
+      "active_tip_ids": [
+        "void-front-1"
+      ],
+      "native_checkpoint_round_trips_exact": true,
+      "report": "review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
+      "source_commit": "bb0c21d9",
+      "status": "PASS",
+      "terminal_void_phase": "DOWNSTREAM_FRONT_ACTIVE"
+    },
+    "complete_ligament": {
+      "G_ligament_J_per_m2": 40.4943938223355,
+      "accepted_state_preserved": true,
+      "classification": "COLLECTIVE_FINITE_LIGAMENT_ALTERNATIVE",
+      "consumer_source": "arrhenius_fracture.voiding_production_v5.dispatch_cavity_intersecting_candidate_drives -> directional_sharp_front_rates",
+      "current_code_role": "EXPLICIT_DIAGNOSTIC_ALTERNATIVE_NOT_SELECTED_BY_DEFAULT",
+      "drive_source": "MATCHED_COMPLETE_LIGAMENT_TOPOLOGY_ENERGY",
+      "mesh_relative_error": 0.08771391032970505,
+      "mesh_relative_limit": 0.1,
+      "report": "review_packet/current_science_pilots_6abbf10/CAVITY_LIGAMENT_QUALIFICATION_v4.json",
+      "selected_local_incremental_conformance": false
+    },
+    "finite_enabled_suppressed_interval": {
+      "accepted_exposure_s": 0.20000000000000107,
+      "classification": "ACCEPTED_PHYSICS_AUDIT_EXPORT_FAILURE",
+      "disabled_topology_action_change": 4,
+      "enabled_topology_action_change": 0,
+      "native_checkpoint_round_trip_exact": true,
+      "report": "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json"
+    },
+    "selected_local_incremental": {
+      "checks": {
+        "accepted_state_preserved": true,
+        "all_contact_drives_are_local_incremental": true,
+        "all_contact_drives_available": true,
+        "at_least_one_contact_candidate": true,
+        "downstream_source_qualified": true,
+        "native_ligament_event_selected": true,
+        "native_ligament_transaction_accepted": true,
+        "native_preexisting_cavity_constructed": true,
+        "ordinary_front_became_connected_dormant": true,
+        "positive_solid_increment_only": true,
+        "post_event_checkpoint_round_trip_exact": true,
+        "post_event_equilibrium": true,
+        "rate_consumer_executed": true,
+        "source_observation_did_not_advance_clocks": true
+      },
+      "classification": "CONSTRUCTED_NATIVE_SPECIMEN_STATE_NOT_PRODUCTION_CALIBRATION",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "qualification_total_opening_m": 8e-06,
+      "report": "integration_evidence/r10_current_local_incremental/qualification.json",
+      "status": "PASS"
+    }
+  },
+  "schema": "r10.cavity-kinetic-role-and-restart-qualification/2",
+  "status": "LOCAL_INCREMENTAL_CONTACT_RESTART_AND_CHILD_CONTINUATION_COMPLETE"
+}

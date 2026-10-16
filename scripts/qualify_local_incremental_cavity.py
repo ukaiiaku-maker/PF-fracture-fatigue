@@ -23,6 +23,13 @@ DURABLE_CHECKPOINT = ROOT / (
     "common_framework_readiness/acceptance_review_20261015/"
     "r10_durable_checkpoint/immediately-before-child-birth.json"
 )
+CURRENT_LOCAL_REPORT = ROOT / (
+    "integration_evidence/r10_current_local_incremental/qualification.json"
+)
+CURRENT_LOCAL_CHECKPOINT = ROOT / (
+    "integration_evidence/r10_current_local_incremental/"
+    "local_incremental_connected_checkpoint.json"
+)
 CHECKPOINT_GLOB = Path(
     "/private/var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T"
 ).glob("unified-one-void-*/immediately-before-child-birth.json")
@@ -57,6 +64,8 @@ def _sha256(path: Path) -> str:
 
 
 def discover_checkpoint() -> Path | None:
+    if CURRENT_LOCAL_CHECKPOINT.is_file():
+        return CURRENT_LOCAL_CHECKPOINT
     if DURABLE_CHECKPOINT.is_file():
         return DURABLE_CHECKPOINT
     candidates = [path for path in CHECKPOINT_GLOB if path.is_file()]
@@ -136,7 +145,20 @@ def retained_evidence() -> dict[str, Any]:
         raise ValueError("retained cavity interaction has no finite interval")
     if combined.get("status") != "PASS":
         raise ValueError("retained branch/cavity compatibility did not pass")
+    local = _load(CURRENT_LOCAL_REPORT)
+    if local.get("status") != "PASS" or not all(local.get("checks", {}).values()):
+        raise ValueError("current selected local-incremental qualification did not pass")
     return {
+        "selected_local_incremental": {
+            "report": str(CURRENT_LOCAL_REPORT.relative_to(ROOT)),
+            "status": local["status"],
+            "checks": local["checks"],
+            "parameter_option": local["parameter_option"],
+            "qualification_total_opening_m": local[
+                "qualification_total_opening_m"
+            ],
+            "classification": local["qualification_input_scope"],
+        },
         "complete_ligament": {
             "report": str(LIGAMENT_REPORT.relative_to(ROOT)),
             "drive_source": ligament.get("drive_source"),
@@ -145,7 +167,7 @@ def retained_evidence() -> dict[str, Any]:
             "mesh_relative_limit": ligament.get("mesh_relative_limit"),
             "accepted_state_preserved": ligament.get("accepted_state_preserved"),
             "current_code_role": (
-                "ACTUAL_KINETIC_RATE_ARGUMENT_FOR_CAVITY_INTERSECTING_CANDIDATE"
+                "EXPLICIT_DIAGNOSTIC_ALTERNATIVE_NOT_SELECTED_BY_DEFAULT"
             ),
             "selected_local_incremental_conformance": False,
             "classification": "COLLECTIVE_FINITE_LIGAMENT_ALTERNATIVE",
@@ -193,7 +215,7 @@ def qualification(checkpoint: Path | None) -> dict[str, Any]:
             ("git", "rev-parse", "HEAD"), cwd=ROOT, text=True,
         ).strip(),
         "status": (
-            "COLLECTIVE_LIGAMENT_RESTART_READY_LOCAL_INCREMENTAL_PENDING"
+            "LOCAL_INCREMENTAL_CONTACT_AND_RESTART_COMPLETE_DOWNSTREAM_PENDING"
             if connected is not None else "INCOMPLETE_NATIVE_CHECKPOINT_UNAVAILABLE"
         ),
         "production_execution_authorized": False,
@@ -208,7 +230,7 @@ def qualification(checkpoint: Path | None) -> dict[str, Any]:
         ),
         "not_claimed": [
             "No downstream child acceptance is claimed until the native continuation exits PASS.",
-            "The current complete-ligament rate does not qualify the selected local-incremental law.",
+            "The retained complete-ligament rate is a diagnostic alternative, not the selected law.",
             "The recovered 0.2 s exporter failure does not identify individual event times.",
             "No production campaign or physical recalibration is authorized.",
         ],
@@ -238,8 +260,7 @@ def main(argv: list[str] | None = None) -> int:
         if child_report.get("status") != "PASS":
             raise RuntimeError("native R10 continuation did not report PASS")
         report["status"] = (
-            "COLLECTIVE_LIGAMENT_CHILD_CONTINUATION_COMPLETE_"
-            "LOCAL_INCREMENTAL_PENDING"
+            "LOCAL_INCREMENTAL_CONTACT_RESTART_AND_CHILD_CONTINUATION_COMPLETE"
         )
         report["native_continuation_report"] = str(
             (args.continuation_output / "qualification_report.json").resolve()

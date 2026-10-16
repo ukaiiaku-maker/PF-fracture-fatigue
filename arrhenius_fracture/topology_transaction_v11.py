@@ -1044,7 +1044,13 @@ def apply_v12_production_trial_geometry(
     graph_segments = tuple(
         (tuple(arm.start_xy_m), tuple(arm.end_xy_m)) for arm in arms
     )
-    refined = graph_state
+    # Refine the accepted mesh while it still owns the accepted graph.  A
+    # short proposed segment may not yet contain an interior cut node; asking
+    # the transport rebuild to represent that tentative graph before
+    # refinement can therefore create only one crack face.  The proposed
+    # network is installed below at the isolated remesh boundary, after the
+    # physical support mesh exists.
+    refined = state
     protected_boundary_edges = ()
     if preserve_cavity_boundary_edges:
         if refined.void_state is None or not refined.void_state.cavities:
@@ -1081,7 +1087,7 @@ def apply_v12_production_trial_geometry(
         refined, _ = refine_accepted_state(
             refined,
             marked_parent_elements=tuple(sorted(marked)),
-            active_tip_ids=network.active_tip_ids,
+            active_tip_ids=refined.crack_network.active_tip_ids,
             generation=int(state.event_counters.get("mesh_generation", 0)) + 1,
             operation_index=int(state.event_counters.get("refinement_operation_index", 0)) + level + 1,
             longest_edge_closure=preserve_cavity_boundary_edges,
@@ -1100,7 +1106,7 @@ def apply_v12_production_trial_geometry(
     # transaction commits.
     support_base = state
     if prepare_support_state is not None:
-        prepared = prepare_support_state(refined)
+        prepared = prepare_support_state(replace(refined, crack_network=network))
         if prepared.mesh is not refined.mesh:
             raise ValueError("support preparation must not replace the refined mesh")
         network = prepared.crack_network

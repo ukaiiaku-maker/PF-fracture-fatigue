@@ -320,22 +320,65 @@ def _bind_p6_branch_pair(
     converted["command_status"] = "RESOLVED_DISABLED"
 
 
-def _bind_p7_native_void_pair(converted: dict[str, Any]) -> None:
+def _p7_execution_contract(root: Path, converted: dict[str, Any]) -> tuple[list[str], list[str]]:
+    """Return complete-case and compact-qualification arguments for P7."""
+    interval_s = 0.2
+    endpoint = converted["physical_endpoint"]
+    exposure_s = float(endpoint["no_event_exposure_ceiling_s"])
+    target_um = float(converted["target_extension_um"])
+    common = [
+        "--duration-s", f"{interval_s:g}",
+        "--transport-refinement-min-duration-s", "1e-8",
+        "--opening-rate-m-per-s", f"{1.0e-6 * float(converted['rate_factor']):.17g}",
+        "--material-class", str(converted["family"]),
+        "--material-registry", str((root / converted["parameter_registry"]).resolve()),
+        "--parameter-option", str(converted["parameter_option"]),
+        "--temperature-K", f"{float(converted['temperature_K']):g}",
+        "--vacancy-energy-variant", "reference",
+    ]
+    complete = [
+        *common,
+        "--target-extension-um", f"{target_um:g}",
+        "--exposure-limit-s", f"{exposure_s:g}",
+        "--endpoint-max-intervals", str(int(exposure_s / interval_s) + 1),
+    ]
+    qualification = [*common, "--steps", "1"]
+    return complete, qualification
+
+
+def _finish_p7_binding(converted: dict[str, Any], qualification_args: list[str]) -> None:
+    pair_identity = {
+        "native_args": converted["native_args"],
+        "seed": converted["seed"],
+    }
+    digest = hashlib.sha256(
+        json.dumps(pair_identity, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()[:16]
+    converted["paired_execution_id"] = f"P7-paired-{digest}"
+    arm_flag = (
+        "--cavity-enabled"
+        if converted["cavity_mode"] != "disabled" else "--cavity-disabled"
+    )
+    converted["qualification_execution"] = {
+        "repository_role": "current_pf_shared_framework",
+        "native_entrypoint": "arrhenius_fracture.shared_v5_cavity_adapter",
+        "launcher": [
+            "python", "-m", "arrhenius_fracture.shared_v5_cavity_adapter",
+            *qualification_args, arm_flag, "--out", "{qualification_output_dir}",
+        ],
+        "physical_exposure_s": 0.2,
+        "production_case_substitution": False,
+    }
+
+
+def _bind_p7_native_void_pair(root: Path, converted: dict[str, Any]) -> None:
     """Bind native vacancy nucleation to the paired accepted-state V5 scheduler."""
     enabled = converted["cavity_mode"] == "nucleation_growth"
     preset = (
         "pf_cavity_v5_single_front" if enabled
         else "pf_cavity_v5_disabled_control"
     )
-    converted["native_args"] = [
-        "--duration-s", "0.2",
-        "--steps", "1",
-        "--transport-refinement-min-duration-s", "1e-8",
-        "--opening-rate-m-per-s", "1e-6",
-        "--material-class", str(converted["family"]),
-        "--temperature-K", f"{float(converted['temperature_K']):g}",
-        "--vacancy-energy-variant", "reference",
-    ]
+    converted["native_args"], qualification_args = _p7_execution_contract(root, converted)
     converted["native_entrypoint"] = (
         "arrhenius_fracture.shared_v5_cavity_adapter"
     )
@@ -345,9 +388,10 @@ def _bind_p7_native_void_pair(converted: dict[str, Any]) -> None:
     converted["command_status"] = "RESOLVED_DISABLED"
     converted["paired_arms_evolved_in_one_native_execution"] = True
     converted["qualification_interval_s"] = 0.2
+    _finish_p7_binding(converted, qualification_args)
 
 
-def _bind_p7_preexisting_pair(converted: dict[str, Any]) -> None:
+def _bind_p7_preexisting_pair(root: Path, converted: dict[str, Any]) -> None:
     """Bind a declared conditional cavity geometry to the native V5 owner."""
     match = re.search(r"_d([0-9.]+)_r([0-9.]+)", str(converted["study"]))
     qualification_geometry = False
@@ -363,18 +407,15 @@ def _bind_p7_preexisting_pair(converted: dict[str, Any]) -> None:
         "pf_cavity_v5_single_front" if enabled
         else "pf_cavity_v5_disabled_control"
     )
-    converted["native_args"] = [
-        "--duration-s", "0.2", "--steps", "1",
-        "--transport-refinement-min-duration-s", "1e-8",
-        "--opening-rate-m-per-s", f"{1.0e-6 * float(converted['rate_factor']):.17g}",
-        "--material-class", str(converted["family"]),
-        "--temperature-K", f"{float(converted['temperature_K']):g}",
-        "--vacancy-energy-variant", "reference",
+    converted["native_args"], qualification_args = _p7_execution_contract(root, converted)
+    geometry_args = [
         "--preexisting-cavity-separation-pz", f"{separation_pz:g}",
         "--preexisting-cavity-radius-pz", f"{radius_pz:g}",
         "--process-zone-length-um", "50",
         "--initial-crack-length-um", f"{float(converted['initial_crack_length_m']) * 1e6:g}",
     ]
+    converted["native_args"].extend(geometry_args)
+    qualification_args.extend(geometry_args)
     converted["native_entrypoint"] = "arrhenius_fracture.shared_v5_cavity_adapter"
     converted["shared_options"] = replace(
         PRESETS[preset], random_seed=int(converted["seed"]),
@@ -390,7 +431,11 @@ def _bind_p7_preexisting_pair(converted: dict[str, Any]) -> None:
         "qualification_geometry_selection": qualification_geometry,
         "production_geometry_selection": None if qualification_geometry else "declared_grid_cell",
     }
-    converted["cavity_material_bundle"] = "unified_fracture_material_v5:DBTT"
+    converted["cavity_material_bundle"] = (
+        f"current_registry:{converted['parameter_option']}"
+    )
+    converted["qualification_interval_s"] = 0.2
+    _finish_p7_binding(converted, qualification_args)
 
 
 def _bind_p3_diagnostic(
@@ -494,10 +539,10 @@ def _convert_v2(
         )
     if (converted.get("block") == "P7"
             and converted.get("study") == "native_void_nucleation"):
-        _bind_p7_native_void_pair(converted)
+        _bind_p7_native_void_pair(root, converted)
     if (converted.get("block") == "P7"
             and converted.get("study") != "native_void_nucleation"):
-        _bind_p7_preexisting_pair(converted)
+        _bind_p7_preexisting_pair(root, converted)
     converted["cohesive_law"] = {
         "kind": "original_activated_opening",
         "temperature_policy": "native_temperature_matched",

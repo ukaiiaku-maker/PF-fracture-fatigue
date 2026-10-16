@@ -1,0 +1,186 @@
+{
+  "binding_errors": {},
+  "campaign": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
+  "campaign_sha256": "055f818d82a5f6558b5645c8e5a2244fdcd1fb4b00bf758fae38bc2ae4dbda18",
+  "case_count": 692,
+  "checks": {
+    "all_36_fitted_rows_have_qualification_requests": true,
+    "all_static_argument_bindings_resolve": true,
+    "case_count_692": true,
+    "exact_near_boundary_count_20": true,
+    "exact_raw_domain_blocked_count_3": true,
+    "native_command_count_656": true,
+    "production_disabled_all_rows": true
+  },
+  "fitted_bilinear_production_blocked_count": 36,
+  "fitted_bilinear_qualification_request_count": 36,
+  "native_command_count": 656,
+  "near_boundary_rows": [
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s31415_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s31415_th0_a500_tip_surface_single_front_nucleation_growth",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s27182_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s27182_th0_a500_tip_surface_single_front_nucleation_growth",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s16180_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s16180_th0_a500_tip_surface_single_front_nucleation_growth",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s14142_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_native_void_nucleation_DBTT_T1000_r1_accommodation_s14142_th0_a500_tip_surface_single_front_nucleation_growth",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d0p5_r0p1_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d0p5_r0p1_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_preexisting_equilibrated",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d0p5_r0p25_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d0p5_r0p25_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_preexisting_equilibrated",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d1_r0p1_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d1_r0p1_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_preexisting_equilibrated",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d1_r0p25_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d1_r0p25_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_preexisting_equilibrated",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d2_r0p1_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d2_r0p1_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_preexisting_equilibrated",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d2_r0p25_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_disabled",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    },
+    {
+      "block": "P7",
+      "case_id": "P7_conditional_void_d2_r0p25_DBTT_T1000_r1_accommodation_s1733_th0_a500_tip_surface_single_front_preexisting_equilibrated",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1000.0
+    }
+  ],
+  "raw_blocked_near_boundary_overlap_case_ids": [],
+  "raw_domain_blocked_rows": [
+    {
+      "block": "P9",
+      "case_id": "P9_cohesive_DBTT_hot_fast_accommodation_activated_bilinear_fit_temperature_matched",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1200.0
+    },
+    {
+      "block": "P9",
+      "case_id": "P9_cohesive_DBTT_hot_fast_accommodation_autonomous_irreversible_bilinear_fit_temperature_matched",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1200.0
+    },
+    {
+      "block": "P9",
+      "case_id": "P9_cohesive_DBTT_hot_fast_accommodation_autonomous_irreversible_bilinear_reference_temperature_frozen",
+      "family": "DBTT",
+      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "temperature_K": 1200.0
+    }
+  ],
+  "schema": "campaign-v3-acceptance-audit/1",
+  "status": "PASS"
+}

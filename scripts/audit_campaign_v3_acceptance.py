@@ -59,13 +59,29 @@ def _binding_errors(row: dict) -> list[str]:
     actual_temperature = _value(args, "--temperatures") or _value(args, "--temperature-K")
     if actual_temperature != expected_temperature:
         errors.append("temperature_K is not translated")
-    if (row.get("block") != "P7" and row.get("parameter_option")
+    if (row.get("parameter_option")
             and _value(args, "--parameter-option") != row["parameter_option"]):
         errors.append("parameter_option is not translated")
-    if row.get("block") != "P7" and row.get("parameter_registry"):
+    if row.get("parameter_registry"):
         actual = _value(args, "--parameter-registry") or _value(args, "--material-registry")
         if actual is None or not actual.endswith(row["parameter_registry"]):
             errors.append("parameter_registry is not translated")
+    if row.get("block") == "P7":
+        endpoint = row["physical_endpoint"]
+        expected_target_um = float(endpoint["target_extension_m"]) * 1.0e6
+        expected_exposure_s = float(endpoint["no_event_exposure_ceiling_s"])
+        if float(_value(args, "--target-extension-um")) != expected_target_um:
+            errors.append("P7 target extension is not translated")
+        if float(_value(args, "--exposure-limit-s")) != expected_exposure_s:
+            errors.append("P7 exposure censor is not translated")
+        if "--steps" in args:
+            errors.append("P7 complete-case request is only a compact fixed-step interval")
+        qualification = row.get("qualification_execution", {})
+        qargs = list(qualification.get("launcher", []))
+        if _value(qargs, "--steps") != "1" or _value(qargs, "--duration-s") != "0.2":
+            errors.append("P7 compact qualification interval is absent")
+        if qualification.get("production_case_substitution") is not False:
+            errors.append("P7 compact interval is not excluded as production substitution")
     if row.get("backend") == "full_fem_czm":
         if _value(args, "--constraint") != row["mechanics_state"]["plane_state"]:
             errors.append("FEM constraint is not translated")

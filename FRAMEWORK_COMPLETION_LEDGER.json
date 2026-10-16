@@ -170,16 +170,16 @@
     {
       "id": "R07",
       "goal_ids": ["FG-08", "FG-09", "FG-10"],
-      "status": "NATIVE_CRACKED_BODY_CONTROLS_QUALIFIED_CAMPAIGN_ACTIVATED_PLASTIC_WIRING_PENDING",
-      "concrete_defect": "The independent native cracked cohesive specimen now executes plane strain, plane stress, generalized prescribed epsilon_zz and generalized prescribed sigma_zz through the assembled bulk residual and cohesive equilibrium. It also executes signed mode II and mixed I-II grip loading. Both generalized controls are combined with mixed loading and the complete active displacement, cohesive-history and transverse-control state restarts exactly.",
+      "status": "MOVING_TIP_CONSTRAINT_MIXITY_CONNECTED_RIGHT_CENSORED_BILINEAR_EVENT_PATH_PENDING",
+      "concrete_defect": "The independent native cracked cohesive specimen executes all four requested transverse controls and signed mixed grips. The original moving-tip/current-law route now also maps plane stress, generalized prescribed epsilon_zz, generalized prescribed sigma_zz and signed mixed grips into the assembled anisotropic equilibrium, calibrated tip consumer and immutable native checkpoint. A fresh-process plane-stress 25-degree continuation preserves the accepted history exactly, and compact native generalized-strain/mixed and generalized-stress/Mode-I executions verify both distinct transverse controls. These executions are right-censored before fracture and do not substitute for an accepted mixed-mode topology event.",
       "owner_consumer": "PF/FEM cracked-body solvers and mechanism tensor projections",
       "authoritative_source": "mechanics constraint contract and native cracked-body fields",
       "dependencies": ["R01", "R03"],
-      "exact_next_command": "no remaining native 2-D R07 implementation; retain explicit no-mode-III/no-finite-thickness boundary",
+      "exact_next_command": "finish the activated/autonomous bilinear connection to the original moving-tip event/topology owner, then execute an accepted transition and post-event restart under one selective constraint/mixity case",
       "input_output_identity": "plane strain, plane stress, generalized prescribed epsilon_zz or sigma_zz; signed mode II and mixed I-II",
       "numerical_criteria": "Nonuniform active state, tensor-consumer trace, response refinement and active-update restart.",
-      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@a0e5945:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@d6ea36d:integration_evidence/r05_r07_bilinear_constraints_a0e5945/qualification_report.json", "fem-czm-current-pf-companion@54e927e:arrhenius_fracture/fem.py", "fem-czm-current-pf-companion@7557ba8:integration_evidence/r05_r07_bilinear_constraints_54e927e/qualification_report.json"],
-      "remaining_limitation": "Uniform prescribed epsilon_zz and pointwise prescribed sigma_zz are distinct native cracked-body controls; neither is labeled a finite-thickness solution. The generic moving-tip route still rejects plane stress/generalized control, so full tensor propagation into its opening, emission and transport consumers and survival through moving-tip remesh/restart remain open. Mode III and a three-dimensional surface/interior transition remain outside the 2-D model."
+      "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@a0e5945:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@d6ea36d:integration_evidence/r05_r07_bilinear_constraints_a0e5945/qualification_report.json", "fem-czm-current-pf-companion@54e927e:arrhenius_fracture/fem.py", "fem-czm-current-pf-companion@7557ba8:integration_evidence/r05_r07_bilinear_constraints_54e927e/qualification_report.json", "fem-czm-current-pf-companion@9045fd3:integration_evidence/r07_moving_tip_controls_working/qualification_report.json", "fem-czm-current-pf-companion@9045fd3:tests/test_native_constraint_mixed_mechanics.py"],
+      "remaining_limitation": "Uniform prescribed epsilon_zz and pointwise prescribed sigma_zz remain distinct 2-D controls and are not labeled finite-thickness solutions. The compact moving-tip executions verify request-to-field mapping and active-state restart but are right-censored before fracture; accepted mixed-mode remesh/post-event equilibrium is not yet qualified. The generic moving-tip entry still fails closed for both bilinear opening descriptions and full-field source scope. Mode III and a three-dimensional surface/interior transition remain outside the 2-D model."
     },
     {
       "id": "R08",
@@ -234,12 +234,12 @@
     {
       "id": "R10",
       "goal_ids": ["FG-14", "FG-16"],
-      "status": "COLLECTIVE_LIGAMENT_PATH_IDENTIFIED_LOCAL_INCREMENTAL_AND_CHILD_CONTINUATION_PENDING",
-      "concrete_defect": "Source tracing demonstrates that dispatch_cavity_intersecting_candidate_drives replaces G_kinetic_used with the matched complete-ligament topology energy and directional_sharp_front_rates consumes that value. The retained result therefore qualifies the collective finite-ligament alternative, not the selected local-incremental front law. The accepted occupied checkpoint is now copied with its payload and verified hashes into a durable project root. Native downstream child continuation remains resource-deferred; a true increment-by-increment ligament approach with physical site support, multiplicity and persistent marks remains to be implemented.",
+      "status": "LOCAL_INCREMENTAL_NATIVE_CONTACT_RESTART_AND_CHILD_CONTINUATION_COMPLETE",
+      "concrete_defect": "The selected local-incremental cavity law is now the default native dispatch: each finite-solid candidate consumes its increment-by-increment like-operation drive on physical support with multiplicity, persistent marks and time ownership. The collective complete-ligament law remains available only as an explicitly named diagnostic alternative. Native contact, topology transaction, equilibrium, exact checkpoint and downstream daughter birth/continuation are qualified, including injected rollback checks that leave accepted state unchanged.",
       "owner_consumer": "V5 vacancy/cavity scheduler, local candidate law, topology/remesh and combined executor",
       "authoritative_source": "original V5 native vacancy/cavity implementation",
       "dependencies": ["R01", "R03", "R07"],
-      "exact_next_command": "python scripts/qualify_local_incremental_cavity.py --compact --checkpoint common_framework_readiness/acceptance_review_20261015/r10_durable_checkpoint/immediately-before-child-birth.json --execute --continuation-output <new-output> --output <new-report>",
+      "exact_next_command": "python scripts/qualify_current_local_incremental_cavity.py --out integration_evidence/r10_current_local_incremental",
       "input_output_identity": "accepted V11/V12 connected-cavity payload ef5682e8fb1fc5d1a3a4764c5752bd7dcb7e1c4a6d59346c98fa7aef76d7fef3; matched complete-ligament topology energy; distinct enabled/suppressed native interval; combined branch/cavity owner state",
       "numerical_criteria": "New-solid accounting, conservative inventories, like-operation drives, coupled interval and occupied-state restart.",
       "executed_evidence": [
@@ -247,10 +247,13 @@
         "review_packet/current_science_pilots_6abbf10/CAVITY_LIGAMENT_QUALIFICATION_v4.json",
         "review_packet/final_fracture_campaign_a5a5883/CAVITY_INTERACTION_0P2S_RECOVERED.json",
         "review_packet/final_fracture_campaign_a5a5883/BRANCH_CAVITY_COMPATIBILITY.json",
-        "tests/test_local_incremental_cavity_qualification.py"
+        "tests/test_local_incremental_cavity_qualification.py",
+        "integration_evidence/r10_current_local_incremental/qualification.json",
+        "integration_evidence/r10_current_local_incremental/consolidated_qualification.json",
+        "integration_evidence/r10_current_local_incremental/downstream_continuation_run2/qualification_report.json"
         ,"common_framework_readiness/acceptance_review_20261015/R10_CAVITY_ROLE_AND_DURABLE_RESTART.json"
       ],
-      "remaining_limitation": "The selected local-incremental kinetic interpretation is not yet spatially implemented; this is a demonstrated implementation gap, not a material-choice gate. Separately, the exact occupied-state collective-path continuation has not exited PASS. Its next topology remesh/equilibrium is approximately 57,252 DOF and remains deferred under current memory pressure. The retained 0.2 s interaction proves a finite enabled/suppressed interval but its generic exporter failed after accepted state publication, so individual event times in that suffix remain unclaimed."
+      "remaining_limitation": "The prior occupied-state complete-ligament continuation remains historical collective-law evidence and is not relabeled as local-incremental ancestry. The completed local-incremental qualification uses the current registry material and compact constructed qualification state; it is not a production calibration or authorization for the disabled campaign."
     },
     {
       "id": "R11",

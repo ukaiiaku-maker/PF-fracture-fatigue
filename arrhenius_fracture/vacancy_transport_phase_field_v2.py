@@ -575,7 +575,11 @@ def build_exact_cut_transport_mesh_for_network(
             owned = math.fsum(face.length_m for face in faces
                               if face.segment_id == identity and face.side == side)
             if not math.isclose(owned, length, rel_tol=1e-10, abs_tol=tolerance):
-                raise RuntimeError("network cut does not own two exact faces per crack segment")
+                raise RuntimeError(
+                    "network cut does not own two exact faces per crack segment: "
+                    f"segment={identity!r}, side={side}, owned_m={owned:.17g}, "
+                    f"required_m={length:.17g}, tolerance_m={tolerance:.17g}"
+                )
     return ExactCutTransportMesh(
         cut_mesh, np.asarray(parents, int), registry,
         (tuple(segments[0][0]), tuple(segments[-1][1])),

@@ -36,6 +36,7 @@ from .unified_fracture_material_v5 import (
 )
 from .hazard_energy_event_gate_v10230 import hazard_resistance_J_per_m2
 from .causal_sharp_wake_v11 import element_damage
+from .candidate_drive_contract import LigamentKineticInterpretation
 from .mechanically_separating_sharp_wake_v12 import (
     certification_arcs, independent_intact_path_certificate,
 )
@@ -1658,7 +1659,7 @@ def cavity_boundary_fitted_recovery_v1(state, *, boundary_node: int | None = Non
     )
 
 
-def qualified_boundary_fitted_source_observation(state, *, refinement_levels=(1, 2)):
+def qualified_boundary_fitted_source_observation(state, *, refinement_levels=(3, 4)):
     """Qualify the polygon-fitted source on isolated nested local refinements."""
     from .adaptive_multitip_mesh_v11 import refine_accepted_state
     from .causal_sharp_wake_v11 import rerasterize_refined_topology_damage
@@ -1787,7 +1788,7 @@ def _boundary_fitted_probe_is_qualified(state, tensor, probe) -> bool:
         bool(proof.get("accepted_state_preserved")),
         float(proof.get("tensor_relative_error", math.inf))
             <= float(proof.get("tensor_relative_limit", -math.inf)),
-        tuple(proof.get("refinement_levels", ())) == (1, 2),
+        tuple(proof.get("refinement_levels", ())) == (3, 4),
         np.array_equal(np.asarray(proof.get("tensor_Pa"), float), np.asarray(tensor, float)),
         proof.get("physical_arc_identity_sha256")
             == probe.get("physical_arc_identity", {}).get("sha256"),
@@ -2481,6 +2482,10 @@ def _directional_rate_source_identity(rates):
         "positive_J_J_per_m2", "K_directional_Pa_sqrt_m",
         "K_effective_Pa_sqrt_m", "resolved_opening_stress_Pa",
         "rate_s", "effective_rate_s", "clock_increment_per_second",
+        "ligament_kinetic_interpretation", "new_solid_length_m",
+        "virtual_solid_increment_m", "cavity_free_span_charged_as_solid",
+        "ordinary_front_owner_preserved",
+        "complete_ligament_energy_used_as_rate_argument",
     )
     return tuple({key: row.get(key) for key in keys} for row in rates)
 
@@ -2778,6 +2783,20 @@ def directional_sharp_front_rates(state, load_rows, *, branch_id, temperature_K=
             "G_kinetic_used_J_per_m2": G_kinetic,
             "G_kinetic_used": G_kinetic,
             "drive_source": load.get("drive_source", "LEGACY_DIRECTIONAL_J"),
+            "ligament_kinetic_interpretation": load.get(
+                "ligament_kinetic_interpretation"
+            ),
+            "new_solid_length_m": load.get("new_solid_length_m"),
+            "virtual_solid_increment_m": load.get("virtual_solid_increment_m"),
+            "cavity_free_span_charged_as_solid": load.get(
+                "cavity_free_span_charged_as_solid"
+            ),
+            "ordinary_front_owner_preserved": load.get(
+                "ordinary_front_owner_preserved"
+            ),
+            "complete_ligament_energy_used_as_rate_argument": load.get(
+                "complete_ligament_energy_used_as_rate_argument"
+            ),
             "tip_id": str(load.get("tip_id", branch_id)),
             "process_owner_id": process_owner_id,
             "accepted_state_id": load.get("accepted_state_id"),
@@ -3155,7 +3174,9 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
     if max_refinement_levels not in range(0,9): raise ValueError("source refinement budget must be 0..8")
     if refinement_region not in ("source_neighborhood","complete_cavity_ring"):
         raise ValueError("unregistered source refinement region")
-    if quality_improvement not in (False, True, "constrained_v1"):
+    if quality_improvement not in (
+        False, True, "constrained_v1", "deferred_constrained_v1",
+    ):
         raise ValueError("unregistered source quality strategy")
     cavity = state.void_state.cavities[0]
     if cavity.phase != VoidPhase.CONNECTED_VOID or state.crack_network.active_tip_ids:
@@ -3176,18 +3197,53 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
         if not quality_preparation["accepted"]:
             return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
                            "quality_preparation":quality_preparation,"operations":operations}
+    initial_scientific_unavailability = None
     try:
         previous = cavity_source_resolution_metrics(current)
     except CavitySourceRecoveryV3Unavailable as exc:
-        return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":[],
-                       "scientific_unavailability":str(exc), "operations":operations}
+        # An under-resolved accepted source is the reason this bounded native
+        # refinement exists.  Preserve the unavailable baseline explicitly,
+        # refine it without advancing any clock, and require two subsequently
+        # available meshes before qualification.
+        previous = None
+        initial_scientific_unavailability = str(exc)
     original_clock = (state.competition, state.rng_state)
     for level in range(1,max_refinement_levels+1):
+        if (quality_improvement == "deferred_constrained_v1"
+                and previous is not None and quality_preparation is None):
+            from .source_quality_transaction_v1 import repair_connected_quality
+            current, quality_preparation = repair_connected_quality(current)
+            if not quality_preparation["accepted"]:
+                return state, {
+                    "status": "SOURCE_TENSOR_UNQUALIFIED", "attempts": rows,
+                    "quality_preparation": quality_preparation,
+                    "operations": operations,
+                }
+            previous = cavity_source_resolution_metrics(current)
         position = np.asarray(cavity.connection_exit_m)
         centroids = current.mesh.nodes[current.mesh.elems].mean(axis=1)
+        local_h = np.sqrt(current.mesh.area_e)
         distance = (np.linalg.norm(centroids-position,axis=1) if refinement_region == "source_neighborhood"
             else np.abs(np.linalg.norm(centroids-np.asarray(cavity.center_m),axis=1)-cavity.radius_m))
-        marked = tuple(np.flatnonzero(distance <= .5*cavity.radius_m + 2*np.sqrt(current.mesh.area_e)))
+        selected = distance <= .5*cavity.radius_m + 2*local_h
+        if refinement_region == "source_neighborhood":
+            # A newly connected short ligament must retain two exact transport
+            # faces while the downstream arc is refined.  Include only that
+            # terminal accepted segment, not the historical wake or the full
+            # cavity circumference.
+            root_path = current.crack_network.branch(ROOT_BRANCH_ID).path
+            ligament_start = np.asarray(root_path[-2], dtype=float)
+            ligament_end = np.asarray(root_path[-1], dtype=float)
+            delta = ligament_end - ligament_start
+            fraction = np.clip(
+                ((centroids-ligament_start) @ delta)
+                / max(float(delta @ delta), 1.0e-300), 0.0, 1.0,
+            )
+            ligament_distance = np.linalg.norm(
+                centroids-(ligament_start+fraction[:, None]*delta), axis=1,
+            )
+            selected |= ligament_distance <= 2*local_h
+        marked = tuple(np.flatnonzero(selected))
         refined, _ = refine_accepted_state(current, marked_parent_elements=marked,
             active_tip_ids=(), generation=int(current.event_counters.get("mesh_generation",0))+1,
             operation_index=int(current.event_counters.get("refinement_operation_index",0))+1)
@@ -3208,7 +3264,7 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
                         **({"transport_boundary_tags_v2": fields["transport_boundary_tags_v2"]}
                            if "transport_boundary_tags_v2" in fields else {})})
         constrained_quality = None
-        if quality_improvement == "constrained_v1":
+        if quality_improvement in ("constrained_v1", "deferred_constrained_v1"):
             from .quality_constrained_mesh_v1 import constrained_quality_mesh, production_geometry_constraints
             fixed, protected = production_geometry_constraints(refined)
             quality_mesh, constrained_quality = constrained_quality_mesh(refined.mesh,
@@ -3246,6 +3302,16 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
         try:
             metrics = cavity_source_resolution_metrics(trial)
         except CavitySourceRecoveryV3Unavailable as exc:
+            if previous is None:
+                rows.append({
+                    "level": level,
+                    "qualified": False,
+                    "qualification_reason": "REFINED_SOURCE_STILL_UNAVAILABLE",
+                    "scientific_unavailability": str(exc),
+                })
+                current = trial
+                initial_scientific_unavailability = str(exc)
+                continue
             return state, {"status":"SOURCE_TENSOR_UNQUALIFIED", "attempts":rows,
                            "scientific_unavailability":str(exc), "operations":operations}
         proof = {"schema":"v12.cavity-source-local-refinement/1", "refinement_count":level,
@@ -3277,7 +3343,19 @@ def refine_downstream_source(state, *, max_refinement_levels=3,
             "vacancy_ledgers":dict(current.vacancy_ledgers),
             "vacancy_temperature_K":current.vacancy_temperature_K,
             "equilibrium_observables":current.equilibrium_observables.to_dict()}
-        if quality_improvement == "constrained_v1":
+        if previous is None:
+            proof["initial_scientific_unavailability"] = initial_scientific_unavailability
+            rows.append({
+                "level": level,
+                "proof": {key: value for key, value in proof.items()
+                          if key != "previous_source_capture"},
+                "qualified": False,
+                "qualification_reason": "FIRST_AVAILABLE_REFINED_BASELINE",
+            })
+            current = trial
+            previous = metrics
+            continue
+        if quality_improvement in ("constrained_v1", "deferred_constrained_v1"):
             from .source_quality_transaction_v1 import PROOF_SCHEMA, source_transfer_budget
             proof.update({"schema":PROOF_SCHEMA, "quality_preparation":quality_preparation,
                 "constrained_quality":constrained_quality,
@@ -3809,17 +3887,70 @@ def matched_ligament_energy_observation(
     }
 
 
+def local_incremental_cavity_candidate_drives(
+    state, *, branch_id, maximum_event_advance_m, refinement_levels=(3, 4),
+):
+    """Observe the selected local-incremental drive up to cavity contact.
+
+    The virtual operation separates only the remaining solid ligament.  It
+    neither removes nor charges the pre-existing cavity span, and it preserves
+    the ordinary front's candidate/clock owner.  Each candidate gets its own
+    physical increment because oblique rays need not have the same ligament.
+    """
+    limit = float(maximum_event_advance_m)
+    if not math.isfinite(limit) or limit <= 0.0:
+        raise ValueError("maximum event advance must be finite and positive")
+    void_state = getattr(state, "void_state", None)
+    if void_state is None or not getattr(void_state, "cavities", ()):
+        return ()
+    start = state.crack_network.branch(str(branch_id)).tip
+    output = []
+    for candidate in state.competition.candidates:
+        entry = _first_ray_cavity_intersection(state, start, candidate.direction_xy)
+        if entry is None:
+            continue
+        solid_length = math.dist(start, entry)
+        if solid_length > limit * (1.0 + 1.0e-12):
+            continue
+        # Keep the virtual endpoint strictly in solid so the cavity boundary
+        # remains an unchanged free surface in both matched-operation members.
+        delta = solid_length * (1.0 - 1.0e-8)
+        if delta <= 0.0:
+            raise RuntimeError("cavity contact has no positive remaining solid ligament")
+        provider = sharp_front_load_provider(
+            state, branch_id=str(branch_id), candidates=(candidate,),
+            evaluate_overlap_marginals=True,
+            marginal_delta_a_m=(delta,), marginal_mesh_levels=refinement_levels,
+            finite_increment_mode=True, matched_discretization=True,
+            virtual_mechanical_trial_transport="deferred_read_only",
+            mechanical_refinement_policy="legacy_accumulated_generations",
+        )
+        row = dict(provider["directional"][0])
+        row.update({
+            "ligament_kinetic_interpretation": (
+                LigamentKineticInterpretation.LOCAL_INCREMENTAL_FRONT.value
+            ),
+            "new_solid_length_m": solid_length,
+            "virtual_solid_increment_m": delta,
+            "cavity_free_span_charged_as_solid": False,
+            "ordinary_front_owner_preserved": True,
+            "complete_ligament_energy_used_as_rate_argument": False,
+        })
+        output.append(row)
+    return tuple(output)
+
+
 def dispatch_cavity_intersecting_candidate_drives(
     state, *, branch_id, directional_rows, maximum_event_advance_m,
-    refinement_levels=(3, 4),
+    refinement_levels=(3, 4), local_incremental_rows=(),
+    interpretation=LigamentKineticInterpretation.LOCAL_INCREMENTAL_FRONT,
 ):
-    """Replace only cavity-intersecting candidates by the finite ligament drive.
+    """Dispatch cavity-contact candidates under an explicit kinetic law.
 
-    Ordinary local-J or finite-advance rows are preserved verbatim.  A
-    candidate is dispatched only when its own ray reaches the current cavity
-    within the physical event-length support supplied by the caller.  The
-    replacement is the existing matched, fixed-load, complete-ligament energy
-    observation; it is never relabeled as local J.
+    The selected default is the local-incremental front.  Complete-ligament
+    energy remains available only through the explicitly named collective
+    alternative; it is never an automatic fallback for an unavailable local
+    drive.
     """
     rows = tuple(dict(row) for row in directional_rows)
     candidates = tuple(state.competition.candidates)
@@ -3834,6 +3965,10 @@ def dispatch_cavity_intersecting_candidate_drives(
     if not math.isfinite(limit) or limit <= 0.0:
         raise ValueError("maximum event advance must be finite and positive")
     start = state.crack_network.branch(str(branch_id)).tip
+    interpretation = LigamentKineticInterpretation(interpretation)
+    local_by_candidate = {
+        str(row["candidate_id"]): dict(row) for row in local_incremental_rows
+    }
     dispatched = []
     for candidate, row in zip(candidates, rows):
         entry = _first_ray_cavity_intersection(
@@ -3841,6 +3976,21 @@ def dispatch_cavity_intersecting_candidate_drives(
         )
         if entry is None or math.dist(start, entry) > limit * (1.0 + 1.0e-12):
             dispatched.append(row)
+            continue
+        if interpretation is LigamentKineticInterpretation.LOCAL_INCREMENTAL_FRONT:
+            local = local_by_candidate.get(str(candidate.candidate_id))
+            if local is None:
+                dispatched.append({
+                    **row,
+                    "directional_drive_status": "DIRECTIONAL_DRIVE_UNAVAILABLE",
+                    "directional_drive_unavailable_reason": (
+                        "LOCAL_INCREMENTAL_CAVITY_DRIVE_NOT_OBSERVED"
+                    ),
+                    "ligament_kinetic_interpretation": interpretation.value,
+                    "complete_ligament_energy_used_as_rate_argument": False,
+                })
+            else:
+                dispatched.append(local)
             continue
         observation = matched_ligament_energy_observation(
             state, branch_id=str(branch_id), candidate=candidate,
@@ -3873,6 +4023,8 @@ def dispatch_cavity_intersecting_candidate_drives(
             "K_directional_Pa_sqrt_m": K,
             "ligament_energy_observation": observation,
             "local_J_substituted": False,
+            "ligament_kinetic_interpretation": interpretation.value,
+            "complete_ligament_energy_used_as_rate_argument": True,
         })
     return tuple(dispatched)
 

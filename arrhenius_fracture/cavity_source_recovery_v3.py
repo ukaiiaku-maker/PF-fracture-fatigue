@@ -162,7 +162,21 @@ def recover_fixed_physical_arc_patch_v3(
     position = xy[node]
     source_radial = position - center
     source_distance = float(np.linalg.norm(source_radial))
-    geometry_tolerance = max(1.0e-12, 1.0e-8 * radius)
+    boundary_nodes = tuple(sorted({index for edge in edges for index in edge}))
+    boundary_radii = np.linalg.norm(xy[np.asarray(boundary_nodes)] - center, axis=1)
+    boundary_radial_deviation = float(np.max(np.abs(boundary_radii - radius)))
+    maximum_faceting_deviation = 0.05 * radius
+    if boundary_radial_deviation > maximum_faceting_deviation:
+        raise CavitySourceRecoveryV3Unavailable(
+            "the owned cavity boundary is inconsistent with its nominal radius"
+        )
+    # The owned free surface is polygonal.  Its exact edge intersections need
+    # not lie on the nominal analytic radius even though every owning vertex
+    # does.  Validate against the measured faceting envelope rather than an
+    # unrealistically pointwise circular tolerance.
+    geometry_tolerance = max(
+        1.0e-12, 1.0e-8 * radius, boundary_radial_deviation + 1.0e-12
+    )
     if abs(source_distance - radius) > geometry_tolerance:
         raise CavitySourceRecoveryV3Unavailable(
             "the exact source coordinate is inconsistent with the owned cavity"
@@ -270,6 +284,9 @@ def recover_fixed_physical_arc_patch_v3(
         "definition": "abs(s)<=0.5*min(R_void,L_pz); 0<=n<=0.5*min(R_void,L_pz)",
         "coordinate_system": "circular-cavity arc length s and outward radial depth n",
         "cavity_radius_m": radius,
+        "source_boundary_radius_m": source_distance,
+        "owned_boundary_radial_deviation_m": boundary_radial_deviation,
+        "geometry_consistency_tolerance_m": geometry_tolerance,
         "canonical_process_length_m": process_length,
         "physical_scale_m": physical_scale,
         "tangential_half_width_m": tangential_half_width,
@@ -287,6 +304,8 @@ def recover_fixed_physical_arc_patch_v3(
         "cavity_id": str(cavity_id),
         "cavity_center_m": center.tolist(),
         "cavity_radius_m": radius,
+        "source_boundary_radius_m": source_distance,
+        "owned_boundary_radial_deviation_m": boundary_radial_deviation,
         "boundary_position_m": position.tolist(),
         "normal_xy": normal.tolist(),
         "tangent_xy": tangent.tolist(),

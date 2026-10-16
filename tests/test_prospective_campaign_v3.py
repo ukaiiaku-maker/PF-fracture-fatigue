@@ -142,6 +142,8 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         and row["paired_arms_evolved_in_one_native_execution"] is True
         for row in p7_native
     )
+    assert all("--target-extension-um" in row["native_args"] for row in p7_native)
+    assert all("--steps" not in row["native_args"] for row in p7_native)
     assert {
         row["shared_options"]["cavity"] for row in p7_native
     } == {"disabled", "full_order_v5"}
@@ -151,6 +153,10 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     ]
     assert len(p7_preexisting) == 28
     assert all(row["native_args"] for row in p7_preexisting)
+    assert all(
+        row["cavity_material_bundle"].startswith("current_registry:")
+        for row in p7_preexisting
+    )
     assert all(
         row["cavity_geometry"]["preparation"]
         == "native_preexisting_resolved_zero_vacancy_debit"
