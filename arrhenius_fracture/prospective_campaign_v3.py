@@ -789,15 +789,18 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                         ),
                         "native_driver_binding": {
                             "specimen_driver": (
-                                "arrhenius_fracture.kinetic_progressive_2d_v1002"
+                                "arrhenius_fracture.mode_i_first_passage_"
+                                "v10_0_5_18_3_9_atomic_path_corridor"
                             ),
                             "cohesive_adapter": (
                                 "arrhenius_fracture.native_bilinear_stepper_v1"
                             ),
                             "accepted_state_owner": (
-                                "CampaignCalibratedCZMFrontEngine."
-                                "integrate_accommodation_only"
+                                "NativeBilinearFrontProvider on the current "
+                                "CalibratedMixedModeMPZV911Engine lineage"
                             ),
+                            "opening_clock_replaced": "inherited_EXP_floor",
+                            "persistent_source_owner_preserved": True,
                             "restart_owner": "fem-czm-specimen-checkpoint/1",
                         },
                         "launcher": [
@@ -813,13 +816,13 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                     }
                     row["readiness"].update({
                         "implementation": (
-                            "IMPLEMENTED_ESTABLISHED_NATIVE_SPECIMEN_"
-                            "BILINEAR_STEPPER"
+                            "IMPLEMENTED_ACTUAL_CURRENT_NATIVE_FRONT_"
+                            "BILINEAR_PROVIDER"
                         ),
                         "native_qualification": (
-                            "PUBLIC_NATIVE_SPECIMEN_BOUNDARY_CLOCK_SURFACE_AND_"
-                            "FRESH_PROCESS_RESTART_QUALIFIED_CONSTRUCTED_SUPPORT_"
-                            "ACTIVE_LIFECYCLE_COMPONENT_QUALIFIED"
+                            "PUBLIC_ACTUAL_ENGINE_ACTIVE_CLASSICAL_AND_ACTIVATED_"
+                            "EVENTS_FRESH_PROCESS_ACTIVE_RESTART_QUALIFIED_"
+                            "CONSTRUCTED_SUPPORT"
                         ),
                     })
                 row["execution"] = _execution(row)

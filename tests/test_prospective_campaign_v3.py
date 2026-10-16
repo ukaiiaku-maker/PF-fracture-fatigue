@@ -42,13 +42,25 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     )
     assert all(
         row["readiness"]["implementation"]
-        == "IMPLEMENTED_ESTABLISHED_NATIVE_SPECIMEN_BILINEAR_STEPPER"
+        == "IMPLEMENTED_ACTUAL_CURRENT_NATIVE_FRONT_BILINEAR_PROVIDER"
         for row in fitted
     )
     assert all(
         row["qualification_execution"]["native_driver_binding"][
             "specimen_driver"
-        ] == "arrhenius_fracture.kinetic_progressive_2d_v1002"
+        ] == (
+            "arrhenius_fracture.mode_i_first_passage_"
+            "v10_0_5_18_3_9_atomic_path_corridor"
+        )
+        for row in fitted
+    )
+    assert all(
+        row["qualification_execution"]["native_driver_binding"][
+            "opening_clock_replaced"
+        ] == "inherited_EXP_floor"
+        and row["qualification_execution"]["native_driver_binding"][
+            "persistent_source_owner_preserved"
+        ] is True
         for row in fitted
     )
     assert all(
