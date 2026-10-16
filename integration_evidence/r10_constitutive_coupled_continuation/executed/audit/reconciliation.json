@@ -1,0 +1,697 @@
+{
+  "authorized_continuation_contract": {
+    "coordinate": "coherent multiplicative emission characteristic-stress scale",
+    "independent_temperature_endpoint_optimization": false,
+    "inherited_transform": "Peierls and Taylor receive the same sigc(T) through emission",
+    "must_remain_exactly_unchanged": [
+      "opening complete EXP_floor surface",
+      "emission G00 and gT (including activation entropy)",
+      "emission alpha, exponent, floor, and attempt frequency",
+      "Peierls H0, activation entropy, alpha, exponent, and attempt frequency",
+      "Taylor H0, activation entropy, alpha, exponent, and attempt frequency",
+      "all state-evolution, source, geometry, mechanics, event, and reward fields"
+    ],
+    "required_transform": [
+      "emit_sigc0_offspring = scale * emit_sigc0_parent",
+      "emit_sT_offspring = scale * emit_sT_parent"
+    ]
+  },
+  "cross_mechanism_coupling": {
+    "peierls": {
+      "active_sT_over_emission": 1.0,
+      "active_sigc0_over_emission": 1.0,
+      "parent_sT_over_emission": 1.0,
+      "parent_sigc0_over_emission": 1.0
+    },
+    "taylor": {
+      "active_sT_over_emission": 1.0,
+      "active_sigc0_over_emission": 1.0,
+      "parent_sT_over_emission": 1.0,
+      "parent_sigc0_over_emission": 1.0
+    }
+  },
+  "decision": "RECONCILED_BEFORE_FURTHER_THERMAL_GENERATION",
+  "evaluated_rows": {
+    "historical_active_endpoint_row": {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_V1",
+      "complete_row_sha256": "d7359b657ab9723ab20fc95a3ef291f555adffc39565db7b9a7c7650e4ff8eb1",
+      "surfaces": {
+        "emission": {
+          "G00_eV": 1.096369176369715,
+          "alpha": 0.6522800833545626,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889902755,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 6.810192505683837,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 3.888006656699019,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 1.2342253868016524,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.9999999999999996,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 6.138095850110057,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 2.848639676227029,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.8921126934008262,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.2499999999999996,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 4.913645138054407,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 1.5104622261456087,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.5500000000000002,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.4999999999999996,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.8178969756700099,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.0007602504297796134,
+          "sT_GPa_per_K": -0.0016666666666666668,
+          "sigc0_GPa": 2.697783333333333
+        },
+        "opening": {
+          "G00_eV": 1.1060847791228108,
+          "alpha": 0.5887163921130266,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866812989546,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -22.808856035587706,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -21.118224437553337,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.7502246541228108,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.2468960742524041,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866814277905,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -18.96955450221101,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -17.979629127381262,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 1.6333496541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.373448037126203,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866811701186,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -19.1849735992092,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -18.261411812666456,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 2.5164746541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.500000000000001,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.25000000000000006,
+          "floor_fraction": 0.48726421565281924,
+          "gT_eV_per_K": 0.0019625,
+          "sT_GPa_per_K": 0.00472567102860844,
+          "sigc0_GPa": 1.1038020018699726
+        },
+        "peierls": {
+          "G00_eV": 5.107608093612558,
+          "alpha": 0.2264547564554959,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 78.84637201425282,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 34.737406226348995,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 6.371094221619522,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.9999999999999996,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 68.82257040205805,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 9.51438895096963,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 3.235547110809761,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.2499999999999996,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 34.870821137432685,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.06767934456338673,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.09999999999999964,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.4999999999999996,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.9374389592558143,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.006967882468466136,
+          "sT_GPa_per_K": -0.0016666666666666668,
+          "sigc0_GPa": 2.697783333333333
+        },
+        "taylor": {
+          "G00_eV": 3.1092449876738772,
+          "alpha": 1.055419295541942,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 26.610279980381513,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 5.455220139346314,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 3.886179454974452,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.9999999999999996,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.72122707088041,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 18.035124338618303,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 1.8187307241274615,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 1.958089727487226,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.2499999999999996,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 6.06737385323995,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.08651575179478559,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.029999999999999805,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.4999999999999996,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.0061173520516604,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.004284643838860502,
+          "sT_GPa_per_K": -0.0016666666666666668,
+          "sigc0_GPa": 2.697783333333333
+        }
+      }
+    },
+    "retained_parent": {
+      "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "complete_row_sha256": "8ffdbb1084e3465b3ded48e223b72546e42985d4f7716e209a27517b5f1fac44",
+      "surfaces": {
+        "emission": {
+          "G00_eV": 1.096369176369715,
+          "alpha": 0.6522800833545626,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889902755,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -2.516326065053094,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -0.35341502483543624,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 1.2342253868016524,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.7213545047154422,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -0.18335180812978308,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -0.3871174531348752,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.8921126934008262,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.110677252357721,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 1.7114715098598705,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.03623656257316115,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.5500000000000002,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.5,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.8178969756700099,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.0007602504297796134,
+          "sT_GPa_per_K": 0.0008651616614272865,
+          "sigc0_GPa": 0.878234268782052
+        },
+        "opening": {
+          "G00_eV": 1.1060847791228108,
+          "alpha": 0.5887163921130266,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866812989546,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -22.808856035587706,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -21.118224437553337,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.7502246541228108,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.2468960742524041,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866814277905,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -18.96955450221101,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -17.979629127381262,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 1.6333496541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.373448037126203,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866811701186,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -19.1849735992092,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -18.261411812666456,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 2.5164746541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.500000000000001,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.25000000000000006,
+          "floor_fraction": 0.48726421565281924,
+          "gT_eV_per_K": 0.0019625,
+          "sT_GPa_per_K": 0.00472567102860844,
+          "sigc0_GPa": 1.1038020018699726
+        },
+        "peierls": {
+          "G00_eV": 5.107608093612558,
+          "alpha": 0.2264547564554959,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -14.675996415645868,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.15875886889040008,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 6.371094221619522,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.7213545047154422,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -1.3449528150170078,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.1573391037634199,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 3.235547110809761,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.110677252357721,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 33.49462244719652,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.04885671037531457,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.09999999999999964,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.5,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.9374389592558143,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.006967882468466136,
+          "sT_GPa_per_K": 0.0008651616614272865,
+          "sigc0_GPa": 0.878234268782052
+        },
+        "taylor": {
+          "G00_eV": 3.1092449876738772,
+          "alpha": 1.055419295541942,
+          "cases": [
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -2.181425405419092,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.0965694625080331,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 3.886179454974452,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.7213545047154422,
+              "temperature_K": 300.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.72122707088041,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 0.02082181213448712,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.07957634877532145,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 1.958089727487226,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.110677252357721,
+              "temperature_K": 750.0
+            },
+            {
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 5.918338046502174,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.08030041225764009,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "raw_G0_eV": 0.029999999999999805,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.5,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.0061173520516604,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.004284643838860502,
+          "sT_GPa_per_K": 0.0008651616614272865,
+          "sigc0_GPa": 0.878234268782052
+        }
+      }
+    }
+  },
+  "historical_row_disposition": {
+    "active_acquisition": {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_V1",
+      "reason": "emit_sigc(300 K) and emit_sigc(1200 K) were independently selected",
+      "status": "PRESERVED_NON_PROMOTABLE"
+    },
+    "thermal_refinement": {
+      "candidate_ids": [
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1925_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1925_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS6P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS8P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS10P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_CS3P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_CS3P5GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_CS4P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1925_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS6P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS8P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS10P0GPA_V2"
+      ],
+      "reason": "opening cold/hot coordinates were independently selected",
+      "registries": [
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement/thermal_refinement_candidates.csv",
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement_narrow/thermal_refinement_candidates.csv",
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement_low_sigc/thermal_refinement_candidates.csv",
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement_p3_2d/thermal_refinement_candidates.csv"
+      ],
+      "status": "PRESERVED_NON_PROMOTABLE"
+    }
+  },
+  "portable_source": {
+    "G0_formula": "G0_eV = G00_eV + gT_eV_per_K*(T_K-Tref_K)",
+    "Gfloor_formula": "Gfloor_eV = min(Gfloor_max_fraction*G0_eV, max(Gfloor_min_eV, Gfloor_fraction*G0_eV))",
+    "formula": "DeltaG_eV = Gfloor_eV + (G0_eV-Gfloor_eV)*exp(-a*(sigma_Pa/sigc_Pa)^n)",
+    "model_type": "EXP_floor",
+    "parameters": {
+      "G00_eV": 1.9402178077061367,
+      "Gfloor_fraction": 0.02,
+      "Gfloor_max_fraction": 0.95,
+      "Gfloor_min_eV": 0.0001,
+      "Tmax_K": 673,
+      "Tmin_K": 298,
+      "Tref_K": 481.3333333333333,
+      "a": 0.08456845038107398,
+      "gT_eV_per_K": 0.003933667018163469,
+      "n": 0.9999999894757535,
+      "sT_Pa_per_K": -656405.0042962168,
+      "sigc0_Pa": 2297967649.09709
+    },
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/1_nanopillar/modulusdata_correctscalingSTDEV_EXPfit/temperature/BarrierModel_Export.json",
+    "sha256": "f9c1a2d2f49be2d346d362cf56f9a07d211866e7a9a381ef83301510fb8383ed",
+    "sigc_formula": "sigc_Pa = sigc0_Pa + sT_Pa_per_K*(T_K-Tref_K)",
+    "system": "W[100]"
+  },
+  "runtime_constitutive_mapping": {
+    "activation_entropy": "S_star(stress,T)=-partial DeltaG_EXP_floor/partial T",
+    "opening_and_emission": "direct ExpFloorBarrier affine G0(T), sigc(T), and source floor law",
+    "peierls_and_taylor": "nonzero activation_entropy_kB sets gT=-S*kB; sigc0 and sT are inherited together from emission through TransportBarrier.as_surface",
+    "rate": "nu0*exp(-DeltaG_EXP_floor(stress,T)/(kB*T))",
+    "separate_entropy_prefactor": false
+  },
+  "schema": "r10.constitutive-temperature-lineage/1"
+}

@@ -1,0 +1,25 @@
+{
+  "affine_energy_slopes_changed": false,
+  "candidates": [
+    {
+      "candidate_id": "R10K_WEAKT_COUPLED_S3P0_OPEN_SCALE_0P6_V1",
+      "complete_row_sha256": "f99a01333d4174a4decedfdb99e4eed68658d48209382d07417ed416e9c09e13",
+      "opening_stress_scale": 0.6
+    },
+    {
+      "candidate_id": "R10K_WEAKT_COUPLED_S3P0_OPEN_SCALE_0P7_V1",
+      "complete_row_sha256": "d99c27012638bd843e6282ba0dc79b6c6fecf17af817f3061b0ba7fb7eb79ee6",
+      "opening_stress_scale": 0.7
+    },
+    {
+      "candidate_id": "R10K_WEAKT_COUPLED_S3P0_OPEN_SCALE_0P8_V1",
+      "complete_row_sha256": "819655b787297412067551eb00e941cae97a8bfff63982bb4b1a20dcd6a84663",
+      "opening_stress_scale": 0.8
+    }
+  ],
+  "independent_endpoint_fit": false,
+  "next_gate": "refined 900/1050/1200 K response map",
+  "parent_candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+  "schema": "r10.weakt-coupled-opening-scale/1",
+  "transport_activation_entropy_changed": false
+}

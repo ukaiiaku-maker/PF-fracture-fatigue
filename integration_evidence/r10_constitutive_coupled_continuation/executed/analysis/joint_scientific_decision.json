@@ -1,0 +1,69 @@
+{
+  "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+  "complete_row_sha256": "f038908e97361b282de7666df65b6040b0d3e98bf332fd55dafaa0ee69b050ef",
+  "constitutive_reconciliation": {
+    "activation_entropy_zeroed": false,
+    "decision": "RECONCILED_BEFORE_FURTHER_THERMAL_GENERATION",
+    "empirical_temperature_law_added": false,
+    "historical_endpoint_rows": "PRESERVED_NON_PROMOTABLE",
+    "independent_endpoint_optimization_withdrawn": true,
+    "portable_source_sha256": "f9c1a2d2f49be2d346d362cf56f9a07d211866e7a9a381ef83301510fb8383ed"
+  },
+  "fatigue": {
+    "DeltaK_MPa_sqrt_m": [
+      15.00000003,
+      21.99999996
+    ],
+    "full_historical_five_point_curve": "preserved but not promoted as corrected-row evidence",
+    "rates_m_per_cycle": [
+      7.192549205365151e-10,
+      2.7526915935834525e-09
+    ],
+    "slope": 3.504297110842671,
+    "status": "PASS_HIGH_PAIR"
+  },
+  "fracture": {
+    "K_init_MPa_sqrt_m": [
+      5.218400197569707,
+      6.256060922786801,
+      5.6305513146209165,
+      5.170886763626391,
+      4.894465809966608,
+      9.365396066606667,
+      8.580168626827168
+    ],
+    "limit": 1.25,
+    "span": 1.9134664394908834,
+    "status": "FAIL_REFINED_WEAK_T_SPAN",
+    "temperatures_K": [
+      300.0,
+      450.0,
+      600.0,
+      750.0,
+      900.0,
+      1050.0,
+      1200.0
+    ]
+  },
+  "joint_decision": "NO_PROMOTION_FRACTURE_GATE_FAILED",
+  "next_search_constraint": "continue only with original EXP_floor P1/P2 reference-state shape/level coordinates and the same affine thermal coefficients; do not resume endpoint fitting",
+  "preserved_results": [
+    "all pre-reconciliation runs and checkpoints",
+    "historical S3.0 five-point fatigue curve as non-promotable diagnostic evidence",
+    "opening-dominated common-barrier positive control",
+    "DBTT and Peak fatigue evidence with their existing causal classifications"
+  ],
+  "same_complete_material_execution": {
+    "fatigue": "fresh candidate-bound native 300 K 15/22 DeltaK developed pair",
+    "fracture": "fresh refined seven-temperature current-backend panel",
+    "shared_complete_row_sha256": "f038908e97361b282de7666df65b6040b0d3e98bf332fd55dafaa0ee69b050ef"
+  },
+  "same_row_2D_status": "NOT_RUN_JOINT_1D_GATE_FAILED",
+  "schema": "r10.constitutive-coupled-continuation-result/1",
+  "stopped_dominated_rows": [
+    "R10K_WEAKT_COUPLED_EMIT_SCALE_S2P6_V1",
+    "R10K_WEAKT_COUPLED_EMIT_SCALE_S2P8_V1",
+    "R10K_WEAKT_COUPLED_S3P0_OPEN_SCALE_0P6_V1",
+    "R10K_WEAKT_COUPLED_S3P0_OPEN_SCALE_0P8_V1"
+  ]
+}
