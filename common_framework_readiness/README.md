@@ -26,10 +26,13 @@ specified public IDs `exp_floor_activated_native`,
 `bilinear_barrier_activated`, and `bilinear_czm_classical`. The latter two keep
 their old internal names only as compatibility aliases. Their present material
 support is constructed qualification input, not a production calibration. Both
-public bilinear routes execute the solved native moving-tip specimen: free-DOF
-mechanics, native plastic accommodation, adaptive cohesive topology, accepted
-physical time/event ownership, unload/reload, state transfer and exact active
-restart. They are not the older fixed-kinematic component fixture.
+public bilinear routes install their cohesive stepper inside the established
+`kinetic_progressive_2d_v1002` specimen driver, retaining its requested mesh,
+loading, source geography, adaptive topology, accepted event lifecycle and
+fresh-process checkpoint owner. The authoritative persistent-source consumer
+advances once per accepted physical interval; mechanics callbacks advance no
+kinetic time. The older compact solved fixture remains useful component
+evidence, but is not the campaign driver.
 
 Current resource admission is workload-specific. R07 and R09 retain exact
 accepted checkpoints and commands, but their substantial continuations are not

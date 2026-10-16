@@ -787,6 +787,19 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                         "native_entrypoint": (
                             "arrhenius_fracture.generic_current_pf_companion"
                         ),
+                        "native_driver_binding": {
+                            "specimen_driver": (
+                                "arrhenius_fracture.kinetic_progressive_2d_v1002"
+                            ),
+                            "cohesive_adapter": (
+                                "arrhenius_fracture.native_bilinear_stepper_v1"
+                            ),
+                            "accepted_state_owner": (
+                                "CampaignCalibratedCZMFrontEngine."
+                                "integrate_accommodation_only"
+                            ),
+                            "restart_owner": "fem-czm-specimen-checkpoint/1",
+                        },
                         "launcher": [
                             "python", "-m",
                             "arrhenius_fracture.generic_current_pf_companion",
@@ -800,11 +813,13 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                     }
                     row["readiness"].update({
                         "implementation": (
-                            "IMPLEMENTED_GENERIC_SOLVED_NATIVE_MOVING_TIP_BILINEAR"
+                            "IMPLEMENTED_ESTABLISHED_NATIVE_SPECIMEN_"
+                            "BILINEAR_STEPPER"
                         ),
                         "native_qualification": (
-                            "SOLVED_FREE_DOF_MOVING_TIP_ACCOMMODATION_TOPOLOGY_"
-                            "WORK_ROLLBACK_ACTIVE_RESTART_QUALIFIED_CONSTRUCTED_SUPPORT"
+                            "PUBLIC_NATIVE_SPECIMEN_BOUNDARY_CLOCK_SURFACE_AND_"
+                            "FRESH_PROCESS_RESTART_QUALIFIED_CONSTRUCTED_SUPPORT_"
+                            "ACTIVE_LIFECYCLE_COMPONENT_QUALIFIED"
                         ),
                     })
                 row["execution"] = _execution(row)

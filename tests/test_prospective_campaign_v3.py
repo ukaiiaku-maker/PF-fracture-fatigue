@@ -42,7 +42,13 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     )
     assert all(
         row["readiness"]["implementation"]
-        == "IMPLEMENTED_GENERIC_SOLVED_NATIVE_MOVING_TIP_BILINEAR"
+        == "IMPLEMENTED_ESTABLISHED_NATIVE_SPECIMEN_BILINEAR_STEPPER"
+        for row in fitted
+    )
+    assert all(
+        row["qualification_execution"]["native_driver_binding"][
+            "specimen_driver"
+        ] == "arrhenius_fracture.kinetic_progressive_2d_v1002"
         for row in fitted
     )
     assert all(
