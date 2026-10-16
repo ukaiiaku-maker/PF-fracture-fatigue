@@ -2,31 +2,32 @@
   "schema": "fracture-framework-final-source-qualification/2",
   "date": "2026-10-16",
   "source_pair": {
-    "pf_calculation_and_campaign_commit": "b41628f6f3a939b06ecebf87f9d55a8f69f1ba7a",
-    "fem_commit": "0dcee64a1f96cc4c05aacc3b3032862ddc5ac273"
+    "pf_calculation_and_campaign_commit": "2dd1372fb45a4b4dd07d77ec5e85ee1bdab25f69",
+    "fem_commit": "7fde6894fe44038f9dc785da87967056a7d12406"
   },
   "pf": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q -m 'not external_evidence'",
     "result": "PASS",
     "passed": 1008,
     "deselected_external_evidence": 16,
-    "duration_s": 96.45
+    "duration_s": 133.45
   },
   "fem": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python -m pytest -q",
     "result": "PASS",
-    "passed": 757,
+    "passed": 759,
     "passing_subtests": 16,
-    "duration_s": 82.10
+    "duration_s": 106.07
   },
   "focused_native_evidence": {
-    "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@ee634968:integration_evidence/r05_controller_transaction_20261016/qualification_report.json",
-    "specified_public_option_names": "fem-czm-current-pf-companion@12971d37:tests/test_bilinear_cohesive_request_v1.py",
-    "prepared_r07_resumption": "fem-czm-current-pf-companion@0dcee64a:scripts/resume_r07_exp_floor_event.py; dry-run regression passed",
-    "moving_tip_and_exp_floor_lifecycle_tests": "30 passed in 0.89 s",
+    "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@7fde6894:integration_evidence/r05_solved_native_moving_tip_20261016/{activated_v2,classical_v2}/solved_moving_tip_bilinear_qualification.json",
+    "specified_public_option_names": "fem-czm-current-pf-companion@7fde6894:tests/test_generic_current_pf_companion.py; tests/test_bilinear_cohesive_request_v1.py",
+    "prepared_r07_resumption": "fem-czm-current-pf-companion@7fde6894:scripts/resume_r07_exp_floor_event.py; preserved dry-run regression",
+    "moving_tip_and_exp_floor_lifecycle_tests": "43 passed in 1.34 s",
     "cohesive_family_tests": "41 passed in 1.47 s",
     "campaign_and_binding_tests": "40 passed in 2.55 s",
-    "campaign_acceptance": "PASS; 699 disabled cases; 663 native command bindings; five selective constraint/mixity rows"
+    "campaign_acceptance": "PASS; 699 disabled cases; 699 native command bindings; 36 fitted bilinear solved-native qualification requests; five selective constraint/mixity rows",
+    "resource_admission": "RESOURCE_ADMISSION_20261016.json; measured host state is separated from workload estimates; R07/R09 not admitted"
   },
   "external_evidence_boundary": {
     "portable_test_profile": "PASS_WITH_16_EXTERNAL_EVIDENCE_TESTS_DESELECTED",
