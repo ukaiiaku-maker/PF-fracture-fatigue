@@ -1,6 +1,11 @@
 {
   "files": [
     {
+      "bytes": 5308,
+      "path": "README.md",
+      "sha256": "db769eb1a29f6ae0bd5a1c5f1e49b78b5eb799b55f925712e892f2c3e0c15c0b"
+    },
+    {
       "bytes": 11093,
       "path": "executed/corrected_eligibility_search/corrected_eligibility.csv",
       "sha256": "6107619148c2f450c51e1284998d0d90657b4d64806d7ead317b3fbeea4b25db"
@@ -49,6 +54,46 @@
       "bytes": 17155,
       "path": "executed/family_a_acquisition/strict_family_a_candidate_rows.csv",
       "sha256": "9292289fc704be44208abda6f85744feb13a22a24ed8eed38000e1c92026a63d"
+    },
+    {
+      "bytes": 33469,
+      "path": "executed/family_a_joint_execution/emit_m060/T_0300K.json",
+      "sha256": "3e24c984dfd5ef4d1b0189247ab71bc51601e0c33276740fba7b85473f100372"
+    },
+    {
+      "bytes": 18917,
+      "path": "executed/family_a_joint_execution/emit_m060/T_0450K.json",
+      "sha256": "0aa683774c914fa7a264bfa0d8bccc3330b97fbf91a370ba3bcf16797e795d25"
+    },
+    {
+      "bytes": 33472,
+      "path": "executed/family_a_joint_execution/emit_p060/T_0300K.json",
+      "sha256": "057e09c206217cd959609de92e9924d24a6e7ebc64d518bed2042ffe31084e67"
+    },
+    {
+      "bytes": 18917,
+      "path": "executed/family_a_joint_execution/emit_p060/T_0450K.json",
+      "sha256": "a015a5ba7d7021a863b659cf782ffaec74268e0a4752020abcffd13a6c736668"
+    },
+    {
+      "bytes": 2259,
+      "path": "executed/family_a_joint_execution/family_a_joint_fracture_screen.csv",
+      "sha256": "c6c2ef7d246eba55d763d5f98d6f50557069a27b99311f525f5d8f7eb972c8f8"
+    },
+    {
+      "bytes": 4541,
+      "path": "executed/family_a_joint_execution/joint_execution_decision.json",
+      "sha256": "3414a7e59b4f43064f82e1c2e60ad6e8ab1bc109c8cefb8d51216ce1ec9d4265"
+    },
+    {
+      "bytes": 33487,
+      "path": "executed/family_a_joint_execution/open/T_0300K.json",
+      "sha256": "2247f04007a986ace7caf682d10feef8671d4b6166ef15df8b465237bd03343c"
+    },
+    {
+      "bytes": 18914,
+      "path": "executed/family_a_joint_execution/open/T_0450K.json",
+      "sha256": "79b8cef4e162457c7eb2f7a267c5cf6cd09e8bbe2072d2eec7ad1b3dda942bfd"
     },
     {
       "bytes": 7519,
@@ -156,6 +201,11 @@
       "sha256": "532c964a6acbe43a0ef1207a306966b2f6954869d65f21ba9fdb54604eb21fe8"
     },
     {
+      "bytes": 4769,
+      "path": "source/scripts/analyze_r10_family_a_joint_execution.py",
+      "sha256": "5689303e7c83e10221dbee36dde68b8c03c25b4754f8dfe4f8e4491dc1595edc"
+    },
+    {
       "bytes": 13719,
       "path": "source/scripts/design_r10_family_a_discrepancy_acquisition.py",
       "sha256": "1bd020d7d18434983d828ebce6440bf7c77bb8b4681b08fe1c1be4c6bd9fcd96"
@@ -171,5 +221,5 @@
       "sha256": "abb7a7e112a2e6207ff110d8b1e8fb4878f2afe796456233778a006e278cb137"
     }
   ],
-  "schema": "r10.v2-p25-developed-completion-package/1"
+  "schema": "r10.v2-p25-developed-completion-package/2"
 }

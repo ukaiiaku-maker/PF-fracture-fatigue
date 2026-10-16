@@ -33,6 +33,20 @@ The leading opening candidate is `R10A_WEAKT_P40_OPEN_P036MEV_V1`. It has correc
 
 These rows are executable strict-Family-A hypotheses, not qualified materials. They require same-row full-state fracture and developed fatigue before any promotion; new 2-D work remains gated behind those 1-D results.
 
+## Executed joint gate
+
+The three selected hypotheses were subsequently executed through the decisive 300/450 K full-state fracture screen with the unchanged current backend:
+
+| Candidate | K-init at 300 K (MPa sqrt(m)) | 450 K result | Span lower bound |
+|---|---:|---|---:|
+| `R10A_WEAKT_P40_OPEN_P036MEV_V1` | 5.237397 | no event through K=80 | 15.2748 |
+| `R10A_WEAKT_P40_EMIT_M060MEV_V1` | 5.242302 | no event through K=80 | 15.2605 |
+| `R10A_WEAKT_P40_EMIT_P060MEV_V1` | 5.233339 | no event through K=80 | 15.2866 |
+
+All three fail the Weak-T fracture gate. The 450 K terminal hazard actions are approximately `2.22e-8`, leaving essentially the complete unit mark pending; these are physical K-endpoint censors, not work-budget stops. Their remaining 600--1200 K panels were intentionally stopped after this decisive result. Same-row fatigue and 2-D were not run because the established workflow forbids those expensive stages after joint 1-D fracture rejection.
+
+The updated feasible set therefore contains no strict-Family-A Weak-T success. Family-B V2-P25 remains the completed benchmark at its stated scope. The next analytical acquisition must require 450 K opening-action accessibility before another full-state launch and must use lawful coupled thermal/nucleation/motion coordinates rather than independently fitted endpoints.
+
 ## Reproduction and contents
 
 The portable tree includes the three complete trajectory results, their final checkpoint state and history, exact source registries, the analytical screen and projection frontier, completed slope tables, strict-Family-A candidate records, source scripts, and focused tests. `MANIFEST.json` records SHA-256 hashes and sizes for the packaged inputs.

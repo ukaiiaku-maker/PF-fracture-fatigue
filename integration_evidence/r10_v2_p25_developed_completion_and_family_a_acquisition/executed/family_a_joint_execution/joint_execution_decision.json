@@ -1,0 +1,70 @@
+{
+  "closed_findings": [
+    "candidate eligibility and endpoint-censor semantics remain closed",
+    "the 3.339 startup secant remains excluded",
+    "original thermal slopes and transport entropies were preserved in all executed candidates",
+    "no endpoint fitting, new physics, or alternative mechanics was introduced"
+  ],
+  "decision": "ALL_THREE_ACQUIRED_FAMILY_A_ROWS_REJECTED_BY_450K_FRACTURE_GATE",
+  "executed_rows": [
+    {
+      "Kendpoint_450_MPa_sqrt_m": 80.0,
+      "Kinit_300_MPa_sqrt_m": 5.237396657908609,
+      "candidate_id": "R10A_WEAKT_P40_OPEN_P036MEV_V1",
+      "cold_artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/family_a_discrepancy_acquisition/full_state/open/T_0300K.json",
+      "event_count_300": 11,
+      "event_count_450": 0,
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "fatigue_action": "NOT_AUTHORIZED_AFTER_DECISIVE_JOINT_FRACTURE_REJECTION",
+      "fracture_gate": "FAIL_PHYSICAL_450K_ENDPOINT_NO_EVENT",
+      "fracture_span_lower_bound": 15.27476439639107,
+      "hot_artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/family_a_discrepancy_acquisition/full_state/open/T_0450K.json",
+      "hot_hazard_action_current": 2.227393184821049e-08,
+      "hot_pending_mark_action": 0.9999999777260682,
+      "spatial_action": "NOT_AUTHORIZED_BEFORE_JOINT_1D_PASS"
+    },
+    {
+      "Kendpoint_450_MPa_sqrt_m": 80.0,
+      "Kinit_300_MPa_sqrt_m": 5.242301578798175,
+      "candidate_id": "R10A_WEAKT_P40_EMIT_M060MEV_V1",
+      "cold_artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/family_a_discrepancy_acquisition/full_state/emit_m060/T_0300K.json",
+      "event_count_300": 11,
+      "event_count_450": 0,
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "fatigue_action": "NOT_AUTHORIZED_AFTER_DECISIVE_JOINT_FRACTURE_REJECTION",
+      "fracture_gate": "FAIL_PHYSICAL_450K_ENDPOINT_NO_EVENT",
+      "fracture_span_lower_bound": 15.260472675503804,
+      "hot_artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/family_a_discrepancy_acquisition/full_state/emit_m060/T_0450K.json",
+      "hot_hazard_action_current": 2.21817638621595e-08,
+      "hot_pending_mark_action": 0.9999999778182361,
+      "spatial_action": "NOT_AUTHORIZED_BEFORE_JOINT_1D_PASS"
+    },
+    {
+      "Kendpoint_450_MPa_sqrt_m": 80.0,
+      "Kinit_300_MPa_sqrt_m": 5.233339006423081,
+      "candidate_id": "R10A_WEAKT_P40_EMIT_P060MEV_V1",
+      "cold_artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/family_a_discrepancy_acquisition/full_state/emit_p060/T_0300K.json",
+      "event_count_300": 11,
+      "event_count_450": 0,
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "fatigue_action": "NOT_AUTHORIZED_AFTER_DECISIVE_JOINT_FRACTURE_REJECTION",
+      "fracture_gate": "FAIL_PHYSICAL_450K_ENDPOINT_NO_EVENT",
+      "fracture_span_lower_bound": 15.286607632682095,
+      "hot_artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/family_a_discrepancy_acquisition/full_state/emit_p060/T_0450K.json",
+      "hot_hazard_action_current": 2.2366011491629483e-08,
+      "hot_pending_mark_action": 0.9999999776339885,
+      "spatial_action": "NOT_AUTHORIZED_BEFORE_JOINT_1D_PASS"
+    }
+  ],
+  "joint_consequence": {
+    "fatigue": "not run: decisive same-row fracture rejection",
+    "same_row_2D": "not run: gated behind joint 1D fracture/fatigue pass",
+    "stopped_temperatures": "600--1200 K omitted after the decisive 300/450 K result"
+  },
+  "next_acquisition": "return to the permitted complete-law analytical bank and require 450 K opening-action accessibility before another expensive current-state run; vary lawful coupled thermal and nucleation/motion coordinates, not independent temperature endpoints",
+  "schema": "r10.family-a-joint-execution/1",
+  "updated_feasible_set": {
+    "Family-B Weak-T benchmark": "P25_TJBSV2_S_026704 retains completed three-point developed fatigue plus historical fracture/2D receipts; benchmark only, not strict-Family-A success",
+    "strict-Family-A Weak-T": "no jointly feasible row established"
+  }
+}
