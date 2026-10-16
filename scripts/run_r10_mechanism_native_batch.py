@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -15,7 +16,7 @@ from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY
 from arrhenius_fracture.paris_slope_r9 import run_trajectory
 from arrhenius_fracture.retained_material_r10 import load_offspring_binding
 from scripts.run_r10_current_fracture_panel import run as run_fracture
-from scripts.run_r10_global_mechanism_search import EVENT_LENGTH_M, LOADS, phase_action
+from scripts.run_r10_global_mechanism_search import EVENT_LENGTH_M, phase_action
 
 
 def atomic_json(path: Path, value: object) -> None:
@@ -24,20 +25,25 @@ def atomic_json(path: Path, value: object) -> None:
     tmp.replace(path)
 
 
-def choose_loads(row: dict, temperature_K: float) -> tuple[list[float], list[dict]]:
+def choose_loads(row: dict, temperature_K: float,
+                 targets: tuple[float, float, float] = (1e-9, 1e-7, 1e-5)
+                 ) -> tuple[list[float], list[dict]]:
+    # Invert the same A0 law on a dense load grid.  The targets span four
+    # decades but remain below cooperative saturation; no full-state transfer
+    # or empirical attenuation is used to choose them.
+    grid = [1.0 + 39.0 * i / 779.0 for i in range(780)]
     refs = []
-    for Kmax in LOADS:
+    for Kmax in grid:
         action = phase_action(row, "cleave", float(Kmax), temperature_K)
         refs.append({"Kmax_MPa_sqrt_m": float(Kmax), "DeltaK_MPa_sqrt_m": 0.9 * float(Kmax),
                      "opening_action_per_cycle": action,
                      "A0_physical_m_per_cycle": EVENT_LENGTH_M * action})
-    viable = [i for i, r in enumerate(refs) if 1e-13 <= r["A0_physical_m_per_cycle"] <= 1e-4]
-    pool = viable if len(viable) >= 3 else list(range(len(refs)))
-    positions = [pool[0], pool[len(pool) // 2], pool[-1]]
-    positions = sorted(set(positions))
-    while len(positions) < 3:
-        positions.append(next(i for i in range(len(refs)) if i not in positions))
-        positions.sort()
+    positions = []
+    for target in targets:
+        candidates = sorted(range(len(refs)), key=lambda i: abs(
+            math.log10(max(refs[i]["A0_physical_m_per_cycle"], 1e-300)) - math.log10(target)))
+        positions.append(next(i for i in candidates if i not in positions))
+    positions.sort()
     return [refs[i]["Kmax_MPa_sqrt_m"] for i in positions], [refs[i] for i in positions]
 
 
@@ -50,11 +56,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--shard-count", type=int, default=1)
     p.add_argument("--shard-index", type=int, default=0)
     p.add_argument("--seed", type=int, default=10162026)
+    p.add_argument("--maximum-cycles", type=float, default=1e12)
+    p.add_argument("--candidate-id", action="append", default=[])
     args = p.parse_args(argv)
     args.out.mkdir(parents=True, exist_ok=True)
     registry = list(csv.DictReader(args.registry.open(newline="")))
     descriptors = {r["candidate_id"]: r for r in csv.DictReader(args.descriptors.open(newline=""))}
-    assigned = [r for i, r in enumerate(registry) if i % args.shard_count == args.shard_index]
+    requested = set(args.candidate_id)
+    assigned = [r for i, r in enumerate(registry)
+                if i % args.shard_count == args.shard_index
+                and (not requested or r["candidate_id"] in requested)]
     for ordinal, record in enumerate(assigned):
         candidate = record["candidate_id"]
         descriptor = descriptors[candidate]
@@ -65,6 +76,10 @@ def main(argv: list[str] | None = None) -> int:
         binding = load_offspring_binding(args.registry, candidate)
         case = args.out / candidate
         case.mkdir(parents=True, exist_ok=True)
+        terminal_status = case / "batch_case_status.json"
+        if terminal_status.exists() and json.loads(terminal_status.read_text()).get("mode_completed") == args.mode:
+            print(json.dumps({"candidate_id": candidate, "stage": "skip", "status": "ALREADY_COMPLETE"}), flush=True)
+            continue
         preflight = {
             "schema": "r10.mechanism-balanced-native-batch/1",
             "candidate_id": candidate, "family": record["family"],
@@ -89,9 +104,14 @@ def main(argv: list[str] | None = None) -> int:
                 print(json.dumps({"candidate_id": candidate, "stage": "fracture", "T": T,
                                   "status": result["status"], "Kinit": result["K_init_MPa_sqrt_m"]}), flush=True)
         if args.mode in ("fatigue", "all"):
-            loads, references = choose_loads(row, temperature)
+            targets = ((1e-9, 1e-7, 1e-5) if mechanism == "OPENING_DIRECTED"
+                       else (1e-5, 1e-4, 1e-3))
+            loads, references = choose_loads(row, temperature, targets)
+            if mechanism != "OPENING_DIRECTED":
+                loads = list(reversed(loads))
             atomic_json(case / "opening_reference.json", {"temperature_K": temperature,
                         "renewal_reward_conversion_m_per_action": EVENT_LENGTH_M,
+                        "A0_target_rates_m_per_cycle": targets,
                         "references": references})
             for Kmax in loads:
                 load_case = case / ("fatigue_Kmax_" + format(Kmax, ".9g").replace(".", "p"))
@@ -104,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
                         seed=args.seed + args.shard_index,
                         checkpoint_directory=load_case / "checkpoint",
                         target_events=12, target_extension_m=70e-6,
-                        maximum_events=40, maximum_cycles=1e12,
+                        maximum_events=40, maximum_cycles=args.maximum_cycles,
                         phase_count=64, temperature_K=temperature,
                         R=0.1, frequency_Hz=1000.0,
                     )

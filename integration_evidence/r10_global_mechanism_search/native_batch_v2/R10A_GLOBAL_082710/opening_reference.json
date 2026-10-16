@@ -1,0 +1,24 @@
+{
+  "references": [
+    {
+      "A0_physical_m_per_cycle": 0.005,
+      "DeltaK_MPa_sqrt_m": 0.9,
+      "Kmax_MPa_sqrt_m": 1.0,
+      "opening_action_per_cycle": 1000.0
+    },
+    {
+      "A0_physical_m_per_cycle": 0.005,
+      "DeltaK_MPa_sqrt_m": 0.9450577663671373,
+      "Kmax_MPa_sqrt_m": 1.0500641848523748,
+      "opening_action_per_cycle": 1000.0
+    },
+    {
+      "A0_physical_m_per_cycle": 0.005,
+      "DeltaK_MPa_sqrt_m": 0.9901155327342748,
+      "Kmax_MPa_sqrt_m": 1.1001283697047497,
+      "opening_action_per_cycle": 1000.0
+    }
+  ],
+  "renewal_reward_conversion_m_per_action": 5e-06,
+  "temperature_K": 600.0
+}

@@ -1,0 +1,292 @@
+{
+  "cycles_from_engine_time": 895.9720753838112,
+  "diagnostics": {
+    "active_K_shield_Pa_sqrt_m": 4.2370678430660544e-64,
+    "emission_hazard_s": 0.5166171161582475,
+    "lambda_cleave_s": 212.82985503414827,
+    "mobile_count": 0.002481391201724843,
+    "retained_count": 1.342159384329152e-65,
+    "sigma_back_Pa": 1752969.7778336196,
+    "sigma_tip_Pa": 2935476488.2818027,
+    "tip_radius_m": 1.0000008456504071e-06
+  },
+  "engine_time_s": 0.8959720753838112,
+  "fields": [
+    {
+      "floor": 1.0,
+      "name": "mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 0,
+      "stop": 160
+    },
+    {
+      "floor": 1.0,
+      "name": "mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 160,
+      "stop": 320
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 320,
+      "stop": 480
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 480,
+      "stop": 640
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 640,
+      "stop": 800
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 800,
+      "stop": 960
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 960,
+      "stop": 1120
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 1120,
+      "stop": 1280
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1280,
+      "stop": 1600
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1600,
+      "stop": 1920
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1920,
+      "stop": 2240
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2240,
+      "stop": 2560
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2560,
+      "stop": 2880
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2880,
+      "stop": 3200
+    },
+    {
+      "floor": 1.0,
+      "name": "W_emit",
+      "owner": "engine",
+      "shape": [],
+      "start": 3200,
+      "stop": 3201
+    },
+    {
+      "floor": 1.0,
+      "name": "K_prev",
+      "owner": "engine",
+      "shape": [],
+      "start": 3201,
+      "stop": 3202
+    }
+  ],
+  "geometry_signature": [
+    13,
+    7.079221899509294e-05,
+    7.079221899414101e-05,
+    7.079221899509294e-05,
+    7.079221899414101e-05,
+    80,
+    160,
+    [
+      2,
+      80
+    ]
+  ],
+  "high_cycle_cache": {},
+  "ledgers": {
+    "engine.N_em": 0.002481391201724843,
+    "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,1]": 0.0,
+    "mpz.cumulative_gross_return_activity": 0.0,
+    "mpz.cumulative_gross_source_activity": 0.3264874477333953,
+    "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+    "mpz.emitted_total": 0.3264874477333949,
+    "mpz.escaped_total": 0.0,
+    "mpz.signed_line_content_emitted_total": 0.3264874477333949,
+    "mpz.signed_source_activations_total": 0.35783024271579866
+  },
+  "metadata": {
+    "cursor": {
+      "completed_cycles": 895,
+      "phase_index": 62,
+      "remaining_phase_s": 1.2299616175390214e-05
+    },
+    "model_id": "r9.archived-v3.1-current-backend-phase-exact-fatigue/1"
+  },
+  "reason": "accepted_event",
+  "schema": "v10.2.30_atomic_live_high_cycle_checkpoint_v1",
+  "stochastic": {
+    "B": 0.0,
+    "avalanche_base_checkpoint_m": 4.9999999999999996e-06,
+    "avalanche_checkpoint_synchronized": true,
+    "avalanche_event_advance_m": 1.6856268546615307e-05,
+    "avalanche_event_length_factor": 3.3712537093230615,
+    "avalanche_event_length_history": [
+      2.77160501661662e-06,
+      8.095047007470395e-06,
+      3.0380131484160188e-06,
+      3.0630499708276816e-06,
+      4.077011794272746e-06,
+      5.6250634651023365e-06,
+      2.492819095270175e-06,
+      2.297340095624873e-06,
+      2.7079725222107463e-06,
+      2.297340095624873e-06,
+      1.3650895923032617e-05,
+      1.8378720764998984e-05,
+      2.297340095624873e-06
+    ],
+    "avalanche_last_completed_advance_m": 2.297340095624873e-06,
+    "avalanche_last_completed_factor": 0.45946801912497465,
+    "hazard_action_current": 0.0,
+    "hazard_event_index": 13,
+    "hazard_threshold_action": 3.6686489254936427,
+    "hazard_threshold_history": [
+      0.6032204421746158,
+      1.7618303495609677,
+      0.6612023083133635,
+      0.666651397557778,
+      0.8873330949207597,
+      1.2242557111624188,
+      0.5425446367339295,
+      0.11746382178470656,
+      0.5893712749296228,
+      0.17365646285687075,
+      2.9710219982295643,
+      5.040608132402539,
+      0.16061137462408737
+    ],
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 336600697774086136286157261067639373807,
+        "state": 49189035547133753914701343692798362472
+      },
+      "uinteger": 0
+    }
+  },
+  "temperature_K": 300.0,
+  "timestamp_unix_s": 1792177456.778187
+}

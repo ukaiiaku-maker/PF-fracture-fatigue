@@ -1,0 +1,18 @@
+{
+  "candidate_count": 48,
+  "classification_guard": "non-opening effects remain unclassified until causal freeze and normalized block sensitivity",
+  "complete_developed_ladders": 3,
+  "effect_counts": {
+    "MIXED_EFFECT_REQUIRES_CAUSAL_CONFIRMATION": 1,
+    "NOT_STARTED": 45,
+    "OPENING_DOMINATED_AT_OPERATIONAL_RESOLUTION": 1,
+    "STRONG_STATE_SLOPE_EFFECT_REQUIRES_CAUSAL_CONFIRMATION": 1
+  },
+  "schema": "r10.mechanism-balanced-native-analysis/1",
+  "thresholds": {
+    "mixed_abs_Delta_m": 0.5,
+    "rate_factor": 1.5,
+    "strong_abs_Delta_m": 1.0,
+    "two_percent_is_not_material": true
+  }
+}

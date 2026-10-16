@@ -1,0 +1,57 @@
+{
+  "classification_guard": "acquisition strata are not final mechanism labels; mixed/plastic final labels require frozen-feedback and normalized block sensitivities",
+  "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+  "lanes": {
+    "MIXED_DIRECTED": {
+      "A0_slope": 20.732886889265554,
+      "C_rate_range": [
+        0.016524948797689638,
+        4.663122329318233
+      ],
+      "Delta_m_state": 50.11057392006474,
+      "candidate_id": "R10A_GLOBAL_119268",
+      "full_slope": 70.8434608093303,
+      "independent_stream_outcomes": {
+        "9.260590500641849": "maximum_cycles_censor",
+        "9.661103979460847": "maximum_cycles_censor",
+        "10.812580231065468": "developed_target_completed"
+      },
+      "primary_developed_points": 2,
+      "result": "STRONG_AMPLITUDE_DEPENDENT_STATE_EFFECT_WITH_STREAM_SENSITIVITY; FINAL_LABEL_WITHHELD"
+    },
+    "OPENING_DIRECTED": {
+      "C_rate_range": [
+        0.8892680201161282,
+        0.8953323336791519
+      ],
+      "candidate_id": "R10A_GLOBAL_018756",
+      "developed_points": 3,
+      "max_abs_Delta_m_state": 0.06266692642390126,
+      "result": "OPENING_DOMINATED_AT_OPERATIONAL_RESOLUTION_ACROSS_BOTH_INTERVALS"
+    },
+    "PLASTICITY_DIRECTED": {
+      "candidate_id": "R10A_GLOBAL_064416",
+      "cycles_per_point": [
+        1000000.0
+      ],
+      "fatigue_points": 3,
+      "maximum_C_rate_95pct_upper": 1.4997771148240873e-06,
+      "result": "STATE_CONTROLLED_NO_GROWTH_CENSOR_DESPITE_A0_GROWTH; NO_DEVELOPED_RATE_OR_FINAL_LABEL",
+      "zero_event_points": 3
+    }
+  },
+  "operational_thresholds": {
+    "mixed_abs_Delta_m": 0.5,
+    "rate_factor": 1.5,
+    "strong_abs_Delta_m": 1.0,
+    "two_percent_is_not_material": true
+  },
+  "remaining_48_row_allocation": "ACTIVE; use target-temperature fatigue accessibility and native fracture discrepancy to reorder",
+  "same_material_fracture_reachability": {
+    "mixed": "complete at 300 and 600 K",
+    "opening": "complete at 300 K",
+    "plasticity": "complete at 300 and 900 K"
+  },
+  "schema": "r10.mechanism-balanced-information-batch/1",
+  "status": "COMPLETE_INFORMATION_BATCH_WITH_DEVELOPED_RATES_AND_PHYSICAL_CENSORS"
+}

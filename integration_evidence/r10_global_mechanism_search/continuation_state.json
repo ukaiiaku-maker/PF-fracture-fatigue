@@ -1,0 +1,33 @@
+{
+  "schema": "r10.global-mechanism-search-state/1",
+  "analytical_bank": {
+    "status": "COMPLETE",
+    "hypotheses": 131072,
+    "valid_domain": 70986,
+    "state_reduction_allocation": 4096,
+    "native_allocation": 48
+  },
+  "first_native_information_block": {
+    "status": "COMPLETE_WITH_DEVELOPED_RATES_AND_PHYSICAL_CENSORS",
+    "opening_directed": "R10A_GLOBAL_018756",
+    "mixed_directed": "R10A_GLOBAL_119268",
+    "plasticity_directed": "R10A_GLOBAL_064416",
+    "decision": "balanced_information_batch/decision.json"
+  },
+  "job_ownership": {
+    "live_writers": [],
+    "all_runs_local_to_current_worktree": true,
+    "interrupted_checkpoints_preserved": true
+  },
+  "classification": {
+    "opening_directed": "OPENING_DOMINATED_AT_OPERATIONAL_RESOLUTION",
+    "mixed_directed": "UNCLASSIFIED_STRONG_STATE_EFFECT_WITH_STREAM_SENSITIVITY",
+    "plasticity_directed": "UNCLASSIFIED_STATE_CONTROLLED_NO_GROWTH_CENSOR"
+  },
+  "next_acquisition": [
+    "third mark stream for R10A_GLOBAL_119268 at the developed high interval",
+    "frozen-feedback and normalized opening/dislocation block sensitivities",
+    "reorder remaining 48-row allocation by target-temperature fatigue accessibility and native fracture discrepancy",
+    "only pass jointly qualified developed-growth rows to exact-same-vector 2-D"
+  ]
+}

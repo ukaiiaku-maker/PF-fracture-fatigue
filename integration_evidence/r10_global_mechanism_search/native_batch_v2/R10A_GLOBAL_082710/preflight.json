@@ -1,0 +1,19 @@
+{
+  "acquisition_stratum_not_final_classification": "MIXED_DIRECTED",
+  "candidate_id": "R10A_GLOBAL_082710",
+  "complete_row_sha256": "b4d8d7766491c4ed6cabce0bb7da73e0af3cbf9a7ac08370caab553434503138",
+  "developed_window_um": [
+    20.0,
+    60.0
+  ],
+  "event_and_extension_stops": {
+    "events": 12,
+    "extension_um": 70.0
+  },
+  "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+  "fatigue_temperature_K": 600.0,
+  "native_backend": "R8_RESTORED_PERSISTENT_REVERSIBLE_CURRENT_BACKEND",
+  "same_complete_material_for_fracture_fatigue_and_A0": true,
+  "schema": "r10.mechanism-balanced-native-batch/1",
+  "thermal_acquisition_stratum": "CERAMIC_OR_FALLING_PROXY"
+}

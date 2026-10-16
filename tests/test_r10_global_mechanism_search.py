@@ -11,6 +11,7 @@ from scripts.run_r10_global_mechanism_search import (
     FAMILY, TREF, assign_relative_mechanism_strata, domain, generate_row,
     read_sources, rereference,
 )
+from scripts.run_r10_mechanism_native_batch import choose_loads
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,3 +56,13 @@ def test_acquisition_strata_are_relative_and_not_final_mechanism_labels():
     assert labels.count("MIXED_DIRECTED") == 3
     assert labels.count("PLASTICITY_DIRECTED") == 3
     assert all("NOT_FINAL_CLASSIFICATION" in row["mechanism_stratum_basis"] for row in rows)
+
+
+def test_native_load_selection_uses_dense_same_law_unsaturated_targets():
+    row = generate_row(0, np.full(22, 0.5), read_sources(ORIGINAL, PARENTS))
+    loads, references = choose_loads(row, 300.0)
+    rates = [r["A0_physical_m_per_cycle"] for r in references]
+    assert loads == sorted(loads)
+    assert rates == sorted(rates)
+    assert len(set(loads)) == 3
+    assert rates[-1] < 1e-3

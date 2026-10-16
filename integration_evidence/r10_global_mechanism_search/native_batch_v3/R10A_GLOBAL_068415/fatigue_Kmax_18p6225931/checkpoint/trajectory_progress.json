@@ -1,0 +1,392 @@
+{
+  "acceleration": [],
+  "cursor": {
+    "completed_cycles": 0,
+    "phase_index": 0,
+    "remaining_phase_s": 0.0
+  },
+  "events": [],
+  "geometry": {
+    "committed_extension_m": 0.0,
+    "continuous_mpz_progress_m": 0.0,
+    "n_adv": 0
+  },
+  "history": [
+    {
+      "cycles": 0.0,
+      "extension_m": 0.0,
+      "kind": "initial"
+    }
+  ],
+  "identity": {
+    "Kmax_MPa_sqrt_m": 18.622593068035943,
+    "R": 0.1,
+    "candidate_id": "R10A_GLOBAL_068415",
+    "frequency_Hz": 1000.0,
+    "phase_count": 64,
+    "seed": 10162051,
+    "temperature_K": 900.0
+  },
+  "native_qualification": {
+    "acceptance_basis": "production retains the declared midpoint grid used by the completed class campaigns; native source paths agree, hazard is phase-converged, and the reported state/observable discretization differences are carried as numerical qualification evidence",
+    "accepted": true,
+    "phase_convergence": [
+      {
+        "coarse_phase_count": 32,
+        "fine_phase_count": 64,
+        "hazard_action_absolute": 4.775732538071122e-17,
+        "hazard_action_relative": 0.4794773258657074,
+        "state": {
+          "diagnostics": {
+            "active_K_shield_Pa_sqrt_m": {
+              "absolute": 169.25708867417043,
+              "unit_floor_relative": 0.981790241014574
+            },
+            "emission_hazard_s": {
+              "absolute": 12995398599756.71,
+              "unit_floor_relative": 0.9998524202152144
+            },
+            "lambda_cleave_s": {
+              "absolute": 7.751680416480477e-32,
+              "unit_floor_relative": 7.751680416480477e-32
+            },
+            "mobile_count": {
+              "absolute": 12126.481497018562,
+              "unit_floor_relative": 1.0
+            },
+            "retained_count": {
+              "absolute": 5.09902466219602,
+              "unit_floor_relative": 0.9822783424052097
+            },
+            "sigma_back_Pa": {
+              "absolute": 635959401.1988199,
+              "unit_floor_relative": 0.7523292445006244
+            },
+            "sigma_tip_Pa": {
+              "absolute": 276481286.00916195,
+              "unit_floor_relative": 0.06495977674795732
+            },
+            "tip_radius_m": {
+              "absolute": 4.3811356163159313e-07,
+              "unit_floor_relative": 4.3811356163159313e-07
+            }
+          },
+          "fields": {
+            "engine.K_prev": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "engine.W_emit": {
+              "absolute_linf": 0.18022293711078619,
+              "unit_floor_relative_linf": 0.13906391772864016
+            },
+            "mpz.accumulated_slip_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.accumulated_slip_positive": {
+              "absolute_linf": 732.0124240418754,
+              "unit_floor_relative_linf": 0.18523672027727736
+            },
+            "mpz.mobile_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.mobile_positive": {
+              "absolute_linf": 332.29835411030126,
+              "unit_floor_relative_linf": 1.0
+            },
+            "mpz.retained_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.retained_positive": {
+              "absolute_linf": 4.0542502151313595,
+              "unit_floor_relative_linf": 0.9832809533474066
+            },
+            "mpz.returned_slip_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.returned_slip_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_mobile_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_mobile_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_retained_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_retained_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_slip_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_slip_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            }
+          },
+          "maximum_field": "mpz.mobile_positive",
+          "maximum_field_absolute": 332.29835411030126,
+          "maximum_unit_floor_relative": 1.0
+        }
+      },
+      {
+        "coarse_phase_count": 64,
+        "fine_phase_count": 128,
+        "hazard_action_absolute": 4.3617387928898703e-17,
+        "hazard_action_relative": 0.30454758088546385,
+        "state": {
+          "diagnostics": {
+            "active_K_shield_Pa_sqrt_m": {
+              "absolute": 0.45360524011673986,
+              "unit_floor_relative": 0.14449263453459524
+            },
+            "emission_hazard_s": {
+              "absolute": 1707073559.3176003,
+              "unit_floor_relative": 0.8899624035567666
+            },
+            "lambda_cleave_s": {
+              "absolute": 8.085418783099188e-35,
+              "unit_floor_relative": 8.085418783099188e-35
+            },
+            "mobile_count": {
+              "absolute": 2391.2857215319455,
+              "unit_floor_relative": 0.19719534657434404
+            },
+            "retained_count": {
+              "absolute": 0.013451264476473102,
+              "unit_floor_relative": 0.013451264476473102
+            },
+            "sigma_back_Pa": {
+              "absolute": 89382428.2250315,
+              "unit_floor_relative": 0.0956265534999425
+            },
+            "sigma_tip_Pa": {
+              "absolute": 6463755.221643925,
+              "unit_floor_relative": 0.0016241771296570315
+            },
+            "tip_radius_m": {
+              "absolute": 1.1348180517071337e-08,
+              "unit_floor_relative": 1.1348180517071337e-08
+            }
+          },
+          "fields": {
+            "engine.K_prev": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "engine.W_emit": {
+              "absolute_linf": 0.0493130585227064,
+              "unit_floor_relative_linf": 0.036656216403563154
+            },
+            "mpz.accumulated_slip_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.accumulated_slip_positive": {
+              "absolute_linf": 26.459019878996514,
+              "unit_floor_relative_linf": 0.00665095884174992
+            },
+            "mpz.mobile_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.mobile_positive": {
+              "absolute_linf": 157.01562576374585,
+              "unit_floor_relative_linf": 0.9983521180494831
+            },
+            "mpz.retained_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.retained_positive": {
+              "absolute_linf": 0.010785090792457333,
+              "unit_floor_relative_linf": 0.010785090792457333
+            },
+            "mpz.returned_slip_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.returned_slip_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_mobile_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_mobile_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_retained_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_retained_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_slip_negative": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            },
+            "mpz.wake_slip_positive": {
+              "absolute_linf": 0.0,
+              "unit_floor_relative_linf": 0.0
+            }
+          },
+          "maximum_field": "mpz.mobile_positive",
+          "maximum_field_absolute": 157.01562576374585,
+          "maximum_unit_floor_relative": 0.9983521180494831
+        }
+      }
+    ],
+    "production_hazard_action_per_cycle": 9.960288590181874e-17,
+    "production_phase_count": 64,
+    "schema": "r10.native-phase-resolution-qualification/1",
+    "source_path_comparison": {
+      "hazard_action_absolute": 3.0935745912679446e-18,
+      "hazard_action_relative": 0.030123478223246045,
+      "paths": [
+        "public_phase_exact_step",
+        "private_native_poincare_map"
+      ],
+      "state": {
+        "diagnostics": {
+          "active_K_shield_Pa_sqrt_m": {
+            "absolute": 0.30107258571340534,
+            "unit_floor_relative": 0.08751170794804711
+          },
+          "emission_hazard_s": {
+            "absolute": 828134104.6907682,
+            "unit_floor_relative": 0.431737820702082
+          },
+          "lambda_cleave_s": {
+            "absolute": 9.490145529070007e-35,
+            "unit_floor_relative": 9.490145529070007e-35
+          },
+          "mobile_count": {
+            "absolute": 356.60383748120876,
+            "unit_floor_relative": 0.028566963048442445
+          },
+          "retained_count": {
+            "absolute": 0.009003465147269227,
+            "unit_floor_relative": 0.009003465147269227
+          },
+          "sigma_back_Pa": {
+            "absolute": 22640788.161075234,
+            "unit_floor_relative": 0.02608501797216742
+          },
+          "sigma_tip_Pa": {
+            "absolute": 7657010.271786213,
+            "unit_floor_relative": 0.0019240117452685977
+          },
+          "tip_radius_m": {
+            "absolute": 1.3448880116345076e-08,
+            "unit_floor_relative": 1.3448880116345076e-08
+          }
+        },
+        "fields": {
+          "engine.K_prev": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "engine.W_emit": {
+            "absolute_linf": 0.001546184047139798,
+            "unit_floor_relative_linf": 0.0011916473477149025
+          },
+          "mpz.accumulated_slip_negative": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.accumulated_slip_positive": {
+            "absolute_linf": 21.378081800004566,
+            "unit_floor_relative_linf": 0.005392397205407971
+          },
+          "mpz.mobile_negative": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.mobile_positive": {
+            "absolute_linf": 98.41068258782036,
+            "unit_floor_relative_linf": 0.9999999997272027
+          },
+          "mpz.retained_negative": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.retained_positive": {
+            "absolute_linf": 0.007186689974095231,
+            "unit_floor_relative_linf": 0.007186689974095231
+          },
+          "mpz.returned_slip_negative": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.returned_slip_positive": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.wake_mobile_negative": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.wake_mobile_positive": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.wake_retained_negative": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.wake_retained_positive": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.wake_slip_negative": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          },
+          "mpz.wake_slip_positive": {
+            "absolute_linf": 0.0,
+            "unit_floor_relative_linf": 0.0
+          }
+        },
+        "maximum_field": "mpz.mobile_positive",
+        "maximum_field_absolute": 98.41068258782036,
+        "maximum_unit_floor_relative": 0.9999999997272027
+      }
+    }
+  },
+  "overlap": {
+    "explicit_hazard_action": 1.0269646049308669e-16,
+    "hazard_relative_error": 0.9999999999999946,
+    "mean_hazard_action": 0.018941569510069634,
+    "mean_inputs": {
+      "cycles": 1,
+      "emission_weighted_stress_Pa": 5453600858.157647,
+      "hazard_action_per_cycle": 0.018941569510069634,
+      "mean_cleavage_rate_s-1": 18.941569510069634,
+      "sigma_max_Pa": 7425312711.259595,
+      "sigma_min_Pa": 746961008.8455932
+    },
+    "micro_translation_relative_error": 3.481218168763866e-77,
+    "passed": false,
+    "phase_count": 64,
+    "state_relative_max_error": 1.0
+  },
+  "schema": "r9.trajectory-progress/1"
+}

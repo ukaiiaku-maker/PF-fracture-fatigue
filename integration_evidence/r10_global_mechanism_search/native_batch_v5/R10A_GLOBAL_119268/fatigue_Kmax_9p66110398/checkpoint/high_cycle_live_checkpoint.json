@@ -1,0 +1,322 @@
+{
+  "cycles_from_engine_time": 51.00556262132612,
+  "diagnostics": {
+    "active_K_shield_Pa_sqrt_m": 5.675180906491908e-07,
+    "emission_hazard_s": 109669.21552640306,
+    "lambda_cleave_s": 1166.9948183883103,
+    "mobile_count": 735.5509537360996,
+    "retained_count": 2.1868494407351385e-08,
+    "sigma_back_Pa": 1088893558.7242327,
+    "sigma_tip_Pa": 3503202874.6374707,
+    "tip_radius_m": 1.210439443348143e-06
+  },
+  "engine_time_s": 0.05100556262132612,
+  "fields": [
+    {
+      "floor": 1.0,
+      "name": "mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 0,
+      "stop": 160
+    },
+    {
+      "floor": 1.0,
+      "name": "mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 160,
+      "stop": 320
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 320,
+      "stop": 480
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 480,
+      "stop": 640
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 640,
+      "stop": 800
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 800,
+      "stop": 960
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 960,
+      "stop": 1120
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 1120,
+      "stop": 1280
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1280,
+      "stop": 1600
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1600,
+      "stop": 1920
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1920,
+      "stop": 2240
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2240,
+      "stop": 2560
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2560,
+      "stop": 2880
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2880,
+      "stop": 3200
+    },
+    {
+      "floor": 1.0,
+      "name": "W_emit",
+      "owner": "engine",
+      "shape": [],
+      "start": 3200,
+      "stop": 3201
+    },
+    {
+      "floor": 1.0,
+      "name": "K_prev",
+      "owner": "engine",
+      "shape": [],
+      "start": 3201,
+      "stop": 3202
+    }
+  ],
+  "geometry_signature": [
+    15,
+    7.027545183066301e-05,
+    4.220587541599115e-05,
+    7.027545183066301e-05,
+    4.220587541599115e-05,
+    80,
+    160,
+    [
+      2,
+      80
+    ]
+  ],
+  "high_cycle_cache": {
+    "exact_burst_next_cycles": 8,
+    "exact_cycles_since_periodic": "inf",
+    "exact_cycles_since_projective": "inf",
+    "geometry_signature": [
+      15,
+      7.027545183066301e-05,
+      4.220587541599115e-05,
+      7.027545183066301e-05,
+      4.220587541599115e-05,
+      80,
+      160,
+      [
+        2,
+        80
+      ]
+    ],
+    "invalidated_reason": "first_passage_event",
+    "last_periodic_converged": false,
+    "periodic_attempts": 0,
+    "periodic_failure_count": 0,
+    "periodic_retry_cycles": 0.0,
+    "projective_attempts": 0,
+    "projective_failure_count": 0,
+    "projective_next_cycles": 96.0,
+    "projective_retry_cycles": 0.0
+  },
+  "ledgers": {
+    "engine.N_em": 735.550953757968,
+    "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,1]": 4.651212748285616e-11,
+    "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,1]": 1.6427748050773516e-10,
+    "mpz.cumulative_gross_return_activity": 0.0,
+    "mpz.cumulative_gross_source_activity": 11121.664720346958,
+    "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+    "mpz.emitted_total": 11121.664720346951,
+    "mpz.escaped_total": 2.1078960799059132e-10,
+    "mpz.signed_line_content_emitted_total": 11121.664720346951,
+    "mpz.signed_source_activations_total": 12189.344533500298
+  },
+  "metadata": {
+    "cursor": {
+      "completed_cycles": 51,
+      "phase_index": 0,
+      "remaining_phase_s": 1.0062378670085081e-05
+    },
+    "model_id": "r9.archived-v3.1-current-backend-phase-exact-fatigue/1"
+  },
+  "reason": "accepted_event",
+  "schema": "v10.2.30_atomic_live_high_cycle_checkpoint_v1",
+  "stochastic": {
+    "B": 0.0,
+    "avalanche_base_checkpoint_m": 4.9999999999999996e-06,
+    "avalanche_checkpoint_synchronized": true,
+    "avalanche_event_advance_m": 2.297340095624873e-06,
+    "avalanche_event_length_factor": 0.45946801912497465,
+    "avalanche_event_length_history": [
+      5.218143455538988e-06,
+      2.297340095624873e-06,
+      4.810668735770195e-06,
+      2.297340095624873e-06,
+      2.3680843815913038e-06,
+      4.091121383973533e-06,
+      2.297340095624873e-06,
+      2.9220953742928505e-06,
+      1.1715063402889598e-05,
+      3.999029703105838e-06,
+      2.297340095624873e-06,
+      5.358711389712808e-06,
+      3.031151481264336e-06,
+      9.596607482733309e-06,
+      7.97541465729075e-06
+    ],
+    "avalanche_last_completed_advance_m": 7.97541465729075e-06,
+    "avalanche_last_completed_factor": 1.59508293145815,
+    "hazard_action_current": 0.0,
+    "hazard_event_index": 15,
+    "hazard_threshold_action": 0.27128054373522936,
+    "hazard_threshold_history": [
+      1.1356924178262906,
+      0.3785404419019064,
+      1.0470083956946088,
+      0.3312329018627929,
+      0.5153969989252263,
+      0.8904039484107715,
+      0.3421545198569153,
+      0.6359736157171028,
+      2.5497015929857607,
+      0.8703608383281422,
+      0.4292570928533647,
+      1.166286045309118,
+      0.6597089144608925,
+      2.088634482332283,
+      1.7357932054725769
+    ],
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 269828778740494821480409952953746532915,
+        "state": 107312789358351605639955912110661357170
+      },
+      "uinteger": 0
+    }
+  },
+  "temperature_K": 600.0,
+  "timestamp_unix_s": 1792178912.8481128
+}
