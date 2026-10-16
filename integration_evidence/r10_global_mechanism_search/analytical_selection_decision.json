@@ -1,0 +1,60 @@
+{
+  "A0_unit_identity": {
+    "consumer": "stationary renewal-reward metres per cycle",
+    "conversion_m_per_action": 5e-06,
+    "derivation": "E[L]/E[Xi] under unit-mean exponential Xi and mean-preserving clipped correlated reward",
+    "expected_action_mark": 1.0,
+    "expected_event_length_m": 5e-06,
+    "fitted_attenuation_used": false,
+    "producer": "cooperative opening action per cycle"
+  },
+  "bank_size": 131072,
+  "constitutive_invariants": {
+    "attempt_frequencies_varied": false,
+    "empirical_temperature_law": false,
+    "guard_or_broad_basis": false,
+    "independent_temperature_endpoints": false,
+    "single_EXP_floor_only": true,
+    "source_geometry_and_event_law_varied": false,
+    "transport_stress_scale_shared_with_emission": true
+  },
+  "domain_and_stratum_counts": {
+    "DOMAIN_REJECT": 60086,
+    "MIXED_DIRECTED": 23662,
+    "OPENING_DIRECTED": 23662,
+    "PLASTICITY_DIRECTED": 23662
+  },
+  "domain_rejections": {
+    "CLEAVE_NONPOSITIVE_DOMAIN": 16657,
+    "EMIT_NONPOSITIVE_DOMAIN": 15777,
+    "TAYLOR_NONPOSITIVE_DOMAIN": 27652
+  },
+  "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+  "files": {
+    "cheap_global_bank.csv.gz": {
+      "bytes": 10011862,
+      "sha256": "0e5038060906deb18b8c4547a59b704c488e8939fd315058ca2fd9e785272fe1"
+    },
+    "native_batch_descriptors.csv": {
+      "bytes": 24074,
+      "sha256": "9269e046035cc1b11359d7bc0e8039fda7a2e583ea4c7b4b2230d04cee429157"
+    },
+    "native_batch_registry.csv": {
+      "bytes": 184696,
+      "sha256": "c337c755d74e1acd3829fd5e5554a2fc04c28c5a234e8b5df88bc22aeb850b3f"
+    },
+    "state_reduction_allocation.csv": {
+      "bytes": 2001136,
+      "sha256": "e246bad6ea0faa4b9a1d3730dcf7851bb08435b7db070a0d08b01af038f8514f"
+    }
+  },
+  "native_batch_size": 48,
+  "operational_thresholds_frozen_before_native_results": {
+    "mixed_absolute_slope_change": 0.5,
+    "rate_level_factor": 1.5,
+    "strong_absolute_slope_change": 1.0,
+    "two_percent_is_not_material": true
+  },
+  "schema": "r10.global-mechanism-stratified-acquisition/1",
+  "status": "ANALYTICAL_SELECTION_COMPLETE_NATIVE_BATCH_PENDING"
+}
