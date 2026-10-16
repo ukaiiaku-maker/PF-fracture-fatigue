@@ -3,7 +3,7 @@
   "date": "2026-10-15",
   "source_pair": {
     "pf_commit": "4dd2fc9dc5e87439899a24b13307b4a6cf0e735e",
-    "fem_commit": "9045fd31be7dcbac35e1afd07f66135571079921"
+    "fem_commit": "cf6a21ba9fca1adf012201b76b3a7bb5898b7372"
   },
   "environment": {
     "platform": "macOS",
@@ -15,17 +15,19 @@
     "result": "PASS",
     "passed": 1004,
     "deselected_external_evidence": 16,
-    "duration_s": 106.08
+    "duration_s": 114.89
   },
   "fem": {
     "command": "python -m pytest -q",
     "result": "PASS_WITH_OPTIONAL_SKIPS",
-    "passed": 734,
+    "passed": 742,
     "skipped_optional_dependency": 2,
     "passing_subtests": 16,
-    "duration_s": 49.79
+    "duration_s": 49.94
   },
   "native_execution_receipts": {
+    "r05_moving_tip_bilinear": "fem-czm-current-pf-companion@cf6a21b:integration_evidence/r05_moving_tip_bilinear_20261015/qualification_report.json",
+    "r06_generic_full_field": "fem-czm-current-pf-companion@cf6a21b:integration_evidence/r06_full_field_generic_working/qualification_report.json",
     "r07_moving_tip_constraints": "fem-czm-current-pf-companion@9045fd3:integration_evidence/r07_moving_tip_controls_working/qualification_report.json",
     "r10_local_incremental_cavity": "integration_evidence/r10_current_local_incremental/consolidated_qualification.json"
   },

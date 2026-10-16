@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     rows = build_cases_v3(ROOT)
-    assert len(rows) == 692
+    assert len(rows) == 694
     assert validate_plan(rows)["valid"]
     assert all(row["production_execution_authorized"] is False for row in rows)
     assert all(set(row["readiness"]) == set(STATUS_AXES) for row in rows)
@@ -37,7 +37,7 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     assert all(row["qualification_execution"]["launcher"] for row in fitted)
     assert all(
         row["readiness"]["implementation"]
-        == "IMPLEMENTED_CONSTITUTIVE_SPECIMEN_ADAPTER_MOVING_TIP_NOT_CONNECTED"
+        == "IMPLEMENTED_NATIVE_MOVING_TIP_CONTROLLER"
         for row in fitted
     )
     assert all(
@@ -75,7 +75,7 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     )
 
     fem = [row for row in rows if row["block"] == "P8"]
-    assert len(fem) == 22
+    assert len(fem) == 24
     assert all(row["native_args"] for row in fem)
     assert all(
         row["native_entrypoint"]
@@ -92,6 +92,15 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         row.get("material_selection_scope") == "QUALIFICATION_ONLY"
         for row in fem
     ) == 2
+    full_field = [
+        row for row in fem
+        if row["shared_options"].get("source_location")
+        in {"bulk_uniform", "tip_plus_bulk"}
+    ]
+    assert len(full_field) == 2
+    assert {row["shared_options"]["source_location"] for row in full_field} == {
+        "bulk_uniform", "tip_plus_bulk",
+    }
 
     p4_tip = [
         row for row in rows

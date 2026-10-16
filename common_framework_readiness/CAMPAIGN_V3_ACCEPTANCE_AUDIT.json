@@ -1,20 +1,20 @@
 {
   "binding_errors": {},
   "campaign": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
-  "campaign_sha256": "055f818d82a5f6558b5645c8e5a2244fdcd1fb4b00bf758fae38bc2ae4dbda18",
-  "case_count": 692,
+  "campaign_sha256": "82911e050d680e3fe56a7a00aaad43b284595f49b4c4fd7548067cf9163a4487",
+  "case_count": 694,
   "checks": {
     "all_36_fitted_rows_have_qualification_requests": true,
     "all_static_argument_bindings_resolve": true,
-    "case_count_692": true,
+    "case_count_694": true,
     "exact_near_boundary_count_20": true,
     "exact_raw_domain_blocked_count_3": true,
-    "native_command_count_656": true,
+    "native_command_count_658": true,
     "production_disabled_all_rows": true
   },
   "fitted_bilinear_production_blocked_count": 36,
   "fitted_bilinear_qualification_request_count": 36,
-  "native_command_count": 656,
+  "native_command_count": 658,
   "near_boundary_rows": [
     {
       "block": "P7",

@@ -131,8 +131,8 @@ def audit(path: Path) -> dict:
         ),
         "binding_errors": per_case,
         "checks": {
-            "case_count_692": len(rows) == 692,
-            "native_command_count_656": len(commands) == 656,
+            "case_count_694": len(rows) == 694,
+            "native_command_count_658": len(commands) == 658,
             "exact_raw_domain_blocked_count_3": len(blocked) == 3,
             "exact_near_boundary_count_20": len(boundary) == 20,
             "all_36_fitted_rows_have_qualification_requests": len(fitted) == 36 and all(

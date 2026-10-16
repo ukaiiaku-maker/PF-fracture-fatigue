@@ -91,12 +91,12 @@
     {
       "id": "R03",
       "goal_ids": ["FG-02", "FG-03", "FG-05", "FG-15"],
-      "status": "CURRENT_PERSISTENT_DBTT_CANDIDATE_NATIVE_QUALIFIED_OLDER_LIFECYCLE_ADAPTER_PENDING_NO_SELECTION",
-      "concrete_defect": "The authorized Taylor-amplitude axis remains resolved. The paper-lineage minimal-stress DBTT qualification row now executes the current persistent native kinetic consumer at 300, 900, 1000, 1200 and 1300 K with finite nonnegative rates, exact selected-output replay and persistent reusable source identity. The older dbtt_primary alternative remains explicitly distinct and is not accepted by the current persistent adapter because its registry lacks rho_source0_m2 and carries a different refresh/recovery lineage. No production selection was made.",
+      "status": "CURRENT_PERSISTENT_DBTT_COMPONENTS_CONSTRUCTED_AND_NATIVE_QUALIFIED_NO_PRODUCTION_SELECTION",
+      "concrete_defect": "The authorized Taylor-amplitude axis remains resolved. The selected EXP-floor DBTT barrier components are constructed explicitly in the qualifier and consumed by the current persistent native kinetic path at 300, 900, 1000, 1200 and 1300 K with finite nonnegative rates, exact selected-output replay and persistent reusable source identity. The older dbtt_primary alternative remains explicitly distinct; no historical lifecycle fallback or production selection was made.",
       "owner_consumer": "material constructors, selection registry, PF/FEM native consumers",
       "authoritative_source": "full-precision selected rows and override chain",
       "dependencies": ["R02"],
-      "exact_next_command": "python scripts/fit_bilinear_opening_analogues.py --registry arrhenius_fracture/data/materials/v10_2_31_taylor_domain/v10_2_31_taylor_domain_registry.csv --output <fit-registry>",
+      "exact_next_command": "No R03 implementation remains; material selection remains an author/calibration decision.",
       "input_output_identity": "parent registry SHA-256 4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760; 12 machine-readable amplitude variants; four prospective 0.10 eV readiness identities; no checkpoint identity inheritance",
       "numerical_criteria": "Analytic continuous-interval Taylor minimum is at least each declared margin; unchanged parents remain unchanged; native constructor/rates/derivatives/floor branches and inverse elementary-rate contours are evaluated only at admissible raw states; no raw-scale clamp counted as admissibility.",
       "executed_evidence": [
@@ -105,7 +105,9 @@
         "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_taylor_domain_dossier.json",
         "arrhenius_fracture/data/materials/v10_2_32_taylor_domain/v10_2_32_shared_stress_scale_candidates.json",
         "fem-czm-current-pf-companion@b14497fc:tests/test_v10232_registry_option_bridge.py",
-        "fem-czm-current-pf-companion@4162181:integration_evidence/r03_dbtt_native_consumers_14a1a31/qualification_report.json"
+        "fem-czm-current-pf-companion@4162181:integration_evidence/r03_dbtt_native_consumers_14a1a31/qualification_report.json",
+        "fem-czm-current-pf-companion@a616bb1:scripts/qualify_dbtt_candidate_native_consumers.py",
+        "fem-czm-current-pf-companion@a616bb1:tests/test_dbtt_candidate_qualifier.py"
       ],
       "remaining_limitation": "These are constructed, not material-calibrated, choices. The selected DBTT parent retains a raw shared stress-scale crossing within 300-1300 K. The minimal-intercept candidate has current kinetic-consumer evidence but no full spatial event specimen; the older dbtt_primary lifecycle requires a deliberate adapter before current-law qualification. Both remain unselected because either changes shared emission/Peierls/Taylor physics."
     },
@@ -126,26 +128,26 @@
     {
       "id": "R05",
       "goal_ids": ["FG-11", "FG-12", "FG-16"],
-      "status": "NATIVE_SPECIMEN_PATHS_QUALIFIED_MOVING_TIP_BILINEAR_PENDING",
-      "concrete_defect": "The native cracked-body specimen now consumes both autonomous opening history and activated-bilinear interface traction/rate, commits damage or clock state, re-equilibrates and restarts exactly under fully specified qualification-only inputs. All 36 fitted campaign rows have typed specimen-qualification requests. The original moving-tip campaign route still accepts only EXP-floor activated opening, so the specimen evidence does not close that broader campaign-consumer chain.",
-      "owner_consumer": "independent FEM interface assembly, state update, serializer and restart",
+      "status": "COMPLETE_NATIVE_MOVING_TIP_BILINEAR_ALGORITHMS_QUALIFIED_CONSTRUCTED_SUPPORT",
+      "concrete_defect": "Both bilinear descriptions now bind the saved fitted parameters and explicit constructed support to the original native adaptive moving-tip transaction. Activated bilinear consumes assembled interface traction and accepted physical time. Conventional irreversible bilinear evolves from opening history without a hazard mark. Qualification exercises native topology insertion, identity bulk-state transfer, nonzero plastic accommodation in assembly, interface work, active-state restart, accepted advance and exact full-transaction rollback.",
+      "owner_consumer": "native adaptive moving-tip topology, FEM interface assembly, state update, serializer and restart",
       "authoritative_source": "original FEM/CZM solver plus R04 fitted registry",
       "dependencies": ["R04", "R08"],
-      "exact_next_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python scripts/qualify_bilinear_cohesive_specimen_v1.py --out <new-output> --bilinear-fit-registry <R04-fit-registry>",
+      "exact_next_command": "python scripts/qualify_moving_tip_bilinear_v1.py --bilinear-fit-registry <R04-fit-registry> --out <new-output>",
       "input_output_identity": "three explicit opening-model IDs with common accommodation inputs",
       "numerical_criteria": "Consistent residual/tangent, autonomous separation, irreversible unload/reload, nonnegative dissipation and active-damage restart equality.",
-      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@1d9fc0b:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@254c30f:integration_evidence/r05_activated_bilinear_acceptance_1d9fc0b/qualification_report.json", "fem-czm-current-pf-companion@254c30f:integration_evidence/r05_autonomous_bilinear_acceptance_1d9fc0b/qualification_report.json", "common_framework_readiness/acceptance_review_20261015/CAMPAIGN_V3_ACCEPTANCE_AUDIT.json"],
-      "remaining_limitation": "No production material was selected. The constructed stiffness/work are qualification-only and are not a tungsten calibration or default. The 36 fitted rows remain blocked for physical cohesive support. The bilinear paths are not yet wired into moving-tip plastic accommodation, topology/remeshing and campaign restart; current evidence closes only their native cracked-specimen consumer/restart scope."
+      "executed_evidence": ["fem-czm-current-pf-companion@5047637:tests/test_bilinear_czm_native.py", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@1d9fc0b:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@254c30f:integration_evidence/r05_activated_bilinear_acceptance_1d9fc0b/qualification_report.json", "fem-czm-current-pf-companion@254c30f:integration_evidence/r05_autonomous_bilinear_acceptance_1d9fc0b/qualification_report.json", "fem-czm-current-pf-companion@cf6a21b:integration_evidence/r05_moving_tip_bilinear_20261015/qualification_report.json", "fem-czm-current-pf-companion@cf6a21b:tests/test_moving_tip_bilinear_v1.py"],
+      "remaining_limitation": "No production material was selected. The constructed stiffness and separation work are qualification-only and are not a tungsten calibration or default. Production campaign rows remain disabled until physical cohesive support and case-level convergence are supplied."
     },
     {
       "id": "R06",
       "goal_ids": ["FG-04", "FG-05", "FG-16"],
-      "status": "COMPLETE_NATIVE_OPTIONS_PERSISTED_DIAGNOSTIC_RESTART_PHYSICAL_TRANSFER_COEFFICIENT_UNAVAILABLE",
+      "status": "COMPLETE_NATIVE_OPTIONS_AND_GENERIC_FULL_FIELD_ROUTE_PHYSICAL_TRANSFER_COEFFICIENT_UNAVAILABLE",
       "concrete_defect": "Tip-only, bulk-only and combined source support are executable and active. Channel-resolved transport has a distinct provider, execution binding and exact fresh-process restart. All five planned diagnostic interventions are typed orthogonal native consumers. The four in-run operators install only after a physically populated accepted state. History reset now writes a distinct atomic checkpoint, preserves physical-loss ledgers and counterfactual work, clears stale propagation cache state, performs native fixed-load mechanics re-equilibration, and continues through the shared driver in a fresh process. A positive conservative parameterized tip/bulk map remains qualified in both directions without installing a coefficient or production default.",
       "owner_consumer": "V10.4 bulk, tip process and transport implementations",
       "authoritative_source": "native geography audits and existing positive transport implementation",
       "dependencies": ["R01", "R03"],
-      "exact_next_command": "no remaining generic R06 implementation; select a physical tip/bulk transfer coefficient only if authoritative support becomes available",
+      "exact_next_command": "no remaining generic R06 implementation; the full-field route is qualified through native bulk_same_pt_km and restart; select a physical tip/bulk transfer coefficient only if authoritative support becomes available",
       "input_output_identity": "retained tip-only history plus native V10.4 bulk-only and tip-plus-bulk histories; exact evidence-file hashes recorded in the receipt",
       "numerical_criteria": "Nonzero activity, full mechanics, ledgers, support exclusions and fresh-process restart.",
       "executed_evidence": [
@@ -163,23 +165,24 @@
         "tests/test_history_reset_checkpoint_v1.py",
         "tests/test_shared_diagnostic_intervention_adapter.py",
         "tests/test_v10221_persistent_site_source.py",
-        "tests/test_tip_bulk_population_transfer_v1.py"
+        "tests/test_tip_bulk_population_transfer_v1.py",
+        "fem-czm-current-pf-companion@cf6a21b:integration_evidence/r06_full_field_generic_working/qualification_report.json"
       ],
       "remaining_limitation": "No physical tip/bulk population-transfer coefficient or production transfer default is identified by the available source. The generic conservative operator therefore requires an explicit requested line content and remains production-disabled. Native vacancy transport is a separate cavity capability and is not relabeled as dislocation transfer."
     },
     {
       "id": "R07",
       "goal_ids": ["FG-08", "FG-09", "FG-10"],
-      "status": "MOVING_TIP_CONSTRAINT_MIXITY_CONNECTED_RIGHT_CENSORED_BILINEAR_EVENT_PATH_PENDING",
+      "status": "MOVING_TIP_CONSTRAINT_MIXITY_CONNECTED_RIGHT_CENSORED_EXP_FLOOR_EVENT_PENDING",
       "concrete_defect": "The independent native cracked cohesive specimen executes all four requested transverse controls and signed mixed grips. The original moving-tip/current-law route now also maps plane stress, generalized prescribed epsilon_zz, generalized prescribed sigma_zz and signed mixed grips into the assembled anisotropic equilibrium, calibrated tip consumer and immutable native checkpoint. A fresh-process plane-stress 25-degree continuation preserves the accepted history exactly, and compact native generalized-strain/mixed and generalized-stress/Mode-I executions verify both distinct transverse controls. These executions are right-censored before fracture and do not substitute for an accepted mixed-mode topology event.",
       "owner_consumer": "PF/FEM cracked-body solvers and mechanism tensor projections",
       "authoritative_source": "mechanics constraint contract and native cracked-body fields",
       "dependencies": ["R01", "R03"],
-      "exact_next_command": "finish the activated/autonomous bilinear connection to the original moving-tip event/topology owner, then execute an accepted transition and post-event restart under one selective constraint/mixity case",
+      "exact_next_command": "resume the independent accepted-state EXP-floor mixed/constraint event and post-event restart when host memory admits it; this does not depend on R05",
       "input_output_identity": "plane strain, plane stress, generalized prescribed epsilon_zz or sigma_zz; signed mode II and mixed I-II",
       "numerical_criteria": "Nonuniform active state, tensor-consumer trace, response refinement and active-update restart.",
       "executed_evidence": ["common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json", "common_framework_readiness/local_preservation_and_kinetics_20261014/NATIVE_TRANSITION_CONTINUATION.json", "fem-czm-current-pf-companion@a0e5945:tests/test_bilinear_cohesive_specimen_v1.py", "fem-czm-current-pf-companion@d6ea36d:integration_evidence/r05_r07_bilinear_constraints_a0e5945/qualification_report.json", "fem-czm-current-pf-companion@54e927e:arrhenius_fracture/fem.py", "fem-czm-current-pf-companion@7557ba8:integration_evidence/r05_r07_bilinear_constraints_54e927e/qualification_report.json", "fem-czm-current-pf-companion@9045fd3:integration_evidence/r07_moving_tip_controls_working/qualification_report.json", "fem-czm-current-pf-companion@9045fd3:tests/test_native_constraint_mixed_mechanics.py"],
-      "remaining_limitation": "Uniform prescribed epsilon_zz and pointwise prescribed sigma_zz remain distinct 2-D controls and are not labeled finite-thickness solutions. The compact moving-tip executions verify request-to-field mapping and active-state restart but are right-censored before fracture; accepted mixed-mode remesh/post-event equilibrium is not yet qualified. The generic moving-tip entry still fails closed for both bilinear opening descriptions and full-field source scope. Mode III and a three-dimensional surface/interior transition remain outside the 2-D model."
+      "remaining_limitation": "Uniform prescribed epsilon_zz and pointwise prescribed sigma_zz remain distinct 2-D controls and are not labeled finite-thickness solutions. The compact moving-tip executions verify request-to-field mapping and active-state restart but are right-censored before fracture; the independent accepted EXP-floor mixed-mode remesh/post-event equilibrium remains resource-blocked. Resource admission was rechecked on 2026-10-15: 7.62/9.0 GiB swap was occupied while two unrelated scientific Python workers each held about 2.4 GiB, so a new non-resumable event attempt was not admitted. Mode III and a three-dimensional surface/interior transition remain outside the 2-D model."
     },
     {
       "id": "R08",
@@ -229,7 +232,7 @@
         "integration_evidence/r09_native_branch_a8620304/qualification_report.json",
         "tests/test_recursive_branch_readiness.py"
       ],
-      "remaining_limitation": "A second-generation physical birth has not yet occurred. The exact continuation is configured for four fronts and preserves all clocks/marks/state, but the current checkpoint is not yet recursively eligible because its owner region remains physically unresolved. Disk admission passes; launch is temporarily deferred because current machine swap is 9.4/10 GiB with multiple unrelated scientific workers active. Production execution remains disabled."
+      "remaining_limitation": "A second-generation physical birth has not yet occurred. The exact continuation is configured for four fronts and preserves all clocks/marks/state, but the current checkpoint is not yet recursively eligible because its owner region remains physically unresolved. Resource admission was rechecked on 2026-10-15: 7.62/9.0 GiB swap was occupied while two unrelated scientific Python workers each held about 2.4 GiB, so the long native continuation was not admitted. Production execution remains disabled."
     },
     {
       "id": "R10",
@@ -279,7 +282,7 @@
       "id": "R12",
       "goal_ids": ["FG-16", "FG-17"],
       "status": "CURRENT_SOURCE_PAIR_SUITES_PASS_EXTERNAL_ARCHIVES_INCOMPLETE",
-      "concrete_defect": "The final current source pair PF 4dd2fc9d / FEM 9045fd31 is qualified in the designated macOS Conda environment. PF passes 1004 tests with 16 explicitly external-evidence tests deselected; FEM passes 734 tests with two optional-dependency skips and 16 passing subtests. This supersedes the stale pre-change suite count without relabeling unavailable independent archives as present. The earlier clean-root and main-root evidence audits remain preserved.",
+      "concrete_defect": "The current calculation-source pair PF 4dd2fc9d / FEM cf6a21ba is qualified in the designated macOS Conda environment. PF passes 1004 tests with 16 explicitly external-evidence tests deselected; FEM passes 742 tests with two optional-dependency skips and 16 passing subtests. This includes the moving-tip bilinear and generic full-field integrations without relabeling unavailable independent archives as present. The earlier clean-root and main-root evidence audits remain preserved.",
       "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
       "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
       "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],
@@ -304,7 +307,7 @@
       "id": "R13",
       "goal_ids": ["FG-01", "FG-02", "FG-03", "FG-04", "FG-05", "FG-06", "FG-07", "FG-08", "FG-09", "FG-10", "FG-11", "FG-12", "FG-13", "FG-14", "FG-15", "FG-16", "FG-17", "FG-18"],
       "status": "COMPLETE_DISABLED_NATIVE_BINDING_PHYSICAL_AND_RESOURCE_DEPENDENCIES_EXPLICIT",
-      "concrete_defect": "The 692-cell v3 campaign preserves all 644 v2 cells and adds 48 deliberate cohesive comparisons. All 656 cells with an implemented native model now carry nonempty source-bound commands, typed options, endpoints and nine independent readiness axes: P3 diagnostics, P4 orientation/source geography, P6 branch/control pairs, P7 native/preexisting cavity pairs, P8 current generic FEM and the 12 native-opening P9 specimens. The 36 fitted-bilinear P9 cells remain explicit because their physical cohesive support is genuinely unassigned.",
+      "concrete_defect": "The 694-cell v3 campaign preserves all 644 v2 cells, adds 48 deliberate cohesive comparisons, and adds two selective full-field generic FEM source-geography cases without a Cartesian expansion. All 658 cells with a production-capable native model carry nonempty source-bound commands, typed options, endpoints and nine independent readiness axes. Each of the 36 fitted-bilinear P9 cells now has a source-bound constructed-input qualification command into the native moving-tip controller; production execution remains fail-closed because physical cohesive support is genuinely unassigned.",
       "owner_consumer": "prospective campaign schema, launcher, audit/resume and all-goal records",
       "authoritative_source": "unchanged charter plus completed R01-R12 registries",
       "dependencies": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R11", "R12"],
@@ -316,8 +319,8 @@
         "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
         "common_framework_readiness/CAMPAIGN_V3_SUMMARY.json"
       ],
-      "remaining_limitation": "Production remains disabled. The 36 fitted-bilinear comparison cells await authoritative activation-area/stiffness/work support and therefore have no fabricated commands. Three history-reset campaign cells require their same-case naturally populated accepted checkpoints before execution. Case-level convergence remains pending where recorded; R09 second-generation ownership and R10 occupied-state child continuation retain their separate physical/resource statuses."
+      "remaining_limitation": "Production remains disabled. The 36 fitted-bilinear comparison cells await authoritative activation-area/stiffness/work support and therefore have no fabricated production commands; their constructed-input native qualification commands are not production substitutes. Three history-reset campaign cells require their same-case naturally populated accepted checkpoints before execution. Case-level convergence remains pending where recorded, and the R09 second-generation ownership transition retains its separate resource status."
     }
   ],
-  "next_priority": "All independently implementable R05-R08 and disabled-campaign adapter work is source-bound. Remaining work is evidence- or input-dependent: admit the exact R09 recursive-owner and R10 occupied-cavity continuations when measured memory permits; retain the 36 fitted-bilinear P9 cells until authoritative cohesive support is supplied; acquire the two genuinely missing R12 external archives if available; and generate each P3 history-reset source checkpoint naturally within its same case before production execution. Production remains disabled."
+  "next_priority": "R05 moving-tip bilinear and R06 generic full-field routing are implemented, qualified and bound into the disabled campaign; R10 contact and downstream evidence are complete and linked to their actual producers. Resume the independent R07 EXP-floor accepted event and R09 recursive-owner transition only when host resources admit them. R12 external archives and production material calibration remain genuinely external. Production remains disabled."
 }

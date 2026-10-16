@@ -6,6 +6,7 @@ It is a construction/audit artifact: production permission is always false.
 """
 from __future__ import annotations
 
+import copy
 import csv
 from dataclasses import replace
 import hashlib
@@ -775,26 +776,25 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                     row["qualification_execution"] = {
                         "repository_role": "current_fem_companion",
                         "native_entrypoint": (
-                            "arrhenius_fracture.bilinear_cohesive_request_v1"
+                            "scripts/qualify_moving_tip_bilinear_v1.py"
                         ),
                         "launcher": [
-                            "python", "-m",
-                            "arrhenius_fracture.bilinear_cohesive_request_v1",
+                            "python", str((
+                                root.parent / "fem-czm-current-pf-companion" /
+                                "scripts/qualify_moving_tip_bilinear_v1.py"
+                            ).resolve()),
                             *qualification_args, "--out", "{qualification_output_dir}",
                         ],
                         "constructed_input_identity": (
-                            "CONSTRUCTED_BILINEAR_SPECIMEN_V1_NOT_PRODUCTION"
+                            "CONSTRUCTED_NATIVE_MOVING_TIP_BILINEAR_NOT_PRODUCTION"
                         ),
                         "production_case_substitution": False,
                     }
                     row["readiness"].update({
-                        "implementation": (
-                            "IMPLEMENTED_CONSTITUTIVE_SPECIMEN_ADAPTER_"
-                            "MOVING_TIP_NOT_CONNECTED"
-                        ),
+                        "implementation": "IMPLEMENTED_NATIVE_MOVING_TIP_CONTROLLER",
                         "native_qualification": (
-                            "NATIVE_SPECIMEN_CONSUMER_RESTART_QUALIFIED_"
-                            "MOVING_TIP_PENDING"
+                            "NATIVE_MOVING_TIP_TOPOLOGY_WORK_ROLLBACK_"
+                            "ACTIVE_RESTART_QUALIFIED_CONSTRUCTED_SUPPORT"
                         ),
                     })
                 row["execution"] = _execution(row)
@@ -811,6 +811,34 @@ def build_cases_v3(root: str | Path) -> list[dict[str, Any]]:
         for row in build_cases_v2(root)
     ]
     rows.extend(_cohesive_cases(root, options))
+    # Add only the two discriminating FEM full-field controls needed to expose
+    # bulk-only versus tip-plus-bulk behavior through the generic entry.
+    for arm, location, plasticity in (
+        ("accommodation", "tip_plus_bulk", "tip_plus_full_field"),
+        ("opening_only", "bulk_uniform", "full_field_evolving_rho"),
+    ):
+        source_id = (
+            "P8_fem_czm_common_peak_T900_r1_" + arm
+            + "_s1733_th0_a500_tip_surface_single_front_disabled"
+        )
+        source = next(row for row in rows if row["case_id"] == source_id)
+        row = copy.deepcopy(source)
+        row["case_id"] = source_id.replace(
+            "tip_surface_single_front", f"{location}_single_front"
+        )
+        row["source_location"] = location
+        row["plasticity_scope"] = plasticity
+        row["native_args"][row["native_args"].index("--source-scope") + 1] = (
+            "full_field"
+        )
+        row["shared_options"]["source_location"] = location
+        row["shared_options"]["plasticity"] = plasticity
+        row["readiness"].update({
+            "native_qualification": "GENERIC_FULL_FIELD_NATIVE_RESTART_QUALIFIED",
+            "kernel_validity": "BOUND_NATIVE_SIGNED_KERNEL_FAMILY",
+        })
+        row["execution"] = _execution(row)
+        rows.append(row)
     ids = [row["case_id"] for row in rows]
     if len(ids) != len(set(ids)):
         raise ValueError("v3 contains duplicate case identifiers")

@@ -4,10 +4,11 @@
   "expected_branch": "codex/current-pf-companion",
   "expected_commit_prefix": "784c57f",
   "generic_entry": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion/arrhenius_fracture/generic_current_pf_companion.py",
-  "generic_parameter_loading_adapter_status": "IMPLEMENTED_REGISTRY_DRIVEN_NATIVE_PLANE_STRAIN_TIP_ONLY_ENTRY",
+  "generic_parameter_loading_adapter_status": "IMPLEMENTED_REGISTRY_DRIVEN_NATIVE_TIP_ONLY_AND_FULL_FIELD_ENTRY",
   "observed_branch": "codex/current-pf-companion",
-  "observed_commit": "784c57f2b48172c6bd5b22f6892faff623cbb1f3",
+  "observed_commit": "cf6a21ba9fca1adf012201b76b3a7bb5898b7372",
   "opening_only_adapter_status": "IMPLEMENTED_NATIVE_CHANNEL_OWNER_AND_EXECUTED",
+  "moving_tip_bilinear_status": "IMPLEMENTED_NATIVE_TRANSACTION_OWNER_AND_QUALIFIED",
   "root": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
   "source_bound": true,
   "tracked_clean": true

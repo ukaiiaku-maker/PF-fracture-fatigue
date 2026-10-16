@@ -73,7 +73,7 @@ def inspect_current_companion() -> CurrentCompanionBinding:
         str(ROOT), COMMIT, observed, BRANCH, branch, tracked_clean,
         str(ROOT / ENTRY), str(ROOT / GENERIC_ENTRY), bound,
         "SOURCE_BOUND_PEAK_1000K_CURRENT_KERNEL" if bound else "UNAVAILABLE",
-        "IMPLEMENTED_REGISTRY_DRIVEN_NATIVE_PLANE_STRAIN_TIP_ONLY_ENTRY",
+        "IMPLEMENTED_REGISTRY_DRIVEN_NATIVE_TIP_ONLY_AND_FULL_FIELD_ENTRY",
         "IMPLEMENTED_NATIVE_CHANNEL_OWNER_AND_EXECUTED",
     )
 

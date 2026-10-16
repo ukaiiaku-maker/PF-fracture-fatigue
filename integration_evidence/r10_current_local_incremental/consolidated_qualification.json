@@ -36,25 +36,41 @@
     "topology_actions": 1,
     "topology_transaction_model_id": "v11.monotonic_tip_only_live_fem_topology_transaction/1"
   },
-  "execution_boundary": "The next command restores the exact occupied accepted state and performs native downstream birth, ordinary continuation, post-event equilibrium, rollback injections and exact active-state checkpoint round trips.",
-  "native_continuation_report": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/r10_current_local_incremental/downstream_continuation_run2/qualification_report.json",
-  "next_native_command": [
-    "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
-    "scripts/continue_unified_one_void_from_checkpoint.py",
-    "--checkpoint",
-    "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/integration_evidence/r10_current_local_incremental/local_incremental_connected_checkpoint.json",
-    "--output",
-    "<new-output>"
-  ],
+  "execution_boundary": "Contact selection, accepted connection, downstream child birth and ordinary continuation, post-event equilibrium, injected rollback and active-state checkpoint round trips are complete. No production or cavity-nucleation prediction was executed.",
+  "native_continuation_report": {
+    "path": "integration_evidence/r10_current_local_incremental/downstream_continuation_run2/qualification_report.json",
+    "sha256": "a0ea8478b89dcc49ad9931f80c29494bd999aed3b873ca6446e49979e1ec8fca",
+    "status": "PASS"
+  },
+  "selected_contact_report": {
+    "path": "integration_evidence/r10_current_local_incremental/qualification.json",
+    "sha256": "883463e656f25d95447b16407e13a29c0ff4fdabdaa1698f1139d6923175c6a9",
+    "status": "PASS"
+  },
   "not_claimed": [
-    "No downstream child acceptance is claimed until the native continuation exits PASS.",
+    "No material-calibrated cavity nucleation or production toughness prediction is claimed.",
     "The retained complete-ligament rate is a diagnostic alternative, not the selected law.",
     "The recovered 0.2 s exporter failure does not identify individual event times.",
     "No production campaign or physical recalibration is authorized."
   ],
   "production_execution_authorized": false,
-  "qualification_only_constructed_inputs": false,
+  "qualification_input_classification": {
+    "constructed_preexisting_cavity_geometry": true,
+    "constructed_injected_rollback_states": true,
+    "selected_material_registry_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+    "naturally_sampled_physical_event_times": false,
+    "production_calibration_claimed": false
+  },
   "qualification_source_commit": "f00c9bcd3c8000aed866f081ff002697265e131d",
+  "qualification_source_identity": {
+    "execution_parent_commit": "f00c9bcd3c8000aed866f081ff002697265e131d",
+    "completed_repairs_committed_as": "4dd2fc9dc5e87439899a24b13307b4a6cf0e735e",
+    "working_tree_patch_at_execution": "transaction and observer repairs subsequently committed without constitutive-law change",
+    "producer_source_hashes": {
+      "arrhenius_fracture/voiding_production_v5.py": "cd90bcd80608b9abb617cd2b1692162a3a1cf85ede02267e7818da0d0514c57b",
+      "scripts/continue_unified_one_void_from_checkpoint.py": "537e3199d80982f168e4fd1a29903b827564746aa982bdf6caae13564393dc6f"
+    }
+  },
   "retained_native_evidence": {
     "combined_branch_cavity": {
       "active_tip_ids": [
