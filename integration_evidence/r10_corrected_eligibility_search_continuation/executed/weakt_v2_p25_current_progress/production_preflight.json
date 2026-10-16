@@ -1,0 +1,58 @@
+{
+  "backend": "R8_RESTORED_PERSISTENT_REVERSIBLE_CURRENT_BACKEND",
+  "binding": {
+    "barrier_changed": false,
+    "candidate_id": "P25_TJBSV2_S_026704",
+    "complete_row_sha256": "85f8d9d2ddbe1e7c7c0c34589883b886023507089d0fe423c1ce2c4eb60d0041",
+    "emission_surface_sha256": "fc54bfb3a818d17e647dc92f88aa93dc5481a907dc0a9af7c0308cbb87f34b9f",
+    "event_law_changed": false,
+    "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION",
+    "historical_engine_loaded": false,
+    "mechanics_changed": false,
+    "opening_surface_sha256": "0aac489e702a9be4f5bc2abb858922e56f47c89935d37e35f6632fb2ec09bc6e",
+    "sealed_manifest": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_manifest.json",
+      "sha256": "76de79b0a784c4f60c9f5dc0c8f2d0b095aa1f4b4e26b0c7529d6027b66db995"
+    },
+    "source": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv",
+      "sha256": "0db44ad0e46bae061088ab2be999930ad59df00dae00afa59e3c2cb25c2967a5"
+    },
+    "translation": "EXACT_RETAINED_ROW_TO_CURRENT_PERSISTENT_REVERSIBLE_INTERFACES"
+  },
+  "kernel": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+    "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+  },
+  "loading": {
+    "Kmax_MPa_sqrt_m": [
+      4.605454507826579,
+      10.730644994333016,
+      20.236752724768525
+    ],
+    "R": 0.1,
+    "frequency_Hz": 1000.0,
+    "phase_count": 64,
+    "temperature_K": 300.0
+  },
+  "local_strength_Pa": 30000000000.0,
+  "local_strength_role": "independent qualified mechanical coordinate; not barrier knee",
+  "native_numerical_controls": {
+    "all_projected_segments_require_existing_state_hazard_ledger_positivity_and_event_guard_validation": true,
+    "current_invocation_DMD_chain_growth_factor": 2.0
+  },
+  "schema": "r10.retained-current-bridge/1",
+  "stochastic": {
+    "mark": "unit_exponential",
+    "owner": "PCG64_SeedSequence_[seed,1]",
+    "reward": "threshold_scaled_bounded",
+    "seed": 4810
+  },
+  "stops": {
+    "maximum_cycles": 1000000000000.0,
+    "maximum_events": 40,
+    "target_events": 12,
+    "target_extension_um": 70.0
+  },
+  "trajectory": "R9_PHASE_EXACT_STOCHASTIC_WITH_TRANSACTIONAL_MEAN_OR_NATIVE_HIGH_CYCLE_BLOCKS"
+}

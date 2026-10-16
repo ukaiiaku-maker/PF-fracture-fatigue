@@ -1,0 +1,30 @@
+{
+  "activation_entropy_changed": false,
+  "candidates": [
+    {
+      "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S2P4_V1",
+      "coherent_stress_scale": 3.327074253104921,
+      "complete_row_sha256": "75a9d5a98ead3c262d9b2da88a65e6f132cf8b247df8f247f6c058297e4df2a7",
+      "emit_sigc_1200_GPa": 4.990611379657381,
+      "emit_sigc_300_GPa": 2.3999999999999995
+    },
+    {
+      "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S2P6_V1",
+      "coherent_stress_scale": 3.6043304408636647,
+      "complete_row_sha256": "676855d59dab177402505f2f86adc5f36e4a65356e75b1d97fe534d1216b30f1",
+      "emit_sigc_1200_GPa": 5.406495661295498,
+      "emit_sigc_300_GPa": 2.6000000000000005
+    },
+    {
+      "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S2P8_V1",
+      "coherent_stress_scale": 3.881586628622408,
+      "complete_row_sha256": "52f4bdbce8f0cac005040e9790ff3db10d3f9a434e65608b6d7ff7dca0281dcc",
+      "emit_sigc_1200_GPa": 5.822379942933612,
+      "emit_sigc_300_GPa": 2.8
+    }
+  ],
+  "independent_endpoint_fit": false,
+  "next_gate": "refined seven-temperature current-backend fracture panel",
+  "parent_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+  "schema": "r10.weakt-coupled-scale-continuation/1"
+}

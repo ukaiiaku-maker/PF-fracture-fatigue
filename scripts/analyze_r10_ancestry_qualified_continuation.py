@@ -57,13 +57,6 @@ def main(argv=None) -> int:
     )
     if preflight["binding"]["complete_row_sha256"] != expected_hash:
         raise RuntimeError("fatigue attempt is not bound to the retained Weak-T row")
-    if any(float(weak[k]) == 0.0 for k in (
-        "cleave_gT_eV_per_K", "cleave_sT_GPa_per_K",
-        "emit_gT_eV_per_K", "emit_sT_GPa_per_K",
-        "peierls_activation_entropy_kB", "taylor_activation_entropy_kB",
-    )):
-        raise RuntimeError("selected original Weak-T row lost a temperature coordinate")
-
     p40_zeroed = [k for k in (
         "cleave_gT_eV_per_K", "cleave_sT_GPa_per_K",
         "emit_gT_eV_per_K", "emit_sT_GPa_per_K",
@@ -76,8 +69,11 @@ def main(argv=None) -> int:
     }, {
         "candidate_id": P40,
         "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
-        "selection_status": "REJECTED_AS_THERMAL_PARENT_AFTER_DIAGNOSTIC",
-        "reason": "300 K fatigue control has zero opening/emission affine temperature slopes: " + ";".join(p40_zeroed),
+        "selection_status": "ELIGIBLE_ISOTHERMAL_CONTROL_AND_DESIGN_SEED_THERMAL_PERFORMANCE_FAILED",
+        "reason": (
+            "zero explicit opening/emission slopes are lawful constant-Q EXP_floor coordinates; "
+            "the executed thermal panel, not coefficient syntax, rejects this row as the final material"
+        ),
     }, {
         "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
         "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
@@ -97,22 +93,29 @@ def main(argv=None) -> int:
         "selected_candidate": {
             "candidate_id": WEAKT, "alias": WEAKT_ALIAS,
             "complete_row_sha256": expected_hash,
-            "basis": "canonical original-family retained row with nonzero inherited temperature/entropy coordinates",
+            "basis": "canonical original-family retained row evaluated without endpoint reconstruction",
             "new_parameter_fit": False,
         },
         "fracture_execution": {
             "scope": "fresh current-backend 300/450 K discriminating panel",
             "cases": fracture,
-            "outcome": "FAIL_WEAK_T_REACHABILITY",
+            "outcome": "FAIL_WEAK_T_PHYSICAL_ENDPOINT_SPAN",
             "quantified_limit": (
                 "300 K completed 55 um with K_init=14.4315409362 MPa sqrt(m); "
                 "450 K had zero events and zero extension through Kmax=80 MPa sqrt(m)"
             ),
+            "stop_reason": "PHYSICAL_K_ENDPOINT_REACHED_NO_EVENT",
+            "final_accepted_K_MPa_sqrt_m": 80.0,
+            "accepted_steps": 1600,
+            "accepted_time_s": 16000.0,
+            "terminal_hazard_action": 0.021197933391292337,
+            "pending_mark_action": 0.9788020666087076,
+            "minimum_span_from_300K": 80.0 / 14.431540936206051,
             "remaining_temperatures": "not run after the 450 K hard censor rejected the row",
         },
         "fatigue_execution": {
             "scope": "same-row native current-state attempt at DeltaK=15 MPa sqrt(m)",
-            "outcome": "NUMERICAL_LIMIT_BEFORE_FIRST_COMPLETED_CYCLE_BLOCK",
+            "outcome": "OPERATOR_STOPPED_RESOURCE_EVIDENCE_NO_DURABLE_PROGRESS",
             "checkpoint_reason": checkpoint["reason"],
             "checkpoint_timestamp_unix_s": checkpoint["timestamp_unix_s"],
             "events_committed": len(progress.get("events", [])),
@@ -120,22 +123,30 @@ def main(argv=None) -> int:
             "observed_wall_seconds_before_operator_stop": 283,
             "limitation": (
                 "no post-initial atomic checkpoint or event was committed in 283 s; "
-                "the process remained inside the native chained-DMD/current-kernel map"
+                "the process remained inside the native chained-DMD/current-kernel map; this is "
+                "not a material failure, convergence result, or intrinsic runtime limit"
             ),
             "analytical_prior": "A0 moderate-slope width was 0.0 decades; not treated as a full-state result",
         },
         "joint_decision": "NO_PROMOTION_OR_2D_ESCALATION",
         "mechanism_interpretation": (
-            "The original row is thermally over-attenuated in opening/current-state competition: "
-            "fracture changes from finite initiation at 300 K to a hard 450 K opening censor. "
-            "The fatigue attempt is numerical-limit evidence only, so no Paris slope is claimed."
+            "The finite 300 K initiation and physical-endpoint 450 K censor reject the current "
+            "Weak-T objective, but event absence alone does not identify a microscopic cause. "
+            "The operator-stopped fatigue attempt has no rate or Paris-slope interpretation."
         ),
         "p40_control_disposition": {
             "zero_temperature_fields": p40_zeroed,
             "fresh_fracture_diagnostic": str((
                 a.run_root / "fracture/p40_transfer_ancestry_qualified_refined/panel_summary.json"
             ).resolve()),
-            "status": "not an eligible complete thermal material",
+            "status": (
+                "lawful retained isothermal control/design seed; not selected as the final thermal "
+                "material because its executed joint thermal fracture performance fails"
+            ),
+            "kinetic_temperature_dependence": (
+                "for fixed Q and state, lambda=nu0*exp[-Q/(kB*T)] remains temperature dependent "
+                "when explicit gT and sT are zero"
+            ),
         },
         "preserved_class_mechanism_evidence": {
             "source": {"path": str(causal_path.resolve()), "sha256": sha256(causal_path)},

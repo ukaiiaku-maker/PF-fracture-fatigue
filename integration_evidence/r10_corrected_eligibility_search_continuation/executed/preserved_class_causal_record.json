@@ -1,0 +1,142 @@
+{
+  "controls_preserved": [
+    "R10J_DBTT_P40_LSHIFT_036MEV_V1",
+    "R10_DBTT_P40_THERMAL_ANCHOR_V1"
+  ],
+  "counts": {
+    "analytical_rows": 2052,
+    "fatigue_cases": 23,
+    "full_state_cases": 146
+  },
+  "mechanism_classification": {
+    "Ceramic-like": {
+      "achieved_topology": "retained control",
+      "mechanism_status": "CONTROL_NO_PARIS_REQUIREMENT"
+    },
+    "DBTT": {
+      "achieved_topology": "rising full-state initiation curve",
+      "mechanism_status": "PLASTICITY_CREATED_DBTT_NOT_ESTABLISHED; retain as intrinsically rising hot-state-enhanced successful-fatigue control",
+      "opening_A0_role": "dominant intrinsic rise: 15.24 MPa sqrt(m) of the tabulated 17.943907 end-to-end rise",
+      "root_difference_warning": "K_full-K_A0 is an operational state correction, not explicit K_shield or microscopic work partition",
+      "state_role": "important hot-end enhancement; operational correction change 2.703907 MPa sqrt(m) and preserves the 1050-to-1200 rise"
+    },
+    "Peak-T": {
+      "achieved_topology": "interior sampled maximum at 600 K",
+      "mechanism_status": "PLASTICITY_GENERATED_PEAK_NOT_ESTABLISHED",
+      "opening_A0_role": "opening-dominated; A0 already peaks at 600 K",
+      "resolution": "600-to-750 full-root difference 0.0249997 MPa sqrt(m), below the executed dK=0.05 MPa sqrt(m) scan step; precise peak location unresolved",
+      "state_role": "modest correction, maximum relative full/A0 about 2.27 percent"
+    },
+    "Weak-T compensated": {
+      "achieved_topology": "bounded compensated curve, not perfectly flat",
+      "mechanism_status": "COMPENSATION_SUPPORTED; cancellation is interval-dependent",
+      "opening_A0_role": "A0 span 1.34945 and 300-to-1200 change -0.670 MPa sqrt(m)",
+      "state_role": "1050 K operational increase 31.49 percent; correction change +0.58255 MPa sqrt(m) opposes the intrinsic decline"
+    }
+  },
+  "schema": "r10.thermal-accessibility-result/1",
+  "selected": {
+    "Ceramic-like": {
+      "candidate_id": "retained ceramic controls",
+      "status": "CONTROL_NO_PARIS_REQUIREMENT"
+    },
+    "DBTT": {
+      "Kinit_by_temperature": [
+        5.2181914331,
+        11.451830867908917,
+        15.928675258493156,
+        18.715387634830424,
+        20.368523588288703,
+        21.927976278628883,
+        23.16209849727098
+      ],
+      "candidate_id": "R10T_DBTT_P40_G3075_S0P25GPA_P4_EP400_PP040_V1",
+      "fatigue_status": "PASS_REUSED_EXACT_300K_CONTRACT_TWO_SEEDS",
+      "fracture_status": "PASS_RISING_WITH_HOT_MECHANICAL_CONTRIBUTION"
+    },
+    "Peak-T": {
+      "Kinit_by_temperature": [
+        5.218191431656145,
+        5.725655455165621,
+        5.789876287820182,
+        5.764876631186712,
+        5.491698413183014,
+        5.132756391190972,
+        4.721988199665786
+      ],
+      "candidate_id": "R10T_PEAK_P40_G2600_S0P25GPA_P4_LOW_TAYLOR_V1",
+      "fatigue_status": "PASS_TWO_SEEDS",
+      "fracture_status": "PASS_RESOLVED_INTERIOR_MAXIMUM_BOTH_LIMBS"
+    },
+    "Weak-T compensated": {
+      "Kinit_by_temperature": [
+        5.2373966579,
+        6.258429080544234,
+        5.6305226556132455,
+        5.170827272321541,
+        5.25710533871317,
+        6.127402117669121,
+        5.1499512237412
+      ],
+      "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "fatigue_status": "FAIL_DEVELOPED_SLOPE_WIDTH_OBJECTIVE_RETURN_TO_SELECTION",
+      "five_point_window": {
+        "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+        "class": "Weak-T compensated",
+        "global_slope": 2.3509165052412855,
+        "growth_rate_width_decades": 1.48287882450669,
+        "local_slope_max": 3.9256604845583345,
+        "local_slope_min": 0.18927053632402085,
+        "moderate_two_decade_interval": false,
+        "point_count": 5,
+        "seed": 4810
+      },
+      "fracture_status": "PASS_BOUNDED_COMPENSATED_CURVE",
+      "independent_stream_status": "NOT_TRIGGERED_OBJECTIVE_FAILED_IN_FIRST_STREAM",
+      "numerical_status": "MEAN_CYCLE_REJECTED_NATIVE_PHASE_RESOLVED_COMPLETED",
+      "two_window_diagnostic": [
+        {
+          "DeltaK_max_MPa_sqrt_m": 9.999999990000001,
+          "DeltaK_min_MPa_sqrt_m": 5.000000004,
+          "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+          "class": "Weak-T compensated",
+          "global_slope": 3.8283225503987657,
+          "growth_rate_width_decades": 1.1527136396291315,
+          "local_slope_max": 3.9256604845583345,
+          "local_slope_min": 3.7382650761708045,
+          "seed": 4810,
+          "window": "low_3"
+        },
+        {
+          "DeltaK_max_MPa_sqrt_m": 21.99999996,
+          "DeltaK_min_MPa_sqrt_m": 9.999999990000001,
+          "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+          "class": "Weak-T compensated",
+          "global_slope": 0.9713542900936322,
+          "growth_rate_width_decades": 0.33016518487755847,
+          "local_slope_max": 1.6961860979240553,
+          "local_slope_min": 0.18927053632402085,
+          "seed": 4810,
+          "window": "high_3"
+        }
+      ]
+    }
+  },
+  "spatial": {
+    "artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/spatial/dbtt_900K_current_backend/r8_current_backend_spatial.json",
+    "binding": {
+      "candidate_id": "R10T_DBTT_P40_G3075_S0P25GPA_P4_EP400_PP040_V1",
+      "complete_row_sha256": "6bed47b28eee9ee50b9df00bec00988a03c5d9ecf440068c2db0e549fec5910c",
+      "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+      "mode": "EXACT_COMPLETE_ROW",
+      "no_refit": true,
+      "source": {
+        "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/thermal_state_candidates.csv",
+        "sha256": "b3a6c897ef9216931c950065579ce57817abe444c25c8333a03bc80aef1b704b"
+      }
+    },
+    "reused_controls": "runs/r10_joint_search/reused_sealed_2d_terminal_summary.csv",
+    "selected_candidate_id": "R10T_DBTT_P40_G3075_S0P25GPA_P4_EP400_PP040_V1",
+    "status": "PASS_EXACT_COMPLETE_ROW_CURRENT_BACKEND"
+  }
+}

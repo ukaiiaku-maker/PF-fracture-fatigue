@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "K_final_event_MPa_sqrt_m": 16.543524307700352,
+      "K_init_MPa_sqrt_m": 14.431540936206051,
+      "candidate_id": "v913_zeroD_sobol_0129902",
+      "event_count": 11,
+      "final_extension_um": 54.99999999999999,
+      "status": "complete",
+      "temperature_K": 300.0
+    },
+    {
+      "K_final_event_MPa_sqrt_m": null,
+      "K_init_MPa_sqrt_m": null,
+      "candidate_id": "v913_zeroD_sobol_0129902",
+      "event_count": 0,
+      "final_extension_um": 0.0,
+      "status": "KMAX_OR_STEP_CENSOR",
+      "temperature_K": 450.0
+    }
+  ]
+}

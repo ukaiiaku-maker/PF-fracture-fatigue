@@ -1,0 +1,121 @@
+{
+  "arrhenius_zero_slope_regression": {
+    "explicit_gT": 0.0,
+    "explicit_sT": 0.0,
+    "formula": "lambda=nu0*exp[-Q/(kB*T)]",
+    "interpretation": "zero explicit barrier derivative is not a temperature-independent rate",
+    "rate_300_s-1": 1.587593756199934e-05,
+    "rate_450_s-1": 6.316738836123897,
+    "rate_increases_with_temperature": true
+  },
+  "class_specific_feasible_pareto": {
+    "Ceramic-like": "retained control; no Paris requirement",
+    "DBTT": "developed moderate fatigue evidence preserved; endpoint-descended thermal rows remain diagnostic/non-promotable; original/refined parents remain in acquisition pool",
+    "Peak-T": "developed fatigue evidence preserved; opening-dominated peak classification retained; endpoint-descended final row remains non-promotable",
+    "Weak-T": "Family-B V2-P25 is current joint frontier: fracture and sealed 2D pass; fatigue completion pending. It cannot count as strict-family-A success."
+  },
+  "decision": "MULTILEVEL_SEARCH_RESUMED_WITH_RESTARTABLE_ACCEPTED_PROGRESS",
+  "joint_gates": {
+    "fatigue_status": "IN_PROGRESS_TWO_RESTARTABLE_POINTS_PLUS_ONE_DEVELOPED_LOW_POINT",
+    "fracture_pass": true,
+    "historical_1d_fracture_span": 1.1896923802208645,
+    "same_row_2D_all_reached_1000um": true,
+    "same_row_2D_cases": 2,
+    "weakT_span_limit": 1.25
+  },
+  "new_full_state_progress": {
+    "candidate_id": "P25_TJBSV2_S_026704",
+    "complete_row_sha256": "85f8d9d2ddbe1e7c7c0c34589883b886023507089d0fe423c1ce2c4eb60d0041",
+    "developed_low_rate_m_per_cycle": 1.106021315367989e-10,
+    "high": {
+      "DeltaK_MPa_sqrt_m": 18.213077452291675,
+      "accepted_cycles": 51.94391671891549,
+      "accepted_events": 2,
+      "accepted_extension_m": 7.112871831479144e-06,
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "case": "A0_band_high",
+      "checkpoint": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/bridges/weakt_v2_p25_high_seed4810/Kmax_20p2367527/checkpoint/trajectory_progress.json",
+      "developed_20_60_rate_m_per_cycle": "",
+      "remaining_events_to_target": 10,
+      "remaining_extension_m_to_70um": 6.288712816852085e-05,
+      "startup_average_rate_m_per_cycle": 1.3693368310997957e-07,
+      "status": "RESTARTABLE_ACCEPTED_PROGRESS"
+    },
+    "mid": {
+      "DeltaK_MPa_sqrt_m": 9.657580494899715,
+      "accepted_cycles": 432.05254352877694,
+      "accepted_events": 2,
+      "accepted_extension_m": 7.112871831479144e-06,
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "case": "A0_band_low",
+      "checkpoint": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/bridges/weakt_v2_p25_seed4810/Kmax_10p730645/checkpoint/trajectory_progress.json",
+      "developed_20_60_rate_m_per_cycle": "",
+      "remaining_events_to_target": 10,
+      "remaining_extension_m_to_70um": 6.288712816852085e-05,
+      "startup_average_rate_m_per_cycle": 1.6462978723339908e-08,
+      "status": "RESTARTABLE_ACCEPTED_PROGRESS"
+    },
+    "restart_contract": "resume the existing atomic checkpoints; do not restart from cycle zero",
+    "startup_mid_to_high_apparent_slope": 3.3392079555726157,
+    "startup_slope_is_not_developed_evidence": true
+  },
+  "next_acquisition": [
+    "resume V2-P25 mid and high cases from their accepted atomic checkpoints to developed 20-60 um rates",
+    "use the measured A0-to-current discrepancy to rank strict-family-A reference-state opening plus nucleation/motion proposals",
+    "retain direct Arrhenius coefficients and inherited cross-process couplings; no independent endpoint coordinates",
+    "send no new row to 2D until the joint 1D gates pass; reuse the exact sealed V2-P25 2D receipts meanwhile"
+  ],
+  "original_weakt_450_stop_receipt": {
+    "accepted_steps": 1600,
+    "accepted_time_s": 16000.0,
+    "candidate_id": "v913_zeroD_sobol_0129902",
+    "event_count": 0,
+    "final_accepted_K_MPa_sqrt_m": 80.0,
+    "hazard_action_current": 0.021197933391292337,
+    "hazard_threshold_action": 1.0,
+    "pending_mark_action": 0.9788020666087076,
+    "reported_status": "KMAX_OR_STEP_CENSOR",
+    "resolved_stop_reason": "PHYSICAL_K_ENDPOINT_REACHED_NO_EVENT",
+    "work_budget_reached": false
+  },
+  "preserved_mechanism_classifications": {
+    "DBTT": {
+      "achieved_topology": "rising full-state initiation curve",
+      "mechanism_status": "PLASTICITY_CREATED_DBTT_NOT_ESTABLISHED; retain as intrinsically rising hot-state-enhanced successful-fatigue control",
+      "opening_A0_role": "dominant intrinsic rise: 15.24 MPa sqrt(m) of the tabulated 17.943907 end-to-end rise",
+      "root_difference_warning": "K_full-K_A0 is an operational state correction, not explicit K_shield or microscopic work partition",
+      "state_role": "important hot-end enhancement; operational correction change 2.703907 MPa sqrt(m) and preserves the 1050-to-1200 rise"
+    },
+    "Peak-T": {
+      "achieved_topology": "interior sampled maximum at 600 K",
+      "mechanism_status": "PLASTICITY_GENERATED_PEAK_NOT_ESTABLISHED",
+      "opening_A0_role": "opening-dominated; A0 already peaks at 600 K",
+      "resolution": "600-to-750 full-root difference 0.0249997 MPa sqrt(m), below the executed dK=0.05 MPa sqrt(m) scan step; precise peak location unresolved",
+      "state_role": "modest correction, maximum relative full/A0 about 2.27 percent"
+    }
+  },
+  "schema": "r10.corrected-eligibility-search-continuation/1",
+  "selected_candidates": [
+    {
+      "analytical_reason": "A0 moderate band 1.0162811480873657 decades; historical full-state fracture span 1.189692; exact sealed 2D at 300/1200 K",
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION",
+      "joint_status": "fracture_and_2D_passed_family_B; fatigue_low_complete_mid_high_restartable",
+      "selection": "CONTINUE_RESTARTABLE_CURRENT_FATIGUE"
+    }
+  ],
+  "sources": {
+    "controls_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v10230-thermodynamic-joint-barrier-search/artifacts/thermodynamic_joint_barrier_search/source_fatigue_controls_registry.csv",
+      "sha256": "153dc913991c98dfb218fefcc254ca731ad1e995373d597050c177c71f4020a6"
+    },
+    "original_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv",
+      "sha256": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760"
+    },
+    "v2_rows": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv",
+      "sha256": "0db44ad0e46bae061088ab2be999930ad59df00dae00afa59e3c2cb25c2967a5"
+    }
+  }
+}

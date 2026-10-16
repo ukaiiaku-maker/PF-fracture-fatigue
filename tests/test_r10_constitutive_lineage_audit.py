@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from scripts.reconcile_r10_constitutive_temperature_lineage import transform_audit
+from arrhenius_fracture.material_manifest import ExpFloorBarrier
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -53,3 +54,20 @@ def test_continuation_analysis_uses_evidence_scoped_labels():
     assert "new_rate_span_decades" in source
     assert "P1/P2-only" in source
     assert "stopped_dominated_rows" not in source
+
+
+def test_zero_explicit_temperature_slopes_still_have_arrhenius_rate_dependence():
+    surface = ExpFloorBarrier(
+        G00_eV=1.0, gT_eV_per_K=0.0, sigc0_Pa=2.0e9,
+        sT_Pa_per_K=0.0, alpha=1.0, exponent=1.0,
+        floor_fraction=0.1,
+    )
+    assert float(surface.values_eV(0.0, 300.0)) == float(surface.values_eV(0.0, 450.0))
+    assert float(surface.rate(0.0, 450.0)) > float(surface.rate(0.0, 300.0))
+
+
+def test_p40_zero_slopes_are_not_an_eligibility_rejection():
+    source = (ROOT / "scripts/analyze_r10_ancestry_qualified_continuation.py").read_text()
+    assert "lost a temperature coordinate" not in source
+    assert "zero explicit opening/emission slopes are lawful" in source
+    assert "OPERATOR_STOPPED_RESOURCE_EVIDENCE" in source
