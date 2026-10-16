@@ -1,0 +1,35 @@
+{
+  "schema": "fracture-framework-final-source-qualification/1",
+  "date": "2026-10-15",
+  "source_pair": {
+    "pf_commit": "4dd2fc9dc5e87439899a24b13307b4a6cf0e735e",
+    "fem_commit": "9045fd31be7dcbac35e1afd07f66135571079921"
+  },
+  "environment": {
+    "platform": "macOS",
+    "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "conda_environment": "arrhenius-sharp-front-v10-codex"
+  },
+  "pf": {
+    "command": "python -m pytest -q -m 'not external_evidence'",
+    "result": "PASS",
+    "passed": 1004,
+    "deselected_external_evidence": 16,
+    "duration_s": 106.08
+  },
+  "fem": {
+    "command": "python -m pytest -q",
+    "result": "PASS_WITH_OPTIONAL_SKIPS",
+    "passed": 734,
+    "skipped_optional_dependency": 2,
+    "passing_subtests": 16,
+    "duration_s": 49.79
+  },
+  "native_execution_receipts": {
+    "r07_moving_tip_constraints": "fem-czm-current-pf-companion@9045fd3:integration_evidence/r07_moving_tip_controls_working/qualification_report.json",
+    "r10_local_incremental_cavity": "integration_evidence/r10_current_local_incremental/consolidated_qualification.json"
+  },
+  "external_evidence_boundary": "The 16 PF external-evidence tests remain separately gated; this receipt does not fabricate the two unavailable independent archives.",
+  "production_campaign_executed": false,
+  "manuscript_modified": false
+}
