@@ -50,15 +50,22 @@ class CapacityReceipt:
     peak_GiB: float
     admitted: bool
     reason: str
+    resource_kind: str = "disk_free_space"
+    peak_basis: str = "caller-supplied disk-footprint estimate"
+    ram_admission_performed: bool = False
 
 
 def capacity_preflight(path: str | Path, peak_GiB: float, *, reserve_GiB: float = 12.0) -> CapacityReceipt:
+    """Check disk capacity only; this receipt is never evidence of peak RAM."""
     root = Path(path).resolve()
     usage = shutil.disk_usage(root)
     free = usage.free / 2**30
     admitted = free >= float(peak_GiB) + float(reserve_GiB)
-    return CapacityReceipt(str(root), free, reserve_GiB, peak_GiB, admitted,
-                           "capacity admitted" if admitted else "DEFERRED_RESOURCE: peak plus reserve exceeds free space")
+    return CapacityReceipt(
+        str(root), free, reserve_GiB, peak_GiB, admitted,
+        ("disk capacity admitted" if admitted else
+         "DEFERRED_RESOURCE: estimated disk footprint plus disk reserve exceeds free space"),
+    )
 
 
 def qualification_jobs() -> tuple[QualificationJob, ...]:

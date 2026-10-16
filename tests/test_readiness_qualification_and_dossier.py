@@ -31,6 +31,8 @@ def test_qualification_manifest_is_separate_and_fail_closed():
 def test_capacity_preflight_accounts_for_peak_plus_reserve():
     free = capacity_preflight(ROOT, 0.01, reserve_GiB=0.0)
     assert free.admitted and free.free_GiB > 0
+    assert free.resource_kind == "disk_free_space"
+    assert free.ram_admission_performed is False
     blocked = capacity_preflight(ROOT, free.free_GiB + 1.0, reserve_GiB=0.0)
     assert not blocked.admitted and "DEFERRED_RESOURCE" in blocked.reason
 

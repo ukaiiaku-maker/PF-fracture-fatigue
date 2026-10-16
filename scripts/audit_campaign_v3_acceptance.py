@@ -148,7 +148,7 @@ def audit(path: Path) -> dict:
         "binding_errors": per_case,
         "checks": {
             "case_count_699": len(rows) == 699,
-            "native_command_count_663": len(commands) == 663,
+            "native_command_count_699": len(commands) == 699,
             "five_selective_constraint_mixity_rows": sum(
                 bool(row.get("selective_native_comparison")) for row in rows
             ) == 5,

@@ -720,15 +720,17 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                         "kind": law, "temperature_policy": temperature_policy,
                         "fit": cohesive_fit, "physical_support_status": physical_support,
                     },
-                    # Filled only for a genuinely bound production consumer.
-                    # Unsupported bilinear rows retain their exact constructed
-                    # qualification route below, never the historical
-                    # EXP-floor entrypoint.
+                    # Filled below only through the generic native consumer
+                    # appropriate to the selected opening description.
                     "native_entrypoint": None,
                     "native_args": [], "output_profile": "publication_restart",
                     "resource_estimate": {
                         "retained_output_GiB": 0.06, "peak_transient_GiB": 6.0,
                         "reserve_GiB": 12.0,
+                        "basis": (
+                            "engineering allocation estimate; not measured RSS, "
+                            "swap, or transient-disk peak"
+                        ),
                     },
                     "output_validation": {
                         "required": [
@@ -775,17 +777,21 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                         qualification_args.extend([
                             "--constructed-separation-work-J-per-m2", "20",
                         ])
+                    _bind_generic_fem(root, row)
+                    row["native_args"] = _replace_arg(
+                        row["native_args"], "--opening-model", law,
+                    )
+                    row["native_args"].extend(qualification_args)
                     row["qualification_execution"] = {
                         "repository_role": "current_fem_companion",
                         "native_entrypoint": (
-                            "scripts/qualify_moving_tip_bilinear_v1.py"
+                            "arrhenius_fracture.generic_current_pf_companion"
                         ),
                         "launcher": [
-                            "python", str((
-                                root.parent / "fem-czm-current-pf-companion" /
-                                "scripts/qualify_moving_tip_bilinear_v1.py"
-                            ).resolve()),
-                            *qualification_args, "--out", "{qualification_output_dir}",
+                            "python", "-m",
+                            "arrhenius_fracture.generic_current_pf_companion",
+                            *row["native_args"],
+                            "--out", "{qualification_output_dir}",
                         ],
                         "constructed_input_identity": (
                             "CONSTRUCTED_NATIVE_MOVING_TIP_BILINEAR_NOT_PRODUCTION"
@@ -793,10 +799,12 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                         "production_case_substitution": False,
                     }
                     row["readiness"].update({
-                        "implementation": "IMPLEMENTED_NATIVE_MOVING_TIP_CONTROLLER",
+                        "implementation": (
+                            "IMPLEMENTED_GENERIC_SOLVED_NATIVE_MOVING_TIP_BILINEAR"
+                        ),
                         "native_qualification": (
-                            "NATIVE_MOVING_TIP_TOPOLOGY_WORK_ROLLBACK_"
-                            "ACTIVE_RESTART_QUALIFIED_CONSTRUCTED_SUPPORT"
+                            "SOLVED_FREE_DOF_MOVING_TIP_ACCOMMODATION_TOPOLOGY_"
+                            "WORK_ROLLBACK_ACTIVE_RESTART_QUALIFIED_CONSTRUCTED_SUPPORT"
                         ),
                     })
                 row["execution"] = _execution(row)

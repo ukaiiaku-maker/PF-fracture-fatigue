@@ -1,7 +1,7 @@
 {
   "binding_errors": {},
   "campaign": "/Volumes/Data/working-papers/Fracture/shared-fracture-fatigue-options-v1/common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
-  "campaign_sha256": "c3ccf678b3124486ba68b2847fe16b2eaf75a9e683d5a198175f94278e0cd293",
+  "campaign_sha256": "366bfa345f5077b6ea279ae3ce1bd75ca508bd9ad695760edabda293f3f207fb",
   "case_count": 699,
   "checks": {
     "all_36_fitted_rows_have_qualification_requests": true,
@@ -10,12 +10,12 @@
     "exact_near_boundary_count_20": true,
     "exact_raw_domain_blocked_count_3": true,
     "five_selective_constraint_mixity_rows": true,
-    "native_command_count_663": true,
+    "native_command_count_699": true,
     "production_disabled_all_rows": true
   },
   "fitted_bilinear_production_blocked_count": 36,
   "fitted_bilinear_qualification_request_count": 36,
-  "native_command_count": 663,
+  "native_command_count": 699,
   "near_boundary_rows": [
     {
       "block": "P7",
@@ -164,21 +164,21 @@
       "block": "P9",
       "case_id": "P9_cohesive_DBTT_hot_fast_accommodation_bilinear_barrier_activated_fit_temperature_matched",
       "family": "DBTT",
-      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "parameter_option": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification",
       "temperature_K": 1200.0
     },
     {
       "block": "P9",
       "case_id": "P9_cohesive_DBTT_hot_fast_accommodation_bilinear_czm_classical_fit_temperature_matched",
       "family": "DBTT",
-      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "parameter_option": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification",
       "temperature_K": 1200.0
     },
     {
       "block": "P9",
       "case_id": "P9_cohesive_DBTT_hot_fast_accommodation_bilinear_czm_classical_reference_temperature_frozen",
       "family": "DBTT",
-      "parameter_option": "v913_paper_dbtt01_0202500_persistent_sites__taylor_margin_0p10eV",
+      "parameter_option": "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification",
       "temperature_K": 1200.0
     }
   ],

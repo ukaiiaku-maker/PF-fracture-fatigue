@@ -25,7 +25,7 @@ GENERIC_FEM_ROOT = Path(
 )
 GENERIC_ENTRY_RELATIVE = Path("arrhenius_fracture/generic_current_pf_companion.py")
 GENERIC_ENTRY_MODULE = "arrhenius_fracture.generic_current_pf_companion"
-GENERIC_FEM_COMMIT = "0dcee64a1f96cc4c05aacc3b3032862ddc5ac273"
+GENERIC_FEM_COMMIT = "7fde6894fe44038f9dc785da87967056a7d12406"
 GENERIC_FEM_BRANCH = "codex/current-pf-companion"
 DEFAULT_FEM_PYTHON = Path(
     "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python"

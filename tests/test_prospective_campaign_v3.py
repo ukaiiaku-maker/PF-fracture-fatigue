@@ -35,10 +35,18 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     assert all(row["readiness"]["input_availability"] == "BLOCKED_PHYSICAL_COHESIVE_SUPPORT" for row in fitted)
     assert all(row["cohesive_law"]["fit"]["unassigned_physical_quantities"] for row in fitted)
     assert all(row["qualification_execution"]["launcher"] for row in fitted)
-    assert all(row["native_entrypoint"] is None for row in fitted)
+    assert all(
+        row["native_entrypoint"]
+        == "arrhenius_fracture.generic_current_pf_companion"
+        for row in fitted
+    )
     assert all(
         row["readiness"]["implementation"]
-        == "IMPLEMENTED_NATIVE_MOVING_TIP_CONTROLLER"
+        == "IMPLEMENTED_GENERIC_SOLVED_NATIVE_MOVING_TIP_BILINEAR"
+        for row in fitted
+    )
+    assert all(
+        row["cohesive_law"]["kind"] in row["native_args"]
         for row in fitted
     )
     assert all(
@@ -62,17 +70,22 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         row for row in rows
         if row.get("material_selection_scope") == "QUALIFICATION_ONLY"
     ]
-    # 66 PF baseline cells, six P4 orientation cells, two P8 cells, and one P9 specimen.
-    assert len(dbtt_qualification) == 75
+    # 66 PF baseline cells, six P4 orientation cells, two P8 cells, and four P9
+    # specimens (one original opening plus three bilinear comparisons).
+    assert len(dbtt_qualification) == 78
     assert all(row["native_args"] for row in dbtt_qualification)
     assert all(row["production_parameter_option"] is None for row in dbtt_qualification)
     assert {row["parameter_option"] for row in dbtt_qualification} == {
         "dbtt_paper_minimal_sigc_taylor_0p10eV_qualification"
     }
+    calibrated_or_original = [
+        row for row in dbtt_qualification
+        if row.get("cohesive_law", {}).get("fit") is None
+    ]
     assert all(
         row["readiness"]["implementation"] == "IMPLEMENTED"
         and row["readiness"]["input_availability"].startswith("AVAILABLE_")
-        for row in dbtt_qualification
+        for row in calibrated_or_original
     )
 
     fem = [row for row in rows if row["block"] == "P8"]

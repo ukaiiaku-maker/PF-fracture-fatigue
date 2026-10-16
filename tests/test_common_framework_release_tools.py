@@ -35,7 +35,7 @@ def test_campaign_runner_reports_current_v3_matrix():
     report = json.loads(result.stdout)
     assert report["schema"].endswith("/3")
     assert report["case_count"] == 699
-    assert report["native_command_count"] == 663
+    assert report["native_command_count"] == 699
     assert report["execution_authorized"] is False
 
 
