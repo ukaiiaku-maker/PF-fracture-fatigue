@@ -4,7 +4,7 @@
 
 The integrated calculation and disabled-campaign source pair is PF `1c7841ea2253d5a6a8b1a016c482c92fb77a7dfd` and FEM `ee634968deae2b280cc179d330e35575956f4000`. A later PF documentation-only closeout commit may contain this report; it does not change that calculation-source identity. Production and manuscript work remain disabled. No remote write or scientific-data deletion was performed.
 
-The portable source qualification passes: PF reports 1004 passed with 16 explicitly external-evidence tests deselected; FEM reports 753 passed plus 16 passing subtests. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
+The portable source qualification passes: PF reports 1004 passed with 16 explicitly external-evidence tests deselected; FEM reports 754 passed plus 16 passing subtests. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
 
 ## Controller findings and repair
 

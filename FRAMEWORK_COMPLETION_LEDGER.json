@@ -282,7 +282,7 @@
       "id": "R12",
       "goal_ids": ["FG-16", "FG-17"],
       "status": "CURRENT_SOURCE_PAIR_SUITES_PASS_EXTERNAL_ARCHIVES_INCOMPLETE",
-      "concrete_defect": "The current working calculation-source pair includes FEM ee634968 and the PF continuation that binds it. Before the PF binding update, the full PF run passed 1002 tests and failed only the two deliberate source-binding checks against the new FEM head; after binding, the affected and campaign suites pass. FEM passes 753 tests with 16 passing subtests. The 16 PF external-evidence tests remain explicitly deselected and the two unavailable independent archives remain INCOMPLETE rather than being relabeled as present.",
+      "concrete_defect": "The current working calculation-source pair includes FEM ee634968 and the PF continuation that binds it. Before the PF binding update, the full PF run passed 1002 tests and failed only the two deliberate source-binding checks against the new FEM head; after binding, the exact portable PF head passes 1004 tests. The exact FEM head passes 754 tests with 16 passing subtests. The 16 PF external-evidence tests remain explicitly deselected and the two unavailable independent archives remain INCOMPLETE rather than being relabeled as present.",
       "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
       "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
       "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],

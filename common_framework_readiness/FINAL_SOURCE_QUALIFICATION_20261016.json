@@ -15,9 +15,9 @@
   "fem": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python -m pytest -q",
     "result": "PASS",
-    "passed": 753,
+    "passed": 754,
     "passing_subtests": 16,
-    "duration_s": 107.15
+    "duration_s": 94.52
   },
   "focused_native_evidence": {
     "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@ee634968:integration_evidence/r05_controller_transaction_20261016/qualification_report.json",
