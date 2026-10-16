@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     rows = build_cases_v3(ROOT)
-    assert len(rows) == 694
+    assert len(rows) == 699
     assert validate_plan(rows)["valid"]
     assert all(row["production_execution_authorized"] is False for row in rows)
     assert all(set(row["readiness"]) == set(STATUS_AXES) for row in rows)
@@ -75,7 +75,7 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     )
 
     fem = [row for row in rows if row["block"] == "P8"]
-    assert len(fem) == 24
+    assert len(fem) == 29
     assert all(row["native_args"] for row in fem)
     assert all(
         row["native_entrypoint"]
@@ -101,6 +101,15 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     assert {row["shared_options"]["source_location"] for row in full_field} == {
         "bulk_uniform", "tip_plus_bulk",
     }
+    selective = [row for row in fem if row.get("selective_native_comparison")]
+    assert len(selective) == 5
+    assert {row["mechanics_state"]["plane_state"] for row in selective} == {
+        "plane_strain", "plane_stress", "generalized_plane_strain",
+    }
+    assert {row["mechanics_state"]["in_plane_mode"] for row in selective} == {
+        "mode_I", "mode_II", "mixed_I_II",
+    }
+    assert all("--grip-mode-angle-deg" in row["native_args"] for row in selective)
 
     p4_tip = [
         row for row in rows

@@ -85,6 +85,22 @@ def _binding_errors(row: dict) -> list[str]:
     if row.get("backend") == "full_fem_czm":
         if _value(args, "--constraint") != row["mechanics_state"]["plane_state"]:
             errors.append("FEM constraint is not translated")
+        expected_angle = float(row["mechanics_state"].get("grip_mode_angle_deg", 0.0))
+        actual_angle = float(_value(args, "--grip-mode-angle-deg") or 0.0)
+        if actual_angle != expected_angle:
+            errors.append("FEM signed grip mixity is not translated")
+        expected_eps = row["mechanics_state"].get("eps_zz")
+        expected_sigma = row["mechanics_state"].get("sigma_zz_Pa")
+        actual_eps = _value(args, "--eps-zz")
+        actual_sigma = _value(args, "--sigma-zz-Pa")
+        if row["mechanics_state"]["plane_state"] == "generalized_plane_strain" and expected_eps is not None and (
+            actual_eps is None or float(actual_eps) != float(expected_eps)
+        ):
+            errors.append("FEM eps_zz control is not translated")
+        if row["mechanics_state"]["plane_state"] == "generalized_plane_strain" and expected_sigma is not None and (
+            actual_sigma is None or float(actual_sigma) != float(expected_sigma)
+        ):
+            errors.append("FEM sigma_zz control is not translated")
         expected = "active_tip" if row["arm"] == "accommodation" else "opening_only"
         if _value(args, "--accommodation-mode") != expected:
             errors.append("FEM accommodation arm is not translated")
@@ -131,8 +147,11 @@ def audit(path: Path) -> dict:
         ),
         "binding_errors": per_case,
         "checks": {
-            "case_count_694": len(rows) == 694,
-            "native_command_count_658": len(commands) == 658,
+            "case_count_699": len(rows) == 699,
+            "native_command_count_663": len(commands) == 663,
+            "five_selective_constraint_mixity_rows": sum(
+                bool(row.get("selective_native_comparison")) for row in rows
+            ) == 5,
             "exact_raw_domain_blocked_count_3": len(blocked) == 3,
             "exact_near_boundary_count_20": len(boundary) == 20,
             "all_36_fitted_rows_have_qualification_requests": len(fitted) == 36 and all(

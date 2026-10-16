@@ -7,11 +7,11 @@
     "P5": 96,
     "P6": 64,
     "P7": 44,
-    "P8": 24,
+    "P8": 29,
     "P9": 48
   },
-  "canonical_semantic_sha256": "a7e7cac2933a23200f7309253ce5064275857860d368577d18ef19485e9f9f6e",
-  "case_count": 694,
+  "canonical_semantic_sha256": "306edef8801730576ea73ba51888018bf73e2ddb780660af5ed3efa1c3dd66c3",
+  "case_count": 699,
   "cohesive_comparison_case_count": 48,
   "goal_records": [
     {
@@ -65,12 +65,12 @@
       "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
     },
     {
-      "case_count": 72,
+      "case_count": 77,
       "goal_id": "FG-11",
       "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
     },
     {
-      "case_count": 72,
+      "case_count": 77,
       "goal_id": "FG-12",
       "status": "REPRESENTED_IN_DISABLED_CAMPAIGN"
     },
@@ -107,26 +107,26 @@
   ],
   "output_root": null,
   "production_execution_authorized": false,
-  "raw_jsonl_sha256": "82911e050d680e3fe56a7a00aaad43b284595f49b4c4fd7548067cf9163a4487",
+  "raw_jsonl_sha256": "81391009231fd829eb92089075addecca18a064f44c25e40f0c6415ff614702b",
   "readiness_counts": {
     "fit_quality": {
-      "NOT_APPLICABLE_OR_NATIVE_OPENING": 658,
+      "NOT_APPLICABLE_OR_NATIVE_OPENING": 663,
       "QUALIFIED_FINITE_DOMAIN_ABSOLUTE_SUPPORT_UNASSIGNED": 36
     },
     "implementation": {
-      "IMPLEMENTED": 658,
+      "IMPLEMENTED": 663,
       "IMPLEMENTED_NATIVE_MOVING_TIP_CONTROLLER": 36
     },
     "input_availability": {
       "AVAILABLE_CONSTRUCTED_QUALIFICATION_INPUTS": 28,
       "AVAILABLE_QUALIFICATION_INPUT_PRODUCTION_SELECTION_PENDING": 75,
-      "AVAILABLE_VERSIONED_INPUTS": 552,
+      "AVAILABLE_VERSIONED_INPUTS": 557,
       "BLOCKED_PHYSICAL_COHESIVE_SUPPORT": 36,
       "PENDING_MATCHED_POPULATED_CHECKPOINT": 3
     },
     "kernel_validity": {
       "BOUND_NATIVE_KERNEL": 452,
-      "BOUND_NATIVE_KERNEL_COMMON_OBSERVER_CONVERGENCE_PENDING": 34,
+      "BOUND_NATIVE_KERNEL_COMMON_OBSERVER_CONVERGENCE_PENDING": 39,
       "BOUND_NATIVE_ORIENTATION_RESOLVER": 104,
       "BOUND_NATIVE_SIGNED_KERNEL_FAMILY": 24,
       "BOUND_NATIVE_V5_DIRECTIONAL_PROVIDER": 44,
@@ -134,7 +134,7 @@
     },
     "material_domain": {
       "BLOCKED_RAW_CONSTITUTIVE_SCALE_NONPOSITIVE": 3,
-      "CONSTRUCTED_PROSPECTIVE_NOT_PRODUCTION_SELECTED": 596,
+      "CONSTRUCTED_PROSPECTIVE_NOT_PRODUCTION_SELECTED": 601,
       "CONSTRUCTED_QUALIFICATION_ADMISSIBLE_NOT_PRODUCTION_SELECTED": 75,
       "QUALIFICATION_REQUIRED_NEAR_SCALE_ZERO": 20
     },
@@ -143,6 +143,7 @@
       "FULL_FIELD_GEOGRAPHY_RESTART_QUALIFIED": 4,
       "GENERIC_ENTRY_DRY_RUN_QUALIFIED_CASE_LEVEL_PENDING": 34,
       "GENERIC_FULL_FIELD_NATIVE_RESTART_QUALIFIED": 2,
+      "NATIVE_CONSTRAINT_AND_SIGNED_MIXITY_PATH_QUALIFIED_CASE_LEVEL_PENDING": 5,
       "NATIVE_FIRST_BIRTH_DAUGHTER_RESTART_QUALIFIED_SECOND_GENERATION_OWNER_GATE_PENDING": 32,
       "NATIVE_MOVING_TIP_TOPOLOGY_WORK_ROLLBACK_ACTIVE_RESTART_QUALIFIED_CONSTRUCTED_SUPPORT": 36,
       "NATIVE_PAIRED_V5_CONNECTED_STATE_QUALIFIED_CASE_CONTINUATION_PENDING": 16,
@@ -158,13 +159,13 @@
       "CASE_LEVEL_PRODUCTION_CONVERGENCE_PENDING": 578,
       "CONSTRUCTOR_EQUILIBRIUM_PASS_CASE_ENDPOINT_PENDING": 28,
       "PENDING_THREE_LEVEL": 36,
-      "PENDING_THREE_LEVEL_CASE_GRID": 36
+      "PENDING_THREE_LEVEL_CASE_GRID": 41
     },
     "production_permission": {
-      "DENIED_CURRENT_MACHINE": 694
+      "DENIED_CURRENT_MACHINE": 699
     },
     "resource_admission": {
-      "PENDING_AUTHORIZED_TARGET_MACHINE_AND_OUTPUT_ROOT": 694
+      "PENDING_AUTHORIZED_TARGET_MACHINE_AND_OUTPUT_ROOT": 699
     }
   },
   "resource_estimates": {
@@ -172,7 +173,7 @@
     "maximum_single_case_peak_transient_GiB": 24.0,
     "maximum_substantial_workers_current_plan": 1,
     "reserve_GiB": 12.0,
-    "summed_retained_output_GiB": 31.35
+    "summed_retained_output_GiB": 31.65
   },
   "schema": "prospective-common-fracture-campaign/3",
   "status_axes": [

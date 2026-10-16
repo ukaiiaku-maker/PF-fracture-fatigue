@@ -839,6 +839,62 @@ def build_cases_v3(root: str | Path) -> list[dict[str, Any]]:
         })
         row["execution"] = _execution(row)
         rows.append(row)
+
+    # Selective (not Cartesian) native FEM controls ensure that constraint and
+    # signed grip mixity are present in the executable campaign itself.  These
+    # remain disabled qualification cells and preserve all original P8 rows.
+    comparison_source_id = (
+        "P8_fem_czm_common_peak_T900_r1_accommodation_"
+        "s1733_th0_a500_tip_surface_single_front_disabled"
+    )
+    comparison_source = next(
+        row for row in rows if row["case_id"] == comparison_source_id
+    )
+    comparisons = (
+        ("plane_stress_mode_I", "plane_stress", None, 0.0, 0.0, "mode_I"),
+        ("gps_eps_mode_I", "generalized_plane_strain", 1.0e-4, None, 0.0, "mode_I"),
+        ("gps_sigma_mode_I", "generalized_plane_strain", None, 5.0e7, 0.0, "mode_I"),
+        ("plane_strain_mode_II", "plane_strain", 0.0, None, 90.0, "mode_II"),
+        ("plane_strain_mixed_I_II", "plane_strain", 0.0, None, 45.0, "mixed_I_II"),
+    )
+    for label, constraint, eps_zz, sigma_zz, angle, in_plane_mode in comparisons:
+        row = copy.deepcopy(comparison_source)
+        row["case_id"] = f"P8_fem_selective_{label}_peak_T900_s1733"
+        args = list(row["native_args"])
+        for flag in ("--eps-zz", "--sigma-zz-Pa"):
+            while flag in args:
+                index = args.index(flag); del args[index:index + 2]
+        args = _replace_arg(args, "--constraint", constraint)
+        args = _replace_arg(args, "--grip-mode-angle-deg", f"{angle:g}")
+        if "--grip-mode-angle-deg" not in args:
+            args.extend(["--grip-mode-angle-deg", f"{angle:g}"])
+        if eps_zz is not None:
+            args.extend(["--eps-zz", f"{eps_zz:g}"])
+        if sigma_zz is not None:
+            args.extend(["--sigma-zz-Pa", f"{sigma_zz:g}"])
+        row["native_args"] = args
+        row["mechanics_state"] = {
+            "plane_state": constraint,
+            "constraint_control": (
+                "prescribed_sigma_zz" if sigma_zz is not None
+                else "prescribed_eps_zz" if eps_zz is not None
+                else "free_eps_zz"
+            ),
+            "eps_zz": eps_zz, "sigma_zz_Pa": sigma_zz,
+            "in_plane_mode": in_plane_mode,
+            "grip_mode_angle_deg": angle,
+            "unit_thickness_m": 1.0,
+        }
+        row["shared_options"]["plane_state"] = constraint
+        row["shared_options"]["in_plane_mode"] = in_plane_mode
+        row["shared_options"]["grip_mode_angle_deg"] = angle
+        row["selective_native_comparison"] = True
+        row["readiness"]["native_qualification"] = (
+            "NATIVE_CONSTRAINT_AND_SIGNED_MIXITY_PATH_QUALIFIED_"
+            "CASE_LEVEL_PENDING"
+        )
+        row["execution"] = _execution(row)
+        rows.append(row)
     ids = [row["case_id"] for row in rows]
     if len(ids) != len(set(ids)):
         raise ValueError("v3 contains duplicate case identifiers")
