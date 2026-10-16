@@ -1,0 +1,73 @@
+{
+  "benchmark": {
+    "candidate_id": "P25_TJBSV2_S_026704",
+    "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION",
+    "fracture_and_2D_receipts": "historical",
+    "points": [
+      {
+        "A0_action_per_cycle": 2.2315106763327544e-05,
+        "DeltaK_MPa_sqrt_m": 4.144909057043921,
+        "developed_20_60_rate_m_per_cycle": 1.106021315367989e-10,
+        "fitted_rate_m_per_cycle": 1.1416034512698163e-10,
+        "log10_current_over_A0": -5.30483547217748
+      },
+      {
+        "A0_action_per_cycle": 0.003582841013732916,
+        "DeltaK_MPa_sqrt_m": 9.657580494899715,
+        "developed_20_60_rate_m_per_cycle": 1.773782827865542e-08,
+        "fitted_rate_m_per_cycle": 1.6043653604685273e-08,
+        "log10_current_over_A0": -5.3053270909130275
+      },
+      {
+        "A0_action_per_cycle": 0.03719706598609012,
+        "DeltaK_MPa_sqrt_m": 18.213077452291675,
+        "developed_20_60_rate_m_per_cycle": 1.4624734834738191e-07,
+        "fitted_rate_m_per_cycle": 1.5665108013797178e-07,
+        "log10_current_over_A0": -5.405420684634765
+      }
+    ],
+    "role": "empirical_acquisition_transfer_only"
+  },
+  "candidate_count": 16,
+  "constraints": [
+    "all candidates descend directly from the original Weak-T Family-A row",
+    "only existing EXP_floor opening-shape/reference coordinates and emission reference energy are varied",
+    "original gT/sT coefficients and Peierls/Taylor activation entropies are unchanged",
+    "no cold/hot endpoint is selected or fitted independently",
+    "P25/P40 projected rows contribute their 300 K opening shape only; their projected thermal slopes are discarded",
+    "Family-B benchmark does not replace the primary strict-Family-A objective",
+    "full-state fracture and developed fatigue are required before promotion; 2-D follows only after 1-D gates"
+  ],
+  "primary_objective": "strict-Family-A complete EXP_floor material evaluated jointly in fracture and fatigue",
+  "ranked_candidate_ids": [
+    "R10A_WEAKT_P40_EMIT_M060MEV_V1",
+    "R10A_WEAKT_P40_EMIT_P060MEV_V1",
+    "R10A_WEAKT_P40_OPEN_P036MEV_V1",
+    "R10A_WEAKT_P25_EMIT_M060MEV_V1",
+    "R10A_WEAKT_P25_EMIT_P060MEV_V1",
+    "R10A_WEAKT_P25_OPEN_P000MEV_V1",
+    "R10A_WEAKT_LOCAL_OPEN_M120MEV_V1",
+    "R10A_WEAKT_LOCAL_OPEN_M060MEV_V1",
+    "R10A_WEAKT_LOCAL_EMIT_P000MEV_V1",
+    "R10A_WEAKT_LOCAL_EMIT_M060MEV_V1",
+    "R10A_WEAKT_LOCAL_EMIT_P060MEV_V1",
+    "R10A_WEAKT_LOCAL_EMIT_M120MEV_V1",
+    "R10A_WEAKT_LOCAL_EMIT_P120MEV_V1",
+    "R10A_WEAKT_LOCAL_OPEN_P000MEV_V1",
+    "R10A_WEAKT_LOCAL_OPEN_P060MEV_V1",
+    "R10A_WEAKT_LOCAL_OPEN_P120MEV_V1"
+  ],
+  "recommended_dislocation_bracket": [
+    "R10A_WEAKT_P40_EMIT_M060MEV_V1",
+    "R10A_WEAKT_P40_EMIT_P060MEV_V1"
+  ],
+  "recommended_opening": "R10A_WEAKT_P40_OPEN_P036MEV_V1",
+  "schema": "r10.family-a-discrepancy-acquisition/1",
+  "transfer": {
+    "formula": "developed_rate=exp(intercept)*A0_action**slope",
+    "intercept_natural_log": -12.46403673418463,
+    "rms_log10_rate": 0.03152021592901541,
+    "scope": "ranking surrogate; not a constitutive law or qualification result",
+    "slope": 0.973775927050478
+  }
+}

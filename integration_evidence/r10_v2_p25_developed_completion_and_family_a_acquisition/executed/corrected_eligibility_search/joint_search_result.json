@@ -1,0 +1,141 @@
+{
+  "arrhenius_zero_slope_regression": {
+    "explicit_gT": 0.0,
+    "explicit_sT": 0.0,
+    "formula": "lambda=nu0*exp[-Q/(kB*T)]",
+    "interpretation": "zero explicit barrier derivative is not a temperature-independent rate",
+    "rate_300_s-1": 1.587593756199934e-05,
+    "rate_450_s-1": 6.316738836123897,
+    "rate_increases_with_temperature": true
+  },
+  "class_specific_feasible_pareto": {
+    "Ceramic-like": "retained control; no Paris requirement",
+    "DBTT": "developed moderate fatigue evidence preserved; endpoint-descended thermal rows remain diagnostic/non-promotable; original/refined parents remain in acquisition pool",
+    "Peak-T": "developed fatigue evidence preserved; opening-dominated peak classification retained; endpoint-descended final row remains non-promotable",
+    "Weak-T": "Family-B V2-P25 is the completed benchmark: fracture and sealed 2D are historical receipts and fatigue has three developed points. It is not strict-family-A success."
+  },
+  "decision": "V2_P25_DECLARED_TARGETS_COMPLETED_AND_DEVELOPED_RATES_EXTRACTED",
+  "joint_gates": {
+    "fatigue_status": "THREE_DEVELOPED_20_60_UM_POINTS_COMPLETED",
+    "fracture_pass": true,
+    "historical_1d_fracture_span": 1.1896923802208645,
+    "same_row_2D_all_reached_1000um": true,
+    "same_row_2D_cases": 2,
+    "weakT_span_limit": 1.25
+  },
+  "new_full_state_progress": {
+    "candidate_id": "P25_TJBSV2_S_026704",
+    "complete_row_sha256": "85f8d9d2ddbe1e7c7c0c34589883b886023507089d0fe423c1ce2c4eb60d0041",
+    "developed_global_slope": 4.855309192262086,
+    "developed_low_to_mid_slope": 6.002768361085132,
+    "developed_mid_to_high_slope": 3.325363633831362,
+    "developed_rate_width_decades": 3.121324503686043,
+    "points": [
+      {
+        "DeltaK_MPa_sqrt_m": 4.144909057043921,
+        "accepted_cycles": 739176.0229604188,
+        "accepted_events": 12,
+        "accepted_extension_m": 8.054507770624631e-05,
+        "artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/bridges/weakt_v2_p25_seed4810/Kmax_4p60545451/result.json",
+        "candidate_id": "P25_TJBSV2_S_026704",
+        "case": "developed_low",
+        "developed_20_60_rate_m_per_cycle": 1.106021315367989e-10,
+        "status": "DEVELOPED_TARGET_COMPLETED",
+        "window_end_cycles": 638486.0459965294,
+        "window_end_event": 9,
+        "window_start_cycles": 218961.98483420478,
+        "window_start_event": 3
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 9.657580494899715,
+        "accepted_cycles": 4608.030925318798,
+        "accepted_events": 12,
+        "accepted_extension_m": 8.054507770624631e-05,
+        "artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/bridges/weakt_v2_p25_seed4810/Kmax_10p730645/result.json",
+        "candidate_id": "P25_TJBSV2_S_026704",
+        "case": "A0_band_low",
+        "developed_20_60_rate_m_per_cycle": 1.773782827865542e-08,
+        "status": "DEVELOPED_TARGET_COMPLETED",
+        "window_end_cycles": 3980.03513423767,
+        "window_end_event": 9,
+        "window_start_cycles": 1364.1424405778364,
+        "window_start_event": 3
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 18.213077452291675,
+        "accepted_cycles": 558.921756383715,
+        "accepted_events": 12,
+        "accepted_extension_m": 8.054507770624631e-05,
+        "artifact": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/bridges/weakt_v2_p25_high_seed4810/Kmax_20p2367527/result.json",
+        "candidate_id": "P25_TJBSV2_S_026704",
+        "case": "A0_band_high",
+        "developed_20_60_rate_m_per_cycle": 1.4624734834738191e-07,
+        "status": "DEVELOPED_TARGET_COMPLETED",
+        "window_end_cycles": 483.0718925999067,
+        "window_end_event": 9,
+        "window_start_cycles": 165.79943658714683,
+        "window_start_event": 3
+      }
+    ],
+    "startup_secant_excluded": true,
+    "window_contract": "all rates use first accepted events at or beyond 20 and 60 um"
+  },
+  "next_acquisition": [
+    "use the measured A0-to-current discrepancy to rank strict-family-A reference-state opening plus nucleation/motion proposals",
+    "retain direct Arrhenius coefficients and inherited cross-process couplings; no independent endpoint coordinates",
+    "send no new row to 2D until the joint 1D gates pass; reuse the exact sealed V2-P25 2D receipts meanwhile"
+  ],
+  "original_weakt_450_stop_receipt": {
+    "accepted_steps": 1600,
+    "accepted_time_s": 16000.0,
+    "candidate_id": "v913_zeroD_sobol_0129902",
+    "event_count": 0,
+    "final_accepted_K_MPa_sqrt_m": 80.0,
+    "hazard_action_current": 0.021197933391292337,
+    "hazard_threshold_action": 1.0,
+    "pending_mark_action": 0.9788020666087076,
+    "reported_status": "KMAX_OR_STEP_CENSOR",
+    "resolved_stop_reason": "PHYSICAL_K_ENDPOINT_REACHED_NO_EVENT",
+    "work_budget_reached": false
+  },
+  "preserved_mechanism_classifications": {
+    "DBTT": {
+      "achieved_topology": "rising full-state initiation curve",
+      "mechanism_status": "PLASTICITY_CREATED_DBTT_NOT_ESTABLISHED; retain as intrinsically rising hot-state-enhanced successful-fatigue control",
+      "opening_A0_role": "dominant intrinsic rise: 15.24 MPa sqrt(m) of the tabulated 17.943907 end-to-end rise",
+      "root_difference_warning": "K_full-K_A0 is an operational state correction, not explicit K_shield or microscopic work partition",
+      "state_role": "important hot-end enhancement; operational correction change 2.703907 MPa sqrt(m) and preserves the 1050-to-1200 rise"
+    },
+    "Peak-T": {
+      "achieved_topology": "interior sampled maximum at 600 K",
+      "mechanism_status": "PLASTICITY_GENERATED_PEAK_NOT_ESTABLISHED",
+      "opening_A0_role": "opening-dominated; A0 already peaks at 600 K",
+      "resolution": "600-to-750 full-root difference 0.0249997 MPa sqrt(m), below the executed dK=0.05 MPa sqrt(m) scan step; precise peak location unresolved",
+      "state_role": "modest correction, maximum relative full/A0 about 2.27 percent"
+    }
+  },
+  "schema": "r10.corrected-eligibility-search-continuation/2",
+  "selected_candidates": [
+    {
+      "analytical_reason": "A0 moderate band 1.0162811480873657 decades; historical full-state fracture span 1.189692; exact sealed 2D at 300/1200 K",
+      "candidate_id": "P25_TJBSV2_S_026704",
+      "family": "B_INHERITED_V2_GUARD_ENTROPY_EXTENSION",
+      "joint_status": "fracture_and_2D_historical_family_B; fatigue_three_point_developed_complete",
+      "selection": "COMPLETED_FAMILY_B_BENCHMARK_ACQUIRE_STRICT_FAMILY_A"
+    }
+  ],
+  "sources": {
+    "controls_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r10_joint_search_amendment/inputs/fatigue_parent_registry.csv",
+      "sha256": "153dc913991c98dfb218fefcc254ca731ad1e995373d597050c177c71f4020a6"
+    },
+    "original_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r10_joint_search_amendment/inputs/original_four_registry.csv",
+      "sha256": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760"
+    },
+    "v2_rows": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/corrected_joint_search_v2_1_and_1d_transfer/production_candidate_rows.csv",
+      "sha256": "0db44ad0e46bae061088ab2be999930ad59df00dae00afa59e3c2cb25c2967a5"
+    }
+  }
+}
