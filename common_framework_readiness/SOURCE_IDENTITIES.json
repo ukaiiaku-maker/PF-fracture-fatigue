@@ -11,7 +11,7 @@
   },
   "pf": {
     "branch": "codex/shared-fracture-fatigue-options-v1",
-    "current_calculation_and_campaign_commit": "1c7841ea2253d5a6a8b1a016c482c92fb77a7dfd",
+    "current_calculation_and_campaign_commit": "b41628f6f3a939b06ecebf87f9d55a8f69f1ba7a",
     "qualified_solver_commit": "2276745b06220125354687f04c182c8d11be66dd",
     "current_recovery_wiring_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750",
     "recovery_wiring_record": "TAYLOR_PEIERLS_RECOVERY_WIRING.json",
@@ -24,8 +24,8 @@
   },
   "fem": {
     "branch": "codex/current-pf-companion",
-    "commit": "12971d375bec5af76ed47c29116d40fad506d3ff",
+    "commit": "0dcee64a1f96cc4c05aacc3b3032862ddc5ac273",
     "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
-    "status": "transactional_front_scoped_moving_tip_bilinear_public_names_and_generic_full_field_qualified"
+    "status": "transactional_front_scoped_moving_tip_bilinear_public_names_generic_full_field_and_prepared_r07_resume_qualified"
   }
 }

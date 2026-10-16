@@ -2,28 +2,30 @@
   "schema": "fracture-framework-final-source-qualification/2",
   "date": "2026-10-16",
   "source_pair": {
-    "pf_calculation_and_campaign_commit": "1c7841ea2253d5a6a8b1a016c482c92fb77a7dfd",
-    "fem_commit": "ee634968deae2b280cc179d330e35575956f4000"
+    "pf_calculation_and_campaign_commit": "b41628f6f3a939b06ecebf87f9d55a8f69f1ba7a",
+    "fem_commit": "0dcee64a1f96cc4c05aacc3b3032862ddc5ac273"
   },
   "pf": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q -m 'not external_evidence'",
     "result": "PASS",
-    "passed": 1004,
+    "passed": 1008,
     "deselected_external_evidence": 16,
-    "duration_s": 116.94
+    "duration_s": 96.45
   },
   "fem": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-fem-czm/bin/python -m pytest -q",
     "result": "PASS",
-    "passed": 754,
+    "passed": 757,
     "passing_subtests": 16,
-    "duration_s": 94.52
+    "duration_s": 82.10
   },
   "focused_native_evidence": {
     "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@ee634968:integration_evidence/r05_controller_transaction_20261016/qualification_report.json",
+    "specified_public_option_names": "fem-czm-current-pf-companion@12971d37:tests/test_bilinear_cohesive_request_v1.py",
+    "prepared_r07_resumption": "fem-czm-current-pf-companion@0dcee64a:scripts/resume_r07_exp_floor_event.py; dry-run regression passed",
     "moving_tip_and_exp_floor_lifecycle_tests": "30 passed in 0.89 s",
     "cohesive_family_tests": "41 passed in 1.47 s",
-    "campaign_and_binding_tests": "31 passed in 1.71 s",
+    "campaign_and_binding_tests": "40 passed in 2.55 s",
     "campaign_acceptance": "PASS; 699 disabled cases; 663 native command bindings; five selective constraint/mixity rows"
   },
   "external_evidence_boundary": {
