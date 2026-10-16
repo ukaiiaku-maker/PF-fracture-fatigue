@@ -1,0 +1,51 @@
+{
+  "backend": "R8_RESTORED_PERSISTENT_REVERSIBLE_CURRENT_BACKEND",
+  "binding": {
+    "barrier_changed": false,
+    "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+    "complete_row_sha256": "f038908e97361b282de7666df65b6040b0d3e98bf332fd55dafaa0ee69b050ef",
+    "event_law_changed": false,
+    "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+    "historical_engine_loaded": false,
+    "mechanics_changed": false,
+    "source": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_coupled_scale_continuation/coupled_scale_candidates.csv",
+      "sha256": "5e5001792fc47c4daae009dc0a31a0e7d3472b4b724dd071bd23112b80425b5f"
+    },
+    "translation": "EXACT_RETAINED_ROW_TO_CURRENT_PERSISTENT_REVERSIBLE_INTERFACES"
+  },
+  "kernel": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+    "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+  },
+  "loading": {
+    "Kmax_MPa_sqrt_m": [
+      16.6666667,
+      24.4444444
+    ],
+    "R": 0.1,
+    "frequency_Hz": 1000.0,
+    "phase_count": 64,
+    "temperature_K": 300.0
+  },
+  "local_strength_Pa": 30000000000.0,
+  "local_strength_role": "independent qualified mechanical coordinate; not barrier knee",
+  "native_numerical_controls": {
+    "all_projected_segments_require_existing_state_hazard_ledger_positivity_and_event_guard_validation": true,
+    "current_invocation_DMD_chain_growth_factor": 8.0
+  },
+  "schema": "r10.retained-current-bridge/1",
+  "stochastic": {
+    "mark": "unit_exponential",
+    "owner": "PCG64_SeedSequence_[seed,1]",
+    "reward": "threshold_scaled_bounded",
+    "seed": 4810
+  },
+  "stops": {
+    "maximum_cycles": 1000000000000.0,
+    "maximum_events": 40,
+    "target_events": 12,
+    "target_extension_um": 70.0
+  },
+  "trajectory": "R9_PHASE_EXACT_STOCHASTIC_WITH_TRANSACTIONAL_MEAN_OR_NATIVE_HIGH_CYCLE_BLOCKS"
+}

@@ -1,0 +1,1960 @@
+{
+  "complete_ancestry": [
+    {
+      "candidate_id": "v913_zeroD_sobol_0129902",
+      "physical_authorization": "eligible retained original-family parent",
+      "provision_kind": "retained physical-source registry row",
+      "record_sha256": "cfc86642687cac968223e4d3ac202c9ff14648c37982d3f188326f0ff25da1e5",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export",
+      "stage": "retained_original_four"
+    },
+    {
+      "candidate_id": "R10_WEAKT_P40_THERMAL_ANCHOR_V1",
+      "physical_authorization": "not established by portable physical source",
+      "provision_kind": "assistant-authored inverse projection and 1200 K anchor",
+      "record_sha256": "ee93cdd855a4d997f65e5799eeaf95a922ff609ea54ff972cb0c71abb11653a9",
+      "source_scope": "opening fields only; helper/search proposal",
+      "stage": "strict_projection_frontier"
+    },
+    {
+      "candidate_id": "R10J_WEAKT_P40_LSHIFT_036MEV_V1",
+      "physical_authorization": "not independently established",
+      "provision_kind": "assistant-authored 300 K level-shift proposal",
+      "record_sha256": "5e992d4a3c485dfad95317d788c036a2ef350049808f55a32049ac9488e8b573",
+      "source_scope": "opening G00 and floor fraction",
+      "stage": "joint_level_shift"
+    },
+    {
+      "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "record_sha256": "8ffdbb1084e3465b3ded48e223b72546e42985d4f7716e209a27517b5f1fac44",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints",
+      "stage": "P3_P4_endpoint_construction"
+    },
+    {
+      "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "physical_authorization": "internally coherent but does not cure inherited endpoint ancestry",
+      "provision_kind": "coherent multiplicative sigc(T) search transform",
+      "record_sha256": "f038908e97361b282de7666df65b6040b0d3e98bf332fd55dafaa0ee69b050ef",
+      "source_scope": "emission sigc0/sT and runtime-inherited Peierls/Taylor stress scale",
+      "stage": "coherent_emission_stress_scale"
+    }
+  ],
+  "cross_mechanism_coupling": {
+    "peierls": {
+      "active_sT_over_emission": 1.0,
+      "active_sigc0_over_emission": 1.0,
+      "parent_sT_over_emission": 1.0,
+      "parent_sigc0_over_emission": 1.0
+    },
+    "taylor": {
+      "active_sT_over_emission": 1.0,
+      "active_sigc0_over_emission": 1.0,
+      "parent_sT_over_emission": 1.0,
+      "parent_sigc0_over_emission": 1.0
+    }
+  },
+  "decision": "ANCESTRY_RECONCILED_ENDPOINT_PARENT_NON_PROMOTABLE",
+  "evaluated_rows": {
+    "final_f038_row": {
+      "candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "complete_row_sha256": "f038908e97361b282de7666df65b6040b0d3e98bf332fd55dafaa0ee69b050ef",
+      "surfaces": {
+        "emission": {
+          "G00_eV": 1.096369176369715,
+          "alpha": 0.6522800833545626,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889902755,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -0.1604794028968202,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -2.734773193380773,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0024232852829573106,
+              "raw_G0_eV": 1.2342253868016524,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 3.0,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 3.677704619621199,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.470261067071092,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0017515792364794804,
+              "raw_G0_eV": 0.8921126934008262,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.619132112285863,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 5.4174869178181275,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 2.571546476119687,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0010798731900016503,
+              "raw_G0_eV": 0.5500000000000002,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 6.238264224571726,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.8178969756700099,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.0007602504297796134,
+          "sT_GPa_per_K": 0.0035980713606352517,
+          "sigc0_GPa": 3.65243827982399
+        },
+        "opening": {
+          "G00_eV": 1.1060847791228108,
+          "alpha": 0.5887163921130266,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866812989546,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -22.808856035587706,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -21.118224437553337,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.365557627654559,
+              "raw_G0_eV": 0.7502246541228108,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.2468960742524041,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866814277905,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -18.96955450221101,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -17.979629127381262,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.795872838102955,
+              "raw_G0_eV": 1.6333496541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.373448037126203,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866811701186,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -19.1849735992092,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -18.261411812666456,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 1.226188048551351,
+              "raw_G0_eV": 2.5164746541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.500000000000001,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.25000000000000006,
+          "floor_fraction": 0.48726421565281924,
+          "gT_eV_per_K": 0.0019625,
+          "sT_GPa_per_K": 0.00472567102860844,
+          "sigc0_GPa": 1.1038020018699726
+        },
+        "peierls": {
+          "G00_eV": 5.107608093612558,
+          "alpha": 0.2264547564554959,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 33.545710934285104,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -36.46675040927498,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.012509043347093369,
+              "raw_G0_eV": 6.371094221619522,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 3.0,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 68.28433833876181,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 15.095286238430631,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.006352691963546834,
+              "raw_G0_eV": 3.235547110809761,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.619132112285863,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": true,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 76.47808648676443,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 50.636127936655214,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.00046586571418623894,
+              "raw_G0_eV": 0.09999999999999964,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 6.238264224571726,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.9374389592558143,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.006967882468466136,
+          "sT_GPa_per_K": 0.0035980713606352517,
+          "sigc0_GPa": 3.65243827982399
+        },
+        "taylor": {
+          "G00_eV": 3.1092449876738772,
+          "alpha": 1.055419295541942,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -2.581651548315163,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -4.999314673853048,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.007630147281749338,
+              "raw_G0_eV": 3.886179454974452,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 3.0,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.72122707088041,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 19.01267324107111,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 1.7371329333585939,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0038445247278747134,
+              "raw_G0_eV": 1.958089727487226,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.619132112285863,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": true,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 29.937440944881217,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 10.742310096715435,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0002835947101294086,
+              "raw_G0_eV": 0.029999999999999805,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 6.238264224571726,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.0061173520516604,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.004284643838860502,
+          "sT_GPa_per_K": 0.0035980713606352517,
+          "sigc0_GPa": 3.65243827982399
+        }
+      }
+    },
+    "historical_active_endpoint_row": {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_V1",
+      "complete_row_sha256": "d7359b657ab9723ab20fc95a3ef291f555adffc39565db7b9a7c7650e4ff8eb1",
+      "surfaces": {
+        "emission": {
+          "G00_eV": 1.096369176369715,
+          "alpha": 0.6522800833545626,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889902755,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 6.810192505683837,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 3.888006656699019,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0024232852829573106,
+              "raw_G0_eV": 1.2342253868016524,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.9999999999999996,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 6.138095850110057,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 2.848639676227029,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0017515792364794804,
+              "raw_G0_eV": 0.8921126934008262,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.2499999999999996,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 4.913645138054407,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 1.5104622261456087,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0010798731900016503,
+              "raw_G0_eV": 0.5500000000000002,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.4999999999999996,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.8178969756700099,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.0007602504297796134,
+          "sT_GPa_per_K": -0.0016666666666666668,
+          "sigc0_GPa": 2.697783333333333
+        },
+        "opening": {
+          "G00_eV": 1.1060847791228108,
+          "alpha": 0.5887163921130266,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866812989546,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -22.808856035587706,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -21.118224437553337,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.365557627654559,
+              "raw_G0_eV": 0.7502246541228108,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.2468960742524041,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866814277905,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -18.96955450221101,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -17.979629127381262,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.795872838102955,
+              "raw_G0_eV": 1.6333496541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.373448037126203,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866811701186,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -19.1849735992092,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -18.261411812666456,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 1.226188048551351,
+              "raw_G0_eV": 2.5164746541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.500000000000001,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.25000000000000006,
+          "floor_fraction": 0.48726421565281924,
+          "gT_eV_per_K": 0.0019625,
+          "sT_GPa_per_K": 0.00472567102860844,
+          "sigc0_GPa": 1.1038020018699726
+        },
+        "peierls": {
+          "G00_eV": 5.107608093612558,
+          "alpha": 0.2264547564554959,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 78.84637201425282,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 34.737406226348995,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.012509043347093369,
+              "raw_G0_eV": 6.371094221619522,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.9999999999999996,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 68.82257040205805,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 9.51438895096963,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.006352691963546834,
+              "raw_G0_eV": 3.235547110809761,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.2499999999999996,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": true,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 34.870821137432685,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.06767934456338673,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.00046586571418623894,
+              "raw_G0_eV": 0.09999999999999964,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.4999999999999996,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.9374389592558143,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.006967882468466136,
+          "sT_GPa_per_K": -0.0016666666666666668,
+          "sigc0_GPa": 2.697783333333333
+        },
+        "taylor": {
+          "G00_eV": 3.1092449876738772,
+          "alpha": 1.055419295541942,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 26.610279980381513,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 5.455220139346314,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.007630147281749338,
+              "raw_G0_eV": 3.886179454974452,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.9999999999999996,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.72122707088041,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 18.035124338618303,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 1.8187307241274615,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0038445247278747134,
+              "raw_G0_eV": 1.958089727487226,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.2499999999999996,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": true,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 6.06737385323995,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.08651575179478559,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0002835947101294086,
+              "raw_G0_eV": 0.029999999999999805,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.4999999999999996,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.0061173520516604,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.004284643838860502,
+          "sT_GPa_per_K": -0.0016666666666666668,
+          "sigc0_GPa": 2.697783333333333
+        }
+      }
+    },
+    "retained_parent": {
+      "candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "complete_row_sha256": "8ffdbb1084e3465b3ded48e223b72546e42985d4f7716e209a27517b5f1fac44",
+      "surfaces": {
+        "emission": {
+          "G00_eV": 1.096369176369715,
+          "alpha": 0.6522800833545626,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889902755,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -2.516326065053094,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -0.35341502483543624,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0024232852829573106,
+              "raw_G0_eV": 1.2342253868016524,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.7213545047154422,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -0.18335180812978308,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -0.3871174531348752,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0017515792364794804,
+              "raw_G0_eV": 0.8921126934008262,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.110677252357721,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 8.822339889258576,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 1.7114715098598705,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.03623656257316115,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0010798731900016503,
+              "raw_G0_eV": 0.5500000000000002,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.5,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.8178969756700099,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.0007602504297796134,
+          "sT_GPa_per_K": 0.0008651616614272865,
+          "sigc0_GPa": 0.878234268782052
+        },
+        "opening": {
+          "G00_eV": 1.1060847791228108,
+          "alpha": 0.5887163921130266,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866812989546,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -22.808856035587706,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -21.118224437553337,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.365557627654559,
+              "raw_G0_eV": 0.7502246541228108,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.2468960742524041,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866814277905,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -18.96955450221101,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -17.979629127381262,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.795872838102955,
+              "raw_G0_eV": 1.6333496541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 2.373448037126203,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": -22.773866811701186,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -19.1849735992092,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": -18.261411812666456,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 1.226188048551351,
+              "raw_G0_eV": 2.5164746541228107,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 4.500000000000001,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 0.25000000000000006,
+          "floor_fraction": 0.48726421565281924,
+          "gT_eV_per_K": 0.0019625,
+          "sT_GPa_per_K": 0.00472567102860844,
+          "sigc0_GPa": 1.1038020018699726
+        },
+        "peierls": {
+          "G00_eV": 5.107608093612558,
+          "alpha": 0.2264547564554959,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -14.675996415645868,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.15875886889040008,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.012509043347093369,
+              "raw_G0_eV": 6.371094221619522,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.7213545047154422,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -1.3449528150170078,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.1573391037634199,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.006352691963546834,
+              "raw_G0_eV": 3.235547110809761,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.110677252357721,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": true,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 80.85891837274245,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 33.49462244719652,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.04885671037531457,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.00046586571418623894,
+              "raw_G0_eV": 0.09999999999999964,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.5,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.9374389592558143,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.006967882468466136,
+          "sT_GPa_per_K": 0.0008651616614272865,
+          "sigc0_GPa": 0.878234268782052
+        },
+        "taylor": {
+          "G00_eV": 3.1092449876738772,
+          "alpha": 1.055419295541942,
+          "cases": [
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": -2.181425405419092,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.0965694625080331,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.007630147281749338,
+              "raw_G0_eV": 3.886179454974452,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 0.7213545047154422,
+              "temperature_K": 300.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": false,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.72122707088041,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 0.02082181213448712,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.07957634877532145,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0038445247278747134,
+              "raw_G0_eV": 1.958089727487226,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.110677252357721,
+              "temperature_K": 750.0
+            },
+            {
+              "active_guards": {
+                "G0_min": false,
+                "floor_max_fraction": false,
+                "floor_min": true,
+                "sigc_min": false
+              },
+              "entropy_probes": [
+                {
+                  "activation_entropy_kB": 49.721227072168766,
+                  "stress_GPa": 0.0
+                },
+                {
+                  "activation_entropy_kB": 5.918338046502174,
+                  "stress_GPa": 3.0
+                },
+                {
+                  "activation_entropy_kB": 0.08030041225764009,
+                  "stress_GPa": 9.0
+                }
+              ],
+              "evaluated_floor_eV": 0.0002835947101294086,
+              "raw_G0_eV": 0.029999999999999805,
+              "raw_domain_valid": true,
+              "raw_sigc_GPa": 1.5,
+              "temperature_K": 1200.0
+            }
+          ],
+          "exponent": 1.0061173520516604,
+          "floor_fraction": 0.001963405800003,
+          "gT_eV_per_K": -0.004284643838860502,
+          "sT_GPa_per_K": 0.0008651616614272865,
+          "sigc0_GPa": 0.878234268782052
+        }
+      }
+    }
+  },
+  "final_stress_scale_transform_audit": {
+    "derived_entropy_at_same_physical_stress_preserved": false,
+    "identity": "G_new(chi,T)=G_parent(chi/c,T); S_new(chi,T)=S_parent(chi/c,T)",
+    "max_abs_G_identity_error_eV": 4.440892098500626e-16,
+    "max_abs_S_identity_error_kB": 1.932541238147678e-09,
+    "named_energy_and_entropy_coefficients_preserved": true,
+    "sT_scale_error_GPa_per_K": 0.0,
+    "samples": [
+      {
+        "G_new_eV": 1.2342253868016524,
+        "G_parent_mapped_eV": 1.2342253868016524,
+        "S_new_kB": 8.822339889902755,
+        "S_parent_mapped_kB": 8.822339889902755,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.6440158167172991,
+        "G_parent_mapped_eV": 0.6440158167172991,
+        "S_new_kB": -0.1604794028968202,
+        "S_parent_mapped_kB": -0.1604794028968202,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 2.3558466621562735,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.2506159519183294,
+        "G_parent_mapped_eV": 0.2506159519183294,
+        "S_new_kB": -2.734773193380773,
+        "S_parent_mapped_kB": -2.7347731927365926,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": -2.3813581685453364,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.019326095924144852,
+        "G_parent_mapped_eV": 0.019326095924144852,
+        "S_new_kB": -0.6870651108710777,
+        "S_parent_mapped_kB": -0.6870651108710777,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": -0.7041921133057374,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.8921126934008262,
+        "G_parent_mapped_eV": 0.8921126934008262,
+        "S_new_kB": 8.822339889258576,
+        "S_parent_mapped_kB": 8.822339889258576,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.5647911763366396,
+        "G_parent_mapped_eV": 0.5647911763366396,
+        "S_new_kB": 3.677704619621199,
+        "S_parent_mapped_kB": 3.677704619621199,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 3.8610564277509822,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.2906509777725069,
+        "G_parent_mapped_eV": 0.29065097777250704,
+        "S_new_kB": 0.470261067071092,
+        "S_parent_mapped_kB": 0.4702610667490019,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 0.8573785202059672,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.045499596339184406,
+        "G_parent_mapped_eV": 0.04549959633918443,
+        "S_new_kB": -0.5246250233020766,
+        "S_parent_mapped_kB": -0.5246250231812928,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": -0.5384732429303333,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.5500000000000002,
+        "G_parent_mapped_eV": 0.5500000000000002,
+        "S_new_kB": 8.822339889258576,
+        "S_parent_mapped_kB": 8.822339889258576,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.38465475852744196,
+        "G_parent_mapped_eV": 0.384654758527442,
+        "S_new_kB": 5.4174869178181275,
+        "S_parent_mapped_kB": 5.417486917496038,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 3.7060154079582572,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.22869646810789696,
+        "G_parent_mapped_eV": 0.22869646810789698,
+        "S_new_kB": 2.571546476119687,
+        "S_parent_mapped_kB": 2.571546475958642,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 2.535309913546526,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.0530852702933777,
+        "G_parent_mapped_eV": 0.05308527029337772,
+        "S_new_kB": 0.1806062965036964,
+        "S_parent_mapped_kB": 0.18060629634265135,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "emission",
+        "same_stress_entropy_change_kB": 0.17052912974360473,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 6.371094221619522,
+        "G_parent_mapped_eV": 6.371094221619522,
+        "S_new_kB": 80.85891837274245,
+        "S_parent_mapped_kB": 80.85891837274245,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 5.082561377677735,
+        "G_parent_mapped_eV": 5.082561377677735,
+        "S_new_kB": 33.545710934285104,
+        "S_parent_mapped_kB": 33.545710934285104,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 48.22170734993097,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.9609710576376204,
+        "G_parent_mapped_eV": 0.9609710576376204,
+        "S_new_kB": -36.46675040927498,
+        "S_parent_mapped_kB": -36.46675040734244,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": -36.62550927816538,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.012509062754480714,
+        "G_parent_mapped_eV": 0.012509062754480714,
+        "S_new_kB": 0.1587488545864101,
+        "S_parent_mapped_kB": 0.1587488545864101,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": -1.0014726733204027e-05,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 3.235547110809761,
+        "G_parent_mapped_eV": 3.235547110809761,
+        "S_new_kB": 80.85891837274245,
+        "S_parent_mapped_kB": 80.85891837274245,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 2.933699316009084,
+        "G_parent_mapped_eV": 2.933699316009084,
+        "S_new_kB": 68.28433833876181,
+        "S_parent_mapped_kB": 68.28433833876181,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 69.62929115377882,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 1.422119818039932,
+        "G_parent_mapped_eV": 1.4221198180399324,
+        "S_new_kB": 15.095286238430631,
+        "S_parent_mapped_kB": 15.095286239718993,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 14.937947134667212,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.007011667351639814,
+        "G_parent_mapped_eV": 0.007011667351639816,
+        "S_new_kB": 0.07716485167355305,
+        "S_parent_mapped_kB": 0.07716485168361836,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": -0.08159401763959026,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.09999999999999964,
+        "G_parent_mapped_eV": 0.09999999999999964,
+        "S_new_kB": 80.85891837274245,
+        "S_parent_mapped_kB": 80.85891837274245,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.09468983101045994,
+        "G_parent_mapped_eV": 0.09468983101045994,
+        "S_new_kB": 76.47808648676443,
+        "S_parent_mapped_kB": 76.47808648676443,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 42.983464039567906,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.06325867701359247,
+        "G_parent_mapped_eV": 0.06325867701359249,
+        "S_new_kB": 50.636127936655214,
+        "S_parent_mapped_kB": 50.63612793657469,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 50.5872712262799,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.0013295262272727411,
+        "G_parent_mapped_eV": 0.0013295262272727427,
+        "S_new_kB": 0.6484495716074007,
+        "S_parent_mapped_kB": 0.6484495715985935,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "peierls",
+        "same_stress_entropy_change_kB": 0.6484495716074007,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 3.886179454974452,
+        "G_parent_mapped_eV": 3.886179454974452,
+        "S_new_kB": 49.721227072168766,
+        "S_parent_mapped_kB": 49.721227072168766,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 1.3575455129791536,
+        "G_parent_mapped_eV": 1.3575455129791536,
+        "S_new_kB": -2.581651548315163,
+        "S_parent_mapped_kB": -2.581651549603523,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": -0.40022614289607095,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.16769959586404212,
+        "G_parent_mapped_eV": 0.16769959586404212,
+        "S_new_kB": -4.999314673853048,
+        "S_parent_mapped_kB": -4.999314673853048,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": -5.095884136361081,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 0.007717247849463679,
+        "G_parent_mapped_eV": 0.007717247849463679,
+        "S_new_kB": 0.08568201928544752,
+        "S_parent_mapped_kB": 0.08568201928544752,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": -0.011940926332714069,
+        "temperature_K": 300.0
+      },
+      {
+        "G_new_eV": 1.958089727487226,
+        "G_parent_mapped_eV": 1.958089727487226,
+        "S_new_kB": 49.72122707088041,
+        "S_parent_mapped_kB": 49.72122707088041,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.9902827768689991,
+        "G_parent_mapped_eV": 0.9902827768689991,
+        "S_new_kB": 19.01267324107111,
+        "S_parent_mapped_kB": 19.01267324107111,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 18.991851428936624,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.2517266574560891,
+        "G_parent_mapped_eV": 0.2517266574560892,
+        "S_new_kB": 1.7371329333585939,
+        "S_parent_mapped_kB": 1.7371329333585939,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 1.6575565845832725,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.005748975819273702,
+        "G_parent_mapped_eV": 0.0057489758192737035,
+        "S_new_kB": 0.025890831086393833,
+        "S_parent_mapped_kB": 0.025890831096459146,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": -0.07173211442104929,
+        "temperature_K": 750.0
+      },
+      {
+        "G_new_eV": 0.029999999999999805,
+        "G_parent_mapped_eV": 0.029999999999999805,
+        "S_new_kB": 49.721227072168766,
+        "S_parent_mapped_kB": 49.721227072168766,
+        "parent_mapped_stress_GPa": 0.0,
+        "physical_stress_GPa": 0.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 0.0,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.018212476594788758,
+        "G_parent_mapped_eV": 0.01821247659478876,
+        "S_new_kB": 29.937440944881217,
+        "S_parent_mapped_kB": 29.937440944881217,
+        "parent_mapped_stress_GPa": 0.7213545047154422,
+        "physical_stress_GPa": 3.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 24.019102898379042,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.006743524620800541,
+        "G_parent_mapped_eV": 0.006743524620800542,
+        "S_new_kB": 10.742310096715435,
+        "S_parent_mapped_kB": 10.74231009670537,
+        "parent_mapped_stress_GPa": 2.1640635141463265,
+        "physical_stress_GPa": 9.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 10.662009684457795,
+        "temperature_K": 1200.0
+      },
+      {
+        "G_new_eV": 0.0004603761795710016,
+        "G_parent_mapped_eV": 0.0004603761795710018,
+        "S_new_kB": 0.28968858255011903,
+        "S_parent_mapped_kB": 0.2896885825491754,
+        "parent_mapped_stress_GPa": 7.2135450471544225,
+        "physical_stress_GPa": 30.0,
+        "process": "taylor",
+        "same_stress_entropy_change_kB": 0.2896885616362817,
+        "temperature_K": 1200.0
+      }
+    ],
+    "scale": 4.158842816381151
+  },
+  "historical_row_disposition": {
+    "active_acquisition": {
+      "candidate_id": "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_V1",
+      "reason": "emit_sigc(300 K) and emit_sigc(1200 K) were independently selected",
+      "status": "PRESERVED_NON_PROMOTABLE"
+    },
+    "thermal_refinement": {
+      "candidate_ids": [
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1925_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS6P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS8P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS10P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_CS3P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_CS3P5GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_CS4P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1925_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1500_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1250_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1000_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1925_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1950_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS6P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS8P0GPA_V2",
+        "R10A_WEAKT_ACTIVE_EMIT_S3P0GPA_CG1900_CS10P0GPA_V2"
+      ],
+      "reason": "opening cold/hot coordinates were independently selected",
+      "registries": [
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement/thermal_refinement_candidates.csv",
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement_low_sigc/thermal_refinement_candidates.csv",
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement_narrow/thermal_refinement_candidates.csv",
+        "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/weakt_active_thermal_refinement_p3_2d/thermal_refinement_candidates.csv"
+      ],
+      "status": "PRESERVED_NON_PROMOTABLE"
+    }
+  },
+  "portable_source": {
+    "G0_formula": "G0_eV = G00_eV + gT_eV_per_K*(T_K-Tref_K)",
+    "Gfloor_formula": "Gfloor_eV = min(Gfloor_max_fraction*G0_eV, max(Gfloor_min_eV, Gfloor_fraction*G0_eV))",
+    "authorization_scope": "W[100] formula and fitted parameter record over 298-673 K only; not authorization of later four-process endpoint constructions to 1200 K",
+    "formula": "DeltaG_eV = Gfloor_eV + (G0_eV-Gfloor_eV)*exp(-a*(sigma_Pa/sigc_Pa)^n)",
+    "model_type": "EXP_floor",
+    "parameters": {
+      "G00_eV": 1.9402178077061367,
+      "Gfloor_fraction": 0.02,
+      "Gfloor_max_fraction": 0.95,
+      "Gfloor_min_eV": 0.0001,
+      "Tmax_K": 673,
+      "Tmin_K": 298,
+      "Tref_K": 481.3333333333333,
+      "a": 0.08456845038107398,
+      "gT_eV_per_K": 0.003933667018163469,
+      "n": 0.9999999894757535,
+      "sT_Pa_per_K": -656405.0042962168,
+      "sigc0_Pa": 2297967649.09709
+    },
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/1_nanopillar/modulusdata_correctscalingSTDEV_EXPfit/temperature/BarrierModel_Export.json",
+    "sha256": "f9c1a2d2f49be2d346d362cf56f9a07d211866e7a9a381ef83301510fb8383ed",
+    "sigc_formula": "sigc_Pa = sigc0_Pa + sT_Pa_per_K*(T_K-Tref_K)",
+    "system": "W[100]"
+  },
+  "runtime_constitutive_mapping": {
+    "activation_entropy": "S_star(stress,T)=-partial DeltaG_EXP_floor/partial T",
+    "opening_and_emission": "direct ExpFloorBarrier affine G0(T), sigc(T), and source floor law",
+    "peierls_and_taylor": "nonzero activation_entropy_kB sets gT=-S*kB; sigc0 and sT are inherited together from emission through TransportBarrier.as_surface",
+    "rate": "nu0*exp(-DeltaG_EXP_floor(stress,T)/(kB*T))",
+    "separate_entropy_prefactor": false
+  },
+  "schema": "r10.constitutive-temperature-lineage/2",
+  "selection_contract": {
+    "eligible_parents": "ancestry-qualified original/refined/retained-bank complete rows",
+    "excluded_directions": "independently selected cold/hot endpoints without source authorization",
+    "not_implied": "no P1/P2-only restriction and no opening-only restriction",
+    "permitted_directions": "physical parameters authorized by each source family with inherited couplings"
+  },
+  "source_to_field_table": [
+    {
+      "field": "cleave_G00_eV",
+      "final_value": 1.1060847791228108,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "opening",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "cleave_gT_eV_per_K",
+      "final_value": 0.0019625,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "opening",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "cleave_sigc0_GPa",
+      "final_value": 1.1038020018699726,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "opening",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "cleave_sT_GPa_per_K",
+      "final_value": 0.00472567102860844,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "opening",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "cleave_exp_a",
+      "final_value": 0.5887163921130266,
+      "last_changed_candidate_id": "R10_WEAKT_P40_THERMAL_ANCHOR_V1",
+      "last_changed_stage": "strict_projection_frontier",
+      "physical_authorization": "not established by portable physical source",
+      "process": "opening",
+      "provision_kind": "assistant-authored inverse projection and 1200 K anchor",
+      "source_scope": "opening fields only; helper/search proposal"
+    },
+    {
+      "field": "cleave_exp_n",
+      "final_value": 0.25000000000000006,
+      "last_changed_candidate_id": "R10_WEAKT_P40_THERMAL_ANCHOR_V1",
+      "last_changed_stage": "strict_projection_frontier",
+      "physical_authorization": "not established by portable physical source",
+      "process": "opening",
+      "provision_kind": "assistant-authored inverse projection and 1200 K anchor",
+      "source_scope": "opening fields only; helper/search proposal"
+    },
+    {
+      "field": "cleave_floor_frac",
+      "final_value": 0.48726421565281924,
+      "last_changed_candidate_id": "R10J_WEAKT_P40_LSHIFT_036MEV_V1",
+      "last_changed_stage": "joint_level_shift",
+      "physical_authorization": "not independently established",
+      "process": "opening",
+      "provision_kind": "assistant-authored 300 K level-shift proposal",
+      "source_scope": "opening G00 and floor fraction"
+    },
+    {
+      "field": "emit_G00_eV",
+      "final_value": 1.096369176369715,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "emission",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "emit_gT_eV_per_K",
+      "final_value": -0.0007602504297796134,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "emission",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "emit_sigc0_GPa",
+      "final_value": 3.65243827982399,
+      "last_changed_candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "last_changed_stage": "coherent_emission_stress_scale",
+      "physical_authorization": "internally coherent but does not cure inherited endpoint ancestry",
+      "process": "emission",
+      "provision_kind": "coherent multiplicative sigc(T) search transform",
+      "source_scope": "emission sigc0/sT and runtime-inherited Peierls/Taylor stress scale"
+    },
+    {
+      "field": "emit_sT_GPa_per_K",
+      "final_value": 0.0035980713606352517,
+      "last_changed_candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "last_changed_stage": "coherent_emission_stress_scale",
+      "physical_authorization": "internally coherent but does not cure inherited endpoint ancestry",
+      "process": "emission",
+      "provision_kind": "coherent multiplicative sigc(T) search transform",
+      "source_scope": "emission sigc0/sT and runtime-inherited Peierls/Taylor stress scale"
+    },
+    {
+      "field": "emit_exp_a",
+      "final_value": "0.6522800833545626",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "emission",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "emit_exp_n",
+      "final_value": "0.8178969756700099",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "emission",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "emit_floor_frac",
+      "final_value": "0.001963405800003",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "emission",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "peierls_H0_eV",
+      "final_value": 5.107608093612558,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "peierls",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "peierls_activation_entropy_kB",
+      "final_value": 80.85891837414806,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "peierls",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "peierls_exp_a",
+      "final_value": "0.2264547564554959",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "peierls",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "peierls_exp_n",
+      "final_value": "1.9374389592558143",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "peierls",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "peierls_nu0_s",
+      "final_value": "1000000000000.0",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "peierls",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "taylor_H0_eV",
+      "final_value": 3.1092449876738772,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "taylor",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "taylor_activation_entropy_kB",
+      "final_value": 49.721227072445636,
+      "last_changed_candidate_id": "R10T_WEAKT_P40_G1962_S4P5GPA_P4_EP055_PP010_V1",
+      "last_changed_stage": "P3_P4_endpoint_construction",
+      "physical_authorization": "excluded from promotion under controlling constitutive specification",
+      "process": "taylor",
+      "provision_kind": "assistant-authored independent 300/1200 K endpoint construction",
+      "source_scope": "opening and emission affine coordinates; Peierls/Taylor energy-entropy endpoints"
+    },
+    {
+      "field": "taylor_exp_a",
+      "final_value": "1.055419295541942",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "taylor",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "taylor_exp_n",
+      "final_value": "1.0061173520516604",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "taylor",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "taylor_nu0_s",
+      "final_value": "100000000000.0",
+      "last_changed_candidate_id": "v913_zeroD_sobol_0129902",
+      "last_changed_stage": "retained_original_four",
+      "physical_authorization": "eligible retained original-family parent",
+      "process": "taylor",
+      "provision_kind": "retained physical-source registry row",
+      "source_scope": "complete v9.13 four-class material record; distinct from W[100] export"
+    },
+    {
+      "field": "effective_sigc0_GPa",
+      "final_value": 3.65243827982399,
+      "last_changed_candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "last_changed_stage": "coherent_emission_stress_scale",
+      "physical_authorization": "transform coherent; upstream parent remains non-promotable",
+      "process": "peierls",
+      "provision_kind": "runtime inherited coupling after coherent stress scaling",
+      "source_scope": "TransportBarrier.as_surface inherits emission sigc0 and sT"
+    },
+    {
+      "field": "effective_sT_GPa_per_K",
+      "final_value": 0.0035980713606352517,
+      "last_changed_candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "last_changed_stage": "coherent_emission_stress_scale",
+      "physical_authorization": "transform coherent; upstream parent remains non-promotable",
+      "process": "peierls",
+      "provision_kind": "runtime inherited coupling after coherent stress scaling",
+      "source_scope": "TransportBarrier.as_surface inherits emission sigc0 and sT"
+    },
+    {
+      "field": "effective_sigc0_GPa",
+      "final_value": 3.65243827982399,
+      "last_changed_candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "last_changed_stage": "coherent_emission_stress_scale",
+      "physical_authorization": "transform coherent; upstream parent remains non-promotable",
+      "process": "taylor",
+      "provision_kind": "runtime inherited coupling after coherent stress scaling",
+      "source_scope": "TransportBarrier.as_surface inherits emission sigc0 and sT"
+    },
+    {
+      "field": "effective_sT_GPa_per_K",
+      "final_value": 0.0035980713606352517,
+      "last_changed_candidate_id": "R10K_WEAKT_COUPLED_EMIT_SCALE_S3P0_V1",
+      "last_changed_stage": "coherent_emission_stress_scale",
+      "physical_authorization": "transform coherent; upstream parent remains non-promotable",
+      "process": "taylor",
+      "provision_kind": "runtime inherited coupling after coherent stress scaling",
+      "source_scope": "TransportBarrier.as_surface inherits emission sigc0 and sT"
+    }
+  ]
+}

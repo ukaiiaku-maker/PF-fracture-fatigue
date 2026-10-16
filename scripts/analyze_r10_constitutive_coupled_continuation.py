@@ -135,19 +135,28 @@ def main(argv=None) -> int:
             "DeltaK_MPa_sqrt_m": [x["DeltaK_MPa_sqrt_m"] for x in rates],
             "rates_m_per_cycle": [x["rate_m_per_cycle"] for x in rates],
             "slope": slope,
-            "full_historical_five_point_curve": "preserved but not promoted as corrected-row evidence",
+            "new_execution_scope": "two-point 15/22 MPa sqrt(m) secant",
+            "new_rate_span_decades": math.log10(
+                rates[1]["rate_m_per_cycle"] / rates[0]["rate_m_per_cycle"]
+            ),
+            "full_historical_five_point_curve": (
+                "preserved as transferred fixed-300-K numerical evidence only; "
+                "not newly executed or promoted as five-point final-row qualification"
+            ),
         },
         "joint_decision": "NO_PROMOTION_FRACTURE_GATE_FAILED",
         "same_row_2D_status": "NOT_RUN_JOINT_1D_GATE_FAILED",
-        "stopped_dominated_rows": [
+        "unevaluated_predicted_uncompetitive_rows": [
             "R10K_WEAKT_COUPLED_EMIT_SCALE_S2P6_V1",
             "R10K_WEAKT_COUPLED_EMIT_SCALE_S2P8_V1",
             "R10K_WEAKT_COUPLED_S3P0_OPEN_SCALE_0P6_V1",
             "R10K_WEAKT_COUPLED_S3P0_OPEN_SCALE_0P8_V1",
         ],
         "next_search_constraint": (
-            "continue only with original EXP_floor P1/P2 reference-state shape/level coordinates "
-            "and the same affine thermal coefficients; do not resume endpoint fitting"
+            "select from ancestry-qualified original/refined/retained-bank complete rows and "
+            "use every physical parameter direction authorized by that row's source family; "
+            "exclude unsupported endpoint degrees of freedom without imposing a P1/P2-only "
+            "or opening-only restriction"
         ),
         "preserved_results": [
             "all pre-reconciliation runs and checkpoints",

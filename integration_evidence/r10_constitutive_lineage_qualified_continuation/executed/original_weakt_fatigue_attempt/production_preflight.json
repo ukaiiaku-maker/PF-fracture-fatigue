@@ -1,0 +1,51 @@
+{
+  "backend": "R8_RESTORED_PERSISTENT_REVERSIBLE_CURRENT_BACKEND",
+  "binding": {
+    "barrier_changed": false,
+    "candidate_id": "v913_zeroD_sobol_0129902",
+    "complete_row_sha256": "cfc86642687cac968223e4d3ac202c9ff14648c37982d3f188326f0ff25da1e5",
+    "event_law_changed": false,
+    "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+    "historical_engine_loaded": false,
+    "mechanics_changed": false,
+    "source": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv",
+      "sha256": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760"
+    },
+    "translation": "EXACT_RETAINED_ROW_TO_CURRENT_PERSISTENT_REVERSIBLE_INTERFACES"
+  },
+  "kernel": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+    "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+  },
+  "loading": {
+    "Kmax_MPa_sqrt_m": [
+      16.6666667,
+      24.4444444
+    ],
+    "R": 0.1,
+    "frequency_Hz": 1000.0,
+    "phase_count": 64,
+    "temperature_K": 300.0
+  },
+  "local_strength_Pa": 30000000000.0,
+  "local_strength_role": "independent qualified mechanical coordinate; not barrier knee",
+  "native_numerical_controls": {
+    "all_projected_segments_require_existing_state_hazard_ledger_positivity_and_event_guard_validation": true,
+    "current_invocation_DMD_chain_growth_factor": 2.0
+  },
+  "schema": "r10.retained-current-bridge/1",
+  "stochastic": {
+    "mark": "unit_exponential",
+    "owner": "PCG64_SeedSequence_[seed,1]",
+    "reward": "threshold_scaled_bounded",
+    "seed": 4810
+  },
+  "stops": {
+    "maximum_cycles": 1000000000000.0,
+    "maximum_events": 40,
+    "target_events": 12,
+    "target_extension_um": 70.0
+  },
+  "trajectory": "R9_PHASE_EXACT_STOCHASTIC_WITH_TRANSACTIONAL_MEAN_OR_NATIVE_HIGH_CYCLE_BLOCKS"
+}

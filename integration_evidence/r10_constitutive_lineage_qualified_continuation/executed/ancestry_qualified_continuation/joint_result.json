@@ -1,0 +1,87 @@
+{
+  "fatigue_execution": {
+    "analytical_prior": "A0 moderate-slope width was 0.0 decades; not treated as a full-state result",
+    "checkpoint_reason": "initial",
+    "checkpoint_timestamp_unix_s": 1792122966.1715672,
+    "events_committed": 0,
+    "limitation": "no post-initial atomic checkpoint or event was committed in 283 s; the process remained inside the native chained-DMD/current-kernel map",
+    "observed_wall_seconds_before_operator_stop": 283,
+    "outcome": "NUMERICAL_LIMIT_BEFORE_FIRST_COMPLETED_CYCLE_BLOCK",
+    "result_written": false,
+    "scope": "same-row native current-state attempt at DeltaK=15 MPa sqrt(m)"
+  },
+  "fracture_execution": {
+    "cases": [
+      {
+        "K_final_event_MPa_sqrt_m": 16.543524307700352,
+        "K_init_MPa_sqrt_m": 14.431540936206051,
+        "candidate_id": "v913_zeroD_sobol_0129902",
+        "event_count": 11,
+        "final_extension_um": 54.99999999999999,
+        "status": "complete",
+        "temperature_K": 300.0
+      },
+      {
+        "K_final_event_MPa_sqrt_m": null,
+        "K_init_MPa_sqrt_m": null,
+        "candidate_id": "v913_zeroD_sobol_0129902",
+        "event_count": 0,
+        "final_extension_um": 0.0,
+        "status": "KMAX_OR_STEP_CENSOR",
+        "temperature_K": 450.0
+      }
+    ],
+    "outcome": "FAIL_WEAK_T_REACHABILITY",
+    "quantified_limit": "300 K completed 55 um with K_init=14.4315409362 MPa sqrt(m); 450 K had zero events and zero extension through Kmax=80 MPa sqrt(m)",
+    "remaining_temperatures": "not run after the 450 K hard censor rejected the row",
+    "scope": "fresh current-backend 300/450 K discriminating panel"
+  },
+  "joint_decision": "NO_PROMOTION_OR_2D_ESCALATION",
+  "lineage_audit": {
+    "decision": "ANCESTRY_RECONCILED_ENDPOINT_PARENT_NON_PROMOTABLE",
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/constitutive_temperature_reconciliation/reconciliation.json",
+    "sha256": "09caa6b1acc862afda7690f7572439c5562ea55588c1a83ced7cebd2e22c7396"
+  },
+  "mechanism_interpretation": "The original row is thermally over-attenuated in opening/current-state competition: fracture changes from finite initiation at 300 K to a hard 450 K opening censor. The fatigue attempt is numerical-limit evidence only, so no Paris slope is claimed.",
+  "p40_control_disposition": {
+    "fresh_fracture_diagnostic": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/fracture/p40_transfer_ancestry_qualified_refined/panel_summary.json",
+    "status": "not an eligible complete thermal material",
+    "zero_temperature_fields": [
+      "cleave_gT_eV_per_K",
+      "cleave_sT_GPa_per_K",
+      "emit_gT_eV_per_K",
+      "emit_sT_GPa_per_K"
+    ]
+  },
+  "preserved_class_mechanism_evidence": {
+    "DBTT": {
+      "achieved_topology": "rising full-state initiation curve",
+      "mechanism_status": "PLASTICITY_CREATED_DBTT_NOT_ESTABLISHED; retain as intrinsically rising hot-state-enhanced successful-fatigue control",
+      "opening_A0_role": "dominant intrinsic rise: 15.24 MPa sqrt(m) of the tabulated 17.943907 end-to-end rise",
+      "root_difference_warning": "K_full-K_A0 is an operational state correction, not explicit K_shield or microscopic work partition",
+      "state_role": "important hot-end enhancement; operational correction change 2.703907 MPa sqrt(m) and preserves the 1050-to-1200 rise"
+    },
+    "Peak-T": {
+      "achieved_topology": "interior sampled maximum at 600 K",
+      "mechanism_status": "PLASTICITY_GENERATED_PEAK_NOT_ESTABLISHED",
+      "opening_A0_role": "opening-dominated; A0 already peaks at 600 K",
+      "resolution": "600-to-750 full-root difference 0.0249997 MPa sqrt(m), below the executed dK=0.05 MPa sqrt(m) scan step; precise peak location unresolved",
+      "state_role": "modest correction, maximum relative full/A0 about 2.27 percent"
+    },
+    "scope": "existing causal classification retained as diagnostic evidence; it does not override the non-promotable disposition of endpoint-constructed descendants",
+    "source": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r1-reduced-spatial-physics-restoration/runs/r10_joint_search/thermal_accessibility_iteration/thermal_accessibility_result.json",
+      "sha256": "9fea59f19de3cd489f955af78b0f6751b525fc162381dac37251fbbc609dc80c"
+    }
+  },
+  "same_row_2D_status": "WITHHELD_AFTER_1D_FRACTURE_FAILURE_AND_FATIGUE_NUMERICAL_LIMIT",
+  "schema": "r10.ancestry-qualified-joint-continuation/1",
+  "search_status": "continue within ancestry-qualified original/refined/bank rows; use permitted physical nucleation and motion parameters with their native couplings; no endpoint DOFs",
+  "selected_candidate": {
+    "alias": "v913_paper_weakT01_0129902_persistent_sites",
+    "basis": "canonical original-family retained row with nonzero inherited temperature/entropy coordinates",
+    "candidate_id": "v913_zeroD_sobol_0129902",
+    "complete_row_sha256": "cfc86642687cac968223e4d3ac202c9ff14648c37982d3f188326f0ff25da1e5",
+    "new_parameter_fit": false
+  }
+}
