@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Build the compact, disabled readiness handoff without executing solvers."""
+"""Regenerate the preserved legacy-v2 readiness handoff without solvers.
+
+The live v3 campaign and R01-R13 records are maintained by their dedicated
+builders. This historical builder writes into an isolated directory so it
+cannot overwrite current acceptance artifacts.
+"""
 from __future__ import annotations
 
 import argparse
@@ -11,7 +16,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "common_framework_readiness"
+OUT = ROOT / "common_framework_readiness/legacy_v2_regeneration"
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 

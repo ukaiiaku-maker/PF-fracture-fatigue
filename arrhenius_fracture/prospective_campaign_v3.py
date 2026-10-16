@@ -671,9 +671,9 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
     )
     laws = (
         ("original_activated_opening", "native_temperature_matched"),
-        ("activated_bilinear", "fit_temperature_matched"),
-        ("autonomous_irreversible_bilinear", "fit_temperature_matched"),
-        ("autonomous_irreversible_bilinear", "reference_temperature_frozen"),
+        ("bilinear_barrier_activated", "fit_temperature_matched"),
+        ("bilinear_czm_classical", "fit_temperature_matched"),
+        ("bilinear_czm_classical", "reference_temperature_frozen"),
     )
     rows: list[dict[str, Any]] = []
     for family, option in options.items():
@@ -720,9 +720,11 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                         "kind": law, "temperature_policy": temperature_policy,
                         "fit": cohesive_fit, "physical_support_status": physical_support,
                     },
-                    "native_entrypoint": (
-                        "arrhenius_fracture.mode_i_first_passage_v10_0_5_18_four_class_stochastic_emission"
-                    ),
+                    # Filled only for a genuinely bound production consumer.
+                    # Unsupported bilinear rows retain their exact constructed
+                    # qualification route below, never the historical
+                    # EXP-floor entrypoint.
+                    "native_entrypoint": None,
                     "native_args": [], "output_profile": "publication_restart",
                     "resource_estimate": {
                         "retained_output_GiB": 0.06, "peak_transient_GiB": 6.0,
@@ -767,9 +769,9 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                         "--temperature-policy", temperature_policy,
                         "--constraint", "plane_strain",
                         "--constructed-normal-stiffness-Pa-per-m",
-                        "2e17" if law == "activated_bilinear" else "2e19",
+                        "2e17" if law == "bilinear_barrier_activated" else "2e19",
                     ]
-                    if law == "autonomous_irreversible_bilinear":
+                    if law == "bilinear_czm_classical":
                         qualification_args.extend([
                             "--constructed-separation-work-J-per-m2", "20",
                         ])

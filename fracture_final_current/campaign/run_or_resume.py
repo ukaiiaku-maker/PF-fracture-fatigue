@@ -15,7 +15,10 @@ import os
 from pathlib import Path
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
+# This file is intentionally executable by path from a clean checkout.  Its
+# package and campaign inputs live at the repository root, two levels above
+# ``fracture_final_current/campaign``.
+ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 

@@ -28,13 +28,14 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     cohesive = [row for row in rows if row["block"] == "P9"]
     assert len(cohesive) == 48
     assert {row["cohesive_law"]["kind"] for row in cohesive} == {
-        "original_activated_opening", "activated_bilinear",
-        "autonomous_irreversible_bilinear",
+        "original_activated_opening", "bilinear_barrier_activated",
+        "bilinear_czm_classical",
     }
     fitted = [row for row in cohesive if row["cohesive_law"]["fit"] is not None]
     assert all(row["readiness"]["input_availability"] == "BLOCKED_PHYSICAL_COHESIVE_SUPPORT" for row in fitted)
     assert all(row["cohesive_law"]["fit"]["unassigned_physical_quantities"] for row in fitted)
     assert all(row["qualification_execution"]["launcher"] for row in fitted)
+    assert all(row["native_entrypoint"] is None for row in fitted)
     assert all(
         row["readiness"]["implementation"]
         == "IMPLEMENTED_NATIVE_MOVING_TIP_CONTROLLER"

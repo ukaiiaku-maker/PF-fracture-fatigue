@@ -27,6 +27,38 @@ def test_campaign_runner_refuses_execution():
     assert "subprocess" not in text
 
 
+def test_campaign_runner_reports_current_v3_matrix():
+    result = subprocess.run(
+        [sys.executable, "scripts/run_prospective_common_campaign.py", "--status"],
+        cwd=ROOT, check=True, text=True, capture_output=True,
+    )
+    report = json.loads(result.stdout)
+    assert report["schema"].endswith("/3")
+    assert report["case_count"] == 699
+    assert report["native_command_count"] == 663
+    assert report["execution_authorized"] is False
+
+
+def test_live_goal_progress_covers_all_charter_goals_with_separate_fields():
+    progress = json.loads((
+        ROOT / "common_framework_readiness/FRAC_GOALS_1.0_LIVE_PROGRESS.json"
+    ).read_text())
+    assert [row["goal_id"] for row in progress["goals"]] == [
+        f"FG-{index:02d}" for index in range(1, 19)
+    ]
+    required = {
+        "code_readiness", "numerical_qualification", "scientific_coverage",
+        "conclusion_status", "evidence_references", "author_acceptance",
+    }
+    assert all(required <= row.keys() for row in progress["goals"])
+    assert all(row["author_acceptance"] == "NOT_RECORDED" for row in progress["goals"])
+
+
+def test_legacy_v2_builder_cannot_overwrite_live_readiness_directory():
+    text = (ROOT / "scripts/build_common_readiness_handoff.py").read_text()
+    assert 'common_framework_readiness/legacy_v2_regeneration' in text
+
+
 def test_no_stateful_kitagawa_in_new_runtime_products():
     paths = [
         ROOT / "arrhenius_fracture/prospective_campaign.py",

@@ -1,88 +1,173 @@
 {
+  "schema": "frac-goals-live-progress/2",
+  "date": "2026-10-16",
   "charter_modified": false,
+  "charter_sha256": "fa744fe4c97b65fb70595ab35a87f05d409dd7c3efb2dd2b80a50a957a82f6ab",
+  "production_execution_authorized": false,
+  "manuscript_modified": false,
+  "author_acceptance_policy": "No goal is author-accepted by this agent record.",
   "goals": [
     {
       "goal_id": "FG-01",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "OPEN_SCIENTIFIC_PRODUCTION_NOT_REQUESTED_ON_THIS_MACHINE"
+      "code_readiness": "CURRENT_NATIVE_LAWS_AND_DISABLED_FRACTURE_CAMPAIGN_BOUND",
+      "numerical_qualification": "PORTABLE_CORE_PASS",
+      "scientific_coverage": "PRODUCTION_FRACTURE_STUDY_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R01", "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-02",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "PARAMETER_TOOLING_QUALIFIED_PARENT_DOMAIN_REMAINS_OPEN"
+      "code_readiness": "EQUATION_AND_CONSUMER_CORRESPONDENCE_CONNECTED",
+      "numerical_qualification": "CURRENT_AND_DIAGNOSTIC_LIMIT_TESTS_PASS",
+      "scientific_coverage": "PROSPECTIVE_REGIME_TESTS_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R02", "common_framework_readiness/local_preservation_and_kinetics_20261014/EQUATION_AND_ACCURACY_CORRESPONDENCE.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-03",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "PARAMETER_TOOLING_QUALIFIED_PARENT_DOMAIN_REMAINS_OPEN"
+      "code_readiness": "VERSIONED_PARAMETER_DOSSIERS_AND_TRANSFER_REGISTRIES_READY",
+      "numerical_qualification": "CONSTRUCTED_CANDIDATES_NATIVE_CONSUMER_QUALIFIED",
+      "scientific_coverage": "PRODUCTION_MATERIAL_SELECTION_AND_HELD_OUT_TESTS_PENDING",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R03", "common_framework_readiness/PARAMETER_PARENT_DOSSIER_V2_NATIVE.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-04",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "OPEN_SCIENTIFIC_PRODUCTION_NOT_REQUESTED_ON_THIS_MACHINE"
+      "code_readiness": "SIGNED_STATE_RECOVERY_WAKE_AND_INTERVENTION_CONSUMERS_CONNECTED",
+      "numerical_qualification": "NATIVE_COMPONENT_RESTART_AND_DIAGNOSTIC_INTERVENTIONS_PASS",
+      "scientific_coverage": "MATCHED_PRODUCTION_FEEDBACK_STUDY_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R01", "FRAMEWORK_COMPLETION_LEDGER.json#R06"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-05",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "PARAMETER_TOOLING_QUALIFIED_PARENT_DOMAIN_REMAINS_OPEN"
+      "code_readiness": "TEMPERATURE_AND_PHYSICAL_RATE_AXES_BOUND_IN_DISABLED_CAMPAIGN",
+      "numerical_qualification": "MATERIAL_DOMAIN_AND_NATIVE_CONSUMER_CHECKS_PASS",
+      "scientific_coverage": "PRODUCTION_TEMPERATURE_RATE_MATRIX_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R03", "common_framework_readiness/CAMPAIGN_V3_ACCEPTANCE_AUDIT.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-06",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "OPEN_SCIENTIFIC_PRODUCTION_NOT_REQUESTED_ON_THIS_MACHINE"
+      "code_readiness": "CRACK_LENGTH_TIP_SUPPORT_AND_GEOMETRY_AXES_BOUND",
+      "numerical_qualification": "NATIVE_SUPPORT_AND_K_LENGTH_REGRESSIONS_PASS",
+      "scientific_coverage": "PRODUCTION_SIZE_AND_RADIUS_COMPARISONS_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R08", "FRAMEWORK_COMPLETION_LEDGER.json#R11"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-07",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "OPEN_SCIENTIFIC_PRODUCTION_NOT_REQUESTED_ON_THIS_MACHINE"
+      "code_readiness": "DEVELOPED_GROWTH_RESTART_AND_K_AT_LENGTH_ANALYSIS_CONNECTED",
+      "numerical_qualification": "CURRENT_REGRESSION_AND_LABELED_HISTORICAL_REPLAY_PASS",
+      "scientific_coverage": "NEW_COMMON_FRAMEWORK_DEVELOPED_GROWTH_CAMPAIGN_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R11", "common_framework_readiness/k_length_analysis_port_20261014/K_LENGTH_ANALYSIS_PORT_QUALIFICATION.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-08",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "AFFINE_SPATIAL_PATCH_QUALIFIED_CRACKED_BODY_EXECUTION_OPEN"
+      "code_readiness": "TENSOR_DRIVES_REACH_NATIVE_CRACKED_BODY_CONSUMERS",
+      "numerical_qualification": "OBJECTIVITY_COMPONENT_AND_RIGHT_CENSORED_MOVING_TIP_PATHS_PASS",
+      "scientific_coverage": "ACCEPTED_EXP_FLOOR_TENSOR_EVENT_PENDING_RESOURCE_ADMISSION",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R07", "common_framework_readiness/MECHANICS_CONSTRAINT_QUALIFICATION.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-09",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "AFFINE_SPATIAL_PATCH_QUALIFIED_CRACKED_BODY_EXECUTION_OPEN"
+      "code_readiness": "PLANE_STRESS_PLANE_STRAIN_AND_TWO_GENERALIZED_CONTROLS_CONNECTED",
+      "numerical_qualification": "ASSEMBLED_FIELD_AND_ACTIVE_RESTART_PATHS_PASS",
+      "scientific_coverage": "ACCEPTED_EVENT_AND_PRODUCTION_CONSTRAINT_COMPARISONS_PENDING",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R07", "fem-czm-current-pf-companion@9045fd3:integration_evidence/r07_moving_tip_controls_working/qualification_report.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-10",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "AFFINE_SPATIAL_PATCH_QUALIFIED_CRACKED_BODY_EXECUTION_OPEN"
+      "code_readiness": "SIGNED_MODE_I_MODE_II_MIXITY_AND_ORIENTATION_REQUESTS_BOUND",
+      "numerical_qualification": "NATIVE_GRIP_FIELD_AND_RESTART_MAPPING_PASS",
+      "scientific_coverage": "ACCEPTED_MIXED_MODE_EVENT_AND_PRODUCTION_COMPARISONS_PENDING",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R07", "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-11",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "NATIVE_INTERFACE_IMPLEMENTED_MINIMAL_CONSTITUTIVE_QUALIFICATION_COMPLETE_SPECIMEN_OPEN"
+      "code_readiness": "ALL_THREE_SPECIFIED_OPENING_MODEL_IDS_RESOLVE_TO_NATIVE_CONSUMERS",
+      "numerical_qualification": "EXP_FLOOR_AND_BOTH_MOVING_TIP_BILINEAR_ALGORITHMS_PASS_WITH_CONSTRUCTED_SUPPORT",
+      "scientific_coverage": "PHYSICAL_COHESIVE_SUPPORT_AND_PRODUCTION_COMPARISON_PENDING",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R04", "FRAMEWORK_COMPLETION_LEDGER.json#R05", "fracture_final_current/methods/model_and_observer_contracts/CAPABILITY_PRESERVATION_MATRIX.csv"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-12",
-      "scientific_evidence": "common_framework_readiness/fem_observer_restart_continuation_20261014/evidence/fem_baseline_reconciliation_v2.json",
-      "status": "FEM_INTERNAL_MATCHED_OBSERVER_AND_ACTIVE_RESTART_QUALIFIED_PF_FEM_THREE_LEVEL_OPEN"
+      "code_readiness": "INDEPENDENT_PF_AND_FEM_CZM_ROUTES_SOURCE_BOUND",
+      "numerical_qualification": "HISTORICAL_FEM_REFERENCE_MATCHED_J_G_AND_INDEPENDENT_REFINEMENT_PASS",
+      "scientific_coverage": "SELECTIVE_COUPLED_PRODUCTION_COMPARISONS_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R08", "common_framework_readiness/fem_observer_restart_continuation_20261014/PF_FEM_COMMON_MECHANICS_COMPARISON.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-13",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "TRANSACTION_CONTRACT_READY_SPATIAL_OR_RECURSIVE_NATIVE_ADAPTER_QUALIFICATION_OPEN"
+      "code_readiness": "NATIVE_BIRTH_DAUGHTER_OWNER_CLOCK_AND_RESTART_CONNECTED",
+      "numerical_qualification": "FIRST_NATIVE_BIRTH_DAUGHTER_EVOLUTION_AND_RESTART_PASS",
+      "scientific_coverage": "PHYSICAL_SECOND_GENERATION_OWNER_TRANSITION_PENDING_RESOURCE_AND_CONNECTIVITY",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R09", "integration_evidence/r09_native_branch_a8620304/qualification_report.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-14",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "TRANSACTION_CONTRACT_READY_SPATIAL_OR_RECURSIVE_NATIVE_ADAPTER_QUALIFICATION_OPEN"
+      "code_readiness": "LOCAL_INCREMENTAL_CAVITY_AND_COMBINED_BRANCH_CAVITY_EXECUTOR_CONNECTED",
+      "numerical_qualification": "CONTACT_ROLLBACK_RESTART_AND_DOWNSTREAM_CHILD_CONTINUATION_PASS",
+      "scientific_coverage": "PRODUCTION_VOID_NUCLEATION_AND_INTERACTION_STUDIES_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R10", "integration_evidence/r10_current_local_incremental/consolidated_qualification.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-15",
-      "scientific_evidence": "DEFERRED_NOT_REQUESTED_ON_THIS_MACHINE",
-      "status": "PARAMETER_TOOLING_QUALIFIED_PARENT_DOMAIN_REMAINS_OPEN"
+      "code_readiness": "DOMAIN_CENSOR_IDENTITY_AND_PARAMETER_NEIGHBORHOOD_RECORDS_READY",
+      "numerical_qualification": "CONSTRUCTED_CANDIDATE_AND_CAMPAIGN_DOMAIN_AUDITS_PASS",
+      "scientific_coverage": "HELD_OUT_PRODUCTION_AND_STOCHASTIC_UNCERTAINTY_STUDIES_NOT_RUN",
+      "conclusion_status": "OPEN",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R02", "FRAMEWORK_COMPLETION_LEDGER.json#R03", "common_framework_readiness/CAMPAIGN_V3_ACCEPTANCE_AUDIT.json"],
+      "author_acceptance": "NOT_RECORDED"
     },
     {
       "goal_id": "FG-16",
-      "scientific_evidence": "common_framework_readiness/fem_observer_restart_continuation_20261014/SPECIMEN_RESTART_QUALIFICATION.json",
-      "status": "FEM_ACTIVE_TOPOLOGY_RESTART_QUALIFIED_BRANCH_AND_CAVITY_TRANSITIONS_OPEN"
+      "code_readiness": "INTEGRATED_OPTION_PRESERVING_FRAMEWORK_WITH_DISABLED_CAMPAIGN",
+      "numerical_qualification": "PORTABLE_SUITES_PASS; R07_ACCEPTED_EVENT_AND_R09_SECOND_GENERATION_PENDING",
+      "scientific_coverage": "FRAMEWORK_ACCEPTANCE_INCOMPLETE_AT_TWO_NATIVE_TRANSITIONS",
+      "conclusion_status": "OPEN_ENGINEERING",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json", "common_framework_readiness/FINAL_SOURCE_QUALIFICATION_20261016.json"],
+      "author_acceptance": "NOT_RECORDED"
+    },
+    {
+      "goal_id": "FG-17",
+      "code_readiness": "699_CASE_DISABLED_SOURCE_BOUND_CAMPAIGN_AND_RESUME_AUDITS_READY",
+      "numerical_qualification": "STATIC_BINDINGS_AND_LEGACY_MATRIX_DIRECT_PATH_AUDIT_PASS",
+      "scientific_coverage": "PRODUCTION_NOT_RUN_AND_TWO_MANDATORY_EXTERNAL_ARCHIVES_UNAVAILABLE",
+      "conclusion_status": "OPEN_EXTERNAL_AND_PRODUCTION",
+      "evidence_references": ["FRAMEWORK_COMPLETION_LEDGER.json#R12", "FRAMEWORK_COMPLETION_LEDGER.json#R13", "common_framework_readiness/CAMPAIGN_V3_ACCEPTANCE_AUDIT.json"],
+      "author_acceptance": "NOT_RECORDED"
+    },
+    {
+      "goal_id": "FG-18",
+      "code_readiness": "GOAL_LEDGER_CAPABILITY_MATRIX_AND_CAMPAIGN_CROSS_LINKED",
+      "numerical_qualification": "ALL_18_GOAL_RECORDS_PRESENT_AND_CAMPAIGN_VALIDATION_PASS",
+      "scientific_coverage": "MANUSCRIPT_WORK_EXCLUDED_UNTIL_PRODUCTION_EVIDENCE",
+      "conclusion_status": "OPEN_SCIENTIFIC_NARRATIVE",
+      "evidence_references": ["common_framework_readiness/FRAC_GOALS_1.0_LIVE_PROGRESS.json", "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl"],
+      "author_acceptance": "NOT_RECORDED"
     }
-  ],
-  "manuscript_modified": false,
-  "production_execution_authorized": false,
-  "schema": "frac-goals-live-progress/1"
+  ]
 }

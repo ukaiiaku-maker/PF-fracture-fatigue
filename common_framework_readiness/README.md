@@ -1,34 +1,39 @@
-# Common fracture framework — readiness handoff
+# Common fracture framework — live readiness records
 
-This is an engineering-readiness package, not a scientific release. The v1 campaign is preserved in `../common_framework_release`; v2 is separately versioned and disabled. `production_execution_authorized=false` and `manuscript_modified=false` are invariant.
+This directory is the engineering-readiness record for the current R01–R13
+implementation. It is not a scientific-results release. Production execution
+and manuscript modification remain disabled.
 
-Numerical evidence marked `DEFERRED_RESOURCE` has not run. Production and all scientific surveys are **not requested on this machine**.
+The current disabled campaign is `PROSPECTIVE_CAMPAIGN_V3.jsonl` (699 cases,
+663 source-bound native commands). Rebuild and validate it with:
 
-The F1/F4 repair is documented in `F1_F4_REPAIR_RECORD.md`. The completed
-full-mechanics native Taylor–Peierls qualification and its fresh-process restart
-and time/state-refinement receipts are indexed by
-`F1_ACTIVE_NATIVE_QUALIFICATION.json` and `TAYLOR_PEIERLS_NATIVE_REPAIR.json`.
-The later recovery-argument repair and its compact nonzero-recovery,
-fresh-process restart receipt are indexed by
-`TAYLOR_PEIERLS_RECOVERY_WIRING.json`. That record establishes exact neutrality
-for the accepted zero-recovery full-PF baseline; it does not relabel that
-trajectory as nonzero-recovery specimen evidence.
-The subsequent `NATIVE_SOURCE_GEOGRAPHY_QUALIFICATION.json` records compact
-native execution and fresh-process restart for both homogeneous persistent
-bulk-only and tip-plus-bulk source geography. It proves option selection and
-executed-mechanics binding, not scientific source-geography sensitivity.
-`MECHANICS_CONSTRAINT_QUALIFICATION.json` then closes the compact affine
-spatial-patch scope for plane stress, plane strain, and both generalized
-transverse controls. Its claim does not extend to a cracked-body or 3-D solve.
-The prescribed-drive 16-bin calculation is retained only as a labeled subsystem
-fixture; it is not the full-mechanics acceptance calculation. The corrected
-native-backed parameter diagnostic is `PARAMETER_PARENT_DOSSIER_V2_NATIVE.json`,
-and the historical v1 dossier is retained.
+```bash
+python scripts/build_prospective_campaign_v3.py --disabled --audit --dry-run
+python scripts/audit_campaign_v3_acceptance.py \
+  --output common_framework_readiness/CAMPAIGN_V3_ACCEPTANCE_AUDIT.json
+python scripts/run_prospective_common_campaign.py --status
+python scripts/run_prospective_common_campaign.py --status --block P9
+```
 
-At qualified full-PF solver commit `2276745b`, the working checkout passed
-913/913 tests. At recovery-wiring commit `9f73dbff`, the expanded checkout
-passed 925/925 tests. At native source-geography qualification commit
-`9d9f3edf`, the expanded checkout passed 929/929 tests. At
-mechanics-constraint manifest commit `9866e398`, it passed 934/934 tests. The
-earlier 901-test clean-clone receipt and the independent FEM/CZM receipt remain
-explicitly labeled historical in `QUALIFICATION_RECEIPT.json`.
+`FRAMEWORK_COMPLETION_LEDGER.json` is the R01–R13 ledger;
+`FRAC_GOALS_1.0_LIVE_PROGRESS.json` carries separate readiness, numerical,
+scientific-coverage, conclusion, evidence and author-acceptance fields for all
+18 charter goals. `fracture_final_current/methods/model_and_observer_contracts/
+CAPABILITY_PRESERVATION_MATRIX.csv` is the capability matrix.
+
+The original EXP-floor route and the two bilinear comparison routes have the
+specified public IDs `exp_floor_activated_native`,
+`bilinear_barrier_activated`, and `bilinear_czm_classical`. The latter two keep
+their old internal names only as compatibility aliases. Their present material
+support is constructed qualification input, not a production calibration.
+
+Current resource admission is workload-specific. R07 and R09 retain exact
+accepted checkpoints and commands, but their substantial continuations are not
+admitted while other multi-gigabyte scientific workers occupy the host and swap
+is under pressure. This does not block lightweight independent implementation,
+auditing, or release work.
+
+The old v2 handoff remains reproducible through
+`scripts/build_common_readiness_handoff.py`, but that script now writes only to
+`common_framework_readiness/legacy_v2_regeneration` and cannot overwrite these
+live v3 records.
