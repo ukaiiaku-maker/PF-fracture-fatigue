@@ -1,0 +1,54 @@
+{
+  "schema": "fracture-native-resource-admission/1",
+  "observed_utc": "2026-10-16T19:56:59Z",
+  "host_measurements": {
+    "vm_page_size_bytes": 16384,
+    "vm_pages_free": 1514,
+    "immediately_free_page_bytes": 24805376,
+    "swap_total_MiB": 6144.0,
+    "swap_used_MiB": 5302.69,
+    "swap_free_MiB": 841.31,
+    "data_volume_size_GiB": 554.0,
+    "data_volume_used_GiB": 525.0,
+    "data_volume_free_GiB": 28.0,
+    "measurement_commands": [
+      "vm_stat",
+      "sysctl vm.swapusage",
+      "df -h /Volumes/Data",
+      "ps -axo pid,rss,vsz,etime,command"
+    ]
+  },
+  "observed_substantial_scientific_workers": [
+    {"pid": 75713, "rss_KiB": 2289200, "role": "PF-sintering C2 descendant"},
+    {"pid": 76342, "rss_KiB": 2262464, "role": "PF-sintering bicrystal descendant"},
+    {"pid": 99324, "rss_KiB": 1793200, "role": "final-stage sintering gb_pore"},
+    {"pid": 99325, "rss_KiB": 1552928, "role": "final-stage sintering tj_pore"}
+  ],
+  "prepared_resumptions": {
+    "R07": {
+      "ram_peak_GiB": 6.0,
+      "ram_peak_basis": "engineering allocation estimate; no measured native peak retained",
+      "disk_peak_GiB": 6.0,
+      "disk_reserve_GiB": 12.0,
+      "disk_preflight_admitted": true,
+      "ram_preflight_admitted": false,
+      "admitted_now": false,
+      "reason": "only 23.66 MiB immediately free, 5.18 GiB of 6 GiB swap occupied, and four unrelated multi-GiB scientific workers active"
+    },
+    "R09": {
+      "ram_peak_GiB": 24.0,
+      "ram_peak_basis": "engineering allocation estimate; no measured native peak retained",
+      "disk_peak_GiB": 24.0,
+      "disk_reserve_GiB": 12.0,
+      "disk_preflight_admitted": false,
+      "ram_preflight_admitted": false,
+      "admitted_now": false,
+      "reason": "28 GiB disk free is below the 36 GiB estimated footprint plus reserve, with the same pressured RAM state"
+    }
+  },
+  "interpretation": {
+    "measured_host_state_distinct_from_workload_estimate": true,
+    "long_native_transition_launched": false,
+    "production_launched": false
+  }
+}
