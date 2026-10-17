@@ -1,0 +1,353 @@
+{
+  "analytical": {
+    "allocated_tuples": 8192,
+    "domain_valid_tuples": 8141,
+    "matched_rows": 32564,
+    "thermal_shape_counts": {
+      "FALLING": 4402,
+      "WEAK_T": 11880
+    }
+  },
+  "developed_followup": {
+    "arm_dispositions": {
+      "cohesive_athermal__bilinear": {
+        "developed": 0,
+        "loads": 6,
+        "recurrent": 6,
+        "startup_or_other_censors": 6
+      },
+      "cohesive_athermal__smooth_exponential": {
+        "developed": 0,
+        "loads": 6,
+        "recurrent": 4,
+        "startup_or_other_censors": 6
+      },
+      "cohesive_mixed__bilinear": {
+        "developed": 0,
+        "loads": 6,
+        "recurrent": 6,
+        "startup_or_other_censors": 6
+      },
+      "cohesive_mixed__smooth_exponential": {
+        "developed": 0,
+        "loads": 6,
+        "recurrent": 4,
+        "startup_or_other_censors": 6
+      }
+    },
+    "candidate_id": "R10D_COH_27231",
+    "case_count": 24,
+    "interpretation": "All advancing points were single-excursion bursts; no developed event-window rate or local Paris slope is claimed.",
+    "strict_Paris_passes": 0
+  },
+  "files": {
+    "integration_evidence/r10_opening_alternatives/analytical_matched_8192.csv.gz": {
+      "bytes": 1504826,
+      "sha256": "d1f9cb275626da37748ffc95def66e48884bef062ae5661d37e7ded822da4e8b"
+    },
+    "integration_evidence/r10_opening_alternatives/developed_followup_case_dispositions.csv": {
+      "bytes": 5501,
+      "sha256": "a292869e3dcd6fcc4b70f3e333c56d968719f1f6854a96321584eb4b6b34230c"
+    },
+    "integration_evidence/r10_opening_alternatives/developed_followup_histories.json.gz": {
+      "bytes": 60970,
+      "sha256": "f701e04fe424e3d4d12913ac49b698266adb3dd762fd9272afc28d080184362a"
+    },
+    "integration_evidence/r10_opening_alternatives/native_12_case_dispositions.csv": {
+      "bytes": 28851,
+      "sha256": "65bd28aec3c6b3dfcf90572a033e04ba88f3c5f6e08e3a7fb63c103363e31187"
+    },
+    "integration_evidence/r10_opening_alternatives/selected_2d_qualification.json": {
+      "bytes": 151562,
+      "sha256": "92d8cfd1d8082eb8b99abe5f3af3a73c7c25b37ebdaefbc083a22cd400765487"
+    },
+    "integration_evidence/r10_opening_alternatives/state_informed_48_executed.csv": {
+      "bytes": 8571,
+      "sha256": "d1495c21a4618e87aaf096fb3604b4d84bdea3e8ab7b8622b729ff291f156f0a"
+    }
+  },
+  "native_initial": {
+    "arm_dispositions": {
+      "cohesive_athermal__bilinear": {
+        "cases": 36,
+        "censors": 27,
+        "events": 117,
+        "target_completed": 9
+      },
+      "cohesive_athermal__smooth_exponential": {
+        "cases": 36,
+        "censors": 33,
+        "events": 39,
+        "target_completed": 3
+      },
+      "cohesive_mixed__bilinear": {
+        "cases": 36,
+        "censors": 27,
+        "events": 117,
+        "target_completed": 9
+      },
+      "cohesive_mixed__smooth_exponential": {
+        "cases": 36,
+        "censors": 32,
+        "events": 54,
+        "target_completed": 4
+      }
+    },
+    "case_count": 144,
+    "material_count": 12,
+    "shape_effect_contrasts": [
+      {
+        "Kmax_MPa_sqrt_m": 29.829113055,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30745",
+        "mode": "cohesive_mixed",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 23.437160257,
+        "bilinear_events": 0,
+        "candidate_id": "R10D_COH_30745",
+        "mode": "cohesive_mixed",
+        "smooth_events": 2
+      },
+      {
+        "Kmax_MPa_sqrt_m": 29.829113055,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30745",
+        "mode": "cohesive_athermal",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 30.75346237,
+        "bilinear_events": 0,
+        "candidate_id": "R10D_COH_31630",
+        "mode": "cohesive_mixed",
+        "smooth_events": 13
+      },
+      {
+        "Kmax_MPa_sqrt_m": 31.987601799,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30667",
+        "mode": "cohesive_athermal",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 31.987601799,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30667",
+        "mode": "cohesive_mixed",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 75.410552568,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30688",
+        "mode": "cohesive_mixed",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 95.977066905,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30688",
+        "mode": "cohesive_mixed",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 95.977066905,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30688",
+        "mode": "cohesive_athermal",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 75.410552568,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_30688",
+        "mode": "cohesive_athermal",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 25.521773221,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_27231",
+        "mode": "cohesive_mixed",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 25.521773221,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_27231",
+        "mode": "cohesive_athermal",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 28.44590104,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_00167",
+        "mode": "cohesive_athermal",
+        "smooth_events": 0
+      },
+      {
+        "Kmax_MPa_sqrt_m": 28.44590104,
+        "bilinear_events": 13,
+        "candidate_id": "R10D_COH_00167",
+        "mode": "cohesive_mixed",
+        "smooth_events": 0
+      }
+    ]
+  },
+  "physics": {
+    "EXP_floor_plasticity_unchanged": true,
+    "legacy_cooperative_clock_used": false,
+    "legacy_family_preserved": true,
+    "mechanical_patch_owner": "DECLARED_SPATIAL_INTERFACE_CELL",
+    "mixed_crossover_is_censored_not_extrapolated": true
+  },
+  "schema": "r10.opening-alternatives-results/1",
+  "spatial_2d": {
+    "candidate_id": "R10D_COH_27231",
+    "case_count": 12,
+    "cases": [
+      {
+        "cohesive_shape": "smooth_exponential",
+        "imposed_at_trigger_m": 6.999366582624881e-08,
+        "mobile_final": 5.077405417658371e-22,
+        "opening_mode": "cohesive_athermal",
+        "peak_traction_Pa": 9167423823.2054,
+        "retained_final": 9.479866199145615e-28,
+        "separation_at_trigger_m": 3.312471266458176e-11,
+        "temperature_K": 300.0,
+        "trigger": "FE_BRANCH_LOSS"
+      },
+      {
+        "cohesive_shape": "smooth_exponential",
+        "imposed_at_trigger_m": 2.413574683663752e-08,
+        "mobile_final": 1.1782800993508239e-24,
+        "opening_mode": "cohesive_mixed",
+        "peak_traction_Pa": 3161943322.595882,
+        "retained_final": 4.054568930030394e-61,
+        "separation_at_trigger_m": 5.601870766219249e-12,
+        "temperature_K": 300.0,
+        "trigger": "THERMAL_ESCAPE"
+      },
+      {
+        "cohesive_shape": "bilinear",
+        "imposed_at_trigger_m": 6.999366582624881e-08,
+        "mobile_final": 5.082868521089767e-22,
+        "opening_mode": "cohesive_athermal",
+        "peak_traction_Pa": 9169923025.35613,
+        "retained_final": 9.64088660270382e-28,
+        "separation_at_trigger_m": 1.4052230244921695e-11,
+        "temperature_K": 300.0,
+        "trigger": "FE_BRANCH_LOSS"
+      },
+      {
+        "cohesive_shape": "bilinear",
+        "imposed_at_trigger_m": 2.413574683663752e-08,
+        "mobile_final": 1.1783896501573932e-24,
+        "opening_mode": "cohesive_mixed",
+        "peak_traction_Pa": 3162042422.536595,
+        "retained_final": 4.0604918682997115e-61,
+        "separation_at_trigger_m": 4.845596636179892e-12,
+        "temperature_K": 300.0,
+        "trigger": "THERMAL_ESCAPE"
+      },
+      {
+        "cohesive_shape": "smooth_exponential",
+        "imposed_at_trigger_m": 6.999366582624881e-08,
+        "mobile_final": 0.0,
+        "opening_mode": "cohesive_athermal",
+        "peak_traction_Pa": 9167423823.2054,
+        "retained_final": 7.329001691205166e-16,
+        "separation_at_trigger_m": 3.312471266458176e-11,
+        "temperature_K": 750.0,
+        "trigger": "FE_BRANCH_LOSS"
+      },
+      {
+        "cohesive_shape": "smooth_exponential",
+        "imposed_at_trigger_m": 1.2067873418318761e-09,
+        "mobile_final": 7.619546559332537e-24,
+        "opening_mode": "cohesive_mixed",
+        "peak_traction_Pa": 158101920.09106758,
+        "retained_final": 1.0189773209819716e-51,
+        "separation_at_trigger_m": 2.4381402189046213e-13,
+        "temperature_K": 750.0,
+        "trigger": "THERMAL_ESCAPE"
+      },
+      {
+        "cohesive_shape": "bilinear",
+        "imposed_at_trigger_m": 6.999366582624881e-08,
+        "mobile_final": 0.0,
+        "opening_mode": "cohesive_athermal",
+        "peak_traction_Pa": 9169923025.35613,
+        "retained_final": 7.343116326924973e-16,
+        "separation_at_trigger_m": 1.4052230244921695e-11,
+        "temperature_K": 750.0,
+        "trigger": "FE_BRANCH_LOSS"
+      },
+      {
+        "cohesive_shape": "bilinear",
+        "imposed_at_trigger_m": 1.2067873418318761e-09,
+        "mobile_final": 7.619559354176702e-24,
+        "opening_mode": "cohesive_mixed",
+        "peak_traction_Pa": 158102121.1268298,
+        "retained_final": 1.0189815503139049e-51,
+        "separation_at_trigger_m": 2.422798318089947e-13,
+        "temperature_K": 750.0,
+        "trigger": "THERMAL_ESCAPE"
+      },
+      {
+        "cohesive_shape": "smooth_exponential",
+        "imposed_at_trigger_m": 6.999366582624881e-08,
+        "mobile_final": 0.0,
+        "opening_mode": "cohesive_athermal",
+        "peak_traction_Pa": 9167423823.2054,
+        "retained_final": 8536.546240291715,
+        "separation_at_trigger_m": 3.312471266458176e-11,
+        "temperature_K": 1200.0,
+        "trigger": "FE_BRANCH_LOSS"
+      },
+      {
+        "cohesive_shape": "smooth_exponential",
+        "imposed_at_trigger_m": 1.2067873418318761e-09,
+        "mobile_final": 0.0,
+        "opening_mode": "cohesive_mixed",
+        "peak_traction_Pa": 158101920.09106758,
+        "retained_final": 2.538993360603551,
+        "separation_at_trigger_m": 2.4381402189046213e-13,
+        "temperature_K": 1200.0,
+        "trigger": "THERMAL_ESCAPE"
+      },
+      {
+        "cohesive_shape": "bilinear",
+        "imposed_at_trigger_m": 6.999366582624881e-08,
+        "mobile_final": 0.0,
+        "opening_mode": "cohesive_athermal",
+        "peak_traction_Pa": 9169923025.35613,
+        "retained_final": 8541.20130226291,
+        "separation_at_trigger_m": 1.4052230244921695e-11,
+        "temperature_K": 1200.0,
+        "trigger": "FE_BRANCH_LOSS"
+      },
+      {
+        "cohesive_shape": "bilinear",
+        "imposed_at_trigger_m": 1.2067873418318761e-09,
+        "mobile_final": 0.0,
+        "opening_mode": "cohesive_mixed",
+        "peak_traction_Pa": 158102121.1268298,
+        "retained_final": 2.538999817562324,
+        "separation_at_trigger_m": 2.422798318089947e-13,
+        "temperature_K": 1200.0,
+        "trigger": "THERMAL_ESCAPE"
+      }
+    ]
+  },
+  "state_informed": {
+    "cycles": 2,
+    "materials_executed": 48,
+    "opening_arms_not_collapsed_into_state_screen": true,
+    "phases": 4,
+    "schema": "r10.mechanical-mixed-opening-comparison/1",
+    "stage": "STATE_INFORMED_EXECUTION_COMPLETE"
+  }
+}

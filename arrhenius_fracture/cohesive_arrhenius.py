@@ -26,10 +26,17 @@ COHESIVE_BARRIER_ONLY = "COHESIVE_BARRIER_ONLY"
 COHESIVE_KINETIC_CZM = "COHESIVE_KINETIC_CZM"
 COHESIVE_RATE_INDEPENDENT_CONTROL = "COHESIVE_RATE_INDEPENDENT_CONTROL"
 COHESIVE_PEAK_CUTOFF_CONTROL = "COHESIVE_PEAK_CUTOFF_CONTROL"
+COHESIVE_ATHERMAL_MECHANICAL = "COHESIVE_ATHERMAL_MECHANICAL"
+COHESIVE_MIXED_MECHANICAL_THERMAL = "COHESIVE_MIXED_MECHANICAL_THERMAL"
 EXECUTION_IDENTITIES = frozenset({
     EXP_FLOOR_REFERENCE, COHESIVE_BARRIER_ONLY, COHESIVE_KINETIC_CZM,
     COHESIVE_RATE_INDEPENDENT_CONTROL, COHESIVE_PEAK_CUTOFF_CONTROL,
+    COHESIVE_ATHERMAL_MECHANICAL, COHESIVE_MIXED_MECHANICAL_THERMAL,
 })
+
+OPENING_ALTERNATIVES_FAMILY = "D_MECHANICAL_MIXED_CZM_EXP_PLASTICITY"
+SMOOTH_EXPONENTIAL = "smooth_exponential"
+BILINEAR = "bilinear"
 
 
 @dataclass(frozen=True)
@@ -260,6 +267,94 @@ def bilinear_barrier_J(stress_ratio, Gamma_J_m2: float,
     return activation_area_m2 * Gamma_J_m2 * (1.0 - s)**2
 
 
+@dataclass(frozen=True)
+class BilinearCohesiveLaw:
+    """Bilinear law matched to an exponential law in work, peak and stiffness."""
+
+    thermal: CohesiveThermalLaw
+
+    @property
+    def peak_separation_m(self) -> float:
+        return self.thermal.Gamma_ref_J_m2 / (
+            EULER**2 * self.thermal.t_hat_ref_Pa
+        )
+
+    def peak_separation(self, temperature_K: float) -> float:
+        # Gamma/t_hat remains fixed under CohesiveThermalLaw's coupled scaling.
+        self.thermal.gamma(temperature_K)
+        return self.peak_separation_m
+
+    def final_separation(self, temperature_K: float) -> float:
+        return 2.0 * self.thermal.gamma(temperature_K) / self.thermal.t_hat(temperature_K)
+
+    def traction(self, separation_m, temperature_K: float):
+        d = np.maximum(np.asarray(separation_m, dtype=float), 0.0)
+        dp = self.peak_separation(temperature_K)
+        df = self.final_separation(temperature_K)
+        peak = self.thermal.t_hat(temperature_K)
+        return np.where(d <= dp, peak*d/dp,
+                        np.where(d < df, peak*(df-d)/(df-dp), 0.0))
+
+    def tangent(self, separation_m, temperature_K: float):
+        d = np.maximum(np.asarray(separation_m, dtype=float), 0.0)
+        dp = self.peak_separation(temperature_K)
+        df = self.final_separation(temperature_K)
+        peak = self.thermal.t_hat(temperature_K)
+        return np.where(d < dp, peak/dp,
+                        np.where(d < df, -peak/(df-dp), 0.0))
+
+    def potential(self, separation_m, temperature_K: float):
+        d = np.maximum(np.asarray(separation_m, dtype=float), 0.0)
+        dp = self.peak_separation(temperature_K)
+        df = self.final_separation(temperature_K)
+        peak = self.thermal.t_hat(temperature_K)
+        elastic = 0.5*peak*d*d/dp
+        up = 0.5*peak*dp + peak*((d-dp) - 0.5*(d-dp)**2/(df-dp))
+        return np.where(d <= dp, elastic,
+                        np.where(d < df, up, self.thermal.gamma(temperature_K)))
+
+
+def cohesive_shape_response(shape: str, separation_m,
+                            thermal: CohesiveThermalLaw,
+                            temperature_K: float):
+    """Return traction, tangent and stored surface work for a declared shape."""
+    if shape == SMOOTH_EXPONENTIAL:
+        return (traction_Pa(separation_m, thermal, temperature_K),
+                tangent_Pa_per_m(separation_m, thermal, temperature_K),
+                potential_J_m2(separation_m, thermal, temperature_K))
+    if shape == BILINEAR:
+        law = BilinearCohesiveLaw(thermal)
+        return (law.traction(separation_m, temperature_K),
+                law.tangent(separation_m, temperature_K),
+                law.potential(separation_m, temperature_K))
+    raise ValueError(f"unsupported cohesive shape: {shape}")
+
+
+def mechanical_completion(shape: str, separation_m: float,
+                          thermal: CohesiveThermalLaw, temperature_K: float,
+                          residual_work_fraction: float = 1.0e-6,
+                          residual_traction_fraction: float = 1.0e-4) -> dict[str, Any]:
+    """Geometry-owned completion test; it contains no kinetic event clock."""
+    d = max(float(separation_m), 0.0)
+    gamma = thermal.gamma(temperature_K)
+    peak = thermal.t_hat(temperature_K)
+    traction, _, work = cohesive_shape_response(shape, d, thermal, temperature_K)
+    remaining = max(gamma-float(work), 0.0)
+    if shape == BILINEAR:
+        cutoff = BilinearCohesiveLaw(thermal).final_separation(temperature_K)
+        complete = d >= cutoff
+    else:
+        cutoff = float(brentq(
+            lambda x: (1.0+x)*math.exp(-x)-residual_work_fraction, 1.0, 100.0,
+        ))*thermal.delta0_m
+        complete = (remaining <= residual_work_fraction*gamma and
+                    float(traction) <= residual_traction_fraction*peak)
+    return {"complete": bool(complete), "cutoff_m": cutoff,
+            "remaining_work_J_m2": remaining,
+            "remaining_work_fraction": remaining/gamma,
+            "traction_fraction": float(traction)/peak}
+
+
 def morse_barrier_J(stress_ratio, Gamma_J_m2: float,
                     activation_area_m2: float):
     s = np.clip(np.asarray(stress_ratio, dtype=float), 0.0, 1.0)
@@ -439,11 +534,14 @@ class MatchedWorkRateIndependentCohesiveControl:
 __all__ = [
     "COHESIVE_BARRIER_ONLY", "COHESIVE_KINETIC_CZM",
     "COHESIVE_RATE_INDEPENDENT_CONTROL", "COHESIVE_PEAK_CUTOFF_CONTROL",
+    "COHESIVE_ATHERMAL_MECHANICAL", "COHESIVE_MIXED_MECHANICAL_THERMAL",
+    "OPENING_ALTERNATIVES_FAMILY", "SMOOTH_EXPONENTIAL", "BILINEAR",
     "EXECUTION_IDENTITIES",
     "EXP_FLOOR_REFERENCE", "FAMILY", "CohesiveThermalLaw",
     "ExponentialCohesiveBarrier", "RateIndependentCohesiveControl",
     "PeakCutoffCohesiveControl", "MatchedWorkRateIndependentCohesiveControl",
     "bilinear_barrier_J", "morse_barrier_J",
+    "BilinearCohesiveLaw", "cohesive_shape_response", "mechanical_completion",
     "potential_J_m2", "stationary_points", "tangent_Pa_per_m",
     "traction_Pa", "traction_barrier", "finite_compliance_landscape",
 ]

@@ -1,0 +1,4230 @@
+{
+  "candidate_id": "R10D_COH_27231",
+  "cases": [
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "smooth_exponential",
+      "imposed_at_trigger_m": 6.999366582624881e-08,
+      "mobile_final": 5.077405417658371e-22,
+      "opening_mode": "cohesive_athermal",
+      "peak_traction_Pa": 9167423823.2054,
+      "retained_final": 9.479866199145615e-28,
+      "separation_at_trigger_m": 3.312471266458176e-11,
+      "temperature_K": 300.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.045726064704067e-28,
+          "retained_count": 3.192063077050991e-74,
+          "separation_m": 2.4381402189046213e-13,
+          "step": 1,
+          "traction_Pa": 158101920.09106758
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.545146074728032e-27,
+          "retained_count": 6.644641037738907e-75,
+          "separation_m": 4.907555856981214e-13,
+          "step": 2,
+          "traction_Pa": 316203430.3582285
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.366755110618586e-27,
+          "retained_count": 1.3988508842580329e-74,
+          "separation_m": 7.409165266834889e-13,
+          "step": 3,
+          "traction_Pa": 474304518.7676596
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.293890215200653e-27,
+          "retained_count": 4.288005174749005e-74,
+          "separation_m": 9.943930178022292e-13,
+          "step": 4,
+          "traction_Pa": 632405172.7171395
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.0745209233771146e-26,
+          "retained_count": 1.4344219033557177e-73,
+          "separation_m": 1.2512858562324988e-12,
+          "step": 5,
+          "traction_Pa": 790505378.9985023
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.7252869795123748e-26,
+          "retained_count": 5.098807142899658e-73,
+          "separation_m": 1.5117007744667156e-12,
+          "step": 6,
+          "traction_Pa": 948605123.7568723
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.6485526424458707e-26,
+          "retained_count": 1.9688907488051325e-72,
+          "separation_m": 1.7757487785776487e-12,
+          "step": 7,
+          "traction_Pa": 1106704392.44634
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.927518908631661e-26,
+          "retained_count": 8.453348586319839e-72,
+          "separation_m": 2.0435465166017707e-12,
+          "step": 8,
+          "traction_Pa": 1264803169.7816894
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.664836764959242e-26,
+          "retained_count": 4.079597444801107e-71,
+          "separation_m": 2.3152166803658075e-12,
+          "step": 9,
+          "traction_Pa": 1422901439.6857433
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.98620241585298e-26,
+          "retained_count": 2.2093352987668112e-70,
+          "separation_m": 2.5908884445239533e-12,
+          "step": 10,
+          "traction_Pa": 1580999185.2318347
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.1044492657450937e-25,
+          "retained_count": 1.3310731483234455e-69,
+          "separation_m": 2.8706979470836507e-12,
+          "step": 11,
+          "traction_Pa": 1739096388.5808392
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.5024506576377459e-25,
+          "retained_count": 8.82916556325248e-69,
+          "separation_m": 3.1547888162896046e-12,
+          "step": 12,
+          "traction_Pa": 1897193030.9121332
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.0148386810829686e-25,
+          "retained_count": 6.386143523696528e-68,
+          "separation_m": 3.443312749423759e-12,
+          "step": 13,
+          "traction_Pa": 2055289092.3477516
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.668180114598825e-25,
+          "retained_count": 4.9951357625256206e-67,
+          "separation_m": 3.7364301498814544e-12,
+          "step": 14,
+          "traction_Pa": 2213384551.868903
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.4940973333969367e-25,
+          "retained_count": 4.194452335742078e-66,
+          "separation_m": 4.0343108298230035e-12,
+          "step": 15,
+          "traction_Pa": 2371479387.2239017
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.530066080297471e-25,
+          "retained_count": 3.7559779191887494e-65,
+          "separation_m": 4.337134786802124e-12,
+          "step": 16,
+          "traction_Pa": 2529573574.826395
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.820318641082487e-25,
+          "retained_count": 3.5639930762316816e-64,
+          "separation_m": 4.645093064071371e-12,
+          "step": 17,
+          "traction_Pa": 2687667089.6426387
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.416864166116944e-25,
+          "retained_count": 3.5615264537025234e-63,
+          "separation_m": 4.9583887057998894e-12,
+          "step": 18,
+          "traction_Pa": 2845759905.066321
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 9.380638989308265e-25,
+          "retained_count": 3.725445181861174e-62,
+          "separation_m": 5.2772378202611156e-12,
+          "step": 19,
+          "traction_Pa": 3003851992.779245
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.1782800993508239e-24,
+          "retained_count": 4.054568930030394e-61,
+          "separation_m": 5.601870766219249e-12,
+          "step": 20,
+          "traction_Pa": 3161943322.595882
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.53425341784694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.4706183364409306e-24,
+          "retained_count": 4.5639556290238816e-60,
+          "separation_m": 5.9325334803411605e-12,
+          "step": 21,
+          "traction_Pa": 3320033862.289406
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.6549321520301275e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.824692446928929e-24,
+          "retained_count": 5.282061233682913e-59,
+          "separation_m": 6.2694889665828286e-12,
+          "step": 22,
+          "traction_Pa": 3478123577.396554
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.775610886213315e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.2516292099388323e-24,
+          "retained_count": 6.248899380589097e-58,
+          "separation_m": 6.613018972268456e-12,
+          "step": 23,
+          "traction_Pa": 3636212430.9979863
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.8962896203965027e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.764272193240088e-24,
+          "retained_count": 7.513833318975722e-57,
+          "separation_m": 6.9634258801535295e-12,
+          "step": 24,
+          "traction_Pa": 3794300383.4703493
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.01696835457969e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.377409181205171e-24,
+          "retained_count": 9.131745073495341e-56,
+          "separation_m": 7.321034851338722e-12,
+          "step": 25,
+          "traction_Pa": 3952387392.205496
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.137647088762878e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.108025531291111e-24,
+          "retained_count": 1.1156342162202601e-54,
+          "separation_m": 7.686196260736804e-12,
+          "step": 26,
+          "traction_Pa": 4110473411.2913194
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.2583258229460654e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.975586006881756e-24,
+          "retained_count": 1.3629531255436774e-53,
+          "separation_m": 8.059288475221597e-12,
+          "step": 27,
+          "traction_Pa": 4268558391.147737
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.379004557129253e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.002347850125371e-24,
+          "retained_count": 1.6566369284567754e-52,
+          "separation_m": 8.440721035039165e-12,
+          "step": 28,
+          "traction_Pa": 4426642278.109798
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.4996832913124405e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.21370808989315e-24,
+          "retained_count": 1.9936322061500772e-51,
+          "separation_m": 8.830938312106046e-12,
+          "step": 29,
+          "traction_Pa": 4584725013.948316
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956284e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.638588328128586e-24,
+          "retained_count": 2.364348432782819e-50,
+          "separation_m": 9.230423735210606e-12,
+          "step": 30,
+          "traction_Pa": 4742806535.3161955
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.7410407596788157e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.030986051365726e-23,
+          "retained_count": 2.751075942311084e-49,
+          "separation_m": 9.639704692878296e-12,
+          "step": 31,
+          "traction_Pa": 4900886773.106
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.8617194938620036e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.2264817497024616e-23,
+          "retained_count": 3.127497242230823e-48,
+          "separation_m": 1.0059358251116295e-11,
+          "step": 32,
+          "traction_Pa": 5058965651.700686
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.9823982280451915e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.4545692464209604e-23,
+          "retained_count": 3.460024868364185e-47,
+          "separation_m": 1.0490017857266129e-11,
+          "step": 33,
+          "traction_Pa": 5217043088.095186
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.103076962228379e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.7200231672239675e-23,
+          "retained_count": 3.711443461500719e-46,
+          "separation_m": 1.0932381245304714e-11,
+          "step": 34,
+          "traction_Pa": 5375118990.8604765
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.2237556964115666e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.0282325256953164e-23,
+          "retained_count": 3.846731938726705e-45,
+          "separation_m": 1.1387219815682023e-11,
+          "step": 35,
+          "traction_Pa": 5533193258.914516
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.344434430594754e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.385270125357751e-23,
+          "retained_count": 3.8400995409314957e-44,
+          "separation_m": 1.1855389839142632e-11,
+          "step": 36,
+          "traction_Pa": 5691265780.054102
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.465113164777942e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.797968836557615e-23,
+          "retained_count": 3.6814855079347986e-43,
+          "separation_m": 1.2337845936049274e-11,
+          "step": 37,
+          "traction_Pa": 5849336429.188578
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.585791898961129e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.2740053437492807e-23,
+          "retained_count": 3.380452458522051e-42,
+          "separation_m": 1.2835657420771273e-11,
+          "step": 38,
+          "traction_Pa": 6007405066.198132
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.706470633144317e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.8219920034351976e-23,
+          "retained_count": 2.9658599731720174e-41,
+          "separation_m": 1.3350028289787568e-11,
+          "step": 39,
+          "traction_Pa": 6165471533.314601
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.827149367327504e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.451577500448886e-23,
+          "retained_count": 2.480928119408565e-40,
+          "separation_m": 1.3882321894765864e-11,
+          "step": 40,
+          "traction_Pa": 6323535651.888385
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.947828101510692e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.1735570405176386e-23,
+          "retained_count": 1.9748682303416205e-39,
+          "separation_m": 1.4434091712165932e-11,
+          "step": 41,
+          "traction_Pa": 6481597218.356491
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.06850683569388e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.999992870140213e-23,
+          "retained_count": 1.4934889051398556e-38,
+          "separation_m": 1.5007120151775745e-11,
+          "step": 42,
+          "traction_Pa": 6639655999.157162
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.189185569877067e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.944345970728192e-23,
+          "retained_count": 1.0714936573409281e-37,
+          "separation_m": 1.5603468121740418e-11,
+          "step": 43,
+          "traction_Pa": 6797711724.235045
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.309864304060255e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.021619832546565e-23,
+          "retained_count": 7.2842692554698295e-37,
+          "separation_m": 1.6225539222761938e-11,
+          "step": 44,
+          "traction_Pa": 6955764078.62935
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.430543038243442e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 9.24851727492827e-23,
+          "retained_count": 4.6878545261678284e-36,
+          "separation_m": 1.6876164205006866e-11,
+          "step": 45,
+          "traction_Pa": 7113812691.406846
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.55122177242663e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.0643611341898527e-22,
+          "retained_count": 2.8538504984721924e-35,
+          "separation_m": 1.7558714074837062e-11,
+          "step": 46,
+          "traction_Pa": 7271857120.840717
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.6719005066098174e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.2227531365555734e-22,
+          "retained_count": 1.642573303619236e-34,
+          "separation_m": 1.8277254670553183e-11,
+          "step": 47,
+          "traction_Pa": 7429896834.155338
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.7925792407930053e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.4023165351155767e-22,
+          "retained_count": 8.935283225127103e-34,
+          "separation_m": 1.9036762899171548e-11,
+          "step": 48,
+          "traction_Pa": 7587931179.191209
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.913257974976193e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.605587989378682e-22,
+          "retained_count": 4.5932187488507004e-33,
+          "separation_m": 1.984343756654954e-11,
+          "step": 49,
+          "traction_Pa": 7745959343.674517
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.8353758878940046e-22,
+          "retained_count": 2.2313279280813685e-32,
+          "separation_m": 2.0705160748262247e-11,
+          "step": 50,
+          "traction_Pa": 7903980294.760041
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.154615443342568e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.0947862232071122e-22,
+          "retained_count": 1.0245460058072e-31,
+          "separation_m": 2.163220947090952e-11,
+          "step": 51,
+          "traction_Pa": 8061992685.773357
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.275294177525756e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.3872505930073675e-22,
+          "retained_count": 4.448078223491111e-31,
+          "separation_m": 2.2638406378949494e-11,
+          "step": 52,
+          "traction_Pa": 8219994705.426911
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.395972911708944e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.716556428644612e-22,
+          "retained_count": 1.8268286595251056e-30,
+          "separation_m": 2.3743093105112912e-11,
+          "step": 53,
+          "traction_Pa": 8377983819.220602
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.516651645892131e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.0868794952854306e-22,
+          "retained_count": 7.101837965664757e-30,
+          "separation_m": 2.4974782616968964e-11,
+          "step": 54,
+          "traction_Pa": 8535956290.781215
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.637330380075318e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.5028185507058156e-22,
+          "retained_count": 2.6151087609695894e-29,
+          "separation_m": 2.6378652241486243e-11,
+          "step": 55,
+          "traction_Pa": 8693906200.929045
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.758009114258507e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.9694315702385157e-22,
+          "retained_count": 9.127525850665431e-29,
+          "separation_m": 2.8034373757074125e-11,
+          "step": 56,
+          "traction_Pa": 8851823108.809118
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.878687848441694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.492271146909118e-22,
+          "retained_count": 3.021133429720809e-28,
+          "separation_m": 3.010992861756124e-11,
+          "step": 57,
+          "traction_Pa": 9009685002.960773
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.999366582624881e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.077405417658371e-22,
+          "retained_count": 9.479866199145615e-28,
+          "separation_m": 3.312471266458176e-11,
+          "step": 58,
+          "traction_Pa": 9167423823.2054
+        }
+      ],
+      "trigger": "FE_BRANCH_LOSS"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "smooth_exponential",
+      "imposed_at_trigger_m": 2.413574683663752e-08,
+      "mobile_final": 1.1782800993508239e-24,
+      "opening_mode": "cohesive_mixed",
+      "peak_traction_Pa": 3161943322.595882,
+      "retained_final": 4.054568930030394e-61,
+      "separation_at_trigger_m": 5.601870766219249e-12,
+      "temperature_K": 300.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 2.6498314780526512e-08,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 5.045726064704067e-28,
+          "retained_count": 3.192063077050991e-74,
+          "separation_m": 2.4381402189046213e-13,
+          "step": 1,
+          "traction_Pa": 158101920.09106758
+        },
+        {
+          "action": 1.3268878122703755e-07,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.545146074728032e-27,
+          "retained_count": 6.644641037738907e-75,
+          "separation_m": 4.907555856981214e-13,
+          "step": 2,
+          "traction_Pa": 316203430.3582285
+        },
+        {
+          "action": 4.993476165302194e-07,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 3.366755110618586e-27,
+          "retained_count": 1.3988508842580329e-74,
+          "separation_m": 7.409165266834889e-13,
+          "step": 3,
+          "traction_Pa": 474304518.7676596
+        },
+        {
+          "action": 1.653067159725285e-06,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 6.293890215200653e-27,
+          "retained_count": 4.288005174749005e-74,
+          "separation_m": 9.943930178022292e-13,
+          "step": 4,
+          "traction_Pa": 632405172.7171395
+        },
+        {
+          "action": 5.04227636756454e-06,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.0745209233771146e-26,
+          "retained_count": 1.4344219033557177e-73,
+          "separation_m": 1.2512858562324988e-12,
+          "step": 5,
+          "traction_Pa": 790505378.9985023
+        },
+        {
+          "action": 1.4465655460803352e-05,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.7252869795123748e-26,
+          "retained_count": 5.098807142899658e-73,
+          "separation_m": 1.5117007744667156e-12,
+          "step": 6,
+          "traction_Pa": 948605123.7568723
+        },
+        {
+          "action": 3.948497985473908e-05,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 2.6485526424458707e-26,
+          "retained_count": 1.9688907488051325e-72,
+          "separation_m": 1.7757487785776487e-12,
+          "step": 7,
+          "traction_Pa": 1106704392.44634
+        },
+        {
+          "action": 0.00010331217845617927,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 3.927518908631661e-26,
+          "retained_count": 8.453348586319839e-72,
+          "separation_m": 2.0435465166017707e-12,
+          "step": 8,
+          "traction_Pa": 1264803169.7816894
+        },
+        {
+          "action": 0.00026049227807403664,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 5.664836764959242e-26,
+          "retained_count": 4.079597444801107e-71,
+          "separation_m": 2.3152166803658075e-12,
+          "step": 9,
+          "traction_Pa": 1422901439.6857433
+        },
+        {
+          "action": 0.0006354583674201871,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 7.98620241585298e-26,
+          "retained_count": 2.2093352987668112e-70,
+          "separation_m": 2.5908884445239533e-12,
+          "step": 10,
+          "traction_Pa": 1580999185.2318347
+        },
+        {
+          "action": 0.0015044434581366066,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.1044492657450937e-25,
+          "retained_count": 1.3310731483234455e-69,
+          "separation_m": 2.8706979470836507e-12,
+          "step": 11,
+          "traction_Pa": 1739096388.5808392
+        },
+        {
+          "action": 0.0034653296851009305,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.5024506576377459e-25,
+          "retained_count": 8.82916556325248e-69,
+          "separation_m": 3.1547888162896046e-12,
+          "step": 12,
+          "traction_Pa": 1897193030.9121332
+        },
+        {
+          "action": 0.0077818607844352536,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 2.0148386810829686e-25,
+          "retained_count": 6.386143523696528e-68,
+          "separation_m": 3.443312749423759e-12,
+          "step": 13,
+          "traction_Pa": 2055289092.3477516
+        },
+        {
+          "action": 0.017066203789181642,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 2.668180114598825e-25,
+          "retained_count": 4.9951357625256206e-67,
+          "separation_m": 3.7364301498814544e-12,
+          "step": 14,
+          "traction_Pa": 2213384551.868903
+        },
+        {
+          "action": 0.03660463833953271,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 3.4940973333969367e-25,
+          "retained_count": 4.194452335742078e-66,
+          "separation_m": 4.0343108298230035e-12,
+          "step": 15,
+          "traction_Pa": 2371479387.2239017
+        },
+        {
+          "action": 0.07688160511509531,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 4.530066080297471e-25,
+          "retained_count": 3.7559779191887494e-65,
+          "separation_m": 4.337134786802124e-12,
+          "step": 16,
+          "traction_Pa": 2529573574.826395
+        },
+        {
+          "action": 0.15829414598490932,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 5.820318641082487e-25,
+          "retained_count": 3.5639930762316816e-64,
+          "separation_m": 4.645093064071371e-12,
+          "step": 17,
+          "traction_Pa": 2687667089.6426387
+        },
+        {
+          "action": 0.3197959254957179,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 7.416864166116944e-25,
+          "retained_count": 3.5615264537025234e-63,
+          "separation_m": 4.9583887057998894e-12,
+          "step": 18,
+          "traction_Pa": 2845759905.066321
+        },
+        {
+          "action": 0.6344638284400734,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 9.380638989308265e-25,
+          "retained_count": 3.725445181861174e-62,
+          "separation_m": 5.2772378202611156e-12,
+          "step": 19,
+          "traction_Pa": 3003851992.779245
+        },
+        {
+          "action": 1.2370446378997868,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.1782800993508239e-24,
+          "retained_count": 4.054568930030394e-61,
+          "separation_m": 5.601870766219249e-12,
+          "step": 20,
+          "traction_Pa": 3161943322.595882
+        }
+      ],
+      "trigger": "THERMAL_ESCAPE"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "bilinear",
+      "imposed_at_trigger_m": 6.999366582624881e-08,
+      "mobile_final": 5.082868521089767e-22,
+      "opening_mode": "cohesive_athermal",
+      "peak_traction_Pa": 9169923025.35613,
+      "retained_final": 9.64088660270382e-28,
+      "separation_at_trigger_m": 1.4052230244921695e-11,
+      "temperature_K": 300.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.045731637922325e-28,
+          "retained_count": 3.1920399932542245e-74,
+          "separation_m": 2.422798318089947e-13,
+          "step": 1,
+          "traction_Pa": 158102121.1268298
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.5451499502070774e-27,
+          "retained_count": 6.644635328783727e-75,
+          "separation_m": 4.845596636179892e-13,
+          "step": 2,
+          "traction_Pa": 316204242.2536595
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.366769825151386e-27,
+          "retained_count": 1.398862564781349e-74,
+          "separation_m": 7.26839495426984e-13,
+          "step": 3,
+          "traction_Pa": 474306363.38048935
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.2939321126618975e-27,
+          "retained_count": 4.2880879390106936e-74,
+          "separation_m": 9.691193272359785e-13,
+          "step": 4,
+          "traction_Pa": 632408484.507319
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.0745309631255909e-26,
+          "retained_count": 1.434470158968193e-73,
+          "separation_m": 1.2113991590449734e-12,
+          "step": 5,
+          "traction_Pa": 790510605.634149
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.725308396545258e-26,
+          "retained_count": 5.099080372296739e-73,
+          "separation_m": 1.4536789908539681e-12,
+          "step": 6,
+          "traction_Pa": 948612726.7609788
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.6485946355851165e-26,
+          "retained_count": 1.9690510234139343e-72,
+          "separation_m": 1.6959588226629624e-12,
+          "step": 7,
+          "traction_Pa": 1106714847.8878083
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.9275961208020375e-26,
+          "retained_count": 8.454352824581468e-72,
+          "separation_m": 1.938238654471957e-12,
+          "step": 8,
+          "traction_Pa": 1264816969.014638
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.664971700792695e-26,
+          "retained_count": 4.0802770079947485e-71,
+          "separation_m": 2.1805184862809527e-12,
+          "step": 9,
+          "traction_Pa": 1422919090.1414685
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.986428688465158e-26,
+          "retained_count": 2.2098322609866028e-70,
+          "separation_m": 2.422798318089946e-12,
+          "step": 10,
+          "traction_Pa": 1581021211.2682974
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.104485929142589e-25,
+          "retained_count": 1.331464497052461e-69,
+          "separation_m": 2.6650781498989417e-12,
+          "step": 11,
+          "traction_Pa": 1739123332.3951278
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.5025083645412449e-25,
+          "retained_count": 8.832468656795152e-69,
+          "separation_m": 2.9073579817079362e-12,
+          "step": 12,
+          "traction_Pa": 1897225453.5219576
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.0149272749923557e-25,
+          "retained_count": 6.3891176386421424e-68,
+          "separation_m": 3.1496378135169308e-12,
+          "step": 13,
+          "traction_Pa": 2055327574.6487873
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.6683132151265863e-25,
+          "retained_count": 4.9979795866180616e-67,
+          "separation_m": 3.3919176453259253e-12,
+          "step": 14,
+          "traction_Pa": 2213429695.7756166
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.4942935350276186e-25,
+          "retained_count": 4.1973270968888375e-66,
+          "separation_m": 3.6341974771349214e-12,
+          "step": 15,
+          "traction_Pa": 2371531816.902447
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.530350470265238e-25,
+          "retained_count": 3.759036124596131e-65,
+          "separation_m": 3.8764773089439155e-12,
+          "step": 16,
+          "traction_Pa": 2529633938.029277
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.820724708940965e-25,
+          "retained_count": 3.567400654811745e-64,
+          "separation_m": 4.118757140752909e-12,
+          "step": 17,
+          "traction_Pa": 2687736059.1561065
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.41743619204232e-25,
+          "retained_count": 3.5654839183075456e-63,
+          "separation_m": 4.361036972561903e-12,
+          "step": 18,
+          "traction_Pa": 2845838180.2829356
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 9.381435015265648e-25,
+          "retained_count": 3.730211612348073e-62,
+          "separation_m": 4.6033168043708975e-12,
+          "step": 19,
+          "traction_Pa": 3003940301.4097652
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.1783896501573932e-24,
+          "retained_count": 4.0604918682997115e-61,
+          "separation_m": 4.845596636179892e-12,
+          "step": 20,
+          "traction_Pa": 3162042422.536595
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.53425341784694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.470767581031566e-24,
+          "retained_count": 4.571509650399026e-60,
+          "separation_m": 5.087876467988888e-12,
+          "step": 21,
+          "traction_Pa": 3320144543.6634254
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.6549321520301275e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.824893884727156e-24,
+          "retained_count": 5.291897496807764e-59,
+          "separation_m": 5.330156299797883e-12,
+          "step": 22,
+          "traction_Pa": 3478246664.790255
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.775610886213315e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.2518987747413127e-24,
+          "retained_count": 6.26190732145099e-58,
+          "separation_m": 5.572436131606878e-12,
+          "step": 23,
+          "traction_Pa": 3636348785.9170856
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.8962896203965027e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.7646300825726768e-24,
+          "retained_count": 7.531213192828599e-57,
+          "separation_m": 5.814715963415871e-12,
+          "step": 24,
+          "traction_Pa": 3794450907.0439143
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.01696835457969e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.377880863886598e-24,
+          "retained_count": 9.155085538648168e-56,
+          "separation_m": 6.056995795224866e-12,
+          "step": 25,
+          "traction_Pa": 3952553028.1707444
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.137647088762878e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.108642967976295e-24,
+          "retained_count": 1.1187689977600964e-54,
+          "separation_m": 6.299275627033861e-12,
+          "step": 26,
+          "traction_Pa": 4110655149.297574
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.2583258229460654e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.9763891247230325e-24,
+          "retained_count": 1.3671430513238185e-53,
+          "separation_m": 6.541555458842855e-12,
+          "step": 27,
+          "traction_Pa": 4268757270.4244037
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.379004557129253e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.003386320206541e-24,
+          "retained_count": 1.662183689148302e-52,
+          "separation_m": 6.783835290651851e-12,
+          "step": 28,
+          "traction_Pa": 4426859391.551234
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.4996832913124405e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.2150434649781e-24,
+          "retained_count": 2.00087180553604e-51,
+          "separation_m": 7.026115122460846e-12,
+          "step": 29,
+          "traction_Pa": 4584961512.678064
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956284e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.640296608790414e-24,
+          "retained_count": 2.3736236141237875e-50,
+          "separation_m": 7.26839495426984e-12,
+          "step": 30,
+          "traction_Pa": 4743063633.804893
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.7410407596788157e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.0312035223342655e-23,
+          "retained_count": 2.7626915827569047e-49,
+          "separation_m": 7.510674786078835e-12,
+          "step": 31,
+          "traction_Pa": 4901165754.931724
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.8617194938620036e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.2267573361465708e-23,
+          "retained_count": 3.141660128300586e-48,
+          "separation_m": 7.752954617887828e-12,
+          "step": 32,
+          "traction_Pa": 5059267876.058552
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.9823982280451915e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.4549169808321636e-23,
+          "retained_count": 3.476775170104184e-47,
+          "separation_m": 7.995234449696824e-12,
+          "step": 33,
+          "traction_Pa": 5217369997.185383
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.103076962228379e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.720460166886472e-23,
+          "retained_count": 3.730591899235888e-46,
+          "separation_m": 8.237514281505815e-12,
+          "step": 34,
+          "traction_Pa": 5375472118.312211
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.2237556964115666e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.0287796187318917e-23,
+          "retained_count": 3.8678214971138886e-45,
+          "separation_m": 8.479794113314813e-12,
+          "step": 35,
+          "traction_Pa": 5533574239.439042
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.344434430594754e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.3859525970143877e-23,
+          "retained_count": 3.8624104245394514e-44,
+          "separation_m": 8.722073945123809e-12,
+          "step": 36,
+          "traction_Pa": 5691676360.565873
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.465113164777942e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.798817318533949e-23,
+          "retained_count": 3.704094565236392e-43,
+          "separation_m": 8.964353776932804e-12,
+          "step": 37,
+          "traction_Pa": 5849778481.692702
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.585791898961129e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.2750568739501034e-23,
+          "retained_count": 3.402343986585503e-42,
+          "separation_m": 9.206633608741795e-12,
+          "step": 38,
+          "traction_Pa": 6007880602.8195305
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.706470633144317e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.823291289138577e-23,
+          "retained_count": 2.9860678006849607e-41,
+          "separation_m": 9.448913440550791e-12,
+          "step": 39,
+          "traction_Pa": 6165982723.946361
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.827149367327504e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.453178424857248e-23,
+          "retained_count": 2.49867594595581e-40,
+          "separation_m": 9.691193272359784e-12,
+          "step": 40,
+          "traction_Pa": 6324084845.07319
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.947828101510692e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.175524461386075e-23,
+          "retained_count": 1.9896727412843453e-39,
+          "separation_m": 9.933473104168778e-12,
+          "step": 41,
+          "traction_Pa": 6482186966.20002
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.06850683569388e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.002404770222035e-23,
+          "retained_count": 1.5052004909779348e-38,
+          "separation_m": 1.0175752935977775e-11,
+          "step": 42,
+          "traction_Pa": 6640289087.32685
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.189185569877067e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.947296033932468e-23,
+          "retained_count": 1.0802690406580132e-37,
+          "separation_m": 1.0418032767786769e-11,
+          "step": 43,
+          "traction_Pa": 6798391208.45368
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.309864304060255e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.025220538102917e-23,
+          "retained_count": 7.346485839819966e-37,
+          "separation_m": 1.0660312599595765e-11,
+          "step": 44,
+          "traction_Pa": 6956493329.58051
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.430543038243442e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 9.252903626173907e-23,
+          "retained_count": 4.7295606739955077e-36,
+          "separation_m": 1.0902592431404758e-11,
+          "step": 45,
+          "traction_Pa": 7114595450.707339
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.55122177242663e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.0648945379070763e-22,
+          "retained_count": 2.8802693352130576e-35,
+          "separation_m": 1.1144872263213753e-11,
+          "step": 46,
+          "traction_Pa": 7272697571.834169
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.6719005066098174e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.2234007657125828e-22,
+          "retained_count": 1.6583826315499406e-34,
+          "separation_m": 1.1387152095022747e-11,
+          "step": 47,
+          "traction_Pa": 7430799692.960999
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.7925792407930053e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.4031017722111334e-22,
+          "retained_count": 9.024647889369937e-34,
+          "separation_m": 1.1629431926831743e-11,
+          "step": 48,
+          "traction_Pa": 7588901814.08783
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.913257974976193e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.6065389742459235e-22,
+          "retained_count": 4.640942960315321e-33,
+          "separation_m": 1.1871711758640738e-11,
+          "step": 49,
+          "traction_Pa": 7747003935.214659
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.8365265575028893e-22,
+          "retained_count": 2.255416140672338e-32,
+          "separation_m": 1.211399159044973e-11,
+          "step": 50,
+          "traction_Pa": 7905106056.341488
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.154615443342568e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.096177631167092e-22,
+          "retained_count": 1.036044672744585e-31,
+          "separation_m": 1.2356271422258725e-11,
+          "step": 51,
+          "traction_Pa": 8063208177.468317
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.275294177525756e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.388932617610468e-22,
+          "retained_count": 4.500039256646588e-31,
+          "separation_m": 1.2598551254067725e-11,
+          "step": 52,
+          "traction_Pa": 8221310298.59515
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.395972911708944e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.7185900448238965e-22,
+          "retained_count": 1.84908523523099e-30,
+          "separation_m": 1.2840831085876718e-11,
+          "step": 53,
+          "traction_Pa": 8379412419.721979
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.516651645892131e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.0893399153663843e-22,
+          "retained_count": 7.192360273222671e-30,
+          "separation_m": 1.3083110917685712e-11,
+          "step": 54,
+          "traction_Pa": 8537514540.848808
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.637330380075318e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.5057998212659707e-22,
+          "retained_count": 2.6501551400865766e-29,
+          "separation_m": 1.3325390749494707e-11,
+          "step": 55,
+          "traction_Pa": 8695616661.975637
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.758009114258507e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.9730539402757303e-22,
+          "retained_count": 9.257168851395509e-29,
+          "separation_m": 1.3567670581303703e-11,
+          "step": 56,
+          "traction_Pa": 8853718783.102468
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.878687848441694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.496694938663064e-22,
+          "retained_count": 3.0672682863140014e-28,
+          "separation_m": 1.3809950413112697e-11,
+          "step": 57,
+          "traction_Pa": 9011820904.229298
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.999366582624881e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 5.082868521089767e-22,
+          "retained_count": 9.64088660270382e-28,
+          "separation_m": 1.4052230244921695e-11,
+          "step": 58,
+          "traction_Pa": 9169923025.35613
+        }
+      ],
+      "trigger": "FE_BRANCH_LOSS"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "bilinear",
+      "imposed_at_trigger_m": 2.413574683663752e-08,
+      "mobile_final": 1.1783896501573932e-24,
+      "opening_mode": "cohesive_mixed",
+      "peak_traction_Pa": 3162042422.536595,
+      "retained_final": 4.0604918682997115e-61,
+      "separation_at_trigger_m": 4.845596636179892e-12,
+      "temperature_K": 300.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 1.615470304334103e-08,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 5.045731637922325e-28,
+          "retained_count": 3.1920399932542245e-74,
+          "separation_m": 2.422798318089947e-13,
+          "step": 1,
+          "traction_Pa": 158102121.1268298
+        },
+        {
+          "action": 6.431858904444803e-08,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.5451499502070774e-27,
+          "retained_count": 6.644635328783727e-75,
+          "separation_m": 4.845596636179892e-13,
+          "step": 2,
+          "traction_Pa": 316204242.2536595
+        },
+        {
+          "action": 2.051958050615644e-07,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 3.366769825151386e-27,
+          "retained_count": 1.398862564781349e-74,
+          "separation_m": 7.26839495426984e-13,
+          "step": 3,
+          "traction_Pa": 474306363.38048935
+        },
+        {
+          "action": 6.094520165584236e-07,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 6.2939321126618975e-27,
+          "retained_count": 4.2880879390106936e-74,
+          "separation_m": 9.691193272359785e-13,
+          "step": 4,
+          "traction_Pa": 632408484.507319
+        },
+        {
+          "action": 1.747522979984122e-06,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.0745309631255909e-26,
+          "retained_count": 1.434470158968193e-73,
+          "separation_m": 1.2113991590449734e-12,
+          "step": 5,
+          "traction_Pa": 790510605.634149
+        },
+        {
+          "action": 4.890771244772365e-06,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.725308396545258e-26,
+          "retained_count": 5.099080372296739e-73,
+          "separation_m": 1.4536789908539681e-12,
+          "step": 6,
+          "traction_Pa": 948612726.7609788
+        },
+        {
+          "action": 1.3407733571494914e-05,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 2.6485946355851165e-26,
+          "retained_count": 1.9690510234139343e-72,
+          "separation_m": 1.6959588226629624e-12,
+          "step": 7,
+          "traction_Pa": 1106714847.8878083
+        },
+        {
+          "action": 3.60483093964002e-05,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 3.9275961208020375e-26,
+          "retained_count": 8.454352824581468e-72,
+          "separation_m": 1.938238654471957e-12,
+          "step": 8,
+          "traction_Pa": 1264816969.014638
+        },
+        {
+          "action": 9.509382378562674e-05,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 5.664971700792695e-26,
+          "retained_count": 4.0802770079947485e-71,
+          "separation_m": 2.1805184862809527e-12,
+          "step": 9,
+          "traction_Pa": 1422919090.1414685
+        },
+        {
+          "action": 0.00024616550170904964,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 7.986428688465158e-26,
+          "retained_count": 2.2098322609866028e-70,
+          "separation_m": 2.422798318089946e-12,
+          "step": 10,
+          "traction_Pa": 1581021211.2682974
+        },
+        {
+          "action": 0.0006253721087040626,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.104485929142589e-25,
+          "retained_count": 1.331464497052461e-69,
+          "separation_m": 2.6650781498989417e-12,
+          "step": 11,
+          "traction_Pa": 1739123332.3951278
+        },
+        {
+          "action": 0.0015591969838340447,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.5025083645412449e-25,
+          "retained_count": 8.832468656795152e-69,
+          "separation_m": 2.9073579817079362e-12,
+          "step": 12,
+          "traction_Pa": 1897225453.5219576
+        },
+        {
+          "action": 0.0038152623658012463,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 2.0149272749923557e-25,
+          "retained_count": 6.3891176386421424e-68,
+          "separation_m": 3.1496378135169308e-12,
+          "step": 13,
+          "traction_Pa": 2055327574.6487873
+        },
+        {
+          "action": 0.009162563288065749,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 2.6683132151265863e-25,
+          "retained_count": 4.9979795866180616e-67,
+          "separation_m": 3.3919176453259253e-12,
+          "step": 14,
+          "traction_Pa": 2213429695.7756166
+        },
+        {
+          "action": 0.02159666078946915,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 3.4942935350276186e-25,
+          "retained_count": 4.1973270968888375e-66,
+          "separation_m": 3.6341974771349214e-12,
+          "step": 15,
+          "traction_Pa": 2371531816.902447
+        },
+        {
+          "action": 0.04996217183272991,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 4.530350470265238e-25,
+          "retained_count": 3.759036124596131e-65,
+          "separation_m": 3.8764773089439155e-12,
+          "step": 16,
+          "traction_Pa": 2529633938.029277
+        },
+        {
+          "action": 0.11344608024788701,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 5.820724708940965e-25,
+          "retained_count": 3.567400654811745e-64,
+          "separation_m": 4.118757140752909e-12,
+          "step": 17,
+          "traction_Pa": 2687736059.1561065
+        },
+        {
+          "action": 0.25283665240144076,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 7.41743619204232e-25,
+          "retained_count": 3.5654839183075456e-63,
+          "separation_m": 4.361036972561903e-12,
+          "step": 18,
+          "traction_Pa": 2845838180.2829356
+        },
+        {
+          "action": 0.5530982875029423,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 9.381435015265648e-25,
+          "retained_count": 3.730211612348073e-62,
+          "separation_m": 4.6033168043708975e-12,
+          "step": 19,
+          "traction_Pa": 3003940301.4097652
+        },
+        {
+          "action": 1.1876441110489484,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 1.1783896501573932e-24,
+          "retained_count": 4.0604918682997115e-61,
+          "separation_m": 4.845596636179892e-12,
+          "step": 20,
+          "traction_Pa": 3162042422.536595
+        }
+      ],
+      "trigger": "THERMAL_ESCAPE"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "smooth_exponential",
+      "imposed_at_trigger_m": 6.999366582624881e-08,
+      "mobile_final": 0.0,
+      "opening_mode": "cohesive_athermal",
+      "peak_traction_Pa": 9167423823.2054,
+      "retained_final": 7.329001691205166e-16,
+      "separation_at_trigger_m": 3.312471266458176e-11,
+      "temperature_K": 750.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.619546559332537e-24,
+          "retained_count": 1.0189773209819716e-51,
+          "separation_m": 2.4381402189046213e-13,
+          "step": 1,
+          "traction_Pa": 158101920.09106758
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.047952939243335e-23,
+          "retained_count": 2.260180522702634e-50,
+          "separation_m": 4.907555856981214e-13,
+          "step": 2,
+          "traction_Pa": 316203430.3582285
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.380826817982583e-23,
+          "retained_count": 3.498532342661537e-49,
+          "separation_m": 7.409165266834889e-13,
+          "step": 3,
+          "traction_Pa": 474304518.7676596
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.928393032516495e-22,
+          "retained_count": 6.994077343556132e-48,
+          "separation_m": 9.943930178022292e-13,
+          "step": 4,
+          "traction_Pa": 632405172.7171395
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.9755449275522315e-22,
+          "retained_count": 2.138397024727798e-46,
+          "separation_m": 1.2512858562324988e-12,
+          "step": 5,
+          "traction_Pa": 790505378.9985023
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.591715161689252e-22,
+          "retained_count": 9.357008607702858e-45,
+          "separation_m": 1.5117007744667156e-12,
+          "step": 6,
+          "traction_Pa": 948605123.7568723
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.3688695375566113e-21,
+          "retained_count": 5.266482167562828e-43,
+          "separation_m": 1.7757487785776487e-12,
+          "step": 7,
+          "traction_Pa": 1106704392.44634
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.3593700738657423e-21,
+          "retained_count": 3.483234485011542e-41,
+          "separation_m": 2.0435465166017707e-12,
+          "step": 8,
+          "traction_Pa": 1264803169.7816894
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.920130146466017e-21,
+          "retained_count": 2.503222595741137e-39,
+          "separation_m": 2.3152166803658075e-12,
+          "step": 9,
+          "traction_Pa": 1422901439.6857433
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.31706988192756e-21,
+          "retained_count": 1.8207411223649085e-37,
+          "separation_m": 2.5908884445239533e-12,
+          "step": 10,
+          "traction_Pa": 1580999185.2318347
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 9.917951358704094e-21,
+          "retained_count": 1.2571429220759936e-35,
+          "separation_m": 2.8706979470836507e-12,
+          "step": 11,
+          "traction_Pa": 1739096388.5808392
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.522475420356637e-20,
+          "retained_count": 7.787443025407786e-34,
+          "separation_m": 3.1547888162896046e-12,
+          "step": 12,
+          "traction_Pa": 1897193030.9121332
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.2914661230040373e-20,
+          "retained_count": 4.1253620702274857e-32,
+          "separation_m": 3.443312749423759e-12,
+          "step": 13,
+          "traction_Pa": 2055289092.3477516
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.3891579871020836e-20,
+          "retained_count": 1.7975755838910666e-30,
+          "separation_m": 3.7364301498814544e-12,
+          "step": 14,
+          "traction_Pa": 2213384551.868903
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.935048849481789e-20,
+          "retained_count": 6.253671283166627e-29,
+          "separation_m": 4.0343108298230035e-12,
+          "step": 15,
+          "traction_Pa": 2371479387.2239017
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.085731673755811e-20,
+          "retained_count": 1.701007631072127e-27,
+          "separation_m": 4.337134786802124e-12,
+          "step": 16,
+          "traction_Pa": 2529573574.826395
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.0044753222018253e-19,
+          "retained_count": 3.570017446017958e-26,
+          "separation_m": 4.645093064071371e-12,
+          "step": 17,
+          "traction_Pa": 2687667089.6426387
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.407468372958889e-19,
+          "retained_count": 5.714027230944916e-25,
+          "separation_m": 4.9583887057998894e-12,
+          "step": 18,
+          "traction_Pa": 2845759905.066321
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.9511509556687922e-19,
+          "retained_count": 6.591798816406795e-24,
+          "separation_m": 5.2772378202611156e-12,
+          "step": 19,
+          "traction_Pa": 3003851992.779245
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.678177326708043e-19,
+          "retained_count": 3.623387755814108e-23,
+          "separation_m": 5.601870766219249e-12,
+          "step": 20,
+          "traction_Pa": 3161943322.595882
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.53425341784694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.6429519923672045e-19,
+          "retained_count": 6.939669644664991e-23,
+          "separation_m": 5.9325334803411605e-12,
+          "step": 21,
+          "traction_Pa": 3320033862.289406
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.6549321520301275e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.910685227326426e-19,
+          "retained_count": 4.0524668732273823e-22,
+          "separation_m": 6.2694889665828286e-12,
+          "step": 22,
+          "traction_Pa": 3478123577.396554
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.775610886213315e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.558296636766625e-19,
+          "retained_count": 1.8879607893232143e-21,
+          "separation_m": 6.613018972268456e-12,
+          "step": 23,
+          "traction_Pa": 3636212430.9979863
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.8962896203965027e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.665735248277159e-19,
+          "retained_count": 7.153164472957753e-21,
+          "separation_m": 6.9634258801535295e-12,
+          "step": 24,
+          "traction_Pa": 3794300383.4703493
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.01696835457969e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.436805877459636e-21,
+          "retained_count": 2.1412077379733935e-20,
+          "separation_m": 7.321034851338722e-12,
+          "step": 25,
+          "traction_Pa": 3952387392.205496
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.137647088762878e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.121602475968305e-20,
+          "separation_m": 7.686196260736804e-12,
+          "step": 26,
+          "traction_Pa": 4110473411.2913194
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.2583258229460654e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0304608908287335e-19,
+          "separation_m": 8.059288475221597e-12,
+          "step": 27,
+          "traction_Pa": 4268558391.147737
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.379004557129253e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.8361042216800845e-19,
+          "separation_m": 8.440721035039165e-12,
+          "step": 28,
+          "traction_Pa": 4426642278.109798
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.4996832913124405e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.010461735763828e-19,
+          "separation_m": 8.830938312106046e-12,
+          "step": 29,
+          "traction_Pa": 4584725013.948316
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956284e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4.670075964596924e-19,
+          "separation_m": 9.230423735210606e-12,
+          "step": 30,
+          "traction_Pa": 4742806535.3161955
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.7410407596788157e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6.996236211879454e-19,
+          "separation_m": 9.639704692878296e-12,
+          "step": 31,
+          "traction_Pa": 4900886773.106
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.8617194938620036e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0257390948123029e-18,
+          "separation_m": 1.0059358251116295e-11,
+          "step": 32,
+          "traction_Pa": 5058965651.700686
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.9823982280451915e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.4803461642565942e-18,
+          "separation_m": 1.0490017857266129e-11,
+          "step": 33,
+          "traction_Pa": 5217043088.095186
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.103076962228379e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.105387055717344e-18,
+          "separation_m": 1.0932381245304714e-11,
+          "step": 34,
+          "traction_Pa": 5375118990.8604765
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.2237556964115666e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.9512586058752266e-18,
+          "separation_m": 1.1387219815682023e-11,
+          "step": 35,
+          "traction_Pa": 5533193258.914516
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.344434430594754e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4.081328316560273e-18,
+          "separation_m": 1.1855389839142632e-11,
+          "step": 36,
+          "traction_Pa": 5691265780.054102
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.465113164777942e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.578157276983318e-18,
+          "separation_m": 1.2337845936049274e-11,
+          "step": 37,
+          "traction_Pa": 5849336429.188578
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.585791898961129e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7.548453217864802e-18,
+          "separation_m": 1.2835657420771273e-11,
+          "step": 38,
+          "traction_Pa": 6007405066.198132
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.706470633144317e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0125415193823382e-17,
+          "separation_m": 1.3350028289787568e-11,
+          "step": 39,
+          "traction_Pa": 6165471533.314601
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.827149367327504e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.3471790917823097e-17,
+          "separation_m": 1.3882321894765864e-11,
+          "step": 40,
+          "traction_Pa": 6323535651.888385
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.947828101510692e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.7786400802675394e-17,
+          "separation_m": 1.4434091712165932e-11,
+          "step": 41,
+          "traction_Pa": 6481597218.356491
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.06850683569388e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.3312685526566467e-17,
+          "separation_m": 1.5007120151775745e-11,
+          "step": 42,
+          "traction_Pa": 6639655999.157162
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.189185569877067e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.034539041080603e-17,
+          "separation_m": 1.5603468121740418e-11,
+          "step": 43,
+          "traction_Pa": 6797711724.235045
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.309864304060255e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.923345081297091e-17,
+          "separation_m": 1.6225539222761938e-11,
+          "step": 44,
+          "traction_Pa": 6955764078.62935
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.430543038243442e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.038150294399896e-17,
+          "separation_m": 1.6876164205006866e-11,
+          "step": 45,
+          "traction_Pa": 7113812691.406846
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.55122177242663e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6.425277327771205e-17,
+          "separation_m": 1.7558714074837062e-11,
+          "step": 46,
+          "traction_Pa": 7271857120.840717
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.6719005066098174e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 8.13742337915093e-17,
+          "separation_m": 1.8277254670553183e-11,
+          "step": 47,
+          "traction_Pa": 7429896834.155338
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.7925792407930053e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0234426810338825e-16,
+          "separation_m": 1.9036762899171548e-11,
+          "step": 48,
+          "traction_Pa": 7587931179.191209
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.913257974976193e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.2784284487901936e-16,
+          "separation_m": 1.984343756654954e-11,
+          "step": 49,
+          "traction_Pa": 7745959343.674517
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.5864395208019784e-16,
+          "separation_m": 2.0705160748262247e-11,
+          "step": 50,
+          "traction_Pa": 7903980294.760041
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.154615443342568e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.9562999889756098e-16,
+          "separation_m": 2.163220947090952e-11,
+          "step": 51,
+          "traction_Pa": 8061992685.773357
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.275294177525756e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.3980800293890757e-16,
+          "separation_m": 2.2638406378949494e-11,
+          "step": 52,
+          "traction_Pa": 8219994705.426911
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.395972911708944e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.923275253939097e-16,
+          "separation_m": 2.3743093105112912e-11,
+          "step": 53,
+          "traction_Pa": 8377983819.220602
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.516651645892131e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.5450042218914415e-16,
+          "separation_m": 2.4974782616968964e-11,
+          "step": 54,
+          "traction_Pa": 8535956290.781215
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.637330380075318e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4.2782250858206375e-16,
+          "separation_m": 2.6378652241486243e-11,
+          "step": 55,
+          "traction_Pa": 8693906200.929045
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.758009114258507e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.139971184107693e-16,
+          "separation_m": 2.8034373757074125e-11,
+          "step": 56,
+          "traction_Pa": 8851823108.809118
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.878687848441694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6.149599224724465e-16,
+          "separation_m": 3.010992861756124e-11,
+          "step": 57,
+          "traction_Pa": 9009685002.960773
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.999366582624881e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7.329001691205166e-16,
+          "separation_m": 3.312471266458176e-11,
+          "step": 58,
+          "traction_Pa": 9167423823.2054
+        }
+      ],
+      "trigger": "FE_BRANCH_LOSS"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "smooth_exponential",
+      "imposed_at_trigger_m": 1.2067873418318761e-09,
+      "mobile_final": 7.619546559332537e-24,
+      "opening_mode": "cohesive_mixed",
+      "peak_traction_Pa": 158101920.09106758,
+      "retained_final": 1.0189773209819716e-51,
+      "separation_at_trigger_m": 2.4381402189046213e-13,
+      "temperature_K": 750.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 3.7092602199777405,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 7.619546559332537e-24,
+          "retained_count": 1.0189773209819716e-51,
+          "separation_m": 2.4381402189046213e-13,
+          "step": 1,
+          "traction_Pa": 158101920.09106758
+        }
+      ],
+      "trigger": "THERMAL_ESCAPE"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "bilinear",
+      "imposed_at_trigger_m": 6.999366582624881e-08,
+      "mobile_final": 0.0,
+      "opening_mode": "cohesive_athermal",
+      "peak_traction_Pa": 9169923025.35613,
+      "retained_final": 7.343116326924973e-16,
+      "separation_at_trigger_m": 1.4052230244921695e-11,
+      "temperature_K": 750.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.619559354176702e-24,
+          "retained_count": 1.0189815503139049e-51,
+          "separation_m": 2.422798318089947e-13,
+          "step": 1,
+          "traction_Pa": 158102121.1268298
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.0479652640159877e-23,
+          "retained_count": 2.2602084925274887e-50,
+          "separation_m": 4.845596636179892e-13,
+          "step": 2,
+          "traction_Pa": 316204242.2536595
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.380887065019543e-23,
+          "retained_count": 3.498635148017445e-49,
+          "separation_m": 7.26839495426984e-13,
+          "step": 3,
+          "traction_Pa": 474306363.38048935
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.9284142986372901e-22,
+          "retained_count": 6.99451143304465e-48,
+          "separation_m": 9.691193272359785e-13,
+          "step": 4,
+          "traction_Pa": 632408484.507319
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.975606562586272e-22,
+          "retained_count": 2.1386378030497974e-46,
+          "separation_m": 1.2113991590449734e-12,
+          "step": 5,
+          "traction_Pa": 790510605.634149
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.591871361672631e-22,
+          "retained_count": 9.358688600098135e-45,
+          "separation_m": 1.4536789908539681e-12,
+          "step": 6,
+          "traction_Pa": 948612726.7609788
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.3689054198613598e-21,
+          "retained_count": 5.2678601476405416e-43,
+          "separation_m": 1.6959588226629624e-12,
+          "step": 7,
+          "traction_Pa": 1106714847.8878083
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.359446508278019e-21,
+          "retained_count": 3.484478756757964e-41,
+          "separation_m": 1.938238654471957e-12,
+          "step": 8,
+          "traction_Pa": 1264816969.014638
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.920283456179074e-21,
+          "retained_count": 2.5043828773430944e-39,
+          "separation_m": 2.1805184862809527e-12,
+          "step": 9,
+          "traction_Pa": 1422919090.1414685
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.317362604682673e-21,
+          "retained_count": 1.8217916029020608e-37,
+          "separation_m": 2.422798318089946e-12,
+          "step": 10,
+          "traction_Pa": 1581021211.2682974
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 9.918487706280907e-21,
+          "retained_count": 1.2580146242160707e-35,
+          "separation_m": 2.6650781498989417e-12,
+          "step": 11,
+          "traction_Pa": 1739123332.3951278
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.5225703066965378e-20,
+          "retained_count": 7.793739348216484e-34,
+          "separation_m": 2.9073579817079362e-12,
+          "step": 12,
+          "traction_Pa": 1897225453.5219576
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.2916289816446043e-20,
+          "retained_count": 4.1291495129252766e-32,
+          "separation_m": 3.1496378135169308e-12,
+          "step": 13,
+          "traction_Pa": 2055327574.6487873
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.3894302129736965e-20,
+          "retained_count": 1.7994059232616714e-30,
+          "separation_m": 3.3919176453259253e-12,
+          "step": 14,
+          "traction_Pa": 2213429695.7756166
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.9354933880430324e-20,
+          "retained_count": 6.260585680198594e-29,
+          "separation_m": 3.6341974771349214e-12,
+          "step": 15,
+          "traction_Pa": 2371531816.902447
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 7.08644266519495e-20,
+          "retained_count": 1.703011046770236e-27,
+          "separation_m": 3.8764773089439155e-12,
+          "step": 16,
+          "traction_Pa": 2529633938.029277
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.0045869374591053e-19,
+          "retained_count": 3.5744165572785004e-26,
+          "separation_m": 4.118757140752909e-12,
+          "step": 17,
+          "traction_Pa": 2687736059.1561065
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.407640663184566e-19,
+          "retained_count": 5.721230186100859e-25,
+          "separation_m": 4.361036972561903e-12,
+          "step": 18,
+          "traction_Pa": 2845838180.2829356
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 1.9514128142262924e-19,
+          "retained_count": 6.599674392811107e-24,
+          "separation_m": 4.6033168043708975e-12,
+          "step": 19,
+          "traction_Pa": 3003940301.4097652
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 2.67856984772509e-19,
+          "retained_count": 3.6251749023436424e-23,
+          "separation_m": 4.845596636179892e-12,
+          "step": 20,
+          "traction_Pa": 3162042422.536595
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.53425341784694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 3.643532341291026e-19,
+          "retained_count": 6.948805483728317e-23,
+          "separation_m": 5.087876467988888e-12,
+          "step": 21,
+          "traction_Pa": 3320144543.6634254
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.6549321520301275e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 4.911530293213903e-19,
+          "retained_count": 4.0577039100267413e-22,
+          "separation_m": 5.330156299797883e-12,
+          "step": 22,
+          "traction_Pa": 3478246664.790255
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.775610886213315e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 6.559503547030748e-19,
+          "retained_count": 1.8903118418668347e-21,
+          "separation_m": 5.572436131606878e-12,
+          "step": 23,
+          "traction_Pa": 3636348785.9170856
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.8962896203965027e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.66741505951746e-19,
+          "retained_count": 7.161444805118099e-21,
+          "separation_m": 5.814715963415871e-12,
+          "step": 24,
+          "traction_Pa": 3794450907.0439143
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.01696835457969e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 8.438390848092282e-21,
+          "retained_count": 2.1433877106148218e-20,
+          "separation_m": 6.056995795224866e-12,
+          "step": 25,
+          "traction_Pa": 3952553028.1707444
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.137647088762878e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.126090199803571e-20,
+          "separation_m": 6.299275627033861e-12,
+          "step": 26,
+          "traction_Pa": 4110655149.297574
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.2583258229460654e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0312505021645554e-19,
+          "separation_m": 6.541555458842855e-12,
+          "step": 27,
+          "traction_Pa": 4268757270.4244037
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.379004557129253e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.8373711465441525e-19,
+          "separation_m": 6.783835290651851e-12,
+          "step": 28,
+          "traction_Pa": 4426859391.551234
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.4996832913124405e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.0123979736684624e-19,
+          "separation_m": 7.026115122460846e-12,
+          "step": 29,
+          "traction_Pa": 4584961512.678064
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956284e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4.672985200468912e-19,
+          "separation_m": 7.26839495426984e-12,
+          "step": 30,
+          "traction_Pa": 4743063633.804893
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.7410407596788157e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7.000616554900438e-19,
+          "separation_m": 7.510674786078835e-12,
+          "step": 31,
+          "traction_Pa": 4901165754.931724
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.8617194938620036e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0264000110817094e-18,
+          "separation_m": 7.752954617887828e-12,
+          "step": 32,
+          "traction_Pa": 5059267876.058552
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.9823982280451915e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.481333572171341e-18,
+          "separation_m": 7.995234449696824e-12,
+          "step": 33,
+          "traction_Pa": 5217369997.185383
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.103076962228379e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.1068367026387284e-18,
+          "separation_m": 8.237514281505815e-12,
+          "step": 34,
+          "traction_Pa": 5375472118.312211
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.2237556964115666e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.9533512444107182e-18,
+          "separation_m": 8.479794113314813e-12,
+          "step": 35,
+          "traction_Pa": 5533574239.439042
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.344434430594754e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4.084313302856665e-18,
+          "separation_m": 8.722073945123809e-12,
+          "step": 36,
+          "traction_Pa": 5691676360.565873
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.465113164777942e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.582383987123722e-18,
+          "separation_m": 8.964353776932804e-12,
+          "step": 37,
+          "traction_Pa": 5849778481.692702
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.585791898961129e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7.55440161454849e-18,
+          "separation_m": 9.206633608741795e-12,
+          "step": 38,
+          "traction_Pa": 6007880602.8195305
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.706470633144317e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0133726435946108e-17,
+          "separation_m": 9.448913440550791e-12,
+          "step": 39,
+          "traction_Pa": 6165982723.946361
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.827149367327504e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.3483312144775103e-17,
+          "separation_m": 9.691193272359784e-12,
+          "step": 40,
+          "traction_Pa": 6324084845.07319
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.947828101510692e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.780225245984379e-17,
+          "separation_m": 9.933473104168778e-12,
+          "step": 41,
+          "traction_Pa": 6482186966.20002
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.06850683569388e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.3334345494127466e-17,
+          "separation_m": 1.0175752935977775e-11,
+          "step": 42,
+          "traction_Pa": 6640289087.32685
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.189185569877067e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.037478033300195e-17,
+          "separation_m": 1.0418032767786769e-11,
+          "step": 43,
+          "traction_Pa": 6798391208.45368
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.309864304060255e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.927302208283827e-17,
+          "separation_m": 1.0660312599595765e-11,
+          "step": 44,
+          "traction_Pa": 6956493329.58051
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.430543038243442e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.043433649229578e-17,
+          "separation_m": 1.0902592431404758e-11,
+          "step": 45,
+          "traction_Pa": 7114595450.707339
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.55122177242663e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6.432270720012967e-17,
+          "separation_m": 1.1144872263213753e-11,
+          "step": 46,
+          "traction_Pa": 7272697571.834169
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.6719005066098174e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 8.146603076733995e-17,
+          "separation_m": 1.1387152095022747e-11,
+          "step": 47,
+          "traction_Pa": 7430799692.960999
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.7925792407930053e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.0246383612492155e-16,
+          "separation_m": 1.1629431926831743e-11,
+          "step": 48,
+          "traction_Pa": 7588901814.08783
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.913257974976193e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.2799752693336297e-16,
+          "separation_m": 1.1871711758640738e-11,
+          "step": 49,
+          "traction_Pa": 7747003935.214659
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.588429046653803e-16,
+          "separation_m": 1.211399159044973e-11,
+          "step": 50,
+          "traction_Pa": 7905106056.341488
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.154615443342568e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1.9588468785250117e-16,
+          "separation_m": 1.2356271422258725e-11,
+          "step": 51,
+          "traction_Pa": 8063208177.468317
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.275294177525756e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.4013286043570553e-16,
+          "separation_m": 1.2598551254067725e-11,
+          "step": 52,
+          "traction_Pa": 8221310298.59515
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.395972911708944e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.9274083925638776e-16,
+          "separation_m": 1.2840831085876718e-11,
+          "step": 53,
+          "traction_Pa": 8379412419.721979
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.516651645892131e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3.5502558089507297e-16,
+          "separation_m": 1.3083110917685712e-11,
+          "step": 54,
+          "traction_Pa": 8537514540.848808
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.637330380075318e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4.2848983742785834e-16,
+          "separation_m": 1.3325390749494707e-11,
+          "step": 55,
+          "traction_Pa": 8695616661.975637
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.758009114258507e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5.148468280105976e-16,
+          "separation_m": 1.3567670581303703e-11,
+          "step": 56,
+          "traction_Pa": 8853718783.102468
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.878687848441694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6.160476313084576e-16,
+          "separation_m": 1.3809950413112697e-11,
+          "step": 57,
+          "traction_Pa": 9011820904.229298
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.999366582624881e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7.343116326924973e-16,
+          "separation_m": 1.4052230244921695e-11,
+          "step": 58,
+          "traction_Pa": 9169923025.35613
+        }
+      ],
+      "trigger": "FE_BRANCH_LOSS"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "bilinear",
+      "imposed_at_trigger_m": 1.2067873418318761e-09,
+      "mobile_final": 7.619559354176702e-24,
+      "opening_mode": "cohesive_mixed",
+      "peak_traction_Pa": 158102121.1268298,
+      "retained_final": 1.0189815503139049e-51,
+      "separation_at_trigger_m": 2.422798318089947e-13,
+      "temperature_K": 750.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 3.043123597122325,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 7.619559354176702e-24,
+          "retained_count": 1.0189815503139049e-51,
+          "separation_m": 2.422798318089947e-13,
+          "step": 1,
+          "traction_Pa": 158102121.1268298
+        }
+      ],
+      "trigger": "THERMAL_ESCAPE"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "smooth_exponential",
+      "imposed_at_trigger_m": 6.999366582624881e-08,
+      "mobile_final": 0.0,
+      "opening_mode": "cohesive_athermal",
+      "peak_traction_Pa": 9167423823.2054,
+      "retained_final": 8536.546240291715,
+      "separation_at_trigger_m": 3.312471266458176e-11,
+      "temperature_K": 1200.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.538993360603551,
+          "separation_m": 2.4381402189046213e-13,
+          "step": 1,
+          "traction_Pa": 158101920.09106758
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 10.155950443115366,
+          "separation_m": 4.907555856981214e-13,
+          "step": 2,
+          "traction_Pa": 316203430.3582285
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 22.85083071679803,
+          "separation_m": 7.409165266834889e-13,
+          "step": 3,
+          "traction_Pa": 474304518.7676596
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 40.6235919589692,
+          "separation_m": 9.943930178022292e-13,
+          "step": 4,
+          "traction_Pa": 632405172.7171395
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 63.47419021533269,
+          "separation_m": 1.2512858562324988e-12,
+          "step": 5,
+          "traction_Pa": 790505378.9985023
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 91.40257969989825,
+          "separation_m": 1.5117007744667156e-12,
+          "step": 6,
+          "traction_Pa": 948605123.7568723
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 124.40871268565604,
+          "separation_m": 1.7757487785776487e-12,
+          "step": 7,
+          "traction_Pa": 1106704392.44634
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 162.49253938344324,
+          "separation_m": 2.0435465166017707e-12,
+          "step": 8,
+          "traction_Pa": 1264803169.7816894
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 205.65400780963427,
+          "separation_m": 2.3152166803658075e-12,
+          "step": 9,
+          "traction_Pa": 1422901439.6857433
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 253.8930636407198,
+          "separation_m": 2.5908884445239533e-12,
+          "step": 10,
+          "traction_Pa": 1580999185.2318347
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 307.20965005572145,
+          "separation_m": 2.8706979470836507e-12,
+          "step": 11,
+          "traction_Pa": 1739096388.5808392
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 365.60370756278076,
+          "separation_m": 3.1547888162896046e-12,
+          "step": 12,
+          "traction_Pa": 1897193030.9121332
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 429.07517381050815,
+          "separation_m": 3.443312749423759e-12,
+          "step": 13,
+          "traction_Pa": 2055289092.3477516
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 497.6239833804734,
+          "separation_m": 3.7364301498814544e-12,
+          "step": 14,
+          "traction_Pa": 2213384551.868903
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 571.2500675597703,
+          "separation_m": 4.0343108298230035e-12,
+          "step": 15,
+          "traction_Pa": 2371479387.2239017
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 649.9533540910295,
+          "separation_m": 4.337134786802124e-12,
+          "step": 16,
+          "traction_Pa": 2529573574.826395
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 733.7337668967566,
+          "separation_m": 4.645093064071371e-12,
+          "step": 17,
+          "traction_Pa": 2687667089.6426387
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 822.5912257738581,
+          "separation_m": 4.9583887057998894e-12,
+          "step": 18,
+          "traction_Pa": 2845759905.066321
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 916.5256460572948,
+          "separation_m": 5.2772378202611156e-12,
+          "step": 19,
+          "traction_Pa": 3003851992.779245
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1015.5369382441413,
+          "separation_m": 5.601870766219249e-12,
+          "step": 20,
+          "traction_Pa": 3161943322.595882
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.53425341784694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1119.6250075777266,
+          "separation_m": 5.9325334803411605e-12,
+          "step": 21,
+          "traction_Pa": 3320033862.289406
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.6549321520301275e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1228.7897535807904,
+          "separation_m": 6.2694889665828286e-12,
+          "step": 22,
+          "traction_Pa": 3478123577.396554
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.775610886213315e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1343.0310695353492,
+          "separation_m": 6.613018972268456e-12,
+          "step": 23,
+          "traction_Pa": 3636212430.9979863
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.8962896203965027e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1462.3488418963598,
+          "separation_m": 6.9634258801535295e-12,
+          "step": 24,
+          "traction_Pa": 3794300383.4703493
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.01696835457969e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1586.742949632548,
+          "separation_m": 7.321034851338722e-12,
+          "step": 25,
+          "traction_Pa": 3952387392.205496
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.137647088762878e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1716.2132634804334,
+          "separation_m": 7.686196260736804e-12,
+          "step": 26,
+          "traction_Pa": 4110473411.2913194
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.2583258229460654e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1850.7596450989968,
+          "separation_m": 8.059288475221597e-12,
+          "step": 27,
+          "traction_Pa": 4268558391.147737
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.379004557129253e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1990.3819461044554,
+          "separation_m": 8.440721035039165e-12,
+          "step": 28,
+          "traction_Pa": 4426642278.109798
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.4996832913124405e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2135.080007110638,
+          "separation_m": 8.830938312106046e-12,
+          "step": 29,
+          "traction_Pa": 4584725013.948316
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956284e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2284.8536561173055,
+          "separation_m": 9.230423735210606e-12,
+          "step": 30,
+          "traction_Pa": 4742806535.3161955
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.7410407596788157e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2439.7027072516867,
+          "separation_m": 9.639704692878296e-12,
+          "step": 31,
+          "traction_Pa": 4900886773.106
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.8617194938620036e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2599.6269591299606,
+          "separation_m": 1.0059358251116295e-11,
+          "step": 32,
+          "traction_Pa": 5058965651.700686
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.9823982280451915e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2764.6261928334507,
+          "separation_m": 1.0490017857266129e-11,
+          "step": 33,
+          "traction_Pa": 5217043088.095186
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.103076962228379e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2934.700169583261,
+          "separation_m": 1.0932381245304714e-11,
+          "step": 34,
+          "traction_Pa": 5375118990.8604765
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.2237556964115666e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3109.848628007626,
+          "separation_m": 1.1387219815682023e-11,
+          "step": 35,
+          "traction_Pa": 5533193258.914516
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.344434430594754e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3290.0712808933695,
+          "separation_m": 1.1855389839142632e-11,
+          "step": 36,
+          "traction_Pa": 5691265780.054102
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.465113164777942e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3475.36781130249,
+          "separation_m": 1.2337845936049274e-11,
+          "step": 37,
+          "traction_Pa": 5849336429.188578
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.585791898961129e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3665.7378678900623,
+          "separation_m": 1.2835657420771273e-11,
+          "step": 38,
+          "traction_Pa": 6007405066.198132
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.706470633144317e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3861.1810592107813,
+          "separation_m": 1.3350028289787568e-11,
+          "step": 39,
+          "traction_Pa": 6165471533.314601
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.827149367327504e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4061.696946732137,
+          "separation_m": 1.3882321894765864e-11,
+          "step": 40,
+          "traction_Pa": 6323535651.888385
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.947828101510692e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4267.285036174268,
+          "separation_m": 1.4434091712165932e-11,
+          "step": 41,
+          "traction_Pa": 6481597218.356491
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.06850683569388e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4477.944766651334,
+          "separation_m": 1.5007120151775745e-11,
+          "step": 42,
+          "traction_Pa": 6639655999.157162
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.189185569877067e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4693.675496887881,
+          "separation_m": 1.5603468121740418e-11,
+          "step": 43,
+          "traction_Pa": 6797711724.235045
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.309864304060255e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4914.476487474049,
+          "separation_m": 1.6225539222761938e-11,
+          "step": 44,
+          "traction_Pa": 6955764078.62935
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.430543038243442e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5140.3468776654,
+          "separation_m": 1.6876164205006866e-11,
+          "step": 45,
+          "traction_Pa": 7113812691.406846
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.55122177242663e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5371.285654504323,
+          "separation_m": 1.7558714074837062e-11,
+          "step": 46,
+          "traction_Pa": 7271857120.840717
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.6719005066098174e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5607.291610885095,
+          "separation_m": 1.8277254670553183e-11,
+          "step": 47,
+          "traction_Pa": 7429896834.155338
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.7925792407930053e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5848.363287265546,
+          "separation_m": 1.9036762899171548e-11,
+          "step": 48,
+          "traction_Pa": 7587931179.191209
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.913257974976193e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6094.498888414449,
+          "separation_m": 1.984343756654954e-11,
+          "step": 49,
+          "traction_Pa": 7745959343.674517
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6345.696160644145,
+          "separation_m": 2.0705160748262247e-11,
+          "step": 50,
+          "traction_Pa": 7903980294.760041
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.154615443342568e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6601.952203681656,
+          "separation_m": 2.163220947090952e-11,
+          "step": 51,
+          "traction_Pa": 8061992685.773357
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.275294177525756e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6863.263168525368,
+          "separation_m": 2.2638406378949494e-11,
+          "step": 52,
+          "traction_Pa": 8219994705.426911
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.395972911708944e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7129.623742774671,
+          "separation_m": 2.3743093105112912e-11,
+          "step": 53,
+          "traction_Pa": 8377983819.220602
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.516651645892131e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7401.0262045872405,
+          "separation_m": 2.4974782616968964e-11,
+          "step": 54,
+          "traction_Pa": 8535956290.781215
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.637330380075318e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7677.458497425443,
+          "separation_m": 2.6378652241486243e-11,
+          "step": 55,
+          "traction_Pa": 8693906200.929045
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.758009114258507e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7958.899674176475,
+          "separation_m": 2.8034373757074125e-11,
+          "step": 56,
+          "traction_Pa": 8851823108.809118
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.878687848441694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 8245.306270535752,
+          "separation_m": 3.010992861756124e-11,
+          "step": 57,
+          "traction_Pa": 9009685002.960773
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.999366582624881e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 8536.546240291715,
+          "separation_m": 3.312471266458176e-11,
+          "step": 58,
+          "traction_Pa": 9167423823.2054
+        }
+      ],
+      "trigger": "FE_BRANCH_LOSS"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "smooth_exponential",
+      "imposed_at_trigger_m": 1.2067873418318761e-09,
+      "mobile_final": 0.0,
+      "opening_mode": "cohesive_mixed",
+      "peak_traction_Pa": 158101920.09106758,
+      "retained_final": 2.538993360603551,
+      "separation_at_trigger_m": 2.4381402189046213e-13,
+      "temperature_K": 1200.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 403.4637899096229,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 0.0,
+          "retained_count": 2.538993360603551,
+          "separation_m": 2.4381402189046213e-13,
+          "step": 1,
+          "traction_Pa": 158101920.09106758
+        }
+      ],
+      "trigger": "THERMAL_ESCAPE"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "bilinear",
+      "imposed_at_trigger_m": 6.999366582624881e-08,
+      "mobile_final": 0.0,
+      "opening_mode": "cohesive_athermal",
+      "peak_traction_Pa": 9169923025.35613,
+      "retained_final": 8541.20130226291,
+      "separation_at_trigger_m": 1.4052230244921695e-11,
+      "temperature_K": 1200.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2.538999817562324,
+          "separation_m": 2.422798318089947e-13,
+          "step": 1,
+          "traction_Pa": 158102121.1268298
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.4135746836637522e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 10.15600259675459,
+          "separation_m": 4.845596636179892e-13,
+          "step": 2,
+          "traction_Pa": 316204242.2536595
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956283e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 22.851008454992428,
+          "separation_m": 7.26839495426984e-13,
+          "step": 3,
+          "traction_Pa": 474306363.38048935
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.8271493673275045e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 40.624017436734434,
+          "separation_m": 9.691193272359785e-13,
+          "step": 4,
+          "traction_Pa": 632408484.507319
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 63.47502957101617,
+          "separation_m": 1.2113991590449734e-12,
+          "step": 5,
+          "traction_Pa": 790510605.634149
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 7.240724050991257e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 91.4040448765534,
+          "separation_m": 1.4536789908539681e-12,
+          "step": 6,
+          "traction_Pa": 948612726.7609788
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 8.447511392823133e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 124.41106336618117,
+          "separation_m": 1.6959588226629624e-12,
+          "step": 7,
+          "traction_Pa": 1106714847.8878083
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 9.654298734655009e-09,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 162.49608504936913,
+          "separation_m": 1.938238654471957e-12,
+          "step": 8,
+          "traction_Pa": 1264816969.014638
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.0861086076486885e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 205.65910993333623,
+          "separation_m": 2.1805184862809527e-12,
+          "step": 9,
+          "traction_Pa": 1422919090.1414685
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.206787341831876e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 253.90013802391337,
+          "separation_m": 2.422798318089946e-12,
+          "step": 10,
+          "traction_Pa": 1581021211.2682974
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.3274660760150638e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 307.2191693258658,
+          "separation_m": 2.6650781498989417e-12,
+          "step": 11,
+          "traction_Pa": 1739123332.3951278
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.4481448101982513e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 365.61620384322487,
+          "separation_m": 2.9073579817079362e-12,
+          "step": 12,
+          "traction_Pa": 1897225453.5219576
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.568823544381439e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 429.0912415794932,
+          "separation_m": 3.1496378135169308e-12,
+          "step": 13,
+          "traction_Pa": 2055327574.6487873
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.6895022785646266e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 497.64428253772144,
+          "separation_m": 3.3919176453259253e-12,
+          "step": 14,
+          "traction_Pa": 2213429695.7756166
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.8101810127478142e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 571.2753267204221,
+          "separation_m": 3.6341974771349214e-12,
+          "step": 15,
+          "traction_Pa": 2371531816.902447
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 1.9308597469310018e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 649.9843741299984,
+          "separation_m": 3.8764773089439155e-12,
+          "step": 16,
+          "traction_Pa": 2529633938.029277
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.0515384811141894e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 733.7714247686781,
+          "separation_m": 4.118757140752909e-12,
+          "step": 17,
+          "traction_Pa": 2687736059.1561065
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.172217215297377e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 822.6364786381963,
+          "separation_m": 4.361036972561903e-12,
+          "step": 18,
+          "traction_Pa": 2845838180.2829356
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.2928959494805645e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 916.5795357404947,
+          "separation_m": 4.6033168043708975e-12,
+          "step": 19,
+          "traction_Pa": 3003940301.4097652
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.413574683663752e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1015.6005960769437,
+          "separation_m": 4.845596636179892e-12,
+          "step": 20,
+          "traction_Pa": 3162042422.536595
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.53425341784694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1119.6996596490922,
+          "separation_m": 5.087876467988888e-12,
+          "step": 21,
+          "traction_Pa": 3320144543.6634254
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.6549321520301275e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1228.8767264582182,
+          "separation_m": 5.330156299797883e-12,
+          "step": 22,
+          "traction_Pa": 3478246664.790255
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.775610886213315e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1343.131796505381,
+          "separation_m": 5.572436131606878e-12,
+          "step": 23,
+          "traction_Pa": 3636348785.9170856
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 2.8962896203965027e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1462.4648697917146,
+          "separation_m": 5.814715963415871e-12,
+          "step": 24,
+          "traction_Pa": 3794450907.0439143
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.01696835457969e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1586.8759463183417,
+          "separation_m": 6.056995795224866e-12,
+          "step": 25,
+          "traction_Pa": 3952553028.1707444
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.137647088762878e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1716.3650260860627,
+          "separation_m": 6.299275627033861e-12,
+          "step": 26,
+          "traction_Pa": 4110655149.297574
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.2583258229460654e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1850.932109095957,
+          "separation_m": 6.541555458842855e-12,
+          "step": 27,
+          "traction_Pa": 4268757270.4244037
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.379004557129253e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 1990.5771953483707,
+          "separation_m": 6.783835290651851e-12,
+          "step": 28,
+          "traction_Pa": 4426859391.551234
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.4996832913124405e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2135.300284985866,
+          "separation_m": 7.026115122460846e-12,
+          "step": 29,
+          "traction_Pa": 4584961512.678064
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.6203620254956284e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2285.1013779459495,
+          "separation_m": 7.26839495426984e-12,
+          "step": 30,
+          "traction_Pa": 4743063633.804893
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.7410407596788157e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2439.980474166567,
+          "separation_m": 7.510674786078835e-12,
+          "step": 31,
+          "traction_Pa": 4901165754.931724
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.8617194938620036e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2599.937573640445,
+          "separation_m": 7.752954617887828e-12,
+          "step": 32,
+          "traction_Pa": 5059267876.058552
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 3.9823982280451915e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2764.9726763677845,
+          "separation_m": 7.995234449696824e-12,
+          "step": 33,
+          "traction_Pa": 5217369997.185383
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.103076962228379e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 2935.08578234921,
+          "separation_m": 8.237514281505815e-12,
+          "step": 34,
+          "traction_Pa": 5375472118.312211
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.2237556964115666e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3110.276891584448,
+          "separation_m": 8.479794113314813e-12,
+          "step": 35,
+          "traction_Pa": 5533574239.439042
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.344434430594754e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3290.546004073998,
+          "separation_m": 8.722073945123809e-12,
+          "step": 36,
+          "traction_Pa": 5691676360.565873
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.465113164777942e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3475.893119817549,
+          "separation_m": 8.964353776932804e-12,
+          "step": 37,
+          "traction_Pa": 5849778481.692702
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.585791898961129e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3666.3182388158143,
+          "separation_m": 9.206633608741795e-12,
+          "step": 38,
+          "traction_Pa": 6007880602.8195305
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.706470633144317e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 3861.8213610684825,
+          "separation_m": 9.448913440550791e-12,
+          "step": 39,
+          "traction_Pa": 6165982723.946361
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.827149367327504e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4062.4024865755846,
+          "separation_m": 9.691193272359784e-12,
+          "step": 40,
+          "traction_Pa": 6324084845.07319
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 4.947828101510692e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4268.061615337303,
+          "separation_m": 9.933473104168778e-12,
+          "step": 41,
+          "traction_Pa": 6482186966.20002
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.06850683569388e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4478.798747353874,
+          "separation_m": 1.0175752935977775e-11,
+          "step": 42,
+          "traction_Pa": 6640289087.32685
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.189185569877067e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4694.6138826253555,
+          "separation_m": 1.0418032767786769e-11,
+          "step": 43,
+          "traction_Pa": 6798391208.45368
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.309864304060255e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 4915.507021151302,
+          "separation_m": 1.0660312599595765e-11,
+          "step": 44,
+          "traction_Pa": 6956493329.58051
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.430543038243442e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5141.478162931876,
+          "separation_m": 1.0902592431404758e-11,
+          "step": 45,
+          "traction_Pa": 7114595450.707339
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.55122177242663e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5372.527307967766,
+          "separation_m": 1.1144872263213753e-11,
+          "step": 46,
+          "traction_Pa": 7272697571.834169
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.6719005066098174e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5608.654456258158,
+          "separation_m": 1.1387152095022747e-11,
+          "step": 47,
+          "traction_Pa": 7430799692.960999
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.7925792407930053e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 5849.859607803051,
+          "separation_m": 1.1629431926831743e-11,
+          "step": 48,
+          "traction_Pa": 7588901814.08783
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 5.913257974976193e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6096.14276260322,
+          "separation_m": 1.1871711758640738e-11,
+          "step": 49,
+          "traction_Pa": 7747003935.214659
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.03393670915938e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6347.503920657735,
+          "separation_m": 1.211399159044973e-11,
+          "step": 50,
+          "traction_Pa": 7905106056.341488
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.154615443342568e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6603.943081967266,
+          "separation_m": 1.2356271422258725e-11,
+          "step": 51,
+          "traction_Pa": 8063208177.468317
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.275294177525756e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 6865.460246531381,
+          "separation_m": 1.2598551254067725e-11,
+          "step": 52,
+          "traction_Pa": 8221310298.59515
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.395972911708944e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7132.055414350269,
+          "separation_m": 1.2840831085876718e-11,
+          "step": 53,
+          "traction_Pa": 8379412419.721979
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.516651645892131e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7403.728585423544,
+          "separation_m": 1.3083110917685712e-11,
+          "step": 54,
+          "traction_Pa": 8537514540.848808
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.637330380075318e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7680.479759751533,
+          "separation_m": 1.3325390749494707e-11,
+          "step": 55,
+          "traction_Pa": 8695616661.975637
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.758009114258507e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 7962.3089373340335,
+          "separation_m": 1.3567670581303703e-11,
+          "step": 56,
+          "traction_Pa": 8853718783.102468
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.878687848441694e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 8249.216118171349,
+          "separation_m": 1.3809950413112697e-11,
+          "step": 57,
+          "traction_Pa": 9011820904.229298
+        },
+        {
+          "action": 0.0,
+          "imposed_jump_m": 6.999366582624881e-08,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 8541.20130226291,
+          "separation_m": 1.4052230244921695e-11,
+          "step": 58,
+          "traction_Pa": 9169923025.35613
+        }
+      ],
+      "trigger": "FE_BRANCH_LOSS"
+    },
+    {
+      "EXP_floor_state_evolved": true,
+      "actual_2d_interface_assembly": true,
+      "cohesive_shape": "bilinear",
+      "imposed_at_trigger_m": 1.2067873418318761e-09,
+      "mobile_final": 0.0,
+      "opening_mode": "cohesive_mixed",
+      "peak_traction_Pa": 158102121.1268298,
+      "retained_final": 2.538999817562324,
+      "separation_at_trigger_m": 2.422798318089947e-13,
+      "temperature_K": 1200.0,
+      "trace": [
+        {
+          "action": 0.0,
+          "imposed_jump_m": 0.0,
+          "kinetic_validity": "NOT_APPLICABLE_ATHERMAL",
+          "mobile_count": 0.0,
+          "retained_count": 0.0,
+          "separation_m": 0.0,
+          "step": 0,
+          "traction_Pa": 0.0
+        },
+        {
+          "action": 356.5124861782426,
+          "imposed_jump_m": 1.2067873418318761e-09,
+          "kinetic_validity": "QUALIFIED_HIGH_BARRIER",
+          "mobile_count": 0.0,
+          "retained_count": 2.538999817562324,
+          "separation_m": 2.422798318089947e-13,
+          "step": 1,
+          "traction_Pa": 158102121.1268298
+        }
+      ],
+      "trigger": "THERMAL_ESCAPE"
+    }
+  ],
+  "legacy_cooperative_clock_used": false,
+  "paired_plasticity_sha256": "961423c0025d4adb83ec316c0c1f2fb25a7e45344e222d0f959c762fb99e619b",
+  "same_complete_material_sha256": "f4e9dab7af3c7c265372b1fbd80454b7fc8e35eb0399277c28339d0e1919668c",
+  "schema": "r10.opening-alternatives-2d-transfer/1",
+  "scope": "SELECTED_2D_THERMAL_FRACTURE_TRANSFER"
+}

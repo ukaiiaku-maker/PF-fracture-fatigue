@@ -19,8 +19,10 @@ import numpy as np
 from scipy import sparse
 
 from .cohesive_arrhenius import (
+    BILINEAR, SMOOTH_EXPONENTIAL,
+    COHESIVE_ATHERMAL_MECHANICAL, COHESIVE_MIXED_MECHANICAL_THERMAL,
     COHESIVE_KINETIC_CZM, COHESIVE_RATE_INDEPENDENT_CONTROL,
-    CohesiveThermalLaw, potential_J_m2, tangent_Pa_per_m, traction_Pa,
+    CohesiveThermalLaw, cohesive_shape_response,
 )
 
 
@@ -37,6 +39,7 @@ class CohesiveElement:
     accepted_event_index: int | None = None
     front_id: int = -1
     metadata: dict = field(default_factory=dict)
+    cohesive_shape: str = SMOOTH_EXPONENTIAL
 
     def __post_init__(self) -> None:
         self.normal = np.asarray(self.normal, dtype=float)
@@ -51,6 +54,8 @@ class CohesiveElement:
             raise ValueError("cohesive element length must be positive")
         if self.rupture_state not in {"INTACT", "BROKEN"}:
             raise ValueError("rupture_state must be INTACT or BROKEN")
+        if self.cohesive_shape not in {SMOOTH_EXPONENTIAL, BILINEAR}:
+            raise ValueError("unsupported cohesive_shape")
 
     @property
     def nodes4(self) -> tuple[int, int, int, int]:
@@ -66,8 +71,9 @@ class CohesiveElement:
             raise ValueError("accepted event index must be nonnegative")
         if not self.broken:
             if separation_m is not None:
-                intact=float(potential_J_m2(max(float(separation_m),0.0),self.thermal,
-                                            self.temperature_K))*self.length
+                intact=float(cohesive_shape_response(
+                    self.cohesive_shape,max(float(separation_m),0.0),self.thermal,
+                    self.temperature_K)[2])*self.length
                 broken=self.thermal.gamma(self.temperature_K)*self.length
                 self.metadata.update({
                     "rupture_surface_energy_owner":"COHESIVE_ELEMENT_BROKEN_STATE",
@@ -88,6 +94,13 @@ class CohesiveElement:
             self.metadata["rupture_owner"] = "PEAK_CUTOFF_DIAGNOSTIC"
         return True
 
+    def accept_mechanical_separation(self, separation_m: float,
+                                     event_index: int) -> None:
+        """Commit geometry-owned separation without invoking a kinetic clock."""
+        self.accept_rupture(event_index,separation_m)
+        self.metadata.update({"rupture_owner":"MECHANICAL_COHESIVE_COMPLETION",
+                              "legacy_cooperative_clock_used":False})
+
 
 @dataclass
 class CohesiveNetwork:
@@ -99,6 +112,7 @@ class CohesiveNetwork:
     def __post_init__(self) -> None:
         if self.execution_identity not in {
             COHESIVE_KINETIC_CZM, COHESIVE_RATE_INDEPENDENT_CONTROL,
+            COHESIVE_ATHERMAL_MECHANICAL, COHESIVE_MIXED_MECHANICAL_THERMAL,
         }:
             raise ValueError("unsupported cohesive network identity")
         if self.contact_penalty_Pa_per_m < 0.0 or self.intact_shear_penalty_Pa_per_m < 0.0:
@@ -119,6 +133,7 @@ class CohesiveNetwork:
                  "front_id": e.front_id, "length_m": e.length,
                  "Gamma_J_m2": e.thermal.gamma(e.temperature_K),
                  "delta0_m": e.thermal.delta0_m,
+                 "cohesive_shape": e.cohesive_shape,
                  **e.metadata} for i, e in enumerate(self.elements)]
 
     def energy_ledger(self,u:np.ndarray) -> dict:
@@ -132,8 +147,9 @@ class CohesiveNetwork:
             if elem.broken:
                 cohesive+=elem.thermal.gamma(elem.temperature_K)*elem.length
             else:
-                cohesive+=float(potential_J_m2(max(dn,0.0),elem.thermal,
-                                                elem.temperature_K))*elem.length
+                cohesive+=float(cohesive_shape_response(
+                    elem.cohesive_shape,max(dn,0.0),elem.thermal,
+                    elem.temperature_K)[2])*elem.length
                 shear+=0.5*self.intact_shear_penalty_Pa_per_m*dt*dt*elem.length
             if dn<0.0:
                 contact+=0.5*self.contact_penalty_Pa_per_m*dn*dn*elem.length
@@ -163,8 +179,9 @@ def _response(elem: CohesiveElement, network: CohesiveNetwork,
     elif elem.broken:
         tn = 0.0; kn = 0.0; contact = False
     else:
-        tn = float(traction_Pa(dn, elem.thermal, elem.temperature_K))
-        kn = float(tangent_Pa_per_m(dn, elem.thermal, elem.temperature_K))
+        tn, kn, _ = cohesive_shape_response(
+            elem.cohesive_shape,dn,elem.thermal,elem.temperature_K)
+        tn=float(tn);kn=float(kn)
         contact = False
     kt = 0.0 if elem.broken else network.intact_shear_penalty_Pa_per_m
     tt = kt * dt
@@ -177,9 +194,11 @@ def _response(elem: CohesiveElement, network: CohesiveNetwork,
             "normal_tangent_Pa_per_m": kn, "contact_active": contact,
             "rupture_state": elem.rupture_state,
             "execution_identity": network.execution_identity,
+            "cohesive_shape":elem.cohesive_shape,
             "surface_free_energy_J_m2": (elem.thermal.gamma(elem.temperature_K)
-                if elem.broken else float(potential_J_m2(max(dn,0.0),elem.thermal,
-                                                         elem.temperature_K))),
+                if elem.broken else float(cohesive_shape_response(
+                    elem.cohesive_shape,max(dn,0.0),elem.thermal,
+                    elem.temperature_K)[2])),
             "surface_energy_owner":"COHESIVE_ELEMENT_STATE",
             "activation_barrier_charged_as_surface_energy":False}
     return traction, tangent, diag
