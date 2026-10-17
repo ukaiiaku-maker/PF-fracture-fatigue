@@ -1,20 +1,26 @@
 # Native Taylor–Peierls repair progress
 
-## Actual-current R05 opening consumer, 16 October 2026
+## Actual solved-interface R05 completion, 16 October 2026
 
-- FEM calculation repair `9c9b3e8` connects both public bilinear descriptions
-  to the fully wrapped `CalibratedMixedModeMPZV911Engine` lineage used by the
-  atomic-path-corridor specimen. Evidence commit `70c52ad` retains the unmocked
-  low-load connection, active classical and activated events, and exact
-  fresh-process active classical restart.
-- Runtime acceptance now distinguishes a connected inactive law from a provider
-  that was never installed or restored and fails closed for the latter. The
-  inherited EXP-floor opening clock is suppressed; persistent signed source,
-  transport, accommodation and checkpoint ownership remain in place.
-- PF calculation/campaign commit `c1d58789` binds all 36 fitted P9 rows to that
+- FEM calculation commit `917d1a4` preserves the actual-consumer repair and
+  connects both public bilinear descriptions to a trial interface assembled by
+  the current atomic-path-corridor specimen. Evidence commit `f8eba83` retains
+  direct classical and activated events plus exact fresh-process active-state
+  restart.
+- Runtime acceptance now requires provider construction/advance, cohesive
+  assembly binding and an actual or restored trial interface. The regression
+  checks residual/tangent participation, repeated mechanical feedback, bounded
+  irreversible evolution, interface work, one accepted source/time update and
+  byte-identical direct/restart histories. The inherited EXP-floor opening
+  clock remains suppressed.
+- The older `r05_solved_native_moving_tip_20261016` accommodation/work values
+  are retained only as invalidated historical evidence because their producer
+  used one second per equilibrium callback and incorrect barriers. Unaffected
+  transaction/serialization scope remains preserved.
+- PF calculation/campaign commit `1ba0e500` binds all 36 fitted P9 rows to that
   actual driver/provider. The 699-row disabled campaign audit has no binding
   errors. Final applicable suites pass: PF 1008 passed with 16 explicit
-  external-evidence deselections; FEM 764 passed plus 16 subtests.
+  external-evidence deselections; FEM 758 passed, 2 skipped, plus 16 subtests.
 - R07 and R09 resumptions remain prepared but were not launched: the latest
   measurement records about 50 MiB immediately free, 873 MiB swap free and
   28 GiB Data free, which does not admit their estimated peak plus 12 GiB

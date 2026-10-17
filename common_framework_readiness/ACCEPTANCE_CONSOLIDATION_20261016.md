@@ -2,9 +2,9 @@
 
 ## Source identity and disposition
 
-The integrated calculation and disabled-campaign implementation is PF `c1d587896b2acad66e73a56545a4762371dc1056`; its exact native FEM dependency is `70c52ad900b1832ae9569fef70df9fc8a0cf8a9c` (consumer repair `9c9b3e8`). A later PF documentation-only closeout commit may contain this report; it does not change that calculation-source identity. Production and manuscript work remain disabled. No remote write or scientific-data deletion was performed.
+The disabled-campaign implementation is PF `1ba0e500a563e839a9ec3fc16264488b80e87755`; its qualified native FEM dependency is calculation commit `917d1a4491ec0abf2f054bac5fe5d1422e1ee781` with evidence commit `f8eba83`. These advance, rather than reset, the earlier PF/FEM checkpoints. A later PF documentation-only closeout commit may contain this report; it does not change either calculation-source identity. Production and manuscript work remain disabled. No remote write or scientific-data deletion was performed.
 
-The current portable PF source qualification reports 1008 passed with 16 explicitly external-evidence tests deselected; the changed PF campaign/binding subset passes 33 tests. FEM reports 764 passed plus 16 passing subtests at `70c52ad`. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
+The current portable PF source qualification remains 1008 passed with 16 explicitly external-evidence tests deselected; the post-binding PF campaign/execution subset passes 31 tests. The post-repair FEM tree reports 758 passed, 2 skipped and 16 passing subtests, including the new real-public-interface regression. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
 
 ## Controller findings and repair
 
@@ -22,20 +22,18 @@ The original EXP-floor route was not replaced. Its existing protection remains i
 
 ## Native R05 evidence
 
-The reproduced acceptance defect was a disconnected constructor: the public generic route actually reached `sharp_front.run_2d` and its dynamic `CalibratedMixedModeMPZV911Engine`, while the earlier installer changed only a class in the unused `kinetic_progressive_2d_v1002` route. FEM `9c9b3e8` installs the requested opening provider only after the complete current wrapper stack is built. It derives a per-engine class, retains `ProductionJointKSingleTrialFrontEngineV10051832` and the persistent signed/source ancestry, replaces only the inherited EXP-floor opening clock, and serializes the provider through the original specimen checkpoint owner. Runtime acceptance now fails closed unless the actual provider is constructed and advanced, and unless a requested restart restores it.
+The disconnected-constructor repair is preserved, and FEM `917d1a4` completes the remaining constitutive connection. The actual backend is a per-instance extension of the current stochastic-length/atomic-corridor backend; it inserts an active trial interface before equilibrium and supplies that cohesive network to native `assemble_mechanics`. The interface residual and tangent therefore affect the solved displacement, traction, J/K state and subsequent constitutive update. Autonomous damage is an irreversible opening-history continuation with bounded damage correctors and no hazard gate. Activated damage consumes one accepted physical-time clock driven by the assembled interface traction while the inherited EXP-floor opening clock remains suppressed. A topology commit is published once, after accepted equilibrium, and is not reinserted by the outer geometry owner.
 
-The actual unmocked public runs are retained under `integration_evidence/r05_actual_current_opening_consumer_20261016/qualification_report.json` at FEM `70c52ad`:
+Public runtime acceptance is now discriminating: provider construction and advance counters are insufficient. The selected request passes only when the provider is also bound to cohesive assembly and owns an actual trial interface (or restores that interface through the public checkpoint path). The active interface, provider state, front state, mesh, bulk fields and mechanics rollback baseline are serialized through the original specimen owner.
 
-- A low-load active-tip run constructs and advances the provider and source owner once, produces no event, and is correctly classified `selected_but_no_opening_event_in_run` rather than disconnected.
-- The autonomous classical run advances through five solved-traction states and commits a native 1 μm topology event. It is not gated by an opening hazard.
-- A fresh process restores the active step-4 provider state and reproduces the direct step-5 terminal history and geometry hashes exactly.
-- The activated run commits a native event at step 20 and localizes the final accepted interval from `3.7967e-11 s` requested to `3.6655e-12 s` consumed. The inherited EXP-floor clock remains suppressed.
+The compact source-bound record is `fem-czm-current-pf-companion@f8eba83:integration_evidence/r05_actual_solved_interface_20261016/qualification_report.json`, produced by calculation source `917d1a4`:
 
-The earlier compact solved-driver results remain component evidence for work, unload/reload, rollback and local constitutive accuracy; they are not used as proof of the public consumer connection:
+- Classical direct: eight accepted source/time updates, 27 mechanical solves, and one 1 µm native event. The event step required 13 equilibrium solves, had maximum damage subincrement `0.1277899931 <= 0.20`, zero final constitutive residual, and changed interface work from `2.951726786e-6 J/m` to zero on commit.
+- Classical active restart: step 7 stores nonzero damage `0.05237946396`; a fresh process restores the active interface and commits at step 8. Direct and restarted terminal histories are byte-identical (SHA-256 `e36eda97e590b390e88e8dbc155e94ee8acbc3c488d19e6b34cfe8f666988008`).
+- Activated direct: 47 accepted source/time updates, 94 mechanical solves, and one native event. The final interval is localized from `3.818760853e-11 s` requested to `1.855529613e-11 s` consumed at assembled interface traction `7.142501651 GPa`; maximum clock/damage subincrement is `0.04890875044`, and work changes from `1.275383246e-6 J/m` to zero on commit.
+- The source-bound public replay passes without mocking native main, front, barrier, source or mechanics. The complete FEM suite passes with the progressive/fatigue source-transform chain preserved.
 
-- Activated evidence: `integration_evidence/r05_solved_native_moving_tip_20261016/activated_v2/solved_moving_tip_bilinear_qualification.json`. It uses accepted physical time and persistent event ownership; the maximum restart errors in displacement, plastic strain and density are all zero. Measured compact-run peak RSS is `0.07498 GiB`, retained output before the report is `33,815 bytes`, and wall time is `0.1265 s`.
-- Autonomous evidence: `integration_evidence/r05_solved_native_moving_tip_20261016/classical_v2/solved_moving_tip_bilinear_qualification.json`. It evolves from opening history with requested hazard duration and clock increments exactly zero; the same three restart errors are zero. Measured compact-run peak RSS is `0.07124 GiB`, retained output is `34,116 bytes`, and wall time is `0.1008 s`.
-- Both show nonzero native plastic accommodation, adaptive topology insertion, irreversible unload/reload, post-event equilibrium, nonnegative cohesive work, terminal event commit and automatic whole-state rollback. The inputs remain explicitly constructed qualification support and do not claim production calibration.
+The older `r05_solved_native_moving_tip_20261016/{activated_v2,classical_v2}` records remain historical component evidence only. Their transaction and serialization checks unaffected by the known defects may be retained, but their accommodation and work values no longer qualify R05 because that driver advanced plasticity by one second per equilibrium callback and constructed the wrong Peierls/Taylor barriers. They are not promoted by relabeling. The replacement inputs remain explicitly constructed qualification support and do not claim production calibration.
 
 ## Disabled campaign and remaining native executions
 
@@ -43,7 +41,7 @@ The v3 campaign has 699 disabled rows and 699 source-bound native commands. Five
 
 The accepted mixed/constraint EXP-floor topology event (R07) and recursive second-generation branch-owner transition (R09) were not launched. The latest measurements show about 50.34 MiB immediately free, 873.31 MiB swap free, 28 GiB free on the Data volume, and five unrelated processes at about 1.36–2.65 GiB RSS each. The 6 GiB R07 and 24 GiB R09 execution peaks and the 12 GiB reserve remain engineering estimates, not measured peaks. Disk-only admission passes R07 but not R09; current RAM pressure admits neither.
 
-Both resumptions remain prepared exactly. R07 was dry-run validated on the preserved ancestor and remains present at FEM `70c52ad`; it executes only when `--execute` is supplied:
+Both resumptions remain prepared exactly. R07 was dry-run validated on the preserved ancestor and remains present on the current FEM line; it executes only when `--execute` is supplied:
 
 ```bash
 cd /Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion
