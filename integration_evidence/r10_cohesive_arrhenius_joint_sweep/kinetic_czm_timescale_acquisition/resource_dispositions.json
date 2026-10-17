@@ -1,0 +1,13 @@
+{
+  "materials": [
+    {
+      "candidate_id": "R10D_COH_19074",
+      "disposition": "ORDER_ONE_ACTION_FULL_WAVEFORM_TRANSPORT_RESOURCE_LIMIT",
+      "evidence_scope": "The actual native peak-load micro-exposure is source-active; the order-one-action advancing run was interrupted after more than three minutes before a durable accepted event record. High-action executions completed as opening-burst controls and are not developed fatigue evidence.",
+      "physical_rejection": false,
+      "numerical_failure": false,
+      "retry_same_interval_recommended": false
+    }
+  ],
+  "schema": "r10.kinetic-czm-resource-dispositions/1"
+}

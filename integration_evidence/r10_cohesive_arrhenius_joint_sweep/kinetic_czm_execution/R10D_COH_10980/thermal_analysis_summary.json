@@ -12,7 +12,14 @@
     17.450000006489304,
     16.800000006489295
   ],
+  "full_fracture_span_bracket_interval": [
+    1.210682492581604,
+    1.2172619047619064
+  ],
+  "full_fracture_span_qualification": "PASS_BOUNDED_WEAK_T_SPAN",
+  "full_fracture_span_ratio": 1.216140226844124,
   "full_intrinsic_classification": "WEAK_T_WITH_LOCAL_HOT_STATE_REBOUND",
+  "inherited_weak_T_span_limit": 1.25,
   "joint_classification": "NOT_DBTT_OR_PEAK__HOT_STATE_ELEVATION_INSUFFICIENT_TO_REVERSE_WEAK_T",
   "maximum_state_effect_MPa_sqrt_m": 0.70000000000001,
   "numerical_censors": 0,
@@ -26,9 +33,15 @@
     16.300000006489288
   ],
   "opening_reference_classification": "MONOTONIC_WEAK_T",
+  "opening_reference_span_bracket_interval": [
+    1.2477064220183507,
+    1.2546012269938671
+  ],
+  "opening_reference_span_qualification": "POINT_ESTIMATE_ABOVE_LIMIT__BRACKET_STRADDLES_LIMIT",
+  "opening_reference_span_ratio": 1.2534451417631416,
   "physical_censors": 0,
   "same_complete_material_sha256": "c17ec5564aafa82ea32bdfc2b5b354e2ca7670147c7403cca2aa2c5dbfe6d94e",
-  "schema": "r10.kinetic-czm-thermal-analysis/1",
+  "schema": "r10.kinetic-czm-thermal-analysis/2",
   "scope": "FINITE_COMPLIANCE_REDUCED_KINETIC_CZM_SAME_MATERIAL_PANEL",
   "state_effect_MPa_sqrt_m": [
     0.0,

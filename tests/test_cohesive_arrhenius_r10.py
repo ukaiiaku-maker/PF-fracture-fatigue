@@ -27,6 +27,7 @@ from arrhenius_fracture.reduced_persistent_reference_r2 import runtime_receipt
 from arrhenius_fracture.retained_material_cohesive_r10 import (
     build_cohesive_current_engine, load_cohesive_binding,
 )
+from scripts.run_r10_kinetic_czm_coupled import phase_landscape
 
 
 def law(entropy=0.0):
@@ -161,6 +162,18 @@ def test_finite_compliance_distinguishes_no_saddle_from_spinodal():
     assert consumed["consumer"]=="FINITE_COMPLIANCE_CONNECTED_COHESIVE_LANDSCAPE"
     assert consumed["state"]=="METASTABLE"
     assert consumed["elementary_rate_s-1"]>0.
+
+
+def test_kinetic_czm_environment_is_not_clipped_by_legacy_source_cap():
+    class Engine:
+        f = type("Front", (), {"sigma_cap": 30.0e9})()
+        def r_eff(self): return 1.0e-6
+    barrier=ExponentialCohesiveBarrier(law(),2e-19,execution_identity=COHESIVE_KINETIC_CZM)
+    requested_free=40.0e9
+    K=requested_free*math.sqrt(2*math.pi*Engine().r_eff())
+    _,_,_,free,_=phase_landscape(Engine(),barrier,K,300.,1.0e21,{"branch":"INTACT"},3.,1e-6)
+    assert free == pytest.approx(requested_free)
+    assert free > Engine.f.sigma_cap
 
 
 def test_nonlinear_assembly_tangent_irreversibility_and_contact():

@@ -48,7 +48,7 @@ Every offspring retains one complete R10 parent dislocation vector. Emission, Pe
 | Contact | Not applicable | Separate numerical compression penalty |
 | Surface-energy charge | Activation landscape only; no separate event bill | Broken-patch/interface free energy only; the activation barrier is not charged again |
 
-The barrier-only legacy 30 GPa numerical strength contract remains independent of `t_hat`. The kinetic interface does not use a deterministic peak-traction failure rule; crossing the peak changes tangent but does not itself rupture the interface. `COHESIVE_PEAK_CUTOFF_CONTROL` is therefore only a diagnostic and has traversed work `Gamma(1-2/e)` at `x=1`. The separate rate-independent comparison is a matched-work envelope whose cutoff leaves a declared residual work fraction (default `1e-6`); neither control is Arrhenius evidence.
+The barrier-only legacy 30 GPa numerical strength contract remains independent of `t_hat` and applies only to the unresolved prescribed-K source/tip operator. It does not clip the elastic K-field used to form the finite-compliance kinetic-CZM opening displacement. The kinetic interface does not use a deterministic peak-traction failure rule; crossing the peak changes tangent but does not itself rupture the interface. `COHESIVE_PEAK_CUTOFF_CONTROL` is therefore only a diagnostic and has traversed work `Gamma(1-2/e)` at `x=1`. The separate rate-independent comparison is a matched-work envelope whose cutoff leaves a declared residual work fraction (default `1e-6`); neither control is Arrhenius evidence.
 
 ## Reproduction
 

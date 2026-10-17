@@ -15,8 +15,17 @@
   "active_job_status": "NONE_AT_LEDGER_SNAPSHOT",
   "active_writers": [],
   "advancing_kinetic_completed_material_ids": [
-    "R10D_COH_10980"
+    "R10D_COH_10980",
+    "R10D_COH_19672",
+    "R10D_COH_30017"
   ],
+  "barrier_only_resume_command": "python scripts/run_r10_cohesive_campaign.py native --candidate-id R10D_COH_19672 --maximum-cycles 100000",
+  "kinetic_czm_active_comparison_completed": "R10D_COH_30017",
+  "kinetic_czm_active_comparison_disposition": "SOURCE_ACTIVE_BLUNTING_SUPPRESSES_RECURRENT_OPENING_OVER_99_CYCLES",
+  "kinetic_czm_next_acquisition_requirement": "NEW_JOINT_VARIATION_OUTSIDE_THE_NARROW_OPENING_TRANSITION__CURRENT_ACTIVE_ROW_HAS_NO_DEVELOPED_FULL_STATE_WINDOW",
+  "kinetic_czm_reproduce_active_comparison_command": "python scripts/run_r10_kinetic_czm_coupled.py --registry integration_evidence/r10_cohesive_arrhenius_joint_sweep/kinetic_czm_execution/kinetic_czm_registry.csv --candidate-id R10D_COH_30017 --out runs/r10_cohesive_arrhenius_joint_sweep/kinetic_czm_timescale/R10D_COH_30017 --loads 28.914041499941035 --target-events 5 --target-extension-um 20 --maximum-cycles 100 --phase-count 12",
+  "kinetic_czm_starting_hypothesis_disposition": "OPENING_BURST_BEFORE_STATE_DEVELOPMENT__NOT_A_DEVELOPED_RATE",
+  "kinetic_czm_starting_hypothesis_verified": "R10D_COH_19672",
   "native_completed_material_ids": [
     "R10D_COH_00167",
     "R10D_HARD_01138"
@@ -90,14 +99,15 @@
     "R10D_HARD_07285",
     "R10D_HARD_07436"
   ],
-  "native_state_screen_closed_material_ids": [
+  "native_state_screen_deprioritized_material_ids": [
     "R10D_COH_00185",
     "R10D_COH_04088",
     "R10D_COH_25753",
     "R10D_COH_28647"
   ],
+  "native_state_screen_scope": "FINITE_12_CYCLE_PROMOTION_SCREEN__NOT_LIFETIME_INACTIVITY",
+  "next_native_command_identity": "COHESIVE_BARRIER_ONLY",
   "next_native_information_candidate": "R10D_COH_19672",
   "phase_alias_history": "RETAINED_BUT_EXCLUDED; 64/128-PHASE CHECK RESOLVED",
-  "resume_command": "python scripts/run_r10_cohesive_campaign.py native --candidate-id R10D_COH_19672 --maximum-cycles 100000",
   "schema": "r10.cohesive-queue-status/1"
 }

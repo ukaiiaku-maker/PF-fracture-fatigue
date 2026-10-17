@@ -37,6 +37,12 @@ def write_ledger(evidence: Path,runs: Path):
     state_summaries=[json.loads(path.read_text()) for path in
                      evidence.glob("state_aware_execution*/state_aware_summary.json")]
     kinetic_analyses=list((evidence/"kinetic_czm_execution").glob("*/analysis_summary.json"))
+    active_comparisons=list((evidence/"kinetic_czm_execution").glob("*/active_comparison_summary.json"))
+    timescales=[json.loads(path.read_text()) for path in evidence.glob("kinetic_czm_timescale_acquisition*/timescale_acquisition.json")]
+    timescale_summaries=[row for payload in timescales for row in payload.get("summaries",[])]
+    observed_controls=[row for payload in timescales for row in payload.get("observed_advancing_controls",[])]
+    resource_path=evidence/"kinetic_czm_timescale_acquisition/resource_dispositions.json"
+    resource=(json.loads(resource_path.read_text()) if resource_path.exists() else {"materials":[]})
     developed=0;censored=0;restartable=0
     for path in fatigue:
         result=json.loads(path.read_text())
@@ -82,13 +88,16 @@ def write_ledger(evidence: Path,runs: Path):
         "state_aware_load_conditions_evaluated":sum(int(x.get("executed_load_conditions",0)) for x in state_summaries),
         "state_aware_informative":sum(int(x.get("informative_count",0)) for x in state_summaries),
         "native_queued":max(total_native_queue-len(executed_native_ids)-len(set(queued_ids)&screen_closed_ids),0),
-        "native_queue_closed_by_state_screen":len(set(queued_ids)&screen_closed_ids),
+        "native_queue_deprioritized_by_finite_12_cycle_screen":len(set(queued_ids)&screen_closed_ids),
         "native_fatigue_executed":len(fatigue),"native_fracture_executed":len(fracture),
         "developed":developed,"physically_censored":censored,"restartable":restartable,
         "kinetic_czm_spatial_qualifications":len(spatial),
-        "kinetic_czm_advancing_materials_analyzed":len(kinetic_analyses),
+        "kinetic_czm_advancing_materials_analyzed":len({json.loads(path.read_text())["candidate_id"] for path in kinetic_analyses+active_comparisons}|{x["candidate_id"] for x in observed_controls}),
+        "kinetic_czm_active_dislocation_comparisons":len(active_comparisons),
+        "kinetic_czm_timescale_materials_evaluated":len(timescale_summaries),
         "kinetic_czm_same_material_thermal_panels":len(list((evidence/"kinetic_czm_execution").glob("*/thermal_analysis_summary.json"))),
-        "numerically_unresolved":0,"qualified_joint_materials":qualified_portfolio+qualified_kinetic,
+        "numerically_unresolved":0,"resource_limited_active_trajectory_materials":len(resource["materials"]),
+        "qualified_joint_materials":qualified_portfolio+qualified_kinetic,
         "classification_status":"ACQUISITION_AND_EXECUTION_IN_PROGRESS",
         "open_cells":"reported in portfolio.csv; unexecuted cells remain NOT_YET_FOUND",
         "counts_are_execution_scoped":True}
@@ -100,17 +109,26 @@ def write_ledger(evidence: Path,runs: Path):
         if candidate not in executed_native_ids and candidate not in screen_closed_ids and candidate not in remaining_order:
             remaining_order.append(candidate)
     next_native=remaining_order[0] if remaining_order else None
+    advancing_ids={json.loads(path.read_text())["candidate_id"] for path in kinetic_analyses+active_comparisons}
+    advancing_ids.update(x["candidate_id"] for x in observed_controls)
     queue_status={"schema":"r10.cohesive-queue-status/1","active_writers":[],
         "active_job_status":"NONE_AT_LEDGER_SNAPSHOT","native_queue_total":len(set(queued_ids)),
         "native_completed_material_ids":sorted(executed_native_ids),
-        "native_state_screen_closed_material_ids":sorted(set(queued_ids)&screen_closed_ids),
+        "native_state_screen_deprioritized_material_ids":sorted(set(queued_ids)&screen_closed_ids),
+        "native_state_screen_scope":"FINITE_12_CYCLE_PROMOTION_SCREEN__NOT_LIFETIME_INACTIVITY",
         "native_remaining_material_ids":sorted(set(queued_ids)-executed_native_ids-screen_closed_ids),
         "accepted_checkpoint_paths":checkpoints,
-        "advancing_kinetic_completed_material_ids":[json.loads(path.read_text())["candidate_id"] for path in kinetic_analyses],
+        "advancing_kinetic_completed_material_ids":sorted(advancing_ids),
         "phase_alias_history":"RETAINED_BUT_EXCLUDED; 64/128-PHASE CHECK RESOLVED",
-        "next_native_information_candidate":next_native,
-        "resume_command":(None if next_native is None else
-            f"python scripts/run_r10_cohesive_campaign.py native --candidate-id {next_native} --maximum-cycles 100000")}
+        "next_native_information_candidate":next_native,"next_native_command_identity":"COHESIVE_BARRIER_ONLY",
+        "kinetic_czm_starting_hypothesis_verified":"R10D_COH_19672" if timescales else None,
+        "kinetic_czm_starting_hypothesis_disposition":"OPENING_BURST_BEFORE_STATE_DEVELOPMENT__NOT_A_DEVELOPED_RATE" if timescales else None,
+        "kinetic_czm_active_comparison_completed":"R10D_COH_30017" if active_comparisons else None,
+        "kinetic_czm_active_comparison_disposition":"SOURCE_ACTIVE_BLUNTING_SUPPRESSES_RECURRENT_OPENING_OVER_99_CYCLES" if active_comparisons else None,
+        "kinetic_czm_next_acquisition_requirement":"NEW_JOINT_VARIATION_OUTSIDE_THE_NARROW_OPENING_TRANSITION__CURRENT_ACTIVE_ROW_HAS_NO_DEVELOPED_FULL_STATE_WINDOW" if active_comparisons else None,
+        "barrier_only_resume_command":(None if next_native is None else
+            f"python scripts/run_r10_cohesive_campaign.py native --candidate-id {next_native} --maximum-cycles 100000"),
+        "kinetic_czm_reproduce_active_comparison_command":("python scripts/run_r10_kinetic_czm_coupled.py --registry integration_evidence/r10_cohesive_arrhenius_joint_sweep/kinetic_czm_execution/kinetic_czm_registry.csv --candidate-id R10D_COH_30017 --out runs/r10_cohesive_arrhenius_joint_sweep/kinetic_czm_timescale/R10D_COH_30017 --loads 28.914041499941035 --target-events 5 --target-extension-um 20 --maximum-cycles 100 --phase-count 12" if active_comparisons else None)}
     queue_path=evidence/"queue_status.json";queue_tmp=queue_path.with_suffix(".json.tmp")
     queue_tmp.write_text(json.dumps(queue_status,indent=2,sort_keys=True)+"\n");queue_tmp.replace(queue_path)
     print(json.dumps(payload,indent=2,sort_keys=True))

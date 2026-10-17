@@ -33,7 +33,11 @@ def phase_values(waveform,n):
     return np.asarray(waveform.K_phase(phi),float)
 
 def phase_landscape(engine,barrier,K,T,kenv,connected,hits,tau):
-    free=max(float(engine.sigma_tip(max(K,0.))),0.)
+    # The cohesive environment is driven by the elastic K-field at the current
+    # retained radius.  The legacy 30 GPa source/tip stress cap belongs to the
+    # unresolved prescribed-K source operator and must not clip the new
+    # finite-compliance opening displacement.
+    free=max(float(K),0.)/math.sqrt(2.*math.pi*max(float(engine.r_eff()),1e-30))
     imposed=free/kenv
     landscape=barrier.rate_from_environment(imposed,kenv,T,connected)
     point=landscape.get('connected')
@@ -83,7 +87,7 @@ def probe_loads(binding,barrier,kenv,T,R,freq,phases):
     for Kmax in grid:
         w=FatigueWaveform(Kmax=Kmax*1e6,R=R,frequency_Hz=freq);state={'branch':'INTACT'};action=0.;spin=False
         for K in phase_values(w,phases):
-            free=min(max(float(K),0.)/math.sqrt(2*math.pi*radius),float(engine.f.sigma_cap))
+            free=max(float(K),0.)/math.sqrt(2*math.pi*radius)
             land=barrier.rate_from_environment(free/kenv,kenv,T,state)
             rate=cooperative(land['elementary_rate_s-1'],binding.reduced_config.cleavage_hits,binding.reduced_config.cleavage_tau_s)
             state=land['connected_state'];action+=rate*w.period_s/phases
@@ -91,8 +95,10 @@ def probe_loads(binding,barrier,kenv,T,R,freq,phases):
         rows.append({'Kmax_MPa_sqrt_m':Kmax,'action_per_cycle':action,'spinodal_reached':spin})
     targets=(.80,1.50,3.00)
     picked=[]
+    eligible=[r for r in rows if not r['spinodal_reached'] and r['action_per_cycle']>0]
     for target in targets:
-        eligible=[r for r in rows if not r['spinodal_reached'] and r['action_per_cycle']>0]
+        if not eligible:
+            break
         row=min(eligible,key=lambda r:abs(math.log10(r['action_per_cycle'])-math.log10(target)))
         if row['Kmax_MPa_sqrt_m'] not in [x['Kmax_MPa_sqrt_m'] for x in picked]:picked.append(row)
     return rows,picked
@@ -120,7 +126,11 @@ def run_arm(binding,barrier,mechanics_receipt,Kmax,arm,seed,target_events,target
             'cohesive_traction_Pa':traction,'separation_m':0. if land.get('connected') is None else land['connected']['delta_m'],
             'landscape_state':land['state'],'barrier_J':land['barrier_J'],'elementary_rate_s-1':land['elementary_rate_s-1'],
             'cooperative_rate_s-1':rate,'mobile_count':float(engine.mpz.mobile_count),'retained_count':float(engine.mpz.retained_count),
-            'K_shield_Pa_sqrt_m':float(engine.K_shield()),'tip_radius_m':float(engine.r_eff()),'fired':bool(result.get('fired'))})
+            'K_shield_Pa_sqrt_m':float(engine.K_shield()),'tip_radius_m':float(engine.r_eff()),
+            'source_activations_total':float(getattr(engine.mpz,'signed_source_activations_total',0.)),
+            'signed_line_content_emitted_total':float(getattr(engine.mpz,'signed_line_content_emitted_total',0.)),
+            'aggregate_source_hazard_s-1':float(getattr(engine.mpz,'continuum_source_last_aggregate_hazard_s',0.)),
+            'fired':bool(result.get('fired'))})
         if result.get('fired'):
             if descriptor is None:raise RuntimeError('accepted kinetic event lacks geometry descriptor')
             advance=float(descriptor['event_advance_m']);gamma=barrier.thermal.gamma(T)
@@ -136,6 +146,8 @@ def run_arm(binding,barrier,mechanics_receipt,Kmax,arm,seed,target_events,target
                 'event_advance_m':advance,'phase':event_cycle%1.,'K_Pa_sqrt_m':K,'threshold_action':descriptor['threshold_action'],
                 'mobile_count':float(engine.mpz.mobile_count),'retained_count':float(engine.mpz.retained_count),
                 'K_shield_Pa_sqrt_m':float(engine.K_shield()),'tip_radius_m':float(engine.r_eff()),
+                'source_activations_total':float(getattr(engine.mpz,'signed_source_activations_total',0.)),
+                'signed_line_content_emitted_total':float(getattr(engine.mpz,'signed_line_content_emitted_total',0.)),
                 'unused_phase_time_s':remaining,'remaining_waveform_continued':remaining>0.})
             print(json.dumps({'kinetic_czm_event':len(events),'arm':arm,'Kmax_MPa_sqrt_m':Kmax,
                 'cycles':event_cycle,'extension_m':float(engine.checkpoint_advance_total_m),
@@ -143,7 +155,8 @@ def run_arm(binding,barrier,mechanics_receipt,Kmax,arm,seed,target_events,target
             connected={'branch':'INTACT'}
     status='developed_target_completed' if len(events)>=target_events and float(engine.checkpoint_advance_total_m)>=target_extension else 'maximum_cycles_resource_stop'
     return {'schema':'r10.kinetic-czm-coupled-advancing/1','status':status,'arm':arm,'execution_identity':COHESIVE_KINETIC_CZM,
-        'candidate_id':binding.optimized_row['candidate_id'],'Kmax_MPa_sqrt_m':Kmax,'DeltaK_MPa_sqrt_m':(1-R)*Kmax,
+        'candidate_id':binding.optimized_row['candidate_id'],'same_complete_material_sha256':binding.provenance['complete_row_sha256'],
+        'Kmax_MPa_sqrt_m':Kmax,'DeltaK_MPa_sqrt_m':(1-R)*Kmax,
         'temperature_K':T,'R':R,'frequency_Hz':freq,'phase_count':phases,'seed':seed,'events':events,'history':history,
         'energy_ledger':energy,'final_cycles':history[-1]['cycles'] if history else 0.,'final_extension_m':float(engine.checkpoint_advance_total_m),
         'target_events':target_events,'target_extension_m':target_extension,'mechanics_condensation':mechanics_receipt,
@@ -158,6 +171,13 @@ def main(argv=None):
     Eprime=400e9/(1-.22**2);mech=mechanics(barrier,Eprime)
     probe,picked=probe_loads(binding,barrier,mech['environment_stiffness_Pa_per_m'],300.,.1,1000.,a.phase_count)
     loads=[float(x) for x in a.loads.split(',')] if a.loads else [r['Kmax_MPa_sqrt_m'] for r in picked]
+    if not loads:
+        atomic(a.out/'campaign_summary.json',{'candidate_id':a.candidate_id,
+            'same_complete_material_sha256':binding.provenance['complete_row_sha256'],
+            'execution_identity':COHESIVE_KINETIC_CZM,'loads':[],
+            'mechanics_condensation':mech,'results':[],
+            'status':'NO_CONNECTED_POSITIVE_ACTION_LOAD_IN_PROBED_DOMAIN'})
+        return 0
     with (a.out/'load_probe.csv').open('w',newline='') as f:w=csv.DictWriter(f,probe[0].keys(),lineterminator='\n');w.writeheader();w.writerows(probe)
     results=[]
     for K in loads:

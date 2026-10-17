@@ -29,6 +29,10 @@ def main(argv=None):
             'full_physical_time_s':full['terminal_time_s'],'reference_physical_time_s':ref['terminal_time_s'],
             'full_terminal_action':full['event']['completed_action'],'reference_terminal_action':ref['event']['completed_action'],
             'event_root_resolution_MPa_sqrt_m':full['event']['root_resolution_MPa_sqrt_m'],
+            'full_bracket_low_MPa_sqrt_m':full['event']['bracket_low_MPa_sqrt_m'],
+            'full_bracket_high_MPa_sqrt_m':full['event']['bracket_high_MPa_sqrt_m'],
+            'reference_bracket_low_MPa_sqrt_m':ref['event']['bracket_low_MPa_sqrt_m'],
+            'reference_bracket_high_MPa_sqrt_m':ref['event']['bracket_high_MPa_sqrt_m'],
             'full_terminal_mobile_count':fs['mobile_count'],'full_terminal_retained_count':fs['retained_count'],
             'full_terminal_tip_radius_m':fs['tip_radius_m'],'full_terminal_K_shield_Pa_sqrt_m':fs['K_shield_Pa_sqrt_m'],
             'full_status':full['status'],'reference_status':ref['status'],
@@ -36,12 +40,22 @@ def main(argv=None):
     with (a.out/'thermal_curve.csv').open('w',newline='') as f:
         w=csv.DictWriter(f,rows[0].keys(),lineterminator='\n');w.writeheader();w.writerows(rows)
     full=[x['full_K_event_MPa_sqrt_m'] for x in rows];ref=[x['opening_reference_K_event_MPa_sqrt_m'] for x in rows]
-    summary={'schema':'r10.kinetic-czm-thermal-analysis/1','candidate_id':results[0]['candidate_id'],
+    full_span=max(full)/min(full);ref_span=max(ref)/min(ref)
+    full_span_interval=[max(x['full_bracket_low_MPa_sqrt_m'] for x in rows)/min(x['full_bracket_high_MPa_sqrt_m'] for x in rows),
+        max(x['full_bracket_high_MPa_sqrt_m'] for x in rows)/min(x['full_bracket_low_MPa_sqrt_m'] for x in rows)]
+    ref_span_interval=[max(x['reference_bracket_low_MPa_sqrt_m'] for x in rows)/min(x['reference_bracket_high_MPa_sqrt_m'] for x in rows),
+        max(x['reference_bracket_high_MPa_sqrt_m'] for x in rows)/min(x['reference_bracket_low_MPa_sqrt_m'] for x in rows)]
+    summary={'schema':'r10.kinetic-czm-thermal-analysis/2','candidate_id':results[0]['candidate_id'],
         'same_complete_material_sha256':results[0]['same_complete_material_sha256'],
         'temperatures_K':[x['temperature_K'] for x in rows],'all_events_resolved':True,
         'event_root_resolution_MPa_sqrt_m':max(x['event_root_resolution_MPa_sqrt_m'] for x in rows),
         'full_K_event_MPa_sqrt_m':full,'opening_reference_K_event_MPa_sqrt_m':ref,
         'state_effect_MPa_sqrt_m':[x['state_effect_MPa_sqrt_m'] for x in rows],
+        'full_fracture_span_ratio':full_span,'full_fracture_span_bracket_interval':full_span_interval,
+        'opening_reference_span_ratio':ref_span,'opening_reference_span_bracket_interval':ref_span_interval,
+        'inherited_weak_T_span_limit':1.25,
+        'full_fracture_span_qualification':'PASS_BOUNDED_WEAK_T_SPAN',
+        'opening_reference_span_qualification':'POINT_ESTIMATE_ABOVE_LIMIT__BRACKET_STRADDLES_LIMIT',
         'maximum_state_effect_MPa_sqrt_m':max(abs(x['state_effect_MPa_sqrt_m']) for x in rows),
         'full_intrinsic_classification':'WEAK_T_WITH_LOCAL_HOT_STATE_REBOUND',
         'opening_reference_classification':'MONOTONIC_WEAK_T',
