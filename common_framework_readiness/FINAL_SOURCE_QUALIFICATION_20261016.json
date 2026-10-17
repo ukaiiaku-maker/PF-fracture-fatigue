@@ -2,9 +2,9 @@
   "schema": "fracture-framework-final-source-qualification/2",
   "date": "2026-10-16",
   "source_pair": {
-    "pf_calculation_and_campaign_commit": "1ba0e500a563e839a9ec3fc16264488b80e87755",
-    "fem_calculation_commit": "917d1a4491ec0abf2f054bac5fe5d1422e1ee781",
-    "fem_evidence_commit": "f8eba83734c0252d9f0c6c226e74450df8c3f889"
+    "pf_calculation_and_campaign_commit": "dd0c1953e57f7aeaa977b4965b2b9f9d0323b584",
+    "fem_calculation_commit": "2987e5b06a48b636dfc1672c7a0144c0c74dbb6e",
+    "fem_evidence_commit": "e2e84aa676d1b7a84977577c5a133eca668233dc"
   },
   "pf": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q -m 'not external_evidence'",
@@ -16,16 +16,17 @@
   "fem": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
     "result": "PASS",
-    "passed": 758,
+    "passed": 759,
     "skipped": 2,
     "passing_subtests": 16,
-    "duration_s": 47.59
+    "duration_s": 92.82
   },
   "focused_native_evidence": {
-    "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@f8eba83:integration_evidence/r05_actual_solved_interface_20261016/qualification_report.json",
-    "actual_public_interface_regression": "fem-czm-current-pf-companion@917d1a4:tests/test_r05_actual_public_interface.py; 1 passed in 13.00 s; no mocked native main/front/barrier/source/mechanics",
-    "specified_public_option_names": "fem-czm-current-pf-companion@917d1a4:tests/test_generic_current_pf_companion.py; tests/test_bilinear_cohesive_request_v1.py",
-    "prepared_r07_resumption": "fem-czm-current-pf-companion@f8eba83:scripts/resume_r07_exp_floor_event.py; preserved dry-run regression",
+    "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@e2e84aa:integration_evidence/r05_actual_solved_interface_20261016/qualification_report.json",
+    "actual_public_interface_regression": "fem-czm-current-pf-companion@2987e5b:tests/test_r05_actual_public_interface.py; direct/event/restart plus accepted-time active-tip accommodation; no mocked native main/front/barrier/source/mechanics",
+    "accepted_time_accommodation": "2 accepted updates and 2 source updates; front-time increments equal 3.5e-10 s and 1.0975208997081333e-10 s accepted intervals; nonzero emission and emission-work increments; no one-second callback artifact",
+    "specified_public_option_names": "fem-czm-current-pf-companion@2987e5b:tests/test_generic_current_pf_companion.py; tests/test_bilinear_cohesive_request_v1.py",
+    "prepared_r07_resumption": "fem-czm-current-pf-companion@e2e84aa:scripts/resume_r07_exp_floor_event.py; preserved dry-run regression",
     "moving_tip_and_exp_floor_lifecycle_tests": "55 passed in 1.52 s",
     "cohesive_family_tests": "41 passed in 1.47 s",
     "campaign_and_binding_tests": "31 passed in 1.14 s",
