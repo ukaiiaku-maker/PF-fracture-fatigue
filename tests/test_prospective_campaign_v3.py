@@ -42,7 +42,7 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     )
     assert all(
         row["readiness"]["implementation"]
-        == "IMPLEMENTED_ACTUAL_CURRENT_NATIVE_FRONT_BILINEAR_PROVIDER"
+        == "IMPLEMENTED_ACTUAL_SOLVED_INTERFACE_BILINEAR_PROVIDER"
         for row in fitted
     )
     assert all(
@@ -60,6 +60,15 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
         ] == "inherited_EXP_floor"
         and row["qualification_execution"]["native_driver_binding"][
             "persistent_source_owner_preserved"
+        ] is True
+        for row in fitted
+    )
+    assert all(
+        row["qualification_execution"]["native_driver_binding"][
+            "cohesive_residual_tangent_assembled"
+        ] is True
+        and row["qualification_execution"]["native_driver_binding"][
+            "runtime_requires_actual_trial_interface"
         ] is True
         for row in fitted
     )

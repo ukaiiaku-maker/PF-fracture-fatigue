@@ -799,6 +799,11 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                                 "NativeBilinearFrontProvider on the current "
                                 "CalibratedMixedModeMPZV911Engine lineage"
                             ),
+                            "actual_interface_backend": (
+                                "NativeBilinearTrial_StochasticLengthBackend"
+                            ),
+                            "cohesive_residual_tangent_assembled": True,
+                            "runtime_requires_actual_trial_interface": True,
                             "opening_clock_replaced": "inherited_EXP_floor",
                             "persistent_source_owner_preserved": True,
                             "restart_owner": "fem-czm-specimen-checkpoint/1",
@@ -816,13 +821,13 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                     }
                     row["readiness"].update({
                         "implementation": (
-                            "IMPLEMENTED_ACTUAL_CURRENT_NATIVE_FRONT_"
+                            "IMPLEMENTED_ACTUAL_SOLVED_INTERFACE_"
                             "BILINEAR_PROVIDER"
                         ),
                         "native_qualification": (
-                            "PUBLIC_ACTUAL_ENGINE_ACTIVE_CLASSICAL_AND_ACTIVATED_"
-                            "EVENTS_FRESH_PROCESS_ACTIVE_RESTART_QUALIFIED_"
-                            "CONSTRUCTED_SUPPORT"
+                            "PUBLIC_ACTUAL_INTERFACE_RESIDUAL_TANGENT_WORK_"
+                            "CLASSICAL_AND_ACTIVATED_EVENTS_ACTIVE_RESTART_"
+                            "QUALIFIED_CONSTRUCTED_SUPPORT"
                         ),
                     })
                 row["execution"] = _execution(row)
