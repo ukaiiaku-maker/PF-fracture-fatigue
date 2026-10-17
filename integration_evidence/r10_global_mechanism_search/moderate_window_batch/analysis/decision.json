@@ -1,0 +1,27 @@
+{
+  "completed_opening_candidate": "R10A_GLOBAL_002081",
+  "completed_opening_ladder": {
+    "DeltaK_ratio": 3.1957381047130498,
+    "all_windows_recurrent": true,
+    "classification": "MODERATE_RECURRENT_OPENING_DOMINATED_CANDIDATE",
+    "developed_points": 3,
+    "finite_window_A0_endpoint_slope": 3.972487969569124,
+    "full_endpoint_slope": 3.972487969569125,
+    "minimum_window_DeltaN": 8.9017991223192,
+    "rate_decades": 2.004402946509288,
+    "state_slope_correction_vs_finite_A0": 8.881784197001252e-16,
+    "stationary_A0_endpoint_slope": 3.998010934367573
+  },
+  "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+  "guard": "no pending checkpoint or startup segment is used as a developed rate",
+  "mixed": {
+    "developed_points": 1,
+    "remaining_points_restartable_or_queued": 2
+  },
+  "plasticity": {
+    "developed_points": 0,
+    "remaining_points_restartable_or_queued": 3
+  },
+  "schema": "r10.moderate-window-native-batch/1",
+  "status": "ONE_COMPLETE_MODERATE_LADDER_PLUS_ONE_MIXED_DEVELOPED_POINT_AND_RESTARTABLE_REMAINDER"
+}

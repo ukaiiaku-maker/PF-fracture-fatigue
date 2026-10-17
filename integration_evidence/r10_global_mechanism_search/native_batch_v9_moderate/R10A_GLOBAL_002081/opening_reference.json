@@ -1,0 +1,29 @@
+{
+  "A0_target_rates_m_per_cycle": [
+    1e-09,
+    1e-07,
+    1e-05
+  ],
+  "references": [
+    {
+      "A0_physical_m_per_cycle": 3.316687862856607e-08,
+      "DeltaK_MPa_sqrt_m": 1.7570281762803075,
+      "Kmax_MPa_sqrt_m": 1.9522535292003416,
+      "opening_action_per_cycle": 0.006633375725713215
+    },
+    {
+      "A0_physical_m_per_cycle": 8.92057375764047e-08,
+      "DeltaK_MPa_sqrt_m": 3.140973819950398,
+      "Kmax_MPa_sqrt_m": 3.4899709110559978,
+      "opening_action_per_cycle": 0.017841147515280938
+    },
+    {
+      "A0_physical_m_per_cycle": 3.4513237539392354e-06,
+      "DeltaK_MPa_sqrt_m": 5.6150018939934565,
+      "Kmax_MPa_sqrt_m": 6.238890993326063,
+      "opening_action_per_cycle": 0.690264750787847
+    }
+  ],
+  "renewal_reward_conversion_m_per_action": 5e-06,
+  "temperature_K": 300.0
+}

@@ -1,0 +1,21 @@
+{
+  "allocated_4096": {
+    "allocated": 4096,
+    "failed_or_stopped": 0,
+    "native_evaluated": 4,
+    "queued_unexecuted": 4092,
+    "selected_in_native_48": 4
+  },
+  "interpretation": "4096 is an analytical descriptor allocation; it is not a completed state-aware reduction table",
+  "native_48": {
+    "allocated": 48,
+    "status_counts": {
+      "ALLOCATED_NOT_EXECUTED": 34,
+      "NATIVE_FATIGUE_CENSORED_OR_STOPPED": 1,
+      "NATIVE_FATIGUE_DEVELOPED": 4,
+      "NATIVE_FRACTURE_ONLY": 5,
+      "PREFLIGHT_ONLY": 4
+    }
+  },
+  "schema": "r10.information-scope-audit/1"
+}

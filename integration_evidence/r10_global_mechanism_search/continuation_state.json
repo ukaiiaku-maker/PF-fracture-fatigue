@@ -1,33 +1,50 @@
 {
-  "schema": "r10.global-mechanism-search-state/1",
+  "schema": "r10.global-mechanism-search-state/2",
   "analytical_bank": {
     "status": "COMPLETE",
     "hypotheses": 131072,
     "valid_domain": 70986,
-    "state_reduction_allocation": 4096,
-    "native_allocation": 48
+    "descriptor_allocation_not_state_reduction": 4096,
+    "native_allocation_not_execution_count": 48,
+    "execution_audit": "information_scope_audit/decision.json"
   },
   "first_native_information_block": {
-    "status": "COMPLETE_WITH_DEVELOPED_RATES_AND_PHYSICAL_CENSORS",
-    "opening_directed": "R10A_GLOBAL_018756",
-    "mixed_directed": "R10A_GLOBAL_119268",
-    "plasticity_directed": "R10A_GLOBAL_064416",
-    "decision": "balanced_information_batch/decision.json"
+    "status": "AUDITED_AND_CLOSED_AT_ACTUAL_SCOPE",
+    "opening_directed": "R10A_GLOBAL_018756_STEEP_NOT_MODERATE",
+    "mixed_directed": "R10A_GLOBAL_119268_UPPER_POINT_FINITE_WINDOW_BURST",
+    "plasticity_directed": "R10A_GLOBAL_064416_FINITE_ZERO_EVENT_CENSOR",
+    "decision": "balanced_information_batch/decision.json",
+    "like_for_like_observables": "balanced_information_batch/window_audit.json"
+  },
+  "moderate_window_batch": {
+    "status": "ONE_COMPLETE_LADDER_ONE_MIXED_POINT_REMAINDER_RESTARTABLE",
+    "decision": "moderate_window_batch/analysis/decision.json",
+    "complete_candidate": "R10A_GLOBAL_002081",
+    "full_endpoint_slope": 3.972487969569125,
+    "rate_decades": 2.004402946509288,
+    "DeltaK_ratio": 3.1957381047130498,
+    "all_windows_recurrent": true,
+    "mixed_completed_point": "R10A_GLOBAL_011750@Kmax19.9378616785",
+    "mixed_restartable_checkpoints": [
+      "native_batch_v9_moderate/R10A_GLOBAL_011750/fatigue_Kmax_6p11516098/checkpoint",
+      "native_batch_v9_moderate/R10A_GLOBAL_011750/fatigue_Kmax_11p0418854/checkpoint"
+    ],
+    "plasticity_fatigue_status": "QUEUED_NOT_STARTED"
   },
   "job_ownership": {
     "live_writers": [],
     "all_runs_local_to_current_worktree": true,
-    "interrupted_checkpoints_preserved": true
+    "interrupted_paths_stopped_after_accepted_event_checkpoint": true
   },
   "classification": {
-    "opening_directed": "OPENING_DOMINATED_AT_OPERATIONAL_RESOLUTION",
-    "mixed_directed": "UNCLASSIFIED_STRONG_STATE_EFFECT_WITH_STREAM_SENSITIVITY",
-    "plasticity_directed": "UNCLASSIFIED_STATE_CONTROLLED_NO_GROWTH_CENSOR"
+    "R10A_GLOBAL_002081": "MODERATE_RECURRENT_OPENING_DOMINATED_CANDIDATE",
+    "R10A_GLOBAL_011750": "MIXED_ACQUISITION_ROW_PARTIAL; FINAL_LABEL_WITHHELD",
+    "R10A_GLOBAL_014670": "PLASTICITY_ACQUISITION_ROW_FATIGUE_PENDING; FINAL_LABEL_WITHHELD"
   },
-  "next_acquisition": [
-    "third mark stream for R10A_GLOBAL_119268 at the developed high interval",
-    "frozen-feedback and normalized opening/dislocation block sensitivities",
-    "reorder remaining 48-row allocation by target-temperature fatigue accessibility and native fracture discrepancy",
-    "only pass jointly qualified developed-growth rows to exact-same-vector 2-D"
+  "next_execution": [
+    "resume R10A_GLOBAL_011750 middle then low accepted-event checkpoints to the unchanged 70 um target",
+    "execute the R10A_GLOBAL_014670 planned fatigue ladder under the same 1e6-cycle ceiling",
+    "repeat R10A_GLOBAL_002081 with an independent mark stream before any promotion",
+    "only pass exact-same-vector jointly qualified candidates to same-row 2-D"
   ]
 }

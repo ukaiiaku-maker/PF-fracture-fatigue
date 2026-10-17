@@ -17,17 +17,26 @@
         "10.812580231065468": "developed_target_completed"
       },
       "primary_developed_points": 2,
-      "result": "STRONG_AMPLITUDE_DEPENDENT_STATE_EFFECT_WITH_STREAM_SENSITIVITY; FINAL_LABEL_WITHHELD"
+      "result": "STRONG_AMPLITUDE_DEPENDENT_EFFECT_WITH_STREAM_SENSITIVITY; UPPER POINT IS A FINITE-WINDOW BURST; FINAL LABEL WITHHELD",
+      "upper_point_is_single_excursion_burst": true
     },
     "OPENING_DIRECTED": {
       "C_rate_range": [
         0.8892680201161282,
         0.8953323336791519
       ],
+      "absolute_A0_slopes": [
+        55.092818264079476,
+        50.899173288067956
+      ],
+      "absolute_full_slopes": [
+        55.10688689735838,
+        50.96184021449186
+      ],
       "candidate_id": "R10A_GLOBAL_018756",
       "developed_points": 3,
       "max_abs_Delta_m_state": 0.06266692642390126,
-      "result": "OPENING_DOMINATED_AT_OPERATIONAL_RESOLUTION_ACROSS_BOTH_INTERVALS"
+      "result": "OPENING_DOMINATED_BUT_STEEP; NOT_A_MODERATE_PARIS_WINDOW"
     },
     "PLASTICITY_DIRECTED": {
       "candidate_id": "R10A_GLOBAL_064416",
@@ -36,7 +45,8 @@
       ],
       "fatigue_points": 3,
       "maximum_C_rate_95pct_upper": 1.4997771148240873e-06,
-      "result": "STATE_CONTROLLED_NO_GROWTH_CENSOR_DESPITE_A0_GROWTH; NO_DEVELOPED_RATE_OR_FINAL_LABEL",
+      "result": "FINITE_ZERO_EVENT_CENSOR_DESPITE_A0_GROWTH; NOT ASYMPTOTIC ARREST; NO DEVELOPED RATE OR FINAL LABEL",
+      "zero_event_bound_scope": "MODEL_CONDITIONAL_HOMOGENEOUS_POISSON_SURROGATE_NOT_MODEL_FREE",
       "zero_event_points": 3
     }
   },
@@ -46,7 +56,7 @@
     "strong_abs_Delta_m": 1.0,
     "two_percent_is_not_material": true
   },
-  "remaining_48_row_allocation": "ACTIVE; use target-temperature fatigue accessibility and native fracture discrepancy to reorder",
+  "remaining_48_row_allocation": "ALLOCATION_ONLY; see information_scope_audit for executed/queued dispositions",
   "same_material_fracture_reachability": {
     "mixed": "complete at 300 and 600 K",
     "opening": "complete at 300 K",

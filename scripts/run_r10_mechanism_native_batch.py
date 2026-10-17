@@ -58,11 +58,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seed", type=int, default=10162026)
     p.add_argument("--maximum-cycles", type=float, default=1e12)
     p.add_argument("--candidate-id", action="append", default=[])
+    p.add_argument("--load-plan", type=Path,
+                   help="optional explicit broad-window plan keyed by candidate")
     args = p.parse_args(argv)
     args.out.mkdir(parents=True, exist_ok=True)
     registry = list(csv.DictReader(args.registry.open(newline="")))
     descriptors = {r["candidate_id"]: r for r in csv.DictReader(args.descriptors.open(newline=""))}
     requested = set(args.candidate_id)
+    load_plan = (json.loads(args.load_plan.read_text())["candidates"]
+                 if args.load_plan else {})
     assigned = [r for i, r in enumerate(registry)
                 if i % args.shard_count == args.shard_index
                 and (not requested or r["candidate_id"] in requested)]
@@ -70,14 +74,18 @@ def main(argv: list[str] | None = None) -> int:
         candidate = record["candidate_id"]
         descriptor = descriptors[candidate]
         mechanism = descriptor["mechanism_acquisition_stratum"]
-        temperature = {"OPENING_DIRECTED": 300.0, "MIXED_DIRECTED": 600.0,
-                       "PLASTICITY_DIRECTED": 900.0}[mechanism]
+        temperature = float(load_plan.get(candidate, {}).get("temperature_K",
+            {"OPENING_DIRECTED": 300.0, "MIXED_DIRECTED": 600.0,
+             "PLASTICITY_DIRECTED": 900.0}[mechanism]))
         row = json.loads(record["complete_parameter_vector"])
         binding = load_offspring_binding(args.registry, candidate)
         case = args.out / candidate
         case.mkdir(parents=True, exist_ok=True)
         terminal_status = case / "batch_case_status.json"
-        if terminal_status.exists() and json.loads(terminal_status.read_text()).get("mode_completed") == args.mode:
+        # An explicit load plan may intentionally add another load to a case;
+        # per-load result files are the idempotence authority in that mode.
+        if (not args.load_plan and terminal_status.exists() and
+                json.loads(terminal_status.read_text()).get("mode_completed") == args.mode):
             print(json.dumps({"candidate_id": candidate, "stage": "skip", "status": "ALREADY_COMPLETE"}), flush=True)
             continue
         preflight = {
@@ -106,8 +114,15 @@ def main(argv: list[str] | None = None) -> int:
         if args.mode in ("fatigue", "all"):
             targets = ((1e-9, 1e-7, 1e-5) if mechanism == "OPENING_DIRECTED"
                        else (1e-5, 1e-4, 1e-3))
-            loads, references = choose_loads(row, temperature, targets)
-            if mechanism != "OPENING_DIRECTED":
+            if candidate in load_plan:
+                loads = [float(x) for x in load_plan[candidate]["Kmax_MPa_sqrt_m"]]
+                references = [{"Kmax_MPa_sqrt_m": K, "DeltaK_MPa_sqrt_m": 0.9 * K,
+                    "opening_action_per_cycle": phase_action(row, "cleave", K, temperature),
+                    "A0_physical_m_per_cycle": 5e-6 * phase_action(row, "cleave", K, temperature)}
+                    for K in loads]
+            else:
+                loads, references = choose_loads(row, temperature, targets)
+            if mechanism != "OPENING_DIRECTED" and candidate not in load_plan:
                 loads = list(reversed(loads))
             atomic_json(case / "opening_reference.json", {"temperature_K": temperature,
                         "renewal_reward_conversion_m_per_action": EVENT_LENGTH_M,
@@ -136,11 +151,16 @@ def main(argv: list[str] | None = None) -> int:
                                   "events": len(result["events"]),
                                   "extension_um": 1e6 * result["final_extension_m"]}), flush=True)
         atomic_json(case / "batch_case_status.json", {"candidate_id": candidate,
-                    "ordinal_in_shard": ordinal, "mode_completed": args.mode})
+                    "ordinal_in_shard": ordinal, "mode_completed": args.mode,
+                    "completion_scope": ("EXPLICIT_LOAD_PLAN_ONLY" if args.load_plan else "DEFAULT_LADDER"),
+                    "load_plan": str(args.load_plan.resolve()) if args.load_plan else None,
+                    "planned_Kmax_MPa_sqrt_m": load_plan.get(candidate, {}).get("Kmax_MPa_sqrt_m")})
     atomic_json(args.out / f"shard_{args.shard_index:02d}_status.json", {
         "shard_index": args.shard_index, "shard_count": args.shard_count,
         "assigned_candidates": [r["candidate_id"] for r in assigned],
         "status": "COMPLETE", "mode": args.mode,
+        "completion_scope": ("EXPLICIT_LOAD_PLAN_ONLY" if args.load_plan else "DEFAULT_LADDER"),
+        "load_plan": str(args.load_plan.resolve()) if args.load_plan else None,
     })
     return 0
 

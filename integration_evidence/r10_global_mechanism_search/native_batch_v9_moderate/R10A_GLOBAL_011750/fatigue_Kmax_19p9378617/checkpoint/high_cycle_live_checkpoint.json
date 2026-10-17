@@ -1,0 +1,334 @@
+{
+  "cycles_from_engine_time": 175.9431710659464,
+  "diagnostics": {
+    "active_K_shield_Pa_sqrt_m": 2.2225633232235114e-12,
+    "emission_hazard_s": 5680627.467937062,
+    "lambda_cleave_s": 327.82148503852943,
+    "mobile_count": 911.4505654082394,
+    "retained_count": 5.753065424440951e-14,
+    "sigma_back_Pa": 1161476702.4983683,
+    "sigma_tip_Pa": 7038217708.045924,
+    "tip_radius_m": 1.2771793739358182e-06
+  },
+  "engine_time_s": 0.1759431710659464,
+  "fields": [
+    {
+      "floor": 1.0,
+      "name": "mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 0,
+      "stop": 160
+    },
+    {
+      "floor": 1.0,
+      "name": "mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 160,
+      "stop": 320
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 320,
+      "stop": 480
+    },
+    {
+      "floor": 1.0,
+      "name": "retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 480,
+      "stop": 640
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 640,
+      "stop": 800
+    },
+    {
+      "floor": 1.0,
+      "name": "accumulated_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 800,
+      "stop": 960
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 960,
+      "stop": 1120
+    },
+    {
+      "floor": 1.0,
+      "name": "returned_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        80
+      ],
+      "start": 1120,
+      "stop": 1280
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1280,
+      "stop": 1600
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_mobile_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1600,
+      "stop": 1920
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 1920,
+      "stop": 2240
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_retained_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2240,
+      "stop": 2560
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_positive",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2560,
+      "stop": 2880
+    },
+    {
+      "floor": 1.0,
+      "name": "wake_slip_negative",
+      "owner": "mpz",
+      "shape": [
+        2,
+        160
+      ],
+      "start": 2880,
+      "stop": 3200
+    },
+    {
+      "floor": 1.0,
+      "name": "W_emit",
+      "owner": "engine",
+      "shape": [],
+      "start": 3200,
+      "stop": 3201
+    },
+    {
+      "floor": 1.0,
+      "name": "K_prev",
+      "owner": "engine",
+      "shape": [],
+      "start": 3201,
+      "stop": 3202
+    }
+  ],
+  "geometry_signature": [
+    21,
+    7.115403765846322e-05,
+    2.8015487089229914e-05,
+    7.115403765846322e-05,
+    2.8015487089229914e-05,
+    80,
+    160,
+    [
+      2,
+      80
+    ]
+  ],
+  "high_cycle_cache": {
+    "exact_burst_next_cycles": 8,
+    "exact_cycles_since_periodic": "inf",
+    "exact_cycles_since_projective": "inf",
+    "geometry_signature": [
+      21,
+      7.115403765846322e-05,
+      2.8015487089229914e-05,
+      7.115403765846322e-05,
+      2.8015487089229914e-05,
+      80,
+      160,
+      [
+        2,
+        80
+      ]
+    ],
+    "invalidated_reason": "first_passage_event",
+    "last_periodic_converged": false,
+    "periodic_attempts": 0,
+    "periodic_failure_count": 0,
+    "periodic_retry_cycles": 0.0,
+    "projective_attempts": 0,
+    "projective_failure_count": 0,
+    "projective_next_cycles": 96.0,
+    "projective_retry_cycles": 0.0
+  },
+  "ledgers": {
+    "engine.N_em": 911.4505654082395,
+    "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,1]": 4.057909563925932e-11,
+    "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,1]": 2.75349520961754e-10,
+    "mpz.cumulative_gross_return_activity": 0.0,
+    "mpz.cumulative_gross_source_activity": 18800.28123862384,
+    "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+    "mpz.emitted_total": 18800.281238623927,
+    "mpz.escaped_total": 3.1592861660101335e-10,
+    "mpz.signed_line_content_emitted_total": 18800.281238623927,
+    "mpz.signed_source_activations_total": 20605.108237531782
+  },
+  "metadata": {
+    "cursor": {
+      "completed_cycles": 175,
+      "phase_index": 60,
+      "remaining_phase_s": 9.953934041249113e-06
+    },
+    "model_id": "r9.archived-v3.1-current-backend-phase-exact-fatigue/1"
+  },
+  "reason": "accepted_event",
+  "schema": "v10.2.30_atomic_live_high_cycle_checkpoint_v1",
+  "stochastic": {
+    "B": 0.0,
+    "avalanche_base_checkpoint_m": 4.9999999999999996e-06,
+    "avalanche_checkpoint_synchronized": true,
+    "avalanche_event_advance_m": 2.297340095624873e-06,
+    "avalanche_event_length_factor": 0.45946801912497465,
+    "avalanche_event_length_history": [
+      2.297340095624873e-06,
+      3.7313443532873293e-06,
+      2.297340095624873e-06,
+      4.506045807342737e-06,
+      2.297340095624873e-06,
+      2.297340095624873e-06,
+      2.297340095624873e-06,
+      4.915938626037775e-06,
+      2.7217895669895513e-06,
+      2.297340095624873e-06,
+      2.297340095624873e-06,
+      4.503076861854192e-06,
+      2.297340095624873e-06,
+      8.359021155632245e-06,
+      2.297340095624873e-06,
+      2.297340095624873e-06,
+      2.297340095624873e-06,
+      2.297340095624873e-06,
+      6.430772108821407e-06,
+      6.12062793537464e-06,
+      2.297340095624873e-06
+    ],
+    "avalanche_last_completed_advance_m": 2.297340095624873e-06,
+    "avalanche_last_completed_factor": 0.45946801912497465,
+    "hazard_action_current": 0.0,
+    "hazard_event_index": 21,
+    "hazard_threshold_action": 0.41329432675188715,
+    "hazard_threshold_history": [
+      0.27446523096972375,
+      0.812100994622742,
+      0.052363808577167076,
+      0.9807093464141842,
+      0.34425887810081496,
+      0.1742588614843916,
+      0.030306075702418472,
+      1.0699196508605417,
+      0.5923784580639613,
+      0.307125256767385,
+      0.11416554185916644,
+      0.9800631761988559,
+      0.08256317215341248,
+      1.8192824761887516,
+      0.3841406032873622,
+      0.19224497427865048,
+      0.08874474711723201,
+      0.004547968247385817,
+      1.3996125608629677,
+      1.3321118512298107,
+      0.22886564201737175
+    ],
+    "rng_state": {
+      "bit_generator": "PCG64",
+      "has_uint32": 0,
+      "state": {
+        "inc": 328686143345248677279479006077180494783,
+        "state": 202160948376783347261882621508054676090
+      },
+      "uinteger": 0
+    }
+  },
+  "temperature_K": 600.0,
+  "timestamp_unix_s": 1792199879.4610171
+}

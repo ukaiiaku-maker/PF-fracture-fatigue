@@ -1,0 +1,32 @@
+{
+  "candidate_count": 3,
+  "family": "A_ORIGINAL_SINGLE_EXP_FLOOR",
+  "files": {
+    "descriptors.csv": {
+      "bytes": 2856,
+      "sha256": "b46d670575df9dffb7d5ce4c46768a44979f632380011a27e37f56bb1990e09c"
+    },
+    "load_plan.json": {
+      "bytes": 1027,
+      "sha256": "af654762416da166bf034117f2742f99c0b81c8238064ecbb4df9911219ceeb9"
+    },
+    "registry.csv": {
+      "bytes": 11588,
+      "sha256": "b589e5913f41c56f9a8e7edc4cb0ea8feddbd79960ea1b9e699f3505acd5516c"
+    }
+  },
+  "schema": "r10.moderate-window-acquisition/1",
+  "selection_invariants": {
+    "endpoint_slope_range": [
+      3.4,
+      4.6
+    ],
+    "maximum_upper_A0_rate_m_per_cycle": 2e-05,
+    "minimum_K_ratio": 2.72134,
+    "minimum_lower_A0_rate_m_per_cycle": 1e-10,
+    "minimum_rate_decades": 2.0,
+    "no_A0_mechanism_gate": true,
+    "thermal_labels_are_proxies": true
+  },
+  "status": "PREPARED_FOR_NATIVE_EXECUTION"
+}

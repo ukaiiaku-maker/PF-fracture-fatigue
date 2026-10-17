@@ -1,0 +1,42 @@
+{
+  "schema": "r10.moderate-window-restart/1",
+  "base_head": "d36baf6f",
+  "live_writer": false,
+  "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "common_arguments": {
+    "registry": "integration_evidence/r10_global_mechanism_search/moderate_window_batch/registry.csv",
+    "descriptors": "integration_evidence/r10_global_mechanism_search/moderate_window_batch/descriptors.csv",
+    "out": "integration_evidence/r10_global_mechanism_search/native_batch_v9_moderate",
+    "maximum_cycles": 1000000
+  },
+  "paths": [
+    {
+      "candidate_id": "R10A_GLOBAL_011750",
+      "Kmax_MPa_sqrt_m": 11.041885430050556,
+      "status": "RESOURCE_BOUNDED_RESTARTABLE_ACCEPTED_EVENT_CHECKPOINT",
+      "checkpoint_cycles": 592.0401394802242,
+      "checkpoint_events": 5,
+      "checkpoint_extension_um": 15.129410447504686,
+      "load_plan": "integration_evidence/r10_global_mechanism_search/moderate_window_batch/load_plan_mixed_middle.json",
+      "priority": 1
+    },
+    {
+      "candidate_id": "R10A_GLOBAL_011750",
+      "Kmax_MPa_sqrt_m": 6.115160984474933,
+      "status": "RESOURCE_BOUNDED_RESTARTABLE_ACCEPTED_EVENT_CHECKPOINT",
+      "checkpoint_cycles": 205.54558350005897,
+      "checkpoint_events": 1,
+      "checkpoint_extension_um": 2.297340095624873,
+      "load_plan": "integration_evidence/r10_global_mechanism_search/moderate_window_batch/load_plan.json",
+      "priority": 2
+    },
+    {
+      "candidate_id": "R10A_GLOBAL_014670",
+      "status": "THREE_FATIGUE_POINTS_QUEUED_NOT_STARTED",
+      "load_plan": "integration_evidence/r10_global_mechanism_search/moderate_window_batch/load_plan.json",
+      "priority": 3
+    }
+  ],
+  "restart_template": "{python} scripts/run_r10_mechanism_native_batch.py --registry {registry} --descriptors {descriptors} --load-plan {load_plan} --out {out} --mode fatigue --maximum-cycles 1000000 --candidate-id {candidate_id}",
+  "rate_guard": "Do not use a checkpoint/startup secant as a developed rate; require the unchanged first-event-at-or-above-20-um through first-event-at-or-above-60-um window."
+}

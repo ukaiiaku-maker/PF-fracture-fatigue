@@ -16,11 +16,21 @@ Three Peak-T Family-A rows give the first mechanism-balanced native block. All f
 
 | Acquisition lane | Candidate | Same-row fracture | Native fatigue result |
 |---|---|---|---|
-| opening-directed | `R10A_GLOBAL_018756` | complete at 300 K, `K_init=6.32162` | three developed points; `C_rate=0.889--0.895`; maximum `abs(Delta_m_state)=0.0627`, opening dominated at the frozen operational resolution |
-| mixed-directed | `R10A_GLOBAL_119268` | complete at 300/600 K, `K_init=6.15555/8.54532` | primary stream has two developed high-load points; full slope `70.8435` versus A0 slope `20.7329`, `C_rate=0.0165--4.663`; independent stream produces one developed high point and two maximum-cycle censors, so final mechanism label is withheld |
-| plasticity-directed | `R10A_GLOBAL_064416` | complete at 300/900 K, `K_init=16.1609/34.7145` | zero events at all three loads through `10^6` cycles although A0 predicts `10^-5--10^-3 m/cycle`; the largest 95% zero-count `C_rate` upper bound is `1.50e-6`; this is a state-controlled no-growth censor, not a developed rate |
+| opening-directed | `R10A_GLOBAL_018756` | complete at 300 K, `K_init=6.32162` | three developed points; absolute full slopes `55.1069/50.9618` versus A0 `55.0928/50.8992`; opening dominated but far too steep to be a moderate Paris window |
+| mixed-directed | `R10A_GLOBAL_119268` | complete at 300/600 K, `K_init=6.15555/8.54532` | primary stream has two nominal developed points; full slope `70.8435` versus stationary A0 `20.7329`, but the upper 20--60 um interval is only `0.00893` cycles and is therefore a finite-window burst, not stationary fatigue |
+| plasticity-directed | `R10A_GLOBAL_064416` | complete at 300/900 K, `K_init=16.1609/34.7145` | zero events at all three loads through `10^6` cycles. The prior `1.50e-11 m/cycle` upper rate is only a homogeneous-Poisson, nominal-5-um-reward surrogate; it is not model-free suppression or asymptotic arrest |
 
-The practical thresholds were frozen before these runs: `abs(Delta_m)>=0.5` for mixed-slope priority, `>=1` for strong state/slope priority, and rate factor `>=1.5`. A 2% difference does not qualify. Acquisition strata are not promoted to final mechanism labels. The mixed row still needs a third independent stream plus frozen-feedback and normalized barrier-block sensitivities; the plasticity row is retained as a joint-reachable no-growth boundary case.
+The practical thresholds were frozen before these runs: `abs(Delta_m)>=0.5` for mixed-slope priority, `>=1` for strong state/slope priority, and rate factor `>=1.5`. A 2% difference does not qualify. Acquisition strata are not promoted to final mechanism labels. The like-for-like endpoint, phase, reversal, state-drift, finite-window A0, and censor audit is in `balanced_information_batch/window_observables.csv` and `zero_event_censors.csv`.
+
+## Broad moderate-window continuation
+
+The retained 4,096-row analytical allocation was rescored for endpoint slope `3.4--4.6`, at least two rate decades, load ratio at least `2.72134`, and an upper A0 rate low enough to require recurrent cycling. No source, event, barrier, entropy, or mechanics field was changed. The first three-row mechanism-balanced native batch is under `moderate_window_batch/` and `native_batch_v9_moderate/`.
+
+`R10A_GLOBAL_002081` is the first complete positive moderate result. Its three developed 20--60 um rates are `4.23642e-8`, `1.13950e-7`, and `4.27959e-6 m/cycle` at `DeltaK=1.75703`, `3.14097`, and `5.61500 MPa sqrt(m)`. The endpoint load ratio is `3.19574`, the rate width is `2.00440` decades, and the full endpoint slope is `3.97249`; the common-mark/reward phase-resolved A0 slope is also `3.97249` and the stationary A0 slope is `3.99801`. The shortest developed window is `8.9018` cycles, so all three are recurrent rather than within-excursion bursts. Full-state drift is numerically negligible, making this an opening-dominated candidate, not a mixed-mechanism claim.
+
+The mixed row `R10A_GLOBAL_011750` has one completed recurrent developed point at `DeltaK=17.9441`, rate `4.13531e-7 m/cycle`, and `DeltaN=92.1238`; its finite-window A0 rate is `9.61515e-7`, giving full/A0 `0.43008`. Its low and middle paths are preserved at accepted-event checkpoints (one event/205.546 cycles and five events/592.040 cycles) and are not used as rates. The plasticity-directed row completed its 900 K fracture screen, has a 300 K fracture censor, and its three fatigue points remain queued. These are explicit resource-bounded dispositions, not inferred failures.
+
+The execution audit corrects scope language: 48 rows were allocated, not all evaluated, and the 4,096 rows are descriptor allocations rather than state-aware reductions. Exact ledgers and the class-by-mechanism execution matrix are under `information_scope_audit/`.
 
 ## Preserved stopped paths
 

@@ -1,0 +1,9 @@
+{
+  "endpoint_rule": "first event at or above 20 um through first event at or above 60 um",
+  "finite_reference": "same material, initial opening state, retained midpoint waveform, marks, rewards, and endpoints; event times independently advanced on A0 opening clock",
+  "row_count": 11,
+  "schema": "r10.like-for-like-window-audit/1",
+  "stationary_reference": "long-time phase-integrated A0 renewal-reward rate",
+  "zero_event_bound_scope": "homogeneous-Poisson nominal-reward surrogate only",
+  "zero_event_count": 4
+}
