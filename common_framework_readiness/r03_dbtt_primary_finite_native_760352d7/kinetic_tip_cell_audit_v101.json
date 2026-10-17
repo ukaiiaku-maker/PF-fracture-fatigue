@@ -1,0 +1,57 @@
+{
+  "schema": "v10.1_kinetic_moving_tip_cell",
+  "config": {
+    "enabled": true,
+    "plasticity_enabled": true,
+    "active_shielding": true,
+    "signed_active_shielding": true,
+    "mobile_shield_fraction": 1.0,
+    "packet_length_m": 2.5e-10,
+    "velocity_scale": 1.0,
+    "max_action_substep": 0.02,
+    "max_translation_substep_m": 1e-07,
+    "min_substep_s": 1e-15,
+    "max_internal_steps": 20000,
+    "coupling_scheme": "strang"
+  },
+  "records": [
+    {
+      "engine_id": 1,
+      "material_class": "dbtt_primary_taylor_0p10eV_qualification",
+      "time_s": 0.01,
+      "K_Pa_sqrt_m": 289742.46458719193,
+      "sigma_tip_Pa": 115590519.55154392,
+      "lambda_c_s-1": 5.696529148763717e-98,
+      "crack_velocity_m_s": 2.848264574381859e-103,
+      "micro_advance_step_m": 2.848264574381859e-105,
+      "micro_advance_total_m": 2.848264574381859e-105,
+      "checkpoint_progress_action": 5.696529148763717e-100,
+      "checkpoint_committed_total_m": 0.0,
+      "active_mobile": 0.0,
+      "active_retained": 7.42287600514896e-15,
+      "active_K_shield_signed_Pa_sqrt_m": 2.698635702824394e-10,
+      "wake_K_shield_signed_Pa_sqrt_m": 0.0,
+      "fired": false,
+      "microsteps": 1
+    },
+    {
+      "engine_id": 1,
+      "material_class": "dbtt_primary_taylor_0p10eV_qualification",
+      "time_s": 0.02,
+      "K_Pa_sqrt_m": 579484.9291743833,
+      "sigma_tip_Pa": 231181039.10307863,
+      "lambda_c_s-1": 6.079672860471149e-98,
+      "crack_velocity_m_s": 3.0398364302355743e-103,
+      "micro_advance_step_m": 3.0398364302355746e-105,
+      "micro_advance_total_m": 5.888101004617434e-105,
+      "checkpoint_progress_action": 1.1776202009234865e-99,
+      "checkpoint_committed_total_m": 0.0,
+      "active_mobile": 0.0,
+      "active_retained": 6.440541283064213e-14,
+      "active_K_shield_signed_Pa_sqrt_m": 2.343922343301737e-09,
+      "wake_K_shield_signed_Pa_sqrt_m": 0.0,
+      "fired": false,
+      "microsteps": 1
+    }
+  ]
+}

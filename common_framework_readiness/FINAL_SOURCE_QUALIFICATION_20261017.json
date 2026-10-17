@@ -1,0 +1,90 @@
+{
+  "schema": "fracture-framework-final-source-qualification/3",
+  "date": "2026-10-17",
+  "overall_status": "LOCAL_IMPLEMENTATION_AND_COMPACT_ACCEPTANCE_PASS_EXTERNAL_AND_RESOURCE_DEPENDENCIES_INCOMPLETE",
+  "source_pair": {
+    "pf_binding_commit": "760352d7cb1bcf556c7709e907c1b47fc9a8ac6d",
+    "fem_calculation_commit": "242f01fd1a400ac86ad13e6c79407b55f8798607",
+    "fem_evidence_commit": "28c5cef87ef4e499889d6a479d5f79d36193e5d9"
+  },
+  "fem": {
+    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
+    "result": "PASS",
+    "passed": 767,
+    "skipped": 2,
+    "passing_subtests": 16,
+    "duration_s": 205.97,
+    "r05_evidence": "fem-czm-current-pf-companion@28c5cef:integration_evidence/r05_event_state_repair_242f01f/qualification_report.json"
+  },
+  "pf": {
+    "portable_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q -m 'not external_evidence'",
+    "portable_result": "PASS",
+    "passed": 1010,
+    "deselected_external_evidence": 16,
+    "duration_s": 150.46,
+    "binding_campaign_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_shared_execution.py tests/test_prospective_campaign_v3.py tests/test_campaign_v3_acceptance_audit.py tests/test_release_campaign_entrypoint.py tests/test_current_registry_v5_binding.py tests/test_common_framework_release_tools.py",
+    "binding_campaign_result": "40 passed in 3.41 s",
+    "campaign_case_count": 699,
+    "campaign_validation_errors": 0,
+    "campaign_canonical_semantic_sha256": "ff573b7f7aedf6ad609d59d8747c96c43489fdca9996da5b7bf3bd5c5ffbdf21",
+    "production_execution_authorized": false
+  },
+  "r05_acceptance": {
+    "continuous_ramp_event_load_time_correspondence": "PASS",
+    "fresh_process_ramp_remainder_continuation": "PASS",
+    "authoritative_bounded_damage_in_residual_tangent_traction_energy": "PASS",
+    "positive_irreversible_cohesive_dissipation": "PASS",
+    "actual_source_to_opening_feedback": "PASS",
+    "autonomous_no_opening_hazard": "PASS",
+    "active_state_restart": "PASS",
+    "post_event_geometry_restart": "PASS",
+    "case_level_three_grid": "RESOURCE_BLOCKED_UNEXECUTED"
+  },
+  "r03_dbtt_lifecycle_acceptance": {
+    "persistent_selected_candidate_native_consumers": "PASS_REUSED",
+    "older_dbtt_primary_finite_inventory_public_execution": "PASS",
+    "finite_inventory_forced_and_runtime_verified": true,
+    "fresh_process": true,
+    "temperature_K": 1200,
+    "steps": 2,
+    "material_manifest_sha256": "887c329efe6af3ccc058cdc2c2fbed12d8faed1c1d0f9ecbd706bfb3c0395e98",
+    "evidence": "common_framework_readiness/r03_dbtt_primary_finite_native_760352d7/shared_runtime_attestation.post.json",
+    "production_selection": null,
+    "physical_calibration_claimed": false
+  },
+  "resource_admission": {
+    "measured_system_memory_GiB": 36.0,
+    "measured_system_memory_free_percent": 46,
+    "derived_memory_available_GiB": 16.6,
+    "measured_data_volume_free_GiB": 21,
+    "r05_grid_and_r07_peak_estimate_GiB": 6,
+    "r09_peak_estimate_GiB": 24,
+    "required_reserve_GiB": 12,
+    "r05_grid_admitted": false,
+    "r07_admitted": false,
+    "r09_admitted": false,
+    "peak_estimates_are_measured": false
+  },
+  "external_evidence": {
+    "portable_profile": "COMPLETE",
+    "verified_directory_records": 11,
+    "full_profile": "INCOMPLETE",
+    "missing_mandatory_archives": [
+      "f0e57d81f8cd94dfe10a2fc0b0c458ce9cfdf5d16063aa1e578200dbc36ef63c",
+      "0195e5e2c04e65b550fac9a96c0791aba5ca218f7d738ec0a3f037e3b08fae1e"
+    ]
+  },
+  "remaining_external_or_resource_dependencies": [
+    "R05 representative three-level case grid execution window with at least the estimated 6 GiB peak plus 12 GiB reserve",
+    "R07 accepted mixed/constraint EXP-floor event continuation with the same resource admission",
+    "R09 recursive second-generation continuation with the estimated 24 GiB peak plus 12 GiB reserve and adequate transient disk",
+    "the two mandatory independent archive bytes",
+    "production cohesive support and final material selection"
+  ],
+  "scope_controls": {
+    "production_executed": false,
+    "manuscript_modified": false,
+    "remote_write_performed": false,
+    "scientific_data_deleted": false
+  }
+}
