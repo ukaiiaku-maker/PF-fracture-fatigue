@@ -39,19 +39,34 @@ def main(argv=None):
                 'traction_Pa':float(traction_Pa(x*thermal.delta0_m,thermal,T)),'traction_over_peak':stress_ratio,
                 'barrier_eV_at_same_traction_ratio':b['barrier_eV'],'activation_volume_m3':b['activation_volume_m3']})
     write(a.out/'cohesive_law_source.csv',law)
+    barrier=[]
+    for T in (300.,750.,1200.):
+        for s in np.concatenate(([1e-8],np.linspace(.002,.998,250),[1.-1e-8])):
+            b=traction_barrier(float(s)*thermal.t_hat(T),thermal,T,c['activation_area_m2'])
+            barrier.append({'temperature_K':T,'traction_over_peak':float(s),
+                'barrier_eV':b['barrier_eV'],'activation_volume_m3':b['activation_volume_m3'],
+                'state':b['state']})
+    write(a.out/'cohesive_barrier_source.csv',barrier)
     fracture=[]
     for path in sorted((a.run_root/'fracture').glob('T_*K.json')):
         x=json.loads(path.read_text());fracture.append({'temperature_K':x['temperature_K'],'status':x['status'],
             'K_init_MPa_sqrt_m':x['K_init_MPa_sqrt_m'],'K_final_event_MPa_sqrt_m':x['K_final_event_MPa_sqrt_m'],
             'event_count':x['event_count'],'extension_um':x['final_extension_um']})
     if fracture:write(a.out/'thermal_fracture_source.csv',fracture)
-    fatigue=[]
+    fatigue=[];history=[]
     summaries=[];observed={}
     for root in [a.run_root,*a.additional_run_root]:
         summary_path=root/'fatigue/campaign_summary.json'
         if summary_path.exists():summaries.append(json.loads(summary_path.read_text()))
         for result_path in (root/'fatigue').glob('Kmax_*/result.json'):
             result=json.loads(result_path.read_text());events=result['events']
+            for event in events:
+                history.append({'Kmax_MPa_sqrt_m':result['Kmax_MPa_sqrt_m'],
+                    'event_index':event['event_index'],'cycles':event['cycles'],
+                    'extension_m':event['extension_m'],'event_advance_m':event['event_advance_m'],
+                    'continuous_mpz_progress_m':event['continuous_mpz_progress_m'],
+                    'mobile_count':event['mobile_count'],'retained_count':event['retained_count'],
+                    'tip_radius_m':event['tip_radius_m']})
             left=next((e for e in events if e['extension_m']>=20e-6),None)
             right=next((e for e in events if e['extension_m']>=60e-6),None)
             window=None if left is None or right is None else {
@@ -76,6 +91,9 @@ def main(argv=None):
         for i,row in enumerate(developed):
             row['adjacent_slope_from_previous']=None if i==0 else math.log(row['developed_rate_m_per_cycle']/developed[i-1]['developed_rate_m_per_cycle'])/math.log(row['DeltaK_MPa_sqrt_m']/developed[i-1]['DeltaK_MPa_sqrt_m'])
         write(a.out/'developed_fatigue_source.csv',fatigue)
+    if history:
+        history.sort(key=lambda r:(r['Kmax_MPa_sqrt_m'],r['event_index']))
+        write(a.out/'representative_event_history_source.csv',history)
     try:
         import matplotlib.pyplot as plt
         fig,ax=plt.subplots(figsize=(4.5,3.4))
@@ -83,6 +101,16 @@ def main(argv=None):
             subset=[r for r in law if r['temperature_K']==T]
             ax.plot([r['separation_over_delta0'] for r in subset],[r['traction_Pa']/1e9 for r in subset],label=f'{int(T)} K')
         ax.set_xlabel(r'$\delta/\delta_0$');ax.set_ylabel('Traction (GPa)');ax.legend(frameon=False);fig.tight_layout();fig.savefig(a.out/'cohesive_traction.png',dpi=180);plt.close(fig)
+        fig,ax=plt.subplots(figsize=(4.5,3.4))
+        for T in (300.,750.,1200.):
+            subset=[r for r in barrier if r['temperature_K']==T]
+            ax.semilogy([r['traction_over_peak'] for r in subset],[max(r['barrier_eV'],1e-15) for r in subset],label=f'{int(T)} K')
+        ax.set_xlabel(r'$\sigma_n/\hat{t}$');ax.set_ylabel('Activation barrier (eV)');ax.legend(frameon=False);fig.tight_layout();fig.savefig(a.out/'cohesive_barrier.png',dpi=180);plt.close(fig)
+        fig,ax=plt.subplots(figsize=(4.5,3.4))
+        for T in (300.,750.,1200.):
+            subset=[r for r in barrier if r['temperature_K']==T]
+            ax.semilogy([r['traction_over_peak'] for r in subset],[r['activation_volume_m3'] for r in subset],label=f'{int(T)} K')
+        ax.set_xlabel(r'$\sigma_n/\hat{t}$');ax.set_ylabel(r'Activation volume (m$^3$)');ax.legend(frameon=False);fig.tight_layout();fig.savefig(a.out/'cohesive_activation_volume.png',dpi=180);plt.close(fig)
         if fracture:
             fig,ax=plt.subplots(figsize=(4.5,3.4));ax.plot([r['temperature_K'] for r in fracture],[r['K_init_MPa_sqrt_m'] for r in fracture],'o-')
             ax.set_xlabel('Temperature (K)');ax.set_ylabel(r'Initiation $K$ (MPa $\sqrt{m}$)');fig.tight_layout();fig.savefig(a.out/'thermal_fracture.png',dpi=180);plt.close(fig)
@@ -90,6 +118,13 @@ def main(argv=None):
         if developed:
             fig,ax=plt.subplots(figsize=(4.5,3.4));ax.loglog([r['DeltaK_MPa_sqrt_m'] for r in developed],[r['developed_rate_m_per_cycle'] for r in developed],'o-')
             ax.set_xlabel(r'$\Delta K$ (MPa $\sqrt{m}$)');ax.set_ylabel(r'$da/dN$ (m cycle$^{-1}$)');fig.tight_layout();fig.savefig(a.out/'developed_fatigue.png',dpi=180);plt.close(fig)
+        if history:
+            fig,ax=plt.subplots(figsize=(4.5,3.4))
+            loads=sorted({r['Kmax_MPa_sqrt_m'] for r in history})
+            for K in loads:
+                subset=[r for r in history if r['Kmax_MPa_sqrt_m']==K]
+                ax.plot([r['cycles'] for r in subset],[1e6*r['extension_m'] for r in subset],label=f'{K:.3f}')
+            ax.set_xlabel('Cycles');ax.set_ylabel(r'Committed extension ($\mu$m)');ax.legend(frameon=False,title=r'$K_{max}$');fig.tight_layout();fig.savefig(a.out/'representative_event_history.png',dpi=180);plt.close(fig)
     except Exception as exc:(a.out/'plot_failure.json').write_text(json.dumps({'error':repr(exc)},indent=2)+'\n')
     developed=[r for r in fatigue if r.get('developed_rate_m_per_cycle') is not None]
     developed.sort(key=lambda r:r['DeltaK_MPa_sqrt_m'])
