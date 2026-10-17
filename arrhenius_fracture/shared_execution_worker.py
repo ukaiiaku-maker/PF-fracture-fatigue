@@ -130,6 +130,7 @@ def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict
             "distributed_source_representation": "native_finite_tip_sites",
             "finite_distributed_source_inventory": True,
             "source_sites_per_system_role": "depletable_capacity_with_native_advance_refresh",
+            "transport_consumer": "UnifiedMPZState.evolve_split_native",
         }
         mismatches = {
             key: {"expected": expected, "observed": payload.get(key)}
@@ -141,11 +142,22 @@ def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict
                 "executed finite source lifecycle does not match the request: "
                 + json.dumps(mismatches, sort_keys=True)
             )
+        counts = payload.get("transport_call_counts", {})
+        required_calls = (
+            "UnifiedMPZState.evolve", "UnifiedMPZState._transport_rates",
+            "UnifiedMPZState._exchange", "UnifiedMPZState._advect_forward",
+        )
+        if any(int(counts.get(name, 0)) <= 0 for name in required_calls):
+            raise RuntimeError(
+                "finite source lifecycle did not execute its declared split "
+                "transport consumer: " + json.dumps(counts, sort_keys=True)
+            )
         return {
             "schema": "shared-executed-finite-inventory-binding/1",
             "all_expected_bindings_match": True,
             "model_audit": str(path),
             **required,
+            "transport_call_counts": counts,
         }
     if options.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE:
         return None

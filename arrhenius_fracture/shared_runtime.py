@@ -216,6 +216,9 @@ def resolve_runtime(options: SharedOptions) -> RuntimeReceipt:
         TransportStrategy.CHANNEL_RESOLVED: ProviderBinding(
             "transport", "arrhenius_fracture.signed_burgers_shared_v1025",
             "channel_resolved_peierls_taylor", "_signed_evolve_channel"),
+        TransportStrategy.LEGACY_SPLIT_NATIVE: ProviderBinding(
+            "transport", "arrhenius_fracture.unified_mpz",
+            "historical_split_evolve_exchange_advection", "UnifiedMPZState"),
     }[options.transport]
     providers.append(transport)
     if options.plasticity is not PlasticityMode.TIP_PROCESS_ONLY:

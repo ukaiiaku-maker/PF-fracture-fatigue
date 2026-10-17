@@ -33,10 +33,12 @@ def test_source_geography_and_lifecycle_are_independent_axes():
     finite_tip = SharedOptions(
         source_location=SourceLocation.TIP_SURFACE,
         source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        transport=TransportStrategy.LEGACY_SPLIT_NATIVE,
     )
     finite_bulk = SharedOptions(
         source_location=SourceLocation.BULK_UNIFORM,
         source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        transport=TransportStrategy.LEGACY_SPLIT_NATIVE,
         plasticity=PlasticityMode.FULL_FIELD_EVOLVING_RHO,
     )
     assert len({item.fingerprint for item in (persistent_tip, finite_tip, finite_bulk)}) == 3
@@ -109,6 +111,7 @@ def test_bulk_does_not_replace_explicit_cyclic_loading_controller():
         loading=LoadingMode.EXPLICIT_CYCLIC,
         source_location=SourceLocation.BULK_UNIFORM,
         source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        transport=TransportStrategy.LEGACY_SPLIT_NATIVE,
         plasticity=PlasticityMode.FULL_FIELD_EVOLVING_RHO,
         kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
     )
@@ -121,6 +124,13 @@ def test_bulk_does_not_replace_explicit_cyclic_loading_controller():
 def test_unknown_option_fields_are_rejected():
     with pytest.raises(ValueError, match="unknown"):
         SharedOptions.from_dict({"loading": LoadingMode.MONOTONIC.value, "surprise": 1})
+
+
+def test_finite_inventory_rejects_uninstalled_joint_transport():
+    with pytest.raises(ValueError, match="finite_inventory requires legacy_split_native"):
+        SharedOptions(source_lifecycle=SourceLifecycle.FINITE_INVENTORY)
+    with pytest.raises(ValueError, match="restricted to the explicit finite_inventory"):
+        SharedOptions(transport=TransportStrategy.LEGACY_SPLIT_NATIVE)
 
 
 @pytest.mark.parametrize("seed", [True, False, 1.0, "1"])

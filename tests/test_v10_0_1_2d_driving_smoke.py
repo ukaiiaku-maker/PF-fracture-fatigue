@@ -51,3 +51,24 @@ def test_tip_only_root_signed_keeps_2d_drive_nonzero(tmp_path, capsys):
     assert modes["bulk_plasticity_mode"] == "tip_only"
     assert modes["directional_j_mode"] == "root_signed"
     assert modes["legacy_full_field_enabled"] is False
+
+
+def test_finite_site_mode_attests_executed_split_transport(tmp_path):
+    out = tmp_path / "finite"
+    sharp_front_v10_1.main([
+        "--mode", "2d", "--material-class", "ceramic",
+        "--tip-source-model", "finite_sites", "--temperatures", "700",
+        "--steps", "1", "--nx", "12", "--ny", "20", "--dU", "2e-6",
+        "--dt", "0.01", "--n-stagger", "1", "--tip-h-fine", "2e-6",
+        "--tip-ratio", "1.2", "--da-phys", "5e-6",
+        "--target-crack-extension-um", "10", "--mpz-length-um", "20",
+        "--mpz-n-bins", "40", "--wake-length-um", "20",
+        "--wake-n-bins", "0", "--crystal-aniso", "--crystal-compete",
+        "--crystal-theta-deg", "45", "--crystal-material", "w",
+        "--j-decomposition", "cluster", "--max-fronts", "1",
+        "--save-snapshots", "0", "--no-plots", "--out", str(out),
+    ])
+    modes = json.loads((out / "v10_1_driver_modes.json").read_text())
+    assert modes["transport_consumer"] == "UnifiedMPZState.evolve_split_native"
+    assert modes["finite_distributed_source_inventory"] is True
+    assert all(value > 0 for value in modes["transport_call_counts"].values())

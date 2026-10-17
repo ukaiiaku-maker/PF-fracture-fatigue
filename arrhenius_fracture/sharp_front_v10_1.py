@@ -194,6 +194,7 @@ def _diagnostics_with_csv_aliases(self, G: float, nu: float, b: float, r0: float
 def _write_mode_audit(
     args: list[str], bulk_mode: str, j_mode: str, kinetics_mode: str,
     cfg: KineticTipConfig, source_model: str, engine_cls,
+    transport_call_counts: dict[str, int],
 ) -> None:
     out = _option_value(args, "--out")
     if not out:
@@ -228,6 +229,12 @@ def _write_mode_audit(
             if source_model == "continuum"
             else "depletable_capacity_with_native_advance_refresh"
         ),
+        "transport_consumer": (
+            "UnifiedMPZState.evolve_split_native"
+            if source_model == "finite_sites" else
+            "ContinuumSourceKineticTipEngine.native_continuum"
+        ),
+        "transport_call_counts": dict(transport_call_counts),
         "tip_plasticity_enabled": cfg.plasticity_enabled,
         "active_shielding_enabled": cfg.active_shielding,
         "signed_active_shielding": cfg.signed_active_shielding,
@@ -281,6 +288,24 @@ def main(argv=None):
     original_engine = sharp_front.UnifiedMPZFrontEngine
     had_shield_cfg = hasattr(UnifiedMPZState, "_v101_shield_cfg")
     old_shield_cfg = getattr(UnifiedMPZState, "_v101_shield_cfg", None)
+    transport_call_counts = {
+        f"UnifiedMPZState.{name}": 0
+        for name in ("evolve", "_transport_rates", "_exchange", "_advect_forward")
+    }
+    traced_descriptors = {}
+    if source_model == "finite_sites":
+        for name in ("evolve", "_transport_rates", "_exchange", "_advect_forward"):
+            descriptor = UnifiedMPZState.__dict__[name]
+            original = getattr(UnifiedMPZState, name)
+            key = f"UnifiedMPZState.{name}"
+            traced_descriptors[name] = descriptor
+            def traced(*values, __original=original, __key=key, **keywords):
+                transport_call_counts[__key] += 1
+                return __original(*values, **keywords)
+            setattr(
+                UnifiedMPZState, name,
+                staticmethod(traced) if isinstance(descriptor, staticmethod) else traced,
+            )
     try:
         plasticity.update_plasticity = _tip_only_update_plasticity
         UnifiedMPZState.diagnostics = _diagnostics_with_csv_aliases
@@ -301,13 +326,16 @@ def main(argv=None):
         )
         result = sharp_front.main(args)
         _write_mode_audit(
-            args, bulk_mode, j_mode, kinetics_mode, tip_cfg, source_model, engine_cls
+            args, bulk_mode, j_mode, kinetics_mode, tip_cfg, source_model,
+            engine_cls, transport_call_counts,
         )
         return result
     finally:
         plasticity.update_plasticity = original_update
         UnifiedMPZState.diagnostics = original_diag
         UnifiedMPZState.advance = original_advance
+        for name, descriptor in traced_descriptors.items():
+            setattr(UnifiedMPZState, name, descriptor)
         sharp_front.UnifiedMPZFrontEngine = original_engine
         if had_shield_cfg:
             UnifiedMPZState._v101_shield_cfg = old_shield_cfg

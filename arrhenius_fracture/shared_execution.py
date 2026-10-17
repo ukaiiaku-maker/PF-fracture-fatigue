@@ -266,6 +266,10 @@ def build_execution_plan(options: SharedOptions) -> ExecutionPlan:
             "arrhenius_fracture.signed_burgers_shared_v1025", "_signed_evolve_channel",
             "per-slip-system Peierls/Taylor transport operator",
         ),
+        TransportStrategy.LEGACY_SPLIT_NATIVE: (
+            "arrhenius_fracture.unified_mpz", "UnifiedMPZState",
+            "historical split evolve/transport/exchange/advection consumer",
+        ),
     }
     bindings.append(_binding("transport", options.transport, *transport_map[options.transport]))
     bindings.append(_binding(
@@ -473,8 +477,9 @@ def execute_shared(
         "PYTHONDONTWRITEBYTECODE": "1",
         "GIT_OPTIONAL_LOCKS": "0",
         "CLEAVAGE_HAZARD_SEED": str(options.random_seed),
-        "ANISOTROPIC_TRANSPORT_MODE": options.transport.value,
     })
+    if options.transport is not TransportStrategy.LEGACY_SPLIT_NATIVE:
+        environment["ANISOTROPIC_TRANSPORT_MODE"] = options.transport.value
     pythonpath = environment.get("PYTHONPATH", "")
     environment["PYTHONPATH"] = str(root) + (os.pathsep + pythonpath if pythonpath else "")
     if (options.output is OutputProfile.PUBLICATION_RESTART

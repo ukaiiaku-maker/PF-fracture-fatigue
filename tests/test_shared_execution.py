@@ -29,6 +29,7 @@ def test_loading_role_is_not_discarded_by_bulk_scheduler_selection():
         loading=LoadingMode.EXPLICIT_CYCLIC,
         source_location=SourceLocation.BULK_UNIFORM,
         source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        transport=TransportStrategy.LEGACY_SPLIT_NATIVE,
         plasticity=PlasticityMode.FULL_FIELD_EVOLVING_RHO,
         kinetics=KineticsStrategy.REVERSIBLE_SIGNED,
     )
@@ -119,7 +120,10 @@ def test_history_reset_maps_to_persisted_reequilibrium_adapter():
 
 
 def test_finite_inventory_maps_to_native_finite_site_driver():
-    options = SharedOptions(source_lifecycle=SourceLifecycle.FINITE_INVENTORY)
+    options = SharedOptions(
+        source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        transport=TransportStrategy.LEGACY_SPLIT_NATIVE,
+    )
     plan = build_execution_plan(options)
     assert plan.executable
     assert plan.executor_module == "arrhenius_fracture.sharp_front_v10_1"
@@ -135,6 +139,7 @@ def test_finite_inventory_public_worker_forces_and_verifies_native_consumer(
     manifest.write_text("fixture\n")
     options = SharedOptions(
         source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        transport=TransportStrategy.LEGACY_SPLIT_NATIVE,
         material_manifest=str(manifest),
     )
     captured = {}
@@ -147,6 +152,13 @@ def test_finite_inventory_public_worker_forces_and_verifies_native_consumer(
             "distributed_source_representation": "native_finite_tip_sites",
             "finite_distributed_source_inventory": True,
             "source_sites_per_system_role": "depletable_capacity_with_native_advance_refresh",
+            "transport_consumer": "UnifiedMPZState.evolve_split_native",
+            "transport_call_counts": {
+                "UnifiedMPZState.evolve": 2,
+                "UnifiedMPZState._transport_rates": 4,
+                "UnifiedMPZState._exchange": 4,
+                "UnifiedMPZState._advect_forward": 10,
+            },
         }))
 
     monkeypatch.setattr(worker, "_attest_source", lambda *args: {
@@ -179,7 +191,10 @@ def test_finite_inventory_public_worker_rejects_disconnected_native_consumer(
 ):
     from arrhenius_fracture import shared_execution_worker as worker
 
-    options = SharedOptions(source_lifecycle=SourceLifecycle.FINITE_INVENTORY)
+    options = SharedOptions(
+        source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        transport=TransportStrategy.LEGACY_SPLIT_NATIVE,
+    )
     monkeypatch.setattr(worker, "_attest_source", lambda *args: {})
     monkeypatch.setattr(worker, "construct_and_attest", lambda *args: (
         lambda argv: None, {"observed_bindings": [], "executor": {}},

@@ -82,6 +82,7 @@ class TransportStrategy(_ValueEnum):
 
     VALIDATED_SCALAR = "validated_scalar"
     CHANNEL_RESOLVED = "channel_resolved"
+    LEGACY_SPLIT_NATIVE = "legacy_split_native"
 
 
 class DiagnosticIntervention(_ValueEnum):
@@ -143,6 +144,18 @@ class SharedOptions:
 
     def validate(self) -> None:
         errors: list[str] = []
+        if (self.source_lifecycle is SourceLifecycle.FINITE_INVENTORY
+                and self.transport is not TransportStrategy.LEGACY_SPLIT_NATIVE):
+            errors.append(
+                "finite_inventory requires legacy_split_native transport; the "
+                "validated scalar joint operator is not installed on that historical engine"
+            )
+        if (self.transport is TransportStrategy.LEGACY_SPLIT_NATIVE
+                and self.source_lifecycle is not SourceLifecycle.FINITE_INVENTORY):
+            errors.append(
+                "legacy_split_native transport is restricted to the explicit "
+                "finite_inventory historical lifecycle"
+            )
         bulk_location = self.source_location in {
             SourceLocation.BULK_UNIFORM, SourceLocation.TIP_PLUS_BULK,
         }
