@@ -4,7 +4,7 @@
 
 The disabled-campaign implementation is PF `dd0c1953e57f7aeaa977b4965b2b9f9d0323b584`; its qualified native FEM dependency is calculation commit `2987e5b06a48b636dfc1672c7a0144c0c74dbb6e` with evidence commit `e2e84aa676d1b7a84977577c5a133eca668233dc`. These advance, rather than reset, the earlier PF/FEM checkpoints. A later PF documentation-only closeout commit may contain this report; it does not change either calculation-source identity. Production and manuscript work remain disabled. No remote write or scientific-data deletion was performed.
 
-The current portable PF source qualification remains 1008 passed with 16 explicitly external-evidence tests deselected; the post-binding PF campaign/execution subset passes 31 tests. The post-repair FEM tree reports 759 passed, 2 skipped and 16 passing subtests, including the real-public-interface and accepted-time accommodation regressions. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
+The current portable PF source qualification is 1008 passed with 16 explicitly external-evidence tests deselected; the final exact-binding PF campaign/execution subset passes 30 tests. The post-repair FEM tree reports 759 passed, 2 skipped and 16 passing subtests, including the real-public-interface and accepted-time accommodation regressions. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
 
 ## Controller findings and repair
 

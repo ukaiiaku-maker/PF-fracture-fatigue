@@ -11,7 +11,7 @@
     "result": "PASS",
     "passed": 1008,
     "deselected_external_evidence": 16,
-    "duration_s": 99.84
+    "duration_s": 194.66
   },
   "fem": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
@@ -29,7 +29,7 @@
     "prepared_r07_resumption": "fem-czm-current-pf-companion@e2e84aa:scripts/resume_r07_exp_floor_event.py; preserved dry-run regression",
     "moving_tip_and_exp_floor_lifecycle_tests": "55 passed in 1.52 s",
     "cohesive_family_tests": "41 passed in 1.47 s",
-    "campaign_and_binding_tests": "31 passed in 1.14 s",
+    "campaign_and_binding_tests": "30 passed in 2.38 s on final exact binding",
     "campaign_acceptance": "PASS; 699 disabled cases; 699 native command bindings; 36 fitted bilinear actual solved-interface qualification requests; five selective constraint/mixity rows",
     "resource_admission": "RESOURCE_ADMISSION_R05_ACTUAL_CONSUMER_20261016.json; measured host state is separated from workload estimates; R07/R09 not admitted"
   },

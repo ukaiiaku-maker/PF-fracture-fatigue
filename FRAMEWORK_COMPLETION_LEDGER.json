@@ -283,7 +283,7 @@
       "id": "R12",
       "goal_ids": ["FG-16", "FG-17"],
       "status": "CURRENT_SOURCE_PAIR_SUITES_PASS_EXTERNAL_ARCHIVES_INCOMPLETE",
-      "concrete_defect": "The disabled campaign implementation is PF dd0c1953 and binds native FEM evidence head e2e84aa (calculation source 2987e5b). The portable PF gate passes 1008 tests with 16 explicit external-evidence deselections; the post-binding PF campaign/execution subset passes 31 tests and its 699-row audit has no binding errors. The exact FEM calculation passes 759 tests, 2 skips and 16 passing subtests. The two unavailable independent archives remain INCOMPLETE rather than being relabeled as present.",
+      "concrete_defect": "The disabled campaign implementation is PF dd0c1953 and binds native FEM evidence head e2e84aa (calculation source 2987e5b). The portable PF gate passes 1008 tests with 16 explicit external-evidence deselections; the final exact-binding PF campaign/execution subset passes 30 tests and its 699-row audit has no binding errors. The exact FEM calculation passes 759 tests, 2 skips and 16 passing subtests. The two unavailable independent archives remain INCOMPLETE rather than being relabeled as present.",
       "owner_consumer": "pytest collection, evidence loader, clean-clone release and result metadata",
       "authoritative_source": "tracked tests plus external evidence manifest and verified backups",
       "dependencies": ["R01", "R03", "R05", "R08", "R09", "R10", "R11"],
