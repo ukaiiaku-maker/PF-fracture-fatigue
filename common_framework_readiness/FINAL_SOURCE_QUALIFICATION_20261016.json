@@ -3,33 +3,37 @@
   "date": "2026-10-16",
   "source_pair": {
     "pf_calculation_and_campaign_commit": "dd0c1953e57f7aeaa977b4965b2b9f9d0323b584",
-    "fem_calculation_commit": "2987e5b06a48b636dfc1672c7a0144c0c74dbb6e",
-    "fem_evidence_commit": "e2e84aa676d1b7a84977577c5a133eca668233dc"
+    "fem_calculation_commit": "285ae07ce3486b4cfd9a9794e6a797b49e50af63",
+    "fem_evidence_commit": "6247534831263c1dbf5dcc06ebcf4211dca7c730"
   },
   "pf": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q -m 'not external_evidence'",
     "result": "PASS",
     "passed": 1008,
     "deselected_external_evidence": 16,
-    "duration_s": 194.66
+    "duration_s": 247.54
   },
   "fem": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
     "result": "PASS",
-    "passed": 759,
+    "passed": 765,
     "skipped": 2,
     "passing_subtests": 16,
-    "duration_s": 92.82
+    "duration_s": 257.65
   },
   "focused_native_evidence": {
-    "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@e2e84aa:integration_evidence/r05_actual_solved_interface_20261016/qualification_report.json",
-    "actual_public_interface_regression": "fem-czm-current-pf-companion@2987e5b:tests/test_r05_actual_public_interface.py; direct/event/restart plus accepted-time active-tip accommodation; no mocked native main/front/barrier/source/mechanics",
+    "moving_tip_bilinear_public_qualification": "fem-czm-current-pf-companion@6247534:integration_evidence/r05_coupled_ownership_285ae07/qualification_report.json",
+    "actual_public_interface_regression": "fem-czm-current-pf-companion@285ae07:tests/test_r05_actual_public_interface.py; direct/event/restart, localized event-time/load carry, accepted-time accommodation and nonzero source-conditioned traction; no mocked native main/front/barrier/source/mechanics",
     "accepted_time_accommodation": "2 accepted updates and 2 source updates; front-time increments equal 3.5e-10 s and 1.0975208997081333e-10 s accepted intervals; nonzero emission and emission-work increments; no one-second callback artifact",
-    "specified_public_option_names": "fem-czm-current-pf-companion@2987e5b:tests/test_generic_current_pf_companion.py; tests/test_bilinear_cohesive_request_v1.py",
-    "prepared_r07_resumption": "fem-czm-current-pf-companion@e2e84aa:scripts/resume_r07_exp_floor_event.py; preserved dry-run regression",
+    "specified_public_option_names": "fem-czm-current-pf-companion@285ae07:tests/test_generic_current_pf_companion.py; tests/test_bilinear_cohesive_request_v1.py",
+    "prepared_r07_resumption": "fem-czm-current-pf-companion@6247534:scripts/resume_r07_exp_floor_event.py; preserved dry-run regression",
+    "source_feedback": "The actual current moving-tip sigma_tip/K_shield/r_eff consumer reduces second-step solved traction by 8300711.26504612 Pa in the active-tip public discriminator; opening-only remains correctly selected but physically zero-feedback.",
+    "event_time_load_and_state_ownership": "The activated public event consumes 1.8555296125433565e-11 s of a 3.818760853467698e-11 s interval and checkpoints the 1.9632312409243415e-11 s remainder at the event load; native cohesive elements own damage and provider values are restartable mirrors.",
+    "cohesive_work": "Assembly and diagnostics use one normal response and apply intact degradation exactly once.",
     "moving_tip_and_exp_floor_lifecycle_tests": "55 passed in 1.52 s",
     "cohesive_family_tests": "41 passed in 1.47 s",
-    "campaign_and_binding_tests": "30 passed in 2.38 s on final exact binding",
+    "campaign_and_release_subset": "25 passed in 3.37 s on the updated binding",
+    "exact_binding_and_campaign_core": "8 passed in 2.42 s",
     "campaign_acceptance": "PASS; 699 disabled cases; 699 native command bindings; 36 fitted bilinear actual solved-interface qualification requests; five selective constraint/mixity rows",
     "resource_admission": "RESOURCE_ADMISSION_R05_ACTUAL_CONSUMER_20261016.json; measured host state is separated from workload estimates; R07/R09 not admitted"
   },

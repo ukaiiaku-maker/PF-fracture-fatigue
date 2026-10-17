@@ -2,11 +2,12 @@
 
 ## Actual solved-interface R05 completion, 16 October 2026
 
-- FEM calculation commit `2987e5b` preserves the actual-consumer repair and
+- FEM calculation commit `285ae07` preserves the actual-consumer repair and
   connects both public bilinear descriptions to a trial interface assembled by
-  the current atomic-path-corridor specimen. Evidence commit `e2e84aa` retains
+  the current atomic-path-corridor specimen. Evidence commit `6247534` retains
   direct classical and activated events plus exact fresh-process active-state
-  restart.
+  restart, localized event-time/load carry, authoritative cohesive-element
+  damage state, corrected work and nonzero current-source feedback.
 - Runtime acceptance now requires provider construction/advance, cohesive
   assembly binding and an actual or restored trial interface. The regression
   checks residual/tangent participation, repeated mechanical feedback, bounded
@@ -24,7 +25,7 @@
 - PF calculation/campaign commit `dd0c1953` binds all 36 fitted P9 rows to that
   actual driver/provider. The 699-row disabled campaign audit has no binding
   errors. Final applicable suites pass: PF 1008 passed with 16 explicit
-  external-evidence deselections; FEM 759 passed, 2 skipped, plus 16 subtests.
+  external-evidence deselections; FEM 765 passed, 2 skipped, plus 16 subtests.
 - R07 and R09 resumptions remain prepared but were not launched: the latest
   measurement records about 50 MiB immediately free, 873 MiB swap free and
   28 GiB Data free, which does not admit their estimated peak plus 12 GiB
