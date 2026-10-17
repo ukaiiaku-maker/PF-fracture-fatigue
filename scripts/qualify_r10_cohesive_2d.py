@@ -6,6 +6,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -85,13 +86,30 @@ def main(argv=None):
     # Load and unload below the peak before accepting rupture.
     for factor in (0.,0.15,0.35,0.60,0.35,0.60):
         u,d=equilibrium(mesh,network,factor*thermal.delta0_m,u); rows.append({"stage":"INTACT",**d})
-    traction=max(float(elem.metadata["normal_traction_Pa"]),0.)
-    raw=float(barrier.rate(traction,a.temperature_K))
+    # This is an assembly/transaction qualification, not a kinetic trajectory.
+    # Evaluate the actual connected finite-compliance state and do not silently
+    # substitute the barrier-only traction-controlled rate when no escape saddle
+    # exists at this deliberately sub-peak fixture displacement.
+    # Condense the linear bulk response actually assembled by this FE fixture.
+    # With two elastic blocks in series, t=k_env*(Delta-delta); this is a Schur
+    # response of the solved mesh, not a searched material coordinate.
+    fe_connected_separation=float(d["normal_jump_m"])
+    kenv=float(d["normal_traction_Pa"])/max(
+        float(d["imposed_jump_m"])-fe_connected_separation,1e-300)
+    environment=barrier.rate_from_environment(
+        0.60*thermal.delta0_m,kenv,a.temperature_K,{"branch":"INTACT"})
+    environment_receipt=dict(environment)
+    environment_receipt["barrier_is_infinite"]=math.isinf(float(environment["barrier_J"]))
+    for key in ("barrier_J","barrier_eV"):
+        if not math.isfinite(float(environment_receipt[key])):environment_receipt[key]=None
+    connected=environment["connected"]
+    condensation_error=abs(float(connected["delta_m"])-fe_connected_separation)
+    raw=float(environment["elementary_rate_s-1"])
     inherited=float(gammainc(binding.reduced_config.cleavage_hits,
                               raw*binding.reduced_config.cleavage_tau_s)
                     /binding.reduced_config.cleavage_tau_s)
-    threshold=0.5; dwell=threshold/max(inherited,1e-300)
-    elem.accept_rupture(1)
+    threshold=0.5; dwell=None if inherited<=0. else threshold/inherited
+    elem.accept_rupture(1,separation_m=float(elem.metadata["normal_jump_m"]))
     u,d=equilibrium(mesh,network,0.60*thermal.delta0_m,u)
     rows.append({"stage":"ACCEPTED_KINETIC_EVENT_REEQUILIBRATED",**d})
     u,d=equilibrium(mesh,network,-0.05*thermal.delta0_m,u)
@@ -127,9 +145,16 @@ def main(argv=None):
         "retained_dislocation_state_exercised":False,
         "accepted_event_owned_rupture":True,"deterministic_failure_rule":False,
         "cohesive_surface_energy_charged_once":True,"contact_does_not_heal":True,
+        "event_trigger_scope":"DECLARED_TRANSACTION_FIXTURE_NOT_KINETIC_EVIDENCE",
+        "finite_compliance_environment":environment_receipt,
+        "finite_compliance_FE_condensation_verification":{"source":"ASSEMBLED_LINEAR_BULK_SCHUR_RESPONSE",
+            "environment_stiffness_Pa_per_m":kenv,"FE_separation_m":fe_connected_separation,
+            "analytic_connected_separation_m":float(connected["delta_m"]),
+            "absolute_separation_error_m":condensation_error},
         "raw_elementary_rate_s-1":raw,"inherited_cooperative_rate_s-1":inherited,
         "dwell_to_accepted_event_s":dwell,"restart_displacement_linf_m":restart_error,
-        "history":rows,"restart_contact":d2,"binding":dict(binding.provenance)}
+        "history":rows,"restart_contact":d2,"energy_ledger":network.energy_ledger(u),
+        "binding":dict(binding.provenance)}
     atomic_json(a.out/"qualification.json",summary)
     with (a.out/"traction_separation_history.csv").open("w",newline="") as stream:
         fields=[]

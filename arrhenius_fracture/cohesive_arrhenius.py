@@ -25,9 +25,10 @@ EXP_FLOOR_REFERENCE = "EXP_FLOOR_REFERENCE"
 COHESIVE_BARRIER_ONLY = "COHESIVE_BARRIER_ONLY"
 COHESIVE_KINETIC_CZM = "COHESIVE_KINETIC_CZM"
 COHESIVE_RATE_INDEPENDENT_CONTROL = "COHESIVE_RATE_INDEPENDENT_CONTROL"
+COHESIVE_PEAK_CUTOFF_CONTROL = "COHESIVE_PEAK_CUTOFF_CONTROL"
 EXECUTION_IDENTITIES = frozenset({
     EXP_FLOOR_REFERENCE, COHESIVE_BARRIER_ONLY, COHESIVE_KINETIC_CZM,
-    COHESIVE_RATE_INDEPENDENT_CONTROL,
+    COHESIVE_RATE_INDEPENDENT_CONTROL, COHESIVE_PEAK_CUTOFF_CONTROL,
 })
 
 
@@ -105,12 +106,24 @@ def stationary_points(stress_Pa: float, thermal: CohesiveThermalLaw,
         return {"state": "ZERO_TRACTION_LIMIT", "s": 0.0,
                 "x_min": 0.0, "x_saddle": math.inf}
     s = stress / peak
-    if s >= 1.0:
-        return {"state": "BARRIERLESS_SPINODAL", "s": s,
+    if s > 1.0:
+        return {"state": "ABOVE_SPINODAL_NO_STATIONARY", "s": s,
+                "x_min": None, "x_saddle": None}
+    if s == 1.0:
+        return {"state": "COALESCED_SPINODAL", "s": s,
                 "x_min": 1.0, "x_saddle": 1.0}
-    z = -s / EULER
-    xm = float(-lambertw(z, 0).real)
-    xs = float(-lambertw(z, -1).real)
+    eps = 1.0-s
+    if eps <= 1.0e-5:
+        # Corless branch-point expansion.  Evaluating W_0 and W_-1
+        # independently loses their separation (and hence V*) near -1/e.
+        p = math.sqrt(2.0*eps)
+        p2=p*p; p3=p2*p; p4=p2*p2; p5=p4*p
+        xm = 1.0-p+p2/3.0-11.0*p3/72.0+43.0*p4/540.0-769.0*p5/17280.0
+        xs = 1.0+p+p2/3.0+11.0*p3/72.0+43.0*p4/540.0+769.0*p5/17280.0
+    else:
+        z = -s / EULER
+        xm = float(-lambertw(z, 0).real)
+        xs = float(-lambertw(z, -1).real)
     return {"state": "METASTABLE", "s": s, "x_min": xm, "x_saddle": xs}
 
 
@@ -136,7 +149,7 @@ def traction_barrier(stress_Pa: float, thermal: CohesiveThermalLaw,
         barrier = math.nan; volume = math.nan
     elif state == "ZERO_TRACTION_LIMIT":
         barrier = area * gamma; volume = math.inf
-    elif state == "BARRIERLESS_SPINODAL":
+    elif state in {"COALESCED_SPINODAL", "ABOVE_SPINODAL_NO_STATIONARY"}:
         barrier = 0.0; volume = 0.0
     else:
         xm = float(roots["x_min"]); xs = float(roots["x_saddle"])
@@ -151,7 +164,9 @@ def traction_barrier(stress_Pa: float, thermal: CohesiveThermalLaw,
 def finite_compliance_landscape(imposed_delta_m: float,
                                 environment_stiffness_Pa_per_m: float,
                                 thermal: CohesiveThermalLaw,
-                                temperature_K: float) -> dict[str, Any]:
+                                temperature_K: float,
+                                connected_state: dict[str, Any] | None = None
+                                ) -> dict[str, Any]:
     """Track stationary points of ``psi + k_env/2*(Delta-delta)^2``.
 
     This is a local condensation reference, not a fit coordinate.  A single
@@ -170,41 +185,73 @@ def finite_compliance_landscape(imposed_delta_m: float,
     def residual(x):
         return x * math.exp(-x) + kappa * (x - D)
 
-    xmax = max(40.0, D + 20.0)
-    grid = np.unique(np.r_[np.linspace(0.0, min(xmax, 6.0), 1201),
-                           np.geomspace(6.0, xmax, 600) if xmax > 6.0 else []])
-    values = np.asarray([residual(float(x)) for x in grid])
-    roots = []
-    for a, b, fa, fb in zip(grid[:-1], grid[1:], values[:-1], values[1:]):
-        if fa == 0.0: roots.append(float(a))
-        if fa * fb < 0.0: roots.append(float(brentq(residual, a, b)))
-    if values[-1] == 0.0: roots.append(float(grid[-1]))
-    roots = sorted({round(x, 13) for x in roots})
+    convex = kappa >= math.exp(-2.0)
+    turning_points = []
+    fold_displacements = []
+    if convex:
+        brackets = [(0.0, max(D+2.0, 4.0))]
+    else:
+        x1 = 1.0-float(lambertw(-EULER*kappa, 0).real)
+        x2 = 1.0-float(lambertw(-EULER*kappa, -1).real)
+        turning_points = [x1,x2]
+        fold_displacements = [x1*x1/(x1-1.0),x2*x2/(x2-1.0)]
+        brackets = [(0.0,x1),(x1,x2),(x2,max(D+2.0,x2+4.0))]
+    roots=[]
+    scale=max(1.0,kappa*max(D,1.0))
+    zero_tol=128.0*np.finfo(float).eps*scale
+    for left,right in brackets:
+        fl=residual(left);fr=residual(right)
+        if abs(fl)<=zero_tol: roots.append(left)
+        if fl*fr < 0.0:
+            roots.append(float(brentq(residual,left,right,xtol=1e-14,rtol=4*np.finfo(float).eps)))
+        if abs(fr)<=zero_tol: roots.append(right)
+    roots=sorted(roots)
+    unique=[]
+    for root in roots:
+        if not unique or abs(root-unique[-1])>2e-12*max(1.0,abs(root)):
+            unique.append(root)
+    roots=unique
     stationary = []
     for x in roots:
         curvature = gamma/d0**2 * ((1.0-x)*math.exp(-x) + kappa)
         energy = gamma*(-math.expm1(-x)-x*math.exp(-x)) + 0.5*kenv*(imposed-x*d0)**2
         stationary.append({"x": x, "delta_m": x*d0, "energy_J_m2": energy,
                            "curvature_Pa_per_m": curvature,
-                           "kind": "MINIMUM" if curvature > 0.0 else "SADDLE"})
+                           "kind": ("FOLD" if abs(curvature) <= 1e-10*gamma/d0**2
+                                    else "MINIMUM" if curvature > 0.0 else "SADDLE")})
     minima = [p for p in stationary if p["kind"] == "MINIMUM"]
     saddles = [p for p in stationary if p["kind"] == "SADDLE"]
-    if not minima:
-        state = "BARRIERLESS_SPINODAL"
-        barrier = 0.0
-    elif not saddles:
-        state = "NO_ESCAPE_SADDLE"
-        barrier = None
+    prior_branch=(connected_state or {}).get("branch","INTACT")
+    intact=minima[0] if minima else None
+    separated=minima[-1] if len(minima)>1 else None
+    bonded_loss_D=(max(fold_displacements) if fold_displacements else None)
+    intact_lost=bool(not convex and bonded_loss_D is not None and D>bonded_loss_D)
+    if convex:
+        connected=minima[0]
+        state="CONVEX_CONNECTED";barrier=None;branch="CONNECTED"
+    elif prior_branch == "SEPARATED":
+        connected=separated or (minima[-1] if minima else None)
+        state="SEPARATED_BRANCH";barrier=None;branch="SEPARATED"
+    elif intact_lost:
+        connected=minima[-1] if minima else None
+        state="INTACT_BRANCH_LOST_TO_SEPARATED";barrier=0.0;branch="SEPARATED"
+    elif intact is None:
+        connected=None;state="NUMERICAL_ROOT_FAILURE";barrier=None;branch=prior_branch
     else:
-        connected = minima[0]
-        later = [p for p in saddles if p["x"] > connected["x"]]
-        if not later:
-            state = "NO_ESCAPE_SADDLE"; barrier = None
+        connected=intact;branch="INTACT"
+        later=[p for p in saddles if p["x"]>connected["x"]]
+        if later:
+            state="METASTABLE";barrier=later[0]["energy_J_m2"]-connected["energy_J_m2"]
         else:
-            state = "METASTABLE"; barrier = later[0]["energy_J_m2"]-connected["energy_J_m2"]
+            state="NO_ESCAPE_SADDLE";barrier=None
+    next_state={"branch":branch,"x":None if connected is None else connected["x"],
+                "imposed_delta_over_delta0":D,"intact_branch_lost":intact_lost}
     return {"state": state, "barrier_J_m2": barrier, "stationary": stationary,
             "kappa": kappa, "imposed_delta_over_delta0": D,
-            "environment_stiffness_Pa_per_m": kenv}
+            "environment_stiffness_Pa_per_m": kenv,"convex":convex,
+            "turning_points_x":turning_points,"fold_displacements_over_delta0":fold_displacements,
+            "bonded_branch_loss_D":bonded_loss_D,"connected":connected,
+            "connected_state":next_state}
 
 
 def bilinear_barrier_J(stress_ratio, Gamma_J_m2: float,
@@ -263,6 +310,14 @@ class ExponentialCohesiveBarrier:
         return out
 
     def rate(self, stress_Pa, temperature_K: float):
+        if self.execution_identity == COHESIVE_KINETIC_CZM:
+            raise RuntimeError(
+                "COHESIVE_KINETIC_CZM requires rate_from_environment; "
+                "the traction-controlled adapter is barrier-only"
+            )
+        return self.traction_controlled_rate(stress_Pa, temperature_K)
+
+    def traction_controlled_rate(self, stress_Pa, temperature_K: float):
         stress = np.asarray(stress_Pa, dtype=float)
         G = self.values_eV(stress, temperature_K)
         rates = self.attempt_frequency_s * np.exp(np.clip(
@@ -271,6 +326,32 @@ class ExponentialCohesiveBarrier:
         # The positive-traction zero limit is mathematically finite, but exact
         # contact/compression is not an admissible irreversible opening event.
         return np.where(stress > 0.0, rates, 0.0)
+
+    def rate_from_environment(self, imposed_delta_m: float,
+                              environment_stiffness_Pa_per_m: float,
+                              temperature_K: float,
+                              connected_state: dict[str, Any] | None = None
+                              ) -> dict[str, Any]:
+        landscape=finite_compliance_landscape(
+            imposed_delta_m,environment_stiffness_Pa_per_m,self.thermal,
+            temperature_K,connected_state,
+        )
+        barrier_density=landscape["barrier_J_m2"]
+        if landscape["state"] in {"INTACT_BRANCH_LOST_TO_SEPARATED"}:
+            barrier_J=0.0
+            continuation="FINITE_ATTEMPT_RATE_SPINODAL_REGULARIZATION"
+        elif barrier_density is None:
+            barrier_J=math.inf
+            continuation=None
+        else:
+            barrier_J=max(float(barrier_density),0.0)*self.activation_area_m2
+            continuation=None
+        rate=(0.0 if not math.isfinite(barrier_J) else self.attempt_frequency_s*math.exp(
+            max(-barrier_J/max(KB_EV_PER_K*EV_TO_J*float(temperature_K),1e-300),-700.0)
+        ))
+        return {**landscape,"barrier_J":barrier_J,"barrier_eV":barrier_J/EV_TO_J,
+                "elementary_rate_s-1":rate,"continuation":continuation,
+                "consumer":"FINITE_COMPLIANCE_CONNECTED_COHESIVE_LANDSCAPE"}
 
     def activation_volume_m3(self, stress_Pa: float,
                              temperature_K: float) -> float:
@@ -295,11 +376,11 @@ class ExponentialCohesiveBarrier:
 
 
 @dataclass(frozen=True)
-class RateIndependentCohesiveControl:
-    """Explicitly non-Arrhenius control using the same cohesive envelope."""
+class PeakCutoffCohesiveControl:
+    """Diagnostic cutoff at the traction peak; work is only ``Gamma*(1-2/e)``."""
 
     thermal: CohesiveThermalLaw
-    execution_identity: str = COHESIVE_RATE_INDEPENDENT_CONTROL
+    execution_identity: str = COHESIVE_PEAK_CUTOFF_CONTROL
 
     def should_rupture(self, separation_m: float, temperature_K: float) -> bool:
         # The control fails at the envelope maximum (x=1).  It is intentionally
@@ -313,12 +394,55 @@ class RateIndependentCohesiveControl:
     def rate(self, *_args, **_kwargs):
         raise RuntimeError("rate-independent cohesive control has no Arrhenius rate")
 
+    def as_dict(self):
+        return {"kind":"peak_cutoff_diagnostic","execution_identity":self.execution_identity,
+                "work_fraction_at_cutoff":1.0-2.0/EULER}
+
+
+RateIndependentCohesiveControl = PeakCutoffCohesiveControl
+
+
+@dataclass(frozen=True)
+class MatchedWorkRateIndependentCohesiveControl:
+    """Rate-independent envelope control with a bounded residual surface work."""
+
+    thermal: CohesiveThermalLaw
+    residual_work_fraction: float = 1.0e-6
+    execution_identity: str = COHESIVE_RATE_INDEPENDENT_CONTROL
+
+    def __post_init__(self):
+        if not (0.0 < self.residual_work_fraction < 1.0):
+            raise ValueError("residual_work_fraction must lie strictly between zero and one")
+
+    @property
+    def cutoff_x(self) -> float:
+        # Remaining work/Gamma=(1+x)exp(-x).
+        return float(brentq(lambda x:(1.0+x)*math.exp(-x)-self.residual_work_fraction,1.0,100.0))
+
+    def should_rupture(self,separation_m:float,temperature_K:float) -> bool:
+        self.thermal.gamma(temperature_K)
+        return float(separation_m)>=self.cutoff_x*self.thermal.delta0_m
+
+    def traction(self,separation_m,temperature_K:float):
+        return traction_Pa(separation_m,self.thermal,temperature_K)
+
+    def rate(self,*_args,**_kwargs):
+        raise RuntimeError("matched-work rate-independent control has no Arrhenius rate")
+
+    def as_dict(self):
+        return {"kind":"matched_work_rate_independent_envelope",
+                "execution_identity":self.execution_identity,"cutoff_x":self.cutoff_x,
+                "residual_work_fraction":self.residual_work_fraction,
+                "traversed_work_fraction":1.0-self.residual_work_fraction}
+
 
 __all__ = [
     "COHESIVE_BARRIER_ONLY", "COHESIVE_KINETIC_CZM",
-    "COHESIVE_RATE_INDEPENDENT_CONTROL", "EXECUTION_IDENTITIES",
+    "COHESIVE_RATE_INDEPENDENT_CONTROL", "COHESIVE_PEAK_CUTOFF_CONTROL",
+    "EXECUTION_IDENTITIES",
     "EXP_FLOOR_REFERENCE", "FAMILY", "CohesiveThermalLaw",
     "ExponentialCohesiveBarrier", "RateIndependentCohesiveControl",
+    "PeakCutoffCohesiveControl", "MatchedWorkRateIndependentCohesiveControl",
     "bilinear_barrier_J", "morse_barrier_J",
     "potential_J_m2", "stationary_points", "tangent_Pa_per_m",
     "traction_Pa", "traction_barrier", "finite_compliance_landscape",

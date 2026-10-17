@@ -1,0 +1,41 @@
+{
+  "activation_barrier_surface_charge_J_per_m": 0.0,
+  "all_arms_completed": true,
+  "candidate_id": "R10D_COH_10980",
+  "developed_window_um": [
+    20.0,
+    60.0
+  ],
+  "disposition": "PHYSICALLY_INFORMATIVE_NEGATIVE__STEEP_OPENING_CONTROLLED",
+  "execution_identity": "COHESIVE_KINETIC_CZM",
+  "full_state_adjacent_slopes": [
+    418.29231676618826,
+    132.00804139909562
+  ],
+  "full_state_endpoint_slope": 322.97825980465626,
+  "full_to_opening_reference_rate_ratios": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "maximum_abs_K_shield_Pa_sqrt_m": 3.070141309925812e-88,
+  "maximum_energy_balance_residual_J_per_m": 0.0,
+  "maximum_fractional_state_effect": 0.0,
+  "maximum_mobile_count": 1.4720234983709534e-35,
+  "mechanism_classification": "OPENING_CONTROLLED_DISLOCATION_INACTIVE",
+  "moderate_slope_pass": false,
+  "phase_convergence": {
+    "acceptance_tolerance": 0.01,
+    "coarse_rate_m_per_cycle": 4.804278971924978e-06,
+    "fine_rate_m_per_cycle": 4.804084939257778e-06,
+    "load_MPa_sqrt_m": 21.028894848114437,
+    "passed": true,
+    "phase_count_coarse": 64,
+    "phase_count_fine": 128,
+    "relative_rate_difference": 4.038910003729563e-05
+  },
+  "rate_independent_controls_are_not_kinetic_results": true,
+  "rate_span_decades": 0.503052575083586,
+  "schema": "r10.kinetic-czm-developed-analysis/1",
+  "surface_energy_owner": "KINETIC_CZM_BROKEN_PATCH"
+}

@@ -27,7 +27,7 @@ where `x=delta/delta0` and `delta0=Gamma_ref/(e t_hat_ref)`. `delta0` is therefo
 
 For `0 < sigma/t_hat < 1`, the traction-controlled minimum and saddle use the real `W_0` and `W_-1` Lambert branches. The activation barrier is their direct tilted-potential difference, with activation volume `A_star delta0 (x_s-x_m)`. Exact zero traction reports the formal `A_star Gamma` barrier and infinite saddle/activation volume, while its mechanically inadmissible opening rate is zero. Compression is `INADMISSIBLE_COMPRESSION`; loss of metastability is `BARRIERLESS_SPINODAL`. The near-spinodal `3/2` asymptotic avoids cancellation. No positive barrier floor is added.
 
-The finite-compliance reference solves the stationary points of `psi + k_env(Delta-delta)^2/2`. A convex combined landscape is `NO_ESCAPE_SADDLE`, not a zero barrier. `k_env` is a mechanics condensation input and is not searched.
+The finite-compliance reference solves the stationary points of `psi + k_env(Delta-delta)^2/2`. Its roots are bracketed analytically by the two Lambert-W turning points and are carried on a connected intact or separated branch through loading and reversal. Intact fold loss is distinct from a landscape with no escape saddle; a convex combined landscape is `CONVEX_CONNECTED`, not a zero barrier. `k_env` is a mechanics condensation input and is not searched. The kinetic identity fails closed if a traction-only rate is requested.
 
 The triangular-bilinear and Morse barriers are analytical shape controls matched in `Gamma`, `t_hat`, `A_star`, and prefactor. They are not separate search campaigns.
 
@@ -46,9 +46,9 @@ Every offspring retains one complete R10 parent dislocation vector. Emission, Pe
 | Signed source backstress/transport | Persistent/reversible MPZ | Same persistent/reversible MPZ |
 | Accepted rupture event | Inherited cooperative marked event | Same event calls `accept_rupture` |
 | Contact | Not applicable | Separate numerical compression penalty |
-| Surface-energy charge | Barrier only; no extra event bill | Interface potential only; no second Griffith cost |
+| Surface-energy charge | Activation landscape only; no separate event bill | Broken-patch/interface free energy only; the activation barrier is not charged again |
 
-The barrier-only legacy 30 GPa numerical strength contract remains independent of `t_hat`. The kinetic interface does not use a deterministic peak-traction failure rule; crossing the peak changes tangent but does not itself rupture the interface.
+The barrier-only legacy 30 GPa numerical strength contract remains independent of `t_hat`. The kinetic interface does not use a deterministic peak-traction failure rule; crossing the peak changes tangent but does not itself rupture the interface. `COHESIVE_PEAK_CUTOFF_CONTROL` is therefore only a diagnostic and has traversed work `Gamma(1-2/e)` at `x=1`. The separate rate-independent comparison is a matched-work envelope whose cutoff leaves a declared residual work fraction (default `1e-6`); neither control is Arrhenius evidence.
 
 ## Reproduction
 
@@ -61,9 +61,10 @@ python scripts/run_r10_cohesive_campaign.py expansion
 python scripts/run_r10_cohesive_campaign.py spatial --candidate-id R10D_COH_00167
 python scripts/run_r10_cohesive_campaign.py native --candidate-id R10D_COH_00167
 python scripts/run_r10_cohesive_campaign.py ledger
+python scripts/run_r10_cohesive_campaign.py continuation
 ```
 
-All stages are additive and idempotent. A 32,768-row analytical allocation, a 4,096-row state-aware allocation, and a 48-row native queue are explicitly not execution counts. Native outputs and restart state live under `runs/r10_cohesive_arrhenius_joint_sweep/`.
+All stages are additive and idempotent. `continuation` resumes completed kinetic arms from their durable result records, finishes the 64-phase advancing comparison and its 128-phase check when absent, analyzes the developed window, and refreshes the execution ledger. A 32,768-row analytical allocation, a 4,096-row state-aware allocation, and a 48-row native queue are explicitly not execution counts. Native outputs and restart state live under `runs/r10_cohesive_arrhenius_joint_sweep/`.
 
 ## Evidence limits
 

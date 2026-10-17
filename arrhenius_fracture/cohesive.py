@@ -20,7 +20,7 @@ from scipy import sparse
 
 from .cohesive_arrhenius import (
     COHESIVE_KINETIC_CZM, COHESIVE_RATE_INDEPENDENT_CONTROL,
-    CohesiveThermalLaw, tangent_Pa_per_m, traction_Pa,
+    CohesiveThermalLaw, potential_J_m2, tangent_Pa_per_m, traction_Pa,
 )
 
 
@@ -60,10 +60,22 @@ class CohesiveElement:
     def broken(self) -> bool:
         return self.rupture_state == "BROKEN"
 
-    def accept_rupture(self, event_index: int) -> None:
+    def accept_rupture(self, event_index: int,
+                       separation_m: float | None = None) -> None:
         if int(event_index) < 0:
             raise ValueError("accepted event index must be nonnegative")
         if not self.broken:
+            if separation_m is not None:
+                intact=float(potential_J_m2(max(float(separation_m),0.0),self.thermal,
+                                            self.temperature_K))*self.length
+                broken=self.thermal.gamma(self.temperature_K)*self.length
+                self.metadata.update({
+                    "rupture_surface_energy_owner":"COHESIVE_ELEMENT_BROKEN_STATE",
+                    "surface_energy_before_J_per_m":intact,
+                    "surface_energy_after_J_per_m":broken,
+                    "surface_transition_J_per_m":broken-intact,
+                    "activation_barrier_charged_as_surface_energy":False,
+                })
             self.rupture_state = "BROKEN"
             self.accepted_event_index = int(event_index)
 
@@ -73,7 +85,7 @@ class CohesiveElement:
         if not self.broken:
             self.rupture_state = "BROKEN"
             self.accepted_event_index = -1
-            self.metadata["rupture_owner"] = "RATE_INDEPENDENT_ENVELOPE_SPINODAL"
+            self.metadata["rupture_owner"] = "PEAK_CUTOFF_DIAGNOSTIC"
         return True
 
 
@@ -109,6 +121,29 @@ class CohesiveNetwork:
                  "delta0_m": e.thermal.delta0_m,
                  **e.metadata} for i, e in enumerate(self.elements)]
 
+    def energy_ledger(self,u:np.ndarray) -> dict:
+        cohesive=0.0;contact=0.0;shear=0.0
+        A=_jump_operator()
+        for elem in self.elements:
+            nodes=np.asarray(elem.nodes4,dtype=int);edofs=np.empty(8,dtype=int)
+            edofs[0::2]=2*nodes;edofs[1::2]=2*nodes+1
+            jump=A@np.asarray(u,dtype=float)[edofs]
+            dn=float(elem.normal@jump);dt=float(elem.tangent@jump)
+            if elem.broken:
+                cohesive+=elem.thermal.gamma(elem.temperature_K)*elem.length
+            else:
+                cohesive+=float(potential_J_m2(max(dn,0.0),elem.thermal,
+                                                elem.temperature_K))*elem.length
+                shear+=0.5*self.intact_shear_penalty_Pa_per_m*dt*dt*elem.length
+            if dn<0.0:
+                contact+=0.5*self.contact_penalty_Pa_per_m*dn*dn*elem.length
+        return {"cohesive_surface_and_storage_J_per_m":cohesive,
+                "contact_numerical_energy_J_per_m":contact,
+                "intact_shear_numerical_energy_J_per_m":shear,
+                "activation_barrier_surface_charge_J_per_m":0.0,
+                "surface_energy_owner":"COHESIVE_NETWORK_STATE",
+                "contact_energy_owner":"NUMERICAL_CONTACT_ONLY"}
+
 
 def _jump_operator() -> np.ndarray:
     A = np.zeros((2, 8), dtype=float)
@@ -141,7 +176,12 @@ def _response(elem: CohesiveElement, network: CohesiveNetwork,
             "normal_traction_Pa": tn, "tangential_traction_Pa": tt,
             "normal_tangent_Pa_per_m": kn, "contact_active": contact,
             "rupture_state": elem.rupture_state,
-            "execution_identity": network.execution_identity}
+            "execution_identity": network.execution_identity,
+            "surface_free_energy_J_m2": (elem.thermal.gamma(elem.temperature_K)
+                if elem.broken else float(potential_J_m2(max(dn,0.0),elem.thermal,
+                                                         elem.temperature_K))),
+            "surface_energy_owner":"COHESIVE_ELEMENT_STATE",
+            "activation_barrier_charged_as_surface_energy":False}
     return traction, tangent, diag
 
 

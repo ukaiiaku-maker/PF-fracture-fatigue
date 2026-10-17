@@ -1,0 +1,51 @@
+{
+  "all_events_resolved": true,
+  "all_terminal_landscapes": "METASTABLE",
+  "candidate_id": "R10D_COH_10980",
+  "event_root_resolution_MPa_sqrt_m": 0.05,
+  "full_K_event_MPa_sqrt_m": [
+    20.431155818873176,
+    18.47755759712067,
+    18.000000006494474,
+    17.75000000648931,
+    17.95000000648931,
+    17.450000006489304,
+    16.800000006489295
+  ],
+  "full_intrinsic_classification": "WEAK_T_WITH_LOCAL_HOT_STATE_REBOUND",
+  "joint_classification": "NOT_DBTT_OR_PEAK__HOT_STATE_ELEVATION_INSUFFICIENT_TO_REVERSE_WEAK_T",
+  "maximum_state_effect_MPa_sqrt_m": 0.70000000000001,
+  "numerical_censors": 0,
+  "opening_reference_K_event_MPa_sqrt_m": [
+    20.431155818873176,
+    18.47755759712067,
+    18.00000000649447,
+    17.650000006489307,
+    17.2500000064893,
+    16.800000006489295,
+    16.300000006489288
+  ],
+  "opening_reference_classification": "MONOTONIC_WEAK_T",
+  "physical_censors": 0,
+  "same_complete_material_sha256": "c17ec5564aafa82ea32bdfc2b5b354e2ca7670147c7403cca2aa2c5dbfe6d94e",
+  "schema": "r10.kinetic-czm-thermal-analysis/1",
+  "scope": "FINITE_COMPLIANCE_REDUCED_KINETIC_CZM_SAME_MATERIAL_PANEL",
+  "state_effect_MPa_sqrt_m": [
+    0.0,
+    0.0,
+    3.552713678800501e-15,
+    0.10000000000000142,
+    0.70000000000001,
+    0.6500000000000092,
+    0.5000000000000071
+  ],
+  "temperatures_K": [
+    300.0,
+    450.0,
+    600.0,
+    750.0,
+    900.0,
+    1050.0,
+    1200.0
+  ]
+}

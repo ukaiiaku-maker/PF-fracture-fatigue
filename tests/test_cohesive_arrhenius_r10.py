@@ -17,6 +17,7 @@ from arrhenius_fracture.cohesive import (
 from arrhenius_fracture.cohesive_arrhenius import (
     COHESIVE_BARRIER_ONLY, COHESIVE_KINETIC_CZM, FAMILY,
     CohesiveThermalLaw, ExponentialCohesiveBarrier, RateIndependentCohesiveControl,
+    MatchedWorkRateIndependentCohesiveControl, PeakCutoffCohesiveControl,
     bilinear_barrier_J, finite_compliance_landscape, morse_barrier_J,
     potential_J_m2, stationary_points,
     tangent_Pa_per_m, traction_Pa, traction_barrier,
@@ -90,11 +91,21 @@ def test_endpoint_states_asymptotic_and_contact_rate():
     assert math.isinf(zero["x_saddle"])
     assert math.isinf(zero["activation_volume_m3"])
     assert stationary_points(-1.0, thermal, 300.0)["state"] == "INADMISSIBLE_COMPRESSION"
-    assert stationary_points(thermal.t_hat(300.0), thermal, 300.0)["state"] == "BARRIERLESS_SPINODAL"
+    assert stationary_points(thermal.t_hat(300.0), thermal, 300.0)["state"] == "COALESCED_SPINODAL"
+    assert stationary_points(1.01*thermal.t_hat(300.0), thermal, 300.0)["state"] == "ABOVE_SPINODAL_NO_STATIONARY"
     eps = 1.0e-9
     result = traction_barrier((1-eps)*thermal.t_hat(300.0), thermal, 300.0, area)
     expected = 4*math.sqrt(2)/(3*math.e)*area*thermal.gamma(300.0)*eps**1.5
     assert result["barrier_J"] == pytest.approx(expected, rel=1e-12)
+    expected_volume=area*thermal.delta0_m*2*math.sqrt(2*eps)
+    assert result["activation_volume_m3"] == pytest.approx(expected_volume,rel=2e-9)
+    for eps_limit in (1e-6,1e-9,1e-12):
+        roots=stationary_points((1-eps_limit)*thermal.t_hat(300.),thermal,300.)
+        for root in (roots['x_min'],roots['x_saddle']):
+            assert root*math.exp(-root)==pytest.approx((1-eps_limit)/math.e,abs=3e-16)
+        separation=roots['x_saddle']-roots['x_min']
+        effective_eps=1-roots['s']
+        assert separation==pytest.approx(2*math.sqrt(2*effective_eps),rel=2e-6)
     barrier = ExponentialCohesiveBarrier(thermal, area)
     assert barrier.rate(np.array([-1.0, 0.0]), 300.0).tolist() == [0.0, 0.0]
     control = RateIndependentCohesiveControl(thermal)
@@ -102,6 +113,13 @@ def test_endpoint_states_asymptotic_and_contact_rate():
     assert control.should_rupture(thermal.delta0_m, 300.0)
     with pytest.raises(RuntimeError, match="no Arrhenius rate"):
         control.rate(1.0, 300.0)
+    assert isinstance(control,PeakCutoffCohesiveControl)
+    assert control.as_dict()["work_fraction_at_cutoff"] == pytest.approx(1-2/math.e)
+    matched=MatchedWorkRateIndependentCohesiveControl(thermal,1e-6)
+    assert matched.cutoff_x>1.0
+    assert not matched.should_rupture((matched.cutoff_x-1e-6)*thermal.delta0_m,300.0)
+    assert matched.should_rupture(matched.cutoff_x*thermal.delta0_m,300.0)
+    assert matched.as_dict()["traversed_work_fraction"] == pytest.approx(1-1e-6)
 
 
 def test_thermal_derivative_and_shape_controls():
@@ -116,18 +134,33 @@ def test_thermal_derivative_and_shape_controls():
 
 
 def test_finite_compliance_distinguishes_no_saddle_from_spinodal():
-    thermal = law(); d0 = thermal.delta0_m
-    stiff = finite_compliance_landscape(
-        2*d0, 2.0*thermal.initial_stiffness(300.0), thermal, 300.0,
-    )
-    assert stiff["state"] == "NO_ESCAPE_SADDLE"
-    assert stiff["barrier_J_m2"] is None
-    compliant = finite_compliance_landscape(
-        3*d0, 0.05*thermal.initial_stiffness(300.0), thermal, 300.0,
-    )
-    assert compliant["state"] in {"METASTABLE", "NO_ESCAPE_SADDLE"}
-    if compliant["state"] == "METASTABLE":
-        assert compliant["barrier_J_m2"] > 0.0
+    thermal=law();d0=thermal.delta0_m;k=.05*thermal.initial_stiffness(300.)
+    one=finite_compliance_landscape(d0,k,thermal,300.)
+    assert one["state"]=="NO_ESCAPE_SADDLE"
+    assert len(one["stationary"])==1
+    three=finite_compliance_landscape(6*d0,k,thermal,300.,one["connected_state"])
+    assert three["state"]=="METASTABLE"
+    assert [p["kind"] for p in three["stationary"]]==["MINIMUM","SADDLE","MINIMUM"]
+    loss=three["bonded_branch_loss_D"]
+    assert loss==pytest.approx(8.43288034155,rel=2e-12)
+    assert three['turning_points_x'][0]==pytest.approx(1.15940118310,rel=2e-11)
+    close=finite_compliance_landscape((loss-1e-7)*d0,k,thermal,300.,three["connected_state"])
+    assert close["state"]=="METASTABLE"
+    assert len(close["stationary"])==3
+    beyond=finite_compliance_landscape(10*d0,k,thermal,300.,close["connected_state"])
+    assert beyond["state"]=="INTACT_BRANCH_LOST_TO_SEPARATED"
+    assert beyond["connected_state"]["branch"]=="SEPARATED"
+    reverse=finite_compliance_landscape(6*d0,k,thermal,300.,beyond["connected_state"])
+    assert reverse["state"]=="SEPARATED_BRANCH"
+    convex=finite_compliance_landscape(2*d0,math.exp(-2)*thermal.initial_stiffness(300.),thermal,300.)
+    assert convex["state"]=="CONVEX_CONNECTED"
+    kinetic=ExponentialCohesiveBarrier(thermal,2e-19,execution_identity=COHESIVE_KINETIC_CZM)
+    with pytest.raises(RuntimeError,match="requires rate_from_environment"):
+        kinetic.rate(0.5*thermal.t_hat(300.),300.)
+    consumed=kinetic.rate_from_environment(6*d0,k,300.,{"branch":"INTACT"})
+    assert consumed["consumer"]=="FINITE_COMPLIANCE_CONNECTED_COHESIVE_LANDSCAPE"
+    assert consumed["state"]=="METASTABLE"
+    assert consumed["elementary_rate_s-1"]>0.
 
 
 def test_nonlinear_assembly_tangent_irreversibility_and_contact():
@@ -142,11 +175,16 @@ def test_nonlinear_assembly_tangent_irreversibility_and_contact():
     numeric = (Rp-Rm)/(2*h)
     assert np.allclose(numeric, K @ direction, rtol=2e-7, atol=1e-5)
     assert np.linalg.norm(R) > 0.0
-    elem.accept_rupture(7)
+    before=network.energy_ledger(u)
+    elem.accept_rupture(7,separation_m=delta)
     _, broken_R = cohesive_contribution(network, u, 8)
     assert np.linalg.norm(broken_R) == pytest.approx(0.0)
     elem.accept_rupture(8)
     assert elem.accepted_event_index == 7
+    after=network.energy_ledger(u)
+    assert after["cohesive_surface_and_storage_J_per_m"]>before["cohesive_surface_and_storage_J_per_m"]
+    assert after["activation_barrier_surface_charge_J_per_m"]==0.0
+    assert elem.metadata["rupture_surface_energy_owner"]=="COHESIVE_ELEMENT_BROKEN_STATE"
     compression = opening_u(-delta)
     _, contact_R = cohesive_contribution(network, compression, 8)
     assert np.linalg.norm(contact_R) > 0.0
@@ -156,7 +194,7 @@ def test_nonlinear_assembly_tangent_irreversibility_and_contact():
     control_elem = element()
     assert not control_elem.accept_rate_independent_spinodal(0.9*control_elem.thermal.delta0_m)
     assert control_elem.accept_rate_independent_spinodal(control_elem.thermal.delta0_m)
-    assert control_elem.metadata["rupture_owner"] == "RATE_INDEPENDENT_ENVELOPE_SPINODAL"
+    assert control_elem.metadata["rupture_owner"] == "PEAK_CUTOFF_DIAGNOSTIC"
 
 
 def test_binding_is_fail_closed_and_emits_final_runtime_identity(tmp_path):

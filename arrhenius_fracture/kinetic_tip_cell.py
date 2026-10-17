@@ -191,7 +191,8 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
 
     def _integrate_coupled(self, K: float, T: float, dt: float,
                            stress_override: float | None = None,
-                           lambda_override: float | None = None) -> dict[str, Any]:
+                           lambda_override: float | None = None,
+                           barrier_override_J: float | None = None) -> dict[str, Any]:
         dt_requested = max(float(dt), 0.0)
         remaining = dt_requested
         consumed = 0.0
@@ -217,10 +218,12 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
                 )
 
             sig0 = self.sigma_tip(K) if stress_override is None else max(float(stress_override), 0.0)
-            lam0, raw0, Gc0 = self.lambda_cleave(sig0, T)
             if lambda_override is not None:
                 lam0 = max(float(lambda_override), 0.0)
                 raw0 = lam0
+                Gc0 = float("nan") if barrier_override_J is None else float(barrier_override_J)
+            else:
+                lam0, raw0, Gc0 = self.lambda_cleave(sig0, T)
             if bool(getattr(self, "_directional_topology_owns_cleavage", False)):
                 lam0 = 0.0
             lam0 = max(float(lam0), 0.0) if math.isfinite(lam0) else 0.0
@@ -233,10 +236,12 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
             W_before = float(self.W_emit)
             first = self._plastic_half_step(0.5 * h, T, sig0)
             sig_mid = self.sigma_tip(K) if stress_override is None else max(float(stress_override), 0.0)
-            lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
             if lambda_override is not None:
                 lam_mid = max(float(lambda_override), 0.0)
                 raw_mid = lam_mid
+                Gc_mid = float("nan") if barrier_override_J is None else float(barrier_override_J)
+            else:
+                lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
             if bool(getattr(self, "_directional_topology_owns_cleavage", False)):
                 lam_mid = 0.0
             lam_mid = max(float(lam_mid), 0.0) if math.isfinite(lam_mid) else 0.0
@@ -248,10 +253,12 @@ class KineticMovingTipFrontEngine(UnifiedMPZFrontEngine):
                 h = min(h, remaining)
                 first = self._plastic_half_step(0.5 * h, T, sig0)
                 sig_mid = self.sigma_tip(K) if stress_override is None else max(float(stress_override), 0.0)
-                lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
                 if lambda_override is not None:
                     lam_mid = max(float(lambda_override), 0.0)
                     raw_mid = lam_mid
+                    Gc_mid = float("nan") if barrier_override_J is None else float(barrier_override_J)
+                else:
+                    lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
                 if bool(getattr(self, "_directional_topology_owns_cleavage", False)):
                     lam_mid = 0.0
                 lam_mid = max(float(lam_mid), 0.0) if math.isfinite(lam_mid) else 0.0

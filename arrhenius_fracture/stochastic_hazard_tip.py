@@ -183,10 +183,12 @@ class StochasticHazardDiagnosticTipEngine(DevelopedStateDiagnosticTipEngine):
                 if stress_override is None
                 else max(float(stress_override), 0.0)
             )
-            lam0, raw0, Gc0 = self.lambda_cleave(sig0, T)
             if lambda_override is not None:
                 lam0 = max(float(lambda_override), 0.0)
                 raw0 = lam0
+                Gc0 = float("nan")
+            else:
+                lam0, raw0, Gc0 = self.lambda_cleave(sig0, T)
             lam0 = max(float(lam0), 0.0) if math.isfinite(lam0) else 0.0
             progress0 = normalized_progress_rate(lam0, threshold)
             h = self._substep_limit(remaining, progress0)
@@ -199,14 +201,15 @@ class StochasticHazardDiagnosticTipEngine(DevelopedStateDiagnosticTipEngine):
                 if stress_override is None
                 else max(float(stress_override), 0.0)
             )
-            lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
             if lambda_override is not None:
                 lam_mid = max(float(lambda_override), 0.0)
                 raw_mid = lam_mid
+                Gc_mid = float("nan")
+            else:
+                lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
             lam_mid = max(float(lam_mid), 0.0) if math.isfinite(lam_mid) else 0.0
             progress_mid = normalized_progress_rate(lam_mid, threshold)
             remaining_progress = max(1.0 - float(self.B), 0.0)
-
             if (
                 progress_mid > 0.0
                 and progress_mid * h > remaining_progress + 1.0e-12
@@ -224,10 +227,12 @@ class StochasticHazardDiagnosticTipEngine(DevelopedStateDiagnosticTipEngine):
                     if stress_override is None
                     else max(float(stress_override), 0.0)
                 )
-                lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
                 if lambda_override is not None:
                     lam_mid = max(float(lambda_override), 0.0)
                     raw_mid = lam_mid
+                    Gc_mid = float("nan")
+                else:
+                    lam_mid, raw_mid, Gc_mid = self.lambda_cleave(sig_mid, T)
                 lam_mid = (
                     max(float(lam_mid), 0.0)
                     if math.isfinite(lam_mid)
