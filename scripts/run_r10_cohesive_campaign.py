@@ -95,6 +95,11 @@ def write_ledger(evidence: Path,runs: Path):
     path=evidence/"continuation_ledger.json";tmp=path.with_suffix(".json.tmp")
     tmp.write_text(json.dumps(payload,indent=2,sort_keys=True)+"\n");tmp.replace(path)
     checkpoints=sorted(str(path.relative_to(ROOT)) for path in runs.glob("**/restart/high_cycle_live_checkpoint.json"))
+    remaining_order=[]
+    for candidate in queued_ids:
+        if candidate not in executed_native_ids and candidate not in screen_closed_ids and candidate not in remaining_order:
+            remaining_order.append(candidate)
+    next_native=remaining_order[0] if remaining_order else None
     queue_status={"schema":"r10.cohesive-queue-status/1","active_writers":[],
         "active_job_status":"NONE_AT_LEDGER_SNAPSHOT","native_queue_total":len(set(queued_ids)),
         "native_completed_material_ids":sorted(executed_native_ids),
@@ -103,7 +108,9 @@ def write_ledger(evidence: Path,runs: Path):
         "accepted_checkpoint_paths":checkpoints,
         "advancing_kinetic_completed_material_ids":[json.loads(path.read_text())["candidate_id"] for path in kinetic_analyses],
         "phase_alias_history":"RETAINED_BUT_EXCLUDED; 64/128-PHASE CHECK RESOLVED",
-        "resume_command":"python scripts/run_r10_cohesive_campaign.py continuation --maximum-cycles 100000"}
+        "next_native_information_candidate":next_native,
+        "resume_command":(None if next_native is None else
+            f"python scripts/run_r10_cohesive_campaign.py native --candidate-id {next_native} --maximum-cycles 100000")}
     queue_path=evidence/"queue_status.json";queue_tmp=queue_path.with_suffix(".json.tmp")
     queue_tmp.write_text(json.dumps(queue_status,indent=2,sort_keys=True)+"\n");queue_tmp.replace(queue_path)
     print(json.dumps(payload,indent=2,sort_keys=True))

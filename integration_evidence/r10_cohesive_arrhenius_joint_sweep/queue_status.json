@@ -96,7 +96,8 @@
     "R10D_COH_25753",
     "R10D_COH_28647"
   ],
+  "next_native_information_candidate": "R10D_COH_19672",
   "phase_alias_history": "RETAINED_BUT_EXCLUDED; 64/128-PHASE CHECK RESOLVED",
-  "resume_command": "python scripts/run_r10_cohesive_campaign.py continuation --maximum-cycles 100000",
+  "resume_command": "python scripts/run_r10_cohesive_campaign.py native --candidate-id R10D_COH_19672 --maximum-cycles 100000",
   "schema": "r10.cohesive-queue-status/1"
 }
