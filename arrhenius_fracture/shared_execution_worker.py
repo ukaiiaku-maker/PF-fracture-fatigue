@@ -116,8 +116,38 @@ def _verify_executed_physics(output: Path, options: SharedOptions, plan) -> dict
     Absence or mismatch is fatal.  This function never selects a replacement
     executor, irrespective of elapsed time or output profile.
     """
-    if (options.mechanics is not MechanicsBackend.SPATIAL_PF
-            or options.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE):
+    if options.mechanics is not MechanicsBackend.SPATIAL_PF:
+        return None
+    if options.source_lifecycle is SourceLifecycle.FINITE_INVENTORY:
+        path = output / "v10_1_driver_modes.json"
+        if not path.is_file():
+            raise RuntimeError(
+                "requested finite-inventory execution produced no native mode audit"
+            )
+        payload = json.loads(path.read_text())
+        required = {
+            "tip_source_model": "finite_sites",
+            "distributed_source_representation": "native_finite_tip_sites",
+            "finite_distributed_source_inventory": True,
+            "source_sites_per_system_role": "depletable_capacity_with_native_advance_refresh",
+        }
+        mismatches = {
+            key: {"expected": expected, "observed": payload.get(key)}
+            for key, expected in required.items()
+            if payload.get(key) != expected
+        }
+        if mismatches:
+            raise RuntimeError(
+                "executed finite source lifecycle does not match the request: "
+                + json.dumps(mismatches, sort_keys=True)
+            )
+        return {
+            "schema": "shared-executed-finite-inventory-binding/1",
+            "all_expected_bindings_match": True,
+            "model_audit": str(path),
+            **required,
+        }
+    if options.source_lifecycle is not SourceLifecycle.PERSISTENT_REUSABLE:
         return None
     if options.source_location in {
         SourceLocation.BULK_UNIFORM, SourceLocation.TIP_PLUS_BULK,
@@ -258,6 +288,21 @@ def execute(request_path: str | Path) -> dict:
             )
         if not tip_toggles:
             native_args.append(required_tip_toggle)
+    if plan.executor_module == "arrhenius_fracture.sharp_front_v10_1":
+        owned = ("--tip-source-model", "--material-manifest")
+        if any(
+            token == flag or token.startswith(flag + "=")
+            for token in native_args for flag in owned
+        ):
+            raise ValueError(
+                "--tip-source-model and --material-manifest are owned by the "
+                "shared finite-inventory adapter"
+            )
+        native_args.extend(["--tip-source-model", "finite_sites"])
+        if options.material_manifest:
+            native_args.extend([
+                "--material-manifest", str(Path(options.material_manifest).resolve()),
+            ])
     restart_from = request.get("restart_from")
     if restart_from and plan.restart_family == "v12_accepted_multifront":
         restart_names = ("--v11-restart-checkpoint", "--v12-restart-checkpoint")

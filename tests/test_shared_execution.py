@@ -126,6 +126,75 @@ def test_finite_inventory_maps_to_native_finite_site_driver():
     assert by_role(plan)["source_lifecycle"].module.endswith("sharp_front_v10_1")
 
 
+def test_finite_inventory_public_worker_forces_and_verifies_native_consumer(
+    monkeypatch, tmp_path,
+):
+    from arrhenius_fracture import shared_execution_worker as worker
+
+    manifest = tmp_path / "material.csv"
+    manifest.write_text("fixture\n")
+    options = SharedOptions(
+        source_lifecycle=SourceLifecycle.FINITE_INVENTORY,
+        material_manifest=str(manifest),
+    )
+    captured = {}
+
+    def executor(argv):
+        captured["argv"] = list(argv)
+        out = Path(argv[argv.index("--out") + 1])
+        (out / "v10_1_driver_modes.json").write_text(json.dumps({
+            "tip_source_model": "finite_sites",
+            "distributed_source_representation": "native_finite_tip_sites",
+            "finite_distributed_source_inventory": True,
+            "source_sites_per_system_role": "depletable_capacity_with_native_advance_refresh",
+        }))
+
+    monkeypatch.setattr(worker, "_attest_source", lambda *args: {
+        "commit": "fixture", "tree": "fixture", "calculation_source_dirty": False,
+        "calculation_changes": [],
+    })
+    monkeypatch.setattr(worker, "_verify_source_unchanged", lambda *args: {})
+    monkeypatch.setattr(worker, "_verify_loaded_files", lambda *args: None)
+    monkeypatch.setattr(worker, "construct_and_attest", lambda *args: (
+        executor, {"observed_bindings": [], "executor": {}},
+    ))
+    request = tmp_path / "request.json"
+    output = tmp_path / "out"
+    output.mkdir()
+    request.write_text(json.dumps({
+        "options": options.to_dict(), "output_dir": str(output),
+        "source_policy": "qualified", "native_args": ["--steps", "0"],
+        "restart_from": None,
+    }))
+
+    receipt = worker.execute(request)
+    argv = captured["argv"]
+    assert argv[argv.index("--tip-source-model") + 1] == "finite_sites"
+    assert argv[argv.index("--material-manifest") + 1] == str(manifest)
+    assert receipt["executed_physics_binding"]["all_expected_bindings_match"] is True
+
+
+def test_finite_inventory_public_worker_rejects_disconnected_native_consumer(
+    monkeypatch, tmp_path,
+):
+    from arrhenius_fracture import shared_execution_worker as worker
+
+    options = SharedOptions(source_lifecycle=SourceLifecycle.FINITE_INVENTORY)
+    monkeypatch.setattr(worker, "_attest_source", lambda *args: {})
+    monkeypatch.setattr(worker, "construct_and_attest", lambda *args: (
+        lambda argv: None, {"observed_bindings": [], "executor": {}},
+    ))
+    request = tmp_path / "request.json"
+    output = tmp_path / "out"
+    output.mkdir()
+    request.write_text(json.dumps({
+        "options": options.to_dict(), "output_dir": str(output),
+        "source_policy": "qualified", "native_args": [], "restart_from": None,
+    }))
+    with pytest.raises(RuntimeError, match="no native mode audit"):
+        worker.execute(request)
+
+
 def test_operator_consistent_preset_maps_to_developed_native_campaign():
     plan = build_execution_plan(PRESETS["pf_operator_consistent_cyclic"])
     assert plan.executable

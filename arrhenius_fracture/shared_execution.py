@@ -440,12 +440,14 @@ def execute_shared(
         )
     if options.kernel_manifest:
         raise RuntimeError("shared kernel-manifest mapping is not yet qualified")
-    if options.material_manifest and not (
-        plan.executor_module
-        == "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited"
-    ):
+    material_manifest_executors = {
+        "arrhenius_fracture.sharp_front_v10_1",
+        "arrhenius_fracture.sharp_front_v10_4_bulk_peierls_taylor_audited",
+    }
+    if options.material_manifest and plan.executor_module not in material_manifest_executors:
         raise RuntimeError(
-            "material_manifest is mapped only for the native v10.4 combined bulk path"
+            "material_manifest is mapped only for the native finite-inventory "
+            "tip path and the native v10.4 combined bulk path"
         )
     output = Path(output_dir).resolve()
     if any(arg == "--out" or arg.startswith("--out=") for arg in native_args):
