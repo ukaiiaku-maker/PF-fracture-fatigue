@@ -31,14 +31,12 @@ def _binding_errors(row: dict) -> list[str]:
         q = row.get("qualification_execution", {})
         command = list(q.get("launcher", []))
         checks = {
-            "material_class": row["family"],
             "opening_model": row["cohesive_law"]["kind"],
             "temperature_K": f"{float(row['temperature_K']):g}",
             "temperature_policy": row["cohesive_law"]["temperature_policy"],
             "constraint": row["mechanics_state"]["plane_state"],
         }
         flags = {
-            "material_class": "--material-class",
             "opening_model": "--opening-model",
             "temperature_K": "--temperature-K",
             "temperature_policy": "--temperature-policy",
@@ -47,6 +45,11 @@ def _binding_errors(row: dict) -> list[str]:
         for name, expected in checks.items():
             if _value(command, flags[name]) != expected:
                 errors.append(f"qualification {name} is not translated")
+        if "--material-class" in command:
+            errors.append(
+                "qualification passes unsupported material-class instead of "
+                "the authoritative registry/option identity"
+            )
         if q.get("production_case_substitution") is not False:
             errors.append("constructed specimen is not explicitly excluded as production substitution")
         return errors

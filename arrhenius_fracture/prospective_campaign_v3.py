@@ -765,7 +765,6 @@ def _cohesive_cases(root: Path, options: dict[str, str]) -> list[dict[str, Any]]
                 else:
                     qualification_args = [
                         "--bilinear-fit-registry", str((root / FIT_REGISTRY).resolve()),
-                        "--material-class", family,
                         "--opening-model", law,
                         "--temperature-K", f"{temperature:g}",
                         "--temperature-policy", temperature_policy,

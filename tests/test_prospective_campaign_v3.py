@@ -36,6 +36,10 @@ def test_v3_is_typed_disabled_and_adds_deliberate_cohesive_block():
     assert all(row["cohesive_law"]["fit"]["unassigned_physical_quantities"] for row in fitted)
     assert all(row["qualification_execution"]["launcher"] for row in fitted)
     assert all(
+        "--material-class" not in row["qualification_execution"]["launcher"]
+        for row in fitted
+    )
+    assert all(
         row["native_entrypoint"]
         == "arrhenius_fracture.generic_current_pf_companion"
         for row in fitted
