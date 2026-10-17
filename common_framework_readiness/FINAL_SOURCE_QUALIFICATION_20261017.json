@@ -1,32 +1,33 @@
 {
   "schema": "fracture-framework-final-source-qualification/3",
   "date": "2026-10-17",
-  "overall_status": "LOCAL_IMPLEMENTATION_AND_COMPACT_ACCEPTANCE_PASS_EXTERNAL_AND_RESOURCE_DEPENDENCIES_INCOMPLETE",
+  "overall_status": "LOCAL_NATIVE_FRAMEWORK_QUALIFIED_R09_RESOURCE_AND_EXTERNAL_PHYSICAL_INPUTS_INCOMPLETE",
   "source_pair": {
-    "pf_binding_commit": "760352d7cb1bcf556c7709e907c1b47fc9a8ac6d",
-    "fem_calculation_commit": "242f01fd1a400ac86ad13e6c79407b55f8798607",
-    "fem_evidence_commit": "28c5cef87ef4e499889d6a479d5f79d36193e5d9"
+    "pf_calculation_and_campaign_commit": "1b398437198caec55ae5ea688032accec7bd17da",
+    "fem_calculation_commit": "d522b5421ebdeabe1063cd735739cc1a26ebaa75",
+    "fem_evidence_commit": "baa27d72c87ba1bb9e5a8b22029e2406e136cf8c"
   },
   "fem": {
     "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q",
     "result": "PASS",
-    "passed": 767,
-    "skipped": 2,
+    "passed": 776,
+    "skipped": 0,
     "passing_subtests": 16,
-    "duration_s": 205.97,
-    "r05_evidence": "fem-czm-current-pf-companion@28c5cef:integration_evidence/r05_event_state_repair_242f01f/qualification_report.json"
+    "duration_s": 520.44,
+    "r05_evidence": "fem-czm-current-pf-companion@baa27d7:integration_evidence/r05_p9_classical_three_grid_d522b54/qualification_report.json",
+    "r07_evidence": "fem-czm-current-pf-companion@baa27d7:integration_evidence/r07_exp_floor_event_resume_ed37972_triangle/qualification_report.json"
   },
   "pf": {
     "portable_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q -m 'not external_evidence'",
     "portable_result": "PASS",
-    "passed": 1010,
+    "passed": 1012,
     "deselected_external_evidence": 16,
-    "duration_s": 150.46,
+    "duration_s": 257.43,
     "binding_campaign_command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_shared_execution.py tests/test_prospective_campaign_v3.py tests/test_campaign_v3_acceptance_audit.py tests/test_release_campaign_entrypoint.py tests/test_current_registry_v5_binding.py tests/test_common_framework_release_tools.py",
     "binding_campaign_result": "40 passed in 3.41 s",
     "campaign_case_count": 699,
     "campaign_validation_errors": 0,
-    "campaign_canonical_semantic_sha256": "ff573b7f7aedf6ad609d59d8747c96c43489fdca9996da5b7bf3bd5c5ffbdf21",
+    "campaign_canonical_semantic_sha256": "f42c3d4b6a0262cba572c1704d9db27158b35dc1a273cb9f56ccbe4639182772",
     "production_execution_authorized": false
   },
   "r05_acceptance": {
@@ -38,7 +39,8 @@
     "autonomous_no_opening_hazard": "PASS",
     "active_state_restart": "PASS",
     "post_event_geometry_restart": "PASS",
-    "case_level_three_grid": "RESOURCE_BLOCKED_UNEXECUTED"
+    "case_level_three_grid": "PASS_CONSTRUCTED_QUALIFICATION",
+    "three_grid_evidence": "fem-czm-current-pf-companion@baa27d7:integration_evidence/r05_p9_classical_three_grid_d522b54/qualification_report.json"
   },
   "r03_dbtt_lifecycle_acceptance": {
     "persistent_selected_candidate_native_consumers": "PASS_REUSED",
@@ -48,7 +50,8 @@
     "temperature_K": 1200,
     "steps": 2,
     "material_manifest_sha256": "887c329efe6af3ccc058cdc2c2fbed12d8faed1c1d0f9ecbd706bfb3c0395e98",
-    "evidence": "common_framework_readiness/r03_dbtt_primary_finite_native_760352d7/shared_runtime_attestation.post.json",
+    "transport_consumer": "legacy_split_native finite-inventory UnifiedMPZState evolve/rates/exchange/advection route",
+    "evidence": "common_framework_readiness/r03_dbtt_primary_finite_native_9c0513ba/shared_runtime_attestation.post.json",
     "production_selection": null,
     "physical_calibration_claimed": false
   },
@@ -60,8 +63,8 @@
     "r05_grid_and_r07_peak_estimate_GiB": 6,
     "r09_peak_estimate_GiB": 24,
     "required_reserve_GiB": 12,
-    "r05_grid_admitted": false,
-    "r07_admitted": false,
+    "r05_grid_admitted": true,
+    "r07_admitted": true,
     "r09_admitted": false,
     "peak_estimates_are_measured": false
   },
@@ -75,8 +78,6 @@
     ]
   },
   "remaining_external_or_resource_dependencies": [
-    "R05 representative three-level case grid execution window with at least the estimated 6 GiB peak plus 12 GiB reserve",
-    "R07 accepted mixed/constraint EXP-floor event continuation with the same resource admission",
     "R09 recursive second-generation continuation with the estimated 24 GiB peak plus 12 GiB reserve and adequate transient disk",
     "the two mandatory independent archive bytes",
     "production cohesive support and final material selection"

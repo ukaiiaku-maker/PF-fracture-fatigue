@@ -1,5 +1,26 @@
 # Native Taylor–Peierls repair progress
 
+## Native framework closeout qualification, 17 October 2026
+
+- The current source pair is PF calculation/campaign `1b398437` with FEM
+  evidence `baa27d7` (calculation source `d522b54`). The final gates pass 1012
+  portable PF tests with 16 explicit external-evidence deselections and 776 FEM
+  tests plus 16 subtests.
+- The representative constructed classical P9 specimen completed genuine
+  2.0/1.5/1.0 micrometre tip-spacing levels. Every level selected and activated
+  the current native bilinear provider, retained tip-only source feedback,
+  reached two cohesive events and 10 micrometres, and recorded accepted-time,
+  authoritative-damage and dissipation evidence. Raw mesh differences are
+  reported without inventing a new convergence tolerance.
+- R07 completed an accepted plane-stress signed 25-degree mixed-grip EXP-floor
+  event at step 821, advanced 9.165550 micrometres, passed the unchanged remesh
+  quality gates, and resumed in a fresh process at step 822 with identical
+  target physics.
+- R09 remains prepared but is not admitted: its 24 GiB estimated peak plus the
+  required 12 GiB reserve exceeds both currently available memory and the
+  21 GiB free Data volume. Production, manuscript work, remote writes and
+  scientific-data deletion remain disabled.
+
 ## Event-state R05 repair and qualification, 17 October 2026
 
 - FEM calculation commit `242f01f` preserves the actual-consumer repair and

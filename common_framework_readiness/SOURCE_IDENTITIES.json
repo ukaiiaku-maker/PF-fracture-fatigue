@@ -1,6 +1,6 @@
 {
   "schema": "common-fracture-readiness-source-identities/2",
-  "generated_utc": "2026-10-16",
+  "generated_utc": "2026-10-17",
   "controlling_continuation": {
     "date": "2026-10-13",
     "sha256": "17e658d723c9b59e2e5cdfed34f3cdfe3c8fa51926a42b4d168b063f1365ccae"
@@ -11,7 +11,7 @@
   },
   "pf": {
     "branch": "codex/shared-fracture-fatigue-options-v1",
-    "current_calculation_and_campaign_commit": "dd0c1953e57f7aeaa977b4965b2b9f9d0323b584",
+    "current_calculation_and_campaign_commit": "1b398437198caec55ae5ea688032accec7bd17da",
     "qualified_solver_commit": "2276745b06220125354687f04c182c8d11be66dd",
     "current_recovery_wiring_commit": "9f73dbff20562f1a87b55fe343b2cd30ff5c2750",
     "recovery_wiring_record": "TAYLOR_PEIERLS_RECOVERY_WIRING.json",
@@ -24,9 +24,9 @@
   },
   "fem": {
     "branch": "codex/current-pf-companion",
-    "calculation_commit": "242f01fd1a400ac86ad13e6c79407b55f8798607",
-    "commit": "3c8c02e1ce7bfc12db9b05ceef6c6a7bcc0c2bbb",
+    "calculation_commit": "d522b5421ebdeabe1063cd735739cc1a26ebaa75",
+    "commit": "baa27d72c87ba1bb9e5a8b22029e2406e136cf8c",
     "path": "/Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion",
-    "status": "actual_solved_interface_bilinear_continuous_ramp_source_feedback_authoritative_damage_dissipation_active_restart_generic_full_field_and_prepared_r07_resume_compact_qualified"
+    "status": "actual_solved_interface_bilinear_continuous_ramp_source_feedback_authoritative_damage_dissipation_active_restart_three_level_r05_and_accepted_r07_event_restart_compact_qualified"
   }
 }
