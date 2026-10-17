@@ -2,9 +2,9 @@
 
 ## Source identity and disposition
 
-The integrated calculation and disabled-campaign implementation is PF `2dd1372fb45a4b4dd07d77ec5e85ee1bdab25f69`; its exact solved native FEM dependency is `7fde6894fe44038f9dc785da87967056a7d12406`. A later PF documentation-only closeout commit may contain this report; it does not change that calculation-source identity. Production and manuscript work remain disabled. No remote write or scientific-data deletion was performed.
+The integrated calculation and disabled-campaign implementation is PF `c1d587896b2acad66e73a56545a4762371dc1056`; its exact native FEM dependency is `70c52ad900b1832ae9569fef70df9fc8a0cf8a9c` (consumer repair `9c9b3e8`). A later PF documentation-only closeout commit may contain this report; it does not change that calculation-source identity. Production and manuscript work remain disabled. No remote write or scientific-data deletion was performed.
 
-The fixed portable source qualification passes: PF reports 1008 passed with 16 explicitly external-evidence tests deselected; FEM reports 759 passed plus 16 passing subtests at `7fde6894`. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
+The current portable PF source qualification reports 1008 passed with 16 explicitly external-evidence tests deselected; the changed PF campaign/binding subset passes 33 tests. FEM reports 764 passed plus 16 passing subtests at `70c52ad`. The exact commands and timings are in `FINAL_SOURCE_QUALIFICATION_20261016.json`.
 
 ## Controller findings and repair
 
@@ -22,7 +22,16 @@ The original EXP-floor route was not replaced. Its existing protection remains i
 
 ## Native R05 evidence
 
-The public generic route now drives `solved_moving_tip_bilinear_v2`, a compact equivalent of the original moving-tip specimen rather than the fixed-kinematic component qualifier. It creates the notched mesh, inserts the adaptive cohesive trial segment, performs sparse free-DOF equilibrium solves, calls native `plasticity.update_plasticity`, transfers state, loads/unloads/reloads, accounts for cohesive/external/plastic work, restores the whole attempted state on injected failure, commits after returned equilibrium, and reloads the active checkpoint exactly.
+The reproduced acceptance defect was a disconnected constructor: the public generic route actually reached `sharp_front.run_2d` and its dynamic `CalibratedMixedModeMPZV911Engine`, while the earlier installer changed only a class in the unused `kinetic_progressive_2d_v1002` route. FEM `9c9b3e8` installs the requested opening provider only after the complete current wrapper stack is built. It derives a per-engine class, retains `ProductionJointKSingleTrialFrontEngineV10051832` and the persistent signed/source ancestry, replaces only the inherited EXP-floor opening clock, and serializes the provider through the original specimen checkpoint owner. Runtime acceptance now fails closed unless the actual provider is constructed and advanced, and unless a requested restart restores it.
+
+The actual unmocked public runs are retained under `integration_evidence/r05_actual_current_opening_consumer_20261016/qualification_report.json` at FEM `70c52ad`:
+
+- A low-load active-tip run constructs and advances the provider and source owner once, produces no event, and is correctly classified `selected_but_no_opening_event_in_run` rather than disconnected.
+- The autonomous classical run advances through five solved-traction states and commits a native 1 μm topology event. It is not gated by an opening hazard.
+- A fresh process restores the active step-4 provider state and reproduces the direct step-5 terminal history and geometry hashes exactly.
+- The activated run commits a native event at step 20 and localizes the final accepted interval from `3.7967e-11 s` requested to `3.6655e-12 s` consumed. The inherited EXP-floor clock remains suppressed.
+
+The earlier compact solved-driver results remain component evidence for work, unload/reload, rollback and local constitutive accuracy; they are not used as proof of the public consumer connection:
 
 - Activated evidence: `integration_evidence/r05_solved_native_moving_tip_20261016/activated_v2/solved_moving_tip_bilinear_qualification.json`. It uses accepted physical time and persistent event ownership; the maximum restart errors in displacement, plastic strain and density are all zero. Measured compact-run peak RSS is `0.07498 GiB`, retained output before the report is `33,815 bytes`, and wall time is `0.1265 s`.
 - Autonomous evidence: `integration_evidence/r05_solved_native_moving_tip_20261016/classical_v2/solved_moving_tip_bilinear_qualification.json`. It evolves from opening history with requested hazard duration and clock increments exactly zero; the same three restart errors are zero. Measured compact-run peak RSS is `0.07124 GiB`, retained output is `34,116 bytes`, and wall time is `0.1008 s`.
@@ -30,11 +39,11 @@ The public generic route now drives `solved_moving_tip_bilinear_v2`, a compact e
 
 ## Disabled campaign and remaining native executions
 
-The v3 campaign has 699 disabled rows and 699 source-bound native commands. Five selective P8 rows carry actual executable request fields for plane stress, generalized plane strain with prescribed `eps_zz`, generalized plane strain with prescribed `sigma_zz`, pure mode II, and mixed I–II. The 36 fitted-bilinear P9 rows use the exact public model IDs and dispatch through the generic companion to the solved native moving-tip driver with explicit constructed qualification inputs. This is an executable qualification binding, not a production material calibration; all production authorization flags remain false.
+The v3 campaign has 699 disabled rows and 699 source-bound native commands. Five selective P8 rows carry actual executable request fields for plane stress, generalized plane strain with prescribed `eps_zz`, generalized plane strain with prescribed `sigma_zz`, pure mode II, and mixed I–II. The 36 fitted-bilinear P9 rows use the exact public model IDs and dispatch through the generic companion to the actual atomic-path-corridor driver and current front provider. Their binding explicitly records replacement of the inherited EXP-floor clock and preservation of the persistent source owner. This is an executable qualification binding, not a production material calibration; all production authorization flags remain false.
 
-The accepted mixed/constraint EXP-floor topology event (R07) and recursive second-generation branch-owner transition (R09) were not launched. `RESOURCE_ADMISSION_20261016.json` separates measurements from estimates: four unrelated workers held about 8.01 GiB RSS in total, swap had 777.31 MiB free, immediately free pages represented about 86.56 MiB, and the Data volume had 30 GiB free. The 6 GiB R07 and 24 GiB R09 execution peaks and the 12 GiB reserve are engineering estimates, not measured peaks. Disk-only admission passes R07 but not R09; current RAM pressure admits neither. The existing disk-capacity preflight is not represented as a RAM check.
+The accepted mixed/constraint EXP-floor topology event (R07) and recursive second-generation branch-owner transition (R09) were not launched. The latest measurements show about 50.34 MiB immediately free, 873.31 MiB swap free, 28 GiB free on the Data volume, and five unrelated processes at about 1.36–2.65 GiB RSS each. The 6 GiB R07 and 24 GiB R09 execution peaks and the 12 GiB reserve remain engineering estimates, not measured peaks. Disk-only admission passes R07 but not R09; current RAM pressure admits neither.
 
-Both resumptions remain prepared exactly. R07 was dry-run validated on the preserved ancestor and remains present at FEM `7fde6894`; it executes only when `--execute` is supplied:
+Both resumptions remain prepared exactly. R07 was dry-run validated on the preserved ancestor and remains present at FEM `70c52ad`; it executes only when `--execute` is supplied:
 
 ```bash
 cd /Volumes/Data/working-papers/Fracture/fem-czm-current-pf-companion

@@ -1,0 +1,57 @@
+{
+  "schema": "fracture-native-resource-admission/1",
+  "observed_utc": "2026-10-16T21:37:00Z",
+  "host_measurements": {
+    "vm_page_size_bytes": 16384,
+    "vm_pages_free": 3222,
+    "immediately_free_page_bytes": 52789248,
+    "immediately_free_page_MiB": 50.34,
+    "swap_total_MiB": 6144.0,
+    "swap_used_MiB": 5270.69,
+    "swap_free_MiB": 873.31,
+    "data_volume_size_GiB": 554.0,
+    "data_volume_used_GiB": 526.0,
+    "data_volume_free_GiB": 28.0,
+    "measurement_commands": [
+      "vm_stat",
+      "sysctl vm.swapusage",
+      "df -h /Volumes/Data",
+      "ps -axo pid,rss,comm"
+    ]
+  },
+  "largest_unrelated_processes": [
+    {"pid": 962, "rss_KiB": 2711392, "role": "Visual Studio Code renderer"},
+    {"pid": 75713, "rss_KiB": 2313024, "role": "PF-sintering Python worker"},
+    {"pid": 76342, "rss_KiB": 2095712, "role": "PF-sintering Python worker"},
+    {"pid": 5747, "rss_KiB": 1561520, "role": "unrelated Python worker"},
+    {"pid": 5748, "rss_KiB": 1431520, "role": "unrelated Python worker"}
+  ],
+  "prepared_resumptions": {
+    "R07": {
+      "ram_peak_GiB": 6.0,
+      "ram_peak_basis": "engineering allocation estimate; no measured native peak retained",
+      "disk_peak_GiB": 6.0,
+      "reserve_GiB": 12.0,
+      "disk_preflight_admitted": true,
+      "ram_preflight_admitted": false,
+      "admitted_now": false,
+      "reason": "immediately free RAM plus free swap is below the estimated peak plus reserve while unrelated multi-GiB workers are active"
+    },
+    "R09": {
+      "ram_peak_GiB": 24.0,
+      "ram_peak_basis": "engineering allocation estimate; no measured native peak retained",
+      "disk_peak_GiB": 24.0,
+      "reserve_GiB": 12.0,
+      "disk_preflight_admitted": false,
+      "ram_preflight_admitted": false,
+      "admitted_now": false,
+      "reason": "28 GiB disk free is below the 36 GiB estimated footprint plus reserve, and RAM admission independently fails"
+    }
+  },
+  "interpretation": {
+    "measured_values_separate_from_estimates": true,
+    "long_native_transition_launched": false,
+    "production_launched": false,
+    "unrelated_process_terminated": false
+  }
+}

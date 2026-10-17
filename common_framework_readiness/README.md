@@ -26,13 +26,15 @@ specified public IDs `exp_floor_activated_native`,
 `bilinear_barrier_activated`, and `bilinear_czm_classical`. The latter two keep
 their old internal names only as compatibility aliases. Their present material
 support is constructed qualification input, not a production calibration. Both
-public bilinear routes install their cohesive stepper inside the established
-`kinetic_progressive_2d_v1002` specimen driver, retaining its requested mesh,
-loading, source geography, adaptive topology, accepted event lifecycle and
-fresh-process checkpoint owner. The authoritative persistent-source consumer
-advances once per accepted physical interval; mechanics callbacks advance no
-kinetic time. The older compact solved fixture remains useful component
-evidence, but is not the campaign driver.
+public bilinear routes install `NativeBilinearFrontProvider` on the actual
+current atomic-path-corridor specimen's fully wrapped
+`CalibratedMixedModeMPZV911Engine`, retaining its requested mesh, loading,
+source geography, signed persistent-source lineage, adaptive topology,
+accepted event lifecycle and fresh-process checkpoint owner. The provider
+replaces the inherited EXP-floor opening clock and advances the established
+source owner once per accepted physical interval. Runtime verification rejects
+a selected but disconnected provider. The older compact solved fixture remains
+useful component evidence, but is not the campaign driver.
 
 Current resource admission is workload-specific. R07 and R09 retain exact
 accepted checkpoints and commands, but their substantial continuations are not
