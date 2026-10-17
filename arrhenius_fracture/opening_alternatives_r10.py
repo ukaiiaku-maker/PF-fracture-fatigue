@@ -40,10 +40,10 @@ class OpeningAlternative:
             raise ValueError("opening_mode must be cohesive_athermal or cohesive_mixed")
         if self.cohesive_shape not in {SMOOTH_EXPONENTIAL, BILINEAR}:
             raise ValueError("unsupported cohesive shape")
-        expected = ("quasistatic_mechanical" if self.opening_mode == "cohesive_athermal"
-                    else "qualified_high_barrier_hazard")
-        if self.dynamics != expected:
-            raise ValueError(f"{self.opening_mode} requires {expected}")
+        expected = ({"quasistatic_mechanical"} if self.opening_mode == "cohesive_athermal"
+                    else {"qualified_high_barrier_hazard","time_dependent_first_passage"})
+        if self.dynamics not in expected:
+            raise ValueError(f"{self.opening_mode} requires one of {sorted(expected)}")
         if self.opening_mode == "cohesive_mixed":
             if not self.activation_area_m2 or not self.attempt_frequency_s:
                 raise ValueError("mixed opening requires area and attempt frequency")
@@ -160,10 +160,44 @@ def connected_landscape(imposed_delta_m: float, environment_stiffness_Pa_per_m: 
             "connected_state":{"branch":branch,"delta_m":connected["delta_m"]}}
 
 
+def overdamped_mfpt(alternative: OpeningAlternative, imposed_delta_m: float,
+                    environment_stiffness_Pa_per_m: float,
+                    thermal: CohesiveThermalLaw, temperature_K: float,
+                    connected: dict[str, Any], saddle: dict[str, Any],
+                    grid_points: int = 1025) -> dict[str, float]:
+    """Static reflecting/absorbing MFPT on the same cohesive coordinate.
+
+    The friction is not fitted: the declared microscopic attempt frequency owns
+    the harmonic relaxation, ``zeta=A*k0/nu0``.  Cyclic use is allowed only
+    when the caller establishes adiabatic separation from its phase duration.
+    """
+    area=float(alternative.activation_area_m2);nu=float(alternative.attempt_frequency_s)
+    k0=thermal.initial_stiffness(temperature_K);zeta=area*k0/nu
+    x0=float(connected["delta_m"]);xb=float(saddle["delta_m"])
+    if not (0.0<=x0<xb):
+        raise ValueError("MFPT requires an ordered connected minimum and saddle")
+    x=np.linspace(0.0,xb,max(int(grid_points),129))
+    _,_,psi=cohesive_shape_response(alternative.cohesive_shape,x,thermal,temperature_K)
+    U=area*(np.asarray(psi)+0.5*environment_stiffness_Pa_per_m*(imposed_delta_m-x)**2)
+    beta=1.0/(KB_EV_PER_K*EV_TO_J*temperature_K);shift=float(np.min(U))
+    em=np.exp(np.clip(-beta*(U-shift),-700.,700.))
+    inner=np.r_[0.,np.cumsum(0.5*(em[1:]+em[:-1])*np.diff(x))]
+    ep=np.exp(np.clip(beta*(U-shift),-700.,700.))
+    integrand=ep*inner
+    start=int(np.searchsorted(x,x0));integral=float(np.trapezoid(integrand[start:],x[start:]))
+    mfpt=zeta*beta*integral
+    relaxation=zeta/(area*max(k0+environment_stiffness_Pa_per_m,1e-300))
+    return {"mfpt_s":mfpt,"mfpt_rate_s-1":0.0 if mfpt<=0.0 else 1.0/mfpt,
+            "friction_J_s_m-2":zeta,"harmonic_relaxation_s":relaxation,
+            "reflecting_boundary_m":0.0,"absorbing_boundary_m":xb,
+            "grid_points":len(x)}
+
+
 def evaluate_opening(alternative: OpeningAlternative, imposed_delta_m: float,
                      environment_stiffness_Pa_per_m: float,
                      thermal: CohesiveThermalLaw, temperature_K: float,
-                     prior: dict[str, Any] | None = None) -> dict[str, Any]:
+                     prior: dict[str, Any] | None = None,
+                     phase_duration_s: float | None = None) -> dict[str, Any]:
     landscape=connected_landscape(imposed_delta_m,environment_stiffness_Pa_per_m,
                                   thermal,temperature_K,
                                   alternative.cohesive_shape,prior)
@@ -186,7 +220,24 @@ def evaluate_opening(alternative: OpeningAlternative, imposed_delta_m: float,
     result.update({"barrier_J":barrier_J,"barrier_eV":barrier_J/EV_TO_J,
                    "barrier_kBT":barrier_kBT})
     if barrier_kBT < alternative.high_barrier_min_kBT:
-        result["kinetic_validity"]="CROSSOVER_REQUIRES_FIRST_PASSAGE"
+        if alternative.dynamics != "time_dependent_first_passage" or phase_duration_s is None:
+            result["kinetic_validity"]="CROSSOVER_REQUIRES_FIRST_PASSAGE"
+            return result
+        connected=landscape.get("connected")
+        later=[p for p in landscape.get("stationary",[]) if p.get("kind")=="SADDLE"
+               and connected is not None and float(p["delta_m"])>float(connected["delta_m"])]
+        if connected is None or not later:
+            result["kinetic_validity"]="CROSSOVER_REQUIRES_FIRST_PASSAGE"
+            return result
+        mfpt=overdamped_mfpt(alternative,imposed_delta_m,environment_stiffness_Pa_per_m,
+                             thermal,temperature_K,connected,later[0])
+        ratio=mfpt["harmonic_relaxation_s"]/max(float(phase_duration_s),1e-300)
+        result.update(mfpt);result["adiabatic_relaxation_to_phase_ratio"]=ratio
+        if ratio>1e-3:
+            result["kinetic_validity"]="NONADIABATIC_DISTRIBUTION_PROPAGATION_REQUIRED"
+            return result
+        result["elementary_rate_s-1"]=mfpt["mfpt_rate_s-1"]
+        result["kinetic_validity"]="TIME_DEPENDENT_FIRST_PASSAGE_ADIABATIC"
         return result
     result["elementary_rate_s-1"]=(float(alternative.attempt_frequency_s)
         *math.exp(max(-barrier_kBT,-700.0)))
@@ -195,4 +246,4 @@ def evaluate_opening(alternative: OpeningAlternative, imposed_delta_m: float,
 
 
 __all__=["BRANCH_STATES","OpeningAlternative","connected_landscape",
-         "evaluate_opening"]
+         "evaluate_opening","overdamped_mfpt"]

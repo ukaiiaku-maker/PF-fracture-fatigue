@@ -2,6 +2,8 @@ import math
 
 import numpy as np
 
+from arrhenius_fracture.cohesive import CohesiveElement,CohesiveNetwork,cohesive_element_diagnostics
+
 from arrhenius_fracture.cohesive_arrhenius import (
     BILINEAR, SMOOTH_EXPONENTIAL, BilinearCohesiveLaw, CohesiveThermalLaw,
     cohesive_shape_response, mechanical_completion,
@@ -54,3 +56,45 @@ def test_completion_is_shape_specific_and_geometry_owned():
     thermal=law();bilinear=BilinearCohesiveLaw(thermal)
     assert mechanical_completion(BILINEAR,bilinear.final_separation(300.),thermal,300.)["complete"]
     assert not mechanical_completion(SMOOTH_EXPONENTIAL,thermal.delta0_m,thermal,300.)["complete"]
+
+
+def test_crossover_first_passage_uses_declared_attempt_scale_without_fit():
+    thermal=law();kenv=0.04*thermal.initial_stiffness(300.)
+    mixed=OpeningAlternative("cohesive_mixed",SMOOTH_EXPONENTIAL,
+        "time_dependent_first_passage",1e-18,1e12,high_barrier_min_kBT=1e6)
+    found=None
+    for factor in np.linspace(1.0,8.0,80):
+        trial=evaluate_opening(mixed,factor*thermal.delta0_m,kenv,thermal,300.,
+                               phase_duration_s=1e-5)
+        if trial["kinetic_validity"]=="TIME_DEPENDENT_FIRST_PASSAGE_ADIABATIC":
+            found=trial;break
+    assert found is not None
+    assert found["mfpt_s"]>0.0
+    assert found["elementary_rate_s-1"]==found["mfpt_rate_s-1"]
+    expected=(1e-18*thermal.initial_stiffness(300.)/1e12)
+    assert math.isclose(found["friction_J_s_m-2"],expected,rel_tol=1e-12)
+
+
+def test_spatial_plastic_closure_is_a_signed_mechanical_feedback():
+    thermal=law();elem=CohesiveElement((0,1),(2,3),np.array([0.,1.]),
+        np.array([1.,0.]),1e-6,thermal)
+    u=np.zeros(8);u[[1,3]]=thermal.delta0_m/2;u[[5,7]]=-thermal.delta0_m/2
+    zero=CohesiveNetwork([elem],plastic_closure_Pa=0.)
+    base=cohesive_element_diagnostics(elem,u,zero)["normal_traction_Pa"]
+    coupled=CohesiveNetwork([elem],plastic_closure_Pa=2e8)
+    changed=cohesive_element_diagnostics(elem,u,coupled)
+    assert math.isclose(changed["normal_traction_Pa"]-base,2e8,rel_tol=1e-12)
+    assert changed["plastic_closure_traction_Pa"]==2e8
+
+
+def test_intact_plastic_closure_is_continuous_into_contact():
+    thermal=law();elem=CohesiveElement((0,1),(2,3),np.array([0.,1.]),
+        np.array([1.,0.]),1e-6,thermal)
+    closure=2e8;network=CohesiveNetwork([elem],contact_penalty_Pa_per_m=1e23,
+                                        plastic_closure_Pa=closure)
+    values=[]
+    for opening in (-1e-18,0.,1e-18):
+        u=np.zeros(8);u[[1,3]]=opening/2;u[[5,7]]=-opening/2
+        values.append(cohesive_element_diagnostics(elem,u,network)["normal_traction_Pa"])
+    assert values[0] < values[1] < values[2]
+    assert max(abs(value-closure) for value in values) < 2e5

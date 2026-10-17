@@ -108,6 +108,7 @@ class CohesiveNetwork:
     contact_penalty_Pa_per_m: float = 1.0e22
     intact_shear_penalty_Pa_per_m: float = 0.0
     execution_identity: str = COHESIVE_KINETIC_CZM
+    plastic_closure_Pa: float = 0.0
 
     def __post_init__(self) -> None:
         if self.execution_identity not in {
@@ -117,6 +118,8 @@ class CohesiveNetwork:
             raise ValueError("unsupported cohesive network identity")
         if self.contact_penalty_Pa_per_m < 0.0 or self.intact_shear_penalty_Pa_per_m < 0.0:
             raise ValueError("numerical penalties must be nonnegative")
+        if not np.isfinite(self.plastic_closure_Pa):
+            raise ValueError("plastic closure traction must be finite")
 
     def add(self, elem: CohesiveElement) -> None:
         self.elements.append(elem)
@@ -137,7 +140,7 @@ class CohesiveNetwork:
                  **e.metadata} for i, e in enumerate(self.elements)]
 
     def energy_ledger(self,u:np.ndarray) -> dict:
-        cohesive=0.0;contact=0.0;shear=0.0
+        cohesive=0.0;contact=0.0;shear=0.0;plastic_closure_work=0.0
         A=_jump_operator()
         for elem in self.elements:
             nodes=np.asarray(elem.nodes4,dtype=int);edofs=np.empty(8,dtype=int)
@@ -151,11 +154,13 @@ class CohesiveNetwork:
                     elem.cohesive_shape,max(dn,0.0),elem.thermal,
                     elem.temperature_K)[2])*elem.length
                 shear+=0.5*self.intact_shear_penalty_Pa_per_m*dt*dt*elem.length
+                plastic_closure_work+=self.plastic_closure_Pa*dn*elem.length
             if dn<0.0:
                 contact+=0.5*self.contact_penalty_Pa_per_m*dn*dn*elem.length
         return {"cohesive_surface_and_storage_J_per_m":cohesive,
                 "contact_numerical_energy_J_per_m":contact,
                 "intact_shear_numerical_energy_J_per_m":shear,
+                "frozen_plastic_closure_work_J_per_m":plastic_closure_work,
                 "activation_barrier_surface_charge_J_per_m":0.0,
                 "surface_energy_owner":"COHESIVE_NETWORK_STATE",
                 "contact_energy_owner":"NUMERICAL_CONTACT_ONLY"}
@@ -173,7 +178,12 @@ def _response(elem: CohesiveElement, network: CohesiveNetwork,
     dn = float(elem.normal @ jump)
     dt = float(elem.tangent @ jump)
     if dn < 0.0:
-        tn = network.contact_penalty_Pa_per_m * dn
+        # Retain the frozen plastic closing traction on the intact closed
+        # branch.  This makes the law continuous at zero opening and lets the
+        # contact reaction balance the pre-stress instead of creating a false
+        # zero-displacement branch-loss censor.
+        closure = 0.0 if elem.broken else float(network.plastic_closure_Pa)
+        tn = network.contact_penalty_Pa_per_m * dn + closure
         kn = network.contact_penalty_Pa_per_m
         contact = True
     elif elem.broken:
@@ -181,7 +191,7 @@ def _response(elem: CohesiveElement, network: CohesiveNetwork,
     else:
         tn, kn, _ = cohesive_shape_response(
             elem.cohesive_shape,dn,elem.thermal,elem.temperature_K)
-        tn=float(tn);kn=float(kn)
+        tn=float(tn)+float(network.plastic_closure_Pa);kn=float(kn)
         contact = False
     kt = 0.0 if elem.broken else network.intact_shear_penalty_Pa_per_m
     tt = kt * dt
@@ -195,6 +205,8 @@ def _response(elem: CohesiveElement, network: CohesiveNetwork,
             "rupture_state": elem.rupture_state,
             "execution_identity": network.execution_identity,
             "cohesive_shape":elem.cohesive_shape,
+            "plastic_closure_traction_Pa":(0.0 if elem.broken else
+                                             float(network.plastic_closure_Pa)),
             "surface_free_energy_J_m2": (elem.thermal.gamma(elem.temperature_K)
                 if elem.broken else float(cohesive_shape_response(
                     elem.cohesive_shape,max(dn,0.0),elem.thermal,
