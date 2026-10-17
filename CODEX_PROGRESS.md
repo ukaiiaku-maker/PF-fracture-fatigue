@@ -1,19 +1,21 @@
 # Native Taylor–Peierls repair progress
 
-## Actual solved-interface R05 completion, 16 October 2026
+## Event-state R05 repair and qualification, 17 October 2026
 
-- FEM calculation commit `285ae07` preserves the actual-consumer repair and
-  connects both public bilinear descriptions to a trial interface assembled by
-  the current atomic-path-corridor specimen. Evidence commit `6247534` retains
-  direct classical and activated events plus exact fresh-process active-state
-  restart, localized event-time/load carry, authoritative cohesive-element
-  damage state, corrected work and nonzero current-source feedback.
+- FEM calculation commit `242f01f` preserves the actual-consumer repair and
+  connects both public bilinear descriptions to the current atomic-path-corridor
+  specimen. Evidence commit `28c5cef` retains direct classical and activated
+  events, fresh-process active-state restart, continuous-ramp localization and
+  remainder continuation, authoritative cohesive-element damage, recoverable
+  work, irreversible dissipation and nonzero current-source feedback.
 - Runtime acceptance now requires provider construction/advance, cohesive
   assembly binding and an actual or restored trial interface. The regression
-  checks residual/tangent participation, repeated mechanical feedback, bounded
-  irreversible evolution, interface work, one accepted source/time update and
+  checks residual/tangent participation, bounded irreversible evolution,
+  distinct recoverable work/dissipation, one accepted source/time update and
   byte-identical direct/restart histories. The inherited EXP-floor opening
-  clock remains suppressed.
+  clock remains suppressed. An activated event now satisfies the requested
+  3500 m/s ramp exactly at accepted time; its unused duration remains a ramp
+  through checkpoint, fresh restart and further numerical subdivision.
 - A separate source-bound active-tip replay advances the persistent
   accommodation/source owner once per accepted interval using exactly
   `3.5e-10 s` and `1.0975208997081333e-10 s`; its emission increments and
@@ -22,15 +24,15 @@
   are retained only as invalidated historical evidence because their producer
   used one second per equilibrium callback and incorrect barriers. Unaffected
   transaction/serialization scope remains preserved.
-- PF calculation/campaign commit `dd0c1953` binds all 36 fitted P9 rows to that
-  actual driver/provider. The 699-row disabled campaign audit has no binding
-  errors. Final applicable suites pass: PF 1008 passed with 16 explicit
-  external-evidence deselections; FEM 765 passed, 2 skipped, plus 16 subtests.
-- R07 and R09 resumptions remain prepared but were not launched: the latest
-  measurement records about 50 MiB immediately free, 873 MiB swap free and
-  28 GiB Data free, which does not admit their estimated peak plus 12 GiB
-  reserve. Production, manuscript work, remote writes and scientific-data
-  deletion remain disabled.
+- The shared framework is being rebound to FEM evidence `28c5cef`; all 699
+  campaign rows remain disabled. Final FEM acceptance passes 767 tests, 2
+  skips and 16 subtests. The exact PF binding subset and portable suite are the
+  next local gates before the PF binding commit.
+- R05 case grids and the R07/R09 resumptions remain prepared but were not
+  launched: the latest measurement records 46% of 36 GiB system memory free
+  (about 16.6 GiB) and 21 GiB Data free, which does not admit their estimated
+  peaks plus the 12 GiB reserve. Production, manuscript work, remote writes
+  and scientific-data deletion remain disabled.
 
 Controlling request: finish the 13 October 2026 native Taylor–Peierls repair in
 the actual coupled solver.  This is a readiness qualification only: no
