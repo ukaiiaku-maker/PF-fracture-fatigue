@@ -165,10 +165,12 @@ class MaterialManifest:
         )
 
     def as_dict(self) -> dict[str, Any]:
+        cleavage = (self.cleavage.as_dict() if hasattr(self.cleavage, "as_dict")
+                    else self.cleavage.__dict__)
         return {
             "name": self.name,
             "candidate_id": self.candidate_id,
-            "cleavage": self.cleavage.__dict__,
+            "cleavage": cleavage,
             "emission": self.emission.__dict__,
             "peierls": self.peierls.__dict__,
             "taylor": self.taylor.__dict__,

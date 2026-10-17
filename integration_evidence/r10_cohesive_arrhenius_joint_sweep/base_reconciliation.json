@@ -1,0 +1,23 @@
+{
+  "schema": "r10.cohesive-additive-base-reconciliation/1",
+  "base_branch": "codex/r10-joint-fracture-fatigue-continuation",
+  "base_commit": "97a1e48fa556f784b2fb5203916da2d17af98732",
+  "new_branch": "codex/r10-cohesive-arrhenius-joint-sweep",
+  "source_tree": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep",
+  "interpreter": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "versions": {"python": "3.12.13", "numpy": "2.5.1", "scipy": "1.18.0", "pandas": "3.0.5", "matplotlib": "3.11.0"},
+  "governing_local_instructions": [],
+  "old_evidence_preserved": {
+    "integration_evidence/r10_global_mechanism_search/continuation_state.json": "a5de23ea2432c3b84a29afe3f76eeb493d6ea9621485af62207f0119d68d240d",
+    "integration_evidence/r10_global_mechanism_search/cheap_global_bank.csv.gz": "0e5038060906deb18b8c4547a59b704c488e8939fd315058ca2fd9e785272fe1",
+    "integration_evidence/r10_joint_search_continuation/inputs/fatigue_parent_registry.csv": "153dc913991c98dfb218fefcc254ca731ad1e995373d597050c177c71f4020a6",
+    "arrhenius_fracture/data/materials/v10_2_27_v913_four_class_paper_registry.csv": "4ba723c80abcfdd7101cee0afaa9b4104eebf2a8e847892528128664829c7760"
+  },
+  "donor": {
+    "repository": "Arrhenius_FEM_CZM_MPZ_v10_0_5_17_paper_campaign",
+    "commit": "6cf5627f288ae90bb6c78e08d61b1aae545f435c",
+    "used_scope": "node-pair interface topology and contact/transaction convention only",
+    "rejected_scope": "linear penalty clock-as-damage constitutive response"
+  },
+  "existing_jobs_or_outputs_modified": false
+}

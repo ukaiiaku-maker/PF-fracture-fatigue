@@ -1,0 +1,10 @@
+{
+  "schema": "r10.cohesive-analytical-target-audit/1",
+  "primary_bank_rows_checked": 32768,
+  "thermal_expansion_rows_checked": 8192,
+  "criterion": "all adjacent LOADS=[4,6,9,13.5,20.25,30] slopes in [3.4,4.6] and endpoint rate width >=2 decades",
+  "rows_passing_primary_target": 0,
+  "selection_consequence": "native rows are information acquisitions, not predicted primary-target successes",
+  "median_slope_is_not_a_success_criterion": true,
+  "R10D_COH_00167_note": "median analytical slope near four masks very steep low-load secants and saturation; native five-amplitude execution is a coupled-state diagnostic, not promotion evidence"
+}

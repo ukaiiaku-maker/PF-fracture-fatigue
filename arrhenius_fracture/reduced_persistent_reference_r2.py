@@ -288,7 +288,13 @@ def runtime_receipt(engine: Any, *, stage: str) -> dict[str, Any]:
     return {
         "schema": "r2-resolved-reduced-runtime-receipt/1",
         "stage": str(stage),
-        "selected_identity": "RESTORED_REDUCED_REFERENCE",
+        "selected_identity": getattr(
+            engine, "_r10_opening_execution_identity", "RESTORED_REDUCED_REFERENCE"
+        ),
+        "material_family": getattr(engine, "_r10_material_family", None),
+        "final_bound_implementation_identity": getattr(
+            engine, "_r10_final_bound_implementation_identity", None
+        ),
         "model_id": MODEL_ID,
         "historical_replay_identity": HISTORICAL_REPLAY_ID,
         "source_geography": "tip_surface",

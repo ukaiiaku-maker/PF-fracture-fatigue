@@ -1,0 +1,36 @@
+{
+  "allocated": 8192,
+  "analytically_evaluated": 8192,
+  "domain_valid": 8192,
+  "expanded_prior": {
+    "Gamma_1200_over_Gamma_300": [
+      1.25,
+      5.0
+    ],
+    "single_S_Gamma_coordinate": true,
+    "temperature_endpoints_independently_fitted": false
+  },
+  "family": "D_COHESIVE_ARRHENIUS_EXP_PLASTICITY",
+  "files": {
+    "analytical_bank.csv.gz": {
+      "bytes": 1244737,
+      "sha256": "32abc73c50e31878d056fa2f927c37bc5dc4fe2e113172c049a55c51fb40e0f7"
+    },
+    "native_batch_descriptors.csv": {
+      "bytes": 11518,
+      "sha256": "429e95551b314a2d27dfdad3c5d7a363d847671ded60dfbb6ea5719c02113b20"
+    },
+    "native_batch_registry.csv": {
+      "bytes": 86503,
+      "sha256": "245f7455940194dd4a620db1b88f327f012d17279d9ebb736782b6600a28ff06"
+    }
+  },
+  "native_queued_not_executed": 24,
+  "reason": "INITIAL_32768_BANK_CONTAINED_NO_DBTT_OR_PEAK_PROXY; THERMAL_HARDENING_BOUND_WAS_ACTIVE",
+  "schema": "r10.cohesive-hardening-bound-expansion/1",
+  "thermal_counts": {
+    "OTHER_OR_CENSORED_PROXY": 4627,
+    "RISING_DBTT_PROXY": 2301,
+    "WEAK_T_PROXY": 1264
+  }
+}

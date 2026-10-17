@@ -1,0 +1,86 @@
+{
+  "allocated": 32768,
+  "analytically_evaluated": 32768,
+  "counts": {
+    "DOMAIN_REJECT": 193,
+    "OTHER_OR_CENSORED_PROXY__MIXED_DIRECTED": 57,
+    "OTHER_OR_CENSORED_PROXY__OPENING_DIRECTED": 8939,
+    "OTHER_OR_CENSORED_PROXY__PLASTICITY_DIRECTED": 20096,
+    "WEAK_T_PROXY__OPENING_DIRECTED": 1307,
+    "WEAK_T_PROXY__PLASTICITY_DIRECTED": 2176
+  },
+  "domain_valid": 32575,
+  "execution_counts_are_not_allocations": true,
+  "family": "D_COHESIVE_ARRHENIUS_EXP_PLASTICITY",
+  "files": {
+    "analytical_bank.csv.gz": {
+      "bytes": 5018903,
+      "sha256": "997a00a9482b8a84a70d2057d92f2543dcc5d89e54598ba6304fdf0984c35e0c"
+    },
+    "native_batch_descriptors.csv": {
+      "bytes": 20874,
+      "sha256": "bb6c858ae43b41df07231383bb54638bc436e13d9ca11093dbfaa8fe2c239b03"
+    },
+    "native_batch_registry.csv": {
+      "bytes": 169024,
+      "sha256": "724d4955e978067b0484609e61b7489de6a04e0e39de5a1e177fbf75f5f427aa"
+    },
+    "state_aware_allocation.csv": {
+      "bytes": 1835873,
+      "sha256": "00df091611f44e02d0253d9d13901626c09171cd381bef695850b0db88238a11"
+    }
+  },
+  "fixed_protocol": {
+    "Paris_adjacent_slope_interval": [
+      3.4,
+      4.6
+    ],
+    "R": 0.1,
+    "attempt_frequency_s": 1000000000000.0,
+    "cleavage_hits": 3.0,
+    "cleavage_tau_s": 1e-06,
+    "connected_rate_decades": 2,
+    "developed_window_um": [
+      20,
+      60
+    ],
+    "fatigue_T_K": 300,
+    "finalist_minimum_events": 50,
+    "frequency_Hz": 1000.0,
+    "initial_target_um": 70,
+    "promotion_minimum_amplitudes": 5,
+    "temperature_K": [
+      300.0,
+      450.0,
+      600.0,
+      750.0,
+      900.0,
+      1050.0,
+      1200.0
+    ]
+  },
+  "native_queued_not_executed": 48,
+  "published_priors_before_native_selection": {
+    "Gamma_1200_minus_300_fraction": [
+      -0.75,
+      0.25
+    ],
+    "Gamma_ref_J_m2": [
+      0.5,
+      8.0
+    ],
+    "activation_area_derived_from_zero_barrier_and_Gamma": true,
+    "delta0_derived_not_independent": true,
+    "t_hat_ref_Pa": [
+      8000000000.0,
+      80000000000.0
+    ],
+    "zero_traction_barrier_eV_300K": [
+      0.35,
+      6.0
+    ]
+  },
+  "schema": "r10.cohesive-arrhenius-global-acquisition/1",
+  "seed": 10162026,
+  "state_aware_allocated_not_executed": 4096
+}
