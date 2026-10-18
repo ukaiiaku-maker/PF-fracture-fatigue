@@ -316,6 +316,12 @@ Final evidence uses the completed original owner or, for the already completed
 10-Hz case, a unique replay from the last atomic checkpoint to the declared
 120-cell target.  Progress, result, and checkpoint identities were reconciled
 again before packaging; no duplicate prefix is counted as an independent run.
+That replay exposed one terminal-transaction defect: an event committed in the
+exact fractional-cycle remainder could reach the path target after the last
+block-level checkpoint.  The runner now seals every accepted non-numeric-stop
+terminal state before writing its result.  The 10-Hz path was replayed from
+event 119 and now has identical 197.9513686586 cycles and 120 events in result,
+progress, and restart state.
 
 The principal limitations are physical or evidentiary rather than hidden rate
 substitutions:
@@ -347,7 +353,10 @@ The independently supplied baseline archive hash is
 `b304aa7159e261aba755c5473a8b47468e794291b8e9cda0bf267405f5aa3c1a`.
 
 Repository-wide validation passed 912 tests in 3,475.33 seconds during the
-campaign.  The final aggregate contains 27 actionable restart checkpoints;
+campaign.  After the terminal-checkpoint repair, 25 focused HCF, reduction,
+analysis, packaging, and archive-verification tests passed in 2.32 seconds, and
+the repaired 120-event trajectory was reproduced natively from event 119.  The
+final aggregate contains 27 actionable restart checkpoints;
 the portable `analysis/restart_inventory.csv` records their exact material,
 protocol, accepted exposure, event count, and checkpoint path.
 

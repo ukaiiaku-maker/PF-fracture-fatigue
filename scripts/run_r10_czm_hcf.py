@@ -189,6 +189,21 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
    if result.get('coupled_hazard_work_budget_exhausted') and consumed<requested-1e-9:
     resource=True;break
  except Exception as exc:numeric=f'{type(exc).__name__}: {exc}'
+ # An event committed while consuming the exact fractional-cycle remainder can
+ # satisfy the observation-path target before the block-level writer below is
+ # reached again.  Seal that accepted terminal state so result, progress, and
+ # restart geometry cannot differ by the final cohesive-cell transaction.
+ if numeric is None:
+  progress={"candidate_id":candidate,"complete_row_sha256":row['complete_row_sha256'],
+            "factor":factor,"temperature_K":T,"R":R,
+            "frequency_Hz":frequency,"horizon":horizon,"accepted_cycles":cycles,
+            "phase_count":phases,"hazard_seed":seed,
+            "patch_m":patch_m,"observation_path_m":path_limit_m,
+            "cpu_seconds":prior_cpu_seconds+time.process_time()-cpu_start,
+            "plastic_feedback":bool(plastic_feedback),
+            "events":events,"history":history,"blocks":blocks,"unsupported":bool(engine._r10_czm_unsupported),
+            "unsupported_validities":sorted(engine._r10_czm_unsupported_validities)}
+  atomic(progress_path,progress);save_checkpoint(checkpoint_dir,engine,wave,T,progress)
  scored=score_recurrence(events,path_limit_m,bool(engine._r10_czm_unsupported))
  post_escape_unresolved=unresolved_post_escape(history,events)
  event_cycles=[float(e['cycle']) for e in events]
