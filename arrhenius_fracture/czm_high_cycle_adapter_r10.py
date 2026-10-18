@@ -104,11 +104,14 @@ def _integrate_czm(self, K_Pa_sqrt_m: float, temperature_K: float, duration_s: f
     if getattr(self.mpz,"_reversible_transport_installed",False):
         self.mpz._reversible_transport_K_signed_Pa_sqrt_m=float(K_Pa_sqrt_m)
         self.mpz._reversible_tip_radius_m=float(self.r_eff())
-    first=self._plastic_half_step(half,temperature_K,stress)
-    if getattr(self.mpz,"_reversible_transport_installed",False):
-        self.mpz._reversible_tip_radius_m=float(self.r_eff())
-    stress_end=max(float(self.sigma_tip(max(float(K_Pa_sqrt_m),0.))),0.)
-    second=self._plastic_half_step(half,temperature_K,stress_end)
+    if getattr(self,"_r10_czm_plastic_feedback",True):
+        first=self._plastic_half_step(half,temperature_K,stress)
+        if getattr(self.mpz,"_reversible_transport_installed",False):
+            self.mpz._reversible_tip_radius_m=float(self.r_eff())
+        stress_end=max(float(self.sigma_tip(max(float(K_Pa_sqrt_m),0.))),0.)
+        second=self._plastic_half_step(half,temperature_K,stress_end)
+    else:
+        first=second={}
     self.t=float(self.t)+consumed
     action=rate*consumed
     fired=bool(rate>0. and current+action>=threshold-1e-12*max(threshold,1.))
@@ -148,7 +151,8 @@ class CZMOwnedPersistentEngine(ReducedPersistentReversibleTipEngine):
 
 def install_czm_owner(engine, alternative: OpeningAlternative, thermal,
                       environment_stiffness_Pa_per_m: float, phase_count: int,
-                      seed: int, frequency_Hz: float = 1000.) -> Any:
+                      seed: int, frequency_Hz: float = 1000.,
+                      plastic_feedback: bool = True) -> Any:
     if not isinstance(engine,ReducedPersistentReversibleTipEngine):
         raise TypeError("CZM high-cycle adapter requires the retained reversible engine")
     engine.__class__=CZMOwnedPersistentEngine
@@ -158,6 +162,7 @@ def install_czm_owner(engine, alternative: OpeningAlternative, thermal,
     if frequency_Hz <= 0.:
         raise ValueError("frequency_Hz must be positive")
     engine._r10_czm_phase_duration_s=1./float(frequency_Hz)/max(int(phase_count),8)
+    engine._r10_czm_plastic_feedback=bool(plastic_feedback)
     engine._r10_czm_branch={"branch":"BONDED","delta_m":0.}
     engine._r10_czm_unsupported=False
     engine._r10_czm_unsupported_validities=set()

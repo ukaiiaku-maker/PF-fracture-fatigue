@@ -165,6 +165,29 @@ def test_athermal_completion_is_a_deterministic_phase_event(monkeypatch):
     assert engine._r10_czm_pending_event["stochastic_threshold"] is False
 
 
+def test_frozen_czm_reference_retains_opening_clock_without_plastic_step(monkeypatch):
+    engine=_RemapEngine(.5)
+    engine._r10_czm_unsupported=False
+    engine._r10_czm_pending_event=None
+    engine._r10_czm_plastic_feedback=False
+    engine._r10_czm_alternative=SimpleNamespace(opening_mode="cohesive_mixed")
+    engine.hazard_threshold_action=10.
+    engine.hazard_action_current=0.;engine.B=0.
+    monkeypatch.setattr(
+        "arrhenius_fracture.czm_high_cycle_adapter_r10._opening",
+        lambda *args,**kwargs: {
+            "state":"BONDED_METASTABLE", "barrier_J":1e-20,
+            "kinetic_validity":"QUALIFIED_HIGH_BARRIER",
+            "elementary_rate_s-1":4., "connected_state":{"branch":"METASTABLE","delta_m":0.},
+        },
+    )
+    got=_integrate_czm(engine,1.,300.,.5,stress_override=2.)
+    assert got["fired"] is False
+    assert got["physical_hazard_action_step"] == 2.
+    assert engine.plastic_calls == 0
+    assert engine.t == .5
+
+
 def test_accepted_cycle_map_carries_connected_branch_state(monkeypatch):
     engine=SimpleNamespace(_r10_czm_branch={"branch":"BONDED","delta_m":0.})
     monkeypatch.setattr(

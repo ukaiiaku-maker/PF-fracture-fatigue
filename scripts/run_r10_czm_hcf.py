@@ -79,7 +79,8 @@ def drain_mechanical_successors(engine,K,T,cycles,events,patch_m,path_limit_m):
    "K_Pa_sqrt_m":K,"event_index":len(events)+1});events.append(event)
 
 def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300.,R=.1,
-             frequency=1000.,patch_m=1e-6,path_limit_m=120e-6,max_wall_s=900.):
+             frequency=1000.,patch_m=1e-6,path_limit_m=120e-6,max_wall_s=900.,
+             plastic_feedback=True):
  row=row_for(registry,candidate);c=json.loads(row['cohesive_parameter_vector'])
  thermal=thermal_from(c);_,kenv=mechanics(thermal,T);Kref,_=reference_load(row,T,phases);Kmax=factor*Kref
  alt=OpeningAlternative(row['selected_mode'],row['selected_shape'],
@@ -88,7 +89,8 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   None if row['selected_mode']=='cohesive_athermal' else float(c['attempt_frequency_s']))
  binding=load_cohesive_binding(registry,candidate,execution_identity=COHESIVE_KINETIC_CZM)
  engine=build_cohesive_current_engine(binding,kernel_family_path=R4_KERNEL_FAMILY)
- install_czm_owner(engine,alt,thermal,kenv,phases,seed,frequency_Hz=frequency)
+ install_czm_owner(engine,alt,thermal,kenv,phases,seed,frequency_Hz=frequency,
+                   plastic_feedback=plastic_feedback)
  wave=FatigueWaveform(Kmax*1e6,R,frequency);controller=CZMPhaseController(phases)
  predictor_cycle=one_cycle_map(engine,controller,wave,T)
  predictor_successor=one_cycle_map(predictor_cycle.engine,controller,wave,T)
@@ -106,7 +108,8 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   saved=json.loads(progress_path.read_text())
   same_protocol=(math.isclose(float(saved.get('temperature_K',T)),T,rel_tol=0.,abs_tol=1e-12) and
                  math.isclose(float(saved.get('R',R)),R,rel_tol=0.,abs_tol=1e-14) and
-                 math.isclose(float(saved.get('frequency_Hz',frequency)),frequency,rel_tol=0.,abs_tol=1e-12))
+                 math.isclose(float(saved.get('frequency_Hz',frequency)),frequency,rel_tol=0.,abs_tol=1e-12) and
+                 bool(saved.get('plastic_feedback',True))==bool(plastic_feedback))
   if (saved['candidate_id']!=candidate or
       not math.isclose(float(saved['factor']),factor,rel_tol=0.,abs_tol=1e-14) or not same_protocol):
    raise RuntimeError('restart identity differs from requested CZM HCF case')
@@ -144,6 +147,7 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
    history.append(state_row(engine,wave,T,cycles,"EVENT" if result.get('fired') else "EXPOSURE_CHECKPOINT"))
    progress={"candidate_id":candidate,"factor":factor,"temperature_K":T,"R":R,
              "frequency_Hz":frequency,"horizon":horizon,"accepted_cycles":cycles,
+             "plastic_feedback":bool(plastic_feedback),
              "events":events,"history":history,"blocks":blocks,"unsupported":bool(engine._r10_czm_unsupported),
              "unsupported_validities":sorted(engine._r10_czm_unsupported_validities)}
    atomic(progress_path,progress);save_checkpoint(checkpoint_dir,engine,wave,T,progress)
@@ -175,6 +179,8 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   "history":history,"acceleration_blocks":blocks,"phase_count":phases,"patch_m":patch_m,
   "observation_path_m":path_limit_m,"legacy_cooperative_clock_used":False,
   "opening_owner":"CURRENT_ATHERMAL_OR_MIXED_CZM","plasticity_owner":"CURRENT_EXP_FLOOR_FULL_STATE",
+  "plastic_feedback_reference":"EVOLVING_FULL_STATE" if plastic_feedback else
+                               "FROZEN_INITIAL_PLASTIC_STATE",
   "restart_checkpoint":str(checkpoint_dir/'high_cycle_live_checkpoint.json'),"wall_seconds":time.monotonic()-start}
  atomic(out/'result.json',result);return result
 
@@ -185,11 +191,13 @@ def main(argv=None):
  p.add_argument('--phases',type=int,default=16);p.add_argument('--max-wall-s',type=float,default=900.)
  p.add_argument('--temperature-K',type=float,default=300.);p.add_argument('--R',type=float,default=.1)
  p.add_argument('--frequency-Hz',type=float,default=1000.);p.add_argument('--patch-um',type=float,default=1.)
+ p.add_argument('--frozen-initial-plastic-state',action='store_true')
  p.add_argument('--path-limit-um',type=float,default=120.)
  a=p.parse_args(argv);a.out.mkdir(parents=True,exist_ok=True)
  result=run_case(a.registry,a.candidate_id,a.factor,a.horizon,a.out,a.seed,a.phases,
   T=a.temperature_K,R=a.R,frequency=a.frequency_Hz,patch_m=a.patch_um*1e-6,
-  path_limit_m=a.path_limit_um*1e-6,max_wall_s=a.max_wall_s)
+  path_limit_m=a.path_limit_um*1e-6,max_wall_s=a.max_wall_s,
+  plastic_feedback=not a.frozen_initial_plastic_state)
  print(json.dumps({k:result[k] for k in ('candidate_id','Kmax_MPa_sqrt_m','accepted_cycles','accepted_seconds','physical_event_count','advance_m','disposition','developed_rate_m_per_cycle','wall_seconds')},indent=2));return 0
 
 if __name__=='__main__':raise SystemExit(main())
