@@ -134,6 +134,13 @@ def _evaluate(item: dict) -> dict:
         thermal = _thermal(cohesive)
         if min(thermal.gamma(T) for T in TEMPERATURES) <= .2:
             return {**base, "domain_pass": False, "rejection": "GAMMA_THERMAL_DOMAIN"}
+        coords = shape_coordinates(shape, thermal, 300.)
+        if coords["completion_cutoff_m"] > 1e-7:
+            return {**base,"domain_pass":False,
+                "rejection":"COHESIVE_SEPARATION_EXCEEDS_100NM_RESEARCH_BOUND"}
+        if coords["peak_separation_m"] < 1e-13:
+            return {**base,"domain_pass":False,
+                "rejection":"COHESIVE_PEAK_SEPARATION_BELOW_0P1PM_BOUND"}
         folds = []
         for temperature in TEMPERATURES:
             _, kenv = mechanics(thermal, temperature)
@@ -159,7 +166,6 @@ def _evaluate(item: dict) -> dict:
         hcf_slopes = np.asarray([float(row["local_log_slope"]) for row in rows
             if row["local_log_slope"] is not None and
             1e-12 <= float(row["events_per_cycle_peak_rate"]) <= 1e-4])
-        coords = shape_coordinates(shape, thermal, 300.)
         source = item["source"]
         mechanism = source.get("mechanism_prediction", "UNRESOLVED")
         return {**base, "domain_pass": True, "rejection": "",
