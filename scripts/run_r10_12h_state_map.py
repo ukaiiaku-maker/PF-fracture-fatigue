@@ -139,11 +139,16 @@ def main(argv=None) -> int:
     parser.add_argument("--limit", type=int)
     parser.add_argument("--mode", choices=("cohesive_athermal", "cohesive_mixed"),
                         help="Optionally reevaluate only one opening owner.")
+    parser.add_argument("--candidate-ids",
+                        help="Optional comma-separated execution-identity subset.")
     args = parser.parse_args(argv)
     with args.registry.open(newline="") as stream:
         registry = list(csv.DictReader(stream))
     if args.mode:
         registry = [row for row in registry if row["selected_mode"] == args.mode]
+    if args.candidate_ids:
+        requested = {value.strip() for value in args.candidate_ids.split(",") if value.strip()}
+        registry = [row for row in registry if row["candidate_id"] in requested]
     if args.limit:
         registry = registry[:args.limit]
     factors = [float(x) for x in args.factors.split(",")]
