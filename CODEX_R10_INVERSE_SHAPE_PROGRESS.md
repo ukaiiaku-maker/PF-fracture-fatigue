@@ -70,5 +70,19 @@
 - A fifth 32,768-vector analytical acquisition with the corrected cyclic
   consumer is running; its selected state/native work will be a new identity.
 
+## Inverse-bound audit
+
+- The pre-bound-check 256-start diagnostic completed with 251 numerically valid
+  rows and zero strict passes.  Its near-four optima left the declared domain
+  (typically rise fraction below 0.0005 and normalized rapid-drop length below
+  0.001); even the out-of-domain maximum strict width was only 0.587 rate
+  decades, not the required two.
+- Only 51 of those optimized rows remained inside every declared compact and
+  activation-energy bound.  Their best HCF slope was 7.016 and none had a
+  strict interval.  They are a bounded-negative diagnostic, not eligible
+  native candidates.
+- The optimizer now enforces every declared rise, drop, tail, and zero-load
+  activation-energy bound.  A fresh bounded 64-start execution is running.
+
 This file is the durable restart ledger. It is updated at scientifically meaningful
 checkpoints; queue creation by itself is not a completion condition.
