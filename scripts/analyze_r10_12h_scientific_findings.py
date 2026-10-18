@@ -95,18 +95,41 @@ def slope_rows(rows):
         groups.setdefault(key, []).append(row)
     output = []
     for key, group in groups.items():
-        group.sort(key=lambda row: float(row["DeltaK_MPa_sqrt_m"]))
-        for low, high in zip(group, group[1:]):
-            x0, x1 = float(low["DeltaK_MPa_sqrt_m"]), float(high["DeltaK_MPa_sqrt_m"])
-            y0 = float(low["developed_rate_m_per_cycle"])
-            y1 = float(high["developed_rate_m_per_cycle"])
+        # Independent seeds at an identical amplitude are replicates, not a
+        # zero-width Paris interval.  Collapse them to a median response before
+        # constructing adjacent-amplitude slopes, while retaining the spread
+        # and paths so stochastic repeatability remains visible.
+        by_amplitude = {}
+        for row in group:
+            by_amplitude.setdefault(float(row["DeltaK_MPa_sqrt_m"]), []).append(row)
+        points = []
+        for amplitude, replicates in sorted(by_amplitude.items()):
+            rates = sorted(float(row["developed_rate_m_per_cycle"])
+                           for row in replicates)
+            points.append({
+                "amplitude": amplitude,
+                "rate": median(rates),
+                "rate_min": rates[0],
+                "rate_max": rates[-1],
+                "replicate_count": len(rates),
+                "paths": ";".join(sorted(row["result_path"] for row in replicates)),
+            })
+        for low, high in zip(points, points[1:]):
+            x0, x1 = low["amplitude"], high["amplitude"]
+            y0, y1 = low["rate"], high["rate"]
             output.append({
                 "candidate_id": key[0], "temperature_K": key[1], "R": key[2],
                 "frequency_Hz": key[3], "plastic_feedback_reference": key[4],
                 "DeltaK_low_MPa_sqrt_m": x0, "DeltaK_high_MPa_sqrt_m": x1,
                 "rate_low_m_per_cycle": y0, "rate_high_m_per_cycle": y1,
                 "local_log_slope": math.log(y1 / y0) / math.log(x1 / x0),
-                "low_result_path": low["result_path"], "high_result_path": high["result_path"],
+                "low_replicate_count": low["replicate_count"],
+                "high_replicate_count": high["replicate_count"],
+                "rate_low_min_m_per_cycle": low["rate_min"],
+                "rate_low_max_m_per_cycle": low["rate_max"],
+                "rate_high_min_m_per_cycle": high["rate_min"],
+                "rate_high_max_m_per_cycle": high["rate_max"],
+                "low_result_path": low["paths"], "high_result_path": high["paths"],
             })
     return output
 
