@@ -30,7 +30,8 @@ def test_frozen_22871_reference_is_reproduced_under_finite_compliance():
     fold_K = fold_stress * math.sqrt(2*math.pi*1e-6)/1e6
     assert math.isclose(fold_K, 39.79889989669268, rel_tol=2e-7)
     cycle = cyclic_rate(31.305705774243552, kenv, thermal, 300.,
-        SMOOTH_EXPONENTIAL, 6.409066161100495e-19, 1e12, phases=32)
+        SMOOTH_EXPONENTIAL, 6.409066161100495e-19, 1e12, phases=32,
+        integration="midpoint")
     assert math.isclose(cycle["ensemble_rate_m_per_cycle"],
                         7.1002786035099876e-12, rel_tol=2e-5)
 
@@ -77,6 +78,24 @@ def test_two_scale_tail_releases_a_broad_finite_compliance_window():
     window=metastable_window(COMPACT_INDEPENDENT,thermal,300.,kenv)
     assert window["state"] == "METASTABLE_WINDOW"
     assert float(window["load_ratio"]) > 5.
+
+
+def test_interval_aware_cycle_integral_resolves_narrow_peak_accessibility():
+    thermal = CohesiveThermalLaw(2., 15e9, 0., compact_variant="two_scale_tail",
+        compact_rise_fraction=.001, compact_drop_fraction=.003,
+        compact_tail_level=.035)
+    kenv=15e9**2/(2.*2.)
+    window=metastable_window(COMPACT_INDEPENDENT,thermal,300.,kenv)
+    birth_K=(float(window["birth_load_Pa"])*math.sqrt(2.*math.pi*1e-6)/1e6)
+    Kmax=birth_K*1.001
+    midpoint=cyclic_rate(Kmax,kenv,thermal,300.,COMPACT_INDEPENDENT,
+        1e-21,1e12,phases=32,integration="midpoint")
+    adaptive=cyclic_rate(Kmax,kenv,thermal,300.,COMPACT_INDEPENDENT,
+        1e-21,1e12,phases=32)
+    assert midpoint["opening_action_per_cycle"] == 0.
+    assert adaptive["opening_action_per_cycle"] > 0.
+    assert 0. < adaptive["accessible_phase_fraction"] < 1./32.
+    assert adaptive["integration_method"] == "finite_interval_gauss"
 
 
 def test_registry_hcf_point_is_selected_from_cycle_integral(monkeypatch):

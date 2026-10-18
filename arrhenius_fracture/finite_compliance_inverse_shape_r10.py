@@ -328,25 +328,68 @@ def cyclic_rate(Kmax_MPa_sqrt_m: float, environment_stiffness_Pa_per_m: float,
                 activation_area_m2: float, attempt_frequency_s: float,
                 R: float = .1, frequency_Hz: float = 1000.,
                 increment_m: float = 1.e-6, phases: int = 128,
-                tip_radius_m: float = DEFAULT_TIP_RADIUS_M) -> dict[str, Any]:
-    """Frozen midpoint waveform integral with moving accessibility included."""
-    angles=(np.arange(max(int(phases),8),dtype=float)+.5)*2.*math.pi/max(int(phases),8)
-    factors=.5*(1.+float(R))+.5*(1.-float(R))*np.cos(angles)
+                tip_radius_m: float = DEFAULT_TIP_RADIUS_M,
+                integration: str = "finite_interval_gauss") -> dict[str, Any]:
+    """Frozen waveform integral with explicit accessibility-boundary support.
+
+    ``midpoint`` is retained only to reproduce archived phase-grid references.
+    Production selection uses Gauss integration on intervals split at the
+    metastable birth/fold crossings, so a narrow peak-accessible interval
+    cannot disappear between uniform phase samples.
+    """
+    count=max(int(phases),8)
+    mean=.5*(1.+float(R));amplitude=.5*(1.-float(R))
+    if integration == "midpoint":
+        angles=(np.arange(count,dtype=float)+.5)*2.*math.pi/count
+        weights=np.full(count,1./count)
+    elif integration == "finite_interval_gauss":
+        window=metastable_window(shape,thermal,temperature_K,
+            environment_stiffness_Pa_per_m)
+        boundaries=[0.,math.pi,2.*math.pi]
+        if window.get("state") == "METASTABLE_WINDOW" and amplitude > 0.:
+            for load_key in ("birth_load_Pa","fold_load_Pa"):
+                imposed=float(window[load_key])/float(environment_stiffness_Pa_per_m)
+                boundary_K=K_from_imposed(imposed,environment_stiffness_Pa_per_m,
+                    tip_radius_m)
+                cosine=(boundary_K/float(Kmax_MPa_sqrt_m)-mean)/amplitude
+                if -1. < cosine < 1.:
+                    theta=math.acos(cosine);boundaries.extend((theta,2.*math.pi-theta))
+        boundaries=sorted(set(boundaries))
+        nodes,base_weights=np.polynomial.legendre.leggauss(count)
+        angle_parts=[];weight_parts=[]
+        for left,right in zip(boundaries[:-1],boundaries[1:]):
+            midpoint=.5*(left+right)
+            Kmid=float(Kmax_MPa_sqrt_m)*(mean+amplitude*math.cos(midpoint))
+            check=opening_rate(Kmid,environment_stiffness_Pa_per_m,thermal,
+                temperature_K,shape,activation_area_m2,attempt_frequency_s,
+                tip_radius_m)
+            if check["state"] != "METASTABLE":
+                continue
+            angle_parts.append(midpoint+.5*(right-left)*nodes)
+            weight_parts.append(.5*(right-left)*base_weights/(2.*math.pi))
+        angles=(np.concatenate(angle_parts) if angle_parts else np.asarray([],float))
+        weights=(np.concatenate(weight_parts) if weight_parts else np.asarray([],float))
+    else:
+        raise ValueError(f"unsupported cyclic integration method: {integration}")
+    factors=mean+amplitude*np.cos(angles)
     evaluations=[opening_rate(float(Kmax_MPa_sqrt_m)*float(factor),
         environment_stiffness_Pa_per_m,thermal,temperature_K,shape,
         activation_area_m2,attempt_frequency_s,tip_radius_m) for factor in factors]
     rates=np.asarray([row["elementary_rate_s-1"] for row in evaluations])
-    action=float(np.mean(rates)/float(frequency_Hz))
+    action=float(np.sum(weights*rates)/float(frequency_Hz))
     sensitivities=np.asarray([0. if row["sensitivity_identity"] is None
         else row["sensitivity_identity"] for row in evaluations])
-    weighted=(float(np.sum(rates*sensitivities)/np.sum(rates))
-              if float(np.sum(rates))>0. else None)
+    weighted_rate=weights*rates
+    weighted=(float(np.sum(weighted_rate*sensitivities)/np.sum(weighted_rate))
+              if float(np.sum(weighted_rate))>0. else None)
     return {"Kmax_MPa_sqrt_m":float(Kmax_MPa_sqrt_m),
         "opening_action_per_cycle":action,
         "ensemble_rate_m_per_cycle":float(increment_m)*action,
         "hazard_weighted_sensitivity_identity":weighted,
-        "phase_count":len(evaluations),
+        "phase_count":len(evaluations),"requested_phase_count":count,
         "accessible_phase_count":sum(row["state"]=="METASTABLE" for row in evaluations),
+        "accessible_phase_fraction":float(np.sum(weights)),
+        "integration_method":integration,
         "peak_barrier_kBT":min((row["barrier_kBT"] for row in evaluations
             if row["barrier_kBT"] is not None),default=None)}
 
