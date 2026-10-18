@@ -35,16 +35,20 @@ def write_csv(path: Path, rows):
 def load_results(campaign: Path):
     native = []
     hcf = []
+    qualifications = []
     for path in campaign.rglob("result.json"):
         try:
             result = read_json(path)
         except (json.JSONDecodeError, OSError):
             continue
         if result.get("schema") == "r10.czm-owned-hcf-trajectory/1":
-            hcf.append((path, result))
+            if "eventful_adapter_qualification" in path.parts:
+                qualifications.append((path, result))
+            else:
+                hcf.append((path, result))
         elif "events" in result and "cycle_history" in result:
             native.append((path, result))
-    return native, hcf
+    return native, hcf, qualifications
 
 
 def native_rows(items):
@@ -138,7 +142,7 @@ def main(argv=None):
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--finalist-source-ids", default="")
     args = parser.parse_args(argv)
-    native_items, hcf_items = load_results(args.campaign)
+    native_items, hcf_items, qualification_items = load_results(args.campaign)
     native = native_rows(native_items)
     hcf = hcf_rows(hcf_items)
     thermal = thermal_rows(args.campaign)
@@ -166,6 +170,7 @@ def main(argv=None):
         "native_eventful_cases": sum(r["events"] > 0 for r in native),
         "native_unsupported_cases": sum(bool(r["unsupported"]) for r in native),
         "hcf_result_files": len(hcf),
+        "adapter_qualification_result_files": len(qualification_items),
         "hcf_physical_vectors": len({r["source_material_candidate_id"] for r in hcf}),
         "hcf_total_accepted_cycles": sum(float(r["accepted_cycles"] or 0.) for r in hcf),
         "hcf_total_accepted_seconds": sum(float(r["accepted_seconds"] or 0.) for r in hcf),
