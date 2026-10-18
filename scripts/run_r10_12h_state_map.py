@@ -137,9 +137,13 @@ def main(argv=None) -> int:
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--seed", type=int, default=2026101801)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--mode", choices=("cohesive_athermal", "cohesive_mixed"),
+                        help="Optionally reevaluate only one opening owner.")
     args = parser.parse_args(argv)
     with args.registry.open(newline="") as stream:
         registry = list(csv.DictReader(stream))
+    if args.mode:
+        registry = [row for row in registry if row["selected_mode"] == args.mode]
     if args.limit:
         registry = registry[:args.limit]
     factors = [float(x) for x in args.factors.split(",")]
