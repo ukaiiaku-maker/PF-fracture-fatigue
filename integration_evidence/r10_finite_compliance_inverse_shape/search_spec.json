@@ -43,6 +43,13 @@
     "minimum_connected_rate_decades": 2.0,
     "minimum_amplitude_ratio_necessary_at_slope_4p6": 2.72
   },
+  "cyclic_integration": {
+    "production_method": "Gauss quadrature on waveform intervals split at finite-compliance metastable birth and fold crossings",
+    "archived_reference_method": "explicit midpoint phase grid only when reproducing a declared historical phase-grid result",
+    "registry_target_opening_action_per_cycle": 1e-6,
+    "local_slope": "central difference of the complete waveform integral including moving accessibility boundaries",
+    "coarse_phase_nonaccess_rule": "a uniform-grid trajectory that misses a nonzero supported accessibility interval is a phase-resolution censor, not physical runout"
+  },
   "immutable_physics": [
     "EXP_floor emission",
     "Peierls motion",
