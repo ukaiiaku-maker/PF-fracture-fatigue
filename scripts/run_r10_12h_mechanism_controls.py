@@ -96,6 +96,8 @@ def main(argv=None):
                 "frozen_status": frozen["status"],
                 "evolving_unsupported": evolving["unsupported_crossover"],
                 "frozen_unsupported": frozen["unsupported_crossover"],
+                "evolving_terminal_K_MPa_sqrt_m": evolving["Kmax_MPa_sqrt_m"],
+                "frozen_terminal_K_MPa_sqrt_m": frozen["Kmax_MPa_sqrt_m"],
             }
             summaries.append(row)
             print(json.dumps(row), flush=True)

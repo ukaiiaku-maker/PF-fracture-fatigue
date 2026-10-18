@@ -168,13 +168,35 @@ def thermal_mechanism_plot(campaign: Path, out: Path):
                              sharex=True, squeeze=False)
     for ax, (candidate, rows) in zip(axes[:, 0], controls):
         rows.sort(key=lambda row: float(row["temperature_K"]))
-        temperatures = [float(row["temperature_K"]) for row in rows]
-        ax.plot(temperatures,
-                [float(row["evolving_commit_K_MPa_sqrt_m"]) for row in rows],
-                marker="o", label="evolving full state")
-        ax.plot(temperatures,
-                [float(row["frozen_commit_K_MPa_sqrt_m"]) for row in rows],
-                marker="s", label="frozen initial plastic state")
+        for prefix, marker, label in (
+                ("evolving", "o", "evolving full state"),
+                ("frozen", "s", "frozen initial plastic state")):
+            resolved = [(float(row["temperature_K"]),
+                         float(row[f"{prefix}_commit_K_MPa_sqrt_m"]))
+                        for row in rows
+                        if row.get(f"{prefix}_commit_K_MPa_sqrt_m") and
+                        row.get(f"{prefix}_unsupported", "").lower() != "true"]
+            if resolved:
+                ax.plot(*zip(*resolved), marker=marker, label=label)
+            censored = [(float(row["temperature_K"]),
+                         float(row[f"{prefix}_terminal_K_MPa_sqrt_m"]))
+                        for row in rows
+                        if row.get(f"{prefix}_terminal_K_MPa_sqrt_m") and
+                        row.get(f"{prefix}_status") == "KMAX_CENSOR"]
+            if censored:
+                ax.scatter(*zip(*censored), marker="^", facecolors="none",
+                           edgecolors="black", s=38,
+                           label=f"{prefix} Kmax censor")
+            unsupported = [(float(row["temperature_K"]),
+                            float(row.get(f"{prefix}_commit_K_MPa_sqrt_m") or
+                                  row.get(f"{prefix}_terminal_K_MPa_sqrt_m")))
+                           for row in rows
+                           if (row.get(f"{prefix}_commit_K_MPa_sqrt_m") or
+                               row.get(f"{prefix}_terminal_K_MPa_sqrt_m")) and
+                           row.get(f"{prefix}_unsupported", "").lower() == "true"]
+            if unsupported:
+                ax.scatter(*zip(*unsupported), marker="x", color="black", s=38,
+                           label=f"{prefix} unsupported")
         ax.set_ylabel(r"commit load (MPa $\sqrt{\mathrm{m}}$)")
         ax.set_title(candidate)
         ax.legend(fontsize=7, frameon=False)
