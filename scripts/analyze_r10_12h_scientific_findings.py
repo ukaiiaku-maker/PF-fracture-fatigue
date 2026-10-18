@@ -166,7 +166,7 @@ def thermal_rows(campaign: Path):
 def mechanism_comparisons(campaign: Path):
     pairs = (
         (campaign / "hcf_round_1_block_2/R10F_V2_22871__MS/T_300__R_0.1__Hz_1000/f_1.0100/result.json",
-         campaign / "hcf_mechanism_controls_22871/frozen/result.json"),
+         campaign / "hcf_mechanism_controls_22871/frozen_phase16_clean/result.json"),
         (campaign / "hcf_round_17_smooth_mixed_28475/f_1.01/result.json",
          campaign / "hcf_mechanism_controls_28475/frozen_f_1.01/result.json"),
     )
@@ -194,6 +194,8 @@ def mechanism_comparisons(campaign: Path):
 def restart_rows(campaign: Path):
     rows = []
     for progress_path in campaign.rglob("progress.json"):
+        if any("invalid" in part.lower() for part in progress_path.parts):
+            continue
         if "eventful_adapter_qualification" in progress_path.parts:
             continue
         checkpoint = progress_path.parent / "checkpoint/high_cycle_live_checkpoint.json"
@@ -224,6 +226,8 @@ def main(argv=None) -> int:
     items = []
     native_items = []
     for path in args.campaign.rglob("result.json"):
+        if any("invalid" in part.lower() for part in path.parts):
+            continue
         result = load(path)
         if result.get("schema") == "r10.czm-owned-hcf-trajectory/1" and "eventful_adapter_qualification" not in path.parts:
             items.append((path, effective_result(path)))

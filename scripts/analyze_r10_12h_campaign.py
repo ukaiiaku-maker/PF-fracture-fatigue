@@ -37,6 +37,8 @@ def load_results(campaign: Path):
     hcf = []
     qualifications = []
     for path in campaign.rglob("result.json"):
+        if any("invalid" in part.lower() for part in path.parts):
+            continue
         try:
             result = read_json(path)
         except (json.JSONDecodeError, OSError):
