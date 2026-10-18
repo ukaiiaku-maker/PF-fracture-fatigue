@@ -31,6 +31,8 @@ def task_run(task:dict)->dict:
 def main(argv=None)->int:
     parser=argparse.ArgumentParser();parser.add_argument("--registry",type=Path,required=True)
     parser.add_argument("--out",type=Path,required=True);parser.add_argument("--workers",type=int,default=8)
+    parser.add_argument("--candidate-ids",default="",
+        help="optional comma-separated subset; omitted means every registry row")
     parser.add_argument("--amplitude-multipliers",default="1.0")
     parser.add_argument("--horizon",type=float,default=1e8);parser.add_argument("--max-wall-s",type=float,default=900.)
     parser.add_argument("--phases",type=int,default=16);parser.add_argument("--temperature-K",type=float,default=300.)
@@ -39,6 +41,11 @@ def main(argv=None)->int:
     parser.add_argument("--frozen-initial-plastic-state",action="store_true")
     args=parser.parse_args(argv);args.out.mkdir(parents=True,exist_ok=True)
     with args.registry.open(newline="") as stream:rows=list(csv.DictReader(stream))
+    wanted={value for value in args.candidate_ids.split(",") if value}
+    if wanted:
+        rows=[row for row in rows if row["candidate_id"] in wanted]
+        missing=wanted-{row["candidate_id"] for row in rows}
+        if missing:raise ValueError(f"candidate IDs absent from registry: {sorted(missing)}")
     multipliers=[float(value) for value in args.amplitude_multipliers.split(",")]
     tasks=[]
     for index,row in enumerate(rows):
