@@ -163,20 +163,31 @@ def thermal_rows(campaign: Path):
     return output
 
 
-def mechanism_comparison(campaign: Path):
-    full_path = campaign / "hcf_round_1_block_2/R10F_V2_22871__MS/T_300__R_0.1__Hz_1000/f_1.0100/result.json"
-    frozen_path = campaign / "hcf_mechanism_controls_22871/frozen/result.json"
-    if not full_path.is_file() or not frozen_path.is_file():
-        return []
-    full, frozen = effective_result(full_path), effective_result(frozen_path)
+def mechanism_comparisons(campaign: Path):
+    pairs = (
+        (campaign / "hcf_round_1_block_2/R10F_V2_22871__MS/T_300__R_0.1__Hz_1000/f_1.0100/result.json",
+         campaign / "hcf_mechanism_controls_22871/frozen/result.json"),
+        (campaign / "hcf_round_17_smooth_mixed_28475/f_1.01/result.json",
+         campaign / "hcf_mechanism_controls_28475/frozen_f_1.01/result.json"),
+    )
     rows = []
-    for index, (a, b) in enumerate(zip(full.get("events", []), frozen.get("events", [])), 1):
-        af, bf = float(a["cycle"]), float(b["cycle"])
-        rows.append({
-            "event_index": index, "full_state_cycle": af, "frozen_state_cycle": bf,
-            "absolute_difference_cycles": af - bf,
-            "relative_difference": (af - bf) / bf if bf else None,
-        })
+    for full_path, frozen_path in pairs:
+        if not full_path.is_file() or not frozen_path.is_file():
+            continue
+        full, frozen = effective_result(full_path), effective_result(frozen_path)
+        for index, (a, b) in enumerate(zip(full.get("events", []),
+                                           frozen.get("events", [])), 1):
+            af, bf = float(a["cycle"]), float(b["cycle"])
+            rows.append({
+                "candidate_id": full.get("candidate_id"),
+                "reference_factor": full.get("reference_factor"),
+                "event_index": index, "full_state_cycle": af,
+                "frozen_state_cycle": bf,
+                "absolute_difference_cycles": af - bf,
+                "relative_difference": (af - bf) / bf if bf else None,
+                "full_result_path": str(full_path),
+                "frozen_result_path": str(frozen_path),
+            })
     return rows
 
 
@@ -236,7 +247,12 @@ def main(argv=None) -> int:
     write(args.out / "event_waiting_and_windows.csv", events)
     write(args.out / "local_developed_slopes.csv", slope_rows(events + native_events))
     write(args.out / "thermal_classification.csv", thermal_rows(args.campaign))
-    write(args.out / "matched_22871_event_comparison.csv", mechanism_comparison(args.campaign))
+    comparisons = mechanism_comparisons(args.campaign)
+    write(args.out / "matched_plastic_feedback_event_comparison.csv", comparisons)
+    # Retain the established filename for downstream readers of the earlier
+    # single-material checkpoint while the general table carries all controls.
+    write(args.out / "matched_22871_event_comparison.csv",
+          (row for row in comparisons if row["candidate_id"] == "R10F_V2_22871__MS"))
     write(args.out / "restart_inventory.csv", restart_rows(args.campaign))
     return 0
 

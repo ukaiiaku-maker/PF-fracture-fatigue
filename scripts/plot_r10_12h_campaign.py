@@ -183,13 +183,22 @@ def thermal_mechanism_plot(campaign: Path, out: Path):
 
 
 def mechanism_plot(analysis: Path, out: Path):
-    rows = read_csv(analysis / "matched_22871_event_comparison.csv")
+    general = analysis / "matched_plastic_feedback_event_comparison.csv"
+    rows = read_csv(general if general.is_file() else
+                    analysis / "matched_22871_event_comparison.csv")
     fig, ax = plt.subplots(figsize=(6.0, 4.0))
-    if rows:
-        ax.plot([int(row["event_index"]) for row in rows],
-                [100 * float(row["relative_difference"]) for row in rows], marker="o")
+    groups = {}
+    for row in rows:
+        groups.setdefault(row.get("candidate_id", "R10F_V2_22871__MS"), []).append(row)
+    for candidate, group in groups.items():
+        group.sort(key=lambda row: int(row["event_index"]))
+        ax.plot([int(row["event_index"]) for row in group],
+                [100 * float(row["relative_difference"]) for row in group],
+                marker="o", markersize=3, label=candidate)
     ax.set_xlabel("matched event index")
     ax.set_ylabel("full vs frozen event-time difference (%)")
+    if groups:
+        ax.legend(fontsize=7, frameon=False)
     save(fig, out / "matched_plastic_feedback_event_times.png")
 
 
