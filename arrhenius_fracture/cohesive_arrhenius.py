@@ -73,11 +73,13 @@ class CohesiveThermalLaw:
         if self.compact_variant not in {"beta_polynomial", "rounded_plateau",
                                         "two_scale_tail"}:
             raise ValueError("unsupported compact_variant")
-        if not (0.0 < self.compact_rise_fraction < self.compact_fall_fraction < 1.0):
+        if (self.compact_variant == "rounded_plateau" and not
+                (0.0 < self.compact_rise_fraction < self.compact_fall_fraction < 1.0)):
             raise ValueError("compact rise/fall fractions must obey 0 < rise < fall < 1")
         if not (0.0 < self.compact_plateau_drop < 1.0):
             raise ValueError("compact_plateau_drop must lie between zero and one")
-        if not (self.compact_rise_fraction < self.compact_drop_fraction < 1.0):
+        if (self.compact_variant == "two_scale_tail" and not
+                (0.0 < self.compact_rise_fraction < self.compact_drop_fraction < 1.0)):
             raise ValueError("compact drop fraction must exceed rise and remain below one")
         if not (0.0 < self.compact_tail_level < 1.0):
             raise ValueError("compact_tail_level must lie between zero and one")
