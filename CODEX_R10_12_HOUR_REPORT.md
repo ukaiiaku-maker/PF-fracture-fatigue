@@ -15,8 +15,11 @@ The strongest HCF material is `R10F_V2_22871__MS`. At 300 K, R=0.1 and
 runs from cycle 4,161,735.0197 to 11,616,310.9558. Its first event is at cycle
 542,018.9866; positive inter-event waits span 4,540.0851 to 803,733.0207
 cycles. Exact-versus-accelerated initial action and state overlap is bit exact
-for this trajectory. A no-refit six-point amplitude ladder is complete; the
-matched frozen-state continuation remains active.
+for this trajectory. A no-refit six-point amplitude ladder is complete.  The
+clean same-seed, same-resolution frozen-state control also crossed the window
+at 5.5000253968e-12 m/cycle, only 8.71e-6 higher in relative terms than the
+evolving rate, and therefore closes the long-exposure fatigue attribution as
+opening dominated at this protocol.
 
 ## Constitutive and numerical scope
 
@@ -45,7 +48,7 @@ files byte-for-byte.
 
 | Complete material | Complete-row SHA-256 | Current evidence | Joint status |
 |---|---|---|---|
-| `R10F_V2_22871__MS` | `4c3ecdf86c50d3ec969d8c114fa8e3215598450b0a406aeff3cd1e5f69354d75` | six developed HCF amplitudes from 5.500e-12 to 5.654e-9 m/cycle; plastic-state-created Peak-T fracture | strongest HCF frontier; five adjacent slopes 146.67--199.71 fail |
+| `R10F_V2_22871__MS` | `4c3ecdf86c50d3ec969d8c114fa8e3215598450b0a406aeff3cd1e5f69354d75` | six developed HCF amplitudes from 5.500e-12 to 5.654e-9 m/cycle; matched frozen fatigue rate within 8.71 ppm; plastic-state-created Peak-T fracture | strongest HCF frontier; five adjacent slopes 146.67--199.71 fail |
 | `R10F_V2_17780__MS` | `a332c34e4d5af32f312523893c24db3296516eb211c8239df20dfd5a0b820cc5` | recurrent multi-amplitude fatigue; seven-temperature Weak-T span 1.209; R/f holdouts | qualified joint near-frontier, failed slope |
 | `R10F_V2_28475__MS` | `0aaa671d1b7c714c23b8ad07f23c84fa2f8d3246c5dd3cbe0a919190e316b1da` | 1.154e-9--2.225e-8 m/cycle, seven amplitudes and seed bounds | HCF-rate near-frontier, failed slope; high-T fracture unsupported |
 | `R10F_V2_11566__MS` | `883c76bd8081c89c8efae6de6da935826e91de95307bb4df23b85666a12ecbfe` | one-cell full-state versus five-cell frozen burst and 1e12-cycle arrest at factor 1.06; phase-sensitive factor-1.10 recurrence | consequential-plasticity frontier; recurrent rate not phase-qualified |
@@ -65,9 +68,11 @@ evolved EXP_floor feedback rather than intrinsic cohesive hardening. Early
 same-seed, same-resolution full/frozen fatigue event times differ by 164 cycles
 (0.0303 percent) at the first event.  The absolute offset remains only
 164--319 cycles and the relative difference decreases to 0.00329 percent by
-event 55;
-the completed matched developed windows determine whether that opening-
-controlled attribution remains valid at long exposure.
+event 55.  The completed frozen developed window gives 5.5000253968e-12
+m/cycle versus 5.4999775106e-12 m/cycle for the evolving path (an 8.71-ppm
+relative difference).  The opening-controlled fatigue attribution therefore
+remains valid through the developed window even though the same material's
+thermal-fracture class is created by plastic-state evolution.
 
 The first completed new amplitude point, factor 1.05, traverses the same
 first-event-at-or-beyond 20/60 micrometre window from cycle 3,282.05879 to
@@ -95,6 +100,33 @@ unsupported post-escape mixed transit and are retained as unresolved rather
 than zero-rate observations.  Consequently these controls bound a
 temperature-dependent accessible interval but do not support a 450-K
 frequency-rate curve.
+
+The developed factor-1.05 protocol panel at 300 K uses the same complete
+material and fixed Kmax=32.5455357059 MPa sqrt(m), without refitting:
+
+| Protocol | Developed rate (m/cycle) | Native interpretation |
+|---|---:|---|
+| R=0.1, 10 Hz | 5.6893127e-7 | 120-cell developed trajectory |
+| R=0.1, 100 Hz | 5.6549816e-8 | 61-event developed prefix |
+| R=0.1, 1000 Hz | 5.6536170e-9 | 120-cell developed trajectory |
+| R=0.3, 1000 Hz | 7.9149896e-9 | 62-event developed prefix |
+| R=0.5, 1000 Hz | 1.1057230e-8 | 61-event developed prefix |
+
+The three frequency rates become 5.6893e-6, 5.6550e-6, and 5.6536e-6 m/s
+after multiplying by frequency (0.63-percent full spread).  This nearly exact
+elapsed-time collapse is the expected signature of the retained mixed
+first-passage owner, not an empirical per-cycle damage law.  Increasing R from
+0.1 to 0.3 and 0.5 raises the per-cycle rate by 40.0 and 95.6 percent at fixed
+Kmax.  Same-Kmax 600-K and 900-K comparisons remain unresolved opening-physics
+cases (a 120-cell post-escape cascade and a zero-accepted-cycle unsupported
+state, respectively), so no thermal rate is manufactured from them.
+
+The final uncertainty block remains deliberately below the developed-rate
+threshold: the factor-1.04 alternate seed has 36 advances in 37,610.95 cycles,
+the factor-1.05 same-seed 32-phase refinement has 25 advances in 7,335.99
+cycles, and the factor-1.05 alternate seed has 42 advances in 6,988.06 cycles.
+All three are `RESOURCE_STOP` prefixes with exact restart checkpoints.  They
+demonstrate continued recurrence but contribute no developed rate or slope.
 
 ### Weak-T recurrent control and protocol holdouts
 
@@ -218,12 +250,13 @@ The campaign met or exceeded each prospective fidelity allocation:
 Of the 105 native physical-vector source identities, 103 are not among the
 four supplied baseline archive sources.  The native work spans nine numbered
 execution rounds plus targeted discrepancy, transition, mechanism, and HCF
-follow-ups.  At the nine-hour checkpoint the production archive contained 71
-HCF-tested physical vectors, 171 finalized HCF results, 12 distinct protocols,
-50 effective developed-rate records, 2.002463017e12 accepted cycles, and
-2.002787014e9 simulated seconds before remaining in-flight additions.  Shape,
-mode, temperature, R, frequency, seed, and numerical refinement remain
-condition or execution counts rather than inflated physical-vector counts.
+follow-ups.  At the stable numerical freeze the production archive contained
+71 HCF-tested physical vectors, 182 finalized HCF results, 12 distinct
+protocols, 56 effective developed-rate records, 3.002478927e12 accepted
+cycles, and 3.002802954e9 simulated seconds.  Those trajectories commit 9,395
+physical opening events.  Shape, mode, temperature, R, frequency, seed, and
+numerical refinement remain condition or execution counts rather than inflated
+physical-vector counts.
 
 Acquisition moved from the retained 1024-arm information registry through new
 native discrepancy blocks, coherent active-plastic crossings, corrected
@@ -276,6 +309,14 @@ feedback mode, phase count, stochastic seed, patch length and observation-path
 length.  Neither excluded suffix contributes to coverage, slopes, or mechanism
 classification.
 
+A late supervisor process audit also detected several transient duplicate
+invocations with the *same* execution identity while their original long-wall
+owners were still active.  The newer invocations were interrupted immediately.
+Final evidence uses the completed original owner or, for the already completed
+10-Hz case, a unique replay from the last atomic checkpoint to the declared
+120-cell target.  Progress, result, and checkpoint identities were reconciled
+again before packaging; no duplicate prefix is counted as an independent run.
+
 The principal limitations are physical or evidentiary rather than hidden rate
 substitutions:
 
@@ -296,12 +337,19 @@ substitutions:
 
 The fixed campaign clock is 2026-10-18 06:08:49--18:08:49 UTC.  It began at
 `6018f4c40df68139fd0a54bda6ab10c48510eca0` on
-`codex/r10-athermal-mixed-czm-comparison`; the final revision and measured
-CPU/wall accounting are recorded below after the deadline.  The host exposed
-14 logical CPUs.  The supervisor limited numerical work to ten one-thread
-workers, reserving four logical CPUs for analysis, validation, and the host.
+`codex/r10-athermal-mixed-czm-comparison`; the last scientific source revision
+before final reporting is `daa0c0fc`.  Across 135 HCF result files carrying
+process accounting, the accepted trajectories report 82,182.99 CPU-seconds
+and 117,506.01 aggregate worker-wall-seconds.  The host exposed 14 logical
+CPUs.  The supervisor limited numerical work to ten one-thread workers,
+reserving four logical CPUs for analysis, validation, and the host.
 The independently supplied baseline archive hash is
 `b304aa7159e261aba755c5473a8b47468e794291b8e9cda0bf267405f5aa3c1a`.
+
+Repository-wide validation passed 912 tests in 3,475.33 seconds during the
+campaign.  The final aggregate contains 27 actionable restart checkpoints;
+the portable `analysis/restart_inventory.csv` records their exact material,
+protocol, accepted exposure, event count, and checkpoint path.
 
 The production interpreter is
 `/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python`.
@@ -323,7 +371,3 @@ material hash, protocol, phase count, stochastic seed, feedback mode, patch,
 and observation-path length before accepting it.  The portable
 `analysis/restart_inventory.csv` lists every still-actionable state and its
 accepted exposure rather than merely naming hypothetical checkpoint paths.
-
-<!-- FINALIZE: replace midpoint accounting, add final best-material table,
-protocol table, tests, timing/CPU, restart inventory, archive hash, limitations,
-and exact reproduction commands after the campaign deadline. -->
