@@ -9,7 +9,7 @@ from arrhenius_fracture.cohesive_arrhenius import (
     cohesive_shape_response, mechanical_completion,
 )
 from arrhenius_fracture.opening_alternatives_r10 import (
-    OpeningAlternative, evaluate_opening,
+    OpeningAlternative, evaluate_opening, frozen_commitment_density_reference,
 )
 
 
@@ -66,13 +66,34 @@ def test_crossover_first_passage_uses_declared_attempt_scale_without_fit():
     for factor in np.linspace(1.0,8.0,80):
         trial=evaluate_opening(mixed,factor*thermal.delta0_m,kenv,thermal,300.,
                                phase_duration_s=1e-5)
-        if trial["kinetic_validity"]=="TIME_DEPENDENT_FIRST_PASSAGE_ADIABATIC":
+        if trial["kinetic_validity"]=="STATIC_SADDLE_MFPT_HAZARD_APPROXIMATION":
             found=trial;break
     assert found is not None
     assert found["mfpt_s"]>0.0
     assert found["elementary_rate_s-1"]==found["mfpt_rate_s-1"]
     expected=(1e-18*thermal.initial_stiffness(300.)/1e12)
     assert math.isclose(found["friction_J_s_m-2"],expected,rel_tol=1e-12)
+
+
+def test_frozen_density_uses_completion_not_saddle_as_absorber():
+    thermal=law();kenv=0.04*thermal.initial_stiffness(300.)
+    mixed=OpeningAlternative("cohesive_mixed",SMOOTH_EXPONENTIAL,
+        "time_dependent_first_passage",1e-18,1e12,high_barrier_min_kBT=1e6)
+    opening=None
+    for factor in np.linspace(1.,8.,80):
+        trial=evaluate_opening(mixed,factor*thermal.delta0_m,kenv,thermal,300.,
+                               phase_duration_s=1e-5)
+        if trial["kinetic_validity"]=="STATIC_SADDLE_MFPT_HAZARD_APPROXIMATION":
+            opening=trial;break
+    assert opening is not None
+    reference=frozen_commitment_density_reference(
+        mixed,factor*thermal.delta0_m,kenv,thermal,300.,opening,1e-9,65)
+    saddle=next(p["delta_m"] for p in opening["stationary"] if p["kind"]=="SADDLE")
+    assert reference["absorbing_commitment_boundary_m"]>saddle
+    assert not reference["saddle_is_absorbing"]
+    assert 0.<=reference["committed_probability"]<=1.
+    assert (reference["mean_commitment_time_s"] is None or
+            reference["mean_commitment_time_s"]>0.)
 
 
 def test_spatial_plastic_closure_is_a_signed_mechanical_feedback():

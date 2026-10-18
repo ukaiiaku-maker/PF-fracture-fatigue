@@ -1,0 +1,142 @@
+{
+  "archived_evidence_preserved": true,
+  "clock_conclusion": "STATIC_SADDLE_MFPT_REPRODUCED; NOT TRANSIENT_COMMITTED_RUPTURE",
+  "mixed_cases": [
+    {
+      "archived_event_accepted_after_reconciliation": false,
+      "archived_event_index": 1,
+      "archived_event_time_s": 1.3939532720165861e-09,
+      "archived_pre_physical_time_s": 0.0,
+      "authoritative_disposition": "NO_ACCEPTED_COMMITTED_EVENT_IN_FROZEN_PHASE_REFERENCE",
+      "candidate_id": "R10E_COH27231_PL31630",
+      "case": "active30_m",
+      "commitment_action_below_pending_mark": true,
+      "commitment_density_grid_refinement": [
+        {
+          "committed_probability": 0.0,
+          "grid_points": 65,
+          "mean_commitment_time_s": null,
+          "mean_resolved": false
+        },
+        {
+          "committed_probability": 0.0,
+          "grid_points": 129,
+          "mean_commitment_time_s": null,
+          "mean_resolved": false
+        },
+        {
+          "committed_probability": 0.0,
+          "grid_points": 257,
+          "mean_commitment_time_s": null,
+          "mean_resolved": false
+        }
+      ],
+      "commitment_density_reference": {
+        "absorbing_commitment_boundary_m": 6.444599988983465e-10,
+        "committed_probability": 0.0,
+        "duration_s": 1.5625e-05,
+        "friction_J_s_m-2": 9.101794498213028e-11,
+        "grid_points": 129,
+        "initialization": "LOCAL_BOLTZMANN_CONNECTED_BASIN_THROUGH_FIRST_SADDLE",
+        "mean_commitment_time_numerically_resolved": false,
+        "mean_commitment_time_s": null,
+        "prefactor_relation": "zeta=A*k0/nu0",
+        "reference_kind": "FROZEN_COMMITMENT_DENSITY",
+        "reflecting_boundary_m": 0.0,
+        "saddle_is_absorbing": false,
+        "survival_probability": 1.0
+      },
+      "maximum_grid_commitment_action": -0.0,
+      "maximum_grid_commitment_probability": 0.0,
+      "reason": "archived clock absorbed at saddle and published full-phase trial action",
+      "static_saddle_arrival": {
+        "accepted_prefix_action": 0.8745369355201913,
+        "archived_full_phase_action": 9802.79604188935,
+        "discarded_trial_endpoint_action": 9802.79604188935,
+        "localized_wait_s": 1.3939532720165952e-09,
+        "mark": 0.8745369355201913,
+        "mfpt_s": 1.593932989448233e-09,
+        "rate_s-1": 627378946.6809185,
+        "recomputed_full_phase_action": 9802.79604188935
+      }
+    },
+    {
+      "archived_event_accepted_after_reconciliation": false,
+      "archived_event_index": 1,
+      "archived_event_time_s": 7.513365657581262e-11,
+      "archived_pre_physical_time_s": 0.0,
+      "authoritative_disposition": "NO_ACCEPTED_COMMITTED_EVENT_IN_FROZEN_PHASE_REFERENCE",
+      "candidate_id": "R10E_COH00167_PL27231",
+      "case": "cross_coh00167_mixed",
+      "commitment_action_below_pending_mark": true,
+      "commitment_density_grid_refinement": [
+        {
+          "committed_probability": 1.2234666613153422e-09,
+          "grid_points": 65,
+          "mean_commitment_time_s": null,
+          "mean_resolved": false
+        },
+        {
+          "committed_probability": 2.6212365611399946e-13,
+          "grid_points": 129,
+          "mean_commitment_time_s": null,
+          "mean_resolved": false
+        },
+        {
+          "committed_probability": 1.639649394036269e-08,
+          "grid_points": 257,
+          "mean_commitment_time_s": null,
+          "mean_resolved": false
+        }
+      ],
+      "commitment_density_reference": {
+        "absorbing_commitment_boundary_m": 1.1263756568027793e-09,
+        "committed_probability": 2.6212365611399946e-13,
+        "duration_s": 1.5625e-05,
+        "friction_J_s_m-2": 2.6886993819383113e-11,
+        "grid_points": 129,
+        "initialization": "LOCAL_BOLTZMANN_CONNECTED_BASIN_THROUGH_FIRST_SADDLE",
+        "mean_commitment_time_numerically_resolved": false,
+        "mean_commitment_time_s": null,
+        "prefactor_relation": "zeta=A*k0/nu0",
+        "reference_kind": "FROZEN_COMMITMENT_DENSITY",
+        "reflecting_boundary_m": 0.0,
+        "saddle_is_absorbing": false,
+        "survival_probability": 0.9999999999997379
+      },
+      "maximum_grid_commitment_action": 1.6396494074785196e-08,
+      "maximum_grid_commitment_probability": 1.639649394036269e-08,
+      "reason": "archived clock absorbed at saddle and published full-phase trial action",
+      "static_saddle_arrival": {
+        "accepted_prefix_action": 0.8745369355201913,
+        "archived_full_phase_action": 181871.08468106014,
+        "discarded_trial_endpoint_action": 181871.08468106014,
+        "localized_wait_s": 7.513365657584386e-11,
+        "mark": 0.8745369355201913,
+        "mfpt_s": 8.591250240466164e-11,
+        "rate_s-1": 11639749419.587849,
+        "recomputed_full_phase_action": 181871.08468106014
+      }
+    }
+  ],
+  "schema": "r10.opening-transaction-reconciliation/1",
+  "smooth_material_cell": {
+    "archived_successor_disposition": "INVALID_TRANSIT_BRANCH_TRANSFER",
+    "branch_after_loss": "TRANSIT",
+    "case": "smooth_adv",
+    "committed_advance_authorized": false,
+    "completion": {
+      "complete": false,
+      "cutoff_m": 6.444599988983465e-10,
+      "remaining_work_J_m2": 0.010115726923305313,
+      "remaining_work_fraction": 0.01039477791302018,
+      "traction_fraction": 0.024535005003871624
+    },
+    "departed_cell_id": 0,
+    "energy_owner": "COHESIVE_POTENTIAL_REMAINS_ON_DEPARTED_INCOMPLETE_CELL",
+    "separation_m": 2.546333416264349e-10,
+    "successor_cell_created": false
+  },
+  "source_head_expected": "0991faff",
+  "transaction_conclusion": "FULL_PHASE_ACTION_AND_ZERO_TIME_THERMAL_SUCCESSORS_REJECTED"
+}

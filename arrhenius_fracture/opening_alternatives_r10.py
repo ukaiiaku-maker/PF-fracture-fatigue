@@ -11,6 +11,7 @@ from typing import Any
 
 import numpy as np
 from scipy.optimize import brentq
+from scipy.linalg import eigh_tridiagonal
 
 from .cohesive_arrhenius import (
     BILINEAR, SMOOTH_EXPONENTIAL, BilinearCohesiveLaw, CohesiveThermalLaw,
@@ -193,6 +194,78 @@ def overdamped_mfpt(alternative: OpeningAlternative, imposed_delta_m: float,
             "grid_points":len(x)}
 
 
+def frozen_commitment_density_reference(
+    alternative: OpeningAlternative, imposed_delta_m: float,
+    environment_stiffness_Pa_per_m: float,
+    thermal: CohesiveThermalLaw, temperature_K: float,
+    landscape: dict[str, Any], duration_s: float,
+    grid_points: int = 129,
+) -> dict[str, Any]:
+    """Frozen-landscape overdamped density reference to committed separation.
+
+    The left boundary is reflecting contact.  The right boundary is the
+    existing geometry-owned cohesive completion cutoff, not the saddle.  The
+    initial density is the local Boltzmann distribution in the connected basin
+    through its first later saddle.  This is a reference calculation, not a
+    claim that a changing cyclic landscape is frozen.
+    """
+    if alternative.opening_mode != "cohesive_mixed":
+        raise ValueError("density reference requires the mixed opening mode")
+    connected=landscape.get("connected")
+    if connected is None:
+        raise ValueError("density reference requires a connected minimum")
+    completion=mechanical_completion(
+        alternative.cohesive_shape,0.,thermal,temperature_K)
+    cutoff=float(completion["cutoff_m"]);d0=thermal.delta0_m
+    n=max(int(grid_points),33);y=np.linspace(0.,cutoff/d0,n);h=float(y[1]-y[0])
+    x=y*d0;area=float(alternative.activation_area_m2)
+    _,_,psi=cohesive_shape_response(
+        alternative.cohesive_shape,x,thermal,temperature_K)
+    U=area*(np.asarray(psi)+0.5*environment_stiffness_Pa_per_m*
+            (imposed_delta_m-x)**2)
+    kBT=KB_EV_PER_K*EV_TO_J*temperature_K;V=(U-float(np.min(U)))/kBT
+    k0=thermal.initial_stiffness(temperature_K)
+    zeta=area*k0/float(alternative.attempt_frequency_s)
+    diffusion_y=kBT/(zeta*d0*d0)
+    # The last node is absorbing; the transient chain contains nodes 0..n-2.
+    m=n-1;forward=np.zeros(m);backward=np.zeros(m)
+    for i in range(m):
+        if i+1<n:
+            forward[i]=diffusion_y/h**2*math.exp(float(np.clip(
+                -0.5*(V[i+1]-V[i]),-80.,80.)))
+        if i>0:
+            backward[i]=diffusion_y/h**2*math.exp(float(np.clip(
+                -0.5*(V[i-1]-V[i]),-80.,80.)))
+    diagonal=-(forward+backward)
+    offdiag=np.sqrt(forward[:-1]*backward[1:])
+    eigenvalues,eigenvectors=eigh_tridiagonal(diagonal,offdiag)
+    saddles=[p for p in landscape.get("stationary",[]) if p.get("kind")=="SADDLE"
+             and float(p["delta_m"])>float(connected["delta_m"])]
+    basin_end=float(saddles[0]["delta_m"])/d0 if saddles else float(connected["delta_m"])/d0
+    initial=np.where(y[:m]<=basin_end+1e-14,np.exp(np.clip(-V[:m],-700.,700.)),0.)
+    if float(np.sum(initial))<=0.:
+        initial[int(np.argmin(abs(y[:m]-float(connected["delta_m"])/d0)))]=1.
+    initial/=float(np.sum(initial))
+    # Q = D S D^-1, with D=sqrt(local reversible Boltzmann weights).
+    pi=np.exp(np.clip(-V[:m],-700.,700.));sqrt_pi=np.sqrt(pi)
+    transformed=initial/np.maximum(sqrt_pi,1e-300)
+    coefficients=eigenvectors.T@transformed
+    evolved=sqrt_pi*(eigenvectors@(np.exp(np.clip(eigenvalues*duration_s,-745.,0.))*coefficients))
+    evolved=np.maximum(np.real(evolved),0.);survival=float(np.clip(np.sum(evolved),0.,1.))
+    spectral_scale=max(float(np.max(np.abs(eigenvalues))),1.)
+    mean_resolved=bool(float(np.max(eigenvalues)) < -1e-13*spectral_scale)
+    mean=(float(np.sum(sqrt_pi*(eigenvectors@((-1./eigenvalues)*coefficients))))
+          if mean_resolved else None)
+    return {"reference_kind":"FROZEN_COMMITMENT_DENSITY",
+            "initialization":"LOCAL_BOLTZMANN_CONNECTED_BASIN_THROUGH_FIRST_SADDLE",
+            "reflecting_boundary_m":0.,"absorbing_commitment_boundary_m":cutoff,
+            "friction_J_s_m-2":zeta,"prefactor_relation":"zeta=A*k0/nu0",
+            "duration_s":float(duration_s),"survival_probability":survival,
+            "committed_probability":1.-survival,"mean_commitment_time_s":mean,
+            "mean_commitment_time_numerically_resolved":mean_resolved,
+            "grid_points":n,"saddle_is_absorbing":False}
+
+
 def evaluate_opening(alternative: OpeningAlternative, imposed_delta_m: float,
                      environment_stiffness_Pa_per_m: float,
                      thermal: CohesiveThermalLaw, temperature_K: float,
@@ -237,7 +310,7 @@ def evaluate_opening(alternative: OpeningAlternative, imposed_delta_m: float,
             result["kinetic_validity"]="NONADIABATIC_DISTRIBUTION_PROPAGATION_REQUIRED"
             return result
         result["elementary_rate_s-1"]=mfpt["mfpt_rate_s-1"]
-        result["kinetic_validity"]="TIME_DEPENDENT_FIRST_PASSAGE_ADIABATIC"
+        result["kinetic_validity"]="STATIC_SADDLE_MFPT_HAZARD_APPROXIMATION"
         return result
     result["elementary_rate_s-1"]=(float(alternative.attempt_frequency_s)
         *math.exp(max(-barrier_kBT,-700.0)))
@@ -246,4 +319,4 @@ def evaluate_opening(alternative: OpeningAlternative, imposed_delta_m: float,
 
 
 __all__=["BRANCH_STATES","OpeningAlternative","connected_landscape",
-         "evaluate_opening","overdamped_mfpt"]
+         "evaluate_opening","frozen_commitment_density_reference","overdamped_mfpt"]
