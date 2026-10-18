@@ -39,6 +39,12 @@ def main(argv: list[str] | None = None) -> int:
                         help="Fixed absolute peak load in MPa sqrt(m).")
     parser.add_argument("--horizon", type=float, default=1.0e6)
     parser.add_argument("--phases", type=int, default=16)
+    parser.add_argument("--temperature-holdouts", default="600,900,1200")
+    parser.add_argument("--load-ratios", default="0.3,0.5")
+    parser.add_argument("--frequency-holdouts", default="10,100")
+    parser.add_argument("--frequency-temperature-K", type=float, default=300.)
+    parser.add_argument("--include-frequency-reference", action="store_true",
+                        help="Also emit 1000 Hz at the frequency-comparison temperature.")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
 
@@ -50,15 +56,16 @@ def main(argv: list[str] | None = None) -> int:
     material = matches[0]
 
     # The 300 K, R=0.1, 1000 Hz baseline is intentionally not repeated.
-    protocols = [
-        (600.0, 0.1, 1000.0, "temperature_holdout"),
-        (900.0, 0.1, 1000.0, "temperature_holdout"),
-        (1200.0, 0.1, 1000.0, "temperature_holdout"),
-        (300.0, 0.3, 1000.0, "load_ratio_holdout"),
-        (300.0, 0.5, 1000.0, "load_ratio_holdout"),
-        (300.0, 0.1, 10.0, "frequency_holdout"),
-        (300.0, 0.1, 100.0, "frequency_holdout"),
-    ]
+    parse = lambda text: [float(value) for value in text.split(",") if value.strip()]
+    protocols = [(temperature, 0.1, 1000.0, "temperature_holdout")
+                 for temperature in parse(args.temperature_holdouts)]
+    protocols += [(300.0, load_ratio, 1000.0, "load_ratio_holdout")
+                  for load_ratio in parse(args.load_ratios)]
+    frequencies = parse(args.frequency_holdouts)
+    if args.include_frequency_reference:
+        frequencies.append(1000.)
+    protocols += [(args.frequency_temperature_K, 0.1, frequency, "frequency_holdout")
+                  for frequency in frequencies]
     rows: list[dict[str, object]] = []
     for temperature, load_ratio, frequency, role in protocols:
         reference, _ = reference_load(material, temperature, args.phases)
