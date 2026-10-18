@@ -1,0 +1,241 @@
+# R10 autonomous joint CZM/EXP_floor campaign
+
+## Decision
+
+The strict Paris target has not been claimed. The campaign found physically
+recurrent smooth-mixed cohesive growth over rates from the HCF range to fast
+growth, but every completed adjacent-slope sequence so far is much steeper and
+less regular than the required 3.4--4.6 band. Censored, unsupported, burst,
+cascade, and resource-stopped cases remain separate throughout the exported
+tables.
+
+The strongest HCF material is `R10F_V2_22871__MS`. At 300 K, R=0.1 and
+1000 Hz, factor 1.01 gives 61 physical one-micrometre advances and a developed
+20--60 micrometre rate of 5.499977510625358e-12 m/cycle. The developed window
+runs from cycle 4,161,735.0197 to 11,616,310.9558. Its first event is at cycle
+542,018.9866; positive inter-event waits span 4,540.0851 to 803,733.0207
+cycles. Exact-versus-accelerated initial action and state overlap is bit exact
+for this trajectory. A no-refit amplitude ladder and the matched frozen-state
+continuation are being completed during the remaining allocation.
+
+## Constitutive and numerical scope
+
+- New opening arms use the existing smooth-exponential or bilinear athermal/
+  mixed CZM owners. No new opening family, empirical cycle damage, fitted
+  endpoint law, per-cell delay, or numerical advance cap was introduced.
+- Emission, Peierls transport, Taylor release, activation entropy, persistent
+  sources, return motion, backstress, blunting, wake/history, contact, and
+  geometry remain owned by the current EXP_floor full-state backend.
+- Every amplitude is an independently initialized fixed-applied-K history
+  unless explicitly labeled as a restart continuation of the same protocol.
+- Developed rates use the established first-event-at-or-beyond 20 and 60
+  micrometre window. No rate is imputed to a censor or unsupported case.
+- The HCF restart identity now records and checks phase resolution in addition
+  to material, load, temperature, R, frequency, and plastic-feedback mode.
+
+## Scientific findings
+
+### Best-material table
+
+The table uses complete consumed-row hashes, not descriptive IDs, as material
+identity. Full-precision cohesive and EXP_floor vectors are exported in
+`runs/r10_12h_autonomous/analysis/finalist_parameterizations.csv` and the two
+`materialized_round_*.csv` registries; the portable manifest hashes those
+files byte-for-byte.
+
+| Complete material | Complete-row SHA-256 | Current evidence | Joint status |
+|---|---|---|---|
+| `R10F_V2_22871__MS` | `4c3ecdf86c50d3ec969d8c114fa8e3215598450b0a406aeff3cd1e5f69354d75` | 5.500e-12 m/cycle developed HCF; plastic-state-created Peak-T fracture | strongest HCF frontier; slope ladder active |
+| `R10F_V2_17780__MS` | `a332c34e4d5af32f312523893c24db3296516eb211c8239df20dfd5a0b820cc5` | recurrent multi-amplitude fatigue; seven-temperature Weak-T span 1.209; R/f holdouts | qualified joint near-frontier, failed slope |
+| `R10F_V2_28475__MS` | `0aaa671d1b7c714c23b8ad07f23c84fa2f8d3246c5dd3cbe0a919190e316b1da` | 1.154e-9--2.225e-8 m/cycle, seven amplitudes and seed bounds | HCF-rate near-frontier, failed slope; high-T fracture unsupported |
+| `R10F_V2_11566__MS` | `883c76bd8081c89c8efae6de6da935826e91de95307bb4df23b85666a12ecbfe` | one-cell full-state versus five-cell frozen burst and 1e12-cycle arrest at factor 1.06; 1.890e-8 m/cycle developed growth at factor 1.10 | consequential-plasticity transition frontier |
+| `R10F_12H_FC_07172_VP_27940__MS` | `d987e245733fb89f38a85e7678aafdc33f99f6c635840eada5f48b42e3caa245` | replicated finite bursts and arrest versus frozen cascades; strong closing response | mechanism boundary, not a fatigue curve |
+| `R10F_V2_00116__MS` | `6e28416309e81ae3593dd818514b481b64506ea26eb964fef25f1feb87dbb38f` | supported rare-opening action with native events at three amplitudes | provisional HCF acquisition |
+| `R10F_V2_01796__MS` | `cfa9d6949a406ae5d05e5a9171c9d56d85d3a6dd6404f94f4345ed55b503bdb0` | intermediate recurrent rates and bounded thermal response | opening-controlled comparison; failed slope/full thermal class |
+
+No row is described as globally optimal or experimentally calibrated.
+
+### Slow recurrent HCF and fracture response
+
+`R10F_V2_22871__MS` is the slow-growth frontier. Its full-state monotonic
+fracture roots at 300--1200 K are 31.1, 50.5, 48.9, 44.4, 40.1, 36.1, and
+32.3 MPa sqrt(m). The matched frozen-plastic roots are 31.1, 29.2, 27.7,
+26.1, 24.5, 23.0, and 21.4 MPa sqrt(m). Thus the Peak-T response is created by
+evolved EXP_floor feedback rather than intrinsic cohesive hardening. Early
+same-seed, same-resolution full/frozen fatigue event times differ by 164 cycles
+(0.0303 percent) at the first event.  The absolute offset remains only
+164--319 cycles and the relative difference decreases to 0.00329 percent by
+event 55;
+the completed matched developed windows determine whether that opening-
+controlled attribution remains valid at long exposure.
+
+### Weak-T recurrent control and protocol holdouts
+
+`R10F_V2_17780__MS` has a qualified seven-temperature fracture span of 1.209
+(33.5--40.5 MPa sqrt(m)). It has developed 1000-Hz rates at multiple amplitudes,
+but replicate-aware local slopes are approximately 123--148 rather than four.
+At fixed Kmax=35.38547195021402 MPa sqrt(m), developed rates change from
+2.128e-5 at 10 Hz to 2.905e-6 at 100 Hz, about 2.32e-7 at 1000 Hz, and
+2.412e-8 m/cycle at 10 kHz. The supplementary 10-kHz point is reported as such;
+the required comparison is 10/100/1000 Hz. R=0.3 and R=0.5 histories are also
+retained at unchanged material and Kmax.
+At the three independently repeated reference amplitudes, the observed
+maximum/minimum rate ratios are 1.274, 1.346, and 1.389.  These are finite
+stream ranges, not confidence intervals; every stream and censor is retained
+in `replicate_rate_bounds.csv`.
+
+The unchanged-material `17780` protocol panel is:
+
+| Protocol change at fixed Kmax=35.38547 MPa sqrt(m) | Native outcome |
+|---|---|
+| 300 K, R=0.1, 10/100/1000 Hz | developed rates 2.128e-5 / 2.905e-6 / median 2.316e-7 m/cycle |
+| 300 K, R=0.3 / 0.5, 1000 Hz | developed prefixes 3.944e-7 / 4.408e-7 m/cycle; later resource stop retained |
+| 600 / 900 K, R=0.1, 1000 Hz | 120-cell target-truncated cascades, not Paris rates |
+| 1200 K, R=0.1, 1000 Hz | unsupported mixed first-passage approximation; unresolved |
+
+The temperature, load-ratio, and frequency rows use the same complete material
+without refitting.  The separately retained 10 kHz result is supplemental.
+
+### Near-frontier recurrent and transition controls
+
+- `R10F_V2_28475__MS` gives seven supported developed rates from 1.154e-9 to
+  2.225e-8 m/cycle. Independent low/middle/high streams preserve substantial
+  stochastic scatter. Its adjacent slopes remain far outside the target, and
+  its evolving/frozen event times are bit-identical through 120 events at the
+  matched factor-1.01 protocol, identifying opening-dominated fatigue there.
+  Its three-stream low/middle/high observed rate ratios are 1.271, 1.273, and
+  1.110, again reported as observed ranges rather than inferred confidence
+  bounds.
+- `R10F_V2_17444__MS` gives a six-point recurrent fast boundary. Its adjacent
+  slopes range from about -1271 to +255 and therefore reject a moderate Paris
+  interval despite genuine recurrent remapping.
+- `R10F_V2_01796__MS` fills an intermediate recurrent control. Factor 1.01
+  reaches a developed 9.315e-7 m/cycle; factor 1.03 reaches 8.285e-6 m/cycle;
+  factor 1.06 is a target-truncated cascade. Its evolving fracture root stays
+  21.3 MPa sqrt(m) through 600 K, rises to 23.1 by 900--1050 K, and becomes an
+  unsupported mixed crossover at 1200 K, so it is not assigned a full seven-
+  temperature class.
+
+### Consequential plastic-state arrest
+
+The coherent active-plastic `R10F_12H_FC_07172_VP_27940__MS` material
+reproducibly changes from finite bursts to arrest and then to a same-excursion
+cascade over a narrow amplitude bracket. At factor 1.04 it gives 2--6 events
+across streams before 1e6-cycle arrest; at factor 1.05 it gives 33--60 events
+before the same exposure censor. Matched frozen-state calculations cascade,
+so the arrest is caused by evolving plastic feedback. A same-material reduced
+2-D transfer restores the developed state bit exactly and measures 5.447 GPa
+of closing traction; even the no-feedback interface remains ramp-censored in
+that reduced geometry, so this is a bounded feedback comparison rather than a
+spatial propagation claim.
+
+The new high-barrier acquisition found `R10F_V2_11566__MS`. At factor 1.06 it
+opens once at cycle 0.03644, evolves from zero mobile population to 2564.51,
+raises tip radius from 1.0 to 1.41579 micrometres, develops 1.399 GPa source
+backstress, changes from bonded-metastable to bonded-stable, and then remains
+arrested through the physical 1e12-cycle censor.  The exact final HCF checkpoint
+was consumed at its one-cell advanced geometry by the reduced 2-D interface:
+state restore was bit exact, the retained operator supplied 1.3068 GPa of
+closing traction, and the factor-100-delta0 terminal opening fell from
+9.564e-11 m with feedback disabled to 6.256e-11 m with feedback active.  Both
+paths remain ramp-limit censored, so this is a 34.6-percent same-state opening
+reduction, not a spatial propagation threshold.  The same-seed, same-phase
+frozen-initial-plastic factor-1.06 control makes five immediate advances before
+arresting through the same 1e12-cycle exposure.  Evolving EXP_floor state thus
+suppresses four otherwise accessible opening transactions and establishes the
+one-cell arrest as a consequential feedback effect; neither history is a
+developed Paris interval.  The matched monotonic fracture control resolves
+300--750 K: evolving/frozen roots are 21.9/19.2, 20.8/17.0, 21.0/14.7, and
+16.4/12.4 MPa sqrt(m).  Evolving plasticity therefore raises the resolved roots
+by 14--43 percent, but 900--1200 K encounters the unsupported mixed crossover
+and the material is not assigned a complete Weak-T, Peak-T, or DBTT class.
+At factor 1.10 the same evolving material reactivates after a 1,424-cycle late
+wait and then reaches the established 20--60 micrometre developed window.  The
+window runs from cycle 2,440.05896 to 4,556.05883 and gives
+1.8903593e-8 m/cycle; positive waits span 1.071e-4--1,424 cycles.  This sharp
+factor-1.06 arrest/factor-1.10 recurrent-growth transition is retained as a
+state-sensitive mechanism bracket, not promoted to a moderate-slope claim.
+
+## Search coverage and acquisition history
+
+At the six-hour checkpoint the executed archive contained:
+
+- 32,768 cheap physical tuples allocated; 23,691 domain-valid tuples and
+  94,764 analytical opening arms;
+- 554 distinct state-informed physical vectors and 9,350 cyclic-state records;
+- 105 distinct current full-state 1-D physical vectors, 112 execution
+  identities, and 213 finalized native results;
+- 69 HCF-tested physical vectors, 156 finalized HCF results, 12 protocols,
+  41 developed-rate records, and 2.465e9 accepted cycles before in-flight
+  additions.
+
+Acquisition moved from the retained 1024-arm information registry through new
+native discrepancy blocks, coherent active-plastic crossings, corrected
+athermal/bilinear transition brackets, exact reconstruction of previously
+unpromoted Sobol vectors, and two new activation-area/barrier cohorts. The
+second cohort discovered supported rare-opening actions of 1.53e-5/cycle for
+`00116` and a state-active no-path-to-opening crossover for `11566`; native
+execution followed immediately rather than stopping at descriptor selection.
+The 1024 exact native-information rows alone span 319 distinct cohesive and 414
+distinct EXP_floor fingerprints.  Their sampled cohesive ranges are
+Gamma(300 K)=0.5110--7.9073 J/m2, cohesive entropy
+-0.0020099--0.0057147 J/(m2 K), activation area
+1.042e-20--1.024e-18 m2, delta0=4.772e-12--2.929e-10 m, peak traction
+8.409--78.526 GPa, and zero-traction barrier 0.3537--5.9340 eV.  The paired
+plastic ranges include emission H0=0.9704--5.1216 eV, Peierls
+H0=1.9176--10.3334 eV, Taylor H0=0.2014--6.8726 eV, and the original nonzero
+Peierls/Taylor activation-entropy coordinates.  These are search ranges, not
+independent fitted endpoint laws; every native case consumes one coherent row.
+
+The discrepancies changed the next selections rather than being treated as a
+post hoc correction.  For `22871`, the current cyclic reduction predicted the
+first event at cycle 539,217.19 and the native trajectory located it at
+542,018.99 (0.520 percent later), validating promotion into a deep HCF ladder.
+For `11566`, the initial reduction reported zero completed-cycle thermal action
+and a 7.50e6-cycle plastic-state timescale, whereas the native first excursion
+mechanically committed at cycle 0.03644 and then the evolved state removed the
+escape path through a 1e12-cycle exposure.  That qualitative miss caused the
+next acquisition to bracket the state-created arrest at factor 1.06 with a
+higher-load factor-1.10 reactivation trajectory and a matched frozen-state
+control; it was not converted into a fitted predictor multiplier.
+
+## Numerical integrity and evidence boundaries
+
+The accelerated high-cycle path was exercised on eventful trajectories, not
+qualified only on zero-event overlap.  It advances current EXP_floor state,
+localizes a current-CZM first passage, commits/remaps a material cell, consumes
+the residual waveform, and continues event-to-event.  Exact-versus-accelerated
+initial overlap is bit exact for the strongest HCF case.  Atomic checkpoints
+carry the active state, accepted geometry, branch/hazard state and histories;
+the final restart inventory reports only checkpoints that exist on disk.
+
+One provenance defect was found during deepening, bounded, and repaired.  A
+legacy 22871 frozen checkpoint did not encode phase resolution and was
+mistakenly continued from 16 to 64 phases.  Its immutable 55-event phase-16
+result remains a valid prefix, but the two-event mixed-resolution suffix is
+excluded.  A subsequent one-event replay with the wrong seed is also excluded.
+The clean replacement uses 16 phases and the production seed 202610184101 from
+cycle zero.  New restarts bind candidate, complete-row hash, T/R/frequency,
+feedback mode, phase count, stochastic seed, patch length and observation-path
+length.  Neither excluded suffix contributes to coverage, slopes, or mechanism
+classification.
+
+The principal limitations are physical or evidentiary rather than hidden rate
+substitutions:
+
+- No completed adjacent local secant currently falls inside 3.4--4.6, so no
+  strict Paris pass is claimed.
+- A resource stop is not a runout.  It retains an exact restart and contributes
+  only its accepted prefix; it receives no zero rate.
+- A static no-path state, a post-escape transit requiring unsupported physics,
+  a physical finite-horizon runout, an arrested burst, and a path-truncated
+  cascade remain separate dispositions.
+- The reduced 2-D comparisons consume the retained closing-traction operator;
+  they bound finite-state feedback but are not presented as a full spatial
+  crack-propagation qualification.
+- These are model calculations, not experimental calibration or uncertainty
+  bounds on a material measurement.
+
+<!-- FINALIZE: replace midpoint accounting, add final best-material table,
+protocol table, tests, timing/CPU, restart inventory, archive hash, limitations,
+and exact reproduction commands after the campaign deadline. -->
