@@ -65,8 +65,12 @@ def main(argv=None):
     parser.add_argument("--count", type=int, default=64)
     parser.add_argument("--exclude-summary", type=Path, action="append", default=[])
     parser.add_argument("--exclude-source-ids", default="")
+    parser.add_argument("--mode", choices=("cohesive_athermal", "cohesive_mixed"),
+                        help="Optionally acquire within one opening owner only.")
     args = parser.parse_args(argv)
     mapped = read(args.state_map)
+    if args.mode:
+        mapped = [row for row in mapped if row["mode"] == args.mode]
     registry = {r["candidate_id"]: r for r in read(args.registry)}
     excluded_sources = set()
     excluded_sources.update(x.strip() for x in args.exclude_source_ids.split(",") if x.strip())
