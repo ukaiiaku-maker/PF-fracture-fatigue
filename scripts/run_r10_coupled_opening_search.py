@@ -7,7 +7,9 @@ from pathlib import Path
 import sys
 
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
-from arrhenius_fracture.cohesive_arrhenius import BILINEAR,SMOOTH_EXPONENTIAL,FAMILY,OPENING_ALTERNATIVES_FAMILY
+from arrhenius_fracture.cohesive_arrhenius import (BILINEAR,COMPACT_INDEPENDENT,
+    SMOOTH_EXPONENTIAL,FAMILY,OPENING_ALTERNATIVES_FAMILY)
+from arrhenius_fracture.finite_compliance_inverse_shape_r10 import branch_loss,K_from_imposed
 from arrhenius_fracture.coupled_opening_reduction_r10 import (bilinear_accessibility_coordinates,
     coupled_cycle_reduction,coupled_monotonic_ramp)
 from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY
@@ -59,6 +61,16 @@ def reference_load(row,T=300.,phases=8):
  if row['selected_shape']==BILINEAR:
   d=bilinear_accessibility_coordinates(thermal,T,kenv,1e-6,phases)
   return d['discrete_waveform_Kmax_for_branch_loss_MPa_sqrt_m'],d
+ if row['selected_shape']==COMPACT_INDEPENDENT:
+  fold=branch_loss(COMPACT_INDEPENDENT,thermal,T,kenv)
+  if fold['fold_imposed_m'] is None:
+   return math.nan,{'state':fold['state'],'occupied_bonded_branch_loss_K_MPa_sqrt_m':None}
+  continuous=K_from_imposed(float(fold['fold_imposed_m']),kenv)
+  hmax=.55+.45*math.cos(math.pi/phases)
+  return continuous/hmax,{'state':fold['state'],
+   'occupied_bonded_branch_loss_K_MPa_sqrt_m':continuous,
+   'discrete_waveform_Kmax_for_branch_loss_MPa_sqrt_m':continuous/hmax,
+   'waveform_midpoint_hmax':hmax,'static_completed_branch_K_MPa_sqrt_m':None}
  continuous=critical_K(thermal,T,SMOOTH_EXPONENTIAL);hmax=.55+.45*math.cos(math.pi/phases)
  return continuous/hmax,{'occupied_bonded_branch_loss_K_MPa_sqrt_m':continuous,
    'discrete_waveform_Kmax_for_branch_loss_MPa_sqrt_m':continuous/hmax,'waveform_midpoint_hmax':hmax,

@@ -19,7 +19,7 @@ import numpy as np
 from scipy import sparse
 
 from .cohesive_arrhenius import (
-    BILINEAR, SMOOTH_EXPONENTIAL,
+    BILINEAR, COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL,
     COHESIVE_ATHERMAL_MECHANICAL, COHESIVE_MIXED_MECHANICAL_THERMAL,
     COHESIVE_KINETIC_CZM, COHESIVE_RATE_INDEPENDENT_CONTROL,
     CohesiveThermalLaw, cohesive_shape_response,
@@ -54,7 +54,8 @@ class CohesiveElement:
             raise ValueError("cohesive element length must be positive")
         if self.rupture_state not in {"INTACT", "BROKEN"}:
             raise ValueError("rupture_state must be INTACT or BROKEN")
-        if self.cohesive_shape not in {SMOOTH_EXPONENTIAL, BILINEAR}:
+        if self.cohesive_shape not in {SMOOTH_EXPONENTIAL, BILINEAR,
+                                       COMPACT_INDEPENDENT}:
             raise ValueError("unsupported cohesive_shape")
 
     @property

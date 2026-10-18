@@ -5,7 +5,8 @@ import numpy as np
 from arrhenius_fracture.cohesive import CohesiveElement,CohesiveNetwork,cohesive_element_diagnostics
 
 from arrhenius_fracture.cohesive_arrhenius import (
-    BILINEAR, SMOOTH_EXPONENTIAL, BilinearCohesiveLaw, CohesiveThermalLaw,
+    BILINEAR, COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL, BilinearCohesiveLaw,
+    CompactIndependentCohesiveLaw, CohesiveThermalLaw,
     cohesive_shape_response, mechanical_completion,
 )
 from arrhenius_fracture.opening_alternatives_r10 import (
@@ -15,6 +16,23 @@ from arrhenius_fracture.opening_alternatives_r10 import (
 
 def law():
     return CohesiveThermalLaw(2.5, 20e9, 2e-4)
+
+
+def test_compact_research_law_is_one_normalized_potential():
+    thermal = CohesiveThermalLaw(2.5, 20e9, 2e-4, compact_b=4.5,
+                                compact_c=2.0)
+    compact = CompactIndependentCohesiveLaw(thermal)
+    cutoff = compact.final_separation(300.)
+    grid = np.linspace(0., cutoff, 10001)
+    traction, tangent, work = cohesive_shape_response(
+        COMPACT_INDEPENDENT, grid, thermal, 300.)
+    assert np.isclose(np.max(traction), 20e9, rtol=2e-7)
+    assert np.isclose(np.trapezoid(traction, grid), 2.5, rtol=2e-7)
+    assert np.isclose(work[-1], 2.5, rtol=1e-13)
+    assert np.count_nonzero(np.diff(np.sign(tangent[:-1]))) == 1
+    completion = mechanical_completion(COMPACT_INDEPENDENT, cutoff, thermal, 300.)
+    assert completion["complete"]
+    assert completion["cutoff_m"] == cutoff
 
 
 def test_bilinear_matches_exponential_work_peak_and_initial_stiffness():

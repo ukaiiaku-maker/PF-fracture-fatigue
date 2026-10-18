@@ -14,7 +14,8 @@ from scipy.optimize import brentq
 from scipy.linalg import eigh_tridiagonal
 
 from .cohesive_arrhenius import (
-    BILINEAR, SMOOTH_EXPONENTIAL, BilinearCohesiveLaw, CohesiveThermalLaw,
+    BILINEAR, COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL, BilinearCohesiveLaw,
+    CompactIndependentCohesiveLaw, CohesiveThermalLaw,
     EV_TO_J, cohesive_shape_response, finite_compliance_landscape,
     mechanical_completion,
 )
@@ -39,7 +40,8 @@ class OpeningAlternative:
     def __post_init__(self):
         if self.opening_mode not in {"cohesive_athermal", "cohesive_mixed"}:
             raise ValueError("opening_mode must be cohesive_athermal or cohesive_mixed")
-        if self.cohesive_shape not in {SMOOTH_EXPONENTIAL, BILINEAR}:
+        if self.cohesive_shape not in {SMOOTH_EXPONENTIAL, BILINEAR,
+                                       COMPACT_INDEPENDENT}:
             raise ValueError("unsupported cohesive shape")
         expected = ({"quasistatic_mechanical"} if self.opening_mode == "cohesive_athermal"
                     else {"qualified_high_barrier_hazard","time_dependent_first_passage"})
@@ -66,7 +68,9 @@ def _root_landscape(imposed: float, kenv: float, thermal: CohesiveThermalLaw,
         if imposed>=df:candidates.append(imposed)
         roots=sorted(set(candidates))
     else:
-        span = max(25.0*thermal.delta0_m, imposed+10.0*thermal.delta0_m)
+        compact_span = (CompactIndependentCohesiveLaw(thermal).final_separation(temperature)
+                        if shape == COMPACT_INDEPENDENT else 25.0*thermal.delta0_m)
+        span = max(compact_span*1.05, imposed+10.0*thermal.delta0_m)
         grid = np.linspace(0.0, span, 257)
 
     def residual(d):
@@ -136,8 +140,10 @@ def connected_landscape(imposed_delta_m: float, environment_stiffness_Pa_per_m: 
     prior=prior or {"branch":"BONDED","delta_m":0.0}
     prior_d=float(prior.get("delta_m") or 0.0)
     connected=min(minima,key=lambda p:abs(float(p["delta_m"])-prior_d))
-    peak_d=(thermal.delta0_m if shape==SMOOTH_EXPONENTIAL
-            else BilinearCohesiveLaw(thermal).peak_separation(temperature_K))
+    peak_d=(thermal.delta0_m if shape==SMOOTH_EXPONENTIAL else
+            BilinearCohesiveLaw(thermal).peak_separation(temperature_K)
+            if shape==BILINEAR else
+            CompactIndependentCohesiveLaw(thermal).peak_separation(temperature_K))
     lost=(prior.get("branch") in {"BONDED","METASTABLE"} and
           float(connected["delta_m"])>peak_d and prior_d<=peak_d and len(minima)==1)
     completion=mechanical_completion(shape,float(connected["delta_m"]),thermal,temperature_K)
@@ -173,7 +179,10 @@ def overdamped_mfpt(alternative: OpeningAlternative, imposed_delta_m: float,
     when the caller establishes adiabatic separation from its phase duration.
     """
     area=float(alternative.activation_area_m2);nu=float(alternative.attempt_frequency_s)
-    k0=thermal.initial_stiffness(temperature_K);zeta=area*k0/nu
+    k0=(CompactIndependentCohesiveLaw(thermal).initial_stiffness(temperature_K)
+        if alternative.cohesive_shape == COMPACT_INDEPENDENT
+        else thermal.initial_stiffness(temperature_K))
+    zeta=area*k0/nu
     x0=float(connected["delta_m"]);xb=float(saddle["delta_m"])
     if not (0.0<=x0<xb):
         raise ValueError("MFPT requires an ordered connected minimum and saddle")
@@ -224,7 +233,9 @@ def frozen_commitment_density_reference(
     U=area*(np.asarray(psi)+0.5*environment_stiffness_Pa_per_m*
             (imposed_delta_m-x)**2)
     kBT=KB_EV_PER_K*EV_TO_J*temperature_K;V=(U-float(np.min(U)))/kBT
-    k0=thermal.initial_stiffness(temperature_K)
+    k0=(CompactIndependentCohesiveLaw(thermal).initial_stiffness(temperature_K)
+        if alternative.cohesive_shape == COMPACT_INDEPENDENT
+        else thermal.initial_stiffness(temperature_K))
     zeta=area*k0/float(alternative.attempt_frequency_s)
     diffusion_y=kBT/(zeta*d0*d0)
     # The last node is absorbing; the transient chain contains nodes 0..n-2.

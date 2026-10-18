@@ -7,7 +7,7 @@ import sys
 import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
-from arrhenius_fracture.cohesive_arrhenius import (BILINEAR,SMOOTH_EXPONENTIAL,
+from arrhenius_fracture.cohesive_arrhenius import (BILINEAR,COMPACT_INDEPENDENT,SMOOTH_EXPONENTIAL,
     COHESIVE_KINETIC_CZM,cohesive_shape_response)
 from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY
 from arrhenius_fracture.fatigue_v1 import FatigueWaveform

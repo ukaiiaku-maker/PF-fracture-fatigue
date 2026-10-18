@@ -42,6 +42,8 @@ def load_cohesive_binding(registry: str | Path, candidate_id: str,
         t_hat_ref_Pa=float(cohesive["t_hat_ref_Pa"]),
         S_Gamma_J_m2_K=float(cohesive["S_Gamma_J_m2_K"]),
         T_ref_K=float(cohesive["T_ref_K"]),
+        compact_b=float(cohesive.get("compact_b", 2.0)),
+        compact_c=float(cohesive.get("compact_c", 0.0)),
     ).validate_range((300, 450, 600, 750, 900, 1050, 1200))
     opening = ExponentialCohesiveBarrier(
         thermal=thermal,

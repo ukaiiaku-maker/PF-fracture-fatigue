@@ -12,7 +12,7 @@ import math
 from typing import Any
 
 import numpy as np
-from scipy.special import lambertw
+from scipy.special import beta as beta_function, betainc, lambertw
 from scipy.optimize import brentq
 
 from .material_manifest import KB_EV_PER_K
@@ -37,6 +37,7 @@ EXECUTION_IDENTITIES = frozenset({
 OPENING_ALTERNATIVES_FAMILY = "D_MECHANICAL_MIXED_CZM_EXP_PLASTICITY"
 SMOOTH_EXPONENTIAL = "smooth_exponential"
 BILINEAR = "bilinear"
+COMPACT_INDEPENDENT = "compact_independent"
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,10 @@ class CohesiveThermalLaw:
     t_hat_ref_Pa: float
     S_Gamma_J_m2_K: float = 0.0
     T_ref_K: float = 300.0
+    # Opt-in research coordinates for the compact, finite-support cohesive
+    # potential.  They are inert for the canonical exponential/bilinear laws.
+    compact_b: float = 2.0
+    compact_c: float = 0.0
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.Gamma_ref_J_m2) or self.Gamma_ref_J_m2 <= 0.0:
@@ -55,6 +60,10 @@ class CohesiveThermalLaw:
             raise ValueError("t_hat_ref_Pa must be finite and positive")
         if not math.isfinite(self.S_Gamma_J_m2_K):
             raise ValueError("S_Gamma_J_m2_K must be finite")
+        if not math.isfinite(self.compact_b) or self.compact_b < 1.0:
+            raise ValueError("compact_b must be finite and at least one")
+        if not math.isfinite(self.compact_c) or self.compact_c <= -1.0:
+            raise ValueError("compact_c must be finite and greater than -1")
 
     @property
     def delta0_m(self) -> float:
@@ -314,6 +323,92 @@ class BilinearCohesiveLaw:
                         np.where(d < df, up, self.thermal.gamma(temperature_K)))
 
 
+@dataclass(frozen=True)
+class CompactIndependentCohesiveLaw:
+    """Finite-support single-potential research law.
+
+    Its normalized traction is ``x (1-x)^b (1+c x)`` on ``0 <= x <= 1``.
+    The support is chosen so that the same potential has exactly the declared
+    work and peak traction.  ``b`` and ``c`` independently alter the initial
+    stiffness and softening distribution without introducing a Paris law or a
+    separate stress-dependent activation barrier.
+    """
+
+    thermal: CohesiveThermalLaw
+
+    @property
+    def b(self) -> float:
+        return float(self.thermal.compact_b)
+
+    @property
+    def c(self) -> float:
+        return float(self.thermal.compact_c)
+
+    @property
+    def peak_x(self) -> float:
+        b, c = self.b, self.c
+        if abs(c) < 1.0e-14:
+            return 1.0 / (b + 1.0)
+        # g'(x)/(1-x)^(b-1) = 1 +(2c-b-1)x-c(b+2)x^2.
+        roots = np.roots([-c * (b + 2.0), 2.0 * c - b - 1.0, 1.0])
+        admissible = [float(r.real) for r in roots
+                      if abs(float(r.imag)) < 1.0e-10 and 0.0 < r.real < 1.0]
+        if len(admissible) != 1:
+            raise ValueError("compact cohesive shape must have one interior peak")
+        return admissible[0]
+
+    @property
+    def peak_shape(self) -> float:
+        x = self.peak_x
+        return x * (1.0 - x) ** self.b * (1.0 + self.c * x)
+
+    @property
+    def shape_integral(self) -> float:
+        return float(beta_function(2.0, self.b + 1.0)
+                     + self.c * beta_function(3.0, self.b + 1.0))
+
+    def final_separation(self, temperature_K: float) -> float:
+        gamma = self.thermal.gamma(temperature_K)
+        peak = self.thermal.t_hat(temperature_K)
+        return gamma * self.peak_shape / (peak * self.shape_integral)
+
+    def peak_separation(self, temperature_K: float) -> float:
+        return self.peak_x * self.final_separation(temperature_K)
+
+    def initial_stiffness(self, temperature_K: float) -> float:
+        return (self.thermal.t_hat(temperature_K) /
+                (self.final_separation(temperature_K) * self.peak_shape))
+
+    def traction(self, separation_m, temperature_K: float):
+        d = np.maximum(np.asarray(separation_m, dtype=float), 0.0)
+        dc = self.final_separation(temperature_K)
+        x = np.clip(d / dc, 0.0, 1.0)
+        g = x * np.maximum(1.0 - x, 0.0) ** self.b * (1.0 + self.c * x)
+        value = self.thermal.t_hat(temperature_K) * g / self.peak_shape
+        return np.where(d < dc, value, 0.0)
+
+    def tangent(self, separation_m, temperature_K: float):
+        d = np.maximum(np.asarray(separation_m, dtype=float), 0.0)
+        dc = self.final_separation(temperature_K)
+        x = np.clip(d / dc, 0.0, 1.0)
+        polynomial = (1.0 + (2.0 * self.c - self.b - 1.0) * x
+                      - self.c * (self.b + 2.0) * x * x)
+        derivative = np.maximum(1.0 - x, 0.0) ** (self.b - 1.0) * polynomial
+        value = self.thermal.t_hat(temperature_K) / (dc * self.peak_shape) * derivative
+        return np.where(d < dc, value, 0.0)
+
+    def potential(self, separation_m, temperature_K: float):
+        d = np.maximum(np.asarray(separation_m, dtype=float), 0.0)
+        dc = self.final_separation(temperature_K)
+        x = np.clip(d / dc, 0.0, 1.0)
+        partial = (beta_function(2.0, self.b + 1.0) *
+                   betainc(2.0, self.b + 1.0, x)
+                   + self.c * beta_function(3.0, self.b + 1.0) *
+                   betainc(3.0, self.b + 1.0, x))
+        value = self.thermal.gamma(temperature_K) * partial / self.shape_integral
+        return np.where(d < dc, value, self.thermal.gamma(temperature_K))
+
+
 def cohesive_shape_response(shape: str, separation_m,
                             thermal: CohesiveThermalLaw,
                             temperature_K: float):
@@ -324,6 +419,11 @@ def cohesive_shape_response(shape: str, separation_m,
                 potential_J_m2(separation_m, thermal, temperature_K))
     if shape == BILINEAR:
         law = BilinearCohesiveLaw(thermal)
+        return (law.traction(separation_m, temperature_K),
+                law.tangent(separation_m, temperature_K),
+                law.potential(separation_m, temperature_K))
+    if shape == COMPACT_INDEPENDENT:
+        law = CompactIndependentCohesiveLaw(thermal)
         return (law.traction(separation_m, temperature_K),
                 law.tangent(separation_m, temperature_K),
                 law.potential(separation_m, temperature_K))
@@ -342,6 +442,9 @@ def mechanical_completion(shape: str, separation_m: float,
     remaining = max(gamma-float(work), 0.0)
     if shape == BILINEAR:
         cutoff = BilinearCohesiveLaw(thermal).final_separation(temperature_K)
+        complete = d >= cutoff
+    elif shape == COMPACT_INDEPENDENT:
+        cutoff = CompactIndependentCohesiveLaw(thermal).final_separation(temperature_K)
         complete = d >= cutoff
     else:
         cutoff = float(brentq(
@@ -536,12 +639,14 @@ __all__ = [
     "COHESIVE_RATE_INDEPENDENT_CONTROL", "COHESIVE_PEAK_CUTOFF_CONTROL",
     "COHESIVE_ATHERMAL_MECHANICAL", "COHESIVE_MIXED_MECHANICAL_THERMAL",
     "OPENING_ALTERNATIVES_FAMILY", "SMOOTH_EXPONENTIAL", "BILINEAR",
+    "COMPACT_INDEPENDENT",
     "EXECUTION_IDENTITIES",
     "EXP_FLOOR_REFERENCE", "FAMILY", "CohesiveThermalLaw",
     "ExponentialCohesiveBarrier", "RateIndependentCohesiveControl",
     "PeakCutoffCohesiveControl", "MatchedWorkRateIndependentCohesiveControl",
     "bilinear_barrier_J", "morse_barrier_J",
-    "BilinearCohesiveLaw", "cohesive_shape_response", "mechanical_completion",
+    "BilinearCohesiveLaw", "CompactIndependentCohesiveLaw",
+    "cohesive_shape_response", "mechanical_completion",
     "potential_J_m2", "stationary_points", "tangent_Pa_per_m",
     "traction_Pa", "traction_barrier", "finite_compliance_landscape",
 ]

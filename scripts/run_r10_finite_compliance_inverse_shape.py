@@ -1,0 +1,316 @@
+#!/usr/bin/env python3
+"""Analytical and inverse stages of the R10 finite-compliance shape search."""
+from __future__ import annotations
+
+import argparse
+from concurrent.futures import ProcessPoolExecutor
+import csv
+import gzip
+import hashlib
+import json
+import math
+from pathlib import Path
+import sys
+
+import numpy as np
+from scipy.optimize import minimize
+from scipy.stats import qmc
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from arrhenius_fracture.cohesive_arrhenius import (
+    BILINEAR, COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL,
+    CohesiveThermalLaw, EV_TO_J,
+)
+from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
+    K_from_imposed, branch_loss, rate_curve, shape_coordinates,
+)
+from scripts.run_r10_global_mechanism_search import canonical_hash
+from scripts.run_r10_opening_alternatives import mechanics
+
+SCHEMA = "r10.finite-compliance-inverse-shape-search/1"
+SEED = 20261018
+SHAPES = (SMOOTH_EXPONENTIAL, BILINEAR, COMPACT_INDEPENDENT)
+TEMPERATURES = (300., 600., 900., 1200.)
+K_FRACTIONS = np.linspace(.70, .985, 17)
+
+
+def _atomic(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix+".tmp")
+    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True,
+                                    default=str)+"\n")
+    temporary.replace(path)
+
+
+def _write_csv(path: Path, rows: list[dict], compressed: bool = False) -> None:
+    fields: list[str] = []
+    for row in rows:
+        for key in row:
+            if key not in fields:
+                fields.append(key)
+    opener = gzip.open if compressed else open
+    with opener(path, "wt", newline="") as stream:
+        writer = csv.DictWriter(stream, fields, lineterminator="\n")
+        writer.writeheader(); writer.writerows(rows)
+
+
+def _log(u: float, low: float, high: float) -> float:
+    return math.exp(math.log(low)+float(u)*math.log(high/low))
+
+
+def _load_sources(path: Path) -> list[dict]:
+    with path.open(newline="") as stream:
+        return list(csv.DictReader(stream))
+
+
+def _candidate(index: int, point: np.ndarray, sources: list[dict]) -> dict:
+    source = sources[min(int(point[0]*len(sources)), len(sources)-1)]
+    shape = SHAPES[index % len(SHAPES)]
+    gamma = _log(point[1], .5, 8.)
+    peak = _log(point[2], 8e9, 80e9)
+    zero_eV = _log(point[3], .25, 12.)
+    area = zero_eV*EV_TO_J/gamma
+    span_fraction = -.25+point[4]*1.0
+    entropy = span_fraction*gamma/900.
+    b = _log(point[5], 1., 24.)
+    c = -.8+point[6]*12.8
+    cohesive = {"Gamma_ref_J_m2": gamma, "t_hat_ref_Pa": peak,
+        "S_Gamma_J_m2_K": entropy, "T_ref_K": 300.,
+        "activation_area_m2": area, "attempt_frequency_s": 1e12,
+        "delta0_m": gamma/(math.e*peak),
+        "zero_traction_barrier_eV_300K": zero_eV,
+        "thermal_subfamily": "MINIMAL_COUPLED_COHESIVE_ENTROPY",
+        "compact_b": b, "compact_c": c}
+    return {"candidate_id": f"R10_INV_{index:05d}", "shape": shape,
+            "cohesive": cohesive, "source": source}
+
+
+def _thermal(cohesive: dict) -> CohesiveThermalLaw:
+    return CohesiveThermalLaw(cohesive["Gamma_ref_J_m2"],
+        cohesive["t_hat_ref_Pa"], cohesive["S_Gamma_J_m2_K"],
+        cohesive.get("T_ref_K", 300.), cohesive.get("compact_b", 2.),
+        cohesive.get("compact_c", 0.))
+
+
+def _thermal_class(Kfold: list[float]) -> str:
+    values = np.asarray(Kfold, float)
+    if not np.all(np.isfinite(values)):
+        return "THERMAL_ACCESS_CENSORED"
+    if np.max(values)/max(np.min(values), 1e-300) <= 1.25:
+        return "WEAK_T_PREDICTED"
+    if np.argmax(values) not in {0, len(values)-1} and np.max(values) > 1.1*max(values[0], values[-1]):
+        return "PEAK_T_PREDICTED"
+    if values[-1] > 1.25*values[0]:
+        return "DBTT_PREDICTED"
+    return "OTHER_T_PREDICTED"
+
+
+def _evaluate(item: dict) -> dict:
+    cohesive, shape = item["cohesive"], item["shape"]
+    base = {"candidate_id": item["candidate_id"], "cohesive_shape": shape,
+            "source_material_candidate_id": item["source"]["candidate_id"]}
+    try:
+        thermal = _thermal(cohesive)
+        if min(thermal.gamma(T) for T in TEMPERATURES) <= .2:
+            return {**base, "domain_pass": False, "rejection": "GAMMA_THERMAL_DOMAIN"}
+        folds = []
+        for temperature in TEMPERATURES:
+            _, kenv = mechanics(thermal, temperature)
+            fold = branch_loss(shape, thermal, temperature, kenv)
+            imposed = fold.get("fold_imposed_m")
+            folds.append(math.nan if imposed is None else K_from_imposed(imposed, kenv))
+        if not math.isfinite(folds[0]):
+            return {**base, "domain_pass": False, "rejection": "NO_BONDED_BRANCH_FOLD"}
+        _, kenv = mechanics(thermal, 300.)
+        Kvalues = K_FRACTIONS*folds[0]
+        curve = rate_curve(Kvalues, kenv, thermal, 300., shape,
+                           cohesive["activation_area_m2"],
+                           cohesive["attempt_frequency_s"])
+        rows = curve["rows"]
+        slopes = np.asarray([np.nan if row["local_log_slope"] is None
+                             else row["local_log_slope"] for row in rows])
+        finite = slopes[np.isfinite(slopes)]
+        coords = shape_coordinates(shape, thermal, 300.)
+        source = item["source"]
+        mechanism = source.get("mechanism_prediction", "UNRESOLVED")
+        return {**base, "domain_pass": True, "rejection": "",
+            "thermal_prediction": _thermal_class(folds),
+            "mechanism_prediction": mechanism,
+            "moderate_connected_width_log10K": curve["moderate_connected_width_log10K"],
+            "moderate_connected_bounds_MPa_sqrt_m": json.dumps(
+                curve["moderate_connected_bounds_MPa_sqrt_m"]),
+            "moderate_points": curve["max_moderate_points"],
+            "slope_min": float(np.min(finite)) if len(finite) else math.nan,
+            "slope_median": float(np.median(finite)) if len(finite) else math.nan,
+            "slope_max": float(np.max(finite)) if len(finite) else math.nan,
+            "min_events_per_cycle": min(row["events_per_cycle_peak_rate"] for row in rows),
+            "max_events_per_cycle": max(row["events_per_cycle_peak_rate"] for row in rows),
+            "fold_K_300K": folds[0], "fold_K_600K": folds[1],
+            "fold_K_900K": folds[2], "fold_K_1200K": folds[3],
+            "initial_stiffness_Pa_per_m": coords["initial_stiffness_Pa_per_m"],
+            "completion_cutoff_m": coords["completion_cutoff_m"],
+            "compact_b": cohesive["compact_b"], "compact_c": cohesive["compact_c"],
+            "Gamma_ref_J_m2": cohesive["Gamma_ref_J_m2"],
+            "t_hat_ref_Pa": cohesive["t_hat_ref_Pa"],
+            "S_Gamma_J_m2_K": cohesive["S_Gamma_J_m2_K"],
+            "activation_area_m2": cohesive["activation_area_m2"],
+            "zero_traction_barrier_eV_300K": cohesive["zero_traction_barrier_eV_300K"],
+            "curve_json": json.dumps(rows, sort_keys=True, separators=(",", ":"))}
+    except (ValueError, OverflowError, FloatingPointError) as error:
+        return {**base, "domain_pass": False,
+                "rejection": f"{type(error).__name__}:{error}"}
+
+
+def _rank(rows: list[dict], count: int) -> list[dict]:
+    valid = [row for row in rows if row.get("domain_pass")]
+    chosen: list[dict] = []
+    # Preserve shape, thermal, and inherited plasticity diversity first.
+    for shape in SHAPES:
+        for thermal in ("WEAK_T_PREDICTED", "PEAK_T_PREDICTED", "DBTT_PREDICTED",
+                        "OTHER_T_PREDICTED"):
+            pool = [r for r in valid if r["cohesive_shape"] == shape and
+                    r["thermal_prediction"] == thermal]
+            pool.sort(key=lambda r: (-float(r["moderate_connected_width_log10K"]),
+                abs(float(r["slope_median"])-4.) if math.isfinite(float(r["slope_median"])) else 1e9,
+                abs(math.log10(max(float(r["max_events_per_cycle"]), 1e-300))+7.),
+                r["candidate_id"]))
+            chosen.extend(pool[:max(count//16, 1)])
+    seen = set(); unique = []
+    for row in chosen+sorted(valid, key=lambda r: (
+            -float(r["moderate_connected_width_log10K"]),
+            abs(float(r["slope_median"])-4.) if math.isfinite(float(r["slope_median"])) else 1e9,
+            r["candidate_id"])):
+        if row["candidate_id"] not in seen:
+            unique.append(row); seen.add(row["candidate_id"])
+        if len(unique) >= count:
+            break
+    return unique
+
+
+def analytical(args) -> int:
+    args.out.mkdir(parents=True, exist_ok=True)
+    sources = _load_sources(args.source_registry)
+    points = qmc.Sobol(d=7, scramble=True, seed=SEED).random_base2(args.log2_bank)
+    items = [_candidate(index, point, sources) for index, point in enumerate(points)]
+    with ProcessPoolExecutor(max_workers=args.workers) as pool:
+        rows = list(pool.map(_evaluate, items, chunksize=16))
+    selected = _rank(rows, args.state_count)
+    item_by_id = {item["candidate_id"]: item for item in items}
+    registry = []
+    for metric in selected:
+        item = item_by_id[metric["candidate_id"]]
+        source = dict(item["source"]); cohesive = dict(item["cohesive"])
+        cid = metric["candidate_id"]+"__"+({SMOOTH_EXPONENTIAL:"S",
+            BILINEAR:"B", COMPACT_INDEPENDENT:"C"}[item["shape"]])+"M"
+        row = dict(source)
+        row.update({"candidate_id": cid, "source_material_candidate_id":
+            source["candidate_id"], "selected_shape": item["shape"],
+            "selected_mode": "cohesive_mixed", "search_design":
+            "FINITE_COMPLIANCE_INVERSE_SHAPE", "cohesive_parameter_vector":
+            json.dumps(cohesive, sort_keys=True, separators=(",", ":")),
+            "predicted_fold_K_300K": metric["fold_K_300K"],
+            "predicted_Kaccess_300K": metric["fold_K_300K"],
+            "thermal_prediction": metric["thermal_prediction"],
+            "mechanism_prediction": metric["mechanism_prediction"]})
+        row["cohesive_parameter_sha256"] = canonical_hash(cohesive)
+        row["complete_row_sha256"] = canonical_hash({"source":
+            source.get("complete_row_sha256"), "cohesive": cohesive,
+            "shape": item["shape"], "mode": "cohesive_mixed",
+            "family": SCHEMA})
+        registry.append(row)
+    selected_ids = {row["candidate_id"] for row in selected}
+    for row in rows:
+        row["selected_state_informed"] = row["candidate_id"] in selected_ids
+    _write_csv(args.out/"analytical_bank_32768.csv.gz", rows, True)
+    _write_csv(args.out/"state_informed_256_registry.csv", registry)
+    counts = {}
+    for row in rows:
+        key = (row["cohesive_shape"], str(row.get("domain_pass")),
+               row.get("thermal_prediction", row.get("rejection")))
+        counts["__".join(key)] = counts.get("__".join(key), 0)+1
+    payload = {"schema": SCHEMA, "stage": "ANALYTICAL_SCREEN_COMPLETE",
+        "allocated_vectors": len(items), "domain_valid": sum(bool(r.get("domain_pass")) for r in rows),
+        "state_informed_selected": len(registry), "shapes": list(SHAPES),
+        "counts": counts, "algebraic_tail_registered": False,
+        "source_registry": str(args.source_registry),
+        "source_registry_sha256": hashlib.sha256(args.source_registry.read_bytes()).hexdigest()}
+    _atomic(args.out/"analytical_summary.json", payload)
+    print(json.dumps(payload, indent=2)); return 0
+
+
+def _inverse_objective(vector: np.ndarray, base: dict) -> float:
+    logb, c, logarea = map(float, vector)
+    cohesive = dict(base["cohesive"])
+    cohesive.update({"compact_b": math.exp(logb), "compact_c": c,
+                     "activation_area_m2": math.exp(logarea)})
+    item = {**base, "shape": COMPACT_INDEPENDENT, "cohesive": cohesive}
+    row = _evaluate(item)
+    if not row.get("domain_pass"):
+        return 1e6
+    slope = float(row["slope_median"])
+    width = float(row["moderate_connected_width_log10K"])
+    rate = max(float(row["max_events_per_cycle"]), 1e-300)
+    slope_penalty = abs(slope-4.) if math.isfinite(slope) else 100.
+    rate_penalty = max(abs(math.log10(rate)+7.)-5., 0.)
+    return slope_penalty-12.*width+rate_penalty
+
+
+def _one_inverse(task: tuple[int, dict]) -> dict:
+    index, base = task
+    c = base["cohesive"]
+    start = np.array([math.log(c["compact_b"]), c["compact_c"],
+                      math.log(c["activation_area_m2"])])
+    result = minimize(_inverse_objective, start, args=(base,), method="Nelder-Mead",
+        options={"maxiter": 80, "xatol": 2e-3, "fatol": 2e-3})
+    final = dict(c); final.update({"compact_b": math.exp(result.x[0]),
+        "compact_c": result.x[1], "activation_area_m2": math.exp(result.x[2])})
+    evaluated = _evaluate({**base, "candidate_id": f"R10_INVERSE_OPT_{index:03d}",
+                           "shape": COMPACT_INDEPENDENT, "cohesive": final})
+    evaluated.update({"optimizer_success": bool(result.success),
+                      "optimizer_message": str(result.message),
+                      "optimizer_evaluations": int(result.nfev),
+                      "objective": float(result.fun),
+                      "optimized_cohesive_json": json.dumps(final, sort_keys=True,
+                                                             separators=(",", ":"))})
+    return evaluated
+
+
+def inverse(args) -> int:
+    args.out.mkdir(parents=True, exist_ok=True)
+    sources = _load_sources(args.source_registry)
+    points = qmc.Sobol(d=7, scramble=True, seed=SEED+1).random(args.starts)
+    bases = [_candidate(index, point, sources) for index, point in enumerate(points)]
+    for base in bases:
+        base["shape"] = COMPACT_INDEPENDENT
+    with ProcessPoolExecutor(max_workers=args.workers) as pool:
+        rows = list(pool.map(_one_inverse, enumerate(bases), chunksize=1))
+    rows.sort(key=lambda row: (float(row.get("objective", 1e9)), row["candidate_id"]))
+    _write_csv(args.out/"inverse_starts.csv", rows)
+    payload = {"schema": SCHEMA, "stage": "INVERSE_STARTS_COMPLETE",
+        "starts": len(rows), "optimizer_successes": sum(bool(r["optimizer_success"]) for r in rows),
+        "domain_valid": sum(bool(r.get("domain_pass")) for r in rows),
+        "best_candidate": rows[0]["candidate_id"], "best_objective": rows[0]["objective"],
+        "algebraic_tail_registered": False}
+    _atomic(args.out/"inverse_summary.json", payload)
+    print(json.dumps(payload, indent=2)); return 0
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest="command", required=True)
+    for name in ("analytical", "inverse"):
+        child = sub.add_parser(name)
+        child.add_argument("--source-registry", type=Path, required=True)
+        child.add_argument("--out", type=Path, required=True)
+        child.add_argument("--workers", type=int, default=8)
+    sub.choices["analytical"].add_argument("--log2-bank", type=int, default=15)
+    sub.choices["analytical"].add_argument("--state-count", type=int, default=256)
+    sub.choices["inverse"].add_argument("--starts", type=int, default=64)
+    args = parser.parse_args(argv)
+    return analytical(args) if args.command == "analytical" else inverse(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
