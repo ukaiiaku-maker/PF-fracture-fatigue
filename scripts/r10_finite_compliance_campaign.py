@@ -194,6 +194,104 @@ def verify(args) -> int:
     print(json.dumps(payload, indent=2)); return 0 if not failures else 1
 
 
+def plot(args) -> int:
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from arrhenius_fracture.cohesive_arrhenius import (
+        BILINEAR, COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL,
+        cohesive_shape_response,
+    )
+    from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
+        connected_barrier, imposed_from_K, shape_coordinates,
+    )
+    from scripts.run_r10_finite_compliance_inverse_shape import _thermal
+    from scripts.run_r10_opening_alternatives import mechanics
+
+    out=args.root/"campaign_delivery"/"figures";out.mkdir(parents=True,exist_ok=True)
+    frontier=analytical_frontier(args.root);best=frontier.get("best")
+    if best:
+        curve=json.loads(best["curve_json"]);K=np.asarray([p["K_MPa_sqrt_m"] for p in curve])
+        rate=np.asarray([p["events_per_cycle_peak_rate"] for p in curve])
+        slope=np.asarray([np.nan if p["local_log_slope"] is None else p["local_log_slope"] for p in curve])
+        fig,axes=plt.subplots(2,1,figsize=(6.2,6.2),sharex=True)
+        axes[0].semilogy(K,rate,"o-",color="#1f4e79",ms=3,lw=1.4)
+        axes[0].set_ylabel("Peak opening action (cycle$^{-1}$)")
+        axes[1].plot(K,slope,"o-",color="#a23b2a",ms=3,lw=1.4)
+        axes[1].axhspan(3.4,4.6,color="#4c956c",alpha=.18)
+        axes[1].set_xlabel(r"$K_{\max}$ (MPa$\sqrt{\mathrm{m}}$)")
+        axes[1].set_ylabel(r"Local $d\ln v/d\ln K$")
+        fig.tight_layout();fig.savefig(out/"analytical_rate_slope.png",dpi=240);fig.savefig(out/"analytical_rate_slope.pdf");plt.close(fig)
+
+        cohesive=json.loads(best["evaluated_cohesive_json"]);thermal=_thermal(cohesive)
+        fig,axes=plt.subplots(2,1,figsize=(6.2,6.2),sharex=True)
+        colors={SMOOTH_EXPONENTIAL:"#1f77b4",BILINEAR:"#ff7f0e",COMPACT_INDEPENDENT:"#2ca02c"}
+        labels={SMOOTH_EXPONENTIAL:"Smooth exponential",BILINEAR:"Bilinear",COMPACT_INDEPENDENT:"Compact research"}
+        maximum=0.
+        data=[]
+        for shape in (SMOOTH_EXPONENTIAL,BILINEAR,COMPACT_INDEPENDENT):
+            coords=shape_coordinates(shape,thermal,300.);maximum=max(maximum,coords["completion_cutoff_m"])
+            cutoff=float(coords["completion_cutoff_m"]);peak=float(coords["peak_separation_m"])
+            d=np.unique(np.r_[0.,peak,np.geomspace(max(cutoff*1e-9,1e-20),cutoff,1400)])
+            traction,_,potential=cohesive_shape_response(shape,d,thermal,300.)
+            data.append((shape,d,np.asarray(traction),np.asarray(potential)))
+        for shape,d,traction,potential in data:
+            axes[0].plot(d*1e9,traction/1e9,color=colors[shape],lw=1.5,label=labels[shape])
+            axes[1].plot(d*1e9,potential,color=colors[shape],lw=1.5)
+        axes[0].set_ylabel("Traction (GPa)");axes[0].legend(frameon=False)
+        axes[1].set_xlabel("Separation (nm)");axes[1].set_ylabel(r"Potential (J m$^{-2}$)")
+        fig.tight_layout();fig.savefig(out/"potential_traction.png",dpi=240);fig.savefig(out/"potential_traction.pdf");plt.close(fig)
+
+        _,kenv=mechanics(thermal,300.);shape=best["cohesive_shape"]
+        sample=[float(curve[i]["K_MPa_sqrt_m"]) for i in (0,len(curve)//3,2*len(curve)//3)]
+        prepared=[];largest_root=0.
+        for index,Kvalue in enumerate(sample):
+            imposed=imposed_from_K(Kvalue,kenv)
+            points=connected_barrier(imposed,kenv,thermal,300.,shape)["stationary"]
+            largest_root=max(largest_root,max((float(point["delta_m"]) for point in points),default=0.))
+            prepared.append((index,Kvalue,imposed,points))
+        dmax=max(2.*largest_root,5.*shape_coordinates(shape,thermal,300.)["peak_separation_m"])
+        d=np.unique(np.r_[0.,np.geomspace(max(dmax*1e-8,1e-20),dmax,1600)])
+        fig,ax=plt.subplots(figsize=(6.2,4.4))
+        for index,Kvalue,imposed,points in prepared:
+            _,_,potential=cohesive_shape_response(shape,d,thermal,300.)
+            landscape=np.asarray(potential)+.5*kenv*(imposed-d)**2
+            landscape=landscape-float(np.min(landscape))
+            ax.plot(d*1e9,landscape,label=fr"{Kvalue:.1f} MPa$\sqrt{{\mathrm{{m}}}}$",lw=1.4)
+            for point in points:
+                marker="o" if point["kind"]=="MINIMUM" else "x"
+                raw_min=float(np.min(np.asarray(potential)+.5*kenv*(imposed-d)**2))
+                ax.plot(float(point["delta_m"])*1e9,float(point["energy_J_m2"])-raw_min,
+                        marker,color=f"C{index}",ms=5)
+        ax.set_xlabel("Separation (nm)");ax.set_ylabel(r"Loaded potential (J m$^{-2}$)")
+        ax.legend(frameon=False);fig.tight_layout();fig.savefig(out/"finite_compliance_landscape.png",dpi=240);fig.savefig(out/"finite_compliance_landscape.pdf");plt.close(fig)
+
+    records=[row for row in hcf_rows(args.root) if row.get("candidate_id")=="R10_INV_21321__SM" and
+             float(row.get("temperature_K") or 0.)==300. and float(row.get("R") or 0.)==.1 and
+             float(row.get("frequency_Hz") or 0.)==1000. and
+             row.get("plastic_feedback_reference")=="EVOLVING_FULL_STATE"]
+    if records:
+        byK={}
+        for row in records:
+            K=float(row["Kmax_MPa_sqrt_m"]);byK[K]=row
+        fig,ax=plt.subplots(figsize=(6.2,4.4))
+        floor=1e-14
+        for K,row in sorted(byK.items()):
+            rate=row.get("developed_rate_m_per_cycle");disposition=row.get("disposition")
+            if rate is not None:
+                ax.semilogy(K,float(rate),"o",color="#a23b2a")
+            elif disposition=="PHYSICAL_RUNOUT_TO_DECLARED_HORIZON":
+                ax.semilogy(K,floor,"v",mfc="none",mec="#1f4e79")
+            elif disposition in {"TARGET_TRUNCATED_CASCADE","UNRESOLVED_OPENING_PHYSICS"}:
+                ax.semilogy(K,1e-4,"^",mfc="none",mec="#6a3d9a")
+            else:
+                ax.semilogy(K,max(float(row.get("advance_m") or 0.)/max(float(row.get("accepted_cycles") or 1.),1.),floor),"s",mfc="none",mec="#444444")
+        ax.set_xlabel(r"$K_{\max}$ (MPa$\sqrt{\mathrm{m}}$)")
+        ax.set_ylabel(r"Developed $da/dN$ (m cycle$^{-1}$)")
+        fig.tight_layout();fig.savefig(out/"native_amplitude_outcomes.png",dpi=240);fig.savefig(out/"native_amplitude_outcomes.pdf");plt.close(fig)
+
+    print(json.dumps({"figure_directory":str(out),"files":sorted(p.name for p in out.iterdir())},indent=2));return 0
+
+
 def execute_plan(args) -> int:
     plan = json.loads(args.plan.read_text())
     receipts = []
@@ -231,7 +329,8 @@ def main(argv=None) -> int:
     parser.add_argument("--root", type=Path,
         default=Path("runs/r10_inverse_shape_12h"))
     sub = parser.add_subparsers(dest="command", required=True)
-    for name, function in (("status", status), ("analyze", analyze), ("verify", verify)):
+    for name, function in (("status", status), ("analyze", analyze),
+                           ("verify", verify), ("plot", plot)):
         child = sub.add_parser(name); child.set_defaults(function=function)
     child = sub.add_parser("run")
     child.add_argument("--plan", type=Path, required=True)
