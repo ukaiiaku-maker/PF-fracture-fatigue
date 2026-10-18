@@ -92,6 +92,7 @@ def execute_stage(a):
  if a.source_ids:
   requested={x.strip() for x in a.source_ids.split(',') if x.strip()}
   rows=[r for r in rows if r['source_material_candidate_id'] in requested]
+ if a.offset:rows=rows[a.offset:]
  if a.limit is not None:rows=rows[:a.limit]
  tasks=[]
  for i,row in enumerate(rows):
@@ -115,6 +116,7 @@ def main(argv=None):
  q.add_argument('--phases',type=int,default=16);q.add_argument('--workers',type=int,default=4);q.add_argument('--seed',type=int,default=20261100);q.add_argument('--max-wall-s',type=float,default=900.)
  q.add_argument('--source-ids',help='Optional comma-separated source-material filter for a continuation.')
  q.add_argument('--limit',type=int,help='Optional number of selection rows for a bounded acquisition block.')
+ q.add_argument('--offset',type=int,default=0,help='Selection-row offset for subsequent acquisition blocks.')
  q.add_argument('--horizon-override',type=float,help='Optional accepted-cycle target for the filtered continuation.')
  q.set_defaults(func=execute_stage)
  a=p.parse_args(argv);a.out.mkdir(parents=True,exist_ok=True);return a.func(a)
