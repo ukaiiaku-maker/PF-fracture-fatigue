@@ -15,6 +15,8 @@ def main(argv=None):
                         help="Disambiguate a source containing several mapped factors.")
     parser.add_argument("--factors", required=True,
                         help="Comma-separated reference-load factors.")
+    parser.add_argument("--exposure-target-cycles", type=float,
+                        help="Attach/override a high-cycle exposure target.")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
 
@@ -39,6 +41,8 @@ def main(argv=None):
             "ladder_parent_factor": f"{parent_factor:.12g}",
             "ladder_kind": "SAME_MATERIAL_TRANSITION_BRACKET",
         })
+        if args.exposure_target_cycles is not None:
+            row["exposure_target_cycles"] = f"{args.exposure_target_cycles:.12g}"
         rows.append(row)
     fields = list(rows[0])
     args.out.parent.mkdir(parents=True, exist_ok=True)
