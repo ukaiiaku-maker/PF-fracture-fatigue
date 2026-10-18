@@ -1,0 +1,9 @@
+candidate_id,source_material_candidate_id,shape,mode,maximum_supported_no_advance_factor,minimum_same_cycle_cascade_factor,unsupported_factors,developed_rate_points,local_slopes,strict_Paris_pass
+R10F_V2_03832__RAB,R10F_V2_03832,bilinear,cohesive_athermal,1.2,,[],0,[],False
+R10F_V2_03832__RAS,R10F_V2_03832,smooth_exponential,cohesive_athermal,1.2,,[],0,[],False
+R10F_V2_03832__RMB,R10F_V2_03832,bilinear,cohesive_mixed,1.2,,[],0,[],False
+R10F_V2_03832__RMS,R10F_V2_03832,smooth_exponential,cohesive_mixed,1.2,,[],0,[],False
+R10F_V2_07211__RAB,R10F_V2_07211,bilinear,cohesive_athermal,0.96,1.06,[],0,[],False
+R10F_V2_07211__RAS,R10F_V2_07211,smooth_exponential,cohesive_athermal,1.2,,[],0,[],False
+R10F_V2_07211__RMB,R10F_V2_07211,bilinear,cohesive_mixed,0.84,1.06,[0.96],0,[],False
+R10F_V2_07211__RMS,R10F_V2_07211,smooth_exponential,cohesive_mixed,0.96,1.06,[1.2],0,[],False

@@ -1,0 +1,58 @@
+{
+  "acquisition": {
+    "basis": "CURRENT_STATE_BOUNDARY_AND_MECHANISM_DIVERSITY",
+    "queued_paired_arms": 16
+  },
+  "fracture": {
+    "ramp_arms": 12,
+    "ramp_rate_MPa_sqrt_m_s": 0.005,
+    "temperature_class_counts": {
+      "HOT_COMMITMENT_WITH_COLD_KMAX_CENSOR": 1,
+      "KMAX_CENSORED": 3,
+      "MIXED_CROSSOVER_UNRESOLVED": 6,
+      "WEAK_T_RESOLVED": 2
+    },
+    "temperatures_per_arm": 7
+  },
+  "inactive_bilinear_coordinate_regression": {
+    "K_cut": 25.900339647524365,
+    "candidate": "R10F_V2_01617__AB",
+    "eight_phase_discrete_loss": 28.63378214589751,
+    "occupied_branch_loss": 27.65295454858545,
+    "production_correction_fitted": false
+  },
+  "joint_pareto": {
+    "decision": "ZERO_PARIS_PASS_PRESERVED; NO_STARTUP_OR_CASCADE_RATE_REPORTED",
+    "strict_passes": 0
+  },
+  "limits": [
+    "No native developed recurrent interval was found in this block.",
+    "Mixed cases with unsupported crossover remain unresolved.",
+    "The current block is 1-D; no candidate passed to a new 2-D run."
+  ],
+  "native": {
+    "cases": 32,
+    "cycles_or_endpoint_exposures": 653,
+    "developed_rates": 0,
+    "dispositions": {
+      "FINITE_EXPOSURE_NO_ADVANCE": 16,
+      "SUPPORTED_CYCLIC_SHAKEDOWN": 9,
+      "TARGET_TRUNCATED_SAME_CYCLE_CASCADE": 5,
+      "UNSUPPORTED_CROSSOVER_UNRESOLVED": 2
+    },
+    "local_slopes": 0
+  },
+  "preserved_inputs": {
+    "descriptor_bank_regenerated": false,
+    "legacy_opening_clock_used": false,
+    "paired_arms": 24,
+    "physical_vectors": 6
+  },
+  "reduction": {
+    "cases": 144,
+    "cycles_requested": 32,
+    "developed_rates": 0,
+    "recurrent_growth_points": 0
+  },
+  "schema": "r10.coupled-opening-search-decision/1"
+}

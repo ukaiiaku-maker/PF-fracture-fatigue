@@ -1,0 +1,76 @@
+{
+  "accepted_base_head": "28761405af7d8f09314138c3fd41d34219e4043d",
+  "allocation": {
+    "mechanism_strata": [
+      "OPENING_CONTROL_PREDICTED",
+      "MIXED_CONTROL_PREDICTED",
+      "PLASTICITY_CONTROL_PREDICTED"
+    ],
+    "opening_modes": 2,
+    "physical_vectors": 6,
+    "shapes": 2
+  },
+  "branch": "codex/r10-athermal-mixed-czm-comparison",
+  "continuation": {
+    "new_native_cases_started_from_serialized_complete_material": 32,
+    "per_case_final_rng_and_state_archived": true,
+    "prior_native_cases_replayed": false,
+    "summary_is_not_a_restart": true
+  },
+  "monotonic_protocol": {
+    "Kdot_MPa_sqrt_m_s": 0.005,
+    "Kmax_by_material_MPa_sqrt_m": {
+      "R10F_V2_01617": 100,
+      "R10F_V2_03832": 200,
+      "R10F_V2_07211": 200
+    },
+    "dK_MPa_sqrt_m": 1.0,
+    "temperatures_K": [
+      300,
+      450,
+      600,
+      750,
+      900,
+      1050,
+      1200
+    ]
+  },
+  "native_protocol": {
+    "R": 0.1,
+    "cohesive_cell_m": 1e-06,
+    "cycles": 24,
+    "frequency_Hz": 1000,
+    "load_factors": [
+      0.84,
+      0.96,
+      1.06,
+      1.2
+    ],
+    "observation_path_m": 0.00012,
+    "opening_phases": 8,
+    "plastic_phases": 4,
+    "process_zone_support_m": 5e-05,
+    "seed_base": 20261017,
+    "temperature_K": 300
+  },
+  "reduced_protocol": {
+    "R": 0.1,
+    "cycles": 32,
+    "frequency_Hz": 1000,
+    "load_factors": [
+      0.72,
+      0.84,
+      0.94,
+      1.02,
+      1.12,
+      1.28
+    ],
+    "phases": 8,
+    "temperature_K": 300
+  },
+  "source_files": {
+    "arrhenius_fracture/coupled_opening_reduction_r10.py": "fae3e12663323560b81688010bbbec99068d8d48033bf8792f3fd07472a5a11c",
+    "scripts/analyze_r10_coupled_opening_search.py": "38c99046ec1b4303853c695a426d67738d90e366bd941355f905b2f2dc99b6be",
+    "scripts/run_r10_coupled_opening_search.py": "3f193cf9f612b22483ce4066449b3bfe68e18149e3418242256de3e082ff5cdb"
+  }
+}
