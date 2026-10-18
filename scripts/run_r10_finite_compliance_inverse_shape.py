@@ -159,6 +159,25 @@ def _evaluate(item: dict) -> dict:
         curve = rate_curve(Kvalues, kenv, thermal, 300., shape,
                            cohesive["activation_area_m2"],
                            cohesive["attempt_frequency_s"])
+        if (shape == COMPACT_INDEPENDENT and
+                cohesive.get("compact_variant") == "two_scale_tail"):
+            # Geometry-first inverse step.  mu/(G/kBT)=P*gap/barrier_density is
+            # independent of activation area.  Locate the geometry nearest the
+            # m=4, G=30 kBT target, then set the one physical area consistently;
+            # it remains bounded by the declared zero-load 0.25--12 eV range.
+            eligible=[point for point in curve["rows"] if point.get("barrier_kBT") and
+                      point.get("sensitivity_identity") is not None]
+            if eligible:
+                target=min(eligible,key=lambda point:abs(
+                    float(point["sensitivity_identity"])/float(point["barrier_kBT"])-4./30.))
+                scaled=float(cohesive["activation_area_m2"])*30./float(target["barrier_kBT"])
+                lower=.25*EV_TO_J/float(cohesive["Gamma_ref_J_m2"])
+                upper=12.*EV_TO_J/float(cohesive["Gamma_ref_J_m2"])
+                cohesive["activation_area_m2"]=float(np.clip(scaled,lower,upper))
+                cohesive["zero_traction_barrier_eV_300K"]=(
+                    cohesive["activation_area_m2"]*cohesive["Gamma_ref_J_m2"]/EV_TO_J)
+                curve=rate_curve(Kvalues,kenv,thermal,300.,shape,
+                    cohesive["activation_area_m2"],cohesive["attempt_frequency_s"])
         rows = curve["rows"]
         slopes = np.asarray([np.nan if row["local_log_slope"] is None
                              else row["local_log_slope"] for row in rows])
@@ -199,6 +218,7 @@ def _evaluate(item: dict) -> dict:
             "metastable_birth_K_300K": Kbirth,
             "metastable_load_ratio_300K": float(window["load_ratio"]),
             "zero_traction_barrier_eV_300K": cohesive["zero_traction_barrier_eV_300K"],
+            "evaluated_cohesive_json":json.dumps(cohesive,sort_keys=True,separators=(",",":")),
             "curve_json": json.dumps([{key:row.get(key) for key in (
                 "K_MPa_sqrt_m","elementary_rate_s-1","events_per_cycle_peak_rate",
                 "barrier_kBT","root_gap_m","sensitivity_identity",
@@ -258,7 +278,9 @@ def analytical(args) -> int:
     registry = []
     for metric in selected:
         item = item_by_id[metric["candidate_id"]]
-        source = dict(item["source"]); cohesive = dict(item["cohesive"])
+        source = dict(item["source"])
+        cohesive = json.loads(metric.get("evaluated_cohesive_json") or
+                              json.dumps(item["cohesive"]))
         analytical_curve=json.loads(metric["curve_json"])
         hcf_point=min(analytical_curve,key=lambda point:abs(math.log10(max(
             float(point["events_per_cycle_peak_rate"]),1e-300))+6.))
