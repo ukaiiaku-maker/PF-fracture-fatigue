@@ -42,7 +42,11 @@ def write_csv(path,rows,compressed=False):
 def thermal_from(c):
     return CohesiveThermalLaw(float(c['Gamma_ref_J_m2']),float(c['t_hat_ref_Pa']),
                               float(c['S_Gamma_J_m2_K']),float(c.get('T_ref_K',300.)),
-                              float(c.get('compact_b',2.0)),float(c.get('compact_c',0.0)))
+                              float(c.get('compact_b',2.0)),float(c.get('compact_c',0.0)),
+                              str(c.get('compact_variant','beta_polynomial')),
+                              float(c.get('compact_rise_fraction',.1)),
+                              float(c.get('compact_fall_fraction',.85)),
+                              float(c.get('compact_plateau_drop',.05)))
 
 def mechanics(thermal,T=300.):
     gamma=thermal.gamma(T);peak=thermal.t_hat(T);zone=EPRIME*gamma/peak**2

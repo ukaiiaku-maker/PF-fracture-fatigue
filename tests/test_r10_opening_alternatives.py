@@ -35,6 +35,22 @@ def test_compact_research_law_is_one_normalized_potential():
     assert completion["cutoff_m"] == cutoff
 
 
+def test_compact_rounded_plateau_is_normalized_smooth_and_single_peak():
+    thermal = CohesiveThermalLaw(2.5, 20e9, 2e-4,
+        compact_variant="rounded_plateau", compact_rise_fraction=.05,
+        compact_fall_fraction=.9, compact_plateau_drop=.08)
+    compact = CompactIndependentCohesiveLaw(thermal)
+    cutoff = compact.final_separation(300.)
+    grid = np.linspace(0., cutoff, 20001)
+    traction, tangent, work = cohesive_shape_response(
+        COMPACT_INDEPENDENT, grid, thermal, 300.)
+    assert np.isclose(np.max(traction), 20e9, rtol=2e-7)
+    assert np.isclose(np.trapezoid(traction, grid), 2.5, rtol=2e-7)
+    assert np.isclose(work[-1], 2.5, rtol=1e-13)
+    assert np.all(np.diff(traction[np.argmax(traction):]) <= 1e-3)
+    assert tangent[0] > 0.
+
+
 def test_bilinear_matches_exponential_work_peak_and_initial_stiffness():
     thermal=law();bilinear=BilinearCohesiveLaw(thermal);T=300.0
     dp=bilinear.peak_separation(T);df=bilinear.final_separation(T)

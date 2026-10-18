@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from arrhenius_fracture.cohesive_arrhenius import (  # noqa: E402
-    BILINEAR, SMOOTH_EXPONENTIAL, COHESIVE_ATHERMAL_MECHANICAL,
+    BILINEAR, COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL, COHESIVE_ATHERMAL_MECHANICAL,
     COHESIVE_KINETIC_CZM,
     mechanical_completion,
 )
@@ -148,7 +148,8 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--registry", type=Path, required=True)
     p.add_argument("--candidate-id", required=True)
-    p.add_argument("--shape", choices=(SMOOTH_EXPONENTIAL, BILINEAR),
+    p.add_argument("--shape", choices=(SMOOTH_EXPONENTIAL, BILINEAR,
+                                        COMPACT_INDEPENDENT),
                    default=SMOOTH_EXPONENTIAL)
     p.add_argument("--temperature-K", type=float, default=300.)
     p.add_argument("--Kmax", type=float, required=True)

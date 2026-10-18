@@ -7,7 +7,7 @@ import sys
 import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
-from arrhenius_fracture.cohesive_arrhenius import (BILINEAR,SMOOTH_EXPONENTIAL,
+from arrhenius_fracture.cohesive_arrhenius import (BILINEAR,COMPACT_INDEPENDENT,SMOOTH_EXPONENTIAL,
     COHESIVE_ATHERMAL_MECHANICAL,COHESIVE_MIXED_MECHANICAL_THERMAL,
     BilinearCohesiveLaw,mechanical_completion,COHESIVE_KINETIC_CZM)
 from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY
@@ -25,7 +25,7 @@ def main(argv=None):
     binding=load_cohesive_binding(a.registry,a.candidate_id,execution_identity=COHESIVE_KINETIC_CZM)
     thermal=binding.manifest.cleavage.thermal;rows=[]
     for T in (300.,750.,1200.):
-      for shape in (SMOOTH_EXPONENTIAL,BILINEAR):
+      for shape in (SMOOTH_EXPONENTIAL,BILINEAR,COMPACT_INDEPENDENT):
        for mode in ('cohesive_athermal','cohesive_mixed'):
         mesh,network,elem=specimen(thermal);elem.temperature_K=T;elem.cohesive_shape=shape
         network.execution_identity=(COHESIVE_ATHERMAL_MECHANICAL if mode=='cohesive_athermal' else COHESIVE_MIXED_MECHANICAL_THERMAL)
@@ -33,7 +33,7 @@ def main(argv=None):
         alt=OpeningAlternative(mode,shape,'quasistatic_mechanical' if mode=='cohesive_athermal' else 'qualified_high_barrier_hazard',
             None if mode=='cohesive_athermal' else float(c['activation_area_m2']),
             None if mode=='cohesive_athermal' else float(c['attempt_frequency_s']))
-        cutoff=2500*thermal.delta0_m
+        cutoff=1.25*float(mechanical_completion(shape,0.,thermal,T)['cutoff_m'])
         u=None;action=0.;threshold=math.log(2.);trigger=None;trace=[];kenv=None
         for i,imposed in enumerate(np.linspace(0.,cutoff,81)):
             try:u,d=equilibrium(mesh,network,float(imposed),u)

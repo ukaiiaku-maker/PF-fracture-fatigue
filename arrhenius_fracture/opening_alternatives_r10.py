@@ -68,10 +68,21 @@ def _root_landscape(imposed: float, kenv: float, thermal: CohesiveThermalLaw,
         if imposed>=df:candidates.append(imposed)
         roots=sorted(set(candidates))
     else:
-        compact_span = (CompactIndependentCohesiveLaw(thermal).final_separation(temperature)
-                        if shape == COMPACT_INDEPENDENT else 25.0*thermal.delta0_m)
+        compact_law = (CompactIndependentCohesiveLaw(thermal)
+                       if shape == COMPACT_INDEPENDENT else None)
+        compact_span = (compact_law.final_separation(temperature)
+                        if compact_law is not None else 25.0*thermal.delta0_m)
         span = max(compact_span*1.05, imposed+10.0*thermal.delta0_m)
-        grid = np.linspace(0.0, span, 257)
+        if (compact_law is not None and
+                thermal.compact_variant == "rounded_plateau"):
+            dc=compact_law.final_separation(temperature)
+            rise=thermal.compact_rise_fraction*dc
+            fall=thermal.compact_fall_fraction*dc
+            grid=np.unique(np.r_[np.linspace(0.,rise,129),
+                np.linspace(rise,fall,257),np.linspace(fall,dc,129),
+                np.linspace(dc,span,65)])
+        else:
+            grid = np.linspace(0.0, span, 257)
 
     def residual(d):
         t = float(cohesive_shape_response(shape,d,thermal,temperature)[0])
