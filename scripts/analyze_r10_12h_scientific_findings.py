@@ -166,7 +166,7 @@ def thermal_rows(campaign: Path):
 def mechanism_comparisons(campaign: Path):
     pairs = (
         (campaign / "hcf_round_1_block_2/R10F_V2_22871__MS/T_300__R_0.1__Hz_1000/f_1.0100/result.json",
-         campaign / "hcf_mechanism_controls_22871/frozen_phase16_clean/result.json"),
+         campaign / "hcf_mechanism_controls_22871/frozen_phase16_same_seed/result.json"),
         (campaign / "hcf_round_17_smooth_mixed_28475/f_1.01/result.json",
          campaign / "hcf_mechanism_controls_28475/frozen_f_1.01/result.json"),
     )

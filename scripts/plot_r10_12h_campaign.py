@@ -233,7 +233,7 @@ def mechanism_plot(analysis: Path, out: Path):
 def state_plot(campaign: Path, out: Path):
     paths = {
         "evolving full state": campaign / "hcf_round_1_block_2/R10F_V2_22871__MS/T_300__R_0.1__Hz_1000/f_1.0100/result.json",
-        "frozen opening feedback": campaign / "hcf_mechanism_controls_22871/frozen_phase16_clean/result.json",
+        "frozen opening feedback": campaign / "hcf_mechanism_controls_22871/frozen_phase16_same_seed/result.json",
     }
     fig, axes = plt.subplots(2, 1, figsize=(6.4, 6.0), sharex=True)
     for label, path in paths.items():
