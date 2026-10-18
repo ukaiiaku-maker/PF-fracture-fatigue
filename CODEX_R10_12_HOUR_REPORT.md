@@ -15,8 +15,8 @@ The strongest HCF material is `R10F_V2_22871__MS`. At 300 K, R=0.1 and
 runs from cycle 4,161,735.0197 to 11,616,310.9558. Its first event is at cycle
 542,018.9866; positive inter-event waits span 4,540.0851 to 803,733.0207
 cycles. Exact-versus-accelerated initial action and state overlap is bit exact
-for this trajectory. A no-refit amplitude ladder and the matched frozen-state
-continuation are being completed during the remaining allocation.
+for this trajectory. A no-refit six-point amplitude ladder is complete; the
+matched frozen-state continuation remains active.
 
 ## Constitutive and numerical scope
 
@@ -45,12 +45,12 @@ files byte-for-byte.
 
 | Complete material | Complete-row SHA-256 | Current evidence | Joint status |
 |---|---|---|---|
-| `R10F_V2_22871__MS` | `4c3ecdf86c50d3ec969d8c114fa8e3215598450b0a406aeff3cd1e5f69354d75` | 5.500e-12 m/cycle developed HCF; plastic-state-created Peak-T fracture | strongest HCF frontier; slope ladder active |
+| `R10F_V2_22871__MS` | `4c3ecdf86c50d3ec969d8c114fa8e3215598450b0a406aeff3cd1e5f69354d75` | six developed HCF amplitudes from 5.500e-12 to 5.654e-9 m/cycle; plastic-state-created Peak-T fracture | strongest HCF frontier; five adjacent slopes 146.67--199.71 fail |
 | `R10F_V2_17780__MS` | `a332c34e4d5af32f312523893c24db3296516eb211c8239df20dfd5a0b820cc5` | recurrent multi-amplitude fatigue; seven-temperature Weak-T span 1.209; R/f holdouts | qualified joint near-frontier, failed slope |
 | `R10F_V2_28475__MS` | `0aaa671d1b7c714c23b8ad07f23c84fa2f8d3246c5dd3cbe0a919190e316b1da` | 1.154e-9--2.225e-8 m/cycle, seven amplitudes and seed bounds | HCF-rate near-frontier, failed slope; high-T fracture unsupported |
-| `R10F_V2_11566__MS` | `883c76bd8081c89c8efae6de6da935826e91de95307bb4df23b85666a12ecbfe` | one-cell full-state versus five-cell frozen burst and 1e12-cycle arrest at factor 1.06; 1.834e-8 m/cycle developed growth at factor 1.10 | consequential-plasticity transition frontier |
+| `R10F_V2_11566__MS` | `883c76bd8081c89c8efae6de6da935826e91de95307bb4df23b85666a12ecbfe` | one-cell full-state versus five-cell frozen burst and 1e12-cycle arrest at factor 1.06; phase-sensitive factor-1.10 recurrence | consequential-plasticity frontier; recurrent rate not phase-qualified |
 | `R10F_12H_FC_07172_VP_27940__MS` | `d987e245733fb89f38a85e7678aafdc33f99f6c635840eada5f48b42e3caa245` | replicated finite bursts and arrest versus frozen cascades; strong closing response | mechanism boundary, not a fatigue curve |
-| `R10F_V2_00116__MS` | `6e28416309e81ae3593dd818514b481b64506ea26eb964fef25f1feb87dbb38f` | supported rare-opening action with native events at three amplitudes | provisional HCF acquisition |
+| `R10F_V2_00116__MS` | `6e28416309e81ae3593dd818514b481b64506ea26eb964fef25f1feb87dbb38f` | three developed rates from 8.090e-11 to 3.783e-10 m/cycle | HCF-rate near-frontier; adjacent slopes 95.06/215.48 fail |
 | `R10F_V2_01796__MS` | `cfa9d6949a406ae5d05e5a9171c9d56d85d3a6dd6404f94f4345ed55b503bdb0` | intermediate recurrent rates and bounded thermal response | opening-controlled comparison; failed slope/full thermal class |
 
 No row is described as globally optimal or experimentally calibrated.
@@ -77,9 +77,16 @@ factor-1.01-to-1.05 endpoint secant is about 178, already excluding a hidden
 moderate four-slope response across that broad interval.  Factor 1.04 has also
 completed the developed window, from cycle 20,542.01894 to 67,063.03504, at
 8.8132211e-10 m/cycle.  The directly adjacent factor-1.04/1.05 local slope is
-194.23, independently rejecting the target band; lower intervening amplitudes
-remain in exact continuation to map the shape rather than infer through their
-censored prefixes.
+194.23, independently rejecting the target band.  Factors 1.02 and 1.03 have
+also matured at 2.7381964e-11 and 1.9214544e-10 m/cycle; the inserted factor
+1.015 point gives 1.1348203e-11 m/cycle.  The resulting six-point factors
+1.01/1.015/1.02/1.03/1.04/1.05 have five adjacent slopes 146.67, 179.25,
+199.71, 157.65, and 194.23.  This is a connected three-decade HCF response and
+a decisive failed moderate-slope test, not an interpolation through censors.
+Nonoverlapping 60--100 micrometre rates at factors 1.04 and 1.05 are
+1.0075324e-9 and 7.0710278e-9 m/cycle, 14.3 and 25.1 percent above their
+respective developed windows; recurrence persists but remains mildly
+path-conditioned.
 
 At 450 K, unchanged-material frequency controls at 10, 100, and 1000 Hz have
 no physical advance through 1e6 cycles at fixed Kmax values of 29 and
@@ -135,6 +142,11 @@ without refitting.  The separately retained 10 kHz result is supplemental.
   21.3 MPa sqrt(m) through 600 K, rises to 23.1 by 900--1050 K, and becomes an
   unsupported mixed crossover at 1200 K, so it is not assigned a full seven-
   temperature class.
+- `R10F_V2_00116__MS` validates the high-barrier acquisition direction with
+  developed rates of 8.0902798e-11, 1.2985738e-10, and 3.7834404e-10 m/cycle
+  at factors 1.00001, 1.005, and 1.01.  The directly adjacent local slopes are
+  95.06 and 215.48, so rare opening was recovered but not the desired broad
+  moderate response.
 
 ### Consequential plastic-state arrest
 
@@ -180,18 +192,38 @@ nonoverlapping 60--100 micrometre window gives 2.4478776e-8 m/cycle over
 evidence of recurrent but still path-conditioned acceleration rather than a
 stationary rate.
 
+This factor-1.10 rate is not promoted as numerically qualified.  A same-seed
+32-phase refinement matches the first two event times bit exactly, but at the
+100-cycle checkpoint its stress, barrier, mobile population, backstress, and
+tip radius differ from the 16-phase path.  It then reaches the full 1e12-cycle
+censor with only those two advances and changes to `BONDED_STABLE`; the
+16-phase path's third event was at cycle 136.973 and ultimately reached 120
+advances.  This is a decision-changing phase-resolution sensitivity, not
+stochastic scatter.
+The 16-phase developed and late-window rates remain useful diagnostic
+measurements but are excluded from the qualified recurrent portfolio unless a
+subsequent refinement resolves the discrepancy.
+
 ## Search coverage and acquisition history
 
-At the six-hour checkpoint the executed archive contained:
+The campaign met or exceeded each prospective fidelity allocation:
 
-- 32,768 cheap physical tuples allocated; 23,691 domain-valid tuples and
-  94,764 analytical opening arms;
-- 554 distinct state-informed physical vectors and 9,350 cyclic-state records;
-- 105 distinct current full-state 1-D physical vectors, 112 execution
-  identities, and 213 finalized native results;
-- 69 HCF-tested physical vectors, 156 finalized HCF results, 12 protocols,
-  41 developed-rate records, and 2.465e9 accepted cycles before in-flight
-  additions.
+| Fidelity | Requested allocation | Executed distinct coverage |
+|---|---:|---:|
+| cheap current-law physical tuples | toward 32,768 | 32,768 allocated; 23,691 domain-valid; 94,764 opening arms |
+| coupled state-informed physical vectors | approximately 512 | 554 vectors; 9,350 cyclic-state records |
+| current full-state 1-D physical vectors | 64, rising toward 96 | 105 vectors; 112 execution identities; 213 results |
+| diverse deepened materials | up to six | seven principal rows plus retained boundary controls |
+
+Of the 105 native physical-vector source identities, 103 are not among the
+four supplied baseline archive sources.  The native work spans nine numbered
+execution rounds plus targeted discrepancy, transition, mechanism, and HCF
+follow-ups.  At the nine-hour checkpoint the production archive contained 71
+HCF-tested physical vectors, 171 finalized HCF results, 12 distinct protocols,
+50 effective developed-rate records, 2.002463017e12 accepted cycles, and
+2.002787014e9 simulated seconds before remaining in-flight additions.  Shape,
+mode, temperature, R, frequency, seed, and numerical refinement remain
+condition or execution counts rather than inflated physical-vector counts.
 
 Acquisition moved from the retained 1024-arm information registry through new
 native discrepancy blocks, coherent active-plastic crossings, corrected
