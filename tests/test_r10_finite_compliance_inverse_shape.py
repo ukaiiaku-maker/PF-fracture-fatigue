@@ -6,7 +6,8 @@ from arrhenius_fracture.cohesive_arrhenius import (
     COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL, CohesiveThermalLaw,
 )
 from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
-    branch_loss, cyclic_rate, metastable_window, opening_rate, shape_coordinates,
+    branch_loss, connected_barrier, cyclic_rate, metastable_window, opening_rate,
+    shape_coordinates,
 )
 from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative, evaluate_opening
 
@@ -62,3 +63,6 @@ def test_rounded_plateau_analytical_and_native_landscapes_agree():
     assert native["state"] == "BONDED_METASTABLE"
     assert math.isclose(analytical["barrier_J_m2"], native["barrier_J_m2"],
                         rel_tol=2e-6)
+    checked = connected_barrier(imposed, kenv, thermal, 300.,
+                                COMPACT_INDEPENDENT, verify_quadrature=True)
+    assert checked["barrier_quadrature_relative_error"] < 1e-8

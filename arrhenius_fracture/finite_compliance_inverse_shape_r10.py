@@ -10,6 +10,7 @@ import math
 from typing import Any, Iterable
 
 import numpy as np
+from scipy.integrate import quad
 from scipy.optimize import brentq
 
 from .cohesive_arrhenius import (
@@ -107,7 +108,7 @@ def _stationary(imposed_m: float, environment_stiffness_Pa_per_m: float,
 
 def connected_barrier(imposed_m: float, environment_stiffness_Pa_per_m: float,
                       thermal: CohesiveThermalLaw, temperature_K: float,
-                      shape: str) -> dict[str, Any]:
+                      shape: str, verify_quadrature: bool = False) -> dict[str, Any]:
     points = _stationary(imposed_m, environment_stiffness_Pa_per_m, thermal,
                          temperature_K, shape)
     minima = [point for point in points if point["kind"] == "MINIMUM"]
@@ -123,9 +124,20 @@ def connected_barrier(imposed_m: float, environment_stiffness_Pa_per_m: float,
                 "stationary": points}
     saddle = saddles[0]
     barrier = float(saddle["energy_J_m2"])-float(connected["energy_J_m2"])
+    quadrature=None;relative_error=None
+    if verify_quadrature:
+        integrand=lambda separation:(float(cohesive_shape_response(
+            shape,separation,thermal,temperature_K)[0])+
+            float(environment_stiffness_Pa_per_m)*(separation-float(imposed_m)))
+        quadrature=float(quad(integrand,float(connected["delta_m"]),
+            float(saddle["delta_m"]),epsabs=max(abs(barrier)*1e-11,1e-14),
+            epsrel=1e-10,limit=200)[0])
+        relative_error=abs(quadrature-barrier)/max(abs(quadrature),abs(barrier),1e-300)
     return {"state": "METASTABLE", "barrier_J_m2": max(barrier, 0.),
             "root_gap_m": float(saddle["delta_m"])-float(connected["delta_m"]),
-            "connected": connected, "saddle": saddle, "stationary": points}
+            "connected": connected, "saddle": saddle, "stationary": points,
+            "barrier_quadrature_J_m2":quadrature,
+            "barrier_quadrature_relative_error":relative_error}
 
 
 def branch_loss(shape: str, thermal: CohesiveThermalLaw, temperature_K: float,
@@ -268,6 +280,10 @@ def rate_curve(K_values: Iterable[float], environment_stiffness_Pa_per_m: float,
         row["local_log_slope"] = None if not np.isfinite(slopes[index]) else float(slopes[index])
         row["local_log_curvature"] = (None if not np.isfinite(curvature[index])
                                       else float(curvature[index]))
+        identity=row.get("sensitivity_identity")
+        row["sensitivity_identity_relative_error"]=(None if identity is None or
+            not np.isfinite(slopes[index]) else abs(float(slopes[index])-float(identity))/
+            max(abs(float(slopes[index])),abs(float(identity)),1e-300))
     useful = positive & (slopes >= 2.) & (slopes <= 8.) & (per_cycle >= 1e-14) & (per_cycle <= 1e-1)
     strict = positive & (slopes >= 3.4) & (slopes <= 4.6) & (per_cycle >= 1e-14) & (per_cycle <= 1e-1)
 
@@ -285,6 +301,8 @@ def rate_curve(K_values: Iterable[float], environment_stiffness_Pa_per_m: float,
         return best_K,best_rate,best_bounds
     useful_K,useful_rate,useful_bounds=connected_width(useful)
     strict_K,strict_rate,strict_bounds=connected_width(strict)
+    identity_errors=[row["sensitivity_identity_relative_error"] for row in rows[1:-1]
+                     if row["sensitivity_identity_relative_error"] is not None]
     return {"rows": rows, "moderate_connected_width_log10K": useful_K,
             "moderate_connected_width_log10rate": useful_rate,
             "moderate_connected_bounds_MPa_sqrt_m": useful_bounds,
@@ -292,6 +310,7 @@ def rate_curve(K_values: Iterable[float], environment_stiffness_Pa_per_m: float,
             "strict_connected_width_log10rate": strict_rate,
             "strict_connected_bounds_MPa_sqrt_m": strict_bounds,
             "strict_internal_reference_pass": bool(strict_rate >= 2.0),
+            "sensitivity_identity_max_relative_error":max(identity_errors,default=None),
             "max_moderate_points": int(np.count_nonzero(useful)),
             "peak_rate_approximation": True}
 
