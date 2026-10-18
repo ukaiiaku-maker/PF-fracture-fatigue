@@ -200,6 +200,8 @@ def mechanism_comparisons(campaign: Path):
          campaign / "hcf_mechanism_controls_22871/frozen_phase16_same_seed/result.json"),
         (campaign / "hcf_round_17_smooth_mixed_28475/f_1.01/result.json",
          campaign / "hcf_mechanism_controls_28475/frozen_f_1.01/result.json"),
+        (campaign / "hcf_round_32_state_active_11566/f_1.06/result.json",
+         campaign / "hcf_mechanism_controls_11566/frozen_f_1.06/result.json"),
     )
     rows = []
     for full_path, frozen_path in pairs:
