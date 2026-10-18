@@ -48,7 +48,7 @@ files byte-for-byte.
 | `R10F_V2_22871__MS` | `4c3ecdf86c50d3ec969d8c114fa8e3215598450b0a406aeff3cd1e5f69354d75` | 5.500e-12 m/cycle developed HCF; plastic-state-created Peak-T fracture | strongest HCF frontier; slope ladder active |
 | `R10F_V2_17780__MS` | `a332c34e4d5af32f312523893c24db3296516eb211c8239df20dfd5a0b820cc5` | recurrent multi-amplitude fatigue; seven-temperature Weak-T span 1.209; R/f holdouts | qualified joint near-frontier, failed slope |
 | `R10F_V2_28475__MS` | `0aaa671d1b7c714c23b8ad07f23c84fa2f8d3246c5dd3cbe0a919190e316b1da` | 1.154e-9--2.225e-8 m/cycle, seven amplitudes and seed bounds | HCF-rate near-frontier, failed slope; high-T fracture unsupported |
-| `R10F_V2_11566__MS` | `883c76bd8081c89c8efae6de6da935826e91de95307bb4df23b85666a12ecbfe` | one-cell full-state versus five-cell frozen burst and 1e12-cycle arrest at factor 1.06; 1.890e-8 m/cycle developed growth at factor 1.10 | consequential-plasticity transition frontier |
+| `R10F_V2_11566__MS` | `883c76bd8081c89c8efae6de6da935826e91de95307bb4df23b85666a12ecbfe` | one-cell full-state versus five-cell frozen burst and 1e12-cycle arrest at factor 1.06; 1.834e-8 m/cycle developed growth at factor 1.10 | consequential-plasticity transition frontier |
 | `R10F_12H_FC_07172_VP_27940__MS` | `d987e245733fb89f38a85e7678aafdc33f99f6c635840eada5f48b42e3caa245` | replicated finite bursts and arrest versus frozen cascades; strong closing response | mechanism boundary, not a fatigue curve |
 | `R10F_V2_00116__MS` | `6e28416309e81ae3593dd818514b481b64506ea26eb964fef25f1feb87dbb38f` | supported rare-opening action with native events at three amplitudes | provisional HCF acquisition |
 | `R10F_V2_01796__MS` | `cfa9d6949a406ae5d05e5a9171c9d56d85d3a6dd6404f94f4345ed55b503bdb0` | intermediate recurrent rates and bounded thermal response | opening-controlled comparison; failed slope/full thermal class |
@@ -68,6 +68,26 @@ same-seed, same-resolution full/frozen fatigue event times differ by 164 cycles
 event 55;
 the completed matched developed windows determine whether that opening-
 controlled attribution remains valid at long exposure.
+
+The first completed new amplitude point, factor 1.05, traverses the same
+first-event-at-or-beyond 20/60 micrometre window from cycle 3,282.05879 to
+10,534.05336, giving 5.6536170e-9 m/cycle.  Its positive waits span
+2.011--934.014 cycles.  The
+factor-1.01-to-1.05 endpoint secant is about 178, already excluding a hidden
+moderate four-slope response across that broad interval.  Factor 1.04 has also
+completed the developed window, from cycle 20,542.01894 to 67,063.03504, at
+8.8132211e-10 m/cycle.  The directly adjacent factor-1.04/1.05 local slope is
+194.23, independently rejecting the target band; lower intervening amplitudes
+remain in exact continuation to map the shape rather than infer through their
+censored prefixes.
+
+At 450 K, unchanged-material frequency controls at 10, 100, and 1000 Hz have
+no physical advance through 1e6 cycles at fixed Kmax values of 29 and
+49 MPa sqrt(m).  The intermediate 40 MPa sqrt(m) histories enter the
+unsupported post-escape mixed transit and are retained as unresolved rather
+than zero-rate observations.  Consequently these controls bound a
+temperature-dependent accessible interval but do not support a 450-K
+frequency-rate curve.
 
 ### Weak-T recurrent control and protocol holdouts
 
@@ -151,10 +171,14 @@ by 14--43 percent, but 900--1200 K encounters the unsupported mixed crossover
 and the material is not assigned a complete Weak-T, Peak-T, or DBTT class.
 At factor 1.10 the same evolving material reactivates after a 1,424-cycle late
 wait and then reaches the established 20--60 micrometre developed window.  The
-window runs from cycle 2,440.05896 to 4,556.05883 and gives
-1.8903593e-8 m/cycle; positive waits span 1.071e-4--1,424 cycles.  This sharp
+first-event-at-or-beyond window runs from cycle 2,440.05896 to 4,675.97360 and
+gives 1.8337015e-8 m/cycle; positive waits span 1.071e-4--1,424 cycles.  This sharp
 factor-1.06 arrest/factor-1.10 recurrent-growth transition is retained as a
-state-sensitive mechanism bracket, not promoted to a moderate-slope claim.
+state-sensitive mechanism bracket, not promoted to a moderate-slope claim.  A
+nonoverlapping 60--100 micrometre window gives 2.4478776e-8 m/cycle over
+1,634.069 cycles, 33.5 percent above the 20--60 micrometre rate and therefore
+evidence of recurrent but still path-conditioned acceleration rather than a
+stationary rate.
 
 ## Search coverage and acquisition history
 
@@ -235,6 +259,38 @@ substitutions:
   crack-propagation qualification.
 - These are model calculations, not experimental calibration or uncertainty
   bounds on a material measurement.
+
+## Execution record and reproduction
+
+The fixed campaign clock is 2026-10-18 06:08:49--18:08:49 UTC.  It began at
+`6018f4c40df68139fd0a54bda6ab10c48510eca0` on
+`codex/r10-athermal-mixed-czm-comparison`; the final revision and measured
+CPU/wall accounting are recorded below after the deadline.  The host exposed
+14 logical CPUs.  The supervisor limited numerical work to ten one-thread
+workers, reserving four logical CPUs for analysis, validation, and the host.
+The independently supplied baseline archive hash is
+`b304aa7159e261aba755c5473a8b47468e794291b8e9cda0bf267405f5aa3c1a`.
+
+The production interpreter is
+`/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python`.
+Representative exact commands, run from this worktree, are:
+
+```sh
+PY=/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python
+$PY scripts/run_r10_czm_hcf.py --registry runs/r10_12h_autonomous/acquisition_round_0_1024/native_information_registry.csv --candidate-id R10F_V2_22871__MS --factor 1.01 --horizon 1000000000000 --out runs/r10_12h_autonomous/hcf_mechanism_controls_22871/frozen_phase16_same_seed --seed 202610184101 --phases 16 --max-wall-s 14400 --frozen-initial-plastic-state
+$PY scripts/analyze_r10_12h_campaign.py --campaign runs/r10_12h_autonomous --out runs/r10_12h_autonomous/analysis --finalist-source-ids R10F_V2_22871,R10F_V2_17780,R10F_V2_28475,R10F_V2_17444,R10F_V2_01796,R10F_V2_07172,R10F_V2_11566,R10F_V2_00116
+$PY scripts/analyze_r10_12h_scientific_findings.py --campaign runs/r10_12h_autonomous --out runs/r10_12h_autonomous/analysis
+MPLCONFIGDIR=/private/tmp/r10-mpl $PY scripts/plot_r10_12h_campaign.py --campaign runs/r10_12h_autonomous --analysis runs/r10_12h_autonomous/analysis --out runs/r10_12h_autonomous/figures
+$PY scripts/package_r10_12h_campaign.py --campaign runs/r10_12h_autonomous --report CODEX_R10_12_HOUR_REPORT.md --out R10_12H_AUTONOMOUS_EVIDENCE.zip
+$PY scripts/verify_r10_12h_campaign_archive.py R10_12H_AUTONOMOUS_EVIDENCE.zip
+```
+
+Reissuing an HCF command with the identical output directory consumes its
+atomic `checkpoint/high_cycle_live_checkpoint.json`; restart identity checks
+material hash, protocol, phase count, stochastic seed, feedback mode, patch,
+and observation-path length before accepting it.  The portable
+`analysis/restart_inventory.csv` lists every still-actionable state and its
+accepted exposure rather than merely naming hypothetical checkpoint paths.
 
 <!-- FINALIZE: replace midpoint accounting, add final best-material table,
 protocol table, tests, timing/CPU, restart inventory, archive hash, limitations,
