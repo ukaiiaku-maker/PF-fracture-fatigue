@@ -6,6 +6,9 @@ from arrhenius_fracture.coupled_opening_reduction_r10 import (
     bilinear_accessibility_coordinates, coupled_cycle_reduction, score_recurrence,
 )
 from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative
+from arrhenius_fracture.czm_high_cycle_adapter_r10 import (
+    CZMOwnedPersistentEngine, _integrate_czm, _lambda_czm, install_czm_owner,
+)
 from scripts.analyze_r10_coupled_opening_search import native_disposition
 
 
@@ -118,3 +121,48 @@ def test_unsupported_prefix_vetoes_an_otherwise_recurrent_window():
     got=score_recurrence(events,120e-6,unsupported=True)
     assert got["outcome"] == "UNSUPPORTED_MIXED_CROSSOVER"
     assert got["developed_rate_m_per_cycle"] is None
+
+
+def test_athermal_completion_is_a_deterministic_phase_event(monkeypatch):
+    engine=_RemapEngine(.5)
+    engine._r10_czm_unsupported=False
+    engine._r10_czm_pending_event=None
+    engine.hazard_threshold_action=.37
+    engine.hazard_action_current=.11
+    engine.B=.2
+    monkeypatch.setattr(
+        "arrhenius_fracture.czm_high_cycle_adapter_r10._opening",
+        lambda *args,**kwargs: {
+            "state":"SEPARATION_COMPLETED", "barrier_J":None,
+            "kinetic_validity":"NOT_APPLICABLE_ATHERMAL",
+        },
+    )
+    got=_integrate_czm(engine,1.,300.,2.5e-5,stress_override=2.)
+    assert got["fired"] is True
+    assert got["dt_consumed"] == 2.5e-5
+    assert got["physical_hazard_action_step"] == 0.
+    assert engine.hazard_threshold_action == .37
+    assert engine._r10_czm_pending_event["stochastic_threshold"] is False
+
+
+def test_accepted_cycle_map_carries_connected_branch_state(monkeypatch):
+    engine=SimpleNamespace(_r10_czm_branch={"branch":"BONDED","delta_m":0.})
+    monkeypatch.setattr(
+        "arrhenius_fracture.czm_high_cycle_adapter_r10._opening",
+        lambda *args,**kwargs: {
+            "state":"BONDED_METASTABLE",
+            "connected_state":{"branch":"METASTABLE","delta_m":2e-10},
+            "kinetic_validity":"QUALIFIED_HIGH_BARRIER",
+            "elementary_rate_s-1":4., "barrier_J":1e-20,
+        },
+    )
+    engine._r10_czm_alternative=SimpleNamespace(opening_mode="cohesive_mixed")
+    rate,raw,barrier=_lambda_czm(engine,2.,300.)
+    assert (rate,raw,barrier) == (4.,4.,1e-20)
+    assert engine._r10_czm_branch == {"branch":"METASTABLE","delta_m":2e-10}
+
+
+def test_mixed_phase_duration_tracks_the_requested_frequency():
+    engine=object.__new__(CZMOwnedPersistentEngine)
+    install_czm_owner(engine,SimpleNamespace(),object(),2.,20,7,frequency_Hz=10.)
+    assert engine._r10_czm_phase_duration_s == .005

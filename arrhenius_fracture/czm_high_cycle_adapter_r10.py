@@ -51,6 +51,7 @@ def _opening(engine, sigma_Pa: float, temperature_K: float, duration_s: float | 
 
 def _lambda_czm(self, sigma_Pa: float, temperature_K: float):
     opening=_opening(self,sigma_Pa,temperature_K)
+    self._r10_czm_branch=dict(opening["connected_state"])
     if opening["state"]=="SEPARATION_COMPLETED":
         rate=1e300
     elif (self._r10_czm_alternative.opening_mode=="cohesive_mixed" and
@@ -69,8 +70,30 @@ def _integrate_czm(self, K_Pa_sqrt_m: float, temperature_K: float, duration_s: f
     stress=(max(float(stress_override),0.) if stress_override is not None
             else max(float(self.sigma_tip(max(float(K_Pa_sqrt_m),0.))),0.))
     opening=_opening(self,stress,temperature_K,requested)
+    if opening["state"]=="SEPARATION_COMPLETED":
+        # Mechanical completion is deterministic.  The phase discretization
+        # locates it at this accepted phase endpoint; an exponential threshold
+        # must not create a fictitious sub-phase waiting time.
+        self.t=float(self.t)+requested
+        self._r10_czm_pending_event={"threshold_action":None,
+            "trigger":"MECHANICAL_COMPLETION","pre_opening":opening,
+            "accepted_duration_s":requested,"unused_duration_s":0.,
+            "stochastic_threshold":False}
+        return {"fired":True,"n_fire":1,"v_crack":0.,"dB":0.,
+            "physical_hazard_action_step":0.,"da":0.,"dt_consumed":requested,
+            "dt_unused":0.,"packet_mean":0.,"packet_variance_m2":0.,
+            "lambda_c":0.,"lambda_c_raw":0.,
+            "Gc_J":float(opening.get("barrier_J") or 0.),"sigma_tip":stress,
+            "plastic":{},"advance":{},"microsteps":1,"r10_czm_owner":MODEL_ID,
+            "r10_czm_accepted_threshold":None,
+            "r10_czm_unsupported":bool(self._r10_czm_unsupported)}
     if lambda_override is None:
-        rate=float(_lambda_czm(self,stress,temperature_K)[0])
+        if (self._r10_czm_alternative.opening_mode=="cohesive_mixed" and
+            opening["kinetic_validity"]=="QUALIFIED_HIGH_BARRIER" and
+            opening.get("elementary_rate_s-1") is not None):
+            rate=max(float(opening["elementary_rate_s-1"]),0.)
+        else:
+            rate=0.
     else:
         rate=max(float(lambda_override),0.)
     threshold=max(float(self.hazard_threshold_action),1e-300)
@@ -95,13 +118,14 @@ def _integrate_czm(self, K_Pa_sqrt_m: float, temperature_K: float, duration_s: f
         self.hazard_event_index=int(self.hazard_event_index)+1
         self.hazard_action_current=0.;self.B=0.
         self._r10_czm_pending_event={"threshold_action":threshold,
-            "trigger":"MECHANICAL_COMPLETION" if opening["state"]=="SEPARATION_COMPLETED" else
-                      "QUALIFIED_HIGH_BARRIER_FIRST_PASSAGE",
+            "trigger":"QUALIFIED_HIGH_BARRIER_FIRST_PASSAGE",
             "pre_opening":opening,"accepted_duration_s":consumed,
-            "unused_duration_s":max(requested-consumed,0.)}
+            "unused_duration_s":max(requested-consumed,0.),
+            "stochastic_threshold":True}
     else:
         self.hazard_action_current=min(current+action,threshold)
         self.B=self.hazard_action_current/threshold
+        self._r10_czm_branch=dict(opening["connected_state"])
     plastic={}
     for payload in (first,second):
         for key,value in dict(payload).items():
@@ -124,14 +148,16 @@ class CZMOwnedPersistentEngine(ReducedPersistentReversibleTipEngine):
 
 def install_czm_owner(engine, alternative: OpeningAlternative, thermal,
                       environment_stiffness_Pa_per_m: float, phase_count: int,
-                      seed: int) -> Any:
+                      seed: int, frequency_Hz: float = 1000.) -> Any:
     if not isinstance(engine,ReducedPersistentReversibleTipEngine):
         raise TypeError("CZM high-cycle adapter requires the retained reversible engine")
     engine.__class__=CZMOwnedPersistentEngine
     engine._r10_czm_alternative=alternative
     engine._r10_czm_thermal=thermal
     engine._r10_czm_kenv=float(environment_stiffness_Pa_per_m)
-    engine._r10_czm_phase_duration_s=1e-3/max(int(phase_count),8)
+    if frequency_Hz <= 0.:
+        raise ValueError("frequency_Hz must be positive")
+    engine._r10_czm_phase_duration_s=1./float(frequency_Hz)/max(int(phase_count),8)
     engine._r10_czm_branch={"branch":"BONDED","delta_m":0.}
     engine._r10_czm_unsupported=False
     engine._r10_czm_unsupported_validities=set()
@@ -152,7 +178,8 @@ def commit_pending_event(engine, patch_m: float) -> dict[str,Any]:
     engine.n_adv=int(engine.n_adv)+1
     engine.checkpoint_advance_total_m=float(engine.checkpoint_advance_total_m)+patch_m
     engine._r10_czm_branch={"branch":"BONDED","delta_m":0.}
-    engine.hazard_threshold_action=float(engine._r10_czm_rng.exponential())
+    if pending.get("stochastic_threshold",True):
+        engine.hazard_threshold_action=float(engine._r10_czm_rng.exponential())
     engine.hazard_action_current=0.;engine.B=0.;engine._r10_czm_pending_event=None
     invalidate_high_cycle_cache(engine,"accepted_r10_czm_event")
     return {**pending,"wake_transaction":wake,"extension_m":float(engine.checkpoint_advance_total_m),

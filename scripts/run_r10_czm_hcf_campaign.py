@@ -83,23 +83,28 @@ def map_stage(a):
 
 def execute_task(task):
  return run_case(Path(task['registry']),task['candidate_id'],float(task['reference_factor']),
-  float(task['exposure_target_cycles']),Path(task['out']),int(task['seed']),int(task['phases']),max_wall_s=float(task['max_wall_s']))
+  float(task['exposure_target_cycles']),Path(task['out']),int(task['seed']),int(task['phases']),
+  T=float(task.get('temperature_K') or 300.),R=float(task.get('R') or .1),
+  frequency=float(task.get('frequency_Hz') or 1000.),max_wall_s=float(task['max_wall_s']))
 
 def execute_stage(a):
  with a.selection.open(newline='') as f:rows=list(csv.DictReader(f))
  if a.source_ids:
   requested={x.strip() for x in a.source_ids.split(',') if x.strip()}
   rows=[r for r in rows if r['source_material_candidate_id'] in requested]
+ if a.limit is not None:rows=rows[:a.limit]
  tasks=[]
  for i,row in enumerate(rows):
   if a.horizon_override is not None:row={**row,'exposure_target_cycles':a.horizon_override}
-  tasks.append({**row,'registry':str(a.registry),'out':str(a.out/row['candidate_id']/f"f_{float(row['reference_factor']):.4f}"),
+  protocol=(f"T_{float(row.get('temperature_K') or 300.):g}__R_{float(row.get('R') or .1):g}"
+            f"__Hz_{float(row.get('frequency_Hz') or 1000.):g}")
+  tasks.append({**row,'registry':str(a.registry),'out':str(a.out/row['candidate_id']/protocol/f"f_{float(row['reference_factor']):.4f}"),
                 'seed':a.seed+i,'phases':a.phases,'max_wall_s':a.max_wall_s})
  summaries=[]
  with ProcessPoolExecutor(max_workers=a.workers) as pool:
   futures=[pool.submit(execute_task,t) for t in tasks]
   for future in as_completed(futures):
-   d=future.result();summaries.append({k:d[k] for k in ('candidate_id','source_material_candidate_id','shape','mode','Kmax_MPa_sqrt_m','DeltaK_MPa_sqrt_m','reference_factor','exposure_target_cycles','accepted_cycles','accepted_seconds','physical_event_count','advance_m','first_event_cycle','inter_event_cycles','developed_window','developed_rate_m_per_cycle','disposition','recurrence_outcome','wall_seconds')});print(json.dumps(summaries[-1]),flush=True)
+   d=future.result();summaries.append({k:d[k] for k in ('candidate_id','source_material_candidate_id','shape','mode','temperature_K','R','frequency_Hz','Kmax_MPa_sqrt_m','DeltaK_MPa_sqrt_m','reference_factor','exposure_target_cycles','accepted_cycles','accepted_seconds','physical_event_count','advance_m','first_event_cycle','inter_event_cycles','developed_window','developed_rate_m_per_cycle','disposition','recurrence_outcome','wall_seconds')});print(json.dumps(summaries[-1]),flush=True)
  write_csv(a.out/'hcf_case_summary.csv',summaries);return 0
 
 def main(argv=None):
@@ -109,6 +114,7 @@ def main(argv=None):
  q=sub.add_parser('execute');q.add_argument('--registry',type=Path,required=True);q.add_argument('--selection',type=Path,required=True);q.add_argument('--out',type=Path,required=True)
  q.add_argument('--phases',type=int,default=16);q.add_argument('--workers',type=int,default=4);q.add_argument('--seed',type=int,default=20261100);q.add_argument('--max-wall-s',type=float,default=900.)
  q.add_argument('--source-ids',help='Optional comma-separated source-material filter for a continuation.')
+ q.add_argument('--limit',type=int,help='Optional number of selection rows for a bounded acquisition block.')
  q.add_argument('--horizon-override',type=float,help='Optional accepted-cycle target for the filtered continuation.')
  q.set_defaults(func=execute_stage)
  a=p.parse_args(argv);a.out.mkdir(parents=True,exist_ok=True);return a.func(a)

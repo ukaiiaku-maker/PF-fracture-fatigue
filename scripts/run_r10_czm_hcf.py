@@ -50,9 +50,10 @@ def save_checkpoint(directory,engine,wave,T,progress):
   if previous is None:os.environ.pop('V10230_HIGH_CYCLE_CHECKPOINT_DIR',None)
   else:os.environ['V10230_HIGH_CYCLE_CHECKPOINT_DIR']=previous
 
-def exact_remainder(engine,wave,T,phases,cycles,events,patch_m,path_limit_m):
+def exact_to_next_cycle(engine,wave,T,phases,cycles,events,patch_m,path_limit_m):
  values=phase_values(wave,phases);tol=1e-12
- while cycles-math.floor(cycles)>tol and engine.checkpoint_advance_total_m<path_limit_m-1e-15:
+ target=math.floor(cycles+tol)+1.
+ while cycles<target-tol and engine.checkpoint_advance_total_m<path_limit_m-1e-15:
   phase_pos=(cycles-math.floor(cycles))*phases;index=min(int(math.floor(phase_pos)),phases-1)
   phase_end=(index+1)/phases;duration=(phase_end-(cycles-math.floor(cycles)))*wave.period_s
   result=engine._integrate_coupled(float(values[index]),T,duration)
@@ -61,8 +62,21 @@ def exact_remainder(engine,wave,T,phases,cycles,events,patch_m,path_limit_m):
    event=commit_pending_event(engine,patch_m);event.update({"cycle":cycles,"phase":cycles%1.,
     "K_Pa_sqrt_m":float(values[index]),"event_index":len(events)+1})
    events.append(event)
+   drain_mechanical_successors(engine,float(values[index]),T,cycles,events,patch_m,path_limit_m)
   elif consumed<=0.:raise RuntimeError("exact waveform remainder made no progress")
  return cycles
+
+def drain_mechanical_successors(engine,K,T,cycles,events,patch_m,path_limit_m):
+ """Commit remapped cells that are already complete at the same accepted phase."""
+ while engine.checkpoint_advance_total_m<path_limit_m-1e-15:
+  snap=opening_snapshot(engine,K,T)
+  if snap["branch_state"]!="SEPARATION_COMPLETED":break
+  opening=engine._r10_czm_last_opening
+  engine._r10_czm_pending_event={"threshold_action":None,
+   "trigger":"MECHANICAL_SUCCESSOR_COMPLETION","pre_opening":opening,
+   "accepted_duration_s":0.,"unused_duration_s":0.,"stochastic_threshold":False}
+  event=commit_pending_event(engine,patch_m);event.update({"cycle":cycles,"phase":cycles%1.,
+   "K_Pa_sqrt_m":K,"event_index":len(events)+1});events.append(event)
 
 def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300.,R=.1,
              frequency=1000.,patch_m=1e-6,path_limit_m=120e-6,max_wall_s=900.):
@@ -74,7 +88,7 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   None if row['selected_mode']=='cohesive_athermal' else float(c['attempt_frequency_s']))
  binding=load_cohesive_binding(registry,candidate,execution_identity=COHESIVE_KINETIC_CZM)
  engine=build_cohesive_current_engine(binding,kernel_family_path=R4_KERNEL_FAMILY)
- install_czm_owner(engine,alt,thermal,kenv,phases,seed)
+ install_czm_owner(engine,alt,thermal,kenv,phases,seed,frequency_Hz=frequency)
  wave=FatigueWaveform(Kmax*1e6,R,frequency);controller=CZMPhaseController(phases)
  predictor_cycle=one_cycle_map(engine,controller,wave,T)
  predictor_successor=one_cycle_map(predictor_cycle.engine,controller,wave,T)
@@ -90,7 +104,11 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
  progress_path=out/'progress.json';checkpoint_dir=out/'checkpoint'
  if progress_path.is_file() and (checkpoint_dir/'high_cycle_live_checkpoint.json').is_file():
   saved=json.loads(progress_path.read_text())
-  if saved['candidate_id']!=candidate or not math.isclose(float(saved['factor']),factor,rel_tol=0.,abs_tol=1e-14):
+  same_protocol=(math.isclose(float(saved.get('temperature_K',T)),T,rel_tol=0.,abs_tol=1e-12) and
+                 math.isclose(float(saved.get('R',R)),R,rel_tol=0.,abs_tol=1e-14) and
+                 math.isclose(float(saved.get('frequency_Hz',frequency)),frequency,rel_tol=0.,abs_tol=1e-12))
+  if (saved['candidate_id']!=candidate or
+      not math.isclose(float(saved['factor']),factor,rel_tol=0.,abs_tol=1e-14) or not same_protocol):
    raise RuntimeError('restart identity differs from requested CZM HCF case')
   _restore_geometry(engine,checkpoint_dir);restore_checkpoint(engine,checkpoint_dir)
   cycles=float(saved['accepted_cycles']);events=list(saved['events']);history=list(saved['history']);blocks=list(saved['blocks'])
@@ -104,8 +122,8 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
  try:
   while cycles<horizon-1e-9 and engine.checkpoint_advance_total_m<path_limit_m-1e-15:
    if time.monotonic()-start>max_wall_s:resource=True;break
-   if cycles-math.floor(cycles)>1e-12:
-    cycles=exact_remainder(engine,wave,T,phases,cycles,events,patch_m,path_limit_m);continue
+   if cycles<1.-1e-12 or cycles-math.floor(cycles)>1e-12:
+    cycles=exact_to_next_cycle(engine,wave,T,phases,cycles,events,patch_m,path_limit_m);continue
    target=next((x for x in targets if x>cycles+1e-9),float(horizon));requested=min(target-cycles,horizon-cycles)
    before=copy.deepcopy(engine);before_cycle=cycles
    result=integrate_state_coupled_waveform(engine,controller,wave,T,requested)
@@ -122,8 +140,10 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
     event=commit_pending_event(engine,patch_m);event.update({"cycle":cycles,"phase":cycles%1.,
       "K_Pa_sqrt_m":float(phase_values(wave,phases)[min(int((cycles%1.)*phases),phases-1)]),
       "event_index":len(events)+1});events.append(event)
+    drain_mechanical_successors(engine,event["K_Pa_sqrt_m"],T,cycles,events,patch_m,path_limit_m)
    history.append(state_row(engine,wave,T,cycles,"EVENT" if result.get('fired') else "EXPOSURE_CHECKPOINT"))
-   progress={"candidate_id":candidate,"factor":factor,"horizon":horizon,"accepted_cycles":cycles,
+   progress={"candidate_id":candidate,"factor":factor,"temperature_K":T,"R":R,
+             "frequency_Hz":frequency,"horizon":horizon,"accepted_cycles":cycles,
              "events":events,"history":history,"blocks":blocks,"unsupported":bool(engine._r10_czm_unsupported),
              "unsupported_validities":sorted(engine._r10_czm_unsupported_validities)}
    atomic(progress_path,progress);save_checkpoint(checkpoint_dir,engine,wave,T,progress)
@@ -163,8 +183,13 @@ def main(argv=None):
  p.add_argument('--factor',type=float,required=True);p.add_argument('--horizon',type=float,required=True)
  p.add_argument('--out',type=Path,required=True);p.add_argument('--seed',type=int,default=20261019)
  p.add_argument('--phases',type=int,default=16);p.add_argument('--max-wall-s',type=float,default=900.)
+ p.add_argument('--temperature-K',type=float,default=300.);p.add_argument('--R',type=float,default=.1)
+ p.add_argument('--frequency-Hz',type=float,default=1000.);p.add_argument('--patch-um',type=float,default=1.)
+ p.add_argument('--path-limit-um',type=float,default=120.)
  a=p.parse_args(argv);a.out.mkdir(parents=True,exist_ok=True)
- result=run_case(a.registry,a.candidate_id,a.factor,a.horizon,a.out,a.seed,a.phases,max_wall_s=a.max_wall_s)
+ result=run_case(a.registry,a.candidate_id,a.factor,a.horizon,a.out,a.seed,a.phases,
+  T=a.temperature_K,R=a.R,frequency=a.frequency_Hz,patch_m=a.patch_um*1e-6,
+  path_limit_m=a.path_limit_um*1e-6,max_wall_s=a.max_wall_s)
  print(json.dumps({k:result[k] for k in ('candidate_id','Kmax_MPa_sqrt_m','accepted_cycles','accepted_seconds','physical_event_count','advance_m','disposition','developed_rate_m_per_cycle','wall_seconds')},indent=2));return 0
 
 if __name__=='__main__':raise SystemExit(main())
