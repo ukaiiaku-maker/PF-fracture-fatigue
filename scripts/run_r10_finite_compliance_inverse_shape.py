@@ -120,7 +120,9 @@ def _thermal_class(Kfold: list[float]) -> str:
 def _evaluate(item: dict) -> dict:
     cohesive, shape = item["cohesive"], item["shape"]
     base = {"candidate_id": item["candidate_id"], "cohesive_shape": shape,
-            "source_material_candidate_id": item["source"]["candidate_id"]}
+            "source_material_candidate_id": item["source"]["candidate_id"],
+            "source_plasticity_sha256": item["source"].get(
+                "plasticity_physics_sha256",item["source"].get("parent_complete_row_sha256"))}
     try:
         thermal = _thermal(cohesive)
         if min(thermal.gamma(T) for T in TEMPERATURES) <= .2:
@@ -210,17 +212,24 @@ def _rank(rows: list[dict], count: int) -> list[dict]:
                 abs(math.log10(max(float(r["max_events_per_cycle"]), 1e-300))+7.),
                 r["candidate_id"]))
             chosen.extend(pool[:max(count//16, 1)])
-    seen = set(); unique = []
-    for row in chosen+sorted(valid, key=lambda r: (
+    ordered=chosen+sorted(valid, key=lambda r: (
             -float(r["strict_connected_width_log10rate"]),
             -float(r["moderate_connected_width_log10rate"]),
             -int(r["hcf_points"]),
             abs(float(r["hcf_slope_median"])-4.) if math.isfinite(float(r["hcf_slope_median"])) else 1e9,
-            r["candidate_id"])):
+            r["candidate_id"]))
+    seen = set(); seen_plastic=set(); unique = []
+    # First protect consumed EXP_floor-vector diversity; then fill remaining
+    # slots with distinct complete cohesive vectors.
+    for diversity_pass in (True,False):
+      for row in ordered:
         if row["candidate_id"] not in seen:
+            plastic=row.get("source_plasticity_sha256")
+            if diversity_pass and plastic in seen_plastic:continue
             unique.append(row); seen.add(row["candidate_id"])
+            if plastic is not None:seen_plastic.add(plastic)
         if len(unique) >= count:
-            break
+            return unique
     return unique
 
 
@@ -237,6 +246,9 @@ def analytical(args) -> int:
     for metric in selected:
         item = item_by_id[metric["candidate_id"]]
         source = dict(item["source"]); cohesive = dict(item["cohesive"])
+        analytical_curve=json.loads(metric["curve_json"])
+        hcf_point=min(analytical_curve,key=lambda point:abs(math.log10(max(
+            float(point["events_per_cycle_peak_rate"]),1e-300))+6.))
         cid = metric["candidate_id"]+"__"+({SMOOTH_EXPONENTIAL:"S",
             BILINEAR:"B", COMPACT_INDEPENDENT:"C"}[item["shape"]])+"M"
         row = dict(source)
@@ -247,6 +259,11 @@ def analytical(args) -> int:
             json.dumps(cohesive, sort_keys=True, separators=(",", ":")),
             "predicted_fold_K_300K": metric["fold_K_300K"],
             "predicted_Kaccess_300K": metric["fold_K_300K"],
+            "predicted_hcf_K_300K": hcf_point["K_MPa_sqrt_m"],
+            "predicted_hcf_factor_300K": (float(hcf_point["K_MPa_sqrt_m"])/
+                float(metric["fold_K_300K"])),
+            "predicted_hcf_peak_action_per_cycle":hcf_point["events_per_cycle_peak_rate"],
+            "predicted_hcf_local_slope":hcf_point["local_log_slope"],
             "thermal_prediction": metric["thermal_prediction"],
             "mechanism_prediction": metric["mechanism_prediction"]})
         row["cohesive_parameter_sha256"] = canonical_hash(cohesive)
@@ -288,11 +305,17 @@ def _inverse_objective(vector: np.ndarray, base: dict) -> float:
     row = _evaluate(item)
     if not row.get("domain_pass"):
         return 1e6
-    slope = float(row["slope_median"])
+    curve=json.loads(row["curve_json"])
+    supported=[point for point in curve if float(point["events_per_cycle_peak_rate"])>0.
+               and point["local_log_slope"] is not None]
+    if not supported:return 1e5
+    target=min(supported,key=lambda point:abs(
+        math.log10(max(float(point["events_per_cycle_peak_rate"]),1e-300))+7.))
+    slope = float(target["local_log_slope"])
     width = float(row["strict_connected_width_log10rate"])
-    rate = max(float(row["max_events_per_cycle"]), 1e-300)
+    rate = max(float(target["events_per_cycle_peak_rate"]), 1e-300)
     slope_penalty = abs(slope-4.) if math.isfinite(slope) else 100.
-    rate_penalty = max(abs(math.log10(rate)+7.)-5., 0.)
+    rate_penalty = abs(math.log10(rate)+7.)
     return slope_penalty-4.*width+rate_penalty
 
 

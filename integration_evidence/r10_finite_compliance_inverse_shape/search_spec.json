@@ -1,0 +1,55 @@
+{
+  "schema": "r10.finite-compliance-inverse-shape-search-spec/1",
+  "campaign_start_utc": "2026-10-18T22:30:09Z",
+  "earliest_completion_utc": "2026-10-19T10:30:09Z",
+  "starting_commit": "8b2f20fe7a421d94e478e21d8729a064884e4970",
+  "branch": "codex/r10-finite-compliance-inverse-shape",
+  "source_registry": "integration_evidence/r10_v2_current_opening_search/native_information_registry.csv",
+  "source_registry_sha256": "5e44242223db22ef079a1a5e1bbcfade9001474d134730eb96e922bb1714a474",
+  "physical_or_inherited_research_bounds": {
+    "Gamma_ref_J_m2": [0.5, 8.0],
+    "t_hat_ref_Pa": [8000000000.0, 80000000000.0],
+    "zero_traction_barrier_eV_300K": [0.25, 12.0],
+    "Gamma_fractional_change_300_to_1200K": [-0.25, 0.75],
+    "attempt_frequency_s-1": 1000000000000.0,
+    "temperature_K": [300.0, 1200.0],
+    "load_ratio_R": 0.1,
+    "reference_frequency_Hz": 1000.0,
+    "reference_tip_radius_m": 1e-6,
+    "physical_advance_m": 1e-6
+  },
+  "compact_research_bounds": {
+    "potential": "rounded compact single-hump potential integrated from one C1 traction law",
+    "rise_fraction": [0.01, 0.25],
+    "fall_fraction": [0.6, 0.99],
+    "plateau_drop": [0.005, 0.3],
+    "status": "conditional opt-in research range; not experimental validation or canonical promotion"
+  },
+  "mechanics": {
+    "environment": "current declared local condensation",
+    "Eprime_Pa": 420344682639.7646,
+    "cohesive_zone_m": "Eprime*Gamma/t_hat^2",
+    "environment_stiffness_Pa_per_m": "Eprime/(2*cohesive_zone)",
+    "environment_is_fit_parameter": false
+  },
+  "strict_internal_reference": {
+    "local_slope_interval": [3.4, 4.6],
+    "minimum_connected_rate_decades": 2.0,
+    "minimum_amplitude_ratio_necessary_at_slope_4p6": 2.72
+  },
+  "immutable_physics": [
+    "EXP_floor emission",
+    "Peierls motion",
+    "Taylor release",
+    "activation entropies and parameter couplings",
+    "persistent signed source transport and return",
+    "backstress and blunting",
+    "material-frame wake",
+    "contact, geometry, and energy ownership",
+    "current high-cycle state integration"
+  ],
+  "diagnostic_only_exclusions": [
+    "p=1.1 algebraic-tail potential cannot be registered or executed natively",
+    "peak-rate analytical screening is not native cyclic evidence"
+  ]
+}

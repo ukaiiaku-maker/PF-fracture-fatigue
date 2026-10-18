@@ -20,10 +20,13 @@
 ## Live stage
 
 1. Reconciliation and reference reproduction: complete.
-2. Compact single-potential constitutive implementation: in progress.
-3. Finite-compliance inverse analytical evaluator: queued.
-4. 32,768-point analytical search and inverse starts: queued.
-5. State-informed/native acquisition rounds: queued.
+2. Compact single-potential constitutive implementation: complete; rounded
+   finite-support research variant added without changing legacy defaults.
+3. Finite-compliance inverse analytical evaluator: complete; exact 22871
+   barrier/root/fold/32-phase cyclic reference reproduced by regression.
+4. 32,768-point analytical search and inverse starts: first screen and 64 starts
+   complete; corrected full-metastable-window screen and 64 compact starts running.
+5. State-informed/native acquisition rounds: waiting on corrected selection.
 6. HCF, protocol, thermal-fracture, restart, and package qualification: queued.
 
 This file is the durable restart ledger. It is updated at scientifically meaningful

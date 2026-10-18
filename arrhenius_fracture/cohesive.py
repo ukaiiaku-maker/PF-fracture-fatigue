@@ -138,6 +138,8 @@ class CohesiveNetwork:
                  "Gamma_J_m2": e.thermal.gamma(e.temperature_K),
                  "delta0_m": e.thermal.delta0_m,
                  "cohesive_shape": e.cohesive_shape,
+                 "compact_variant": (e.thermal.compact_variant
+                    if e.cohesive_shape == COMPACT_INDEPENDENT else None),
                  **e.metadata} for i, e in enumerate(self.elements)]
 
     def energy_ledger(self,u:np.ndarray) -> dict:
@@ -206,6 +208,8 @@ def _response(elem: CohesiveElement, network: CohesiveNetwork,
             "rupture_state": elem.rupture_state,
             "execution_identity": network.execution_identity,
             "cohesive_shape":elem.cohesive_shape,
+            "compact_variant":(elem.thermal.compact_variant
+                if elem.cohesive_shape == COMPACT_INDEPENDENT else None),
             "plastic_closure_traction_Pa":(0.0 if elem.broken else
                                              float(network.plastic_closure_Pa)),
             "surface_free_energy_J_m2": (elem.thermal.gamma(elem.temperature_K)

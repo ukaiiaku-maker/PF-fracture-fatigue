@@ -91,7 +91,9 @@ def reduced(a):
  factors=[float(x) for x in a.load_factors.split(',')];tasks=[]
  for row in rows:
   Kref,_=reference_load(row,300.,a.phases)
-  for factor in factors:tasks.append({'registry':str(a.registry),'row':row,'T':300.,'Kref':Kref,'K':factor*Kref,'cycles':a.cycles,'phases':a.phases})
+  loads=([float(row['predicted_hcf_K_300K'])] if a.use_predicted_hcf_load
+         else [factor*Kref for factor in factors])
+  for K in loads:tasks.append({'registry':str(a.registry),'row':row,'T':300.,'Kref':Kref,'K':K,'cycles':a.cycles,'phases':a.phases})
  summaries=[]
  with ProcessPoolExecutor(max_workers=a.workers) as pool:
   futures=[pool.submit(cycle_task,t) for t in tasks]
@@ -136,8 +138,10 @@ def native(a):
  factors=[float(x) for x in a.load_factors.split(',')];tasks=[]
  for i,row in enumerate(rows):
   Kref,_=reference_load(row,300.,a.opening_phases)
-  for j,factor in enumerate(factors):tasks.append({'registry':str(a.registry),'row':row,'Kref':Kref,
-   'K':factor*Kref,'cycles':a.cycles,'plastic_phases':a.plastic_phases,
+  loads=([float(row['predicted_hcf_K_300K'])] if a.use_predicted_hcf_load
+         else [factor*Kref for factor in factors])
+  for j,K in enumerate(loads):tasks.append({'registry':str(a.registry),'row':row,'Kref':Kref,
+   'K':K,'cycles':a.cycles,'plastic_phases':a.plastic_phases,
    'opening_phases':a.opening_phases,'seed':a.seed+1000*i+j})
  summaries=[]
  with ProcessPoolExecutor(max_workers=a.workers) as pool:
@@ -156,8 +160,8 @@ def native(a):
 def main(argv=None):
  p=argparse.ArgumentParser();sub=p.add_subparsers(dest='stage',required=True)
  q=sub.add_parser('prepare');q.add_argument('--source',type=Path,required=True);q.add_argument('--out',type=Path,required=True);q.set_defaults(func=prepare)
- q=sub.add_parser('reduced');q.add_argument('--registry',type=Path,required=True);q.add_argument('--out',type=Path,required=True);q.add_argument('--load-factors',default='.72,.84,.94,1.02,1.12,1.28');q.add_argument('--cycles',type=int,default=32);q.add_argument('--phases',type=int,default=8);q.add_argument('--workers',type=int,default=4);q.set_defaults(func=reduced)
+ q=sub.add_parser('reduced');q.add_argument('--registry',type=Path,required=True);q.add_argument('--out',type=Path,required=True);q.add_argument('--load-factors',default='.72,.84,.94,1.02,1.12,1.28');q.add_argument('--use-predicted-hcf-load',action='store_true');q.add_argument('--cycles',type=int,default=32);q.add_argument('--phases',type=int,default=8);q.add_argument('--workers',type=int,default=4);q.set_defaults(func=reduced)
  q=sub.add_parser('ramps');q.add_argument('--registry',type=Path,required=True);q.add_argument('--candidate-ids',required=True);q.add_argument('--out',type=Path,required=True);q.add_argument('--Kdot',type=float,default=.005);q.add_argument('--dK',type=float,default=1.);q.add_argument('--Kmax',type=float,default=200.);q.add_argument('--workers',type=int,default=4);q.set_defaults(func=ramps)
- q=sub.add_parser('native');q.add_argument('--registry',type=Path,required=True);q.add_argument('--candidate-ids',required=True);q.add_argument('--out',type=Path,required=True);q.add_argument('--load-factors',default='.84,.96,1.06,1.20');q.add_argument('--cycles',type=int,default=24);q.add_argument('--plastic-phases',type=int,default=4);q.add_argument('--opening-phases',type=int,default=8);q.add_argument('--workers',type=int,default=4);q.add_argument('--seed',type=int,default=20261018);q.set_defaults(func=native)
+ q=sub.add_parser('native');q.add_argument('--registry',type=Path,required=True);q.add_argument('--candidate-ids',required=True);q.add_argument('--out',type=Path,required=True);q.add_argument('--load-factors',default='.84,.96,1.06,1.20');q.add_argument('--use-predicted-hcf-load',action='store_true');q.add_argument('--cycles',type=int,default=24);q.add_argument('--plastic-phases',type=int,default=4);q.add_argument('--opening-phases',type=int,default=8);q.add_argument('--workers',type=int,default=4);q.add_argument('--seed',type=int,default=20261018);q.set_defaults(func=native)
  a=p.parse_args(argv);return a.func(a)
 if __name__=='__main__':raise SystemExit(main())
