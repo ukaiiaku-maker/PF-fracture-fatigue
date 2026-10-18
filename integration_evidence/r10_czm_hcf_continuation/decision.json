@@ -1,0 +1,23 @@
+{
+  "accepted_cycles_total": 12040000.0,
+  "accepted_seconds_total": 12040.0,
+  "amplitude_map_rows": 144,
+  "decision": "HCF_BOUNDARY_ESTABLISHED_NO_PARIS_PASS",
+  "developed_rates_total": 0,
+  "disposition_counts": {
+    "PHYSICAL_RUNOUT_TO_DECLARED_HORIZON": 12,
+    "SUPPORTED_SHAKEDOWN_PERIODIC_ORBIT": 4
+  },
+  "executed_cases": 16,
+  "legacy_cooperative_clock_used": false,
+  "next_acquisition": "Move amplitude within the mapped bonded interval toward finite opening/plastic timescale coordinates; retain exact event continuation and extend only state-evolving finite-horizon arms.",
+  "physical_events_total": 0,
+  "schema": "r10.current-czm-hcf-continuation/1",
+  "scientific_interpretation": [
+    "The lower-amplitude current-CZM block is a genuine HCF exposure comparison, not a first-excursion prefix.",
+    "No selected arm advanced, so no Paris slope or recurrent-growth rate is reported.",
+    "Stationary-tail convergence is called supported shakedown; other completed cases are finite-horizon physical runouts only.",
+    "The four opening arms remain paired to identical source plasticity inputs but evolve independently."
+  ],
+  "unsupported_map_points_excluded_from_execution": 3
+}

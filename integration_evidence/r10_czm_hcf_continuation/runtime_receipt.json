@@ -1,0 +1,58 @@
+{
+  "exact_checkpoint_count": 16,
+  "executed_candidate_ids": [
+    "R10F_V2_01617__RAB",
+    "R10F_V2_01617__RAS",
+    "R10F_V2_01617__RMB",
+    "R10F_V2_01617__RMS",
+    "R10F_V2_01620__RAB",
+    "R10F_V2_01620__RAS",
+    "R10F_V2_01620__RMB",
+    "R10F_V2_01620__RMS",
+    "R10F_V2_02913__RAB",
+    "R10F_V2_02913__RAS",
+    "R10F_V2_02913__RMB",
+    "R10F_V2_02913__RMS",
+    "R10F_V2_03963__RAB",
+    "R10F_V2_03963__RAS",
+    "R10F_V2_03963__RMB",
+    "R10F_V2_03963__RMS"
+  ],
+  "git_branch": "codex/r10-athermal-mixed-czm-comparison",
+  "legacy_cooperative_clock_used": false,
+  "opening_owners": [
+    "CURRENT_ATHERMAL_OR_MIXED_CZM"
+  ],
+  "parent_head": "7087c0e8b524b860ef57f9f76989f4cb9e53f718",
+  "phase_count": [
+    16
+  ],
+  "plasticity_owners": [
+    "CURRENT_EXP_FLOOR_FULL_STATE"
+  ],
+  "result_sha256": {
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01617__RAB/f_0.9300/result.json": "fedb8748511b65ab9c07b4a9f7397da56c9fc4c4cf53519ffcdcecd76dc49925",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01617__RAS/f_0.9300/result.json": "87b96dacfe1706cbf7c6bed7e2d18441b50c98214949a5e53c9486fe0c399ae1",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01617__RMB/f_0.8900/result.json": "a301c04bbfab6f9f52d2995a6511740570a849f1d83a0941e0c51b519c58ce40",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01617__RMS/f_0.9300/result.json": "4512c6782207d0d8bff6153f28f8569b681266d97feb1510105b85e5ba4d43f8",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01620__RAB/f_0.9300/result.json": "b2062016278d2a10fbacb50ab4f37753f70172c9afa7245380d04fe0c7e3e390",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01620__RAS/f_0.9300/result.json": "92478f09e623fa84b01306b2549061b8d697d9dabff32293c00915a2a6f7e2bb",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01620__RMB/f_0.8900/result.json": "f5d815b7e237f9c575f69e4610f40e902606fb5bda46f61b9094b31d91b12239",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_01620__RMS/f_0.9300/result.json": "8b0bd9f885bfe4689c88a986251bb725fd029eafc8f05a24a46fc0ea175cdd16",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_02913__RAB/f_0.9300/result.json": "1ba670a46490e1694c911a9e94119054ff6fc43cdaad1c89365af7f0b2b4cc31",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_02913__RAS/f_0.9300/result.json": "8e1fde3921ea5ade526582d786d1f8a586a8fae58c7b45ead4184e54dd4c447a",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_02913__RMB/f_0.8900/result.json": "66e3349cb0140f8e4dea8e8576a1c37f3af49c4cf307d69f8d2c4ddd6b0ba005",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_02913__RMS/f_0.9300/result.json": "a8ebbc38d13060831ceae45a8ea3a0b07d95b0badcb62431eded6d1774b1e747",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_03963__RAB/f_0.8400/result.json": "d6517768273334c13931448c91adb0ebb3c70c04beaa693ed5b704e71d906cb3",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_03963__RAS/f_0.9300/result.json": "ecd19aeac6d54838da2640b4fce94a00db3ae61aab1f42c220d993c54afaba9f",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_03963__RMB/f_0.8400/result.json": "d84e74999aba4f0c8e91c36ab0273db6ec960e02ac4b62e8114e53eb8c7f90fa",
+    "runs/r10_czm_hcf_campaign/executed/R10F_V2_03963__RMS/f_0.9300/result.json": "704c41b213e53bd695dab4a44f7e10515e5afacc7f269e72b6a0519c9651537e"
+  },
+  "schema": "r10.current-czm-hcf-runtime-receipt/1",
+  "source_sha256": {
+    "arrhenius_fracture/coupled_opening_reduction_r10.py": "0f1cd37955c9ea8957c677a5e1cea9d4f8887b4610e958d059e2e696fc3bc8fb",
+    "arrhenius_fracture/czm_high_cycle_adapter_r10.py": "4d9aeb29dec6aa7dbbd062a86e2cf0035bc40a89fc139c6e615a9c3ed9388ca2",
+    "scripts/run_r10_czm_hcf.py": "9d67bf45d1c776eb31e5bca63be6a96ae9cd22be030c7d20e0554170d57bbe9f",
+    "scripts/run_r10_czm_hcf_campaign.py": "fc977455fd2f07693e8e447ef0e8b41ecc7fde098c760e3babc1f31e9cabfb6c"
+  }
+}

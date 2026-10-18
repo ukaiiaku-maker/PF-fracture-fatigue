@@ -1,6 +1,11 @@
 import math
+from types import SimpleNamespace
+import numpy as np
 from arrhenius_fracture.cohesive_arrhenius import CohesiveThermalLaw
-from arrhenius_fracture.coupled_opening_reduction_r10 import bilinear_accessibility_coordinates
+from arrhenius_fracture.coupled_opening_reduction_r10 import (
+    bilinear_accessibility_coordinates, coupled_cycle_reduction, score_recurrence,
+)
+from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative
 from scripts.analyze_r10_coupled_opening_search import native_disposition
 
 
@@ -33,3 +38,83 @@ def test_unsupported_mixed_nonadvance_remains_unresolved():
         "events": [],
     }
     assert native_disposition(result) == "UNSUPPORTED_CROSSOVER_UNRESOLVED"
+
+
+def test_bounded_two_increment_bursts_can_supply_recurrent_rate():
+    events=[]
+    for cycle in range(40):
+        for index in range(2):
+            events.append({"cycle":cycle+0.25,"extension_m":1e-6*(2*cycle+index+1)})
+    got=score_recurrence(events,120e-6)
+    assert got["outcome"] == "FINITE_RECURRENT_GROWTH"
+    assert got["observation_target_hit"] is False
+    assert math.isclose(got["developed_rate_m_per_cycle"],2e-6,rel_tol=1e-12)
+    assert got["developed_window"]["duration_cycles"] == 20.0
+
+
+class _RemapMPZ:
+    def __init__(self):
+        for name in ("mobile_positive","mobile_negative","retained_positive","retained_negative",
+                     "accumulated_slip_positive","accumulated_slip_negative","returned_slip_positive",
+                     "returned_slip_negative","wake_mobile_positive","wake_mobile_negative",
+                     "wake_retained_positive","wake_retained_negative","wake_slip_positive","wake_slip_negative"):
+            setattr(self,name,np.zeros(1))
+        self.mobile_count=0.;self.retained_count=0.;self._reversible_transport_installed=False
+    def advance(self,patch): return {"advanced_m":patch}
+
+
+class _RemapEngine:
+    def __init__(self,successor_drive):
+        self.mpz=_RemapMPZ();self.t=0.;self.n_adv=0;self.a_adv=0.;self.checkpoint_advance_total_m=0.
+        self.W_emit=0.;self.K_prev=0.;self.successor_drive=successor_drive
+    def sigma_tip(self,K): return 2. if self.n_adv==0 else self.successor_drive
+    def _plastic_half_step(self,dt,T,sigma): return {}
+    def r_eff(self): return 1e-6
+    def K_shield(self): return 0.
+
+
+def _mechanical_probe(alternative,imposed,kenv,thermal,T,prior,phase_duration_s=None):
+    complete=imposed>=1.
+    return {"state":"SEPARATION_COMPLETED" if complete else "BONDED_STABLE",
+            "connected_state":{"branch":"SEPARATED" if complete else "BONDED","delta_m":0.},
+            "kinetic_validity":"NOT_APPLICABLE_ATHERMAL"}
+
+
+def test_successor_opening_drive_is_recomputed_after_relaxing_remap(monkeypatch):
+    monkeypatch.setattr("arrhenius_fracture.coupled_opening_reduction_r10.evaluate_opening",_mechanical_probe)
+    alt=OpeningAlternative("cohesive_athermal","bilinear","quasistatic_mechanical")
+    got=coupled_cycle_reduction(_RemapEngine(.5),alt,object(),1.,1e-6,cycles=1,phases=1,
+                                patch_m=1e-6,observation_limit_m=5e-6)
+    assert len(got["events"]) == 1
+    assert got["observation_target_hit"] is False
+
+
+def test_successor_opening_drive_is_recomputed_when_remap_amplifies(monkeypatch):
+    monkeypatch.setattr("arrhenius_fracture.coupled_opening_reduction_r10.evaluate_opening",_mechanical_probe)
+    alt=OpeningAlternative("cohesive_athermal","bilinear","quasistatic_mechanical")
+    got=coupled_cycle_reduction(_RemapEngine(3.),alt,object(),1.,1e-6,cycles=1,phases=1,
+                                patch_m=1e-6,observation_limit_m=3e-6)
+    assert len(got["events"]) == 3
+    assert got["events"][1]["accepted_opening_drive_Pa"] == 3.
+    assert got["outcome"] == "TARGET_TRUNCATED_SINGLE_EXCURSION_CASCADE"
+
+
+def test_mixed_unit_action_is_a_screen_not_successor_commitment(monkeypatch):
+    def high_rate(*args,**kwargs):
+        return {"state":"BONDED_METASTABLE","connected_state":{"branch":"METASTABLE","delta_m":0.},
+                "kinetic_validity":"QUALIFIED_HIGH_BARRIER","elementary_rate_s-1":2500.}
+    monkeypatch.setattr("arrhenius_fracture.coupled_opening_reduction_r10.evaluate_opening",high_rate)
+    alt=OpeningAlternative("cohesive_mixed","bilinear","time_dependent_first_passage",1e-20,1e12)
+    got=coupled_cycle_reduction(_RemapEngine(.5),alt,object(),1.,1e-6,cycles=4,phases=1,
+                                patch_m=1e-6,observation_limit_m=5e-6)
+    assert got["events"] == []
+    assert got["mixed_action_crossing"]["action"] == 2.5
+    assert got["outcome"] == "SCREENED_MIXED_ACTION_CROSSING_REQUIRES_NATIVE_LOCALIZATION"
+    assert got["developed_rate_m_per_cycle"] is None
+
+
+def test_unsupported_prefix_vetoes_an_otherwise_recurrent_window():
+    events=[{"cycle":float(i),"extension_m":2e-6*(i+1)} for i in range(40)]
+    got=score_recurrence(events,120e-6,unsupported=True)
+    assert got["outcome"] == "UNSUPPORTED_MIXED_CROSSOVER"
+    assert got["developed_rate_m_per_cycle"] is None

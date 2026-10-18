@@ -19,6 +19,41 @@ from .persistent_site_high_cycle_state_v10230 import serialize_active_state
 MODEL_ID = "r10.coupled-opening-state-reduction/1"
 
 
+def score_recurrence(events: list[dict[str, Any]], observation_limit_m: float,
+                     unsupported: bool=False, lower_m: float=20e-6,
+                     upper_m: float=60e-6) -> dict[str, Any]:
+    """Classify event histories without treating bounded bursts as a veto."""
+    cycles=sorted({int(math.floor(float(e["cycle"])+1e-12)) for e in events})
+    target_hit=bool(events and float(events[-1]["extension_m"])>=observation_limit_m-1e-15)
+    lower=next((e for e in events if float(e["extension_m"])>=lower_m),None)
+    upper=next((e for e in events if float(e["extension_m"])>=upper_m),None)
+    rate=None;window=None
+    if lower is not None and upper is not None:
+        duration=float(upper["cycle"])-float(lower["cycle"])
+        if duration>0. and len(cycles)>=2:
+            rate=(float(upper["extension_m"])-float(lower["extension_m"]))/duration
+            window={"start_cycle":float(lower["cycle"]),"end_cycle":float(upper["cycle"]),
+                    "start_extension_m":float(lower["extension_m"]),
+                    "end_extension_m":float(upper["extension_m"]),"duration_cycles":duration}
+    if unsupported:
+        outcome="UNSUPPORTED_MIXED_CROSSOVER"
+        rate=None;window=None
+    elif target_hit and len(cycles)<=1:
+        outcome="TARGET_TRUNCATED_SINGLE_EXCURSION_CASCADE"
+        rate=None;window=None
+    elif rate is not None:
+        outcome="FINITE_RECURRENT_GROWTH"
+    elif len(cycles)>=2:
+        outcome="RECURRENT_GROWTH_OUTSIDE_REPORTING_WINDOW"
+    elif events:
+        outcome="FINITE_SINGLE_BURST"
+    else:
+        outcome="FINITE_EXPOSURE_NO_GROWTH"
+    return {"outcome":outcome,"developed_rate_m_per_cycle":rate,
+            "developed_window":window,"event_cycle_count":len(cycles),
+            "observation_target_hit":target_hit}
+
+
 def bilinear_accessibility_coordinates(thermal, temperature_K: float,
                                        environment_stiffness_Pa_per_m: float,
                                        radius_m: float, phases: int) -> dict[str, float]:
@@ -68,7 +103,7 @@ def coupled_cycle_reduction(engine, alternative: OpeningAlternative, thermal,
                             patch_m: float=1e-6, observation_limit_m: float=120e-6) -> dict[str,Any]:
     wave=FatigueWaveform(Kmax=Kmax_MPa_sqrt_m*1e6,R=.1,frequency_Hz=1000.)
     dt=wave.period_s/phases;branch={"branch":"BONDED","delta_m":0.};action=0.
-    events=[];history=[];unsupported=False;same_phase_cascade=False
+    events=[];history=[];unsupported=False;mixed_action_crossing=None
     for cycle in range(cycles):
         start=serialize_active_state(engine).vector;cycle_events=0
         for phase in range(phases):
@@ -83,13 +118,17 @@ def coupled_cycle_reduction(engine, alternative: OpeningAlternative, thermal,
                 "STATIC_SADDLE_MFPT_HAZARD_APPROXIMATION"}
             if validity=="QUALIFIED_HIGH_BARRIER" and opening.get("elementary_rate_s-1") is not None:
                 action+=float(opening["elementary_rate_s-1"])*dt
-            trigger=(opening["state"]=="SEPARATION_COMPLETED" or
-                     (alternative.opening_mode=="cohesive_mixed" and action>=1.))
-            commits_this_phase=0
+            if alternative.opening_mode=="cohesive_mixed" and action>=1.:
+                mixed_action_crossing={"cycle":cycle+(phase+.5)/phases,"phase":phase,
+                    "action":action,"approximation":"DETERMINISTIC_UNIT_ACTION_ACQUISITION_SCREEN",
+                    "commitment_status":"REQUIRES_PREFIX_REMAINDER_NATIVE_CONSUMER"}
+                break
+            trigger=opening["state"]=="SEPARATION_COMPLETED"
             while trigger and engine.checkpoint_advance_total_m+patch_m<=observation_limit_m+1e-15:
-                _commit(engine,patch_m);cycle_events+=1;commits_this_phase+=1
+                _commit(engine,patch_m);cycle_events+=1
                 events.append({"cycle":cycle+(phase+.5)/phases,"phase":phase,
                     "extension_m":float(engine.checkpoint_advance_total_m),
+                    "accepted_opening_drive_Pa":stress,
                     "trigger":"MECHANICAL_COMPLETION" if opening["state"]=="SEPARATION_COMPLETED" else "MEAN_HIGH_BARRIER_ACTION",
                     "mobile_count":float(engine.mpz.mobile_count),"retained_count":float(engine.mpz.retained_count),
                     "tip_radius_m":float(engine.r_eff()),"K_shield_Pa_sqrt_m":float(engine.K_shield())})
@@ -97,37 +136,34 @@ def coupled_cycle_reduction(engine, alternative: OpeningAlternative, thermal,
                 # that cell starts bonded.  mpz.advance retains/remaps the
                 # plastic wake rather than copying the departed cell state.
                 branch={"branch":"BONDED","delta_m":0.};action=max(action-1.,0.)
+                stress=max(float(engine.sigma_tip(max(Ksigned,0.))),0.)
                 opening=evaluate_opening(alternative,stress/environment_stiffness_Pa_per_m,
                     environment_stiffness_Pa_per_m,thermal,temperature_K,branch,phase_duration_s=dt)
                 branch=opening["connected_state"]
-                trigger=(opening["state"]=="SEPARATION_COMPLETED" or
-                         (alternative.opening_mode=="cohesive_mixed" and action>=1.))
-                if commits_this_phase>1:same_phase_cascade=True
+                trigger=opening["state"]=="SEPARATION_COMPLETED"
             if engine.checkpoint_advance_total_m>=observation_limit_m-1e-15:break
+            if mixed_action_crossing is not None:break
         end=serialize_active_state(engine).vector;denom=max(float(np.linalg.norm(start)),1.)
         history.append({"cycle":cycle+1,"events_cycle":cycle_events,
             "extension_m":float(engine.checkpoint_advance_total_m),
             "state_relative_change":float(np.linalg.norm(end-start)/denom),
             "mobile_count":float(engine.mpz.mobile_count),"retained_count":float(engine.mpz.retained_count),
             "tip_radius_m":float(engine.r_eff()),"K_shield_Pa_sqrt_m":float(engine.K_shield())})
-        if engine.checkpoint_advance_total_m>=observation_limit_m-1e-15:break
-    event_cycles=sorted({int(math.floor(e["cycle"]+1e-12)) for e in events})
-    window=[e for e in events if 20e-6<=e["extension_m"]<=60e-6]
-    rate=None
-    if len(event_cycles)>=2 and not same_phase_cascade and len(window)>=2:
-        dc=window[-1]["cycle"]-window[0]["cycle"]
-        if dc>0:rate=(window[-1]["extension_m"]-window[0]["extension_m"])/dc
-    outcome=("TARGET_TRUNCATED_SAME_PHASE_CASCADE" if same_phase_cascade else
-             "FINITE_RECURRENT_GROWTH" if len(event_cycles)>=2 else
-             "FINITE_SINGLE_BURST" if events else
-             "UNSUPPORTED_MIXED_CROSSOVER" if unsupported else
-             "FINITE_EXPOSURE_NO_GROWTH")
+        if engine.checkpoint_advance_total_m>=observation_limit_m-1e-15 or mixed_action_crossing is not None:break
+    scored=score_recurrence(events,observation_limit_m,unsupported)
+    if mixed_action_crossing is not None and not unsupported:
+        scored.update({"outcome":"SCREENED_MIXED_ACTION_CROSSING_REQUIRES_NATIVE_LOCALIZATION",
+                       "developed_rate_m_per_cycle":None,"developed_window":None})
     return {"schema":MODEL_ID,"loading":"CYCLIC_STATE_REDUCTION","Kmax_MPa_sqrt_m":Kmax_MPa_sqrt_m,
         "DeltaK_MPa_sqrt_m":.9*Kmax_MPa_sqrt_m,"temperature_K":temperature_K,
         "cycles_requested":cycles,"cycles_completed":len(history),"phases":phases,
-        "events":events,"history":history,"event_cycle_count":len(event_cycles),
-        "developed_rate_m_per_cycle":rate,"outcome":outcome,"unsupported_crossover":unsupported,
-        "legacy_opening_clock_used":False,"mean_action_mark_used":alternative.opening_mode=="cohesive_mixed"}
+        "events":events,"history":history,"event_cycle_count":scored["event_cycle_count"],
+        "developed_rate_m_per_cycle":scored["developed_rate_m_per_cycle"],
+        "developed_window":scored["developed_window"],"outcome":scored["outcome"],
+        "observation_target_hit":scored["observation_target_hit"],
+        "unsupported_crossover":unsupported,"mixed_action_crossing":mixed_action_crossing,
+        "legacy_opening_clock_used":False,"mean_action_mark_used":False,
+        "mixed_action_role":"ACQUISITION_SCREEN_ONLY" if alternative.opening_mode=="cohesive_mixed" else None}
 
 
 def coupled_monotonic_ramp(engine, alternative: OpeningAlternative, thermal,
@@ -167,5 +203,5 @@ def coupled_monotonic_ramp(engine, alternative: OpeningAlternative, thermal,
         "history":history,"legacy_opening_clock_used":False}
 
 
-__all__=["MODEL_ID","bilinear_accessibility_coordinates","coupled_cycle_reduction",
+__all__=["MODEL_ID","bilinear_accessibility_coordinates","score_recurrence","coupled_cycle_reduction",
          "coupled_monotonic_ramp"]
