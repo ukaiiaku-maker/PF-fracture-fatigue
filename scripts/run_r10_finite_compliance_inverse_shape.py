@@ -388,16 +388,31 @@ def analytical(args) -> int:
     print(json.dumps(payload, indent=2)); return 0
 
 
-def _inverse_objective(vector: np.ndarray, base: dict) -> float:
+def _inverse_coordinates(vector: np.ndarray) -> tuple[float,float,float,float]:
     log_rise, drop_coordinate, log_tail, logarea = map(float, vector)
     rise=math.exp(log_rise)
     drop_fraction=rise+(1.-rise)/(1.+math.exp(-max(min(drop_coordinate,50.),-50.)))
+    return rise,drop_fraction,math.exp(log_tail),math.exp(logarea)
+
+
+def _inverse_bounds_pass(vector: np.ndarray, gamma_J_m2: float) -> bool:
+    rise,drop_fraction,tail,area=_inverse_coordinates(vector)
+    normalized_drop=(drop_fraction-rise)/(1.-rise)
+    zero_eV=area*float(gamma_J_m2)/EV_TO_J
+    return (.0005 <= rise <= .05 and .001 <= normalized_drop <= .08 and
+            .005 <= tail <= .3 and .25 <= zero_eV <= 12.)
+
+
+def _inverse_objective(vector: np.ndarray, base: dict) -> float:
+    if not _inverse_bounds_pass(vector,base["cohesive"]["Gamma_ref_J_m2"]):
+        return 1e6
+    rise,drop_fraction,tail,area=_inverse_coordinates(vector)
     cohesive = dict(base["cohesive"])
     cohesive.update({"compact_variant":"two_scale_tail",
                      "compact_rise_fraction":rise,
                      "compact_drop_fraction":drop_fraction,
-                     "compact_tail_level":math.exp(log_tail),
-                     "activation_area_m2": math.exp(logarea)})
+                     "compact_tail_level":tail,
+                     "activation_area_m2":area})
     item = {**base, "shape": COMPACT_INDEPENDENT, "cohesive": cohesive}
     row = _evaluate(item)
     if not row.get("domain_pass"):
@@ -426,15 +441,16 @@ def _one_inverse(task: tuple[int, dict]) -> dict:
                       math.log(c["activation_area_m2"])])
     result = minimize(_inverse_objective, start, args=(base,), method="Nelder-Mead",
         options={"maxiter": 80, "xatol": 2e-3, "fatol": 2e-3})
-    optimized_rise=math.exp(result.x[0])
+    optimized_rise,optimized_drop,optimized_tail,optimized_area=_inverse_coordinates(result.x)
     final = dict(c); final.update({"compact_variant":"two_scale_tail",
         "compact_rise_fraction":optimized_rise,
-        "compact_drop_fraction":optimized_rise+(1.-optimized_rise)/
-            (1.+math.exp(-max(min(result.x[1],50.),-50.))),
-        "compact_tail_level":math.exp(result.x[2]),
-        "activation_area_m2":math.exp(result.x[3])})
+        "compact_drop_fraction":optimized_drop,
+        "compact_tail_level":optimized_tail,
+        "activation_area_m2":optimized_area})
     evaluated = _evaluate({**base, "candidate_id": f"R10_INVERSE_OPT_{index:03d}",
                            "shape": COMPACT_INDEPENDENT, "cohesive": final})
+    if not _inverse_bounds_pass(result.x,c["Gamma_ref_J_m2"]):
+        evaluated.update({"domain_pass":False,"rejection":"INVERSE_RESEARCH_BOUNDS"})
     evaluated.update({"optimizer_success": bool(result.success),
                       "optimizer_message": str(result.message),
                       "optimizer_evaluations": int(result.nfev),

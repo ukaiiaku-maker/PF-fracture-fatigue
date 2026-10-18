@@ -118,3 +118,16 @@ def test_registry_hcf_point_is_selected_from_cycle_integral(monkeypatch):
     assert chosen["chosen"]["opening_action_per_cycle"] == 1e-6
     assert chosen["target_action_per_cycle"] == 1e-6
     assert chosen["total_local_slope"] is not None
+
+
+def test_inverse_coordinates_cannot_leave_declared_research_bounds():
+    gamma=2.0
+    area=2.0e-19
+    valid=np.asarray([math.log(.01),math.log(.02/.98),math.log(.02),math.log(area)])
+    assert search._inverse_bounds_pass(valid,gamma)
+    too_small_rise=valid.copy();too_small_rise[0]=math.log(1e-5)
+    too_long_drop=valid.copy();too_long_drop[1]=math.log(.2/.8)
+    too_low_tail=valid.copy();too_low_tail[2]=math.log(1e-4)
+    assert not search._inverse_bounds_pass(too_small_rise,gamma)
+    assert not search._inverse_bounds_pass(too_long_drop,gamma)
+    assert not search._inverse_bounds_pass(too_low_tail,gamma)
