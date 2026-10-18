@@ -1,0 +1,88 @@
+{
+  "analytical": {
+    "allocated_materials": 8192,
+    "counts": {
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_athermal__MIXED_CONTROL_PREDICTED__OTHER_T_PREDICTED": 6,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_athermal__MIXED_CONTROL_PREDICTED__WEAK_T_PREDICTED": 17,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_athermal__OPENING_CONTROL_PREDICTED__OTHER_T_PREDICTED": 239,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_athermal__OPENING_CONTROL_PREDICTED__WEAK_T_PREDICTED": 763,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_athermal__PLASTICITY_CONTROL_PREDICTED__OTHER_T_PREDICTED": 751,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_athermal__PLASTICITY_CONTROL_PREDICTED__WEAK_T_PREDICTED": 2114,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_mixed__MIXED_CONTROL_PREDICTED__OTHER_T_PREDICTED": 6,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_mixed__MIXED_CONTROL_PREDICTED__WEAK_T_PREDICTED": 17,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_mixed__OPENING_CONTROL_PREDICTED__OTHER_T_PREDICTED": 239,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_mixed__OPENING_CONTROL_PREDICTED__WEAK_T_PREDICTED": 763,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_mixed__PLASTICITY_CONTROL_PREDICTED__OTHER_T_PREDICTED": 751,
+      "FIXED_COHESION_VARY_PLASTICITY__cohesive_mixed__PLASTICITY_CONTROL_PREDICTED__WEAK_T_PREDICTED": 2114,
+      "FIXED_PLASTICITY_VARY_COHESION__cohesive_athermal__PLASTICITY_CONTROL_PREDICTED__OTHER_T_PREDICTED": 1130,
+      "FIXED_PLASTICITY_VARY_COHESION__cohesive_athermal__PLASTICITY_CONTROL_PREDICTED__WEAK_T_PREDICTED": 2954,
+      "FIXED_PLASTICITY_VARY_COHESION__cohesive_mixed__PLASTICITY_CONTROL_PREDICTED__OTHER_T_PREDICTED": 1130,
+      "FIXED_PLASTICITY_VARY_COHESION__cohesive_mixed__PLASTICITY_CONTROL_PREDICTED__WEAK_T_PREDICTED": 2954,
+      "JOINT_COHESION_PLASTICITY__cohesive_athermal__MIXED_CONTROL_PREDICTED__OTHER_T_PREDICTED": 10,
+      "JOINT_COHESION_PLASTICITY__cohesive_athermal__MIXED_CONTROL_PREDICTED__WEAK_T_PREDICTED": 16,
+      "JOINT_COHESION_PLASTICITY__cohesive_athermal__OPENING_CONTROL_PREDICTED__OTHER_T_PREDICTED": 294,
+      "JOINT_COHESION_PLASTICITY__cohesive_athermal__OPENING_CONTROL_PREDICTED__WEAK_T_PREDICTED": 745,
+      "JOINT_COHESION_PLASTICITY__cohesive_athermal__PLASTICITY_CONTROL_PREDICTED__OTHER_T_PREDICTED": 818,
+      "JOINT_COHESION_PLASTICITY__cohesive_athermal__PLASTICITY_CONTROL_PREDICTED__WEAK_T_PREDICTED": 2057,
+      "JOINT_COHESION_PLASTICITY__cohesive_mixed__MIXED_CONTROL_PREDICTED__OTHER_T_PREDICTED": 10,
+      "JOINT_COHESION_PLASTICITY__cohesive_mixed__MIXED_CONTROL_PREDICTED__WEAK_T_PREDICTED": 16,
+      "JOINT_COHESION_PLASTICITY__cohesive_mixed__OPENING_CONTROL_PREDICTED__OTHER_T_PREDICTED": 294,
+      "JOINT_COHESION_PLASTICITY__cohesive_mixed__OPENING_CONTROL_PREDICTED__WEAK_T_PREDICTED": 745,
+      "JOINT_COHESION_PLASTICITY__cohesive_mixed__PLASTICITY_CONTROL_PREDICTED__OTHER_T_PREDICTED": 818,
+      "JOINT_COHESION_PLASTICITY__cohesive_mixed__PLASTICITY_CONTROL_PREDICTED__WEAK_T_PREDICTED": 2057
+    },
+    "designs": [
+      "FIXED_COHESION_VARY_PLASTICITY",
+      "FIXED_PLASTICITY_VARY_COHESION",
+      "JOINT_COHESION_PLASTICITY"
+    ],
+    "domain_valid_materials": 5957,
+    "evaluated_opening_arms": 23828,
+    "legacy_opening_clock_used": false,
+    "native_information_material_arms": 24,
+    "opening_transaction_semantics": "COMMITTED_SEPARATION_ONLY",
+    "schema": "r10.v2-current-opening-joint-search/1",
+    "source_registry_sha256": "a439d534a78a7e6aec2a9273dc08196c8963a57b6e9ca7b6606d532cec18b422",
+    "stage": "ANALYTICAL_COMPLETE"
+  },
+  "continuing_acquisition_arms": 12,
+  "discrepancy": {
+    "analytical_coordinate": "FINITE_COMPLIANCE_COMPLETION_COORDINATE",
+    "block1_cascade_min_factor": 1.14,
+    "block1_nonadvance_max_factor": 1.14,
+    "block1_role": "CALIBRATION_INFORMATION",
+    "block2_cascade_min_factor": 1.2,
+    "block2_nonadvance_max_factor": 1.35,
+    "block2_role": "HELD_OUT_REFINEMENT_CHECK",
+    "production_rate_transfer_fit_used": false
+  },
+  "execution": {
+    "developed_rate_points": 0,
+    "fatigue_cases": 48,
+    "fatigue_cycles_completed": 618,
+    "native_cases": 96,
+    "opening_arm_identities": 12,
+    "physical_material_vectors": 6,
+    "recurrent_growth_points": 0,
+    "same_time_cascade_points": 10,
+    "thermal_cases": 48,
+    "unsupported_crossover_points": 5
+  },
+  "joint_pareto": {
+    "decision": "NO_PARIS_PASS; RETAIN DIVERSE TRANSITION BRACKETS AND CONTINUE ACQUISITION",
+    "developed_rates_available": false,
+    "strict_passes": 0
+  },
+  "numerical_scope": {
+    "fatigue_cycles_limit": 16,
+    "interpretation": "NATIVE_INFORMATION_BLOCK; FINALISTS_REQUIRE_PHASE_AND_LATER-WINDOW_REFINEMENT",
+    "opening_phases": 8,
+    "plastic_phases": 4
+  },
+  "schema": "r10.v2-current-opening-joint-search-decision/1",
+  "thermal": {
+    "decision": "ANALYTICAL_TRENDS_RETAINED_AS_PREDICTIONS; NATIVE_0P98_1P02_BRACKETS_DID_NOT_REACH_COMMITMENT",
+    "native_events_in_endpoint_checks": 0,
+    "same_material_endpoint_checks": 48
+  }
+}
