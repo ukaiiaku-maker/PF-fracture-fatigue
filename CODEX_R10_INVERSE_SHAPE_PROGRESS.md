@@ -52,5 +52,23 @@
 8. Protocol holdouts, final restart audit, manifest, report, and archive remain
    active campaign work; they are not replaced by the intermediate frontier.
 
+## Discrepancy correction after the first compact HCF block
+
+- The first targeted compact registry was promoted with a peak-phase action,
+  not the complete waveform integral.  Its narrow metastable window occupied
+  only about 0.67% of a cycle, so 16--64 uniform midpoint phases could miss it
+  entirely and incorrectly report physical runout.
+- Production analytical selection now integrates intervals split exactly at
+  finite-compliance birth/fold crossings and differentiates that complete
+  cycle result.  The archived midpoint option remains only for declared
+  phase-grid reproduction.
+- Registry rows now carry cyclic action and accessible phase fraction.  The
+  HCF batch runner can raise phase count to a declared minimum number of
+  samples in that supported interval.  Existing coarse receipts are preserved
+  and will be classified from the ongoing 256/512-phase convergence, not
+  overwritten.
+- A fifth 32,768-vector analytical acquisition with the corrected cyclic
+  consumer is running; its selected state/native work will be a new identity.
+
 This file is the durable restart ledger. It is updated at scientifically meaningful
 checkpoints; queue creation by itself is not a completion condition.
