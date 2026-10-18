@@ -31,6 +31,18 @@ from scripts.run_r10_coupled_opening_search import reference_load
 from scripts.run_r10_opening_alternatives import mechanics, thermal_from
 
 
+def event_reachable(snapshot: dict, normalized_clock_per_cycle: float) -> bool:
+    """Use deterministic completion as well as the mixed survival clock.
+
+    Athermal arms have no hazard clock.  Their peak-load connected branch can
+    nevertheless already be mechanically complete, which the exact HCF
+    consumer commits on the corresponding phase.  Treating only a clock >= 1
+    as reachable incorrectly labels these arms quiet.
+    """
+    return (snapshot.get("branch_state") == "SEPARATION_COMPLETED" or
+            normalized_clock_per_cycle >= 1.)
+
+
 def write_csv(path: Path, rows: list[dict]) -> None:
     fields: list[str] = []
     for row in rows:
@@ -104,8 +116,10 @@ def task(payload: dict) -> dict:
         "tip_radius_m_initial": initial["tip_radius_m"], "tip_radius_m_final": final["tip_radius_m"],
         "separation_m_initial": initial["cohesive_separation_m"],
         "separation_m_final": final["cohesive_separation_m"],
-        "one_cycle_event_reachable": bool(first.normalized_clock_per_cycle >= 1.),
-        "second_cycle_event_reachable": bool(successor.normalized_clock_per_cycle >= 1.),
+        "one_cycle_event_reachable": event_reachable(
+            initial, float(first.normalized_clock_per_cycle)),
+        "second_cycle_event_reachable": event_reachable(
+            final, float(successor.normalized_clock_per_cycle)),
         "unsupported": bool(successor.engine._r10_czm_unsupported),
         "unsupported_validities": json.dumps(sorted(successor.engine._r10_czm_unsupported_validities)),
     }

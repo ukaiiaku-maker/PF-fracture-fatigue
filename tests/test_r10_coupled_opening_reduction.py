@@ -11,6 +11,7 @@ from arrhenius_fracture.czm_high_cycle_adapter_r10 import (
     CZMOwnedPersistentEngine, _integrate_czm, _lambda_czm, install_czm_owner,
 )
 from scripts.analyze_r10_coupled_opening_search import native_disposition
+from scripts.run_r10_12h_state_map import event_reachable
 
 
 def test_inactive_bilinear_reference_separates_cut_loss_and_discrete_screen():
@@ -209,3 +210,9 @@ def test_mixed_phase_duration_tracks_the_requested_frequency():
     engine=object.__new__(CZMOwnedPersistentEngine)
     install_czm_owner(engine,SimpleNamespace(),object(),2.,20,7,frequency_Hz=10.)
     assert engine._r10_czm_phase_duration_s == .005
+
+
+def test_state_map_counts_athermal_mechanical_completion_without_a_clock():
+    assert event_reachable({"branch_state": "SEPARATION_COMPLETED"}, 0.)
+    assert event_reachable({"branch_state": "BONDED_METASTABLE"}, 1.)
+    assert not event_reachable({"branch_state": "BONDED_STABLE"}, 0.)
