@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -27,6 +28,10 @@ from arrhenius_fracture.cohesive_arrhenius import (  # noqa: E402
 )
 from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY  # noqa: E402
 from arrhenius_fracture.fatigue_v1 import FatigueWaveform  # noqa: E402
+from arrhenius_fracture.developed_fatigue_r3 import _restore_geometry  # noqa: E402
+from arrhenius_fracture.persistent_site_high_cycle_checkpoint_v10230 import (  # noqa: E402
+    restore_checkpoint,
+)
 from arrhenius_fracture.persistent_site_high_cycle_state_v10230 import (  # noqa: E402
     restore_active_state, serialize_active_state,
 )
@@ -40,6 +45,14 @@ def atomic(path: Path, payload: dict) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n")
     tmp.replace(path)
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def evolve(engine, Kmax_MPa_sqrt_m: float, temperature_K: float,
@@ -143,6 +156,11 @@ def main(argv=None) -> int:
     p.add_argument("--phases", type=int, default=8)
     p.add_argument("--step-delta0", type=float, default=0.05)
     p.add_argument("--maximum-delta0", type=float, default=20.)
+    p.add_argument(
+        "--checkpoint-dir", type=Path,
+        help=("Consume an accepted current-HCF checkpoint, including its outer "
+              "crack geometry, instead of regenerating a short cyclic state."),
+    )
     p.add_argument("--out", type=Path, required=True)
     args = p.parse_args(argv)
     args.out.mkdir(parents=True, exist_ok=True)
@@ -154,12 +172,48 @@ def main(argv=None) -> int:
         args.registry, args.candidate_id, execution_identity=COHESIVE_KINETIC_CZM)
     engine = build_cohesive_current_engine(binding, kernel_family_path=R4_KERNEL_FAMILY)
     initial = serialize_active_state(engine)
-    history = evolve(engine, args.Kmax, args.temperature_K, args.cycles, args.phases)
+    checkpoint_receipt = None
+    if args.checkpoint_dir is not None:
+        manifest = args.checkpoint_dir / "high_cycle_live_checkpoint.json"
+        state_file = args.checkpoint_dir / "high_cycle_live_state.npz"
+        checkpoint_payload = json.loads(manifest.read_text())
+        checkpoint_metadata = checkpoint_payload.get("metadata", {})
+        checkpoint_candidate = checkpoint_metadata.get("candidate_id")
+        checkpoint_hash = checkpoint_metadata.get("complete_row_sha256")
+        checkpoint_temperature = checkpoint_payload.get(
+            "temperature_K", checkpoint_metadata.get("temperature_K"))
+        if checkpoint_candidate != args.candidate_id:
+            raise RuntimeError("checkpoint candidate differs from requested material")
+        if checkpoint_hash not in (None, row["complete_row_sha256"]):
+            raise RuntimeError("checkpoint material hash differs from registry row")
+        if (checkpoint_temperature is not None and
+                not math.isclose(float(checkpoint_temperature),
+                                 args.temperature_K, rel_tol=0., abs_tol=1e-12)):
+            raise RuntimeError("checkpoint temperature differs from requested transfer")
+        _restore_geometry(engine, args.checkpoint_dir)
+        restore_checkpoint(engine, args.checkpoint_dir)
+        checkpoint_receipt = {
+            "directory": str(args.checkpoint_dir),
+            "manifest_sha256": sha256(manifest),
+            "state_sha256": sha256(state_file),
+            "reason": checkpoint_payload.get("reason"),
+            "accepted_cycles": checkpoint_metadata.get("accepted_cycles"),
+            "candidate_id": checkpoint_candidate,
+            "complete_row_sha256": checkpoint_hash,
+            "phase_count": checkpoint_metadata.get("phase_count"),
+            "hazard_seed": checkpoint_metadata.get("hazard_seed"),
+            "geometry_signature": checkpoint_payload.get("geometry_signature"),
+        }
+        history = []
+    else:
+        history = evolve(engine, args.Kmax, args.temperature_K, args.cycles, args.phases)
     developed = serialize_active_state(engine)
 
     # Prove that the saved developed state is exactly restorable before it is
     # used to generate the coupling observable.
     replay = build_cohesive_current_engine(binding, kernel_family_path=R4_KERNEL_FAMILY)
+    if args.checkpoint_dir is not None:
+        _restore_geometry(replay, args.checkpoint_dir)
     restore_active_state(replay, developed)
     replay_state = serialize_active_state(replay)
     exact_restore = bool(np.array_equal(developed.vector, replay_state.vector))
@@ -173,6 +227,10 @@ def main(argv=None) -> int:
     # discrepancy avoids inventing a line-count-to-eigenstrain conversion.
     reference = build_cohesive_current_engine(
         binding, kernel_family_path=R4_KERNEL_FAMILY)
+    if args.checkpoint_dir is not None:
+        # Compare A0 and developed plastic states at the identical advanced
+        # crack geometry; geometry itself is not a plastic closing traction.
+        _restore_geometry(reference, args.checkpoint_dir)
     applied_K = args.Kmax * 1e6
     sigma_A0 = float(reference.sigma_tip(applied_K))
     sigma_current = float(replay.sigma_tip(applied_K))
@@ -200,8 +258,11 @@ def main(argv=None) -> int:
         "paired_plasticity_sha256": row["parent_complete_row_sha256"],
         "temperature_K": args.temperature_K,
         "Kmax_MPa_sqrt_m": args.Kmax,
-        "cycles": args.cycles,
-        "phases_per_cycle": args.phases,
+        "cycles": None if checkpoint_receipt else args.cycles,
+        "phases_per_cycle": None if checkpoint_receipt else args.phases,
+        "state_origin": ("ACCEPTED_HCF_CHECKPOINT" if checkpoint_receipt
+                         else "LOCAL_SHORT_CYCLE_EVOLUTION"),
+        "checkpoint_receipt": checkpoint_receipt,
         "shape": args.shape,
         "state_restore_bit_exact": exact_restore,
         "state_vector_size": int(developed.vector.size),

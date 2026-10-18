@@ -177,12 +177,26 @@ def main(argv=None):
     thermal = thermal_rows(args.campaign)
     developed = [r for r in native + hcf if r["developed_rate_m_per_cycle"] not in (None, "", 0, 0.)]
     state_sources = set()
+    state_complete = set()
+    state_cohesive = set()
+    state_plasticity = set()
+    state_shapes = set()
+    state_modes = set()
     state_rows = 0
     for path in args.campaign.rglob("*state_map*.csv"):
         with path.open(newline="") as stream:
             mapped = list(csv.DictReader(stream))
         state_rows += len(mapped)
         state_sources.update(r.get("source_material_candidate_id") for r in mapped)
+        state_complete.update(r.get("complete_row_sha256") for r in mapped)
+        state_cohesive.update(r.get("cohesive_parameter_sha256") for r in mapped)
+        state_plasticity.update(r.get("plasticity_physics_sha256") for r in mapped)
+        state_shapes.update(r.get("shape") or r.get("selected_shape") for r in mapped)
+        state_modes.update(r.get("mode") or r.get("selected_mode") for r in mapped)
+    for values in (state_sources, state_complete, state_cohesive,
+                   state_plasticity, state_shapes, state_modes):
+        values.discard(None)
+        values.discard("")
     native_sources = {r["source_material_candidate_id"] for r in native if r["source_material_candidate_id"]}
     protocols = {(r["temperature_K"], r["R"], r["frequency_Hz"]) for r in hcf}
     cheap = read_json(args.campaign / "acquisition_round_0_1024" / "analytical_summary.json")
@@ -193,6 +207,11 @@ def main(argv=None):
         "cheap_opening_arms": cheap["evaluated_opening_arms"],
         "state_map_records": state_rows,
         "state_informed_physical_vectors": len(state_sources),
+        "state_informed_execution_identity_hashes": len(state_complete),
+        "state_informed_cohesive_vectors": len(state_cohesive),
+        "state_informed_plasticity_vectors": len(state_plasticity),
+        "state_informed_shapes": len(state_shapes),
+        "state_informed_opening_modes": len(state_modes),
         "native_result_files": len(native),
         "native_physical_vectors": len(native_sources),
         "native_execution_identities": len({r["candidate_id"] for r in native}),

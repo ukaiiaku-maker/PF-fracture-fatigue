@@ -134,6 +134,37 @@ def slope_rows(rows):
     return output
 
 
+def replicate_rows(rows):
+    """Report observed independent-stream ranges without implying confidence."""
+    groups = {}
+    for row in rows:
+        rate = row.get("developed_rate_m_per_cycle")
+        amplitude = row.get("DeltaK_MPa_sqrt_m")
+        if rate in (None, "", 0, 0.) or amplitude in (None, ""):
+            continue
+        key = (row["candidate_id"], row["temperature_K"], row["R"],
+               row["frequency_Hz"], row["plastic_feedback_reference"],
+               float(amplitude))
+        groups.setdefault(key, []).append(row)
+    output = []
+    for key, group in sorted(groups.items()):
+        if len(group) < 2:
+            continue
+        rates = sorted(float(row["developed_rate_m_per_cycle"]) for row in group)
+        output.append({
+            "candidate_id": key[0], "temperature_K": key[1], "R": key[2],
+            "frequency_Hz": key[3], "plastic_feedback_reference": key[4],
+            "DeltaK_MPa_sqrt_m": key[5], "independent_streams": len(rates),
+            "observed_rate_min_m_per_cycle": rates[0],
+            "observed_rate_median_m_per_cycle": median(rates),
+            "observed_rate_max_m_per_cycle": rates[-1],
+            "observed_max_over_min": rates[-1] / rates[0],
+            "bound_interpretation": "OBSERVED_STREAM_RANGE; NOT_A_CONFIDENCE_INTERVAL",
+            "result_paths": ";".join(sorted(row["result_path"] for row in group)),
+        })
+    return output
+
+
 def thermal_rows(campaign: Path):
     output = []
     for summary in sorted(campaign.glob("thermal_ramps_*/ramp_dispositions.csv")):
@@ -208,10 +239,21 @@ def restart_rows(campaign: Path):
                 float(result.get("accepted_cycles", 0.)) >= float(progress.get("accepted_cycles", 0.))):
             continue
         rows.append({
-            "candidate_id": result.get("candidate_id"),
+            "candidate_id": (progress.get("candidate_id") or
+                             result.get("candidate_id")),
+            "complete_row_sha256": (progress.get("complete_row_sha256") or
+                                    result.get("complete_row_sha256")),
             "accepted_cycles": progress.get("accepted_cycles"),
             "events": len(progress.get("events", [])),
-            "declared_horizon_cycles": result.get("exposure_target_cycles"),
+            "declared_horizon_cycles": (progress.get("horizon") or
+                                        result.get("exposure_target_cycles")),
+            "temperature_K": progress.get("temperature_K", result.get("temperature_K")),
+            "R": progress.get("R", result.get("R")),
+            "frequency_Hz": progress.get("frequency_Hz", result.get("frequency_Hz")),
+            "reference_factor": progress.get("factor", result.get("reference_factor")),
+            "phase_count": progress.get("phase_count", result.get("phase_count")),
+            "hazard_seed": progress.get("hazard_seed", result.get("hazard_seed")),
+            "plastic_feedback": progress.get("plastic_feedback"),
             "last_result_disposition": result.get("disposition"),
             "checkpoint_path": str(checkpoint),
         })
@@ -250,6 +292,7 @@ def main(argv=None) -> int:
     native_events = [event_metrics(path, result) for path, result in native_items]
     write(args.out / "event_waiting_and_windows.csv", events)
     write(args.out / "local_developed_slopes.csv", slope_rows(events + native_events))
+    write(args.out / "replicate_rate_bounds.csv", replicate_rows(events + native_events))
     write(args.out / "thermal_classification.csv", thermal_rows(args.campaign))
     comparisons = mechanism_comparisons(args.campaign)
     write(args.out / "matched_plastic_feedback_event_comparison.csv", comparisons)

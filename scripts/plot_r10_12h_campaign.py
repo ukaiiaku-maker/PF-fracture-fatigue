@@ -65,6 +65,14 @@ def fatigue_plot(analysis: Path, out: Path):
 
 
 def growth_history_plot(campaign: Path, out: Path):
+    representative_factors = {
+        "R10F_V2_17780__MS": {1.0375, 1.0525, 1.075},
+        "R10F_V2_28475__MS": {1.0025, 1.01, 1.02},
+        "R10F_V2_22871__MS": {1.01, 1.02, 1.04},
+        "R10F_V2_01796__MS": {1.01, 1.03},
+        "R10F_V2_00116__MS": {1.00001, 1.005, 1.01},
+        "R10F_V2_11566__MS": {1.06, 1.1},
+    }
     patterns = (
         "hcf_round_3_17780_developed/*/result.json",
         "hcf_round_5_28340_developed/*/result.json",
@@ -82,21 +90,68 @@ def growth_history_plot(campaign: Path, out: Path):
     paths = []
     for pattern in patterns:
         paths.extend(campaign.glob(pattern))
-    fig, ax = plt.subplots(figsize=(6.4, 4.4))
+    fig, ax = plt.subplots(figsize=(7.8, 4.8))
+    plotted = set()
     for path in sorted(paths):
         result = load_effective(path)
         events = result.get("events", [])
         if not events:
             continue
+        candidate = result["candidate_id"]
+        factor = float(result["reference_factor"])
+        if (candidate not in representative_factors or
+                not any(math.isclose(factor, value, rel_tol=0., abs_tol=1e-10)
+                        for value in representative_factors[candidate])):
+            continue
+        key = (candidate, round(factor, 8))
+        if key in plotted:
+            continue
+        plotted.add(key)
         ax.step([max(float(row["cycle"]), 1e-12) for row in events],
                 [1e6 * float(row["extension_m"]) for row in events], where="post",
-                linewidth=1., label=f"{result['candidate_id']} f={float(result['reference_factor']):g}")
+                linewidth=1.1, label=f"{candidate} f={factor:g}")
     ax.set_xscale("log")
     ax.set_xlabel("accepted cycles, N")
     ax.set_ylabel(r"crack extension, $\Delta a$ ($\mu$m)")
-    if paths:
-        ax.legend(fontsize=6, frameon=False, ncol=2)
+    if plotted:
+        ax.legend(fontsize=6.5, frameon=False, loc="upper left",
+                  bbox_to_anchor=(1.01, 1.))
     save(fig, out / "crack_extension_histories.png")
+
+
+def long_exposure_history_plot(campaign: Path, out: Path):
+    paths = (
+        campaign / ("hcf_round_1_block_2/R10F_V2_22871__MS/"
+                    "T_300__R_0.1__Hz_1000/f_1.0100/result.json"),
+        campaign / "hcf_round_32_state_active_11566/f_1.06/result.json",
+    )
+    fig, ax = plt.subplots(figsize=(6.4, 4.4))
+    plotted = False
+    for path in paths:
+        if not path.is_file():
+            continue
+        result = load_effective(path)
+        events = result.get("events", [])
+        if not events:
+            continue
+        cycles = [max(float(row["cycle"]), 1e-12) for row in events]
+        extensions = [1e6 * float(row["extension_m"]) for row in events]
+        accepted = float(result.get("accepted_cycles", cycles[-1]))
+        if accepted > cycles[-1]:
+            cycles.append(accepted)
+            extensions.append(extensions[-1])
+        label = (f"{result['candidate_id']} f="
+                 f"{float(result['reference_factor']):g}")
+        ax.step(cycles, extensions, where="post", linewidth=1.3, label=label)
+        plotted = True
+    if not plotted:
+        plt.close(fig)
+        return
+    ax.set_xscale("log")
+    ax.set_xlabel("accepted cycles, N")
+    ax.set_ylabel(r"crack extension, $\Delta a$ ($\mu$m)")
+    ax.legend(fontsize=7, frameon=False)
+    save(fig, out / "long_exposure_hcf_and_arrest.png")
 
 
 def local_slope_plot(analysis: Path, out: Path):
@@ -404,6 +459,7 @@ def main(argv=None) -> int:
     fatigue_plot(args.analysis, args.out)
     local_slope_plot(args.analysis, args.out)
     growth_history_plot(args.campaign, args.out)
+    long_exposure_history_plot(args.campaign, args.out)
     thermal_plot(args.campaign, args.out)
     thermal_mechanism_plot(args.campaign, args.out)
     mechanism_plot(args.analysis, args.out)

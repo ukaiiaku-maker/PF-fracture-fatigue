@@ -81,6 +81,9 @@ def main(argv=None) -> int:
         entries.append((path, Path("evidence") / relative))
     for path in sources:
         entries.append((path, Path("source_snapshot") / path.relative_to(ROOT)))
+    verifier = ROOT / "scripts" / "verify_r10_12h_campaign_archive.py"
+    if verifier.is_file():
+        entries.append((verifier, Path("VERIFY_ARCHIVE.py")))
     # Deduplicate archive names while preserving the evidence copy of a report.
     unique = {str(archive): (path, archive) for path, archive in entries}
     entries = [unique[key] for key in sorted(unique)]
