@@ -5,7 +5,9 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 from pathlib import Path
+from statistics import median
 
 import matplotlib.pyplot as plt
 
@@ -37,14 +39,23 @@ def fatigue_plot(analysis: Path, out: Path):
     fig, ax = plt.subplots(figsize=(6.4, 4.4))
     groups = {}
     for row in rows:
+        reference = row.get("plastic_feedback_reference") or "NATIVE_FULL_STATE"
         label = (f"{row['candidate_id']} | T={float(row['temperature_K']):g} K, "
-                 f"R={float(row['R']):g}, f={float(row['frequency_Hz']):g} Hz")
+                 f"R={float(row['R']):g}, f={float(row['frequency_Hz']):g} Hz | "
+                 f"{reference}")
         groups.setdefault(label, []).append(row)
     for label, group in groups.items():
-        group.sort(key=lambda row: float(row["DeltaK_MPa_sqrt_m"]))
-        ax.plot([float(row["DeltaK_MPa_sqrt_m"]) for row in group],
-                [float(row["developed_rate_m_per_cycle"]) for row in group],
-                marker="o", linewidth=1.2, label=label)
+        by_amplitude = {}
+        for row in group:
+            by_amplitude.setdefault(float(row["DeltaK_MPa_sqrt_m"]), []).append(
+                float(row["developed_rate_m_per_cycle"]))
+        x, y, low, high = [], [], [], []
+        for amplitude, rates in sorted(by_amplitude.items()):
+            center = median(rates)
+            x.append(amplitude); y.append(center)
+            low.append(center - min(rates)); high.append(max(rates) - center)
+        ax.errorbar(x, y, yerr=[low, high], marker="o", linewidth=1.2,
+                    capsize=2, label=label)
     ax.set_yscale("log")
     ax.set_xlabel(r"$\Delta K$ (MPa $\sqrt{\mathrm{m}}$)")
     ax.set_ylabel(r"developed $da/dN$ (m cycle$^{-1}$)")
@@ -58,6 +69,9 @@ def growth_history_plot(campaign: Path, out: Path):
         "hcf_round_3_17780_developed/*/result.json",
         "hcf_round_5_28340_developed/*/result.json",
         "hcf_seed_replicates_17780/*/result.json",
+        "hcf_round_17_smooth_mixed_28475/**/result.json",
+        "hcf_round_18_smooth_mixed_28475_dense/*/result.json",
+        "hcf_seed_replicates_28475/*/result.json",
     )
     paths = []
     for pattern in patterns:
@@ -77,6 +91,33 @@ def growth_history_plot(campaign: Path, out: Path):
     if paths:
         ax.legend(fontsize=6, frameon=False, ncol=2)
     save(fig, out / "crack_extension_histories.png")
+
+
+def local_slope_plot(analysis: Path, out: Path):
+    """Plot every adjacent developed-window secant without regression averaging."""
+    rows = read_csv(analysis / "local_developed_slopes.csv")
+    if not rows:
+        return
+    fig, ax = plt.subplots(figsize=(6.4, 4.4))
+    groups = {}
+    for row in rows:
+        key = (row["candidate_id"], row.get("temperature_K"), row.get("R"),
+               row.get("frequency_Hz"), row.get("plastic_feedback_reference"))
+        groups.setdefault(key, []).append(row)
+    for key, group in groups.items():
+        group.sort(key=lambda row: float(row["DeltaK_low_MPa_sqrt_m"]))
+        x = [math.sqrt(float(row["DeltaK_low_MPa_sqrt_m"]) *
+                       float(row["DeltaK_high_MPa_sqrt_m"])) for row in group]
+        y = [float(row["local_log_slope"]) for row in group]
+        label = (f"{key[0]} | T={float(key[1]):g} K, R={float(key[2]):g}, "
+                 f"f={float(key[3]):g} Hz | {key[4]}")
+        ax.plot(x, y, marker="o", linewidth=1.1, label=label)
+    ax.axhspan(3.4, 4.6, color="tab:green", alpha=.15, label="strict target")
+    ax.set_yscale("symlog", linthresh=5.)
+    ax.set_xlabel(r"geometric-mean $\Delta K$ (MPa $\sqrt{\mathrm{m}}$)")
+    ax.set_ylabel("adjacent local log slope")
+    ax.legend(fontsize=5.5, frameon=False)
+    save(fig, out / "adjacent_local_slopes.png")
 
 
 def thermal_plot(campaign: Path, out: Path):
@@ -233,6 +274,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     args.out.mkdir(parents=True, exist_ok=True)
     fatigue_plot(args.analysis, args.out)
+    local_slope_plot(args.analysis, args.out)
     growth_history_plot(args.campaign, args.out)
     thermal_plot(args.campaign, args.out)
     thermal_mechanism_plot(args.campaign, args.out)
