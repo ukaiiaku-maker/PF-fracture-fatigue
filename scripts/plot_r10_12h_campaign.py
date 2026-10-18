@@ -177,6 +177,54 @@ def state_plot(campaign: Path, out: Path):
     save(fig, out / "matched_state_histories.png")
 
 
+def athermal_transition_plot(campaign: Path, out: Path):
+    """Keep runouts, arrested increments, and cascades visually distinct."""
+    wanted = {"R10F_V2_06081__AB", "R10F_V2_21280__AB"}
+    points = {}
+    for pattern in ("hcf_round_9_athermal_new/*/*/*/result.json",
+                    "hcf_round_12_athermal_brackets_*/*/*/*/result.json",
+                    "hcf_round_13_athermal_renewal_*/*/*/*/result.json"):
+        for path in campaign.glob(pattern):
+            result = load_effective(path)
+            if result.get("candidate_id") not in wanted:
+                continue
+            key = (result["candidate_id"], float(result["reference_factor"]))
+            if key not in points or float(result["accepted_cycles"]) > float(
+                    points[key]["accepted_cycles"]):
+                points[key] = result
+    if not points:
+        return
+    styles = {
+        "runout": ("o", "none"),
+        "arrested one-cell increment": ("^", "tab:orange"),
+        "single-excursion cascade": ("X", "tab:red"),
+    }
+    colors = {"R10F_V2_06081__AB": "tab:blue", "R10F_V2_21280__AB": "tab:green"}
+    fig, ax = plt.subplots(figsize=(6.4, 4.4))
+    labels = set()
+    for (candidate, factor), result in sorted(points.items()):
+        events = len(result.get("events", []))
+        if events == 0:
+            category = "runout"
+        elif events == 1:
+            category = "arrested one-cell increment"
+        else:
+            category = "single-excursion cascade"
+        marker, fill = styles[category]
+        label = f"{candidate} — {category}"
+        edge = colors[candidate]
+        ax.scatter([factor], [max(float(result["accepted_cycles"]), 1e-6)],
+                   marker=marker, s=55, facecolors=fill if fill != "none" else "none",
+                   edgecolors=edge, linewidths=1.2,
+                   label=label if label not in labels else None)
+        labels.add(label)
+    ax.set_yscale("log")
+    ax.set_xlabel("reference-load factor")
+    ax.set_ylabel("accepted cycles before disposition")
+    ax.legend(fontsize=6.5, frameon=False, ncol=2)
+    save(fig, out / "athermal_bilinear_transition_map.png")
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--campaign", type=Path, required=True)
@@ -190,6 +238,7 @@ def main(argv=None) -> int:
     thermal_mechanism_plot(args.campaign, args.out)
     mechanism_plot(args.analysis, args.out)
     state_plot(args.campaign, args.out)
+    athermal_transition_plot(args.campaign, args.out)
     return 0
 
 
