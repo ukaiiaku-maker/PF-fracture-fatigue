@@ -6,6 +6,7 @@ import argparse
 from concurrent.futures import ProcessPoolExecutor,as_completed
 import csv
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -28,6 +29,14 @@ def task_run(task:dict)->dict:
         max_wall_s=task["max_wall_s"],plastic_feedback=task["plastic_feedback"])
 
 
+def resolved_phase_count(row:dict,base:int,minimum_samples:int,maximum:int)->int:
+    fraction=float(row.get("predicted_hcf_accessible_phase_fraction") or 0.)
+    if minimum_samples <= 0 or fraction <= 0.:
+        return int(base)
+    needed=math.ceil(int(minimum_samples)/fraction)
+    return min(int(maximum),max(int(base),needed))
+
+
 def main(argv=None)->int:
     parser=argparse.ArgumentParser();parser.add_argument("--registry",type=Path,required=True)
     parser.add_argument("--out",type=Path,required=True);parser.add_argument("--workers",type=int,default=8)
@@ -36,6 +45,9 @@ def main(argv=None)->int:
     parser.add_argument("--amplitude-multipliers",default="1.0")
     parser.add_argument("--horizon",type=float,default=1e8);parser.add_argument("--max-wall-s",type=float,default=900.)
     parser.add_argument("--phases",type=int,default=16);parser.add_argument("--temperature-K",type=float,default=300.)
+    parser.add_argument("--minimum-accessible-phase-samples",type=int,default=0,
+        help="raise the uniform phase count from registry accessibility support")
+    parser.add_argument("--maximum-auto-phases",type=int,default=4096)
     parser.add_argument("--R",type=float,default=.1);parser.add_argument("--frequency-Hz",type=float,default=1000.)
     parser.add_argument("--path-limit-um",type=float,default=120.);parser.add_argument("--seed",type=int,default=20261018)
     parser.add_argument("--frozen-initial-plastic-state",action="store_true")
@@ -51,12 +63,14 @@ def main(argv=None)->int:
     for index,row in enumerate(rows):
         reference,_=reference_load(row,args.temperature_K,args.phases)
         predicted=float(row.get("predicted_hcf_K_300K") or row["predicted_Kaccess_300K"])
+        task_phases=resolved_phase_count(row,args.phases,
+            args.minimum_accessible_phase_samples,args.maximum_auto_phases)
         for j,multiplier in enumerate(multipliers):
             desired=predicted*multiplier;label=f"m_{multiplier:.5f}".replace(".","p")
             tasks.append({"registry":str(args.registry),"candidate_id":row["candidate_id"],
                 "factor":desired/reference,"desired_Kmax":desired,"horizon":args.horizon,
                 "out":str(args.out/row["candidate_id"]/label),"seed":args.seed+1000*index+j,
-                "phases":args.phases,"temperature_K":args.temperature_K,"R":args.R,
+                "phases":task_phases,"temperature_K":args.temperature_K,"R":args.R,
                 "frequency_Hz":args.frequency_Hz,"path_limit_um":args.path_limit_um,
                 "max_wall_s":args.max_wall_s,
                 "plastic_feedback":not args.frozen_initial_plastic_state})
@@ -69,6 +83,7 @@ def main(argv=None)->int:
             except Exception as exc:result={};error=f"{type(exc).__name__}: {exc}"
             summary={"candidate_id":task["candidate_id"],"desired_Kmax_MPa_sqrt_m":task["desired_Kmax"],
                 "temperature_K":task["temperature_K"],"R":task["R"],"frequency_Hz":task["frequency_Hz"],
+                "phase_count":task["phases"],
                 "accepted_cycles":result.get("accepted_cycles"),"accepted_seconds":result.get("accepted_seconds"),
                 "physical_event_count":result.get("physical_event_count"),"advance_m":result.get("advance_m"),
                 "developed_rate_m_per_cycle":result.get("developed_rate_m_per_cycle"),

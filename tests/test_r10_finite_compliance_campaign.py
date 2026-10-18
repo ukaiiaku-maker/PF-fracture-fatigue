@@ -1,6 +1,7 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import hcf_rows, native_rows
+from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
 
 
 def test_campaign_aggregation_preserves_complete_material_identity(tmp_path):
@@ -32,3 +33,10 @@ def test_campaign_hcf_aggregation_requires_native_schema(tmp_path):
     assert len(rows) == 1
     assert rows[0]["candidate_id"] == "CAND"
     assert rows[0]["accepted_cycles"] == 1e8
+
+
+def test_hcf_phase_resolution_uses_accessible_cycle_fraction():
+    row = {"predicted_hcf_accessible_phase_fraction": "0.0067"}
+    assert resolved_phase_count(row, 16, 4, 4096) == 598
+    assert resolved_phase_count(row, 16, 0, 4096) == 16
+    assert resolved_phase_count({}, 16, 4, 4096) == 16

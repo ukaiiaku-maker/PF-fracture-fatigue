@@ -337,7 +337,10 @@ def analytical(args) -> int:
             hcf_action=float(hcf_point["opening_action_per_cycle"])
             hcf_slope=cyclic_point.get("total_local_slope")
             accessible_phases=int(hcf_point["accessible_phase_count"])
-            selection_basis="FROZEN_WAVEFORM_INTEGRAL_32_PHASE"
+            accessible_fraction=float(hcf_point.get("accessible_phase_fraction") or 0.)
+            selection_basis="FROZEN_MOVING_BOUNDARY_GAUSS_32_ORDER"
+        if hcf_point is None:
+            accessible_fraction=0.
         cid = metric["candidate_id"]+"__"+({SMOOTH_EXPONENTIAL:"S",
             BILINEAR:"B", COMPACT_INDEPENDENT:"C"}[item["shape"]])+"M"
         row = dict(source)
@@ -355,6 +358,7 @@ def analytical(args) -> int:
             "predicted_hcf_peak_action_per_cycle":peak_hcf_point["events_per_cycle_peak_rate"],
             "predicted_hcf_local_slope":hcf_slope,
             "predicted_hcf_accessible_phases":accessible_phases,
+            "predicted_hcf_accessible_phase_fraction":accessible_fraction,
             "predicted_hcf_selection_basis":selection_basis,
             "thermal_prediction": metric["thermal_prediction"],
             "mechanism_prediction": metric["mechanism_prediction"]})
