@@ -64,9 +64,11 @@ def _stationary(imposed_m: float, environment_stiffness_Pa_per_m: float,
         grid = np.r_[0., positive]
     else:
         span = max(cutoff * 1.001, imposed + .05 * cutoff)
-        if shape == COMPACT_INDEPENDENT and thermal.compact_variant == "rounded_plateau":
+        if shape == COMPACT_INDEPENDENT and thermal.compact_variant in {
+                "rounded_plateau","two_scale_tail"}:
             rise=thermal.compact_rise_fraction*cutoff
-            fall=thermal.compact_fall_fraction*cutoff
+            fall=(thermal.compact_fall_fraction if thermal.compact_variant=="rounded_plateau"
+                  else thermal.compact_drop_fraction)*cutoff
             segment=max(points//4,33)
             grid=np.unique(np.r_[np.linspace(0.,rise,segment),
                 np.linspace(rise,fall,2*segment),np.linspace(fall,cutoff,segment),
@@ -209,7 +211,13 @@ def metastable_window(shape: str, thermal: CohesiveThermalLaw,
         return {"state": "NO_METASTABLE_WINDOW", "extrema": extrema,
                 "birth_load_Pa": None, "fold_load_Pa": None,
                 "load_ratio": None}
-    fold, birth = maxima[0], minima[-1]
+    # The connected bonded basin loses stability at the first maximum.  The
+    # first following minimum is where its directly adjacent separated branch
+    # is born; later extrema belong to secondary tail branches and must not
+    # silently replace that accessibility window.
+    fold = maxima[0]
+    birth = next((point for point in minima
+                  if point["separation_m"] > fold["separation_m"]), minima[0])
     valid = 0. < float(birth["load_Pa"]) < float(fold["load_Pa"])
     return {"state": "METASTABLE_WINDOW" if valid else "NO_METASTABLE_WINDOW",
             "birth_load_Pa": birth["load_Pa"], "fold_load_Pa": fold["load_Pa"],

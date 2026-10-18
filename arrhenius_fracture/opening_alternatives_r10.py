@@ -73,11 +73,12 @@ def _root_landscape(imposed: float, kenv: float, thermal: CohesiveThermalLaw,
         compact_span = (compact_law.final_separation(temperature)
                         if compact_law is not None else 25.0*thermal.delta0_m)
         span = max(compact_span*1.05, imposed+10.0*thermal.delta0_m)
-        if (compact_law is not None and
-                thermal.compact_variant == "rounded_plateau"):
+        if (compact_law is not None and thermal.compact_variant in
+                {"rounded_plateau","two_scale_tail"}):
             dc=compact_law.final_separation(temperature)
             rise=thermal.compact_rise_fraction*dc
-            fall=thermal.compact_fall_fraction*dc
+            fall=(thermal.compact_fall_fraction if thermal.compact_variant=="rounded_plateau"
+                  else thermal.compact_drop_fraction)*dc
             grid=np.unique(np.r_[np.linspace(0.,rise,129),
                 np.linspace(rise,fall,257),np.linspace(fall,dc,129),
                 np.linspace(dc,span,65)])

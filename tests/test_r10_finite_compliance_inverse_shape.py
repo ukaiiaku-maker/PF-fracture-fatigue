@@ -66,3 +66,13 @@ def test_rounded_plateau_analytical_and_native_landscapes_agree():
     checked = connected_barrier(imposed, kenv, thermal, 300.,
                                 COMPACT_INDEPENDENT, verify_quadrature=True)
     assert checked["barrier_quadrature_relative_error"] < 1e-8
+
+
+def test_two_scale_tail_releases_a_broad_finite_compliance_window():
+    thermal = CohesiveThermalLaw(2., 15e9, 0., compact_variant="two_scale_tail",
+        compact_rise_fraction=.001, compact_drop_fraction=.003,
+        compact_tail_level=.035)
+    kenv=15e9**2/(2.*2.)
+    window=metastable_window(COMPACT_INDEPENDENT,thermal,300.,kenv)
+    assert window["state"] == "METASTABLE_WINDOW"
+    assert float(window["load_ratio"]) > 5.

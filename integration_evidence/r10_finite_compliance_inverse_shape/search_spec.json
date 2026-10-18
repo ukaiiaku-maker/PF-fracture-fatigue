@@ -20,9 +20,12 @@
   },
   "compact_research_bounds": {
     "potential": "rounded compact single-hump potential integrated from one C1 traction law",
-    "rise_fraction": [0.01, 0.25],
+    "rise_fraction": [0.0005, 0.05],
     "fall_fraction": [0.6, 0.99],
     "plateau_drop": [0.005, 0.3],
+    "two_scale_tail_rise_fraction": [0.0005, 0.05],
+    "two_scale_tail_drop_end_fraction": ["rise+0.001*(1-rise)", "rise+0.08*(1-rise)"],
+    "two_scale_tail_level": [0.005, 0.3],
     "status": "conditional opt-in research range; not experimental validation or canonical promotion"
   },
   "mechanics": {

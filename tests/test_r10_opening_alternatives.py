@@ -51,6 +51,22 @@ def test_compact_rounded_plateau_is_normalized_smooth_and_single_peak():
     assert tangent[0] > 0.
 
 
+def test_compact_two_scale_tail_is_normalized_and_single_peak():
+    thermal = CohesiveThermalLaw(2.5, 20e9, 2e-4,
+        compact_variant="two_scale_tail", compact_rise_fraction=.005,
+        compact_drop_fraction=.02, compact_tail_level=.04)
+    compact = CompactIndependentCohesiveLaw(thermal)
+    cutoff = compact.final_separation(300.)
+    grid = np.linspace(0., cutoff, 50001)
+    traction, tangent, work = cohesive_shape_response(
+        COMPACT_INDEPENDENT, grid, thermal, 300.)
+    assert np.isclose(np.max(traction), 20e9, rtol=3e-6)
+    assert np.isclose(np.trapezoid(traction, grid), 2.5, rtol=1e-6)
+    assert np.isclose(work[-1], 2.5, rtol=1e-13)
+    assert np.all(np.diff(traction[np.argmax(traction):]) <= 1e-3)
+    assert tangent[0] > 0.
+
+
 def test_bilinear_matches_exponential_work_peak_and_initial_stiffness():
     thermal=law();bilinear=BilinearCohesiveLaw(thermal);T=300.0
     dp=bilinear.peak_separation(T);df=bilinear.final_separation(T)

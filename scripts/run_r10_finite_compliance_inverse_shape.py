@@ -76,10 +76,14 @@ def _candidate(index: int, point: np.ndarray, sources: list[dict]) -> dict:
     entropy = span_fraction*gamma/900.
     b = _log(point[5], 1., 24.)
     c = -.8+point[6]*12.8
-    rise = _log(point[7], .01, .25)
+    rise = _log(point[7], .0005, .05)
     fall = .6+.39*point[8]
     if fall <= rise+.05: fall=rise+.05
     drop = _log(point[9], .005, .3)
+    drop_end = rise+(1.-rise)*(.001+.079*point[10])
+    tail_level = _log(point[11], .005, .3)
+    compact_variant=("two_scale_tail" if shape==COMPACT_INDEPENDENT and
+                     (index//len(SHAPES))%2 else "rounded_plateau")
     cohesive = {"Gamma_ref_J_m2": gamma, "t_hat_ref_Pa": peak,
         "S_Gamma_J_m2_K": entropy, "T_ref_K": 300.,
         "activation_area_m2": area, "attempt_frequency_s": 1e12,
@@ -87,9 +91,10 @@ def _candidate(index: int, point: np.ndarray, sources: list[dict]) -> dict:
         "zero_traction_barrier_eV_300K": zero_eV,
         "thermal_subfamily": "MINIMAL_COUPLED_COHESIVE_ENTROPY",
         "compact_b": b, "compact_c": c,
-        "compact_variant": "rounded_plateau" if shape == COMPACT_INDEPENDENT else "beta_polynomial",
+        "compact_variant": compact_variant if shape == COMPACT_INDEPENDENT else "beta_polynomial",
         "compact_rise_fraction": rise, "compact_fall_fraction": fall,
-        "compact_plateau_drop": drop}
+        "compact_plateau_drop": drop,"compact_drop_fraction":drop_end,
+        "compact_tail_level":tail_level}
     return {"candidate_id": f"R10_INV_{index:05d}", "shape": shape,
             "cohesive": cohesive, "source": source}
 
@@ -101,7 +106,9 @@ def _thermal(cohesive: dict) -> CohesiveThermalLaw:
         cohesive.get("compact_c", 0.), cohesive.get("compact_variant", "beta_polynomial"),
         cohesive.get("compact_rise_fraction", .1),
         cohesive.get("compact_fall_fraction", .85),
-        cohesive.get("compact_plateau_drop", .05))
+        cohesive.get("compact_plateau_drop", .05),
+        cohesive.get("compact_drop_fraction", .2),
+        cohesive.get("compact_tail_level", .05))
 
 
 def _thermal_class(Kfold: list[float]) -> str:
@@ -236,7 +243,7 @@ def _rank(rows: list[dict], count: int) -> list[dict]:
 def analytical(args) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     sources = _load_sources(args.source_registry)
-    points = qmc.Sobol(d=10, scramble=True, seed=SEED).random_base2(args.log2_bank)
+    points = qmc.Sobol(d=12, scramble=True, seed=SEED).random_base2(args.log2_bank)
     items = [_candidate(index, point, sources) for index, point in enumerate(points)]
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         rows = list(pool.map(_evaluate, items, chunksize=16))
@@ -293,13 +300,14 @@ def analytical(args) -> int:
 
 
 def _inverse_objective(vector: np.ndarray, base: dict) -> float:
-    log_rise, fall_coordinate, log_drop, logarea = map(float, vector)
-    fall=.5+.49/(1.+math.exp(-max(min(fall_coordinate,50.),-50.)))
+    log_rise, drop_coordinate, log_tail, logarea = map(float, vector)
+    rise=math.exp(log_rise)
+    drop_fraction=rise+(1.-rise)/(1.+math.exp(-max(min(drop_coordinate,50.),-50.)))
     cohesive = dict(base["cohesive"])
-    cohesive.update({"compact_variant":"rounded_plateau",
-                     "compact_rise_fraction":math.exp(log_rise),
-                     "compact_fall_fraction":fall,
-                     "compact_plateau_drop":math.exp(log_drop),
+    cohesive.update({"compact_variant":"two_scale_tail",
+                     "compact_rise_fraction":rise,
+                     "compact_drop_fraction":drop_fraction,
+                     "compact_tail_level":math.exp(log_tail),
                      "activation_area_m2": math.exp(logarea)})
     item = {**base, "shape": COMPACT_INDEPENDENT, "cohesive": cohesive}
     row = _evaluate(item)
@@ -322,17 +330,19 @@ def _inverse_objective(vector: np.ndarray, base: dict) -> float:
 def _one_inverse(task: tuple[int, dict]) -> dict:
     index, base = task
     c = base["cohesive"]
-    fall_fraction=float(c["compact_fall_fraction"])
-    fall_coordinate=math.log((fall_fraction-.5)/(.99-fall_fraction))
-    start = np.array([math.log(c["compact_rise_fraction"]),fall_coordinate,
-                      math.log(c["compact_plateau_drop"]),
+    rise=float(c["compact_rise_fraction"]);drop=float(c["compact_drop_fraction"])
+    drop_coordinate=math.log((drop-rise)/(1.-drop))
+    start = np.array([math.log(rise),drop_coordinate,
+                      math.log(c["compact_tail_level"]),
                       math.log(c["activation_area_m2"])])
     result = minimize(_inverse_objective, start, args=(base,), method="Nelder-Mead",
         options={"maxiter": 80, "xatol": 2e-3, "fatol": 2e-3})
-    final = dict(c); final.update({"compact_variant":"rounded_plateau",
-        "compact_rise_fraction":math.exp(result.x[0]),
-        "compact_fall_fraction":.5+.49/(1.+math.exp(-max(min(result.x[1],50.),-50.))),
-        "compact_plateau_drop":math.exp(result.x[2]),
+    optimized_rise=math.exp(result.x[0])
+    final = dict(c); final.update({"compact_variant":"two_scale_tail",
+        "compact_rise_fraction":optimized_rise,
+        "compact_drop_fraction":optimized_rise+(1.-optimized_rise)/
+            (1.+math.exp(-max(min(result.x[1],50.),-50.))),
+        "compact_tail_level":math.exp(result.x[2]),
         "activation_area_m2":math.exp(result.x[3])})
     evaluated = _evaluate({**base, "candidate_id": f"R10_INVERSE_OPT_{index:03d}",
                            "shape": COMPACT_INDEPENDENT, "cohesive": final})
@@ -348,10 +358,11 @@ def _one_inverse(task: tuple[int, dict]) -> dict:
 def inverse(args) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     sources = _load_sources(args.source_registry)
-    points = qmc.Sobol(d=10, scramble=True, seed=SEED+1).random(args.starts)
+    points = qmc.Sobol(d=12, scramble=True, seed=SEED+1).random(args.starts)
     bases = [_candidate(index, point, sources) for index, point in enumerate(points)]
     for base in bases:
         base["shape"] = COMPACT_INDEPENDENT
+        base["cohesive"]["compact_variant"]="two_scale_tail"
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         rows = list(pool.map(_one_inverse, enumerate(bases), chunksize=1))
     rows.sort(key=lambda row: (float(row.get("objective", 1e9)), row["candidate_id"]))

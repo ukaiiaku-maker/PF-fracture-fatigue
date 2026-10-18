@@ -56,6 +56,8 @@ class CohesiveThermalLaw:
     compact_rise_fraction: float = 0.1
     compact_fall_fraction: float = 0.85
     compact_plateau_drop: float = 0.05
+    compact_drop_fraction: float = 0.2
+    compact_tail_level: float = 0.05
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.Gamma_ref_J_m2) or self.Gamma_ref_J_m2 <= 0.0:
@@ -68,12 +70,17 @@ class CohesiveThermalLaw:
             raise ValueError("compact_b must be finite and at least one")
         if not math.isfinite(self.compact_c) or self.compact_c <= -1.0:
             raise ValueError("compact_c must be finite and greater than -1")
-        if self.compact_variant not in {"beta_polynomial", "rounded_plateau"}:
+        if self.compact_variant not in {"beta_polynomial", "rounded_plateau",
+                                        "two_scale_tail"}:
             raise ValueError("unsupported compact_variant")
         if not (0.0 < self.compact_rise_fraction < self.compact_fall_fraction < 1.0):
             raise ValueError("compact rise/fall fractions must obey 0 < rise < fall < 1")
         if not (0.0 < self.compact_plateau_drop < 1.0):
             raise ValueError("compact_plateau_drop must lie between zero and one")
+        if not (self.compact_rise_fraction < self.compact_drop_fraction < 1.0):
+            raise ValueError("compact drop fraction must exceed rise and remain below one")
+        if not (0.0 < self.compact_tail_level < 1.0):
+            raise ValueError("compact_tail_level must lie between zero and one")
 
     @property
     def delta0_m(self) -> float:
@@ -356,7 +363,7 @@ class CompactIndependentCohesiveLaw:
 
     @property
     def peak_x(self) -> float:
-        if self.thermal.compact_variant == "rounded_plateau":
+        if self.thermal.compact_variant in {"rounded_plateau","two_scale_tail"}:
             return float(self.thermal.compact_rise_fraction)
         b, c = self.b, self.c
         if abs(c) < 1.0e-14:
@@ -371,7 +378,7 @@ class CompactIndependentCohesiveLaw:
 
     @property
     def peak_shape(self) -> float:
-        if self.thermal.compact_variant == "rounded_plateau":
+        if self.thermal.compact_variant in {"rounded_plateau","two_scale_tail"}:
             return 1.0
         x = self.peak_x
         return x * (1.0 - x) ** self.b * (1.0 + self.c * x)
@@ -384,6 +391,11 @@ class CompactIndependentCohesiveLaw:
             drop = float(self.thermal.compact_plateau_drop)
             return (2.0*rise/3.0 + (fall-rise)*(1.0-drop/2.0)
                     + (1.0-drop)*(1.0-fall)/3.0)
+        if self.thermal.compact_variant == "two_scale_tail":
+            rise=float(self.thermal.compact_rise_fraction)
+            end=float(self.thermal.compact_drop_fraction)
+            tail=float(self.thermal.compact_tail_level)
+            return 2.*rise/3.+(end-rise)*(1.+tail)/2.+tail*(1.-end)/2.
         return float(beta_function(2.0, self.b + 1.0)
                      + self.c * beta_function(3.0, self.b + 1.0))
 
@@ -397,7 +409,8 @@ class CompactIndependentCohesiveLaw:
 
     def initial_stiffness(self, temperature_K: float) -> float:
         derivative0 = (2.0/float(self.thermal.compact_rise_fraction)
-                       if self.thermal.compact_variant == "rounded_plateau" else 1.0)
+                       if self.thermal.compact_variant in {"rounded_plateau","two_scale_tail"}
+                       else 1.0)
         return (self.thermal.t_hat(temperature_K) * derivative0 /
                 (self.final_separation(temperature_K) * self.peak_shape))
 
@@ -412,6 +425,14 @@ class CompactIndependentCohesiveLaw:
             v=np.clip((x-fall)/(1.-fall),0.,1.)
             g=np.where(x<rise,2.*u-u*u,np.where(x<fall,
                 1.-drop*(3.*w*w-2.*w*w*w),(1.-drop)*(1.-v)**2))
+        elif self.thermal.compact_variant == "two_scale_tail":
+            rise=float(self.thermal.compact_rise_fraction);end=float(self.thermal.compact_drop_fraction)
+            tail=float(self.thermal.compact_tail_level)
+            u=np.clip(x/rise,0.,1.);w=np.clip((x-rise)/(end-rise),0.,1.)
+            v=np.clip((x-end)/(1.-end),0.,1.)
+            smooth=3.*w*w-2.*w*w*w;tail_smooth=3.*v*v-2.*v*v*v
+            g=np.where(x<rise,2.*u-u*u,np.where(x<end,
+                1.-(1.-tail)*smooth,tail*(1.-tail_smooth)))
         else:
             g = x * np.maximum(1.0 - x, 0.0) ** self.b * (1.0 + self.c * x)
         value = self.thermal.t_hat(temperature_K) * g / self.peak_shape
@@ -429,6 +450,14 @@ class CompactIndependentCohesiveLaw:
             derivative=np.where(x<rise,2.*(1.-u)/rise,np.where(x<fall,
                 -drop*(6.*w-6.*w*w)/(fall-rise),
                 -2.*(1.-drop)*(1.-v)/(1.-fall)))
+        elif self.thermal.compact_variant == "two_scale_tail":
+            rise=float(self.thermal.compact_rise_fraction);end=float(self.thermal.compact_drop_fraction)
+            tail=float(self.thermal.compact_tail_level)
+            u=np.clip(x/rise,0.,1.);w=np.clip((x-rise)/(end-rise),0.,1.)
+            v=np.clip((x-end)/(1.-end),0.,1.)
+            derivative=np.where(x<rise,2.*(1.-u)/rise,np.where(x<end,
+                -(1.-tail)*(6.*w-6.*w*w)/(end-rise),
+                -tail*(6.*v-6.*v*v)/(1.-end)))
         else:
             polynomial = (1.0 + (2.0 * self.c - self.b - 1.0) * x
                           - self.c * (self.b + 2.0) * x * x)
@@ -451,6 +480,16 @@ class CompactIndependentCohesiveLaw:
             fall_base=middle_base+(fall-rise)*(1.-drop/2.)
             tail=fall_base+(1.-drop)*(1.-fall)*(v-v*v+v*v*v/3.)
             partial=np.where(x<rise,rise_area,np.where(x<fall,middle,tail))
+        elif self.thermal.compact_variant == "two_scale_tail":
+            rise=float(self.thermal.compact_rise_fraction);end=float(self.thermal.compact_drop_fraction)
+            level=float(self.thermal.compact_tail_level)
+            u=np.clip(x/rise,0.,1.);w=np.clip((x-rise)/(end-rise),0.,1.)
+            v=np.clip((x-end)/(1.-end),0.,1.)
+            rise_area=rise*(u*u-u*u*u/3.);rise_total=2.*rise/3.
+            drop=rise_total+(end-rise)*(w-(1.-level)*(w*w*w-.5*w*w*w*w))
+            drop_total=rise_total+(end-rise)*(1.+level)/2.
+            tail=drop_total+level*(1.-end)*(v-v*v*v+.5*v*v*v*v)
+            partial=np.where(x<rise,rise_area,np.where(x<end,drop,tail))
         else:
             partial = (beta_function(2.0, self.b + 1.0) *
                        betainc(2.0, self.b + 1.0, x)
