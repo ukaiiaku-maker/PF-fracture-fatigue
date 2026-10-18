@@ -19,14 +19,21 @@ def atomic(path,p):
     t=path.with_suffix('.tmp');t.write_text(json.dumps(p,indent=2,sort_keys=True,default=str)+'\n');t.replace(path)
 
 def main(argv=None):
-    p=argparse.ArgumentParser();p.add_argument('--registry',type=Path,required=True);p.add_argument('--candidate-id',required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args(argv);a.out.mkdir(parents=True,exist_ok=True)
+    p=argparse.ArgumentParser();p.add_argument('--registry',type=Path,required=True);p.add_argument('--candidate-id',required=True);p.add_argument('--out',type=Path,required=True)
+    p.add_argument('--selected-only',action='store_true',
+        help='execute only the registry-owned shape/mode for exact-material transfer')
+    a=p.parse_args(argv);a.out.mkdir(parents=True,exist_ok=True)
     with a.registry.open(newline='') as f:record=next(r for r in csv.DictReader(f) if r['candidate_id']==a.candidate_id)
     c=json.loads(record['cohesive_parameter_vector'])
     binding=load_cohesive_binding(a.registry,a.candidate_id,execution_identity=COHESIVE_KINETIC_CZM)
     thermal=binding.manifest.cleavage.thermal;rows=[]
+    shapes=((record['selected_shape'],) if a.selected_only else
+        (SMOOTH_EXPONENTIAL,BILINEAR,COMPACT_INDEPENDENT))
+    modes=((record['selected_mode'],) if a.selected_only else
+        ('cohesive_athermal','cohesive_mixed'))
     for T in (300.,750.,1200.):
-      for shape in (SMOOTH_EXPONENTIAL,BILINEAR,COMPACT_INDEPENDENT):
-       for mode in ('cohesive_athermal','cohesive_mixed'):
+      for shape in shapes:
+       for mode in modes:
         mesh,network,elem=specimen(thermal);elem.temperature_K=T;elem.cohesive_shape=shape
         network.execution_identity=(COHESIVE_ATHERMAL_MECHANICAL if mode=='cohesive_athermal' else COHESIVE_MIXED_MECHANICAL_THERMAL)
         engine=build_cohesive_current_engine(binding,kernel_family_path=R4_KERNEL_FAMILY)
@@ -55,13 +62,19 @@ def main(argv=None):
                 trigger='MECHANICAL_COMPLETION' if comp['complete'] else 'THERMAL_ESCAPE';elem.accept_mechanical_separation(sep,1);break
         if trigger is None:trigger='RAMP_LIMIT_CENSOR'
         rows.append({'temperature_K':T,'cohesive_shape':shape,'opening_mode':mode,'trigger':trigger,
+            'complete_material_identity':bool(shape==record['selected_shape'] and
+                mode==record['selected_mode']),
             'imposed_at_trigger_m':trace[-1]['imposed_jump_m'] if trace else None,
             'separation_at_trigger_m':trace[-1]['separation_m'] if trace else None,
             'peak_traction_Pa':max((x['traction_Pa'] for x in trace),default=math.nan),
             'mobile_final':float(engine.mpz.mobile_count),'retained_final':float(engine.mpz.retained_count),
             'actual_2d_interface_assembly':True,'EXP_floor_state_evolved':True,'trace':trace})
     summary={'schema':'r10.opening-alternatives-2d-transfer/1','candidate_id':a.candidate_id,
-        'same_complete_material_sha256':record['complete_row_sha256'],'paired_plasticity_sha256':record['parent_complete_row_sha256'],
-        'cases':rows,'legacy_cooperative_clock_used':False,'scope':'SELECTED_2D_THERMAL_FRACTURE_TRANSFER'}
+        'source_complete_material_sha256':record['complete_row_sha256'],
+        'same_complete_material_sha256':record['complete_row_sha256'] if a.selected_only else None,
+        'paired_plasticity_sha256':record['parent_complete_row_sha256'],
+        'cases':rows,'legacy_cooperative_clock_used':False,
+        'scope':('EXACT_SELECTED_MATERIAL_2D_THERMAL_FRACTURE_TRANSFER' if a.selected_only else
+                 'MATCHED_PLASTICITY_CROSS_OPENING_2D_COMPARISON')}
     atomic(a.out/'qualification.json',summary);print(json.dumps({'candidate_id':a.candidate_id,'cases':len(rows),'triggers':[r['trigger'] for r in rows]},indent=2));return 0
 if __name__=='__main__':raise SystemExit(main())
