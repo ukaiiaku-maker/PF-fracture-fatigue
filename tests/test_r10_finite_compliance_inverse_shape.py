@@ -10,6 +10,7 @@ from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
     shape_coordinates,
 )
 from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative, evaluate_opening
+from scripts import run_r10_finite_compliance_inverse_shape as search
 
 
 def test_frozen_22871_reference_is_reproduced_under_finite_compliance():
@@ -76,3 +77,25 @@ def test_two_scale_tail_releases_a_broad_finite_compliance_window():
     window=metastable_window(COMPACT_INDEPENDENT,thermal,300.,kenv)
     assert window["state"] == "METASTABLE_WINDOW"
     assert float(window["load_ratio"]) > 5.
+
+
+def test_registry_hcf_point_is_selected_from_cycle_integral(monkeypatch):
+    def fake_cycle(K, *args, **kwargs):
+        action = 10.0 ** (3.0 * (float(K) - 2.0) - 6.0)
+        return {"Kmax_MPa_sqrt_m": float(K),
+                "opening_action_per_cycle": action,
+                "accessible_phase_count": 17}
+
+    monkeypatch.setattr(search, "cyclic_rate", fake_cycle)
+    metric = {"curve_json": "["
+        "{\"K_MPa_sqrt_m\":1.0},{\"K_MPa_sqrt_m\":2.0},"
+        "{\"K_MPa_sqrt_m\":3.0}]"}
+    cohesive = {"Gamma_ref_J_m2": 2.0, "t_hat_ref_Pa": 15e9,
+        "S_Gamma_J_m2_K": 0.0, "T_ref_K": 300.0,
+        "activation_area_m2": 1e-19, "attempt_frequency_s": 1e12}
+    chosen = search._cyclic_registry_point(
+        (metric, cohesive, SMOOTH_EXPONENTIAL))
+    assert chosen["chosen"]["Kmax_MPa_sqrt_m"] == 2.0
+    assert chosen["chosen"]["opening_action_per_cycle"] == 1e-6
+    assert chosen["target_action_per_cycle"] == 1e-6
+    assert chosen["total_local_slope"] is not None

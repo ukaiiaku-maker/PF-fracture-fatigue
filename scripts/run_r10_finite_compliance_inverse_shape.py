@@ -24,7 +24,8 @@ from arrhenius_fracture.cohesive_arrhenius import (
     CohesiveThermalLaw, EV_TO_J,
 )
 from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
-    K_from_imposed, branch_loss, metastable_window, rate_curve, shape_coordinates,
+    K_from_imposed, branch_loss, cyclic_rate, metastable_window, rate_curve,
+    shape_coordinates,
 )
 from scripts.run_r10_global_mechanism_search import canonical_hash
 from scripts.run_r10_opening_alternatives import mechanics
@@ -266,6 +267,40 @@ def _rank(rows: list[dict], count: int) -> list[dict]:
     return unique
 
 
+def _cyclic_registry_point(task: tuple[dict, dict, str]) -> dict:
+    """Choose an HCF load from the waveform integral, never peak action."""
+    metric, cohesive, shape = task
+    thermal = _thermal(cohesive)
+    _, kenv = mechanics(thermal, 300.)
+    peak_curve = json.loads(metric["curve_json"])
+    points = []
+    for point in peak_curve:
+        cyclic = cyclic_rate(float(point["K_MPa_sqrt_m"]), kenv, thermal,
+            300., shape, float(cohesive["activation_area_m2"]),
+            float(cohesive["attempt_frequency_s"]), R=.1, frequency_Hz=1000.,
+            phases=32)
+        points.append(cyclic)
+    positive = [point for point in points
+                if float(point["opening_action_per_cycle"]) > 0.]
+    if not positive:
+        return {"cyclic_supported": False, "cyclic_curve": points}
+    chosen = min(positive, key=lambda point: abs(math.log10(max(
+        float(point["opening_action_per_cycle"]), 1e-300)) + 6.))
+    K = float(chosen["Kmax_MPa_sqrt_m"])
+    adjacent = []
+    for factor in (.99, 1.01):
+        adjacent.append(cyclic_rate(K*factor, kenv, thermal, 300., shape,
+            float(cohesive["activation_area_m2"]),
+            float(cohesive["attempt_frequency_s"]), R=.1, frequency_Hz=1000.,
+            phases=64))
+    actions = [float(point["opening_action_per_cycle"]) for point in adjacent]
+    slope = (math.log(actions[1]/actions[0])/math.log(1.01/.99)
+             if min(actions) > 0. else None)
+    return {"cyclic_supported": True, "cyclic_curve": points,
+        "chosen": chosen, "total_local_slope": slope,
+        "target_action_per_cycle": 1e-6}
+
+
 def analytical(args) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     sources = _load_sources(args.source_registry)
@@ -275,15 +310,34 @@ def analytical(args) -> int:
         rows = list(pool.map(_evaluate, items, chunksize=16))
     selected = _rank(rows, args.state_count)
     item_by_id = {item["candidate_id"]: item for item in items}
-    registry = []
+    cyclic_tasks=[]
     for metric in selected:
+        item=item_by_id[metric["candidate_id"]]
+        cohesive=json.loads(metric.get("evaluated_cohesive_json") or
+                            json.dumps(item["cohesive"]))
+        cyclic_tasks.append((metric,cohesive,item["shape"]))
+    with ProcessPoolExecutor(max_workers=args.workers) as pool:
+        cyclic_points=list(pool.map(_cyclic_registry_point,cyclic_tasks,chunksize=1))
+    registry = []
+    for metric,cyclic_point in zip(selected,cyclic_points):
         item = item_by_id[metric["candidate_id"]]
         source = dict(item["source"])
         cohesive = json.loads(metric.get("evaluated_cohesive_json") or
                               json.dumps(item["cohesive"]))
         analytical_curve=json.loads(metric["curve_json"])
-        hcf_point=min(analytical_curve,key=lambda point:abs(math.log10(max(
+        peak_hcf_point=min(analytical_curve,key=lambda point:abs(math.log10(max(
             float(point["events_per_cycle_peak_rate"]),1e-300))+6.))
+        hcf_point=cyclic_point.get("chosen")
+        if hcf_point is None:
+            hcf_K=float(peak_hcf_point["K_MPa_sqrt_m"])
+            hcf_action=0.;hcf_slope=None;accessible_phases=0
+            selection_basis="PEAK_FALLBACK_NO_CYCLIC_ACCESS"
+        else:
+            hcf_K=float(hcf_point["Kmax_MPa_sqrt_m"])
+            hcf_action=float(hcf_point["opening_action_per_cycle"])
+            hcf_slope=cyclic_point.get("total_local_slope")
+            accessible_phases=int(hcf_point["accessible_phase_count"])
+            selection_basis="FROZEN_WAVEFORM_INTEGRAL_32_PHASE"
         cid = metric["candidate_id"]+"__"+({SMOOTH_EXPONENTIAL:"S",
             BILINEAR:"B", COMPACT_INDEPENDENT:"C"}[item["shape"]])+"M"
         row = dict(source)
@@ -294,11 +348,14 @@ def analytical(args) -> int:
             json.dumps(cohesive, sort_keys=True, separators=(",", ":")),
             "predicted_fold_K_300K": metric["fold_K_300K"],
             "predicted_Kaccess_300K": metric["fold_K_300K"],
-            "predicted_hcf_K_300K": hcf_point["K_MPa_sqrt_m"],
-            "predicted_hcf_factor_300K": (float(hcf_point["K_MPa_sqrt_m"])/
+            "predicted_hcf_K_300K": hcf_K,
+            "predicted_hcf_factor_300K": (hcf_K/
                 float(metric["fold_K_300K"])),
-            "predicted_hcf_peak_action_per_cycle":hcf_point["events_per_cycle_peak_rate"],
-            "predicted_hcf_local_slope":hcf_point["local_log_slope"],
+            "predicted_hcf_cyclic_action_per_cycle":hcf_action,
+            "predicted_hcf_peak_action_per_cycle":peak_hcf_point["events_per_cycle_peak_rate"],
+            "predicted_hcf_local_slope":hcf_slope,
+            "predicted_hcf_accessible_phases":accessible_phases,
+            "predicted_hcf_selection_basis":selection_basis,
             "thermal_prediction": metric["thermal_prediction"],
             "mechanism_prediction": metric["mechanism_prediction"]})
         row["cohesive_parameter_sha256"] = canonical_hash(cohesive)
