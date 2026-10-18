@@ -1,6 +1,11 @@
+import json
 import math
 
-from scripts.analyze_r10_12h_scientific_findings import replicate_rows, slope_rows
+from scripts.analyze_r10_12h_scientific_findings import (
+    mechanism_comparisons,
+    replicate_rows,
+    slope_rows,
+)
 
 
 def _row(delta_k, rate, path):
@@ -43,3 +48,24 @@ def test_replicate_rows_labels_observed_range_without_confidence_claim():
     assert math.isclose(result[0]["observed_max_over_min"], 3.0)
     assert result[0]["bound_interpretation"] == (
         "OBSERVED_STREAM_RANGE; NOT_A_CONFIDENCE_INTERVAL")
+
+
+def test_mechanism_comparisons_includes_state_active_11566_control(tmp_path):
+    full = (tmp_path / "hcf_round_32_state_active_11566" / "f_1.06" /
+            "result.json")
+    frozen = (tmp_path / "hcf_mechanism_controls_11566" / "frozen_f_1.06" /
+              "result.json")
+    for path, cycles in ((full, [0.25]), (frozen, [0.25, 0.5])):
+        path.parent.mkdir(parents=True)
+        path.write_text(json.dumps({
+            "candidate_id": "R10F_V2_11566__MS",
+            "reference_factor": 1.06,
+            "accepted_cycles": 1.0e12,
+            "events": [{"cycle": cycle} for cycle in cycles],
+        }))
+
+    rows = mechanism_comparisons(tmp_path)
+
+    assert len(rows) == 1
+    assert rows[0]["candidate_id"] == "R10F_V2_11566__MS"
+    assert rows[0]["absolute_difference_cycles"] == 0.0
