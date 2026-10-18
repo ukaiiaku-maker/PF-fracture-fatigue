@@ -3,7 +3,8 @@ from types import SimpleNamespace
 import numpy as np
 from arrhenius_fracture.cohesive_arrhenius import CohesiveThermalLaw
 from arrhenius_fracture.coupled_opening_reduction_r10 import (
-    bilinear_accessibility_coordinates, coupled_cycle_reduction, score_recurrence,
+    bilinear_accessibility_coordinates, coupled_cycle_reduction,
+    coupled_monotonic_ramp, score_recurrence,
 )
 from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative
 from arrhenius_fracture.czm_high_cycle_adapter_r10 import (
@@ -70,8 +71,9 @@ class _RemapEngine:
     def __init__(self,successor_drive):
         self.mpz=_RemapMPZ();self.t=0.;self.n_adv=0;self.a_adv=0.;self.checkpoint_advance_total_m=0.
         self.W_emit=0.;self.K_prev=0.;self.successor_drive=successor_drive
+        self.plastic_calls=0
     def sigma_tip(self,K): return 2. if self.n_adv==0 else self.successor_drive
-    def _plastic_half_step(self,dt,T,sigma): return {}
+    def _plastic_half_step(self,dt,T,sigma): self.plastic_calls+=1;return {}
     def r_eff(self): return 1e-6
     def K_shield(self): return 0.
 
@@ -81,6 +83,24 @@ def _mechanical_probe(alternative,imposed,kenv,thermal,T,prior,phase_duration_s=
     return {"state":"SEPARATION_COMPLETED" if complete else "BONDED_STABLE",
             "connected_state":{"branch":"SEPARATED" if complete else "BONDED","delta_m":0.},
             "kinetic_validity":"NOT_APPLICABLE_ATHERMAL"}
+
+
+def test_monotonic_frozen_reference_advances_time_without_evolving_plasticity(monkeypatch):
+    monkeypatch.setattr("arrhenius_fracture.coupled_opening_reduction_r10.evaluate_opening",
+                        _mechanical_probe)
+    alt=OpeningAlternative("cohesive_athermal","bilinear","quasistatic_mechanical")
+    evolving=_RemapEngine(.5)
+    full=coupled_monotonic_ramp(evolving,alt,object(),1.,300.,Kdot_MPa_sqrt_m_s=1.,
+                                dK_MPa_sqrt_m=.5,Kmax_MPa_sqrt_m=1.)
+    frozen=_RemapEngine(.5)
+    reference=coupled_monotonic_ramp(frozen,alt,object(),1.,300.,Kdot_MPa_sqrt_m_s=1.,
+                                     dK_MPa_sqrt_m=.5,Kmax_MPa_sqrt_m=1.,
+                                     plastic_feedback=False)
+    assert evolving.plastic_calls == 2
+    assert frozen.plastic_calls == 0
+    assert math.isclose(evolving.t,frozen.t)
+    assert full["plastic_feedback_reference"] == "EVOLVING_FULL_STATE"
+    assert reference["plastic_feedback_reference"] == "FROZEN_INITIAL_PLASTIC_STATE"
 
 
 def test_successor_opening_drive_is_recomputed_after_relaxing_remap(monkeypatch):

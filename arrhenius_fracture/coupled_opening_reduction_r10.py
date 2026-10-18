@@ -169,13 +169,20 @@ def coupled_cycle_reduction(engine, alternative: OpeningAlternative, thermal,
 def coupled_monotonic_ramp(engine, alternative: OpeningAlternative, thermal,
                            environment_stiffness_Pa_per_m: float, temperature_K: float,
                            Kdot_MPa_sqrt_m_s: float=.005, dK_MPa_sqrt_m: float=.5,
-                           Kmax_MPa_sqrt_m: float=200.) -> dict[str,Any]:
+                           Kmax_MPa_sqrt_m: float=200.,
+                           plastic_feedback: bool=True) -> dict[str,Any]:
     K=0.;branch={"branch":"BONDED","delta_m":0.};action=0.;history=[];unsupported=False
     first_loss=None;first_commit=None
     while K<Kmax_MPa_sqrt_m-1e-14:
         right=min(K+dK_MPa_sqrt_m,Kmax_MPa_sqrt_m);mid=.5*(K+right)
         dt=(right-K)/Kdot_MPa_sqrt_m_s
-        _advance_plastic(engine,dt,temperature_K,mid*1e6)
+        if plastic_feedback:
+            _advance_plastic(engine,dt,temperature_K,mid*1e6)
+        else:
+            # Counterfactual mechanism reference: retain the exact initial
+            # plastic state and material law while allowing physical opening
+            # time/action to elapse under the identical loading protocol.
+            engine.t=float(engine.t)+dt
         stress=max(float(engine.sigma_tip(right*1e6)),0.)
         opening=evaluate_opening(alternative,stress/environment_stiffness_Pa_per_m,
             environment_stiffness_Pa_per_m,thermal,temperature_K,branch,phase_duration_s=dt)
@@ -196,6 +203,8 @@ def coupled_monotonic_ramp(engine, alternative: OpeningAlternative, thermal,
         if committed:first_commit=right;break
     return {"schema":MODEL_ID,"loading":"MONOTONIC_RAMP","temperature_K":temperature_K,
         "Kdot_MPa_sqrt_m_s":Kdot_MPa_sqrt_m_s,"dK_MPa_sqrt_m":dK_MPa_sqrt_m,
+        "plastic_feedback_reference":"EVOLVING_FULL_STATE" if plastic_feedback else
+                                     "FROZEN_INITIAL_PLASTIC_STATE",
         "Kmax_MPa_sqrt_m":Kmax_MPa_sqrt_m,"occupied_branch_loss_K_MPa_sqrt_m":first_loss,
         "first_committed_separation_K_MPa_sqrt_m":first_commit,"unsupported_crossover":unsupported,
         "status":"COMMITTED_SEPARATION" if first_commit is not None else

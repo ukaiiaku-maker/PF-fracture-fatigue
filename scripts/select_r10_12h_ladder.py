@@ -11,6 +11,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--candidate-id", required=True)
+    parser.add_argument("--source-factor", type=float,
+                        help="Disambiguate a source containing several mapped factors.")
     parser.add_argument("--factors", required=True,
                         help="Comma-separated reference-load factors.")
     parser.add_argument("--out", type=Path, required=True)
@@ -18,7 +20,9 @@ def main(argv=None):
 
     with args.source.open(newline="") as stream:
         matches = [row for row in csv.DictReader(stream)
-                   if row["candidate_id"] == args.candidate_id]
+                   if row["candidate_id"] == args.candidate_id and
+                   (args.source_factor is None or
+                    abs(float(row["reference_factor"]) - args.source_factor) < 1e-12)]
     if len(matches) != 1:
         raise SystemExit(f"expected one {args.candidate_id!r} row, found {len(matches)}")
     source = matches[0]
