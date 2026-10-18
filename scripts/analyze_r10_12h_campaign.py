@@ -45,6 +45,24 @@ def load_results(campaign: Path):
             if "eventful_adapter_qualification" in path.parts:
                 qualifications.append((path, result))
             else:
+                progress_path = path.with_name("progress.json")
+                if progress_path.is_file():
+                    progress = read_json(progress_path)
+                    if float(progress.get("accepted_cycles", 0.)) > float(result.get("accepted_cycles", 0.)):
+                        result = {**result, **progress, "live_checkpoint_ahead": True}
+                        result["acceleration_blocks"] = result.get(
+                            "blocks", result.get("acceleration_blocks", []))
+                        result["accepted_seconds"] = (float(result["accepted_cycles"]) /
+                                                      float(result["frequency_Hz"]))
+                        scored = score_recurrence(
+                            result.get("events", []),
+                            float(result.get("observation_path_m", 120e-6)),
+                            bool(result.get("unsupported_validities", [])))
+                        result["physical_event_count"] = len(result.get("events", []))
+                        result["advance_m"] = (result["events"][-1].get("extension_m", 0.)
+                                               if result.get("events") else 0.)
+                        result["developed_rate_m_per_cycle"] = scored["developed_rate_m_per_cycle"]
+                        result["developed_window"] = scored["developed_window"]
                 hcf.append((path, result))
         elif "events" in result and "cycle_history" in result:
             native.append((path, result))
@@ -108,6 +126,7 @@ def hcf_rows(items):
             "developed_window": json.dumps(result.get("developed_window"), sort_keys=True),
             "plastic_feedback_reference": result.get("plastic_feedback_reference", "EVOLVING_FULL_STATE"),
             "resource_stop": result.get("resource_stop", False),
+            "live_checkpoint_ahead": result.get("live_checkpoint_ahead", False),
             "cpu_seconds": result.get("cpu_seconds"),
             "wall_seconds": result.get("wall_seconds"),
             "acceleration_blocks": len(result.get("acceleration_blocks", [])),
