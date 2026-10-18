@@ -56,8 +56,8 @@ def main(argv: list[str] | None = None) -> int:
         (1200.0, 0.1, 1000.0, "temperature_holdout"),
         (300.0, 0.3, 1000.0, "load_ratio_holdout"),
         (300.0, 0.5, 1000.0, "load_ratio_holdout"),
+        (300.0, 0.1, 10.0, "frequency_holdout"),
         (300.0, 0.1, 100.0, "frequency_holdout"),
-        (300.0, 0.1, 10000.0, "frequency_holdout"),
     ]
     rows: list[dict[str, object]] = []
     for temperature, load_ratio, frequency, role in protocols:
