@@ -72,6 +72,12 @@ def growth_history_plot(campaign: Path, out: Path):
         "hcf_round_17_smooth_mixed_28475/**/result.json",
         "hcf_round_18_smooth_mixed_28475_dense/*/result.json",
         "hcf_seed_replicates_28475/*/result.json",
+        "hcf_round_24_fast_recurrent_17444/*/result.json",
+        "hcf_round_28_intermediate_recurrent_01796/*/result.json",
+        "hcf_round_30_22871_amplitude_ladder/*/result.json",
+        "hcf_round_31_high_barrier_00116/*/result.json",
+        "hcf_round_32_state_active_11566/*/result.json",
+        "hcf_round_1_block_2/R10F_V2_22871__MS/**/result.json",
     )
     paths = []
     for pattern in patterns:
@@ -353,6 +359,41 @@ def active_plastic_transition_plot(campaign: Path, out: Path):
     save(fig, out / "active_plastic_burst_arrest_transition.png")
 
 
+def state_active_11566_plot(campaign: Path, out: Path):
+    """Show the newly acquired plasticity-created arrest/reactivation bracket."""
+    paths = list(campaign.glob("hcf_round_32_state_active_11566/*/result.json"))
+    paths.extend(campaign.glob("hcf_mechanism_controls_11566/*/result.json"))
+    if not paths:
+        return
+    records = []
+    for path in paths:
+        result = load_effective(path)
+        records.append((
+            float(result["reference_factor"]), len(result.get("events", [])),
+            max(float(result.get("accepted_cycles", 0.)), 1e-12),
+            result.get("plastic_feedback_reference", "EVOLVING_FULL_STATE")))
+    fig, axes = plt.subplots(2, 1, figsize=(6.4, 6.0), sharex=True)
+    styles = {
+        "EVOLVING_FULL_STATE": ("o", "tab:blue", "evolving full state"),
+        "FROZEN_INITIAL_PLASTIC_STATE": ("s", "tab:orange", "frozen initial plastic state"),
+    }
+    for reference, (marker, color, label) in styles.items():
+        rows = sorted(row for row in records if row[3] == reference)
+        if not rows:
+            continue
+        axes[0].plot([row[0] for row in rows], [row[1] for row in rows],
+                     marker=marker, color=color, label=label)
+        axes[1].plot([row[0] for row in rows], [row[2] for row in rows],
+                     marker=marker, color=color, label=label)
+    axes[0].set_ylabel("physical advances")
+    axes[1].set_yscale("log")
+    axes[1].set_ylabel("accepted cycles")
+    axes[1].set_xlabel("reference-load factor")
+    for ax in axes:
+        ax.legend(fontsize=7, frameon=False)
+    save(fig, out / "state_active_11566_transition.png")
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--campaign", type=Path, required=True)
@@ -369,6 +410,7 @@ def main(argv=None) -> int:
     state_plot(args.campaign, args.out)
     athermal_transition_plot(args.campaign, args.out)
     active_plastic_transition_plot(args.campaign, args.out)
+    state_active_11566_plot(args.campaign, args.out)
     return 0
 
 
