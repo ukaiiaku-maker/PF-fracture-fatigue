@@ -83,6 +83,7 @@ def thermal_plot(campaign: Path, out: Path):
     roots = (
         campaign / "thermal_ramps_17780",
         campaign / "thermal_ramps_22871",
+        campaign / "thermal_ramps_28340",
         campaign / "thermal_ramps_active_plastic_descendants_K400",
     )
     fig, ax = plt.subplots(figsize=(6.4, 4.4))
@@ -111,6 +112,33 @@ def thermal_plot(campaign: Path, out: Path):
     ax.set_ylabel(r"committed separation load (MPa $\sqrt{\mathrm{m}}$)")
     ax.legend(fontsize=5.5, frameon=False, ncol=2)
     save(fig, out / "thermal_fracture_responses.png")
+
+
+def thermal_mechanism_plot(campaign: Path, out: Path):
+    """Show which thermal response survives a frozen-plastic reference."""
+    controls = []
+    for path in sorted(campaign.glob("mechanism_controls_*/mechanism_control_summary.csv")):
+        rows = read_csv(path)
+        if rows:
+            controls.append((rows[0]["candidate_id"], rows))
+    if not controls:
+        return
+    fig, axes = plt.subplots(len(controls), 1, figsize=(6.4, 3.2 * len(controls)),
+                             sharex=True, squeeze=False)
+    for ax, (candidate, rows) in zip(axes[:, 0], controls):
+        rows.sort(key=lambda row: float(row["temperature_K"]))
+        temperatures = [float(row["temperature_K"]) for row in rows]
+        ax.plot(temperatures,
+                [float(row["evolving_commit_K_MPa_sqrt_m"]) for row in rows],
+                marker="o", label="evolving full state")
+        ax.plot(temperatures,
+                [float(row["frozen_commit_K_MPa_sqrt_m"]) for row in rows],
+                marker="s", label="frozen initial plastic state")
+        ax.set_ylabel(r"commit load (MPa $\sqrt{\mathrm{m}}$)")
+        ax.set_title(candidate)
+        ax.legend(fontsize=7, frameon=False)
+    axes[-1, 0].set_xlabel("temperature (K)")
+    save(fig, out / "thermal_plastic_state_controls.png")
 
 
 def mechanism_plot(analysis: Path, out: Path):
@@ -159,6 +187,7 @@ def main(argv=None) -> int:
     fatigue_plot(args.analysis, args.out)
     growth_history_plot(args.campaign, args.out)
     thermal_plot(args.campaign, args.out)
+    thermal_mechanism_plot(args.campaign, args.out)
     mechanism_plot(args.analysis, args.out)
     state_plot(args.campaign, args.out)
     return 0
