@@ -25,6 +25,23 @@ from scripts.run_r10_opening_alternatives import thermal_from,mechanics
 
 SCHEMA="r10.czm-owned-hcf-trajectory/1"
 
+def restart_identity_matches(saved,candidate,factor,T,R,frequency,plastic_feedback,phases):
+ """Return whether a checkpoint belongs to the requested numerical protocol.
+
+ Older checkpoints predate the phase-count field, so they can be adopted once;
+ the next atomic progress write seals the supplied phase count.  Checkpoints
+ written by this version and later cannot be silently resumed at a different
+ waveform resolution.
+ """
+ saved_phase=saved.get('phase_count')
+ return (saved['candidate_id']==candidate and
+  math.isclose(float(saved['factor']),factor,rel_tol=0.,abs_tol=1e-14) and
+  math.isclose(float(saved.get('temperature_K',T)),T,rel_tol=0.,abs_tol=1e-12) and
+  math.isclose(float(saved.get('R',R)),R,rel_tol=0.,abs_tol=1e-14) and
+  math.isclose(float(saved.get('frequency_Hz',frequency)),frequency,rel_tol=0.,abs_tol=1e-12) and
+  bool(saved.get('plastic_feedback',True))==bool(plastic_feedback) and
+  (saved_phase is None or int(saved_phase)==int(phases)))
+
 def unresolved_post_escape(history,events):
  return (not events and any(row.get('branch_state')=='POST_ESCAPE_TRANSIT'
                             for row in history))
@@ -110,12 +127,8 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
  progress_path=out/'progress.json';checkpoint_dir=out/'checkpoint'
  if progress_path.is_file() and (checkpoint_dir/'high_cycle_live_checkpoint.json').is_file():
   saved=json.loads(progress_path.read_text())
-  same_protocol=(math.isclose(float(saved.get('temperature_K',T)),T,rel_tol=0.,abs_tol=1e-12) and
-                 math.isclose(float(saved.get('R',R)),R,rel_tol=0.,abs_tol=1e-14) and
-                 math.isclose(float(saved.get('frequency_Hz',frequency)),frequency,rel_tol=0.,abs_tol=1e-12) and
-                 bool(saved.get('plastic_feedback',True))==bool(plastic_feedback))
-  if (saved['candidate_id']!=candidate or
-      not math.isclose(float(saved['factor']),factor,rel_tol=0.,abs_tol=1e-14) or not same_protocol):
+  if not restart_identity_matches(saved,candidate,factor,T,R,frequency,
+                                  plastic_feedback,phases):
    raise RuntimeError('restart identity differs from requested CZM HCF case')
   _restore_geometry(engine,checkpoint_dir);restore_checkpoint(engine,checkpoint_dir)
   cycles=float(saved['accepted_cycles']);events=list(saved['events']);history=list(saved['history']);blocks=list(saved['blocks'])
@@ -155,6 +168,7 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
    history.append(state_row(engine,wave,T,cycles,"EVENT" if result.get('fired') else "EXPOSURE_CHECKPOINT"))
    progress={"candidate_id":candidate,"factor":factor,"temperature_K":T,"R":R,
              "frequency_Hz":frequency,"horizon":horizon,"accepted_cycles":cycles,
+             "phase_count":phases,
              "cpu_seconds":prior_cpu_seconds+time.process_time()-cpu_start,
              "plastic_feedback":bool(plastic_feedback),
              "events":events,"history":history,"blocks":blocks,"unsupported":bool(engine._r10_czm_unsupported),
