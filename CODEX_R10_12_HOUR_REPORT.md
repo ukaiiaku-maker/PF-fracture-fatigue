@@ -343,8 +343,8 @@ substitutions:
 
 The fixed campaign clock is 2026-10-18 06:08:49--18:08:49 UTC.  It began at
 `6018f4c40df68139fd0a54bda6ab10c48510eca0` on
-`codex/r10-athermal-mixed-czm-comparison`; the last scientific source revision
-before final reporting is `daa0c0fc`.  Across 135 HCF result files carrying
+`codex/r10-athermal-mixed-czm-comparison`; the final execution-source revision,
+including the terminal-checkpoint seal, is `2a897297`.  Across 135 HCF result files carrying
 process accounting, the accepted trajectories report 82,182.99 CPU-seconds
 and 117,506.01 aggregate worker-wall-seconds.  The host exposed 14 logical
 CPUs.  The supervisor limited numerical work to ten one-thread workers,
