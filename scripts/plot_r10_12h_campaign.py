@@ -275,6 +275,62 @@ def athermal_transition_plot(campaign: Path, out: Path):
     save(fig, out / "athermal_bilinear_transition_map.png")
 
 
+def active_plastic_transition_plot(campaign: Path, out: Path):
+    """Contrast plasticity-arrested bursts with matched frozen cascades."""
+    paths = []
+    for pattern in (
+            "hcf_round_23_active_plastic_low_area/*/result.json",
+            "hcf_round_25_active_plastic_bracket/*/result.json",
+            "hcf_mechanism_controls_active_07172/*/result.json"):
+        paths.extend(campaign.glob(pattern))
+    records = []
+    for path in paths:
+        result = load_effective(path)
+        records.append({
+            "factor": float(result["reference_factor"]),
+            "events": len(result.get("events", [])),
+            "cycles": max(float(result.get("accepted_cycles", 0.)), 1e-12),
+            "reference": result.get("plastic_feedback_reference", "EVOLVING_FULL_STATE"),
+            "disposition": result.get("disposition", ""),
+            "unsupported": bool(result.get("unsupported_validities")) or
+                           result.get("disposition") == "UNRESOLVED_OPENING_PHYSICS",
+        })
+    if not records:
+        return
+    fig, axes = plt.subplots(2, 1, figsize=(6.4, 6.0), sharex=True)
+    styles = {
+        "EVOLVING_FULL_STATE": ("o", "tab:blue", "evolving full state"),
+        "FROZEN_INITIAL_PLASTIC_STATE": ("s", "tab:orange", "frozen initial plastic state"),
+    }
+    for reference, (marker, color, label) in styles.items():
+        group = sorted((row for row in records if row["reference"] == reference and
+                        not row["unsupported"]),
+                       key=lambda row: row["factor"])
+        if not group:
+            continue
+        axes[0].plot([row["factor"] for row in group],
+                     [row["events"] for row in group], marker=marker,
+                     color=color, linewidth=1.1, label=label)
+        axes[1].plot([row["factor"] for row in group],
+                     [row["cycles"] for row in group], marker=marker,
+                     color=color, linewidth=1.1, label=label)
+    unresolved = [row for row in records if row["unsupported"]]
+    if unresolved:
+        axes[0].scatter([row["factor"] for row in unresolved],
+                        [row["events"] for row in unresolved], marker="x",
+                        color="black", s=55, label="unsupported opening transit")
+        axes[1].scatter([row["factor"] for row in unresolved],
+                        [row["cycles"] for row in unresolved], marker="x",
+                        color="black", s=55, label="unsupported opening transit")
+    axes[0].set_ylabel("physical advances")
+    axes[1].set_yscale("log")
+    axes[1].set_ylabel("accepted cycles")
+    axes[1].set_xlabel("reference-load factor")
+    for ax in axes:
+        ax.legend(fontsize=7, frameon=False)
+    save(fig, out / "active_plastic_burst_arrest_transition.png")
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--campaign", type=Path, required=True)
@@ -290,6 +346,7 @@ def main(argv=None) -> int:
     mechanism_plot(args.analysis, args.out)
     state_plot(args.campaign, args.out)
     athermal_transition_plot(args.campaign, args.out)
+    active_plastic_transition_plot(args.campaign, args.out)
     return 0
 
 
