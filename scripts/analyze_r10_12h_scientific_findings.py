@@ -41,6 +41,13 @@ def effective_result(path: Path):
         progress = load(progress_path)
         if float(progress.get("accepted_cycles", 0.)) > float(result.get("accepted_cycles", 0.)):
             result = {**result, **progress, "result_disposition": result.get("disposition")}
+            result["accepted_seconds"] = (float(result["accepted_cycles"]) /
+                                          float(result["frequency_Hz"]))
+            scored = score_recurrence(
+                result.get("events", []), float(result.get("observation_path_m", 120e-6)),
+                bool(result.get("unsupported_validities", [])))
+            result["developed_rate_m_per_cycle"] = scored["developed_rate_m_per_cycle"]
+            result["developed_window"] = scored["developed_window"]
     return result
 
 
