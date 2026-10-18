@@ -128,8 +128,10 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
  start=time.monotonic();cpu_start=time.process_time()
  targets=sorted(set([x for x in (1e2,1e4,1e6,1e8,1e10,1e12,float(horizon)) if x<=horizon]))
  resource=False;numeric=None
+ post_escape_stop=unresolved_post_escape(history,events)
  try:
-  while cycles<horizon-1e-9 and engine.checkpoint_advance_total_m<path_limit_m-1e-15:
+  while (not post_escape_stop and cycles<horizon-1e-9 and
+         engine.checkpoint_advance_total_m<path_limit_m-1e-15):
    if time.monotonic()-start>max_wall_s:resource=True;break
    if cycles<1.-1e-12 or cycles-math.floor(cycles)>1e-12:
     cycles=exact_to_next_cycle(engine,wave,T,phases,cycles,events,patch_m,path_limit_m);continue
