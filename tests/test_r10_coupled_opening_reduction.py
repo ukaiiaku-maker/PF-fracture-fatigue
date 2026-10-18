@@ -12,6 +12,7 @@ from arrhenius_fracture.czm_high_cycle_adapter_r10 import (
 )
 from scripts.analyze_r10_coupled_opening_search import native_disposition
 from scripts.run_r10_12h_state_map import event_reachable
+from scripts.run_r10_czm_hcf import unresolved_post_escape
 
 
 def test_inactive_bilinear_reference_separates_cut_loss_and_discrete_screen():
@@ -216,3 +217,10 @@ def test_state_map_counts_athermal_mechanical_completion_without_a_clock():
     assert event_reachable({"branch_state": "SEPARATION_COMPLETED"}, 0.)
     assert event_reachable({"branch_state": "BONDED_METASTABLE"}, 1.)
     assert not event_reachable({"branch_state": "BONDED_STABLE"}, 0.)
+
+
+def test_uncommitted_post_escape_transit_is_not_a_physical_runout():
+    history = [{"branch_state": "BONDED_METASTABLE"},
+               {"branch_state": "POST_ESCAPE_TRANSIT"}]
+    assert unresolved_post_escape(history, [])
+    assert not unresolved_post_escape(history, [{"cycle": 1.}])

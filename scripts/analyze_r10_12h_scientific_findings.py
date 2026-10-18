@@ -56,6 +56,9 @@ def event_metrics(path: Path, result: dict):
     cycles = [float(row["cycle"]) for row in events]
     gaps = [b - a for a, b in zip(cycles, cycles[1:]) if b > a]
     window = result.get("developed_window") or {}
+    post_escape_unresolved = (not events and any(
+        row.get("branch_state") == "POST_ESCAPE_TRANSIT"
+        for row in result.get("history", [])))
     return {
         "candidate_id": result.get("candidate_id"),
         "temperature_K": result.get("temperature_K"),
@@ -74,7 +77,8 @@ def event_metrics(path: Path, result: dict):
         "maximum_positive_interevent_cycles": max(gaps) if gaps else None,
         "developed_rate_m_per_cycle": result.get("developed_rate_m_per_cycle"),
         "developed_window_duration_cycles": window.get("duration_cycles"),
-        "disposition": result.get("disposition"),
+        "disposition": ("UNRESOLVED_OPENING_PHYSICS" if post_escape_unresolved
+                        else result.get("disposition")),
         "plastic_feedback_reference": result.get("plastic_feedback_reference", "EVOLVING_FULL_STATE"),
         "result_path": str(path),
     }

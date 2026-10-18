@@ -105,6 +105,9 @@ def native_rows(items):
 def hcf_rows(items):
     rows = []
     for path, result in items:
+        post_escape_unresolved = (not result.get("events") and any(
+            row.get("branch_state") == "POST_ESCAPE_TRANSIT"
+            for row in result.get("history", [])))
         rows.append({
             "candidate_id": result.get("candidate_id"),
             "source_material_candidate_id": result.get("source_material_candidate_id"),
@@ -120,8 +123,10 @@ def hcf_rows(items):
             "accepted_seconds": result.get("accepted_seconds", 0.),
             "events": result.get("physical_event_count", 0),
             "advance_m": result.get("advance_m", 0.),
-            "disposition": result.get("disposition"),
-            "recurrence_outcome": result.get("recurrence_outcome"),
+            "disposition": ("UNRESOLVED_OPENING_PHYSICS" if post_escape_unresolved
+                            else result.get("disposition")),
+            "recurrence_outcome": ("UNRESOLVED_POST_ESCAPE_TRANSIT" if post_escape_unresolved
+                                   else result.get("recurrence_outcome")),
             "developed_rate_m_per_cycle": result.get("developed_rate_m_per_cycle"),
             "developed_window": json.dumps(result.get("developed_window"), sort_keys=True),
             "plastic_feedback_reference": result.get("plastic_feedback_reference", "EVOLVING_FULL_STATE"),

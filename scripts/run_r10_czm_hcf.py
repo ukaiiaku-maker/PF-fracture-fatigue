@@ -25,6 +25,10 @@ from scripts.run_r10_opening_alternatives import thermal_from,mechanics
 
 SCHEMA="r10.czm-owned-hcf-trajectory/1"
 
+def unresolved_post_escape(history,events):
+ return (not events and any(row.get('branch_state')=='POST_ESCAPE_TRANSIT'
+                            for row in history))
+
 def atomic(path,payload):
  path.parent.mkdir(parents=True,exist_ok=True);tmp=path.with_suffix(path.suffix+'.tmp')
  tmp.write_text(json.dumps(payload,indent=2,sort_keys=True,default=str)+'\n');tmp.replace(path)
@@ -158,11 +162,12 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
     resource=True;break
  except Exception as exc:numeric=f'{type(exc).__name__}: {exc}'
  scored=score_recurrence(events,path_limit_m,bool(engine._r10_czm_unsupported))
+ post_escape_unresolved=unresolved_post_escape(history,events)
  event_cycles=[float(e['cycle']) for e in events]
  waits=([event_cycles[0]] if event_cycles else [])+[event_cycles[i]-event_cycles[i-1] for i in range(1,len(event_cycles))]
  if numeric:disposition="NUMERICAL_STOP"
  elif resource:disposition="RESOURCE_STOP"
- elif engine._r10_czm_unsupported:disposition="UNRESOLVED_OPENING_PHYSICS"
+ elif engine._r10_czm_unsupported or post_escape_unresolved:disposition="UNRESOLVED_OPENING_PHYSICS"
  elif scored['developed_rate_m_per_cycle'] is not None:disposition="DEVELOPED_CYCLIC_GROWTH"
  elif scored['observation_target_hit']:disposition="TARGET_TRUNCATED_CASCADE"
  elif events:disposition="FINITE_BURST_WITH_EXPOSURE"
@@ -177,7 +182,9 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   "first_event_cycle":event_cycles[0] if event_cycles else None,"inter_event_cycles":waits[1:],
   "all_waiting_intervals_cycles":waits,"developed_window":scored['developed_window'],
   "developed_rate_m_per_cycle":scored['developed_rate_m_per_cycle'],"disposition":disposition,
-  "recurrence_outcome":scored['outcome'],"unsupported_validities":sorted(engine._r10_czm_unsupported_validities),
+  "recurrence_outcome":"UNRESOLVED_POST_ESCAPE_TRANSIT" if post_escape_unresolved else scored['outcome'],
+  "unsupported_validities":sorted(engine._r10_czm_unsupported_validities |
+    ({'POST_ESCAPE_TRANSIT_PROPAGATION_REQUIRED'} if post_escape_unresolved else set())),
   "numeric_failure":numeric,"resource_stop":resource,"predictor":predictor,"overlap":overlap,
   "history":history,"acceleration_blocks":blocks,"phase_count":phases,"patch_m":patch_m,
   "observation_path_m":path_limit_m,"legacy_cooperative_clock_used":False,
