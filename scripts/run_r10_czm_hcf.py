@@ -115,11 +115,13 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
    raise RuntimeError('restart identity differs from requested CZM HCF case')
   _restore_geometry(engine,checkpoint_dir);restore_checkpoint(engine,checkpoint_dir)
   cycles=float(saved['accepted_cycles']);events=list(saved['events']);history=list(saved['history']);blocks=list(saved['blocks'])
+  prior_cpu_seconds=float(saved.get('cpu_seconds',0.))
   engine._r10_czm_unsupported=bool(saved.get('unsupported',False))
   engine._r10_czm_unsupported_validities=set(saved.get('unsupported_validities',[]))
  else:
   cycles=0.;events=[];history=[state_row(engine,wave,T,0.,"INITIAL")];blocks=[]
- start=time.monotonic()
+  prior_cpu_seconds=0.
+ start=time.monotonic();cpu_start=time.process_time()
  targets=sorted(set([x for x in (1e2,1e4,1e6,1e8,1e10,1e12,float(horizon)) if x<=horizon]))
  resource=False;numeric=None
  try:
@@ -147,6 +149,7 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
    history.append(state_row(engine,wave,T,cycles,"EVENT" if result.get('fired') else "EXPOSURE_CHECKPOINT"))
    progress={"candidate_id":candidate,"factor":factor,"temperature_K":T,"R":R,
              "frequency_Hz":frequency,"horizon":horizon,"accepted_cycles":cycles,
+             "cpu_seconds":prior_cpu_seconds+time.process_time()-cpu_start,
              "plastic_feedback":bool(plastic_feedback),
              "events":events,"history":history,"blocks":blocks,"unsupported":bool(engine._r10_czm_unsupported),
              "unsupported_validities":sorted(engine._r10_czm_unsupported_validities)}
@@ -181,7 +184,9 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   "opening_owner":"CURRENT_ATHERMAL_OR_MIXED_CZM","plasticity_owner":"CURRENT_EXP_FLOOR_FULL_STATE",
   "plastic_feedback_reference":"EVOLVING_FULL_STATE" if plastic_feedback else
                                "FROZEN_INITIAL_PLASTIC_STATE",
-  "restart_checkpoint":str(checkpoint_dir/'high_cycle_live_checkpoint.json'),"wall_seconds":time.monotonic()-start}
+  "restart_checkpoint":str(checkpoint_dir/'high_cycle_live_checkpoint.json'),
+  "cpu_seconds":prior_cpu_seconds+time.process_time()-cpu_start,
+  "wall_seconds":time.monotonic()-start}
  atomic(out/'result.json',result);return result
 
 def main(argv=None):
