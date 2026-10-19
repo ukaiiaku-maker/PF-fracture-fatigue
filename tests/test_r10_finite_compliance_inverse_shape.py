@@ -12,6 +12,7 @@ from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
 from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative, evaluate_opening
 from scripts import run_r10_finite_compliance_inverse_shape as search
 from scripts import run_r10_cyclic_inverse_refinement as cyclic_inverse
+from scripts import project_r10_bounded_inverse_candidates as projection
 
 
 def test_frozen_22871_reference_is_reproduced_under_finite_compliance():
@@ -186,3 +187,22 @@ def test_cyclic_inverse_objective_honors_requested_hcf_action(monkeypatch):
         "target_action_per_cycle": 1e-8, "rate_weight": 1.0}) == 0.0
     assert cyclic_inverse.objective(vector, {
         "target_action_per_cycle": 1e-6, "rate_weight": 1.0}) == 2.0
+
+
+def test_projection_protects_parent_material_class_before_objective_fill():
+    rows = [
+        {"candidate_id": "A", "domain_pass": "True", "objective": "1",
+         "source_material_class": "DBTT", "source_plasticity_sha256": "p1"},
+        {"candidate_id": "B", "domain_pass": "True", "objective": "2",
+         "source_material_class": "DBTT", "source_plasticity_sha256": "p2"},
+        {"candidate_id": "C", "domain_pass": "True", "objective": "3",
+         "source_material_class": "peak", "source_plasticity_sha256": "p3"},
+    ]
+    assert [row["candidate_id"] for row in projection.choose(rows, 2)] == ["A", "C"]
+
+
+def test_source_class_is_distinct_from_cohesive_fold_trend():
+    source = {"parent_complete_parameter_vector":
+              '{"material_class":"peak"}',
+              "thermal_prediction": "WEAK_T_PREDICTED"}
+    assert search._source_material_class(source) == "peak"

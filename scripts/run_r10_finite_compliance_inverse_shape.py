@@ -66,6 +66,20 @@ def _load_sources(path: Path) -> list[dict]:
         return list(csv.DictReader(stream))
 
 
+def _source_material_class(source: dict) -> str:
+    """Recover the retained EXP_floor class without relabeling cohesive trend."""
+    direct = source.get("source_material_class") or source.get("material_class")
+    if direct:
+        return str(direct)
+    payload = source.get("parent_complete_parameter_vector")
+    if payload:
+        try:
+            return str(json.loads(payload).get("material_class") or "UNDECLARED")
+        except (TypeError, json.JSONDecodeError):
+            pass
+    return "UNDECLARED"
+
+
 def _candidate(index: int, point: np.ndarray, sources: list[dict]) -> dict:
     source = sources[min(int(point[0]*len(sources)), len(sources)-1)]
     shape = SHAPES[index % len(SHAPES)]
@@ -129,6 +143,7 @@ def _evaluate(item: dict) -> dict:
     cohesive, shape = item["cohesive"], item["shape"]
     base = {"candidate_id": item["candidate_id"], "cohesive_shape": shape,
             "source_material_candidate_id": item["source"]["candidate_id"],
+            "source_material_class": _source_material_class(item["source"]),
             "source_plasticity_sha256": item["source"].get(
                 "plasticity_physics_sha256",item["source"].get("parent_complete_row_sha256"))}
     try:
@@ -190,6 +205,7 @@ def _evaluate(item: dict) -> dict:
         mechanism = source.get("mechanism_prediction", "UNRESOLVED")
         return {**base, "domain_pass": True, "rejection": "",
             "thermal_prediction": _thermal_class(folds),
+            "cohesive_fold_thermal_prediction": _thermal_class(folds),
             "mechanism_prediction": mechanism,
             "moderate_connected_width_log10K": curve["moderate_connected_width_log10K"],
             "moderate_connected_width_log10rate": curve["moderate_connected_width_log10rate"],
@@ -376,6 +392,8 @@ def analytical(args) -> int:
             "predicted_hcf_accessible_phase_fraction":accessible_fraction,
             "predicted_hcf_selection_basis":selection_basis,
             "thermal_prediction": metric["thermal_prediction"],
+            "cohesive_fold_thermal_prediction": metric["thermal_prediction"],
+            "source_material_class": metric.get("source_material_class", "UNDECLARED"),
             "mechanism_prediction": metric["mechanism_prediction"]})
         row["cohesive_parameter_sha256"] = canonical_hash(cohesive)
         row["complete_row_sha256"] = canonical_hash({"source":

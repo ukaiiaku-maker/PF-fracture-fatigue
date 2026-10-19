@@ -23,6 +23,7 @@ from arrhenius_fracture.cohesive_arrhenius import COMPACT_INDEPENDENT
 from scripts.run_r10_finite_compliance_inverse_shape import (
     SCHEMA,
     _cyclic_registry_point,
+    _source_material_class,
 )
 from scripts.run_r10_global_mechanism_search import canonical_hash
 
@@ -57,6 +58,20 @@ def choose(rows: list[dict], count: int) -> list[dict]:
                                 row["candidate_id"]))
     selected: list[dict] = []
     seen_plasticity: set[str] = set()
+    seen_classes: set[str] = set()
+    # Protect the retained EXP_floor Weak-T/Peak/DBTT/ceramic backgrounds
+    # before filling by plasticity identity and inverse objective.  The
+    # cohesive-fold trend remains a separate field and cannot substitute for
+    # the parent complete material's mechanism class.
+    for row in valid:
+        source_class = str(row.get("source_material_class") or "UNDECLARED")
+        if source_class in seen_classes:
+            continue
+        selected.append(row)
+        seen_classes.add(source_class)
+        seen_plasticity.add(str(row.get("source_plasticity_sha256") or ""))
+        if len(selected) >= count:
+            return selected
     # First preserve independent EXP_floor backgrounds, then fill from the
     # bounded objective frontier.  Shape is fixed by construction.
     for distinct in (True, False):
@@ -85,6 +100,11 @@ def main(argv=None) -> int:
     inverse_rows = read_csv(args.inverse_table)
     sources = read_csv(args.source_registry)
     source_by_id = {row["candidate_id"]: row for row in sources}
+    for metric in inverse_rows:
+        if not metric.get("source_material_class"):
+            source = source_by_id.get(metric.get("source_material_candidate_id", ""))
+            if source is not None:
+                metric["source_material_class"] = _source_material_class(source)
     selected = choose(inverse_rows, args.count)
     projected: list[dict] = []
     projection_metrics: list[dict] = []
@@ -93,6 +113,8 @@ def main(argv=None) -> int:
         if source_id not in source_by_id:
             raise ValueError(f"inverse source missing from registry: {source_id}")
         source = dict(source_by_id[source_id])
+        source_class = (metric.get("source_material_class") or
+                        _source_material_class(source))
         cohesive = json.loads(metric["optimized_cohesive_json"])
         cyclic = _cyclic_registry_point((metric, cohesive, COMPACT_INDEPENDENT))
         chosen = cyclic.get("chosen")
@@ -137,6 +159,9 @@ def main(argv=None) -> int:
             "predicted_hcf_accessible_phase_fraction": accessible_fraction,
             "predicted_hcf_selection_basis": basis,
             "thermal_prediction": metric["thermal_prediction"],
+            "cohesive_fold_thermal_prediction": metric.get(
+                "cohesive_fold_thermal_prediction", metric["thermal_prediction"]),
+            "source_material_class": source_class,
             "mechanism_prediction": metric["mechanism_prediction"],
             "inverse_objective": metric["objective"],
             "inverse_moderate_width_log10rate": metric["moderate_connected_width_log10rate"],
