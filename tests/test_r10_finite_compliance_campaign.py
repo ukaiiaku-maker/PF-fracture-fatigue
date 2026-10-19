@@ -318,6 +318,10 @@ def test_executed_plan_retains_restart_safe_mechanism_blocks():
     assert tasks["mechanism_diverse_full_hcf"]["sentinel"].endswith(
         "batch_summary.json")
     assert tasks["mechanism_diverse_full_hcf"]["always_run_on_resume"] is True
+    for task_id in ("mechanism_diverse_full_hcf", "mechanism_diverse_frozen_hcf"):
+        argv = tasks[task_id]["argv"]
+        support_index = argv.index("--minimum-accessible-phase-samples")
+        assert argv[support_index + 1] == "4"
     assert tasks["campaign_analysis"]["always_run_on_resume"] is True
     assert all("algebraic" not in " ".join(task["argv"]).lower()
                for task in plan["tasks"])
