@@ -120,6 +120,12 @@ def test_execution_timing_records_real_elapsed_scope(tmp_path):
     assert timing["campaign_status"] == "FINAL"
 
 
+def test_search_specification_declares_mechanics_mapping():
+    mechanics = search_specification()["mechanics_mapping"]
+    assert mechanics["tip_radius_m"] == 1e-6
+    assert mechanics["status"].endswith("NOT_A_FIT_PARAMETER")
+
+
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
     directory = tmp_path / "hcf" / "CAND" / "m"
     directory.mkdir(parents=True)

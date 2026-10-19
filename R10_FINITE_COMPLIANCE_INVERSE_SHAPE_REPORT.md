@@ -24,7 +24,12 @@ signed transport, backstress, blunting, wake, contact, geometry, and energy
 owners.
 
 The finite-compliance evaluator uses the declared condensed stiffness and solves
-the occupied minimum and adjacent saddle.  Loaded-potential and independent
+the occupied minimum and adjacent saddle.  Specifically,
+`E'=400 GPa/(1-0.22^2)`, the complete material gives
+`Lpz=E' Gamma(T)/t_hat(T)^2`, and `ke=E'/(2 Lpz)`.  At the 1 micrometre local
+tip radius, `D=K/[ke sqrt(2 pi r)]` after the stated SI conversion.  Thus both
+`ke` and the K-to-separation map are recomputed from the serialized material,
+not fitted acquisition coordinates.  Loaded-potential and independent
 quadrature barriers agree to a maximum relative error of
 `6.914860158463601e-12` in the 32-material dense qualification.  The archived
 `22871` barrier, root gap, fold, and 32-midpoint cyclic reference are reproduced.

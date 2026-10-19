@@ -321,6 +321,15 @@ def search_specification() -> dict:
         "default_protocol": {"temperature_K": 300.0, "R": 0.1,
                              "frequency_Hz": 1000.0,
                              "patch_advance_m": 1e-6},
+        "mechanics_mapping": {
+            "plane_strain_modulus_Pa": 400e9/(1.-.22**2),
+            "process_zone_m": "Eprime*Gamma(T)/t_hat(T)^2",
+            "environment_stiffness_Pa_per_m": "Eprime/(2*process_zone_m)",
+            "tip_radius_m": 1e-6,
+            "imposed_separation_m":
+                "K_MPa_sqrt_m*1e6/(sqrt(2*pi*tip_radius_m)*environment_stiffness)",
+            "status": "DERIVED_PER_COMPLETE_COHESIVE_MATERIAL; NOT_A_FIT_PARAMETER",
+        },
         "temperature_panel_K": [300, 450, 600, 750, 900, 1050, 1200],
         "immutable_physics": [
             "EXP_floor_dislocation_emission", "Peierls_motion",
