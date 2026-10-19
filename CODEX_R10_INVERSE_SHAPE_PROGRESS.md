@@ -108,6 +108,12 @@
   rows, zero strict passes, and best local slopes 6.753/6.764 at about
   6.13e-5 action per cycle.  Its dense held-out maximum moderate width is
   1.48857 rate decades.
+- A further eight-start round requested 1e-8 action/cycle and multiplied the
+  log-rate penalty by four.  Three rows remained domain-valid, but action stayed
+  at 3.61e-5--6.14e-5/cycle and local slope at 6.76--6.96.  Exact projection and
+  a fresh 101-amplitude/32-phase qualification again produced zero strict passes,
+  maximum moderate width 1.48857 decades, and minimum local slope 6.7294.  This
+  is retained as a bounded negative rather than promoted to redundant native work.
 
 ## Developed compact checkpoint
 

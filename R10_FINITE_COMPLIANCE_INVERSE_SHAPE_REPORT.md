@@ -184,6 +184,17 @@ optima and zero strict passes.  The best exact-coordinate points have slopes
 moderate rate decades.  Numerical optimizer convergence is now reported
 separately from physical/domain eligibility.
 
+A subsequent eight-start acquisition increased the HCF log-rate penalty fourfold
+and moved its requested action from `1e-6` to `1e-8/cycle`.  This did not create
+a hidden slow-growth solution: only three starts remained domain-valid, their
+selected actions stayed at `3.61e-5--6.14e-5/cycle`, and their local slopes were
+`6.76--6.96`.  Exact-coordinate projection followed by an independent 101-point,
+32-phase qualification again gave zero strict passes, a maximum moderate width
+of `1.48857` rate decades, and a minimum local slope of `6.7294`.  Optimizer
+nonconvergence and physical ineligibility remain distinct; this round is a
+bounded negative showing that simply weighting slow rates more heavily does not
+move the admissible compact frontier into the requested HCF range.
+
 The source EXP_floor material class and the intrinsic cohesive-fold thermal
 trend are also now separate fields.  For example, the bounded trio retains
 DBTT, Peak, and ceramic parent backgrounds, respectively, even though its new
