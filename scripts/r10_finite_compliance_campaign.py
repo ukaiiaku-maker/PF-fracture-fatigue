@@ -185,6 +185,89 @@ def developed_slope_rows(rows: list[dict]) -> list[dict]:
     return output
 
 
+def hcf_event_window_rows(root: Path) -> list[dict]:
+    """Report fixed spatial windows from the newest accepted case state.
+
+    The canonical 20--60 um window remains the classification observable.  The
+    adjacent 60--100 um and aggregate 20--100 um windows are diagnostics for
+    within-trajectory stationarity and are never substituted for it.
+    """
+    metadata = registry_metadata(root)
+    cases = {path.parent for path in json_files(root, "result.json")}
+    cases.update(path.parent for path in json_files(root, "progress.json"))
+    output = []
+    for case in sorted(cases):
+        result_path, progress_path = case/"result.json", case/"progress.json"
+        result = None; evidence_path = None
+        if result_path.is_file():
+            try:
+                candidate = json.loads(result_path.read_text())
+            except (OSError, json.JSONDecodeError):
+                candidate = {}
+            if candidate.get("schema") == "r10.czm-owned-hcf-trajectory/1":
+                result, evidence_path = candidate, result_path
+        if progress_path.is_file():
+            try:
+                progress = json.loads(progress_path.read_text())
+            except (OSError, json.JSONDecodeError):
+                progress = {}
+            if (progress.get("complete_row_sha256") and
+                    float(progress.get("accepted_cycles") or 0.) >
+                    float((result or {}).get("accepted_cycles") or 0.)):
+                result, evidence_path = progress, progress_path
+        if result is None:
+            continue
+        events = result.get("events") or []
+        identity = result.get("complete_row_sha256")
+        meta = metadata.get(identity, {})
+        Kmax = result.get("Kmax_MPa_sqrt_m")
+        if Kmax in (None, ""):
+            predicted = meta.get("predicted_hcf_K_300K")
+            label = case.name.removeprefix("m_").replace("p", ".")
+            try:
+                multiplier = float(label)
+            except ValueError:
+                multiplier = 1.
+            Kmax = None if predicted in (None, "") else float(predicted)*multiplier
+        for lower_um, upper_um, purpose in (
+                (20., 60., "CANONICAL_DEVELOPED_WINDOW"),
+                (60., 100., "LATE_STATIONARITY_DIAGNOSTIC"),
+                (20., 100., "AGGREGATE_STATIONARITY_DIAGNOSTIC")):
+            lower_m, upper_m = lower_um*1e-6, upper_um*1e-6
+            endpoint_tol = max(1e-15, 1e-12*upper_m)
+            low = next((event for event in events
+                        if float(event["extension_m"])+endpoint_tol >= lower_m), None)
+            high = next((event for event in events
+                         if float(event["extension_m"])+endpoint_tol >= upper_m), None)
+            if low is None or high is None:
+                continue
+            duration = float(high["cycle"])-float(low["cycle"])
+            if duration <= 0.:
+                continue
+            output.append({
+                "candidate_id": result.get("candidate_id"),
+                "complete_row_sha256": identity,
+                "temperature_K": result.get("temperature_K"), "R": result.get("R"),
+                "frequency_Hz": result.get("frequency_Hz"),
+                "Kmax_MPa_sqrt_m": Kmax,
+                "DeltaK_MPa_sqrt_m": (None if Kmax is None else
+                    float(Kmax)*(1.-float(result.get("R") or 0.))),
+                "hazard_seed": result.get("hazard_seed"),
+                "plastic_feedback_reference": result.get(
+                    "plastic_feedback_reference", "EVOLVING_FULL_STATE" if
+                    result.get("plastic_feedback", True) else "FROZEN_INITIAL_PLASTIC_STATE"),
+                "window_purpose": purpose, "window_start_um": lower_um,
+                "window_end_um": upper_um, "start_cycle": float(low["cycle"]),
+                "end_cycle": float(high["cycle"]), "duration_cycles": duration,
+                "rate_m_per_cycle": (float(high["extension_m"])-
+                    float(low["extension_m"]))/duration,
+                "accepted_cycles_at_receipt": result.get("accepted_cycles"),
+                "event_count_at_receipt": len(events),
+                "evidence_path": str(evidence_path.relative_to(root)),
+            })
+    return output
+
+
 def search_specification() -> dict:
     return {
         "schema": "r10.finite-compliance-inverse-shape-search-specification/1",
@@ -370,6 +453,7 @@ def analyze(args) -> int:
                 "triggers": [case.get("trigger") for case in record.get("cases") or []]})
     csv_write(out / "hcf_results.csv", hcf)
     csv_write(out / "native_developed_slopes.csv", developed_slope_rows(hcf))
+    csv_write(out / "native_event_windows.csv", hcf_event_window_rows(args.root))
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
     atomic(out / "two_d_results.json", two_d)

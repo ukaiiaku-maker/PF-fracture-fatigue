@@ -1,7 +1,8 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import (
-    developed_slope_rows, hcf_rows, native_rows, search_specification,
+    developed_slope_rows, hcf_event_window_rows, hcf_rows, native_rows,
+    search_specification,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
@@ -59,6 +60,30 @@ def test_campaign_hcf_aggregation_includes_accepted_progress_without_result(tmp_
     assert rows[0]["Kmax_MPa_sqrt_m"] == 11.
     assert rows[0]["DeltaK_MPa_sqrt_m"] == 9.9
     assert rows[0]["physical_event_count"] == 1
+
+
+def test_event_windows_use_latest_accepted_progress_and_keep_window_meanings(tmp_path):
+    registry = tmp_path / "projection" / "projected_registry.csv"
+    registry.parent.mkdir()
+    registry.write_text(
+        "complete_row_sha256,candidate_id,selected_shape,selected_mode,predicted_hcf_K_300K\n"
+        + f"{'e' * 64},CAND,compact_independent,cohesive_mixed,20\n")
+    case = tmp_path / "hcf" / "CAND" / "m_1p00000"
+    case.mkdir(parents=True)
+    events = [{"cycle": float(index*100), "extension_m": index*1e-6}
+              for index in range(1, 101)]
+    (case / "progress.json").write_text(json.dumps({
+        "candidate_id": "CAND", "complete_row_sha256": "e" * 64,
+        "accepted_cycles": 10000., "frequency_Hz": 1000., "temperature_K": 300.,
+        "R": .1, "events": events, "observation_path_m": 120e-6,
+        "hazard_seed": 7, "plastic_feedback": True,
+    }))
+    rows = hcf_event_window_rows(tmp_path)
+    assert [row["window_purpose"] for row in rows] == [
+        "CANONICAL_DEVELOPED_WINDOW", "LATE_STATIONARITY_DIAGNOSTIC",
+        "AGGREGATE_STATIONARITY_DIAGNOSTIC"]
+    assert all(abs(row["rate_m_per_cycle"]-1e-8) < 1e-20 for row in rows)
+    assert rows[0]["evidence_path"].endswith("progress.json")
 
 
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
