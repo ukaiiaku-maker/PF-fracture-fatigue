@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from scripts import package_r10_12h_campaign as package
 from scripts.package_r10_12h_campaign import campaign_files
 
 
@@ -21,3 +22,10 @@ def test_campaign_export_keeps_restart_state_but_not_append_only_history(tmp_pat
     assert {keep, state, result} <= selected
     assert {summary, delivery} <= selected
     assert drop not in selected
+
+
+def test_relative_cli_paths_are_rooted_at_repository(tmp_path, monkeypatch):
+    monkeypatch.setattr(package, "ROOT", tmp_path)
+    assert package.rooted(Path("runs/campaign")) == tmp_path/"runs/campaign"
+    absolute = tmp_path/"elsewhere"
+    assert package.rooted(absolute) == absolute

@@ -18,6 +18,11 @@ RESTART_NAMES = {
 }
 
 
+def rooted(path: Path) -> Path:
+    """Resolve CLI paths relative to the repository, independent of caller cwd."""
+    return path.resolve() if path.is_absolute() else (ROOT / path).resolve()
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -76,6 +81,10 @@ def main(argv=None) -> int:
     parser.add_argument("--base-revision", default=BASE_REVISION)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
+    args.campaign = rooted(args.campaign)
+    if args.report is not None:
+        args.report = rooted(args.report)
+    args.out = rooted(args.out)
     evidence = campaign_files(args.campaign)
     sources = changed_sources(args.base_revision)
     if args.report and args.report.is_file():
