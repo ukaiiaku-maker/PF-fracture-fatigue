@@ -1,6 +1,7 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import hcf_rows, native_rows
+from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
 
 
@@ -40,3 +41,21 @@ def test_hcf_phase_resolution_uses_accessible_cycle_fraction():
     assert resolved_phase_count(row, 16, 4, 4096) == 598
     assert resolved_phase_count(row, 16, 0, 4096) == 16
     assert resolved_phase_count({}, 16, 4, 4096) == 16
+
+
+def test_hcf_phase_resolution_recomputes_each_protocol_load(monkeypatch):
+    monkeypatch.setattr(hcf_batch, "thermal_from", lambda cohesive: "thermal")
+    monkeypatch.setattr(hcf_batch, "mechanics", lambda thermal, temperature: (None, 7.))
+    def fake_cycle(Kmax, stiffness, thermal, temperature, shape, area,
+                   attempt, **kwargs):
+        assert (Kmax, stiffness, thermal, temperature, shape) == (
+            12.5, 7., "thermal", 600., "compact_independent")
+        return {"accessible_phase_fraction": .125}
+    monkeypatch.setattr(hcf_batch, "cyclic_rate", fake_cycle)
+    row={"cohesive_parameter_vector":json.dumps({
+            "activation_area_m2":1e-19,"attempt_frequency_s":1e12}),
+         "selected_shape":"compact_independent"}
+    fraction=hcf_batch.accessible_fraction_for_load(row,12.5,600.,.3,100.)
+    assert fraction == .125
+    assert resolved_phase_count(
+        {"predicted_hcf_accessible_phase_fraction":fraction},16,4,256) == 32

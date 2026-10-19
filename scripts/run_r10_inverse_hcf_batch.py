@@ -13,6 +13,8 @@ import sys
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from scripts.run_r10_coupled_opening_search import reference_load
 from scripts.run_r10_czm_hcf import run_case
+from arrhenius_fracture.finite_compliance_inverse_shape_r10 import cyclic_rate
+from scripts.run_r10_opening_alternatives import mechanics,thermal_from
 
 
 def atomic(path:Path,payload:dict)->None:
@@ -35,6 +37,18 @@ def resolved_phase_count(row:dict,base:int,minimum_samples:int,maximum:int)->int
         return int(base)
     needed=math.ceil(int(minimum_samples)/fraction)
     return min(int(maximum),max(int(base),needed))
+
+
+def accessible_fraction_for_load(row:dict,Kmax:float,temperature_K:float,
+                                 R:float,frequency_Hz:float)->float:
+    """Resolve each protocol load, rather than reusing the base-load width."""
+    cohesive=json.loads(row["cohesive_parameter_vector"])
+    thermal=thermal_from(cohesive);_,kenv=mechanics(thermal,temperature_K)
+    point=cyclic_rate(Kmax,kenv,thermal,temperature_K,row["selected_shape"],
+        float(cohesive["activation_area_m2"]),
+        float(cohesive["attempt_frequency_s"]),R=R,
+        frequency_Hz=frequency_Hz,phases=8)
+    return float(point.get("accessible_phase_fraction") or 0.)
 
 
 def main(argv=None)->int:
@@ -63,15 +77,20 @@ def main(argv=None)->int:
     for index,row in enumerate(rows):
         reference,_=reference_load(row,args.temperature_K,args.phases)
         predicted=float(row.get("predicted_hcf_K_300K") or row["predicted_Kaccess_300K"])
-        task_phases=resolved_phase_count(row,args.phases,
-            args.minimum_accessible_phase_samples,args.maximum_auto_phases)
         for j,multiplier in enumerate(multipliers):
             desired=predicted*multiplier;label=f"m_{multiplier:.5f}".replace(".","p")
+            phase_row=dict(row)
+            fraction=accessible_fraction_for_load(row,desired,args.temperature_K,
+                                                  args.R,args.frequency_Hz)
+            phase_row["predicted_hcf_accessible_phase_fraction"]=fraction
+            task_phases=resolved_phase_count(phase_row,args.phases,
+                args.minimum_accessible_phase_samples,args.maximum_auto_phases)
             tasks.append({"registry":str(args.registry),"candidate_id":row["candidate_id"],
                 "factor":desired/reference,"desired_Kmax":desired,"horizon":args.horizon,
                 "out":str(args.out/row["candidate_id"]/label),"seed":args.seed+1000*index+j,
                 "phases":task_phases,"temperature_K":args.temperature_K,"R":args.R,
                 "frequency_Hz":args.frequency_Hz,"path_limit_um":args.path_limit_um,
+                "phase_selection_accessible_fraction":fraction,
                 "max_wall_s":args.max_wall_s,
                 "plastic_feedback":not args.frozen_initial_plastic_state})
     results=[]
@@ -84,6 +103,7 @@ def main(argv=None)->int:
             summary={"candidate_id":task["candidate_id"],"desired_Kmax_MPa_sqrt_m":task["desired_Kmax"],
                 "temperature_K":task["temperature_K"],"R":task["R"],"frequency_Hz":task["frequency_Hz"],
                 "phase_count":task["phases"],
+                "phase_selection_accessible_fraction":task["phase_selection_accessible_fraction"],
                 "accepted_cycles":result.get("accepted_cycles"),"accepted_seconds":result.get("accepted_seconds"),
                 "physical_event_count":result.get("physical_event_count"),"advance_m":result.get("advance_m"),
                 "developed_rate_m_per_cycle":result.get("developed_rate_m_per_cycle"),
