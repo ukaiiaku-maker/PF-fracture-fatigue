@@ -17,7 +17,7 @@
 - Native evidence must come from the current state-aware/full-state path.
 - Same complete material owns fatigue and Weak-T/Peak-T/DBTT fracture comparisons.
 
-## Live stage
+## Historical live-stage ledger (superseded by final closure below)
 
 1. Reconciliation and reference reproduction: complete.
 2. Compact single-potential constitutive implementation: complete; rounded
