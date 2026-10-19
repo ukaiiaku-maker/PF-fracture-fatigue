@@ -1,7 +1,8 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import (
-    csv_row_count, developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows,
+    complete_material_rows, csv_row_count, developed_slope_rows, execution_timing,
+    hcf_event_window_rows, hcf_rows,
     native_rows, replicate_rate_rows, search_specification, state_effect_rows,
     state_prefix_rows,
 )
@@ -22,6 +23,20 @@ def test_campaign_aggregation_preserves_complete_material_identity(tmp_path):
     assert rows[0]["same_complete_material_sha256"] == "a" * 64
     assert rows[0]["paired_plasticity_sha256"] == "b" * 64
     assert rows[0]["event_count"] == 1
+
+
+def test_complete_material_vectors_are_deduplicated_by_identity(tmp_path):
+    header = ("candidate_id,complete_row_sha256,cohesive_parameter_vector,"
+              "parent_complete_parameter_vector,predicted_hcf_local_slope\n")
+    for index, slope in enumerate(("", "4.1")):
+        path = tmp_path/f"round_{index}"/"projected_registry.csv"
+        path.parent.mkdir()
+        path.write_text(header + f'C,{"a"*64},"{{""x"":1}}","{{""y"":2}}",{slope}\n')
+    rows = complete_material_rows(tmp_path)
+    assert len(rows) == 1
+    assert rows[0]["complete_row_sha256"] == "a"*64
+    assert rows[0]["predicted_hcf_local_slope"] == "4.1"
+    assert rows[0]["registry_source"].endswith("round_1/projected_registry.csv")
 
 
 def test_campaign_hcf_aggregation_requires_native_schema(tmp_path):

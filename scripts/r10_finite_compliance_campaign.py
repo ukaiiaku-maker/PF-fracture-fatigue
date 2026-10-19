@@ -42,7 +42,7 @@ def json_files(root: Path, name: str) -> list[Path]:
 
 def registry_metadata(root: Path) -> dict[str, dict]:
     metadata = {}
-    for path in sorted(root.rglob("projected_registry.csv")):
+    for path in sorted(root.rglob("*registry.csv")):
         with path.open(newline="") as stream:
             for row in csv.DictReader(stream):
                 identity = row.get("complete_row_sha256")
@@ -56,6 +56,41 @@ def registry_metadata(root: Path) -> dict[str, dict]:
                     "predicted_hcf_local_slope",
                     "predicted_hcf_accessible_phase_fraction")}
     return metadata
+
+
+def complete_material_rows(root: Path) -> list[dict]:
+    """Deduplicate complete serialized materials across projected registries."""
+    selected: dict[str, dict] = {}
+    keep = (
+        "candidate_id", "family", "additive_family", "complete_row_sha256",
+        "parent_candidate_id", "parent_complete_row_sha256",
+        "plasticity_physics_sha256", "cohesive_parameter_sha256",
+        "source_material_candidate_id", "selected_shape", "selected_mode",
+        "source_material_class", "mechanism_prediction", "thermal_prediction",
+        "cohesive_fold_thermal_prediction", "research_status", "search_design",
+        "cohesive_parameter_vector", "parent_complete_parameter_vector",
+        "predicted_fold_K_300K", "predicted_hcf_K_300K",
+        "predicted_hcf_cyclic_action_per_cycle", "predicted_hcf_local_slope",
+        "predicted_hcf_accessible_phase_fraction",
+    )
+    for path in sorted(root.rglob("*registry.csv")):
+        with path.open(newline="") as stream:
+            for row in csv.DictReader(stream):
+                identity = row.get("complete_row_sha256")
+                if not identity:
+                    continue
+                record = {key: row.get(key) for key in keep}
+                record["registry_source"] = str(path.relative_to(root))
+                existing = selected.get(identity)
+                # Prefer the richer record when the same immutable material was
+                # projected at multiple acquisition stages.
+                richness = sum(value not in (None, "") for value in record.values())
+                previous = (-1 if existing is None else
+                    sum(value not in (None, "") for value in existing.values()))
+                if richness > previous:
+                    selected[identity] = record
+    return sorted(selected.values(), key=lambda row: (
+        row.get("candidate_id") or "", row["complete_row_sha256"]))
 
 
 def hcf_rows(root: Path) -> list[dict]:
@@ -616,6 +651,7 @@ def analyze(args) -> int:
     out = args.root / "campaign_delivery"
     hcf = hcf_rows(args.root)
     native = native_rows(args.root)
+    materials = complete_material_rows(args.root)
     frontier = analytical_frontier(args.root)
     fractures = []
     for path in sorted(args.root.rglob("ramp_dispositions.csv")):
@@ -652,6 +688,7 @@ def analyze(args) -> int:
                                  "NO_FICTITIOUS_RATIO_FORMED"),
     })
     csv_write(out / "native_event_windows.csv", hcf_event_window_rows(args.root))
+    csv_write(out / "complete_material_vectors.csv", materials)
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
     atomic(out / "two_d_results.json", two_d)
@@ -686,6 +723,7 @@ def analyze(args) -> int:
                 for path in args.root.rglob("matched_shape_isolation.csv")),
             "stiffness_sensitivity_rows":sum(csv_row_count(path)
                 for path in args.root.rglob("stiffness_sensitivity.csv")),
+            "complete_material_vectors": len(materials),
             "state_informed_results": sum(1 for path in args.root.glob("state_informed*/*/*.json")),
             "native_full_state_results": len(native),
             "native_unique_complete_materials": len({row.get("same_complete_material_sha256") for row in native
