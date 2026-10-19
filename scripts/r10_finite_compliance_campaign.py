@@ -114,6 +114,7 @@ def hcf_rows(root: Path) -> list[dict]:
             continue
         evidence_state = ("ACCEPTED_PROGRESS_WITHOUT_TERMINAL_RESULT"
                           if standalone_progress else "TERMINAL_RESULT")
+        evidence_path = path
         progress_path = case / "progress.json"
         if not standalone_progress and progress_path.is_file():
             try:
@@ -138,6 +139,7 @@ def hcf_rows(root: Path) -> list[dict]:
                 record["recurrence_outcome"] = scored["outcome"]
                 record["disposition"] = "ACCEPTED_RESTART_IN_PROGRESS"
                 evidence_state = "ACCEPTED_PROGRESS_NEWER_THAN_RESULT"
+                evidence_path = progress_path
         identity = record.get("complete_row_sha256")
         meta = metadata.get(identity, {})
         if standalone_progress:
@@ -187,7 +189,7 @@ def hcf_rows(root: Path) -> list[dict]:
         record["maximum_active_mobile_postcommit"] = max(mobile, default=None)
         record["maximum_active_retained_postcommit"] = max(retained, default=None)
         record["maximum_absolute_wake_slip"] = max(wake_slip, default=None)
-        rows.append({"path": str(path.relative_to(root)),
+        rows.append({"path": str(evidence_path.relative_to(root)),
             "evidence_state": evidence_state,
             **meta, **{key: record.get(key) for key in (
             "candidate_id", "complete_row_sha256", "shape", "mode", "temperature_K",
@@ -749,7 +751,27 @@ def analyze(args) -> int:
             "candidate_id","complete_row_sha256","accepted_cycles",
             "accepted_seconds","physical_event_count","advance_m","disposition",
             "resource_stop","restart_checkpoint")})
-        restarts[-1]["checkpoint_exists"]=(ROOT/checkpoint).exists()
+        checkpoint_path = ROOT/checkpoint
+        evidence_path = args.root/row["path"]
+        restarts[-1]["checkpoint_exists"]=checkpoint_path.exists()
+        restarts[-1]["checkpoint_sha256"]=(sha256(checkpoint_path)
+            if checkpoint_path.is_file() else None)
+        restarts[-1]["accepted_evidence_sha256"]=(sha256(evidence_path)
+            if evidence_path.is_file() else None)
+        checkpoint_cycles = None
+        if checkpoint_path.is_file():
+            try:
+                checkpoint_record = json.loads(checkpoint_path.read_text())
+                checkpoint_cycles = (checkpoint_record.get("metadata") or {}).get(
+                    "accepted_cycles", checkpoint_record.get("cycles_from_engine_time"))
+            except (OSError, json.JSONDecodeError):
+                pass
+        restarts[-1]["checkpoint_accepted_cycles"] = checkpoint_cycles
+        receipt_cycles = float(row.get("accepted_cycles") or 0.)
+        restarts[-1]["checkpoint_cycle_delta_from_receipt"] = (None
+            if checkpoint_cycles is None else float(checkpoint_cycles)-receipt_cycles)
+        restarts[-1]["checkpoint_not_ahead_of_receipt"] = (None
+            if checkpoint_cycles is None else float(checkpoint_cycles) <= receipt_cycles+1e-6)
         restarts[-1]["result_path"]=row["path"]
     csv_write(out/"restart_inventory.csv",restarts)
     analytical_ids=set()

@@ -234,6 +234,7 @@ def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
     }))
     row = hcf_rows(tmp_path)[0]
     assert row["evidence_state"] == "ACCEPTED_PROGRESS_NEWER_THAN_RESULT"
+    assert row["path"].endswith("progress.json")
     assert row["physical_event_count"] == 60
     assert row["developed_rate_m_per_cycle"] == 1e-6
 
