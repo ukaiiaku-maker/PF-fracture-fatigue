@@ -50,7 +50,10 @@ def test_campaign_hcf_aggregation_includes_accepted_progress_without_result(tmp_
     progress.write_text(json.dumps({
         "candidate_id": "CAND", "complete_row_sha256": "d" * 64,
         "accepted_cycles": 1234., "frequency_Hz": 100., "temperature_K": 300.,
-        "R": .1, "events": [{"cycle": 100., "extension_m": 1e-6}],
+        "R": .1, "events": [{"cycle": 100., "extension_m": 1e-6,
+            "wake_transaction": {"active_mobile_postcommit": 12.,
+                                 "active_retained_postcommit": 3.,
+                                 "wake_slip": -8.}}],
         "observation_path_m": 60e-6, "plastic_feedback": True,
     }))
     rows = hcf_rows(tmp_path)
@@ -60,6 +63,9 @@ def test_campaign_hcf_aggregation_includes_accepted_progress_without_result(tmp_
     assert rows[0]["Kmax_MPa_sqrt_m"] == 11.
     assert rows[0]["DeltaK_MPa_sqrt_m"] == 9.9
     assert rows[0]["physical_event_count"] == 1
+    assert rows[0]["maximum_active_mobile_postcommit"] == 12.
+    assert rows[0]["maximum_active_retained_postcommit"] == 3.
+    assert rows[0]["maximum_absolute_wake_slip"] == 8.
 
 
 def test_event_windows_use_latest_accepted_progress_and_keep_window_meanings(tmp_path):

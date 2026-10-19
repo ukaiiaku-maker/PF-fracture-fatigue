@@ -135,6 +135,16 @@ def hcf_rows(root: Path) -> list[dict]:
                 "plastic_feedback_reference": ("EVOLVING_FULL_STATE" if
                     record.get("plastic_feedback", True) else "FROZEN_INITIAL_PLASTIC_STATE"),
             })
+        event_rows = record.get("events") or []
+        mobile = [float(event.get("wake_transaction", {}).get(
+                    "active_mobile_postcommit") or 0.) for event in event_rows]
+        retained = [float(event.get("wake_transaction", {}).get(
+                      "active_retained_postcommit") or 0.) for event in event_rows]
+        wake_slip = [abs(float(event.get("wake_transaction", {}).get(
+                       "wake_slip") or 0.)) for event in event_rows]
+        record["maximum_active_mobile_postcommit"] = max(mobile, default=None)
+        record["maximum_active_retained_postcommit"] = max(retained, default=None)
+        record["maximum_absolute_wake_slip"] = max(wake_slip, default=None)
         rows.append({"path": str(path.relative_to(root)),
             "evidence_state": evidence_state,
             **meta, **{key: record.get(key) for key in (
@@ -144,7 +154,10 @@ def hcf_rows(root: Path) -> list[dict]:
             "first_event_cycle", "all_waiting_intervals_cycles", "inter_event_cycles",
             "developed_rate_m_per_cycle", "developed_window", "disposition",
             "recurrence_outcome", "numeric_failure", "resource_stop",
-            "unsupported_validities", "restart_checkpoint", "plastic_feedback_reference")}})
+            "unsupported_validities", "restart_checkpoint", "plastic_feedback_reference",
+            "maximum_active_mobile_postcommit",
+            "maximum_active_retained_postcommit",
+            "maximum_absolute_wake_slip")}})
     return rows
 
 
