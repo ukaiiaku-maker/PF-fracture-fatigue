@@ -405,7 +405,7 @@ def plot(args) -> int:
         cohesive_shape_response,
     )
     from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
-        connected_barrier, imposed_from_K, shape_coordinates,
+        connected_barrier, cyclic_rate_curve, imposed_from_K, shape_coordinates,
     )
     from scripts.run_r10_finite_compliance_inverse_shape import _thermal
     from scripts.run_r10_opening_alternatives import mechanics
@@ -468,7 +468,8 @@ def plot(args) -> int:
         ax.set_xlabel("Separation (nm)");ax.set_ylabel(r"Loaded potential (J m$^{-2}$)")
         ax.legend(frameon=False);fig.tight_layout();fig.savefig(out/"finite_compliance_landscape.png",dpi=240);fig.savefig(out/"finite_compliance_landscape.pdf");plt.close(fig)
 
-    records=[row for row in hcf_rows(args.root) if row.get("candidate_id")=="R10_INV_21321__SM" and
+    all_hcf=hcf_rows(args.root)
+    records=[row for row in all_hcf if row.get("candidate_id")=="R10_INV_21321__SM" and
              float(row.get("temperature_K") or 0.)==300. and float(row.get("R") or 0.)==.1 and
              float(row.get("frequency_Hz") or 0.)==1000. and
              row.get("plastic_feedback_reference")=="EVOLVING_FULL_STATE"]
@@ -491,6 +492,97 @@ def plot(args) -> int:
         ax.set_xlabel(r"$K_{\max}$ (MPa$\sqrt{\mathrm{m}}$)")
         ax.set_ylabel(r"Developed $da/dN$ (m cycle$^{-1}$)")
         fig.tight_layout();fig.savefig(out/"native_amplitude_outcomes.png",dpi=240);fig.savefig(out/"native_amplitude_outcomes.pdf");plt.close(fig)
+
+    compact_id="R10_INVERSE_OPT_027__CM"
+    compact_records=[row for row in all_hcf if row.get("candidate_id")==compact_id and
+        float(row.get("temperature_K") or 0.)==300. and float(row.get("R") or 0.)==.1 and
+        float(row.get("frequency_Hz") or 0.)==1000. and
+        row.get("plastic_feedback_reference")=="EVOLVING_FULL_STATE"]
+    registries=sorted(args.root.rglob("projected_registry.csv"))
+    compact_registry=None
+    for registry in registries:
+        with registry.open(newline="") as stream:
+            match=next((row for row in csv.DictReader(stream)
+                        if row.get("candidate_id")==compact_id),None)
+        if match is not None:
+            compact_registry=match;break
+    if compact_records and compact_registry is not None:
+        cohesive=json.loads(compact_registry["cohesive_parameter_vector"])
+        thermal=_thermal(cohesive);_,kenv=mechanics(thermal,300.)
+        base=float(compact_registry["predicted_hcf_K_300K"])
+        K=np.geomspace(.9*base,1.25*base,61)
+        analytical=cyclic_rate_curve(K,kenv,thermal,300.,COMPACT_INDEPENDENT,
+            float(cohesive["activation_area_m2"]),
+            float(cohesive["attempt_frequency_s"]),R=.1,frequency_Hz=1000.,phases=32)
+        action=np.asarray([row["opening_action_per_cycle"] for row in analytical["rows"]])
+        slope=np.asarray([np.nan if row["local_log_slope"] is None else row["local_log_slope"]
+                          for row in analytical["rows"]])
+        fig,axes=plt.subplots(2,1,figsize=(6.4,6.4),sharex=True)
+        axes[0].semilogy(K,np.maximum(action*1e-6,1e-16),color="#1f4e79",lw=1.5,
+                         label="Frozen complete-cycle reference")
+        for row in sorted(compact_records,key=lambda item:float(item["Kmax_MPa_sqrt_m"])):
+            kval=float(row["Kmax_MPa_sqrt_m"]);rate=row.get("developed_rate_m_per_cycle")
+            if rate not in (None,"",0,0.):
+                axes[0].semilogy(kval,float(rate),"o",color="#a23b2a",ms=5)
+            elif row.get("disposition")=="PHYSICAL_RUNOUT_TO_DECLARED_HORIZON":
+                axes[0].semilogy(kval,1e-16,"v",mfc="none",mec="#1f4e79")
+            else:
+                axes[0].semilogy(kval,1e-15,"s",mfc="none",mec="#555555")
+        axes[0].set_ylabel(r"Opening / developed rate (m cycle$^{-1}$)")
+        axes[0].legend(frameon=False)
+        axes[1].plot(K,slope,color="#1f4e79",lw=1.5,label="Analytical local slope")
+        for row in developed_slope_rows(compact_records):
+            midpoint=math.sqrt(float(row["DeltaK_low_MPa_sqrt_m"])*
+                               float(row["DeltaK_high_MPa_sqrt_m"]))/.9
+            axes[1].plot(midpoint,float(row["local_log_slope"]),"o",color="#a23b2a")
+        axes[1].axhspan(3.4,4.6,color="#4c956c",alpha=.18)
+        axes[1].set_xlabel(r"$K_{\max}$ (MPa$\sqrt{\mathrm{m}}$)")
+        axes[1].set_ylabel(r"Local $d\ln(da/dN)/d\ln K$")
+        fig.tight_layout();fig.savefig(out/"compact_027_analytical_native.png",dpi=240)
+        fig.savefig(out/"compact_027_analytical_native.pdf");plt.close(fig)
+
+    full_path=args.root/"hcf_bounded_inverse_top3"/compact_id/"m_1p00000"/"progress.json"
+    frozen_path=args.root/"hcf_bounded_inverse_027_frozen"/compact_id/"m_1p00000"/"progress.json"
+    if full_path.is_file() and frozen_path.is_file():
+        fig,ax=plt.subplots(figsize=(6.2,4.4))
+        for path,label,style in ((full_path,"Evolving full state","-"),
+                                 (frozen_path,"Frozen initial plastic state","--")):
+            record=json.loads(path.read_text());events=record.get("events") or []
+            x=[0.]+[float(event["cycle"]) for event in events]
+            y=[0.]+[float(event["extension_m"])*1e6 for event in events]
+            ax.step(x,y,where="post",lw=1.5,ls=style,label=label)
+        ax.set_xlabel("Accepted cycles");ax.set_ylabel("Cohesive advance (micrometres)")
+        ax.legend(frameon=False);fig.tight_layout()
+        fig.savefig(out/"compact_027_full_frozen_events.png",dpi=240)
+        fig.savefig(out/"compact_027_full_frozen_events.pdf");plt.close(fig)
+
+    ramp=args.root/"fracture_bounded_inverse_top3"/"ramp_dispositions.csv"
+    if ramp.is_file():
+        with ramp.open(newline="") as stream:ramp_rows=list(csv.DictReader(stream))
+        fig,ax=plt.subplots(figsize=(6.4,4.5))
+        colors={"R10_INVERSE_OPT_002__CM":"#1f77b4",
+                "R10_INVERSE_OPT_008__CM":"#ff7f0e",
+                "R10_INVERSE_OPT_027__CM":"#2ca02c"}
+        for candidate in colors:
+            group=sorted((row for row in ramp_rows if row["candidate_id"]==candidate),
+                         key=lambda row:float(row["temperature_K"]))
+            resolved=[row for row in group if row.get("first_committed_separation_K_MPa_sqrt_m")]
+            ax.plot([float(row["temperature_K"]) for row in resolved],
+                    [float(row["first_committed_separation_K_MPa_sqrt_m"]) for row in resolved],
+                    "o-",lw=1.3,ms=4,color=colors[candidate],label=candidate.replace("R10_INVERSE_OPT_",""))
+            censored=[row for row in group if row.get("status")=="KMAX_CENSOR"]
+            if censored:
+                ax.plot([float(row["temperature_K"]) for row in censored],[200.]*len(censored),
+                        "^",mfc="none",mec=colors[candidate])
+            unsupported=[row for row in group if row.get("status")=="UNSUPPORTED_MIXED_CROSSOVER"]
+            if unsupported:
+                ax.plot([float(row["temperature_K"]) for row in unsupported],[200.]*len(unsupported),
+                        "x",color=colors[candidate])
+        ax.set_xlabel("Temperature (K)")
+        ax.set_ylabel(r"Committed separation / censor $K$ (MPa$\sqrt{\mathrm{m}}$)")
+        ax.legend(frameon=False);fig.tight_layout()
+        fig.savefig(out/"bounded_inverse_same_material_fracture.png",dpi=240)
+        fig.savefig(out/"bounded_inverse_same_material_fracture.pdf");plt.close(fig)
 
     print(json.dumps({"figure_directory":str(out),"files":sorted(p.name for p in out.iterdir())},indent=2));return 0
 
