@@ -38,6 +38,29 @@ def test_campaign_hcf_aggregation_requires_native_schema(tmp_path):
     assert rows[0]["accepted_cycles"] == 1e8
 
 
+def test_campaign_hcf_aggregation_includes_accepted_progress_without_result(tmp_path):
+    registry = tmp_path / "projection" / "projected_registry.csv"
+    registry.parent.mkdir()
+    registry.write_text(
+        "complete_row_sha256,candidate_id,selected_shape,selected_mode,predicted_hcf_K_300K\n"
+        + f"{'d' * 64},CAND,compact_independent,cohesive_mixed,10\n")
+    progress = tmp_path / "hcf" / "CAND" / "m_1p10000" / "progress.json"
+    progress.parent.mkdir(parents=True)
+    progress.write_text(json.dumps({
+        "candidate_id": "CAND", "complete_row_sha256": "d" * 64,
+        "accepted_cycles": 1234., "frequency_Hz": 100., "temperature_K": 300.,
+        "R": .1, "events": [{"cycle": 100., "extension_m": 1e-6}],
+        "observation_path_m": 60e-6, "plastic_feedback": True,
+    }))
+    rows = hcf_rows(tmp_path)
+    assert len(rows) == 1
+    assert rows[0]["evidence_state"] == "ACCEPTED_PROGRESS_WITHOUT_TERMINAL_RESULT"
+    assert rows[0]["accepted_seconds"] == 12.34
+    assert rows[0]["Kmax_MPa_sqrt_m"] == 11.
+    assert rows[0]["DeltaK_MPa_sqrt_m"] == 9.9
+    assert rows[0]["physical_event_count"] == 1
+
+
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
     directory = tmp_path / "hcf" / "CAND" / "m"
     directory.mkdir(parents=True)

@@ -50,6 +50,7 @@ def registry_metadata(root: Path) -> dict[str, dict]:
                 metadata[identity] = {key: row.get(key) for key in (
                     "source_material_class", "cohesive_fold_thermal_prediction",
                     "thermal_prediction", "mechanism_prediction",
+                    "selected_shape", "selected_mode", "predicted_hcf_K_300K",
                     "predicted_hcf_cyclic_action_per_cycle",
                     "predicted_hcf_local_slope",
                     "predicted_hcf_accessible_phase_fraction")}
@@ -59,16 +60,26 @@ def registry_metadata(root: Path) -> dict[str, dict]:
 def hcf_rows(root: Path) -> list[dict]:
     rows = []
     metadata = registry_metadata(root)
-    for path in json_files(root, "result.json"):
+    case_paths = {path.parent: path for path in json_files(root, "result.json")}
+    for progress_path in json_files(root, "progress.json"):
+        case_paths.setdefault(progress_path.parent, progress_path)
+    for case, path in sorted(case_paths.items()):
         try:
             record = json.loads(path.read_text())
         except (OSError, json.JSONDecodeError):
             continue
-        if record.get("schema") != "r10.czm-owned-hcf-trajectory/1":
+        standalone_progress = path.name == "progress.json"
+        if (not standalone_progress and
+                record.get("schema") != "r10.czm-owned-hcf-trajectory/1"):
             continue
-        evidence_state = "TERMINAL_RESULT"
-        progress_path = path.with_name("progress.json")
-        if progress_path.is_file():
+        if standalone_progress and not all(record.get(key) is not None for key in (
+                "candidate_id", "complete_row_sha256", "accepted_cycles",
+                "frequency_Hz", "events")):
+            continue
+        evidence_state = ("ACCEPTED_PROGRESS_WITHOUT_TERMINAL_RESULT"
+                          if standalone_progress else "TERMINAL_RESULT")
+        progress_path = case / "progress.json"
+        if not standalone_progress and progress_path.is_file():
             try:
                 progress = json.loads(progress_path.read_text())
             except (OSError, json.JSONDecodeError):
@@ -92,9 +103,41 @@ def hcf_rows(root: Path) -> list[dict]:
                 record["disposition"] = "ACCEPTED_RESTART_IN_PROGRESS"
                 evidence_state = "ACCEPTED_PROGRESS_NEWER_THAN_RESULT"
         identity = record.get("complete_row_sha256")
+        meta = metadata.get(identity, {})
+        if standalone_progress:
+            frequency = float(record["frequency_Hz"])
+            events = record.get("events") or []
+            scored = score_recurrence(events,
+                float(record.get("observation_path_m") or 120e-6),
+                bool(record.get("unsupported") or record.get("unsupported_validities")))
+            multiplier_label = case.name.removeprefix("m_").replace("p", ".")
+            try:
+                multiplier = float(multiplier_label)
+            except ValueError:
+                multiplier = 1.
+            predicted = meta.get("predicted_hcf_K_300K")
+            Kmax = None if predicted in (None, "") else float(predicted)*multiplier
+            record.update({
+                "shape": meta.get("selected_shape"), "mode": meta.get("selected_mode"),
+                "Kmax_MPa_sqrt_m": Kmax,
+                "DeltaK_MPa_sqrt_m": (None if Kmax is None else
+                                        Kmax*(1.-float(record.get("R") or 0.))),
+                "accepted_seconds": float(record["accepted_cycles"])/frequency,
+                "physical_event_count": len(events),
+                "advance_m": (float(events[-1]["extension_m"]) if events else 0.),
+                "first_event_cycle": (float(events[0]["cycle"]) if events else None),
+                "all_waiting_intervals_cycles": [float(b["cycle"])-float(a["cycle"])
+                    for a,b in zip(events,events[1:])],
+                "developed_rate_m_per_cycle": scored["developed_rate_m_per_cycle"],
+                "developed_window": scored["developed_window"],
+                "recurrence_outcome": scored["outcome"],
+                "disposition": "ACCEPTED_RESTART_IN_PROGRESS",
+                "plastic_feedback_reference": ("EVOLVING_FULL_STATE" if
+                    record.get("plastic_feedback", True) else "FROZEN_INITIAL_PLASTIC_STATE"),
+            })
         rows.append({"path": str(path.relative_to(root)),
             "evidence_state": evidence_state,
-            **metadata.get(identity, {}), **{key: record.get(key) for key in (
+            **meta, **{key: record.get(key) for key in (
             "candidate_id", "complete_row_sha256", "shape", "mode", "temperature_K",
             "R", "frequency_Hz", "Kmax_MPa_sqrt_m", "DeltaK_MPa_sqrt_m",
             "accepted_cycles", "accepted_seconds", "physical_event_count", "advance_m",
