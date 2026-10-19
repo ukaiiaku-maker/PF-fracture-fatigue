@@ -97,6 +97,34 @@
   domain-valid rows.  Its best peak-phase point is not a valid two-sided cyclic
   slope; the first supported cyclic derivative is 8.475 at 2.87e-5 action per
   cycle.
+- Dense 101-amplitude/32-phase complete-cycle qualification is complete for all
+  eight bounded projections: zero strict passes, maximum connected moderate
+  width 1.62788 rate decades, and maximum barrier/quadrature relative error
+  1.59682e-12.
+- A sparse-secant/local-derivative discrepancy in the first cyclic optimizer
+  round was diagnosed and corrected.  Current inverse objectives use an exact
+  two-sided +/-1% complete-cycle derivative, and projection preserves that
+  optimizer coordinate.  The corrected eight-start round has three eligible
+  rows, zero strict passes, and best local slopes 6.753/6.764 at about
+  6.13e-5 action per cycle.  Its dense held-out maximum moderate width is
+  1.48857 rate decades.
+
+## Developed compact checkpoint
+
+- `R10_INVERSE_OPT_027__CM` now has completed 20--60 micrometre developed
+  windows at 1.05x and 1.10x: 3.07210e-11 and 5.99323e-11 m/cycle,
+  respectively.  Their adjacent local slope is 14.3652, so recurrent compact
+  growth is demonstrated but the strict moderate-slope objective is not.
+- Its 0.70/0.80/0.90 arms are physical no-advance outcomes through 1e8 cycles;
+  0.95 has four recurrent events outside the developed window.  Higher-load
+  and protocol arms remain active.
+- The full/frozen base histories are event-time identical through four events
+  with negligible plastic activity.  The redundant frozen worker was stopped
+  inside an unaccepted long block and sealed from its accepted checkpoint.
+- Parent EXP_floor class and intrinsic cohesive-fold temperature trend now have
+  separate registry fields.  This preserves DBTT/Peak/weakT/ceramic lineage
+  without claiming that the new cohesive potential retained the parent
+  fracture class.
 
 ## Resource ownership adjustment
 

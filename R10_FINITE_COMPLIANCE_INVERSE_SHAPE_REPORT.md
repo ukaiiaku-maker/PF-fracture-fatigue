@@ -160,6 +160,58 @@ monotonic ramps.  `R10_INVERSE_OPT_002__CM` separates at 15, 18, 23, and
 `002` are censors, not fracture roots.  Current HCF execution uses these exact
 complete-material identities.
 
+## Dense cyclic qualification and acquisition corrections
+
+All eight bounded inverse materials have now been evaluated at 101 held-out
+amplitudes with the complete moving-boundary cycle integral and 32 integration
+phases.  No material has a connected strict interval.  The largest connected
+2--8 interval is `1.62788` rate decades, below the two-decade benchmark, and
+the minimum local slopes among the eight lie between `6.3375` and `6.5989`.
+The maximum independent barrier/quadrature disagreement is
+`1.59682e-12`.
+
+The first HCF-weighted cyclic inverse round exposed two selection-semantic
+defects rather than a new success.  A 13-point curve supplied broad secants
+that understated a local slope (`6.34` sparse versus `8.75` after exact local
+projection), and the projection consumer initially discarded the optimizer's
+declared operating load in favor of the old peak-grid selection.  Both
+historical receipts are retained.  Current acquisition evaluates a dedicated
+two-sided +/-1% derivative of the complete cyclic integral and projects that
+exact operating coordinate.  Its first eight-start round has three eligible
+optima and zero strict passes.  The best exact-coordinate points have slopes
+`6.7531` and `6.7636` at actions about `6.13e-5/cycle`; their independent
+101-point qualification still has zero strict passes and at most `1.48857`
+moderate rate decades.  Numerical optimizer convergence is now reported
+separately from physical/domain eligibility.
+
+The source EXP_floor material class and the intrinsic cohesive-fold thermal
+trend are also now separate fields.  For example, the bounded trio retains
+DBTT, Peak, and ceramic parent backgrounds, respectively, even though its new
+same-material ramps are rising/censored (`002`), nearly flat (`008`), and flat
+(`027`).  This prevents a `WEAK_T_PREDICTED` cohesive-fold label from being
+misreported as a demonstrated coupled Weak-T/Peak/DBTT fracture class.
+
+## First developed compact HCF windows
+
+`R10_INVERSE_OPT_027__CM` has produced the first developed compact windows in
+this campaign.  At 1.05 times its selected load, the 20--60 micrometre window
+runs from cycle `485394.8764` to `1787435.0938` and gives
+`3.07210e-11 m/cycle`.  At 1.10 times load, the matched window runs from cycle
+`425419.8769` to `1092839.9596` and gives `5.99323e-11 m/cycle`.  Their adjacent
+local slope is `14.3652` over only `0.29023` rate decades, so this is recurrent
+long-exposure growth but not a moderate Paris interval.  A reporting-only
+endpoint tolerance was corrected after nominal 60-micrometre values rounded
+slightly below their binary threshold; accepted physics and histories were not
+rerun.
+
+The same candidate has physical non-advance through `1e8` cycles at 0.70,
+0.80, and 0.90 times load; 0.95 times has four recurrent events but has not
+reached the developed reporting window.  The full/frozen base comparison is
+event-time identical through four events and both have negligible active
+plastic populations.  Its frozen duplicate was therefore stopped inside an
+unaccepted long block and sealed from the last accepted checkpoint as a
+resource-bounded opening-control comparison.
+
 ## Current decision (campaign still active)
 
 The existing smooth and bilinear potentials are bounded negatives for the
