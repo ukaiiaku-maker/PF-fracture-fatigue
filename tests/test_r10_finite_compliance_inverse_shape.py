@@ -6,8 +6,8 @@ from arrhenius_fracture.cohesive_arrhenius import (
     COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL, CohesiveThermalLaw,
 )
 from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
-    branch_loss, connected_barrier, cyclic_rate, metastable_window, opening_rate,
-    shape_coordinates,
+    branch_loss, connected_barrier, cyclic_rate, cyclic_rate_curve,
+    metastable_window, opening_rate, shape_coordinates,
 )
 from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative, evaluate_opening
 from scripts import run_r10_finite_compliance_inverse_shape as search
@@ -96,6 +96,23 @@ def test_interval_aware_cycle_integral_resolves_narrow_peak_accessibility():
     assert adaptive["opening_action_per_cycle"] > 0.
     assert 0. < adaptive["accessible_phase_fraction"] < 1./32.
     assert adaptive["integration_method"] == "finite_interval_gauss"
+
+
+def test_complete_cycle_curve_reports_derivatives_and_connected_widths():
+    thermal = CohesiveThermalLaw(2., 15e9, 0., compact_variant="two_scale_tail",
+        compact_rise_fraction=.001, compact_drop_fraction=.003,
+        compact_tail_level=.035)
+    kenv=15e9**2/(2.*2.)
+    window=metastable_window(COMPACT_INDEPENDENT,thermal,300.,kenv)
+    birth=(float(window["birth_load_Pa"])*math.sqrt(2.*math.pi*1e-6)/1e6)
+    fold=(float(window["fold_load_Pa"])*math.sqrt(2.*math.pi*1e-6)/1e6)
+    result=cyclic_rate_curve(np.geomspace(1.01*birth,.7*fold,17),kenv,
+        thermal,300.,COMPACT_INDEPENDENT,1e-21,1e12,phases=12)
+    assert result["integration_method"] == "finite_interval_gauss"
+    assert len(result["rows"]) == 17
+    assert sum(row["local_log_slope"] is not None for row in result["rows"]) >= 3
+    assert result["moderate_connected_width_log10rate"] >= 0.
+    assert result["strict_connected_width_log10rate"] >= 0.
 
 
 def test_registry_hcf_point_is_selected_from_cycle_integral(monkeypatch):

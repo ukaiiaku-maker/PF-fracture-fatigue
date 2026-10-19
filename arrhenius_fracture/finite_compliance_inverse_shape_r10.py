@@ -394,6 +394,67 @@ def cyclic_rate(Kmax_MPa_sqrt_m: float, environment_stiffness_Pa_per_m: float,
             if row["barrier_kBT"] is not None),default=None)}
 
 
+def cyclic_rate_curve(K_values: Iterable[float],
+                      environment_stiffness_Pa_per_m: float,
+                      thermal: CohesiveThermalLaw, temperature_K: float,
+                      shape: str, activation_area_m2: float,
+                      attempt_frequency_s: float, R: float = .1,
+                      frequency_Hz: float = 1000., phases: int = 32) -> dict[str, Any]:
+    """Complete-cycle rate, slope, curvature, and connected-width metrics."""
+    rows = [cyclic_rate(K, environment_stiffness_Pa_per_m, thermal,
+                        temperature_K, shape, activation_area_m2,
+                        attempt_frequency_s, R=R, frequency_Hz=frequency_Hz,
+                        phases=phases) for K in K_values]
+    K = np.asarray([row["Kmax_MPa_sqrt_m"] for row in rows], dtype=float)
+    actions = np.asarray([row["opening_action_per_cycle"] for row in rows],
+                         dtype=float)
+    positive = actions > 0.
+    slopes = np.full(len(rows), np.nan)
+    curvature = np.full(len(rows), np.nan)
+    if np.count_nonzero(positive) >= 3:
+        indices = np.flatnonzero(positive)
+        x = np.log(K[indices]); y = np.log(actions[indices])
+        slopes[indices] = np.gradient(y, x, edge_order=2)
+        curvature[indices] = np.gradient(slopes[indices], x, edge_order=2)
+    for index, row in enumerate(rows):
+        row["local_log_slope"] = (None if not np.isfinite(slopes[index])
+                                  else float(slopes[index]))
+        row["local_log_curvature"] = (None if not np.isfinite(curvature[index])
+                                      else float(curvature[index]))
+
+    def connected_width(mask: np.ndarray) -> tuple[float, float, tuple[float,float] | None]:
+        best_K=0.;best_action=0.;best_bounds=None;start=None
+        for index, flag in enumerate(np.r_[mask, False]):
+            if flag and start is None:
+                start=index
+            elif not flag and start is not None:
+                end=index-1
+                width_K=math.log10(K[end]/K[start]) if end>start else 0.
+                width_action=math.log10(actions[end]/actions[start]) if end>start else 0.
+                if width_action>best_action:
+                    best_K,best_action,best_bounds=(width_K,width_action,
+                                                    (float(K[start]),float(K[end])))
+                start=None
+        return best_K,best_action,best_bounds
+
+    rate_band=(actions >= 1e-14) & (actions <= 1e-1)
+    moderate=positive & np.isfinite(slopes) & (slopes >= 2.) & (slopes <= 8.) & rate_band
+    strict=positive & np.isfinite(slopes) & (slopes >= 3.4) & (slopes <= 4.6) & rate_band
+    moderate_K,moderate_action,moderate_bounds=connected_width(moderate)
+    strict_K,strict_action,strict_bounds=connected_width(strict)
+    return {"rows":rows,
+        "moderate_connected_width_log10K":moderate_K,
+        "moderate_connected_width_log10rate":moderate_action,
+        "moderate_connected_bounds_MPa_sqrt_m":moderate_bounds,
+        "strict_connected_width_log10K":strict_K,
+        "strict_connected_width_log10rate":strict_action,
+        "strict_connected_bounds_MPa_sqrt_m":strict_bounds,
+        "strict_internal_reference_pass":bool(strict_action >= 2.),
+        "max_moderate_points":int(np.count_nonzero(moderate)),
+        "integration_method":"finite_interval_gauss"}
+
+
 __all__ = ["branch_loss", "metastable_window", "connected_barrier", "imposed_from_K",
            "K_from_imposed", "opening_rate", "rate_curve", "cyclic_rate",
+           "cyclic_rate_curve",
            "shape_coordinates"]
