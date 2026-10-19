@@ -126,7 +126,7 @@ completed without numerical or mixed-crossover failure.  Their event-free
 2--8-cycle prefixes are exposure/state probes, not HCF runout claims.
 
 For smooth material `R10_INV_21321__SM`, the completed 300 K amplitude evidence
-currently shows:
+shows:
 
 | Multiplier | Outcome |
 |---:|---|
