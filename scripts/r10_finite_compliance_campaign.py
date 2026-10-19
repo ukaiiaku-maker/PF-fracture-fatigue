@@ -592,6 +592,7 @@ def verify(args) -> int:
 
 def plot(args) -> int:
     import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
     import numpy as np
     from arrhenius_fracture.cohesive_arrhenius import (
         BILINEAR, COMPACT_INDEPENDENT, SMOOTH_EXPONENTIAL,
@@ -782,6 +783,41 @@ def plot(args) -> int:
         ax.legend(frameon=False);fig.tight_layout()
         fig.savefig(out/"bounded_inverse_same_material_fracture.png",dpi=240)
         fig.savefig(out/"bounded_inverse_same_material_fracture.pdf");plt.close(fig)
+
+    stiffness_table=args.root/"stiffness_sensitivity_bounded_trio"/"stiffness_sensitivity.csv"
+    if stiffness_table.is_file():
+        with stiffness_table.open(newline="") as stream:
+            stiffness_rows=list(csv.DictReader(stream))
+        fig,axes=plt.subplots(2,1,figsize=(6.2,6.2),sharex=True)
+        colors={"R10_INVERSE_OPT_002__CM":"#1f77b4",
+                "R10_INVERSE_OPT_008__CM":"#ff7f0e",
+                "R10_INVERSE_OPT_027__CM":"#2ca02c"}
+        for candidate,color in colors.items():
+            group=sorted((row for row in stiffness_rows
+                          if row["candidate_id"]==candidate and row["status"]=="RESOLVED"),
+                         key=lambda row:float(row["stiffness_factor"]))
+            x=[float(row["stiffness_factor"]) for row in group]
+            axes[0].plot(x,[float(row["minimum_local_slope"]) for row in group],
+                         "o-",color=color,lw=1.4,ms=4,
+                         label=candidate.replace("R10_INVERSE_OPT_",""))
+            axes[1].plot(x,[float(row["moderate_connected_width_log10rate"])
+                            for row in group],"o--",color=color,lw=1.2,ms=4)
+            axes[1].plot(x,[float(row["strict_connected_width_log10rate"])
+                            for row in group],"o-",color=color,lw=1.5,ms=4)
+        for ax in axes: ax.axvline(1.,color="#333333",lw=1.,ls=":")
+        axes[0].axhspan(3.4,4.6,color="#4c956c",alpha=.18)
+        axes[0].set_xscale("log",base=2);axes[0].set_ylabel("Minimum local slope")
+        axes[0].legend(frameon=False)
+        axes[1].axhline(2.,color="#333333",lw=1.,ls=":")
+        axes[1].legend(handles=[
+            Line2D([0],[0],color="#555555",lw=1.2,ls="--",
+                   label="Moderate 2--8 slope width"),
+            Line2D([0],[0],color="#555555",lw=1.5,ls="-",
+                   label="Strict 3.4--4.6 width")],frameon=False)
+        axes[1].set_xlabel(r"Diagnostic stiffness factor $k_e/k_{e,derived}$")
+        axes[1].set_ylabel("Connected rate width (decades)")
+        fig.tight_layout();fig.savefig(out/"stiffness_sensitivity.png",dpi=240)
+        fig.savefig(out/"stiffness_sensitivity.pdf");plt.close(fig)
 
     print(json.dumps({"figure_directory":str(out),"files":sorted(p.name for p in out.iterdir())},indent=2));return 0
 
