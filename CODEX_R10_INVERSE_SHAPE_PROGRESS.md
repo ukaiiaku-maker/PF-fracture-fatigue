@@ -187,8 +187,11 @@
 - Matched frozen-plastic 002 histories are executing with the same complete
   material, amplitudes, and hazard streams.  The 1.10 first event occurs at
   cycle 7604.945, versus 7604.998 in full state (ratio 0.999993).  This rules
-  out a consequential first-event effect; accepted inter-event exposure is
-  retained to test whether the large committed plastic state changes renewal.
+  out a consequential first-event effect.  Second events are now matched at
+  30820.012/30819.103 cycles (full/frozen) at 1.10 and
+  17670.007/17666.092 at 1.20.  The frozen/full waiting-interval ratios are
+  0.999963 and 0.999704, respectively: large committed plastic populations do
+  not create a consequential renewal-time effect in these tested prefixes.
 - Reporting now exports matched first-event ratios and one-sided exposure
   bounds separately from developed-rate ratios and slope changes.  Prefixes
   cannot be promoted into a developed state-effect claim.

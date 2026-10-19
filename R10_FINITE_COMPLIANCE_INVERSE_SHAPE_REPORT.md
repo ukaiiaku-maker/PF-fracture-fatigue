@@ -342,13 +342,20 @@ and `284/196` wake-slip units.  These resource-bounded prefixes demonstrate
 mechanism diversity but do not yet support developed plasticity-controlled
 Paris rates.
 
-The matched 002 full/frozen first events occur at cycles `2941.0570` and
-`2941.0307`, respectively.  Their near-equality prevents a state-effect claim
-from one event even though the committed transaction is strongly plastic; both
-accepted checkpoints are retained for later inter-event comparison.  At high
-temperature the same nominally opening-controlled 027 material develops a
-post-commit mobile population of about `44.1` by the 1200 K cascade, another
-reason the thermal cascades are kept separate from its 300 K HCF mechanism.
+The matched 002 full/frozen base first events occur at cycles `2941.0570` and
+`2941.0307`.  More consequential high-load pairs now resolve renewal after a
+strongly plastic transaction.  At 1.10 times load, full/frozen first events are
+`7604.998/7604.945` and second events are `30820.012/30819.103`; the frozen/full
+inter-event ratio is `0.999963`.  At 1.20 times load the corresponding first
+events are `4974.041/4973.882`, second events are `17670.007/17666.092`, and the
+ratio is `0.999704`.  The full transactions carry roughly 295--413 mobile units
+and 197--275 wake-slip units at event 1, yet the matched first and renewal times
+change by less than 0.04%.  This is evidence of a materially active plastic
+background whose tested fatigue timing remains opening-clock-controlled, not a
+developed plasticity-controlled rate.  At high temperature the same nominally
+opening-controlled 027 material develops a post-commit mobile population of
+about `44.1` by the 1200 K cascade, another reason the thermal cascades are kept
+separate from its 300 K HCF mechanism.
 
 ## Current decision (campaign still active)
 
