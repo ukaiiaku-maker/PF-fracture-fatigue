@@ -119,6 +119,10 @@
   but strict widths remain only 0.925--1.187 decades; all 15 cases fail strict.
   Factor 1 is the only native environment, so this is an environment-sensitivity
   bound rather than a mechanics adjustment.
+- A same-vector 027 shape isolation holds work, peak, activation convention,
+  environment, and plasticity fixed.  HCF-range slopes are 296--355 (smooth),
+  855--1309 (bilinear), and at least 6.505 (compact); only compact creates a
+  moderate interval (1.549 decades), but no arm creates strict width.
 - The slow-target cyclic acquisition was broadened to 32 starts: 20 are
   domain-valid across all four parent classes and zero pass strict.  Eight
   diversity-preserving exact projections retain zero strict passes under a

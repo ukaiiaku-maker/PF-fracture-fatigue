@@ -234,6 +234,21 @@ geometry but does not yield a strict success even at one quarter of the derived
 stiffness; the favorable force-controlled diagnostic cannot be transferred to
 the current mechanics by relabeling it.
 
+## Matched shape isolation
+
+An exact one-vector comparison uses the 027 cohesive work, peak traction,
+activation area/prefactor, derived environment, plasticity identity, temperature,
+and protocol for all three shapes.  Initial stiffness is reported as a shape
+output rather than forced: smooth and bilinear give `4.48643e22 Pa/m`, while
+the independently parameterized compact shape gives `2.06639e23 Pa/m`.
+Within the declared `1e-12--1e-4` opening-action range, smooth-exponential
+local slopes are `296.1--355.2`, bilinear slopes are `855.1--1308.8`, and the
+compact minimum is `6.5052`.  The compact arm creates `1.5490` moderate rate
+decades, versus zero for the two legacy shapes, but all three retain zero strict
+width.  This is direct evidence that the broader shape materially improves the
+finite-compliance response, while also showing that shape release alone does
+not satisfy the target.
+
 ## First developed compact HCF windows
 
 `R10_INVERSE_OPT_027__CM` has produced the first developed compact windows in
