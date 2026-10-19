@@ -12,6 +12,11 @@
 
 This is an opt-in research extension.  It does not promote a canonical material
 or reinterpret the diagnostic algebraic-tail potential as a native law.
+The delivery's `complete_material_vectors.csv` contains 1,161 deduplicated
+complete-material hashes with both the cohesive parameter vector and its parent
+EXP_floor vector, ownership hashes, source lineage, analytical coordinates, and
+explicit native/HCF/fracture/2-D evidence flags.  Complete vectors are therefore
+reported directly rather than reconstructed from candidate labels.
 
 ## Constitutive implementation and numerical checks
 
