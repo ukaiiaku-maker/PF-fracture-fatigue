@@ -121,7 +121,8 @@ def objective(vector: np.ndarray, base: dict) -> float:
     action = max(float(row["cyclic_target_action_per_cycle"]), 1e-300)
     strict = float(row["cyclic_strict_connected_width_log10rate"])
     moderate = float(row["cyclic_moderate_connected_width_log10rate"])
-    return abs(slope-4.) + .25*abs(math.log10(action)+6.) - 4.*strict - moderate
+    rate_weight=float(base.get("rate_weight",1.0))
+    return abs(slope-4.) + rate_weight*abs(math.log10(action)+6.) - 4.*strict - moderate
 
 
 def one(task: tuple[int,dict]) -> dict:
@@ -146,6 +147,7 @@ def main(argv=None) -> int:
     parser.add_argument("--out",type=Path,required=True)
     parser.add_argument("--starts",type=int,default=16)
     parser.add_argument("--workers",type=int,default=4)
+    parser.add_argument("--rate-weight",type=float,default=1.0)
     args=parser.parse_args(argv);args.out.mkdir(parents=True,exist_ok=True)
     inverse=[row for row in read_csv(args.inverse_table)
              if row.get("domain_pass")=="True"]
@@ -157,7 +159,7 @@ def main(argv=None) -> int:
         source_id=row["source_material_candidate_id"]
         bases.append({"candidate_id":f"R10_CYCLIC_OPT_{index:03d}",
             "cohesive":json.loads(row["optimized_cohesive_json"]),
-            "source":sources[source_id]})
+            "source":sources[source_id],"rate_weight":args.rate_weight})
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         rows=list(pool.map(one,enumerate(bases),chunksize=1))
     rows.sort(key=lambda row:(float(row.get("objective",math.inf)),
@@ -171,6 +173,7 @@ def main(argv=None) -> int:
                             for row in rows),
         "best_candidate":rows[0].get("candidate_id") if rows else None,
         "best_objective":rows[0].get("objective") if rows else None,
+        "hcf_log_rate_penalty_weight":args.rate_weight,
         "algebraic_tail_registered":False}
     atomic(args.out/"cyclic_inverse_summary.json",payload)
     print(json.dumps(payload,indent=2));return 0
