@@ -121,6 +121,35 @@ def analytical_frontier(root: Path) -> dict:
             "valid": valid, "strict_passes": strict, "best": keep}
 
 
+def cyclic_inverse_frontier(root: Path) -> dict:
+    tables=sorted(root.rglob("cyclic_inverse_starts.csv"))
+    executions=[];best=None
+    for path in tables:
+        valid=0;strict=0;local_best=None
+        with path.open(newline="") as stream:
+            for row in csv.DictReader(stream):
+                if row.get("domain_pass") != "True":continue
+                valid+=1;strict+=row.get("cyclic_strict_internal_reference_pass")=="True"
+                score=float(row.get("objective") or math.inf)
+                if local_best is None or score<local_best[0]:local_best=(score,row)
+                if best is None or score<best[0]:best=(score,row,path)
+        executions.append({"table":str(path.relative_to(root)),"valid":valid,
+                           "strict_passes":strict})
+    keep=None
+    if best is not None:
+        keep={key:best[1].get(key) for key in (
+            "candidate_id","source_material_candidate_id","mechanism_prediction",
+            "thermal_prediction","objective","cyclic_target_K_MPa_sqrt_m",
+            "cyclic_target_action_per_cycle","cyclic_target_local_slope",
+            "cyclic_moderate_connected_width_log10K",
+            "cyclic_moderate_connected_width_log10rate",
+            "cyclic_strict_connected_width_log10rate",
+            "optimized_cohesive_json")}
+        keep["table"]=str(best[2].relative_to(root))
+    return {"executions":executions,"best":keep,
+            "strict_passes":sum(row["strict_passes"] for row in executions)}
+
+
 def analyze(args) -> int:
     out = args.root / "campaign_delivery"
     hcf = hcf_rows(args.root)
@@ -147,10 +176,28 @@ def analyze(args) -> int:
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
     atomic(out / "two_d_results.json", two_d)
+    restarts=[]
+    for row in hcf:
+        checkpoint=row.get("restart_checkpoint")
+        if not checkpoint:continue
+        restarts.append({key:row.get(key) for key in (
+            "candidate_id","complete_row_sha256","accepted_cycles",
+            "accepted_seconds","physical_event_count","advance_m","disposition",
+            "resource_stop","restart_checkpoint")})
+        restarts[-1]["checkpoint_exists"]=(ROOT/checkpoint).exists()
+        restarts[-1]["result_path"]=row["path"]
+    csv_write(out/"restart_inventory.csv",restarts)
+    analytical_ids=set()
+    for bank in args.root.rglob("analytical_bank_32768.csv.gz"):
+        with gzip.open(bank,"rt",newline="") as stream:
+            analytical_ids.update(row.get("candidate_id") for row in csv.DictReader(stream))
     summary = {"schema": "r10.finite-compliance-campaign-analysis/1",
         "analytical_frontier": frontier,
+        "cyclic_inverse_frontier":cyclic_inverse_frontier(args.root),
         "coverage": {"analytical_allocated": sum(json.loads(path.read_text()).get("allocated_vectors", 0)
                 for path in args.root.rglob("analytical_summary.json")),
+            "analytical_bank_executions":len(list(args.root.rglob("analytical_bank_32768.csv.gz"))),
+            "analytical_unique_candidate_labels":len(analytical_ids),
             "state_informed_results": sum(1 for path in args.root.glob("state_informed*/*/*.json")),
             "native_full_state_results": len(native),
             "native_unique_complete_materials": len({row.get("same_complete_material_sha256") for row in native
@@ -161,7 +208,8 @@ def analyze(args) -> int:
             "hcf_accepted_cycles": sum(float(row.get("accepted_cycles") or 0.) for row in hcf),
             "hcf_accepted_seconds": sum(float(row.get("accepted_seconds") or 0.) for row in hcf),
             "hcf_events": sum(int(row.get("physical_event_count") or 0) for row in hcf),
-            "fracture_rows": len(fractures), "two_d_receipts": len(two_d)},
+            "fracture_rows": len(fractures), "two_d_receipts": len(two_d),
+            "accepted_restart_records":len(restarts)},
         "hcf_dispositions": {}, "native_stop_categories": {}}
     for row in hcf:
         key = str(row.get("disposition")); summary["hcf_dispositions"][key] = summary["hcf_dispositions"].get(key, 0) + 1
