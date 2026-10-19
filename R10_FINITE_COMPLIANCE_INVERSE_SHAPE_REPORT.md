@@ -207,6 +207,22 @@ same-material ramps are rising/censored (`002`), nearly flat (`008`), and flat
 (`027`).  This prevents a `WEAK_T_PREDICTED` cohesive-fold label from being
 misreported as a demonstrated coupled Weak-T/Peak/DBTT fracture class.
 
+## Mechanical-environment sensitivity
+
+A diagnostic stiffness sweep re-solved all branches and the complete 101-point,
+32-phase cycle integral for bounded candidates 002, 008, and 027 at
+`ke/ke_derived = 0.25, 0.5, 1, 2, 4`.  It is explicitly not a native support
+claim or fit.  All 15 landscapes resolve and none passes the strict reference.
+At the actual factor 1, minimum local slopes are `6.3375`, `6.4267`, and
+`6.4961`, and maximum moderate connected widths are `1.6268`, `1.5451`, and
+`1.5490` rate decades.  At the much softer factor 0.25, minimum slopes fall to
+`3.4622--3.8059` and moderate widths rise to `2.8436--2.9504` decades, but the
+connected intervals on which *every* slope remains in 3.4--4.6 are still only
+`0.9250--1.1873` decades.  Thus softness moves the family toward the desired
+geometry but does not yield a strict success even at one quarter of the derived
+stiffness; the favorable force-controlled diagnostic cannot be transferred to
+the current mechanics by relabeling it.
+
 ## First developed compact HCF windows
 
 `R10_INVERSE_OPT_027__CM` has produced the first developed compact windows in

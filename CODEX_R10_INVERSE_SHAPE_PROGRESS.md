@@ -114,6 +114,11 @@
   a fresh 101-amplitude/32-phase qualification again produced zero strict passes,
   maximum moderate width 1.48857 decades, and minimum local slope 6.7294.  This
   is retained as a bounded negative rather than promoted to redundant native work.
+- A 3-material x 5-stiffness diagnostic map re-solved 101 amplitudes and 32
+  phases per case.  Softer 0.25x environments reach 2.84--2.95 moderate decades,
+  but strict widths remain only 0.925--1.187 decades; all 15 cases fail strict.
+  Factor 1 is the only native environment, so this is an environment-sensitivity
+  bound rather than a mechanics adjustment.
 
 ## Developed compact checkpoint
 
