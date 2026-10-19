@@ -1123,6 +1123,35 @@ def plot(args) -> int:
         fig.savefig(out/"compact_027_full_frozen_events.png",dpi=240)
         fig.savefig(out/"compact_027_full_frozen_events.pdf");plt.close(fig)
 
+    # Candidate 002 is the deliberately active-plasticity comparison.  Keep its
+    # matched opening histories separate from the nearly opening-only 027 case:
+    # the accepted event coordinates are the evidence, even when neither arm
+    # has yet accumulated a long enough window for a developed-rate estimate.
+    active_id="R10_INVERSE_OPT_002__CM"
+    active_pairs=[]
+    for amplitude in ("1p10000","1p20000"):
+        full=args.root/"hcf_bounded_inverse_mechanism_amplitudes"/active_id/f"m_{amplitude}"/"progress.json"
+        frozen=args.root/"hcf_bounded_inverse_002_high_frozen"/active_id/f"m_{amplitude}"/"progress.json"
+        if full.is_file() and frozen.is_file():
+            active_pairs.append((amplitude,full,frozen))
+    if active_pairs:
+        fig,axes=plt.subplots(1,len(active_pairs),figsize=(6.2*len(active_pairs),4.4),
+                              squeeze=False,sharey=True)
+        for ax,(amplitude,full,frozen) in zip(axes[0],active_pairs):
+            for path,label,style in ((full,"Evolving full state","-"),
+                                     (frozen,"Frozen initial plastic state","--")):
+                record=json.loads(path.read_text());events=record.get("events") or []
+                x=[0.]+[float(event["cycle"]) for event in events]
+                y=[0.]+[float(event["extension_m"])*1e6 for event in events]
+                ax.step(x,y,where="post",lw=1.5,ls=style,label=label)
+            ax.set_xlabel("Accepted cycles")
+            ax.set_title(f"Load factor {float(amplitude.replace('p','.')):.2f}")
+        axes[0][0].set_ylabel("Cohesive advance (micrometres)")
+        axes[0][0].legend(frameon=False)
+        fig.tight_layout()
+        fig.savefig(out/"bounded_002_full_frozen_events.png",dpi=240)
+        fig.savefig(out/"bounded_002_full_frozen_events.pdf");plt.close(fig)
+
     ramp=args.root/"fracture_bounded_inverse_top3"/"ramp_dispositions.csv"
     if ramp.is_file():
         with ramp.open(newline="") as stream:ramp_rows=list(csv.DictReader(stream))
