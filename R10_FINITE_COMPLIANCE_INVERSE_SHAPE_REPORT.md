@@ -295,7 +295,12 @@ median replicated rates at 1.05/1.10, the resulting adjacent slopes are
 `6.9437` from 1.10 to 1.15 and `8.6305` from 1.15 to 1.20, over `0.13405` and
 `0.15952` rate decades.  Both remain above the strict upper bound, and the
 resolved change between them exposes native curvature rather than supporting a
-single fitted Paris exponent.
+single fitted Paris exponent.  The same trajectory subsequently completed the
+100 micrometre endpoint at cycle `1207551.0582`.  Its independent 60--100
+micrometre rate is `8.16540e-11 m/cycle`, only 3.82% above its canonical rate;
+the resulting late adjacent slopes are `5.9306` and `9.8218`.  Thus the
+curvature persists after a matched stationarity check and neither segment enters
+the strict slope band.
 
 The same candidate has physical non-advance through `1e8` cycles at 0.70,
 0.80, and 0.90 times load; 0.95 times has four recurrent events but has not

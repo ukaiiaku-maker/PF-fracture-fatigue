@@ -151,7 +151,10 @@
   seed variation does not move this interval into the moderate band.
 - The 1.15x refinement completed its canonical window at 7.86477e-11 m/cycle.
   It splits the 1.10--1.20 segment into slopes 6.9437 and 8.6305, both above
-  strict and each spanning less than 0.16 rate decades.
+  strict and each spanning less than 0.16 rate decades.  It then completed 100
+  events at cycle 1,207,551.058; its independent 60--100 um rate is
+  8.16540e-11 m/cycle (3.82% above canonical), with late adjacent slopes 5.9306
+  and 9.8218.  The native curvature therefore survives the stationarity check.
 - At the unchanged base load, 600/900/1200 K each reaches 60 cells within one
   cycle (0.112203, 4.15911e-4, and 3.90948e-5 cycles).  They are retained as
   target-truncated thermal cascades with no developed-rate classification.
