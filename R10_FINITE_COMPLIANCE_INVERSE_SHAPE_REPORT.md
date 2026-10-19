@@ -165,6 +165,13 @@ monotonic ramps.  `R10_INVERSE_OPT_002__CM` separates at 15, 18, 23, and
 `002` are censors, not fracture roots.  Current HCF execution uses these exact
 complete-material identities.
 
+Exact selected-material 2-D transfer now covers the full bounded trio at 300,
+750, and 1200 K.  Candidate 008 is ramp-censored at 300 K and reaches thermal
+escape at 750/1200 K; 002 and 027 are ramp-censored at all three temperatures.
+Every receipt preserves the registry complete-material hash and evolves the
+EXP_floor state.  This is a same-material thermal-fracture transfer at its
+declared reduced 2-D scope, not a developed 2-D fatigue-rate campaign.
+
 ## Dense cyclic qualification and acquisition corrections
 
 All eight bounded inverse materials have now been evaluated at 101 held-out

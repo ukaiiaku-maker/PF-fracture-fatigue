@@ -60,6 +60,9 @@
    block is complete.  The targeted compact trio's thermal ramps and an exact
    same-material 2-D qualification are running.  Results retain load censors,
    committed separation, and unsupported crossover as separate outcomes.
+   Exact selected-material 2-D receipts now cover bounded 002/008/027 at
+   300/750/1200 K; 008 is censored at 300 K and thermally escapes at 750/1200 K,
+   while 002/027 are ramp-censored throughout this reduced 2-D panel.
 8. Protocol holdouts, final restart audit, manifest, report, and archive remain
    active campaign work; they are not replaced by the intermediate frontier.
 
