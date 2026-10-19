@@ -91,8 +91,10 @@ def cyclic_evaluate(vector: np.ndarray, base: dict) -> dict:
     if not supported:
         return {**metric, "domain_pass":False,
                 "rejection":"NO_TWO_SIDED_CYCLIC_POINTS"}
+    target_action = float(base.get("target_action_per_cycle", 1e-6))
+    target_log_action = math.log10(target_action)
     target = min(supported, key=lambda row: abs(math.log10(max(
-        float(row["opening_action_per_cycle"]), 1e-300)) + 6.))
+        float(row["opening_action_per_cycle"]), 1e-300)) - target_log_action))
     return {**metric,
         "evaluated_cohesive_json":json.dumps(effective,sort_keys=True,
                                                separators=(",",":")),
@@ -100,6 +102,7 @@ def cyclic_evaluate(vector: np.ndarray, base: dict) -> dict:
                                         separators=(",",":")),
         "cyclic_target_K_MPa_sqrt_m":target["Kmax_MPa_sqrt_m"],
         "cyclic_target_action_per_cycle":target["opening_action_per_cycle"],
+        "cyclic_requested_target_action_per_cycle":target_action,
         "cyclic_target_local_slope":target["local_log_slope"],
         "cyclic_moderate_connected_width_log10K":
             cyclic["moderate_connected_width_log10K"],
@@ -119,10 +122,13 @@ def objective(vector: np.ndarray, base: dict) -> float:
         return 1e6
     slope = float(row["cyclic_target_local_slope"])
     action = max(float(row["cyclic_target_action_per_cycle"]), 1e-300)
+    target_action = float(base.get("target_action_per_cycle", 1e-6))
     strict = float(row["cyclic_strict_connected_width_log10rate"])
     moderate = float(row["cyclic_moderate_connected_width_log10rate"])
     rate_weight=float(base.get("rate_weight",1.0))
-    return abs(slope-4.) + rate_weight*abs(math.log10(action)+6.) - 4.*strict - moderate
+    return (abs(slope-4.) +
+            rate_weight*abs(math.log10(action)-math.log10(target_action)) -
+            4.*strict - moderate)
 
 
 def one(task: tuple[int,dict]) -> dict:
@@ -148,7 +154,11 @@ def main(argv=None) -> int:
     parser.add_argument("--starts",type=int,default=16)
     parser.add_argument("--workers",type=int,default=4)
     parser.add_argument("--rate-weight",type=float,default=1.0)
-    args=parser.parse_args(argv);args.out.mkdir(parents=True,exist_ok=True)
+    parser.add_argument("--target-action-per-cycle",type=float,default=1e-6)
+    args=parser.parse_args(argv)
+    if args.target_action_per_cycle <= 0.:
+        parser.error("--target-action-per-cycle must be positive")
+    args.out.mkdir(parents=True,exist_ok=True)
     inverse=[row for row in read_csv(args.inverse_table)
              if row.get("domain_pass")=="True"]
     inverse.sort(key=lambda row:(float(row.get("objective") or math.inf),
@@ -159,7 +169,8 @@ def main(argv=None) -> int:
         source_id=row["source_material_candidate_id"]
         bases.append({"candidate_id":f"R10_CYCLIC_OPT_{index:03d}",
             "cohesive":json.loads(row["optimized_cohesive_json"]),
-            "source":sources[source_id],"rate_weight":args.rate_weight})
+            "source":sources[source_id],"rate_weight":args.rate_weight,
+            "target_action_per_cycle":args.target_action_per_cycle})
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         rows=list(pool.map(one,enumerate(bases),chunksize=1))
     rows.sort(key=lambda row:(float(row.get("objective",math.inf)),
@@ -174,6 +185,7 @@ def main(argv=None) -> int:
         "best_candidate":rows[0].get("candidate_id") if rows else None,
         "best_objective":rows[0].get("objective") if rows else None,
         "hcf_log_rate_penalty_weight":args.rate_weight,
+        "target_action_per_cycle":args.target_action_per_cycle,
         "algebraic_tail_registered":False}
     atomic(args.out/"cyclic_inverse_summary.json",payload)
     print(json.dumps(payload,indent=2));return 0

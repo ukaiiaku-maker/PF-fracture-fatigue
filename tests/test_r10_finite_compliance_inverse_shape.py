@@ -11,6 +11,7 @@ from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
 )
 from arrhenius_fracture.opening_alternatives_r10 import OpeningAlternative, evaluate_opening
 from scripts import run_r10_finite_compliance_inverse_shape as search
+from scripts import run_r10_cyclic_inverse_refinement as cyclic_inverse
 
 
 def test_frozen_22871_reference_is_reproduced_under_finite_compliance():
@@ -170,3 +171,18 @@ def test_inverse_coordinates_cannot_leave_declared_research_bounds():
     assert not search._inverse_bounds_pass(too_small_rise,gamma)
     assert not search._inverse_bounds_pass(too_long_drop,gamma)
     assert not search._inverse_bounds_pass(too_low_tail,gamma)
+
+
+def test_cyclic_inverse_objective_honors_requested_hcf_action(monkeypatch):
+    monkeypatch.setattr(cyclic_inverse, "cyclic_evaluate", lambda vector, base: {
+        "domain_pass": True,
+        "cyclic_target_local_slope": 4.0,
+        "cyclic_target_action_per_cycle": 1e-8,
+        "cyclic_strict_connected_width_log10rate": 0.0,
+        "cyclic_moderate_connected_width_log10rate": 0.0,
+    })
+    vector = np.zeros(4)
+    assert cyclic_inverse.objective(vector, {
+        "target_action_per_cycle": 1e-8, "rate_weight": 1.0}) == 0.0
+    assert cyclic_inverse.objective(vector, {
+        "target_action_per_cycle": 1e-6, "rate_weight": 1.0}) == 2.0
