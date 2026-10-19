@@ -136,6 +136,12 @@ def hcf_rows(root: Path) -> list[dict]:
                 "plastic_feedback_reference": ("EVOLVING_FULL_STATE" if
                     record.get("plastic_feedback", True) else "FROZEN_INITIAL_PLASTIC_STATE"),
             })
+        checkpoint_path = case/"checkpoint"/"high_cycle_live_checkpoint.json"
+        if not record.get("restart_checkpoint") and checkpoint_path.is_file():
+            try:
+                record["restart_checkpoint"] = str(checkpoint_path.relative_to(ROOT))
+            except ValueError:
+                record["restart_checkpoint"] = str(checkpoint_path)
         event_rows = record.get("events") or []
         mobile = [float(event.get("wake_transaction", {}).get(
                     "active_mobile_postcommit") or 0.) for event in event_rows]

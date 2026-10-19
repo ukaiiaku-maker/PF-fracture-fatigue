@@ -56,6 +56,8 @@ def test_campaign_hcf_aggregation_includes_accepted_progress_without_result(tmp_
                                  "wake_slip": -8.}}],
         "observation_path_m": 60e-6, "plastic_feedback": True,
     }))
+    checkpoint = progress.parent/"checkpoint"/"high_cycle_live_checkpoint.json"
+    checkpoint.parent.mkdir(); checkpoint.write_text("{}")
     rows = hcf_rows(tmp_path)
     assert len(rows) == 1
     assert rows[0]["evidence_state"] == "ACCEPTED_PROGRESS_WITHOUT_TERMINAL_RESULT"
@@ -63,6 +65,7 @@ def test_campaign_hcf_aggregation_includes_accepted_progress_without_result(tmp_
     assert rows[0]["Kmax_MPa_sqrt_m"] == 11.
     assert rows[0]["DeltaK_MPa_sqrt_m"] == 9.9
     assert rows[0]["physical_event_count"] == 1
+    assert rows[0]["restart_checkpoint"].endswith("high_cycle_live_checkpoint.json")
     assert rows[0]["maximum_active_mobile_postcommit"] == 12.
     assert rows[0]["maximum_active_retained_postcommit"] == 3.
     assert rows[0]["maximum_absolute_wake_slip"] == 8.
