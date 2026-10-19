@@ -349,6 +349,36 @@ def state_prefix_rows(rows: list[dict]) -> list[dict]:
         frozen_first = frozen.get("first_event_cycle")
         full_exposure = float(full.get("accepted_cycles") or 0.)
         frozen_exposure = float(frozen.get("accepted_cycles") or 0.)
+        def intervals(row: dict) -> list[float]:
+            values = row.get("all_waiting_intervals_cycles") or []
+            if isinstance(values, str):
+                try:
+                    values = json.loads(values)
+                except json.JSONDecodeError:
+                    values = []
+            return [float(value) for value in values]
+        full_intervals = intervals(full)
+        frozen_intervals = intervals(frozen)
+        paired_intervals = min(len(full_intervals), len(frozen_intervals))
+        interval_ratios = [frozen_intervals[index]/full_intervals[index]
+                           for index in range(paired_intervals)
+                           if full_intervals[index] > 0.]
+        frozen_next_lower_bound = None
+        if (full_first not in (None, "") and frozen_first not in (None, "") and
+                len(full_intervals) > len(frozen_intervals)):
+            index = len(frozen_intervals)
+            frozen_last = float(frozen_first) + sum(frozen_intervals)
+            elapsed = max(0., frozen_exposure-frozen_last)
+            if full_intervals[index] > 0.:
+                frozen_next_lower_bound = elapsed/full_intervals[index]
+        full_next_lower_bound = None
+        if (full_first not in (None, "") and frozen_first not in (None, "") and
+                len(frozen_intervals) > len(full_intervals)):
+            index = len(full_intervals)
+            full_last = float(full_first) + sum(full_intervals)
+            elapsed = max(0., full_exposure-full_last)
+            if frozen_intervals[index] > 0.:
+                full_next_lower_bound = elapsed/frozen_intervals[index]
         if full_first not in (None, "") and frozen_first not in (None, ""):
             comparison = "MATCHED_FIRST_EVENT_RATIO"
             ratio = float(frozen_first)/float(full_first)
@@ -374,6 +404,11 @@ def state_prefix_rows(rows: list[dict]) -> list[dict]:
             "frozen_accepted_cycles": frozen_exposure,
             "frozen_over_full_first_event_cycle": ratio,
             "observed_delay_lower_bound": lower_bound,
+            "full_inter_event_cycles": full_intervals,
+            "frozen_inter_event_cycles": frozen_intervals,
+            "matched_inter_event_ratios_frozen_over_full": interval_ratios,
+            "frozen_next_interval_ratio_lower_bound": frozen_next_lower_bound,
+            "full_next_interval_ratio_lower_bound": full_next_lower_bound,
             "interpretation": "FIRST_EVENT_OR_EXPOSURE_ONLY; NOT_A_DEVELOPED_RATE_EFFECT",
             "full_evidence_path": full.get("path"),
             "frozen_evidence_path": frozen.get("path"),

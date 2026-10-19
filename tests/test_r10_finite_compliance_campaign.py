@@ -198,6 +198,25 @@ def test_state_prefix_comparison_reports_only_observed_exposure_bound():
     assert comparison["interpretation"].endswith("NOT_A_DEVELOPED_RATE_EFFECT")
 
 
+def test_state_prefix_comparison_reports_inter_event_ratio_and_censor():
+    common = {"candidate_id": "C", "complete_row_sha256": "a"*64,
+        "temperature_K": 300., "R": .1, "frequency_Hz": 1000.,
+        "DeltaK_MPa_sqrt_m": 10., "hazard_seed": 42,
+        "first_event_cycle": 100.}
+    rows = [
+        {**common, "plastic_feedback_reference": "EVOLVING_FULL_STATE",
+         "accepted_cycles": 500., "all_waiting_intervals_cycles": [200., 100.],
+         "path": "full"},
+        {**common, "plastic_feedback_reference": "FROZEN_INITIAL_PLASTIC_STATE",
+         "accepted_cycles": 450., "all_waiting_intervals_cycles": [300.],
+         "path": "frozen"},
+    ]
+    comparison = state_prefix_rows(rows)[0]
+    assert comparison["matched_inter_event_ratios_frozen_over_full"] == [1.5]
+    assert comparison["frozen_next_interval_ratio_lower_bound"] == .5
+    assert comparison["full_next_interval_ratio_lower_bound"] is None
+
+
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
     directory = tmp_path / "hcf" / "CAND" / "m"
     directory.mkdir(parents=True)
