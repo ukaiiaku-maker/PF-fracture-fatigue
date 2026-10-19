@@ -431,8 +431,8 @@ the newly deepened 002/008 histories do not.
 All 59 HCF identities have restart records, all checkpoints are at or behind
 their accepted evidence coordinate, and the final campaign verifier reports no
 failure.  The focused implementation/transaction/restart/report/package suite
-passes 72 tests.  The complete repository suite passes all 953 tests in
-`2207.49 s` (`36:47`) with no failure.
+passes 74 tests.  The complete repository suite passes all 954 tests in
+`2201.57 s` (`36:41`) with no failure.
 
 The existing smooth and bilinear potentials are bounded negatives for the
 strict target in the evaluated domain.  The compact family materially changes

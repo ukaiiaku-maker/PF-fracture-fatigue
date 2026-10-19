@@ -216,8 +216,8 @@ checkpoints; queue creation by itself is not a completion condition.
   This is a strong opening-clock-controlled result, not plastic inactivity and
   not a developed plasticity-controlled rate.
 - The final verifier passes, all 59 restart checkpoints are at or behind their
-  accepted evidence coordinate, 72 targeted tests pass, and the complete
-  repository suite passes all 953 tests in 2207.49 seconds.
+  accepted evidence coordinate, 74 targeted tests pass, and the complete
+  repository suite passes all 954 tests in 2201.57 seconds.
 - No strict two-rate-decade Paris material was found.  The deliverable is an
   executed admissible near-frontier and bounded-negative campaign; the
   algebraic-tail counterexample remains diagnostic-only.
