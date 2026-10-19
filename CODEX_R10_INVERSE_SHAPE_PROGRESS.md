@@ -172,5 +172,23 @@
   replica was stopped before it wrote an accepted state; both informative
   256-phase compact arms, native acquisition, HCF, and fracture work continued.
 
+## Mechanism-diverse long-exposure block
+
+- Exact bounded compact candidates 002 and 008 are executing at 1.10 and 1.20
+  times their selected loads with current full-state evolution.  Candidate 002
+  has accepted first events at cycles 7604.998 and 4974.041, respectively,
+  with 295--413 post-commit mobile units and 197--275 wake-slip units.  The 008
+  histories have recurrent prefixes with sub-unit mobile state, so the block
+  spans materially different plastic backgrounds rather than duplicating the
+  opening-controlled 027 lane.
+- Matched frozen-plastic 002 histories are executing with the same complete
+  material, amplitudes, and hazard streams.  The 1.10 first event occurs at
+  cycle 7604.945, versus 7604.998 in full state (ratio 0.999993).  This rules
+  out a consequential first-event effect; accepted inter-event exposure is
+  retained to test whether the large committed plastic state changes renewal.
+- Reporting now exports matched first-event ratios and one-sided exposure
+  bounds separately from developed-rate ratios and slope changes.  Prefixes
+  cannot be promoted into a developed state-effect claim.
+
 This file is the durable restart ledger. It is updated at scientifically meaningful
 checkpoints; queue creation by itself is not a completion condition.
