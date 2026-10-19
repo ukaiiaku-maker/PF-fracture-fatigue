@@ -20,12 +20,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from arrhenius_fracture.cohesive_arrhenius import COMPACT_INDEPENDENT
+from arrhenius_fracture.finite_compliance_inverse_shape_r10 import cyclic_rate
 from scripts.run_r10_finite_compliance_inverse_shape import (
     SCHEMA,
     _cyclic_registry_point,
     _source_material_class,
+    _thermal,
 )
 from scripts.run_r10_global_mechanism_search import canonical_hash
+from scripts.run_r10_opening_alternatives import mechanics
 
 
 def atomic(path: Path, payload: object) -> None:
@@ -88,6 +91,33 @@ def choose(rows: list[dict], count: int) -> list[dict]:
     return selected
 
 
+def cyclic_projection_point(metric: dict, cohesive: dict) -> dict:
+    """Re-evaluate a cyclic optimizer coordinate instead of resampling it."""
+    target_K = metric.get("cyclic_target_K_MPa_sqrt_m")
+    if not target_K or not metric.get("cyclic_local_derivative_curve_json"):
+        return _cyclic_registry_point((metric, cohesive, COMPACT_INDEPENDENT))
+    target_K = float(target_K)
+    thermal = _thermal(cohesive)
+    _, kenv = mechanics(thermal, 300.)
+    points = [cyclic_rate(target_K*factor, kenv, thermal, 300.,
+                          COMPACT_INDEPENDENT,
+                          float(cohesive["activation_area_m2"]),
+                          float(cohesive["attempt_frequency_s"]), R=.1,
+                          frequency_Hz=1000., phases=64)
+              for factor in (.99, 1., 1.01)]
+    actions = [float(point["opening_action_per_cycle"]) for point in points]
+    if min(actions) <= 0.:
+        return {"cyclic_supported": False, "cyclic_curve": points,
+                "chosen": None,
+                "selection_support": "OPTIMIZER_COORDINATE_NOT_TWO_SIDED"}
+    slope = math.log(actions[2]/actions[0])/math.log(1.01/.99)
+    return {"cyclic_supported": True, "cyclic_curve": points,
+            "chosen": points[1], "total_local_slope": slope,
+            "selection_support": "OPTIMIZER_EXACT_K_TWO_SIDED_CYCLIC_DERIVATIVE",
+            "target_action_per_cycle": metric.get(
+                "cyclic_requested_target_action_per_cycle", 1e-6)}
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--inverse-table", type=Path, required=True)
@@ -116,7 +146,7 @@ def main(argv=None) -> int:
         source_class = (metric.get("source_material_class") or
                         _source_material_class(source))
         cohesive = json.loads(metric["optimized_cohesive_json"])
-        cyclic = _cyclic_registry_point((metric, cohesive, COMPACT_INDEPENDENT))
+        cyclic = cyclic_projection_point(metric, cohesive)
         chosen = cyclic.get("chosen")
         if chosen is None:
             hcf_K = float(metric["metastable_birth_K_300K"])

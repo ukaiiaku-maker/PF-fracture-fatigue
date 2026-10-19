@@ -206,3 +206,22 @@ def test_source_class_is_distinct_from_cohesive_fold_trend():
               '{"material_class":"peak"}',
               "thermal_prediction": "WEAK_T_PREDICTED"}
     assert search._source_material_class(source) == "peak"
+
+
+def test_projection_reuses_exact_cyclic_optimizer_coordinate(monkeypatch):
+    monkeypatch.setattr(projection, "_thermal", lambda cohesive: "thermal")
+    monkeypatch.setattr(projection, "mechanics", lambda thermal, temperature: (None, 3.0))
+    def fake_rate(K, *args, **kwargs):
+        return {"Kmax_MPa_sqrt_m": K,
+                "opening_action_per_cycle": 1e-6*(K/10.)**4,
+                "accessible_phase_count": 10,
+                "accessible_phase_fraction": .2}
+    monkeypatch.setattr(projection, "cyclic_rate", fake_rate)
+    result = projection.cyclic_projection_point({
+        "cyclic_target_K_MPa_sqrt_m": "10.0",
+        "cyclic_local_derivative_curve_json": "[]",
+        "cyclic_requested_target_action_per_cycle": "1e-6",
+    }, {"activation_area_m2": 1e-19, "attempt_frequency_s": 1e12})
+    assert result["chosen"]["Kmax_MPa_sqrt_m"] == 10.0
+    assert math.isclose(result["total_local_slope"], 4.0, rel_tol=1e-12)
+    assert result["selection_support"].startswith("OPTIMIZER_EXACT_K")
