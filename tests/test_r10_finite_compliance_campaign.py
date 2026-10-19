@@ -1,8 +1,8 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import (
-    developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows, native_rows,
-    search_specification,
+    developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows,
+    native_rows, replicate_rate_rows, search_specification,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
@@ -124,6 +124,19 @@ def test_search_specification_declares_mechanics_mapping():
     mechanics = search_specification()["mechanics_mapping"]
     assert mechanics["tip_radius_m"] == 1e-6
     assert mechanics["status"].endswith("NOT_A_FIT_PARAMETER")
+
+
+def test_replicate_bounds_do_not_claim_a_confidence_interval():
+    base = {"candidate_id": "C", "complete_row_sha256": "a"*64,
+        "temperature_K": 300., "R": .1, "frequency_Hz": 1000.,
+        "plastic_feedback_reference": "EVOLVING_FULL_STATE",
+        "DeltaK_MPa_sqrt_m": 10.}
+    rows = [{**base, "developed_rate_m_per_cycle": rate, "path": str(index)}
+            for index, rate in enumerate((2e-11, 3e-11))]
+    bounds = replicate_rate_rows(rows)[0]
+    assert bounds["independent_streams"] == 2
+    assert bounds["observed_max_over_min"] == 1.5
+    assert bounds["interpretation"] == "OBSERVED_STREAM_RANGE; NOT_A_CONFIDENCE_INTERVAL"
 
 
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):

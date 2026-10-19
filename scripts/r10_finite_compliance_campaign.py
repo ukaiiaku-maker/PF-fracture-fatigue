@@ -199,6 +199,36 @@ def developed_slope_rows(rows: list[dict]) -> list[dict]:
     return output
 
 
+def replicate_rate_rows(rows: list[dict]) -> list[dict]:
+    grouped: dict[tuple, list[dict]] = {}
+    for row in rows:
+        rate = row.get("developed_rate_m_per_cycle")
+        amplitude = row.get("DeltaK_MPa_sqrt_m")
+        if rate in (None, "", 0, 0.) or amplitude in (None, ""):
+            continue
+        key = (row.get("candidate_id"), row.get("complete_row_sha256"),
+               row.get("temperature_K"), row.get("R"), row.get("frequency_Hz"),
+               row.get("plastic_feedback_reference"), float(amplitude))
+        grouped.setdefault(key, []).append(row)
+    output = []
+    for key, group in sorted(grouped.items(), key=lambda item: str(item[0])):
+        if len(group) < 2:
+            continue
+        rates = sorted(float(row["developed_rate_m_per_cycle"]) for row in group)
+        output.append({
+            "candidate_id": key[0], "complete_row_sha256": key[1],
+            "temperature_K": key[2], "R": key[3], "frequency_Hz": key[4],
+            "plastic_feedback_reference": key[5], "DeltaK_MPa_sqrt_m": key[6],
+            "independent_streams": len(rates), "observed_rate_min_m_per_cycle": rates[0],
+            "observed_rate_median_m_per_cycle": median(rates),
+            "observed_rate_max_m_per_cycle": rates[-1],
+            "observed_max_over_min": rates[-1]/rates[0],
+            "interpretation": "OBSERVED_STREAM_RANGE; NOT_A_CONFIDENCE_INTERVAL",
+            "evidence_paths": ";".join(sorted(row["path"] for row in group)),
+        })
+    return output
+
+
 def hcf_event_window_rows(root: Path) -> list[dict]:
     """Report fixed spatial windows from the newest accepted case state.
 
@@ -482,6 +512,7 @@ def analyze(args) -> int:
                 "triggers": [case.get("trigger") for case in record.get("cases") or []]})
     csv_write(out / "hcf_results.csv", hcf)
     csv_write(out / "native_developed_slopes.csv", developed_slope_rows(hcf))
+    csv_write(out / "native_replicate_rate_bounds.csv", replicate_rate_rows(hcf))
     csv_write(out / "native_event_windows.csv", hcf_event_window_rows(args.root))
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
