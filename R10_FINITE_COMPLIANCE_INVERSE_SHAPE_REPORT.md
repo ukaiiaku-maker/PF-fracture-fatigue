@@ -116,6 +116,15 @@ The frozen-feedback 1.00 control first fired at `78,962,035.04` cycles.  The
 effect target and is based on one event in each arm.  It is not evidence of a
 state-mediated moderate Paris interval.
 
+The inherited `R10F_V2_11566__MS` phase-sensitive lane is retained rather than
+repeated.  At factor 1.06 its full arm arrests after one cell and its frozen arm
+after five cells through `1e12` cycles.  At factor 1.10 the 16-phase receipt
+reports 120 cells and a nominal `1.83370e-8 m/cycle`, but the same-seed 32-phase
+refinement arrests after two cells through `1e12` cycles.  It is therefore a
+phase-sensitivity censor, not a qualified plasticity-controlled rate.  The four
+exact source paths, hashes, event cycles, and dispositions are exported in
+`retained_11566_controls.json`; no current rerun or reclassification is claimed.
+
 The first compact HCF block revealed a phase-resolution censor.  For
 `R10_INV_29729__CM`, the moving-boundary integral predicts action
 `9.4947e-6/cycle`, but the accessible interval occupies only `0.006710` of the

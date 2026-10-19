@@ -4,7 +4,7 @@ from scripts.r10_finite_compliance_campaign import (
     complete_material_rows, csv_row_count, developed_slope_rows, execution_timing,
     hcf_event_window_rows, hcf_rows,
     native_rows, replicate_rate_rows, search_specification, state_effect_rows,
-    state_prefix_rows,
+    state_prefix_rows, retained_11566_controls,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
@@ -37,6 +37,27 @@ def test_complete_material_vectors_are_deduplicated_by_identity(tmp_path):
     assert rows[0]["complete_row_sha256"] == "a"*64
     assert rows[0]["predicted_hcf_local_slope"] == "4.1"
     assert rows[0]["registry_source"].endswith("round_1/projected_registry.csv")
+
+
+def test_retained_11566_controls_are_hashed_not_reclassified(tmp_path):
+    relative_paths = (
+        "hcf_round_32_state_active_11566/f_1.06/result.json",
+        "hcf_mechanism_controls_11566/frozen_f_1.06/result.json",
+        "hcf_round_32_state_active_11566/f_1.1/result.json",
+        "hcf_refinement_11566/f_1.1_phase32_same_seed/result.json",
+    )
+    for index, relative in enumerate(relative_paths):
+        path = tmp_path/"runs"/"r10_12h_autonomous"/relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"candidate_id": "R10F_V2_11566__MS",
+            "phase_count": 16 if index < 3 else 32,
+            "accepted_cycles": 1e12, "physical_event_count": index,
+            "events": [{"cycle": float(value)} for value in range(index)]}))
+    receipt = retained_11566_controls(tmp_path)
+    assert receipt["rerun_in_current_campaign"] is False
+    assert len(receipt["controls"]) == 4
+    assert all(len(row["result_sha256"]) == 64 for row in receipt["controls"])
+    assert "NOT_QUALIFIED_RATE" in receipt["interpretation"]
 
 
 def test_campaign_hcf_aggregation_requires_native_schema(tmp_path):

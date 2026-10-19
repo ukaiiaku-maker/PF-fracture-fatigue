@@ -93,6 +93,45 @@ def complete_material_rows(root: Path) -> list[dict]:
         row.get("candidate_id") or "", row["complete_row_sha256"]))
 
 
+def retained_11566_controls(repository_root: Path = ROOT) -> dict:
+    """Hash the inherited phase-sensitive 11566 controls without rerunning them."""
+    base = repository_root/"runs"/"r10_12h_autonomous"
+    relative_paths = (
+        "hcf_round_32_state_active_11566/f_1.06/result.json",
+        "hcf_mechanism_controls_11566/frozen_f_1.06/result.json",
+        "hcf_round_32_state_active_11566/f_1.1/result.json",
+        "hcf_refinement_11566/f_1.1_phase32_same_seed/result.json",
+    )
+    rows = []
+    for relative in relative_paths:
+        path = base/relative
+        if not path.is_file():
+            rows.append({"source_path": str(path.relative_to(repository_root)),
+                         "status": "MISSING_RETAINED_CONTROL"})
+            continue
+        record = json.loads(path.read_text())
+        events = record.get("events") or []
+        rows.append({
+            "source_path": str(path.relative_to(repository_root)),
+            "result_sha256": sha256(path), "status": "RETAINED_EXACT_RESULT",
+            **{key: record.get(key) for key in (
+                "candidate_id", "complete_row_sha256", "Kmax_MPa_sqrt_m",
+                "temperature_K", "R", "frequency_Hz", "phase_count",
+                "hazard_seed", "plastic_feedback_reference", "accepted_cycles",
+                "accepted_seconds", "physical_event_count", "advance_m",
+                "developed_rate_m_per_cycle", "disposition", "resource_stop",
+                "numeric_failure")},
+            "event_cycles": [event.get("cycle") for event in events],
+        })
+    return {
+        "schema": "r10.retained-11566-phase-control/1",
+        "rerun_in_current_campaign": False,
+        "interpretation": ("PHASE16_DEVELOPED_RESPONSE_FAILS_SAME_SEED_PHASE32; "
+                           "RETAIN_AS_PHASE_SENSITIVITY_CENSOR_NOT_QUALIFIED_RATE"),
+        "controls": rows,
+    }
+
+
 def hcf_rows(root: Path) -> list[dict]:
     rows = []
     metadata = registry_metadata(root)
@@ -742,6 +781,7 @@ def analyze(args) -> int:
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
     atomic(out / "two_d_results.json", two_d)
+    atomic(out / "retained_11566_controls.json", retained_11566_controls())
     atomic(out / "search_specification.json", search_specification())
     restarts=[]
     for row in hcf:
