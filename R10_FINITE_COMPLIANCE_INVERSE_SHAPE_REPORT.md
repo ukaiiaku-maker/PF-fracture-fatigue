@@ -245,6 +245,28 @@ strongly thermally activated.  The reporting code explicitly requires events
 in at least two integer cycles before exporting any event-window rate, so these
 cascades cannot be mistaken for HCF evidence.
 
+## Native mechanism separation
+
+The event transactions separate opening control from active EXP_floor plasticity
+without changing either model.  Across the developed 027 amplitude histories,
+the maximum post-commit mobile population remains below `3.8e-30` and absolute
+wake slip below `3.0e-30`; its growth is therefore opening-controlled at machine
+scale.  In contrast, the first 002 event carries about `171` active mobile units
+and `114` wake-slip units.  The corrected cyclic candidates also span distinct
+backgrounds: `R10_CYCLIC_OPT_001__CM` remains nearly opening-only through its
+two-event prefix, while `000` and `002` reach roughly `425/284` active-mobile
+and `284/196` wake-slip units.  These resource-bounded prefixes demonstrate
+mechanism diversity but do not yet support developed plasticity-controlled
+Paris rates.
+
+The matched 002 full/frozen first events occur at cycles `2941.0570` and
+`2941.0307`, respectively.  Their near-equality prevents a state-effect claim
+from one event even though the committed transaction is strongly plastic; both
+accepted checkpoints are retained for later inter-event comparison.  At high
+temperature the same nominally opening-controlled 027 material develops a
+post-commit mobile population of about `44.1` by the 1200 K cascade, another
+reason the thermal cascades are kept separate from its 300 K HCF mechanism.
+
 ## Current decision (campaign still active)
 
 The existing smooth and bilinear potentials are bounded negatives for the
