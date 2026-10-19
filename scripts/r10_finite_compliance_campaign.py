@@ -12,9 +12,12 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from statistics import median
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+from arrhenius_fracture.coupled_opening_reduction_r10 import score_recurrence
 
 
 def atomic(path: Path, payload: object) -> None:
@@ -36,8 +39,26 @@ def json_files(root: Path, name: str) -> list[Path]:
     return sorted(root.rglob(name)) if root.exists() else []
 
 
+def registry_metadata(root: Path) -> dict[str, dict]:
+    metadata = {}
+    for path in sorted(root.rglob("projected_registry.csv")):
+        with path.open(newline="") as stream:
+            for row in csv.DictReader(stream):
+                identity = row.get("complete_row_sha256")
+                if not identity:
+                    continue
+                metadata[identity] = {key: row.get(key) for key in (
+                    "source_material_class", "cohesive_fold_thermal_prediction",
+                    "thermal_prediction", "mechanism_prediction",
+                    "predicted_hcf_cyclic_action_per_cycle",
+                    "predicted_hcf_local_slope",
+                    "predicted_hcf_accessible_phase_fraction")}
+    return metadata
+
+
 def hcf_rows(root: Path) -> list[dict]:
     rows = []
+    metadata = registry_metadata(root)
     for path in json_files(root, "result.json"):
         try:
             record = json.loads(path.read_text())
@@ -45,7 +66,35 @@ def hcf_rows(root: Path) -> list[dict]:
             continue
         if record.get("schema") != "r10.czm-owned-hcf-trajectory/1":
             continue
-        rows.append({"path": str(path.relative_to(root)), **{key: record.get(key) for key in (
+        evidence_state = "TERMINAL_RESULT"
+        progress_path = path.with_name("progress.json")
+        if progress_path.is_file():
+            try:
+                progress = json.loads(progress_path.read_text())
+            except (OSError, json.JSONDecodeError):
+                progress = {}
+            if float(progress.get("accepted_cycles") or 0.) > float(
+                    record.get("accepted_cycles") or 0.):
+                record = {**record, **progress}
+                frequency = float(record.get("frequency_Hz") or 1.)
+                record["accepted_seconds"] = float(record["accepted_cycles"])/frequency
+                events = record.get("events") or []
+                scored = score_recurrence(events,
+                    float(record.get("observation_path_m") or 120e-6),
+                    bool(record.get("unsupported") or
+                         record.get("unsupported_validities")))
+                record["physical_event_count"] = len(events)
+                record["advance_m"] = (float(events[-1]["extension_m"])
+                                       if events else float(record.get("advance_m") or 0.))
+                record["developed_rate_m_per_cycle"] = scored["developed_rate_m_per_cycle"]
+                record["developed_window"] = scored["developed_window"]
+                record["recurrence_outcome"] = scored["outcome"]
+                record["disposition"] = "ACCEPTED_RESTART_IN_PROGRESS"
+                evidence_state = "ACCEPTED_PROGRESS_NEWER_THAN_RESULT"
+        identity = record.get("complete_row_sha256")
+        rows.append({"path": str(path.relative_to(root)),
+            "evidence_state": evidence_state,
+            **metadata.get(identity, {}), **{key: record.get(key) for key in (
             "candidate_id", "complete_row_sha256", "shape", "mode", "temperature_K",
             "R", "frequency_Hz", "Kmax_MPa_sqrt_m", "DeltaK_MPa_sqrt_m",
             "accepted_cycles", "accepted_seconds", "physical_event_count", "advance_m",
@@ -54,6 +103,43 @@ def hcf_rows(root: Path) -> list[dict]:
             "recurrence_outcome", "numeric_failure", "resource_stop",
             "unsupported_validities", "restart_checkpoint", "plastic_feedback_reference")}})
     return rows
+
+
+def developed_slope_rows(rows: list[dict]) -> list[dict]:
+    grouped: dict[tuple, list[dict]] = {}
+    for row in rows:
+        rate = row.get("developed_rate_m_per_cycle")
+        amplitude = row.get("DeltaK_MPa_sqrt_m")
+        if rate in (None, "", 0, 0.) or amplitude in (None, ""):
+            continue
+        key = (row.get("candidate_id"), row.get("complete_row_sha256"),
+               row.get("temperature_K"), row.get("R"), row.get("frequency_Hz"),
+               row.get("plastic_feedback_reference"))
+        grouped.setdefault(key, []).append(row)
+    output = []
+    for key, group in grouped.items():
+        amplitudes: dict[float, list[dict]] = {}
+        for row in group:
+            amplitudes.setdefault(float(row["DeltaK_MPa_sqrt_m"]), []).append(row)
+        points = []
+        for amplitude, replicates in sorted(amplitudes.items()):
+            rates = sorted(float(row["developed_rate_m_per_cycle"])
+                           for row in replicates)
+            points.append((amplitude, median(rates), len(rates)))
+        for low, high in zip(points, points[1:]):
+            output.append({
+                "candidate_id": key[0], "complete_row_sha256": key[1],
+                "temperature_K": key[2], "R": key[3], "frequency_Hz": key[4],
+                "plastic_feedback_reference": key[5],
+                "DeltaK_low_MPa_sqrt_m": low[0],
+                "DeltaK_high_MPa_sqrt_m": high[0],
+                "rate_low_m_per_cycle": low[1],
+                "rate_high_m_per_cycle": high[1],
+                "local_log_slope": math.log(high[1]/low[1])/math.log(high[0]/low[0]),
+                "low_replicates": low[2], "high_replicates": high[2],
+                "connected_rate_width_log10": math.log10(high[1]/low[1]),
+            })
+    return output
 
 
 def native_rows(root: Path) -> list[dict]:
@@ -173,6 +259,7 @@ def analyze(args) -> int:
                 "cases": len(record.get("cases") or []),
                 "triggers": [case.get("trigger") for case in record.get("cases") or []]})
     csv_write(out / "hcf_results.csv", hcf)
+    csv_write(out / "native_developed_slopes.csv", developed_slope_rows(hcf))
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
     atomic(out / "two_d_results.json", two_d)

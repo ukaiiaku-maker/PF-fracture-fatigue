@@ -1,6 +1,8 @@
 import json
 
-from scripts.r10_finite_compliance_campaign import hcf_rows, native_rows
+from scripts.r10_finite_compliance_campaign import (
+    developed_slope_rows, hcf_rows, native_rows,
+)
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
 
@@ -34,6 +36,42 @@ def test_campaign_hcf_aggregation_requires_native_schema(tmp_path):
     assert len(rows) == 1
     assert rows[0]["candidate_id"] == "CAND"
     assert rows[0]["accepted_cycles"] == 1e8
+
+
+def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
+    directory = tmp_path / "hcf" / "CAND" / "m"
+    directory.mkdir(parents=True)
+    (directory / "result.json").write_text(json.dumps({
+        "schema": "r10.czm-owned-hcf-trajectory/1", "candidate_id": "CAND",
+        "complete_row_sha256": "d" * 64, "frequency_Hz": 1000.,
+        "accepted_cycles": 10., "physical_event_count": 0,
+        "disposition": "RESOURCE_STOP", "observation_path_m": 120e-6,
+    }))
+    events = [{"cycle": float(index), "extension_m": index*1e-6}
+              for index in range(1, 61)]
+    (directory / "progress.json").write_text(json.dumps({
+        "accepted_cycles": 60., "frequency_Hz": 1000., "events": events,
+        "observation_path_m": 120e-6, "unsupported": False,
+    }))
+    row = hcf_rows(tmp_path)[0]
+    assert row["evidence_state"] == "ACCEPTED_PROGRESS_NEWER_THAN_RESULT"
+    assert row["physical_event_count"] == 60
+    assert row["developed_rate_m_per_cycle"] == 1e-6
+
+
+def test_developed_slopes_require_two_distinct_amplitudes():
+    common = {"candidate_id": "C", "complete_row_sha256": "h",
+              "temperature_K": 300., "R": .1, "frequency_Hz": 1000.,
+              "plastic_feedback_reference": "EVOLVING_FULL_STATE"}
+    rows = [
+        {**common, "DeltaK_MPa_sqrt_m": 9., "developed_rate_m_per_cycle": 1e-10},
+        {**common, "DeltaK_MPa_sqrt_m": 9., "developed_rate_m_per_cycle": 2e-10},
+        {**common, "DeltaK_MPa_sqrt_m": 18., "developed_rate_m_per_cycle": 12e-10},
+    ]
+    slopes = developed_slope_rows(rows)
+    assert len(slopes) == 1
+    assert slopes[0]["low_replicates"] == 2
+    assert slopes[0]["local_log_slope"] == 3.0
 
 
 def test_hcf_phase_resolution_uses_accessible_cycle_fraction():
