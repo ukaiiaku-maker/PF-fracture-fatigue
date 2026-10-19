@@ -1,7 +1,7 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import (
-    developed_slope_rows, hcf_rows, native_rows,
+    developed_slope_rows, hcf_rows, native_rows, search_specification,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
@@ -72,6 +72,14 @@ def test_developed_slopes_require_two_distinct_amplitudes():
     assert len(slopes) == 1
     assert slopes[0]["low_replicates"] == 2
     assert slopes[0]["local_log_slope"] == 3.0
+
+
+def test_search_spec_keeps_diagnostic_tail_out_of_native_shape_families():
+    spec = search_specification()
+    assert "compact_independent" in spec["shape_families"]
+    assert "algebraic_tail_p_1p1" in spec["diagnostic_only_exclusions"]
+    assert spec["strict_internal_reference"]["minimum_connected_rate_decades"] == 2.0
+    assert spec["immutable_physics"][0] == "EXP_floor_dislocation_emission"
 
 
 def test_hcf_phase_resolution_uses_accessible_cycle_fraction():

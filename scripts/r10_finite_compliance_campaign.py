@@ -142,6 +142,55 @@ def developed_slope_rows(rows: list[dict]) -> list[dict]:
     return output
 
 
+def search_specification() -> dict:
+    return {
+        "schema": "r10.finite-compliance-inverse-shape-search-specification/1",
+        "status": "OPT_IN_RESEARCH_NOT_CANONICAL_PROMOTION",
+        "shape_families": ["smooth_exponential", "bilinear",
+                           "compact_independent"],
+        "diagnostic_only_exclusions": ["algebraic_tail_p_1p1"],
+        "continuous_material_domain": {
+            "Gamma_ref_J_m2": [0.5, 8.0],
+            "t_hat_ref_Pa": [8e9, 80e9],
+            "zero_traction_barrier_eV_300K": [0.25, 12.0],
+            "cohesive_entropy_span_fraction_300_to_1200K": [-0.25, 0.75],
+            "attempt_frequency_s": 1e12,
+            "compact_rise_fraction": [0.0005, 0.05],
+            "compact_normalized_drop_fraction": [0.001, 0.08],
+            "compact_tail_level": [0.005, 0.3],
+        },
+        "physical_numerical_filters": {
+            "minimum_Gamma_J_m2_over_temperature_panel": 0.2,
+            "maximum_completion_separation_m": 1e-7,
+            "minimum_peak_separation_m": 1e-13,
+            "finite_positive_work_required": True,
+            "actual_finite_environment_branch_required": True,
+            "two_sided_complete_cycle_derivative_for_promotion": True,
+        },
+        "strict_internal_reference": {
+            "local_slope_bounds": [3.4, 4.6],
+            "minimum_connected_rate_decades": 2.0,
+            "not_universal_experimental_definition": True,
+        },
+        "default_protocol": {"temperature_K": 300.0, "R": 0.1,
+                             "frequency_Hz": 1000.0,
+                             "patch_advance_m": 1e-6},
+        "temperature_panel_K": [300, 450, 600, 750, 900, 1050, 1200],
+        "immutable_physics": [
+            "EXP_floor_dislocation_emission", "Peierls_motion",
+            "Taylor_release", "activation_entropy_and_parameter_couplings",
+            "signed_history", "geometry_and_energy_ownership",
+            "current_high_cycle_state_integration",
+        ],
+        "bound_provenance": {
+            "cohesive_energy_strength_activation_and_compact_shape":
+                "DECLARED_CONDITIONAL_RESEARCH_DOMAIN",
+            "separation_and_mesh_support": "INHERITED_NUMERICAL_RESEARCH_BOUND",
+            "EXP_floor_parameters": "RETAINED_COMPLETE_V2_SOURCE_MATERIALS",
+        },
+    }
+
+
 def native_rows(root: Path) -> list[dict]:
     rows = []
     for directory in sorted(root.glob("native*")):
@@ -281,6 +330,7 @@ def analyze(args) -> int:
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
     atomic(out / "two_d_results.json", two_d)
+    atomic(out / "search_specification.json", search_specification())
     restarts=[]
     for row in hcf:
         checkpoint=row.get("restart_checkpoint")
