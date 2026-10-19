@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from scripts.r10_finite_compliance_campaign import (
     complete_material_rows, csv_row_count, developed_slope_rows, execution_timing,
@@ -281,6 +282,20 @@ def test_search_spec_keeps_diagnostic_tail_out_of_native_shape_families():
     assert "algebraic_tail_p_1p1" in spec["diagnostic_only_exclusions"]
     assert spec["strict_internal_reference"]["minimum_connected_rate_decades"] == 2.0
     assert spec["immutable_physics"][0] == "EXP_floor_dislocation_emission"
+
+
+def test_executed_plan_retains_restart_safe_mechanism_blocks():
+    root = Path(__file__).resolve().parents[1]
+    plan = json.loads((root/"r10_inverse_shape_campaign_plan.json").read_text())
+    tasks = {task["id"]: task for task in plan["tasks"]}
+    assert plan["schema"] == "r10.finite-compliance-executed-plan/1"
+    assert tasks["bounded_inverse_64_starts"]["argv"][-1] == "64"
+    assert "--frozen-initial-plastic-state" in tasks[
+        "mechanism_diverse_frozen_hcf"]["argv"]
+    assert tasks["mechanism_diverse_full_hcf"]["sentinel"].endswith(
+        "batch_summary.json")
+    assert all("algebraic" not in " ".join(task["argv"]).lower()
+               for task in plan["tasks"])
 
 
 def test_hcf_phase_resolution_uses_accessible_cycle_fraction():

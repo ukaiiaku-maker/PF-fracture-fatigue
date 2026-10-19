@@ -1,0 +1,108 @@
+{
+  "schema": "r10.finite-compliance-executed-plan/1",
+  "campaign_root": "runs/r10_inverse_shape_12h",
+  "qualified_python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "interpretation": "Executed-stage and restart-safe continuation plan. With --resume, completed sentinels are preserved and only unfinished tasks execute.",
+  "tasks": [
+    {
+      "id": "analytical_32768_reference_bank",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/run_r10_finite_compliance_inverse_shape.py", "analytical",
+        "--source-registry", "integration_evidence/r10_v2_current_opening_search/native_information_registry.csv",
+        "--out", "runs/r10_inverse_shape_12h/acquisition_round_0",
+        "--workers", "8", "--log2-bank", "15", "--state-count", "256"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/acquisition_round_0/analytical_summary.json"
+    },
+    {
+      "id": "bounded_inverse_64_starts",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/run_r10_finite_compliance_inverse_shape.py", "inverse",
+        "--source-registry", "runs/r10_12h_autonomous/acquisition_round_0_1024/native_information_registry.csv",
+        "--out", "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64",
+        "--workers", "8", "--starts", "64"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/inverse_starts.csv"
+    },
+    {
+      "id": "bounded_projection_top8",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/project_r10_bounded_inverse_candidates.py",
+        "--inverse-table", "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/inverse_starts.csv",
+        "--source-registry", "runs/r10_12h_autonomous/acquisition_round_0_1024/native_information_registry.csv",
+        "--out", "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/projected_top8",
+        "--count", "8"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/projected_top8/projected_registry.csv"
+    },
+    {
+      "id": "bounded_projection_top8_two_sided",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/project_r10_bounded_inverse_candidates.py",
+        "--inverse-table", "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/inverse_starts.csv",
+        "--source-registry", "runs/r10_12h_autonomous/acquisition_round_0_1024/native_information_registry.csv",
+        "--out", "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/projected_top8_two_sided",
+        "--count", "8"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/projected_top8_two_sided/projected_registry.csv"
+    },
+    {
+      "id": "mechanism_diverse_full_hcf",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/run_r10_inverse_hcf_batch.py",
+        "--registry", "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/projected_top8_two_sided/projected_registry.csv",
+        "--out", "runs/r10_inverse_shape_12h/hcf_bounded_inverse_mechanism_amplitudes",
+        "--workers", "4",
+        "--candidate-ids", "R10_INVERSE_OPT_002__CM,R10_INVERSE_OPT_008__CM",
+        "--amplitude-multipliers", "1.1,1.2",
+        "--horizon", "1000000000000", "--max-wall-s", "7200",
+        "--phases", "16", "--path-limit-um", "60", "--seed", "20279018"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/hcf_bounded_inverse_mechanism_amplitudes/batch_summary.json"
+    },
+    {
+      "id": "mechanism_diverse_frozen_hcf",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/run_r10_inverse_hcf_batch.py",
+        "--registry", "runs/r10_inverse_shape_12h/inverse_round_5_bounded_64/projected_top8_two_sided/projected_registry.csv",
+        "--out", "runs/r10_inverse_shape_12h/hcf_bounded_inverse_002_high_frozen",
+        "--workers", "2", "--candidate-ids", "R10_INVERSE_OPT_002__CM",
+        "--amplitude-multipliers", "1.1,1.2",
+        "--horizon", "1000000000000", "--max-wall-s", "7200",
+        "--phases", "16", "--path-limit-um", "60", "--seed", "20279018",
+        "--frozen-initial-plastic-state"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/hcf_bounded_inverse_002_high_frozen/batch_summary.json"
+    },
+    {
+      "id": "campaign_analysis",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/r10_finite_compliance_campaign.py", "--root", "runs/r10_inverse_shape_12h", "analyze"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/campaign_delivery/campaign_summary.json"
+    },
+    {
+      "id": "campaign_figures",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/r10_finite_compliance_campaign.py", "--root", "runs/r10_inverse_shape_12h", "plot"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/campaign_delivery/figures/native_amplitude_outcomes.pdf"
+    },
+    {
+      "id": "campaign_verification",
+      "argv": [
+        "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+        "scripts/r10_finite_compliance_campaign.py", "--root", "runs/r10_inverse_shape_12h", "verify"
+      ],
+      "sentinel": "runs/r10_inverse_shape_12h/campaign_delivery/verification.json"
+    }
+  ]
+}

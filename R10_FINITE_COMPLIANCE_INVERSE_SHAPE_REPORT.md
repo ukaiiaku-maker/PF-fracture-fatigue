@@ -17,6 +17,15 @@ complete-material hashes with both the cohesive parameter vector and its parent
 EXP_floor vector, ownership hashes, source lineage, analytical coordinates, and
 explicit native/HCF/fracture/2-D evidence flags.  Complete vectors are therefore
 reported directly rather than reconstructed from candidate labels.
+The durable executed-stage entry point is:
+
+```text
+/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python scripts/r10_finite_compliance_campaign.py --root runs/r10_inverse_shape_12h run --plan r10_inverse_shape_campaign_plan.json --resume
+```
+
+The plan records the qualified interpreter, actual major stage arguments,
+completion sentinels, and restart-safe full/frozen HCF continuation commands.
+It must not be launched while the same output owners are already live.
 
 ## Constitutive implementation and numerical checks
 
