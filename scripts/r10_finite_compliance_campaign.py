@@ -824,11 +824,30 @@ def verify(args) -> int:
         record = json.loads(path.read_text()); summaries.append(str(path.relative_to(args.root)))
         if record.get("algebraic_tail_registered") is not False:
             failures.append(f"algebraic diagnostic registration flag invalid: {path}")
+    for path in sorted(args.root.rglob("*registry.csv")):
+        with path.open(newline="") as stream:
+            for row in csv.DictReader(stream):
+                shape = str(row.get("selected_shape") or row.get("cohesive_shape") or "")
+                if "algebraic" in shape.lower():
+                    failures.append(f"diagnostic algebraic tail registered in {path}")
+                    break
     hcf = hcf_rows(args.root)
     for row in hcf:
         checkpoint = row.get("restart_checkpoint")
         if checkpoint and not (ROOT / checkpoint).exists():
             failures.append(f"missing restart checkpoint: {checkpoint}")
+        elif checkpoint:
+            try:
+                state = json.loads((ROOT/checkpoint).read_text())
+                checkpoint_cycles = (state.get("metadata") or {}).get(
+                    "accepted_cycles", state.get("cycles_from_engine_time"))
+                receipt_cycles = float(row.get("accepted_cycles") or 0.)
+                if (checkpoint_cycles is not None and
+                        float(checkpoint_cycles) > receipt_cycles+1e-6):
+                    failures.append(
+                        f"checkpoint ahead of accepted receipt: {checkpoint}")
+            except (OSError, json.JSONDecodeError):
+                failures.append(f"unreadable restart checkpoint: {checkpoint}")
         if row.get("numeric_failure"):
             failures.append(f"numeric failure in {row['path']}: {row['numeric_failure']}")
     payload = {"schema": "r10.finite-compliance-campaign-verification/1",
