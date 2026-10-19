@@ -128,6 +128,9 @@
   windows are 1.13555e-10 and 1.24028e-10 m/cycle; 1.10--1.20 slopes are
   7.3447 and 7.8339, respectively.  These add stationarity evidence but do not
   create the required connected moderate two-decade interval.
+- Independent second streams completed 20--60 um at 1.05x and 1.10x.  Observed
+  rate spreads are 2.6% and 7.8%; paired slopes are 12.2048 and 14.3652, so
+  seed variation does not move this interval into the moderate band.
 - At the unchanged base load, 600/900/1200 K each reaches 60 cells within one
   cycle (0.112203, 4.15911e-4, and 3.90948e-5 cycles).  They are retained as
   target-truncated thermal cascades with no developed-rate classification.

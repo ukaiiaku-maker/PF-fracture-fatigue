@@ -231,6 +231,15 @@ replacement Paris qualification.  Across 1.05--1.20, the canonical rate span
 is `0.56777` decades with endpoint slope `9.7905`; the aggregate 20--100
 micrometre span is `0.49722` decades with endpoint slope `8.5739`.
 
+Independent second hazard streams reached the same canonical endpoint at both
+1.05 and 1.10 times load.  Their rates are `3.15079e-11` and
+`5.55902e-11 m/cycle`, compared with `3.07210e-11` and `5.99323e-11` in the
+first stream.  The observed max/min spreads are only `1.0256` and `1.0781`,
+and the two paired adjacent slopes are `12.2048` and `14.3652` (median-rate
+slope `13.2985`).  This is an observed two-stream range, not a confidence
+interval, but it shows that the steep classification is not caused by the first
+mark stream alone.
+
 The same candidate has physical non-advance through `1e8` cycles at 0.70,
 0.80, and 0.90 times load; 0.95 times has four recurrent events but has not
 reached the developed reporting window.  The full/frozen base comparison is
