@@ -282,6 +282,14 @@ slope `13.2985`).  This is an observed two-stream range, not a confidence
 interval, but it shows that the steep classification is not caused by the first
 mark stream alone.
 
+The added 1.15 point has now crossed the canonical endpoint.  Its window spans
+cycles `209082.0877--717679.0756` and gives `7.86477e-11 m/cycle`.  Using the
+median replicated rates at 1.05/1.10, the resulting adjacent slopes are
+`6.9437` from 1.10 to 1.15 and `8.6305` from 1.15 to 1.20, over `0.13405` and
+`0.15952` rate decades.  Both remain above the strict upper bound, and the
+resolved change between them exposes native curvature rather than supporting a
+single fitted Paris exponent.
+
 The same candidate has physical non-advance through `1e8` cycles at 0.70,
 0.80, and 0.90 times load; 0.95 times has four recurrent events but has not
 reached the developed reporting window.  The full/frozen base comparison is

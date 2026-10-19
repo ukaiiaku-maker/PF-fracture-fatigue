@@ -146,6 +146,9 @@
 - Independent second streams completed 20--60 um at 1.05x and 1.10x.  Observed
   rate spreads are 2.6% and 7.8%; paired slopes are 12.2048 and 14.3652, so
   seed variation does not move this interval into the moderate band.
+- The 1.15x refinement completed its canonical window at 7.86477e-11 m/cycle.
+  It splits the 1.10--1.20 segment into slopes 6.9437 and 8.6305, both above
+  strict and each spanning less than 0.16 rate decades.
 - At the unchanged base load, 600/900/1200 K each reaches 60 cells within one
   cycle (0.112203, 4.15911e-4, and 3.90948e-5 cycles).  They are retained as
   target-truncated thermal cascades with no developed-rate classification.
