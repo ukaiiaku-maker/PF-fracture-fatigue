@@ -443,3 +443,10 @@ admissible compact near-frontier, recurrent long-exposure growth in candidate
 state-effect result for the strongly plastic 002 background—not a successful
 strict Paris material.  The diagnostic algebraic tail remains analytical-only,
 and no default/canonical cohesive law has been promoted.
+
+The portable delivery is named
+`R10_FINITE_COMPLIANCE_INVERSE_SHAPE_EXECUTED.zip`.  Its internal manifest uses
+schema `r10.12h-portable-evidence-manifest/1`, records the compatible parent and
+final source revision, and hashes every source/evidence member.  The archive's
+external self-hash is reported alongside the delivered file, because an archive
+cannot contain its own final byte hash without changing that hash.
