@@ -773,6 +773,13 @@ def analyze(args) -> int:
         "matched_slope_differences": sum(row["comparison"] == "SLOPE_DIFFERENCE"
                                          for row in state_effects),
         "matched_prefix_comparisons": len(prefix_effects),
+        "matched_inter_event_ratios": sum(len(
+            row.get("matched_inter_event_ratios_frozen_over_full") or [])
+            for row in prefix_effects),
+        "one_sided_inter_event_bounds": sum(
+            row.get("frozen_next_interval_ratio_lower_bound") is not None or
+            row.get("full_next_interval_ratio_lower_bound") is not None
+            for row in prefix_effects),
         "empty_interpretation": ("NO_MATCHED_DEVELOPED_FULL_AND_FROZEN_RATES; "
                                  "NO_FICTITIOUS_RATIO_FORMED"),
     })
