@@ -22,6 +22,7 @@ from scripts.run_r10_finite_compliance_inverse_shape import (
     _evaluate,
     _inverse_bounds_pass,
     _inverse_coordinates,
+    _source_material_class,
     _thermal,
 )
 from scripts.run_r10_opening_alternatives import mechanics
@@ -156,6 +157,15 @@ def one(task: tuple[int,dict]) -> dict:
         options={"maxiter":48, "xatol":2e-3, "fatol":2e-3})
     evaluated = cyclic_evaluate(result.x, {**base,
         "candidate_id":f"R10_CYCLIC_OPT_{index:03d}"})
+    evaluated = {
+        "candidate_id": f"R10_CYCLIC_OPT_{index:03d}",
+        "source_material_candidate_id": base["source"]["candidate_id"],
+        "source_material_class": _source_material_class(base["source"]),
+        "source_plasticity_sha256": base["source"].get(
+            "plasticity_physics_sha256",
+            base["source"].get("parent_complete_row_sha256")),
+        **evaluated,
+    }
     evaluated.update({"optimizer_success":bool(result.success),
         "optimizer_message":str(result.message),
         "optimizer_evaluations":int(result.nfev),
@@ -197,7 +207,10 @@ def main(argv=None) -> int:
     payload={"schema":"r10.finite-compliance-cyclic-inverse-refinement/1",
         "stage":"CYCLIC_INVERSE_STARTS_COMPLETE","starts":len(rows),
         "domain_valid":sum(bool(row.get("domain_pass")) for row in rows),
-        "optimizer_successes":sum(bool(row.get("optimizer_success")) for row in rows),
+        "optimizer_numerical_convergences":sum(
+            bool(row.get("optimizer_success")) for row in rows),
+        "optimizer_successes":sum(bool(row.get("optimizer_success")) and
+                                  bool(row.get("domain_pass")) for row in rows),
         "strict_passes":sum(row.get("cyclic_strict_internal_reference_pass") is True
                             for row in rows),
         "best_candidate":rows[0].get("candidate_id") if rows else None,
