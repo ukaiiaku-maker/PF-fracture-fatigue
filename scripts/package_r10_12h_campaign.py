@@ -44,13 +44,18 @@ def campaign_files(campaign: Path) -> list[Path]:
         path = campaign / name
         if path.is_file():
             selected.add(path)
-    for directory in (campaign / "analysis", campaign / "figures"):
+    for directory in (campaign / "analysis", campaign / "figures",
+                      campaign / "campaign_delivery",
+                      campaign / "reference_reproduction"):
         if directory.is_dir():
             selected.update(path for path in directory.rglob("*") if path.is_file())
     for path in campaign.rglob("*"):
         if not path.is_file():
             continue
         if path.name in {"result.json", "progress.json"} | RESTART_NAMES:
+            selected.add(path)
+        elif (path.name.endswith("summary.json") or
+              path.name in {"qualification.json", "selection_summary.json"}):
             selected.add(path)
         elif path.suffix == ".csv" or path.name.endswith(".csv.gz"):
             selected.add(path)
