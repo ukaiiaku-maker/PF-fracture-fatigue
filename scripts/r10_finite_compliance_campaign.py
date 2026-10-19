@@ -221,6 +221,17 @@ def hcf_rows(root: Path) -> list[dict]:
                 record["physical_event_count"] = len(events)
                 record["advance_m"] = (float(events[-1]["extension_m"])
                                        if events else float(record.get("advance_m") or 0.))
+                record["first_event_cycle"] = (float(events[0]["cycle"])
+                                               if events else None)
+                record["inter_event_cycles"] = [
+                    float(b["cycle"])-float(a["cycle"])
+                    for a,b in zip(events,events[1:])]
+                # This field historically included the first-passage wait in
+                # native result.json files.  Campaign comparisons require
+                # renewal intervals only, so normalize it whenever a newer
+                # accepted checkpoint supersedes that result.
+                record["all_waiting_intervals_cycles"] = list(
+                    record["inter_event_cycles"])
                 record["developed_rate_m_per_cycle"] = scored["developed_rate_m_per_cycle"]
                 record["developed_window"] = scored["developed_window"]
                 record["recurrence_outcome"] = scored["outcome"]

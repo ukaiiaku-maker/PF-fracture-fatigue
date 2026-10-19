@@ -132,6 +132,38 @@ def test_campaign_hcf_aggregation_includes_accepted_progress_without_result(tmp_
     assert rows[0]["maximum_absolute_wake_slip"] == 8.
 
 
+def test_newer_progress_rebuilds_waiting_intervals_from_newest_events(tmp_path):
+    registry = tmp_path / "projection" / "projected_registry.csv"
+    registry.parent.mkdir()
+    registry.write_text(
+        "complete_row_sha256,candidate_id,selected_shape,selected_mode,predicted_hcf_K_300K\n"
+        + f"{'d' * 64},CAND,compact_independent,cohesive_mixed,10\n")
+    case = tmp_path / "hcf" / "CAND" / "m_1p00000"
+    case.mkdir(parents=True)
+    (case / "result.json").write_text(json.dumps({
+        "schema": "r10.czm-owned-hcf-trajectory/1", "candidate_id": "CAND",
+        "complete_row_sha256": "d" * 64, "accepted_cycles": 30.,
+        "frequency_Hz": 100., "temperature_K": 300., "R": .1,
+        "events": [{"cycle": 10., "extension_m": 1e-6},
+                   {"cycle": 30., "extension_m": 2e-6}],
+        "first_event_cycle": 10., "inter_event_cycles": [20.],
+        "all_waiting_intervals_cycles": [10., 20.],
+    }))
+    (case / "progress.json").write_text(json.dumps({
+        "candidate_id": "CAND", "complete_row_sha256": "d" * 64,
+        "accepted_cycles": 60., "frequency_Hz": 100., "temperature_K": 300.,
+        "R": .1, "events": [{"cycle": 10., "extension_m": 1e-6},
+                              {"cycle": 30., "extension_m": 2e-6},
+                              {"cycle": 60., "extension_m": 3e-6}],
+        "observation_path_m": 60e-6, "plastic_feedback": True,
+    }))
+    row = hcf_rows(tmp_path)[0]
+    assert row["evidence_state"] == "ACCEPTED_PROGRESS_NEWER_THAN_RESULT"
+    assert row["first_event_cycle"] == 10.
+    assert row["inter_event_cycles"] == [20., 30.]
+    assert row["all_waiting_intervals_cycles"] == [20., 30.]
+
+
 def test_event_windows_use_latest_accepted_progress_and_keep_window_meanings(tmp_path):
     registry = tmp_path / "projection" / "projected_registry.csv"
     registry.parent.mkdir()
