@@ -418,6 +418,13 @@ def csv_write(path: Path, rows: list[dict]) -> None:
                                    else value) for key, value in row.items()})
 
 
+def csv_row_count(path: Path) -> int:
+    if not path.is_file():
+        return 0
+    with path.open(newline="") as stream:
+        return sum(1 for _ in csv.DictReader(stream))
+
+
 def analytical_frontier(root: Path) -> dict:
     banks = sorted(root.rglob("analytical_bank_32768.csv.gz"))
     if not banks:
@@ -546,6 +553,14 @@ def analyze(args) -> int:
                 for path in args.root.rglob("analytical_summary.json")),
             "analytical_bank_executions":len(list(args.root.rglob("analytical_bank_32768.csv.gz"))),
             "analytical_unique_candidate_labels":len(analytical_ids),
+            "bounded_inverse_start_rows":sum(csv_row_count(path)
+                for path in args.root.rglob("inverse_starts.csv")),
+            "cyclic_inverse_start_rows":sum(csv_row_count(path)
+                for path in args.root.rglob("cyclic_inverse_starts.csv")),
+            "matched_shape_isolation_arms":sum(csv_row_count(path)
+                for path in args.root.rglob("matched_shape_isolation.csv")),
+            "stiffness_sensitivity_rows":sum(csv_row_count(path)
+                for path in args.root.rglob("stiffness_sensitivity.csv")),
             "state_informed_results": sum(1 for path in args.root.glob("state_informed*/*/*.json")),
             "native_full_state_results": len(native),
             "native_unique_complete_materials": len({row.get("same_complete_material_sha256") for row in native

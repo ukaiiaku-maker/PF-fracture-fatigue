@@ -1,7 +1,7 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import (
-    developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows,
+    csv_row_count, developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows,
     native_rows, replicate_rate_rows, search_specification,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
@@ -140,6 +140,12 @@ def test_replicate_bounds_do_not_claim_a_confidence_interval():
     assert bounds["independent_streams"] == 2
     assert bounds["observed_max_over_min"] == 1.5
     assert bounds["interpretation"] == "OBSERVED_STREAM_RANGE; NOT_A_CONFIDENCE_INTERVAL"
+
+
+def test_csv_row_count_excludes_header(tmp_path):
+    path = tmp_path/"rows.csv"
+    path.write_text("a,b\n1,2\n3,4\n")
+    assert csv_row_count(path) == 2
 
 
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
