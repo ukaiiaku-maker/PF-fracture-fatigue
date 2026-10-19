@@ -91,6 +91,16 @@ does not survive the actual cyclic finite-compliance environment as a moderate
 HCF interval.  The onset-only and two-sided projections are retained as
 separate receipts; only the latter entered native execution.
 
+The three bounded candidates deepened in native work are fully identified
+below; the complete cohesive and parent EXP_floor JSON vectors are preserved in
+`complete_material_vectors.csv` under these hashes.
+
+| Candidate | Complete hash prefix | Parent | Gamma (J/m2) | peak traction (GPa) | delta0 (m) | activation area (m2) | E0 (eV) | rise / drop / tail |
+|---|---|---|---:|---:|---:|---:|---:|---|
+| 002 | `433b50903bd6` | P25 rank 1 | 5.07589 | 67.6428 | 2.76055e-11 | 3.78773e-19 | 12.0000 | 5.44766e-4 / 1.54448e-3 / 0.0227884 |
+| 008 | `86cd0a974984` | peak row 0242980 | 4.26668 | 18.2526 | 8.59943e-11 | 4.50478e-19 | 11.9965 | 7.82358e-4 / 1.79549e-3 / 0.0270311 |
+| 027 | `b8b75d6335c8` | ceramic row 0077080 | 0.623678 | 61.5370 | 3.72846e-12 | 3.08270e-18 | 12.0000 | 9.37550e-4 / 1.94985e-3 / 0.0296731 |
+
 ## State-informed and native evidence
 
 Two 256-material exact-state screens and five discrepancy updates have been
