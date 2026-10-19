@@ -29,14 +29,21 @@
    intervals; the current frontier spans 1.134 rate decades and 0.165 load
    decades with median HCF slope 5.912 (minimum observed median 5.440).  The
    strict 3.4--4.6 / two-decade internal reference remains unpassed.  A
-   256-start bounded inverse refinement is running.  Independent 32-phase/101-
+   bounded 64-start inverse refinement is complete: 63 domain-valid optima,
+   zero strict passes, and a best peak-phase slope 4.837 over 1.685 rate
+   decades.  Its first two-sided complete-cycle point is steeper (8.475), so
+   the apparent near-four peak-phase interval does not transfer to the cyclic
+   finite-compliance consumer.  Independent 32-phase/101-
    amplitude validation retained zero strict passes and bounded barrier
    quadrature disagreement below 6.92e-12.
-5. State-informed/native acquisition: two 256-material exact-state screens and
-   five discrepancy-driven acquisition updates are complete.  The first four
-   updates produced 32 distinct current full-state vectors; all completed their
-   four-cycle exposure endpoints without numerical/crossover failure.  The
-   targeted compact trio completed eight exact cycles on supported branches;
+5. State-informed/native acquisition: three 256-material exact-state screens and
+   six discrepancy-driven acquisition updates are complete.  The first four
+   updates produced 32 distinct current full-state vectors; the targeted fifth
+   adds eight, the separate mechanism trio adds three, and the cyclic-corrected
+   sixth adds eight, for 51 total native vectors.  All completed
+   their declared short exposure endpoints without numerical/crossover failure.  The
+   targeted compact trio and the corrected cyclic batch completed eight exact
+   cycles on supported branches;
    long exposure is being resolved separately rather than inferred from this
    prefix.  A fifth eight-material native block is running.
 6. HCF: three bilinear controls reached 1e8-cycle physical runout; one smooth
@@ -45,6 +52,10 @@
    unresolved opening physics.  One compact control has reached 1e8-cycle
    runout; the other compact and smooth workers retain restart checkpoints.
    Three geometry-targeted compact near-frontier HCF trajectories are running.
+   The smooth 10/100 Hz holdouts each reached two events at about 268,290
+   physical seconds and retain accepted resource-stop checkpoints.  Three
+   bounded-inverse, mechanism-diverse HCF trajectories are now executing from
+   the two-sided cyclic projection.
 7. Same-material fracture/2-D: the first six-material, seven-temperature ramp
    block is complete.  The targeted compact trio's thermal ramps and an exact
    same-material 2-D qualification are running.  Results retain load censors,
@@ -82,7 +93,17 @@
   strict interval.  They are a bounded-negative diagnostic, not eligible
   native candidates.
 - The optimizer now enforces every declared rise, drop, tail, and zero-load
-  activation-energy bound.  A fresh bounded 64-start execution is running.
+  activation-energy bound.  The bounded 64-start execution completed with 63
+  domain-valid rows.  Its best peak-phase point is not a valid two-sided cyclic
+  slope; the first supported cyclic derivative is 8.475 at 2.87e-5 action per
+  cycle.
+
+## Resource ownership adjustment
+
+- The host is concurrently running unrelated long simulations.  Their workers
+  were inspected but not modified.  One redundant campaign-owned 512-phase
+  replica was stopped before it wrote an accepted state; both informative
+  256-phase compact arms, native acquisition, HCF, and fracture work continued.
 
 This file is the durable restart ledger. It is updated at scientifically meaningful
 checkpoints; queue creation by itself is not a completion condition.
