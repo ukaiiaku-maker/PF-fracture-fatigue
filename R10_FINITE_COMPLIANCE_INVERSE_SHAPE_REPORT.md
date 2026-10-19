@@ -200,6 +200,17 @@ nonconvergence and physical ineligibility remain distinct; this round is a
 bounded negative showing that simply weighting slow rates more heavily does not
 move the admissible compact frontier into the requested HCF range.
 
+The same corrected objective was then broadened from 8 to 32 diverse starts.
+Twenty remained domain-valid and span DBTT, Weak-T, Peak-T, and ceramic parent
+backgrounds; none passes strict, no requested `1e-8/cycle` basin appears, and
+the lowest selected action remains `3.49e-5/cycle`.  Diversity-preserving
+projection of eight distinct plasticity vectors followed by a fresh 101-point,
+32-phase qualification again gives zero strict passes, maximum moderate width
+`1.48857` decades, and minimum local slope `6.5426`.  Because these projected
+geometries do not improve the qualified frontier, they are retained as
+analytical bounded negatives rather than consuming native execution on
+near-duplicates.
+
 The source EXP_floor material class and the intrinsic cohesive-fold thermal
 trend are also now separate fields.  For example, the bounded trio retains
 DBTT, Peak, and ceramic parent backgrounds, respectively, even though its new
