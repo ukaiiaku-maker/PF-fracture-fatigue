@@ -58,6 +58,17 @@ def test_bounded_two_increment_bursts_can_supply_recurrent_rate():
     assert got["developed_window"]["duration_cycles"] == 20.0
 
 
+def test_developed_window_accepts_roundoff_below_declared_extension_endpoints():
+    events = [{"cycle": float(index),
+               "extension_m": math.nextafter(index*1e-6, 0.0)}
+              for index in range(1, 62)]
+    got = score_recurrence(events, 120e-6)
+    assert got["developed_window"]["start_cycle"] == 20.0
+    assert got["developed_window"]["end_cycle"] == 60.0
+    assert math.isclose(got["developed_rate_m_per_cycle"], 1e-6,
+                        rel_tol=1e-12)
+
+
 class _RemapMPZ:
     def __init__(self):
         for name in ("mobile_positive","mobile_negative","retained_positive","retained_negative",

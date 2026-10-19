@@ -25,8 +25,11 @@ def score_recurrence(events: list[dict[str, Any]], observation_limit_m: float,
     """Classify event histories without treating bounded bursts as a veto."""
     cycles=sorted({int(math.floor(float(e["cycle"])+1e-12)) for e in events})
     target_hit=bool(events and float(events[-1]["extension_m"])>=observation_limit_m-1e-15)
-    lower=next((e for e in events if float(e["extension_m"])>=lower_m),None)
-    upper=next((e for e in events if float(e["extension_m"])>=upper_m),None)
+    endpoint_tol=max(1e-15,1e-12*max(lower_m,upper_m,1e-30))
+    lower=next((e for e in events
+                if float(e["extension_m"])+endpoint_tol>=lower_m),None)
+    upper=next((e for e in events
+                if float(e["extension_m"])+endpoint_tol>=upper_m),None)
     rate=None;window=None
     if lower is not None and upper is not None:
         duration=float(upper["cycle"])-float(lower["cycle"])
