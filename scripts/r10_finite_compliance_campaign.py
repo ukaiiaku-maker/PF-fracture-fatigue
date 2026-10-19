@@ -577,7 +577,17 @@ def analyze(args) -> int:
     csv_write(out / "hcf_results.csv", hcf)
     csv_write(out / "native_developed_slopes.csv", developed_slope_rows(hcf))
     csv_write(out / "native_replicate_rate_bounds.csv", replicate_rate_rows(hcf))
-    csv_write(out / "native_state_effects.csv", state_effect_rows(hcf))
+    state_effects = state_effect_rows(hcf)
+    csv_write(out / "native_state_effects.csv", state_effects)
+    atomic(out / "native_state_effects_summary.json", {
+        "schema": "r10.native-state-effects-summary/1",
+        "matched_rate_ratios": sum(row["comparison"] == "RATE_RATIO"
+                                   for row in state_effects),
+        "matched_slope_differences": sum(row["comparison"] == "SLOPE_DIFFERENCE"
+                                         for row in state_effects),
+        "empty_interpretation": ("NO_MATCHED_DEVELOPED_FULL_AND_FROZEN_RATES; "
+                                 "NO_FICTITIOUS_RATIO_FORMED"),
+    })
     csv_write(out / "native_event_windows.csv", hcf_event_window_rows(args.root))
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
