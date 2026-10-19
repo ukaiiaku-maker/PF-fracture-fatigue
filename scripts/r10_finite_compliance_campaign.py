@@ -13,6 +13,7 @@ from pathlib import Path
 import subprocess
 import sys
 from statistics import median
+from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -765,6 +766,33 @@ def status(args) -> int:
     print(json.dumps(payload, indent=2)); return 0
 
 
+def execution_timing(args) -> int:
+    def parse(value: str) -> datetime:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            raise ValueError("campaign timing requires an explicit UTC offset")
+        return parsed.astimezone(timezone.utc)
+    start = parse(args.start_utc)
+    deadline = parse(args.deadline_utc)
+    observed = parse(args.end_utc) if args.end_utc else datetime.now(timezone.utc)
+    elapsed = (observed-start).total_seconds()
+    payload = {
+        "schema": "r10.finite-compliance-campaign-timing/1",
+        "campaign_start_utc": start.isoformat().replace("+00:00", "Z"),
+        "campaign_deadline_utc": deadline.isoformat().replace("+00:00", "Z"),
+        "observation_utc": observed.isoformat().replace("+00:00", "Z"),
+        "productive_elapsed_wall_seconds": elapsed,
+        "declared_allocation_seconds": (deadline-start).total_seconds(),
+        "allocation_elapsed": observed >= deadline,
+        "campaign_status": "FINAL" if args.final else "ACTIVE",
+        "interpretation": ("Wall time covers continuous development, numerical execution, "
+                           "analysis, and validation; accepted simulated exposure and CPU "
+                           "receipts are reported separately."),
+    }
+    atomic(args.root/"campaign_delivery"/"execution_timing.json", payload)
+    print(json.dumps(payload, indent=2)); return 0
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path,
@@ -778,6 +806,12 @@ def main(argv=None) -> int:
     child.add_argument("--resume", action="store_true")
     child.add_argument("--keep-going", action="store_true")
     child.set_defaults(function=execute_plan)
+    child = sub.add_parser("timing")
+    child.add_argument("--start-utc", required=True)
+    child.add_argument("--deadline-utc", required=True)
+    child.add_argument("--end-utc")
+    child.add_argument("--final", action="store_true")
+    child.set_defaults(function=execution_timing)
     args = parser.parse_args(argv)
     return args.function(args)
 

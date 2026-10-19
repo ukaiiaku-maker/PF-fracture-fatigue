@@ -1,7 +1,7 @@
 import json
 
 from scripts.r10_finite_compliance_campaign import (
-    developed_slope_rows, hcf_event_window_rows, hcf_rows, native_rows,
+    developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows, native_rows,
     search_specification,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
@@ -103,6 +103,21 @@ def test_event_windows_reject_single_cycle_cascade(tmp_path):
         "R": .1, "events": events, "observation_path_m": 60e-6,
     }))
     assert hcf_event_window_rows(tmp_path) == []
+
+
+def test_execution_timing_records_real_elapsed_scope(tmp_path):
+    class Args:
+        root = tmp_path
+        start_utc = "2026-10-18T22:30:09Z"
+        deadline_utc = "2026-10-19T10:30:09Z"
+        end_utc = "2026-10-19T10:31:09Z"
+        final = True
+    assert execution_timing(Args()) == 0
+    timing = json.loads((tmp_path/"campaign_delivery"/"execution_timing.json").read_text())
+    assert timing["productive_elapsed_wall_seconds"] == 43260.
+    assert timing["declared_allocation_seconds"] == 43200.
+    assert timing["allocation_elapsed"] is True
+    assert timing["campaign_status"] == "FINAL"
 
 
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
