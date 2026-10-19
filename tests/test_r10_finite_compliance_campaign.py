@@ -2,7 +2,7 @@ import json
 
 from scripts.r10_finite_compliance_campaign import (
     csv_row_count, developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows,
-    native_rows, replicate_rate_rows, search_specification,
+    native_rows, replicate_rate_rows, search_specification, state_effect_rows,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
@@ -146,6 +146,23 @@ def test_csv_row_count_excludes_header(tmp_path):
     path = tmp_path/"rows.csv"
     path.write_text("a,b\n1,2\n3,4\n")
     assert csv_row_count(path) == 2
+
+
+def test_state_effects_require_matched_full_and_frozen_rates():
+    common = {"candidate_id": "C", "complete_row_sha256": "a"*64,
+        "temperature_K": 300., "R": .1, "frequency_Hz": 1000.}
+    rows = []
+    for feedback, factor in (("EVOLVING_FULL_STATE", 2.),
+                             ("FROZEN_INITIAL_PLASTIC_STATE", 1.)):
+        for amplitude, rate in ((10., 1e-11*factor), (20., 4e-11*factor)):
+            rows.append({**common, "plastic_feedback_reference": feedback,
+                "DeltaK_MPa_sqrt_m": amplitude,
+                "developed_rate_m_per_cycle": rate})
+    effects = state_effect_rows(rows)
+    ratios = [row for row in effects if row["comparison"] == "RATE_RATIO"]
+    slopes = [row for row in effects if row["comparison"] == "SLOPE_DIFFERENCE"]
+    assert len(ratios) == 2 and all(row["C_full_over_frozen"] == 2. for row in ratios)
+    assert len(slopes) == 1 and abs(slopes[0]["Delta_m_full_minus_frozen"]) < 1e-15
 
 
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
