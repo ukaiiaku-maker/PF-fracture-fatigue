@@ -307,6 +307,16 @@ the resulting late adjacent slopes are `5.9306` and `9.8218`.  Thus the
 curvature persists after a matched stationarity check and neither segment enters
 the strict slope band.
 
+The dense 32-phase finite-compliance evaluator predicts rates of
+`4.1985e-11`, `5.8153e-11`, `7.8116e-11`, and `1.0306e-10 m/cycle` at the exact
+1.05/1.10/1.15/1.20 loads after log interpolation.  The corresponding native
+canonical rates (median across the replicated 1.05/1.10 streams) are 0.741,
+0.993, 1.007, and 1.102 times those predictions.  Absolute rates therefore
+transfer to within -26%/+10% across the developed block, but the local slopes
+do not: analytical adjacent slopes are `7.003/6.639/6.511`, versus native
+median slopes `13.299/6.944/8.631`.  Acquisition must retain the native
+discrepancy and may not report the analytical curve as the measured Paris law.
+
 The same candidate has physical non-advance through `1e8` cycles at 0.70,
 0.80, and 0.90 times load; 0.95 times has four recurrent events but has not
 reached the developed reporting window.  The full/frozen base comparison is
