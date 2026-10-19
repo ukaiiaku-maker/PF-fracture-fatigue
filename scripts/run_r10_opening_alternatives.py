@@ -48,7 +48,9 @@ def thermal_from(c):
                               float(c.get('compact_fall_fraction',.85)),
                               float(c.get('compact_plateau_drop',.05)),
                               float(c.get('compact_drop_fraction',.2)),
-                              float(c.get('compact_tail_level',.05)))
+                              float(c.get('compact_tail_level',.05)),
+                              float(c.get('compact_knee_fraction',.6)),
+                              float(c.get('compact_mid_level',.2)))
 
 def mechanics(thermal,T=300.):
     gamma=thermal.gamma(T);peak=thermal.t_hat(T);zone=EPRIME*gamma/peak**2

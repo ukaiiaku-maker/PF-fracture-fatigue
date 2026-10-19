@@ -123,7 +123,9 @@ def _thermal(cohesive: dict) -> CohesiveThermalLaw:
         cohesive.get("compact_fall_fraction", .85),
         cohesive.get("compact_plateau_drop", .05),
         cohesive.get("compact_drop_fraction", .2),
-        cohesive.get("compact_tail_level", .05))
+        cohesive.get("compact_tail_level", .05),
+        cohesive.get("compact_knee_fraction", .6),
+        cohesive.get("compact_mid_level", .2))
 
 
 def _thermal_class(Kfold: list[float]) -> str:

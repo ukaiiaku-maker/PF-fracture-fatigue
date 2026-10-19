@@ -82,6 +82,42 @@ def test_two_scale_tail_releases_a_broad_finite_compliance_window():
     assert float(window["load_ratio"]) > 5.
 
 
+def test_three_scale_tail_is_one_positive_finite_work_potential():
+    thermal = CohesiveThermalLaw(2., 15e9, 0., compact_variant="three_scale_tail",
+        compact_rise_fraction=.002, compact_drop_fraction=.012,
+        compact_mid_level=.18, compact_knee_fraction=.55,
+        compact_tail_level=.025)
+    coordinates=shape_coordinates(COMPACT_INDEPENDENT,thermal,300.)
+    cutoff=coordinates["completion_cutoff_m"]
+    x=np.linspace(0.,cutoff,4001)
+    from arrhenius_fracture.cohesive_arrhenius import cohesive_shape_response
+    traction,tangent,work=cohesive_shape_response(COMPACT_INDEPENDENT,x,thermal,300.)
+    assert np.all(np.asarray(traction)>=0.)
+    peak=int(np.argmax(traction))
+    assert peak>0
+    assert np.all(np.diff(np.asarray(traction)[:peak+1])>=-1e-8)
+    assert np.all(np.diff(np.asarray(traction)[peak:])<=1e-8)
+    assert math.isclose(float(work[-1]),2.,rel_tol=2e-12)
+    assert math.isclose(float(np.trapezoid(traction,x)),2.,rel_tol=1e-4)
+    assert np.count_nonzero(np.diff(np.asarray(traction))>0.) < 20
+
+
+def test_complete_cycle_slope_decomposes_into_accessibility_and_conditional_rate():
+    thermal = CohesiveThermalLaw(2., 15e9, 0., compact_variant="two_scale_tail",
+        compact_rise_fraction=.001, compact_drop_fraction=.003,
+        compact_tail_level=.035)
+    kenv=15e9**2/(2.*2.)
+    window=metastable_window(COMPACT_INDEPENDENT,thermal,300.,kenv)
+    birth=float(window["birth_load_Pa"])*math.sqrt(2.*math.pi*1e-6)/1e6
+    fold=float(window["fold_load_Pa"])*math.sqrt(2.*math.pi*1e-6)/1e6
+    result=cyclic_rate_curve(np.geomspace(1.02*birth,.8*fold,21),kenv,
+        thermal,300.,COMPACT_INDEPENDENT,1e-21,1e12,phases=24)
+    decomposed=[row for row in result["rows"]
+        if row["slope_decomposition_error"] is not None]
+    assert decomposed
+    assert max(abs(row["slope_decomposition_error"]) for row in decomposed)<1e-9
+
+
 def test_interval_aware_cycle_integral_resolves_narrow_peak_accessibility():
     thermal = CohesiveThermalLaw(2., 15e9, 0., compact_variant="two_scale_tail",
         compact_rise_fraction=.001, compact_drop_fraction=.003,

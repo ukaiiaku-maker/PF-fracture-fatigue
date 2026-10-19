@@ -65,14 +65,20 @@ def _stationary(imposed_m: float, environment_stiffness_Pa_per_m: float,
     else:
         span = max(cutoff * 1.001, imposed + .05 * cutoff)
         if shape == COMPACT_INDEPENDENT and thermal.compact_variant in {
-                "rounded_plateau","two_scale_tail"}:
+                "rounded_plateau","two_scale_tail","three_scale_tail"}:
             rise=thermal.compact_rise_fraction*cutoff
             fall=(thermal.compact_fall_fraction if thermal.compact_variant=="rounded_plateau"
                   else thermal.compact_drop_fraction)*cutoff
             segment=max(points//4,33)
-            grid=np.unique(np.r_[np.linspace(0.,rise,segment),
-                np.linspace(rise,fall,2*segment),np.linspace(fall,cutoff,segment),
-                np.linspace(cutoff,span,segment)])
+            pieces=[np.linspace(0.,rise,segment),np.linspace(rise,fall,2*segment)]
+            if thermal.compact_variant == "three_scale_tail":
+                knee=thermal.compact_knee_fraction*cutoff
+                pieces.extend((np.linspace(fall,knee,segment),
+                               np.linspace(knee,cutoff,segment)))
+            else:
+                pieces.append(np.linspace(fall,cutoff,segment))
+            pieces.append(np.linspace(cutoff,span,segment))
+            grid=np.unique(np.concatenate(pieces))
         else:
             grid = np.linspace(0., span, points)
 
@@ -288,6 +294,8 @@ def rate_curve(K_values: Iterable[float], environment_stiffness_Pa_per_m: float,
         row["local_log_slope"] = None if not np.isfinite(slopes[index]) else float(slopes[index])
         row["local_log_curvature"] = (None if not np.isfinite(curvature[index])
                                       else float(curvature[index]))
+
+    for index,row in enumerate(rows):
         identity=row.get("sensitivity_identity")
         row["sensitivity_identity_relative_error"]=(None if identity is None or
             not np.isfinite(slopes[index]) else abs(float(slopes[index])-float(identity))/
@@ -421,6 +429,30 @@ def cyclic_rate_curve(K_values: Iterable[float],
                                   else float(slopes[index]))
         row["local_log_curvature"] = (None if not np.isfinite(curvature[index])
                                       else float(curvature[index]))
+
+    # Exact bookkeeping decomposition for the frozen complete-cycle response:
+    # action = accessible_fraction * conditional_supported_rate / frequency.
+    # The conditional term includes changes in which phases are accessible.
+    fractions=np.asarray([row.get("accessible_phase_fraction",0.) for row in rows],float)
+    conditional=np.divide(actions*float(frequency_Hz),fractions,
+        out=np.full_like(actions,np.nan),where=fractions>0.)
+    access_slope=np.full(len(rows),np.nan);conditional_slope=np.full(len(rows),np.nan)
+    decomposition_error=np.full(len(rows),np.nan)
+    supported=positive & (fractions>0.) & np.isfinite(conditional) & (conditional>0.)
+    if np.count_nonzero(supported)>=3:
+        indices=np.flatnonzero(supported);x=np.log(K[indices])
+        access_slope[indices]=np.gradient(np.log(fractions[indices]),x,edge_order=2)
+        conditional_slope[indices]=np.gradient(np.log(conditional[indices]),x,edge_order=2)
+        decomposition_error[indices]=slopes[indices]-access_slope[indices]-conditional_slope[indices]
+    for index,row in enumerate(rows):
+        row["conditional_mean_supported_rate_s-1"]=(None if not np.isfinite(conditional[index])
+            else float(conditional[index]))
+        row["accessibility_log_slope"]=(None if not np.isfinite(access_slope[index])
+            else float(access_slope[index]))
+        row["conditional_rate_log_slope"]=(None if not np.isfinite(conditional_slope[index])
+            else float(conditional_slope[index]))
+        row["slope_decomposition_error"]=(None if not np.isfinite(decomposition_error[index])
+            else float(decomposition_error[index]))
 
     def connected_width(mask: np.ndarray) -> tuple[float, float, tuple[float,float] | None]:
         best_K=0.;best_action=0.;best_bounds=None;start=None

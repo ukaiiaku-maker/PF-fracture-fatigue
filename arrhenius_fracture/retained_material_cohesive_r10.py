@@ -50,6 +50,8 @@ def load_cohesive_binding(registry: str | Path, candidate_id: str,
         compact_plateau_drop=float(cohesive.get("compact_plateau_drop", .05)),
         compact_drop_fraction=float(cohesive.get("compact_drop_fraction", .2)),
         compact_tail_level=float(cohesive.get("compact_tail_level", .05)),
+        compact_knee_fraction=float(cohesive.get("compact_knee_fraction", .6)),
+        compact_mid_level=float(cohesive.get("compact_mid_level", .2)),
     ).validate_range((300, 450, 600, 750, 900, 1050, 1200))
     opening = ExponentialCohesiveBarrier(
         thermal=thermal,
