@@ -707,14 +707,20 @@ def plot(args) -> int:
         fig,axes=plt.subplots(2,1,figsize=(6.4,6.4),sharex=True)
         axes[0].semilogy(K,np.maximum(action*1e-6,1e-16),color="#1f4e79",lw=1.5,
                          label="Frozen complete-cycle reference")
+        developed_by_K={}
         for row in sorted(compact_records,key=lambda item:float(item["Kmax_MPa_sqrt_m"])):
             kval=float(row["Kmax_MPa_sqrt_m"]);rate=row.get("developed_rate_m_per_cycle")
             if rate not in (None,"",0,0.):
-                axes[0].semilogy(kval,float(rate),"o",color="#a23b2a",ms=5)
+                developed_by_K.setdefault(kval,[]).append(float(rate))
             elif row.get("disposition")=="PHYSICAL_RUNOUT_TO_DECLARED_HORIZON":
                 axes[0].semilogy(kval,1e-16,"v",mfc="none",mec="#1f4e79")
             else:
                 axes[0].semilogy(kval,1e-15,"s",mfc="none",mec="#555555")
+        for index,(kval,rates) in enumerate(sorted(developed_by_K.items())):
+            centre=median(rates);low=centre-min(rates);high=max(rates)-centre
+            axes[0].errorbar(kval,centre,yerr=np.asarray([[low],[high]]),fmt="o",
+                color="#a23b2a",ms=5,capsize=3,
+                label="Native developed window" if index==0 else None)
         axes[0].set_ylabel(r"Opening / developed rate (m cycle$^{-1}$)")
         axes[0].legend(frameon=False)
         axes[1].plot(K,slope,color="#1f4e79",lw=1.5,label="Analytical local slope")
