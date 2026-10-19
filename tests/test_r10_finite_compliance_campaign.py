@@ -86,6 +86,19 @@ def test_event_windows_use_latest_accepted_progress_and_keep_window_meanings(tmp
     assert rows[0]["evidence_path"].endswith("progress.json")
 
 
+def test_event_windows_reject_single_cycle_cascade(tmp_path):
+    case = tmp_path / "hcf" / "CAND" / "m_1p00000"
+    case.mkdir(parents=True)
+    events = [{"cycle": index*1e-4, "extension_m": index*1e-6}
+              for index in range(1, 61)]
+    (case / "progress.json").write_text(json.dumps({
+        "candidate_id": "CAND", "complete_row_sha256": "f" * 64,
+        "accepted_cycles": .006, "frequency_Hz": 1000., "temperature_K": 900.,
+        "R": .1, "events": events, "observation_path_m": 60e-6,
+    }))
+    assert hcf_event_window_rows(tmp_path) == []
+
+
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
     directory = tmp_path / "hcf" / "CAND" / "m"
     directory.mkdir(parents=True)

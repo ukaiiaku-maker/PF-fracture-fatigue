@@ -218,6 +218,12 @@ def hcf_event_window_rows(root: Path) -> list[dict]:
         if result is None:
             continue
         events = result.get("events") or []
+        # A fractional-time cascade inside one accepted cycle is a first
+        # excursion, not a cyclic growth window, even if it spans 20--60 um.
+        accepted_event_cycles = {int(math.floor(float(event["cycle"])+1e-12))
+                                 for event in events}
+        if len(accepted_event_cycles) < 2:
+            continue
         identity = result.get("complete_row_sha256")
         meta = metadata.get(identity, {})
         Kmax = result.get("Kmax_MPa_sqrt_m")
