@@ -57,3 +57,20 @@ def test_legacy_restart_is_adopted_once():
     assert restart_identity_matches(
         saved, "candidate", "hash", 1.01, 300.0, 0.1, 1000.0, True,
         64, 19, 2e-6, 60e-6)
+
+
+def test_restart_identity_seals_explicit_environment_alternative():
+    saved=identity();saved["environment_stiffness_Pa_per_m"]=1.25e17
+    assert restart_identity_matches(
+        saved,"candidate","hash",1.01,300.,.1,1000.,True,
+        16,17,1e-6,120e-6,1.25e17)
+    assert not restart_identity_matches(
+        saved,"candidate","hash",1.01,300.,.1,1000.,True,
+        16,17,1e-6,120e-6,2.5e17)
+    assert not restart_identity_matches(
+        saved,"candidate","hash",1.01,300.,.1,1000.,True,
+        16,17,1e-6,120e-6,None)
+    control=identity()
+    assert not restart_identity_matches(
+        control,"candidate","hash",1.01,300.,.1,1000.,True,
+        16,17,1e-6,120e-6,1.25e17)

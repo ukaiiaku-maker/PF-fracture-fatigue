@@ -26,7 +26,8 @@ from scripts.run_r10_opening_alternatives import thermal_from,mechanics
 SCHEMA="r10.czm-owned-hcf-trajectory/1"
 
 def restart_identity_matches(saved,candidate,complete_row_sha256,factor,T,R,frequency,
-                             plastic_feedback,phases,seed,patch_m,path_limit_m):
+                             plastic_feedback,phases,seed,patch_m,path_limit_m,
+                             environment_stiffness_override_Pa_per_m=None):
  """Return whether a checkpoint belongs to the requested numerical protocol.
 
  Older checkpoints predate these added fields, so they can be adopted once;
@@ -39,7 +40,13 @@ def restart_identity_matches(saved,candidate,complete_row_sha256,factor,T,R,freq
  saved_hash=saved.get('complete_row_sha256')
  saved_patch=saved.get('patch_m')
  saved_path=saved.get('observation_path_m')
- return (saved['candidate_id']==candidate and
+ saved_environment=saved.get('environment_stiffness_Pa_per_m')
+ environment_matches=((saved_environment is None and
+                       environment_stiffness_override_Pa_per_m is None) or
+  (saved_environment is not None and environment_stiffness_override_Pa_per_m is not None and
+   math.isclose(float(saved_environment),float(environment_stiffness_override_Pa_per_m),
+                rel_tol=1e-12,abs_tol=0.)))
+ return (saved['candidate_id']==candidate and environment_matches and
   (saved_hash is None or saved_hash==complete_row_sha256) and
   math.isclose(float(saved['factor']),factor,rel_tol=0.,abs_tol=1e-14) and
   math.isclose(float(saved.get('temperature_K',T)),T,rel_tol=0.,abs_tol=1e-12) and
@@ -110,9 +117,14 @@ def drain_mechanical_successors(engine,K,T,cycles,events,patch_m,path_limit_m):
 
 def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300.,R=.1,
              frequency=1000.,patch_m=1e-6,path_limit_m=120e-6,max_wall_s=900.,
-             plastic_feedback=True):
+             plastic_feedback=True,environment_stiffness_override_Pa_per_m=None):
  row=row_for(registry,candidate);c=json.loads(row['cohesive_parameter_vector'])
- thermal=thermal_from(c);_,kenv=mechanics(thermal,T);Kref,_=reference_load(row,T,phases);Kmax=factor*Kref
+ thermal=thermal_from(c);_,derived_kenv=mechanics(thermal,T)
+ kenv=(derived_kenv if environment_stiffness_override_Pa_per_m is None else
+       float(environment_stiffness_override_Pa_per_m))
+ environment_model=("DECLARED_LPZ_CONTROL" if environment_stiffness_override_Pa_per_m is None
+                    else "EXPLICIT_MECHANICAL_RESPONSE_ALTERNATIVE")
+ Kref,_=reference_load(row,T,phases);Kmax=factor*Kref
  alt=OpeningAlternative(row['selected_mode'],row['selected_shape'],
   'quasistatic_mechanical' if row['selected_mode']=='cohesive_athermal' else 'time_dependent_first_passage',
   None if row['selected_mode']=='cohesive_athermal' else float(c['activation_area_m2']),
@@ -138,7 +150,8 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   saved=json.loads(progress_path.read_text())
   if not restart_identity_matches(saved,candidate,row['complete_row_sha256'],
                                   factor,T,R,frequency,plastic_feedback,phases,
-                                  seed,patch_m,path_limit_m):
+                                  seed,patch_m,path_limit_m,
+                                  environment_stiffness_override_Pa_per_m):
    raise RuntimeError('restart identity differs from requested CZM HCF case')
   _restore_geometry(engine,checkpoint_dir);restore_checkpoint(engine,checkpoint_dir)
   cycles=float(saved['accepted_cycles']);events=list(saved['events']);history=list(saved['history']);blocks=list(saved['blocks'])
@@ -181,6 +194,8 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
              "frequency_Hz":frequency,"horizon":horizon,"accepted_cycles":cycles,
              "phase_count":phases,"hazard_seed":seed,
              "patch_m":patch_m,"observation_path_m":path_limit_m,
+             "environment_stiffness_Pa_per_m":kenv,
+             "environment_model":environment_model,
              "cpu_seconds":prior_cpu_seconds+time.process_time()-cpu_start,
              "plastic_feedback":bool(plastic_feedback),
              "events":events,"history":history,"blocks":blocks,"unsupported":bool(engine._r10_czm_unsupported),
@@ -232,6 +247,7 @@ def run_case(registry,candidate,factor,horizon,out,seed=20261019,phases=16,T=300
   "numeric_failure":numeric,"resource_stop":resource,"predictor":predictor,"overlap":overlap,
   "history":history,"acceleration_blocks":blocks,"phase_count":phases,"patch_m":patch_m,
   "hazard_seed":seed,
+  "environment_stiffness_Pa_per_m":kenv,"environment_model":environment_model,
   "observation_path_m":path_limit_m,"legacy_cooperative_clock_used":False,
   "opening_owner":"CURRENT_ATHERMAL_OR_MIXED_CZM","plasticity_owner":"CURRENT_EXP_FLOOR_FULL_STATE",
   "plastic_feedback_reference":"EVOLVING_FULL_STATE" if plastic_feedback else
@@ -250,11 +266,13 @@ def main(argv=None):
  p.add_argument('--frequency-Hz',type=float,default=1000.);p.add_argument('--patch-um',type=float,default=1.)
  p.add_argument('--frozen-initial-plastic-state',action='store_true')
  p.add_argument('--path-limit-um',type=float,default=120.)
+ p.add_argument('--environment-stiffness-override-Pa-per-m',type=float)
  a=p.parse_args(argv);a.out.mkdir(parents=True,exist_ok=True)
  result=run_case(a.registry,a.candidate_id,a.factor,a.horizon,a.out,a.seed,a.phases,
   T=a.temperature_K,R=a.R,frequency=a.frequency_Hz,patch_m=a.patch_um*1e-6,
   path_limit_m=a.path_limit_um*1e-6,max_wall_s=a.max_wall_s,
-  plastic_feedback=not a.frozen_initial_plastic_state)
+  plastic_feedback=not a.frozen_initial_plastic_state,
+  environment_stiffness_override_Pa_per_m=a.environment_stiffness_override_Pa_per_m)
  print(json.dumps({k:result[k] for k in ('candidate_id','Kmax_MPa_sqrt_m','accepted_cycles','accepted_seconds','physical_event_count','advance_m','disposition','developed_rate_m_per_cycle','wall_seconds')},indent=2));return 0
 
 if __name__=='__main__':raise SystemExit(main())

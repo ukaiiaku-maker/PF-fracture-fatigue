@@ -23,7 +23,8 @@ from scipy.stats import chi2
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from arrhenius_fracture.config import ElasticProperties
 from arrhenius_fracture.fem import assemble_mechanics,plane_strain_D
-from arrhenius_fracture.finite_compliance_inverse_shape_r10 import cyclic_rate,cyclic_rate_curve
+from arrhenius_fracture.finite_compliance_inverse_shape_r10 import (
+    K_from_imposed,cyclic_rate,cyclic_rate_curve,metastable_window)
 from arrhenius_fracture.mesh import rebuild_tri_mesh
 from scripts.run_r10_opening_alternatives import mechanics,thermal_from
 
@@ -103,10 +104,33 @@ def main(argv=None)->int:
         "assembled_bulk_only_fixtures":fixtures,
         "conclusion":("DECLARED_CLOSURE_IS_REPRODUCED_ONLY_BY_A_FIXTURE_WITH_HALF_HEIGHT_LPZ; "
             "THE_MICROMETRE_FIXTURE_HAS_A DISTINCT, GEOMETRY_CONTROLLED SCHUR STIFFNESS")}
-    atomic(a.out/"mechanical_environment_audit.json",environment)
-
+    # Compare rather than replace the declared closure.  Each curve uses its
+    # own connected birth/fold interval; no stiffness multiplier is fitted.
     shape=row["selected_shape"];area=float(cohesive["activation_area_m2"])
     attempt=float(cohesive["attempt_frequency_s"])
+    closure_curves=[]
+    for label,k in (("DECLARED_LPZ_CONTROL",control_k),
+                    ("ASSEMBLED_2UM_HALF_HEIGHT_FIXTURE",
+                     fixtures[1]["environment_stiffness_Pa_per_m"])):
+        window=metastable_window(shape,thermal,300.,k)
+        receipt={"closure":label,"environment_stiffness_Pa_per_m":k,
+                 "window_state":window["state"]}
+        if window["state"]=="METASTABLE_WINDOW":
+            birth=K_from_imposed(float(window["birth_load_Pa"])/k,k)
+            fold=K_from_imposed(float(window["fold_load_Pa"])/k,k)
+            curve=cyclic_rate_curve(np.geomspace(1.005*birth,.985*fold,41),k,
+                thermal,300.,shape,area,attempt,R=.1,frequency_Hz=1000.,phases=32)
+            finite=[r for r in curve["rows"] if r["local_log_slope"] is not None]
+            receipt.update({"birth_K_MPa_sqrt_m":birth,"fold_K_MPa_sqrt_m":fold,
+                "load_ratio":window["load_ratio"],
+                "minimum_complete_cycle_slope":min((r["local_log_slope"] for r in finite),default=None),
+                "moderate_connected_width_log10rate":curve["moderate_connected_width_log10rate"],
+                "strict_connected_width_log10rate":curve["strict_connected_width_log10rate"],
+                "rows":curve["rows"]})
+        closure_curves.append(receipt)
+    environment["explicit_alternative_closure_comparison"]=closure_curves
+    atomic(a.out/"mechanical_environment_audit.json",environment)
+
     case_paths=sorted(a.campaign_root.glob(
         "hcf_bounded_inverse_027_amplitude*/R10_INVERSE_OPT_027__CM/m_*/result.json"))
     native=[]
