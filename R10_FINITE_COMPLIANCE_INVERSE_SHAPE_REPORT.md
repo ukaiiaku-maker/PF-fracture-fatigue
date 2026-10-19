@@ -391,9 +391,11 @@ strongly plastic transaction.  At 1.10 times load, full/frozen first events are
 `7604.998/7604.945` and second events are `30820.012/30819.103`; the frozen/full
 inter-event ratio is `0.999963`.  At 1.20 times load the corresponding first
 events are `4974.041/4973.882`, second events are `17670.007/17666.092`, and the
-ratio is `0.999704`.  The full transactions carry roughly 295--413 mobile units
+ratio is `0.999704`.  Both pairs now include event 3; the next frozen/full
+waiting-interval ratios are `0.999968` at 1.10 and `1.003368` at 1.20.  The full
+transactions carry roughly 295--413 mobile units
 and 197--275 wake-slip units at event 1, yet the matched first and renewal times
-change by less than 0.04%.  This is evidence of a materially active plastic
+change by at most 0.34%.  This is evidence of a materially active plastic
 background whose tested fatigue timing remains opening-clock-controlled, not a
 developed plasticity-controlled rate.  At high temperature the same nominally
 opening-controlled 027 material develops a post-commit mobile population of

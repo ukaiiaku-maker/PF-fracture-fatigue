@@ -190,8 +190,10 @@
   out a consequential first-event effect.  Second events are now matched at
   30820.012/30819.103 cycles (full/frozen) at 1.10 and
   17670.007/17666.092 at 1.20.  The frozen/full waiting-interval ratios are
-  0.999963 and 0.999704, respectively: large committed plastic populations do
-  not create a consequential renewal-time effect in these tested prefixes.
+  0.999963 and 0.999704, respectively.  Both pairs now include event 3; their
+  next interval ratios are 0.999968 and 1.003368.  Large committed plastic
+  populations therefore do not create a consequential renewal-time effect in
+  these tested prefixes.
 - Reporting now exports matched first-event ratios and one-sided exposure
   bounds separately from developed-rate ratios and slope changes.  Prefixes
   cannot be promoted into a developed state-effect claim.
