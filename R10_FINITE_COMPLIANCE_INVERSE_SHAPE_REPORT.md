@@ -4,6 +4,8 @@
 
 - Campaign start: `2026-10-18T22:30:09Z`
 - Earliest finalization: `2026-10-19T10:30:09Z`
+- Final observation: `2026-10-19T10:30:18Z`
+- Productive elapsed wall time: `43,209 s` (`12 h 00 min 09 s`)
 - Branch: `codex/r10-finite-compliance-inverse-shape`
 - Compatible parent: `8b2f20fe7a421d94e478e21d8729a064884e4970`
 - Qualified environment: `arrhenius-sharp-front-v10-codex`

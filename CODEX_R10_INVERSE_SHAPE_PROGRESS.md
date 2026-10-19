@@ -203,6 +203,8 @@ checkpoints; queue creation by itself is not a completion condition.
 
 ## Final campaign closure
 
+- Final timing receipt: `2026-10-19T10:30:18Z`, 43,209 productive elapsed
+  seconds against the declared 43,200-second allocation (`FINAL`).
 - All numerical output owners were stopped after their last atomic accepted
   checkpoint; unfinished exact blocks contribute no event or exposure claim.
 - Final stable coverage is 196,864 analytical allocations, 1,161 complete
