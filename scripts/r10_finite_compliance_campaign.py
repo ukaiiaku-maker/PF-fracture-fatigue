@@ -157,6 +157,7 @@ def hcf_rows(root: Path) -> list[dict]:
             **meta, **{key: record.get(key) for key in (
             "candidate_id", "complete_row_sha256", "shape", "mode", "temperature_K",
             "R", "frequency_Hz", "Kmax_MPa_sqrt_m", "DeltaK_MPa_sqrt_m",
+            "hazard_seed",
             "accepted_cycles", "accepted_seconds", "physical_event_count", "advance_m",
             "cpu_seconds", "wall_seconds",
             "first_event_cycle", "all_waiting_intervals_cycles", "inter_event_cycles",
@@ -283,6 +284,65 @@ def state_effect_rows(rows: list[dict]) -> list[dict]:
             "frozen_local_log_slope": frozen["local_log_slope"],
             "Delta_m_full_minus_frozen": (full["local_log_slope"]-
                                             frozen["local_log_slope"])})
+    return output
+
+
+def state_prefix_rows(rows: list[dict]) -> list[dict]:
+    """Compare matched full/frozen first-event evidence without inventing rates."""
+    grouped: dict[tuple, dict[str, dict]] = {}
+    for row in rows:
+        feedback = row.get("plastic_feedback_reference")
+        amplitude = row.get("DeltaK_MPa_sqrt_m")
+        if feedback not in {"EVOLVING_FULL_STATE", "FROZEN_INITIAL_PLASTIC_STATE"}:
+            continue
+        if amplitude in (None, "") or row.get("hazard_seed") in (None, ""):
+            continue
+        key = (row.get("candidate_id"), row.get("complete_row_sha256"),
+               row.get("temperature_K"), row.get("R"), row.get("frequency_Hz"),
+               float(amplitude), row.get("hazard_seed"))
+        existing = grouped.setdefault(key, {}).get(feedback)
+        if existing is None or float(row.get("accepted_cycles") or 0.) > float(
+                existing.get("accepted_cycles") or 0.):
+            grouped[key][feedback] = row
+    output = []
+    for key, modes in sorted(grouped.items(), key=lambda item: str(item[0])):
+        full = modes.get("EVOLVING_FULL_STATE")
+        frozen = modes.get("FROZEN_INITIAL_PLASTIC_STATE")
+        if full is None or frozen is None:
+            continue
+        full_first = full.get("first_event_cycle")
+        frozen_first = frozen.get("first_event_cycle")
+        full_exposure = float(full.get("accepted_cycles") or 0.)
+        frozen_exposure = float(frozen.get("accepted_cycles") or 0.)
+        if full_first not in (None, "") and frozen_first not in (None, ""):
+            comparison = "MATCHED_FIRST_EVENT_RATIO"
+            ratio = float(frozen_first)/float(full_first)
+            lower_bound = None
+        elif full_first not in (None, "") and frozen_exposure >= float(full_first):
+            comparison = "FROZEN_FIRST_EVENT_DELAY_LOWER_BOUND"
+            ratio = None
+            lower_bound = frozen_exposure/float(full_first)
+        elif frozen_first not in (None, "") and full_exposure >= float(frozen_first):
+            comparison = "FULL_FIRST_EVENT_DELAY_LOWER_BOUND"
+            ratio = None
+            lower_bound = full_exposure/float(frozen_first)
+        else:
+            comparison = "MATCHED_PREFIX_INSUFFICIENT_EXPOSURE"
+            ratio = lower_bound = None
+        output.append({
+            "comparison": comparison, "candidate_id": key[0],
+            "complete_row_sha256": key[1], "temperature_K": key[2], "R": key[3],
+            "frequency_Hz": key[4], "DeltaK_MPa_sqrt_m": key[5],
+            "hazard_seed": key[6], "full_first_event_cycle": full_first,
+            "frozen_first_event_cycle": frozen_first,
+            "full_accepted_cycles": full_exposure,
+            "frozen_accepted_cycles": frozen_exposure,
+            "frozen_over_full_first_event_cycle": ratio,
+            "observed_delay_lower_bound": lower_bound,
+            "interpretation": "FIRST_EVENT_OR_EXPOSURE_ONLY; NOT_A_DEVELOPED_RATE_EFFECT",
+            "full_evidence_path": full.get("path"),
+            "frozen_evidence_path": frozen.get("path"),
+        })
     return output
 
 
@@ -579,12 +639,15 @@ def analyze(args) -> int:
     csv_write(out / "native_replicate_rate_bounds.csv", replicate_rate_rows(hcf))
     state_effects = state_effect_rows(hcf)
     csv_write(out / "native_state_effects.csv", state_effects)
+    prefix_effects = state_prefix_rows(hcf)
+    csv_write(out / "native_state_prefix_comparisons.csv", prefix_effects)
     atomic(out / "native_state_effects_summary.json", {
         "schema": "r10.native-state-effects-summary/1",
         "matched_rate_ratios": sum(row["comparison"] == "RATE_RATIO"
                                    for row in state_effects),
         "matched_slope_differences": sum(row["comparison"] == "SLOPE_DIFFERENCE"
                                          for row in state_effects),
+        "matched_prefix_comparisons": len(prefix_effects),
         "empty_interpretation": ("NO_MATCHED_DEVELOPED_FULL_AND_FROZEN_RATES; "
                                  "NO_FICTITIOUS_RATIO_FORMED"),
     })

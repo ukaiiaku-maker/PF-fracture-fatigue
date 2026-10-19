@@ -3,6 +3,7 @@ import json
 from scripts.r10_finite_compliance_campaign import (
     csv_row_count, developed_slope_rows, execution_timing, hcf_event_window_rows, hcf_rows,
     native_rows, replicate_rate_rows, search_specification, state_effect_rows,
+    state_prefix_rows,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
@@ -163,6 +164,23 @@ def test_state_effects_require_matched_full_and_frozen_rates():
     slopes = [row for row in effects if row["comparison"] == "SLOPE_DIFFERENCE"]
     assert len(ratios) == 2 and all(row["C_full_over_frozen"] == 2. for row in ratios)
     assert len(slopes) == 1 and abs(slopes[0]["Delta_m_full_minus_frozen"]) < 1e-15
+
+
+def test_state_prefix_comparison_reports_only_observed_exposure_bound():
+    common = {"candidate_id": "C", "complete_row_sha256": "a"*64,
+        "temperature_K": 300., "R": .1, "frequency_Hz": 1000.,
+        "DeltaK_MPa_sqrt_m": 10., "hazard_seed": 42}
+    rows = [
+        {**common, "plastic_feedback_reference": "EVOLVING_FULL_STATE",
+         "accepted_cycles": 8000., "first_event_cycle": 4000., "path": "full"},
+        {**common, "plastic_feedback_reference": "FROZEN_INITIAL_PLASTIC_STATE",
+         "accepted_cycles": 6000., "first_event_cycle": None, "path": "frozen"},
+    ]
+    comparison = state_prefix_rows(rows)[0]
+    assert comparison["comparison"] == "FROZEN_FIRST_EVENT_DELAY_LOWER_BOUND"
+    assert comparison["observed_delay_lower_bound"] == 1.5
+    assert comparison["frozen_over_full_first_event_cycle"] is None
+    assert comparison["interpretation"].endswith("NOT_A_DEVELOPED_RATE_EFFECT")
 
 
 def test_campaign_uses_newer_accepted_progress_and_recomputes_window(tmp_path):
