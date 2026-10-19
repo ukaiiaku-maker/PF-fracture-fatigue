@@ -134,6 +134,8 @@
 - At the unchanged base load, 600/900/1200 K each reaches 60 cells within one
   cycle (0.112203, 4.15911e-4, and 3.90948e-5 cycles).  They are retained as
   target-truncated thermal cascades with no developed-rate classification.
+- The unchanged-material R=0.5 holdout completed 20--60 um at
+  3.02402e-11 m/cycle after 1.853e6 cycles; R=0.3 remains a one-event prefix.
 - The full/frozen base histories are event-time identical through four events
   with negligible plastic activity.  The redundant frozen worker was stopped
   inside an unaccepted long block and sealed from its accepted checkpoint.

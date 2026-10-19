@@ -259,6 +259,13 @@ strongly thermally activated.  The reporting code explicitly requires events
 in at least two integer cycles before exporting any event-window rate, so these
 cascades cannot be mistaken for HCF evidence.
 
+At fixed base `Kmax`, 300 K, and 1000 Hz, the `R=0.5` holdout reached the
+canonical 60 micrometre endpoint after `1,852,860.8932` accepted cycles and
+gives `3.02402e-11 m/cycle`.  The `R=0.3` holdout remains a one-event accepted
+prefix and has no rate.  This sparse protocol pair demonstrates a consequential
+load-ratio response without refitting the material; it does not convert the
+temperature cascades or lower-R censors into curve points.
+
 ## Native mechanism separation
 
 The event transactions separate opening control from active EXP_floor plasticity
