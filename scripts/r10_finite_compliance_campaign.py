@@ -670,6 +670,19 @@ def analyze(args) -> int:
                 "same_complete_material_sha256": record.get("same_complete_material_sha256"),
                 "cases": len(record.get("cases") or []),
                 "triggers": [case.get("trigger") for case in record.get("cases") or []]})
+    native_ids = {row.get("same_complete_material_sha256") for row in native}
+    hcf_ids = {row.get("complete_row_sha256") for row in hcf}
+    two_d_ids = {row.get("same_complete_material_sha256") for row in two_d}
+    fracture_candidates = {row.get("candidate_id") for row in fractures}
+    for material in materials:
+        identity = material.get("complete_row_sha256")
+        candidate = material.get("candidate_id")
+        material.update({
+            "has_current_native_1d_evidence": identity in native_ids,
+            "has_current_hcf_evidence": identity in hcf_ids,
+            "has_same_material_fracture_evidence": candidate in fracture_candidates,
+            "has_exact_2d_evidence": identity in two_d_ids,
+        })
     csv_write(out / "hcf_results.csv", hcf)
     csv_write(out / "native_developed_slopes.csv", developed_slope_rows(hcf))
     csv_write(out / "native_replicate_rate_bounds.csv", replicate_rate_rows(hcf))
