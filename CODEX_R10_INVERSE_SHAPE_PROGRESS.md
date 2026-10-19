@@ -200,3 +200,23 @@
 
 This file is the durable restart ledger. It is updated at scientifically meaningful
 checkpoints; queue creation by itself is not a completion condition.
+
+## Final campaign closure
+
+- All numerical output owners were stopped after their last atomic accepted
+  checkpoint; unfinished exact blocks contribute no event or exposure claim.
+- Final stable coverage is 196,864 analytical allocations, 1,161 complete
+  material vectors, 779 state-informed results, 54 unique native full-state
+  materials, 59 HCF identities, 112 fracture rows, and eight exact 2-D receipts.
+- Bounded candidate 008 reaches 24/27 recurrent events at 1.10/1.20 times load
+  and begins, but does not finish, its fixed 20--60 micrometre windows.
+- Bounded candidate 002 reaches ten full-state events at both amplitudes.  Its
+  matched frozen arms reach ten/eleven events; nine paired renewal ratios per
+  amplitude differ by at most 0.337% despite large active plastic populations.
+  This is a strong opening-clock-controlled result, not plastic inactivity and
+  not a developed plasticity-controlled rate.
+- The final verifier passes, all 59 restart checkpoints are at or behind their
+  accepted evidence coordinate, and 72 targeted tests pass.
+- No strict two-rate-decade Paris material was found.  The deliverable is an
+  executed admissible near-frontier and bounded-negative campaign; the
+  algebraic-tail counterexample remains diagnostic-only.

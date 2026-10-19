@@ -56,9 +56,9 @@ The archived uniform-midpoint method remains available only when reproducing a
 declared historical phase grid.  Candidate slopes use a central difference of
 the complete cycle integral, including the moving accessibility interval.
 
-Checkpoint-level HCF qualification currently spans 59 restart receipts, 158
-accepted projective segments, 196 exact-cycle fallback bursts, 62 rejected
-projections, and 1,329 bracketed first-passage locators.  Maximum accepted
+Checkpoint-level HCF qualification spans 59 restart receipts, 256 accepted
+projective segments, 401 exact-cycle fallback bursts, 169 rejected
+projections, and 1,389 bracketed first-passage locators.  Maximum accepted
 state-drift and hazard errors are `1.9961e-6` and `9.99999e-6`, respectively;
 no accepted block reports work-budget exhaustion.  These diagnostics are
 exported per checkpoint rather than averaged away.
@@ -393,31 +393,54 @@ mechanism diversity but do not yet support developed plasticity-controlled
 Paris rates.
 
 The matched 002 full/frozen base first events occur at cycles `2941.0570` and
-`2941.0307`.  More consequential high-load pairs now resolve renewal after a
-strongly plastic transaction.  At 1.10 times load, full/frozen first events are
-`7604.998/7604.945` and second events are `30820.012/30819.103`; the frozen/full
-inter-event ratio is `0.999963`.  At 1.20 times load the corresponding first
-events are `4974.041/4973.882`, second events are `17670.007/17666.092`, and the
-ratio is `0.999704`.  Both pairs now include event 3; the next frozen/full
-waiting-interval ratios are `0.999968` at 1.10 and `1.003368` at 1.20.  The full
-transactions carry roughly 295--413 mobile units
-and 197--275 wake-slip units at event 1, yet the matched first and renewal times
-change by at most 0.34%.  This is evidence of a materially active plastic
-background whose tested fatigue timing remains opening-clock-controlled, not a
-developed plasticity-controlled rate.  At high temperature the same nominally
+`2941.0307`.  More consequential high-load pairs resolve repeated renewal after
+strongly plastic transactions.  The 1.10-times pair reaches ten events in both
+arms at cycles `142900.083/142896.977`; all nine matched renewal ratios lie in
+`0.9992576--1.0001384`.  At 1.20 times load the full arm reaches ten events at
+cycle `196211.947`, while the frozen arm reaches eleven at `241816.900`.  Its
+nine matched renewal ratios lie in `0.9997042--1.0033677`; the unmatched frozen
+event 11 leaves a declared full-state next-interval exposure bound rather than a
+rate comparison.  The full transactions carry roughly 136--413 mobile units
+and 187--332 wake-slip units, yet the largest observed matched timing change is
+only 0.337%.  This is evidence of a materially active plastic background whose
+tested fatigue timing remains opening-clock-controlled, not a developed
+plasticity-controlled rate.
+
+Candidate 008 supplies a distinct, nearly opening-only recurrent background.
+Its 1.10 and 1.20 times histories reach 24 and 27 events at cycles
+`406853.971` and `325046.922`; maximum mobile populations remain below `0.141`.
+Both cross the 20 micrometre reporting-window start, but advance only 4 and
+7 micrometres beyond it.  They are therefore accepted partial developed-window
+trajectories, not 20--60 micrometre rates or startup secants.  At high
+temperature the same nominally
 opening-controlled 027 material develops a post-commit mobile population of
 about `44.1` by the 1200 K cascade, another reason the thermal cascades are kept
 separate from its 300 K HCF mechanism.
 
-## Current decision (campaign still active)
+## Final executed coverage and decision
+
+The stable final snapshot contains 196,864 analytical allocations in seven
+banks, 32,768 unique analytical labels, 576 bounded-inverse starts, 89 cyclic-
+inverse starts, 1,161 deduplicated complete-material vectors, 779 state-informed
+results, 54 unique native full-state materials, 59 HCF identities, 112 fracture
+rows, and eight exact selected-material 2-D receipts.  HCF evidence totals
+`1.842767183e9` accepted cycles, `2.349879261e6` accepted seconds, and 1,404
+physical events.  Five trajectories meet the declared developed-window rule;
+the newly deepened 002/008 histories do not.
+
+All 59 HCF identities have restart records, all checkpoints are at or behind
+their accepted evidence coordinate, and the final campaign verifier reports no
+failure.  The focused implementation/transaction/restart/report/package suite
+passes 72 tests.  A broader repository run had reached 58 passes without a
+failure before it was stopped in an unrelated expensive mechanics test to
+preserve the numerical allocation; it is not represented as a complete suite.
 
 The existing smooth and bilinear potentials are bounded negatives for the
 strict target in the evaluated domain.  The compact family materially changes
 the finite-compliance span and lowers slopes, but no admissible strict two-decade
 candidate has been demonstrated.  The strongest result is therefore an
-admissible near-frontier plus a sharper inverse bound, not a successful Paris
-material.  Long-exposure compact results remain conditional on the active phase
-convergence and corrected cyclic-selection rounds.
-
-The final section, exact coverage totals, hashes, restart table, and archive
-identity will be completed after the declared elapsed campaign allocation.
+admissible compact near-frontier, recurrent long-exposure growth in candidate
+027, partial post-20-micrometre growth in candidate 008, and a direct negative
+state-effect result for the strongly plastic 002 background—not a successful
+strict Paris material.  The diagnostic algebraic tail remains analytical-only,
+and no default/canonical cohesive law has been promoted.
