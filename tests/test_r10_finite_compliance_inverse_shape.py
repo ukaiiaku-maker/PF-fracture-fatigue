@@ -120,6 +120,28 @@ def test_registry_hcf_point_is_selected_from_cycle_integral(monkeypatch):
     assert chosen["total_local_slope"] is not None
 
 
+def test_registry_hcf_point_skips_one_sided_metastable_onset(monkeypatch):
+    def fake_cycle(K, *args, **kwargs):
+        value = float(K)
+        action = 0.0 if value < .995 else 1e-6 * 100.0 ** (value-1.0)
+        return {"Kmax_MPa_sqrt_m": value,
+                "opening_action_per_cycle": action,
+                "accessible_phase_count": 1,
+                "accessible_phase_fraction": .01}
+
+    monkeypatch.setattr(search, "cyclic_rate", fake_cycle)
+    metric = {"curve_json": "["
+        "{\"K_MPa_sqrt_m\":1.0},{\"K_MPa_sqrt_m\":2.0}]"}
+    cohesive = {"Gamma_ref_J_m2": 2.0, "t_hat_ref_Pa": 15e9,
+        "S_Gamma_J_m2_K": 0.0, "T_ref_K": 300.0,
+        "activation_area_m2": 1e-19, "attempt_frequency_s": 1e12}
+    chosen = search._cyclic_registry_point(
+        (metric, cohesive, SMOOTH_EXPONENTIAL))
+    assert chosen["chosen"]["Kmax_MPa_sqrt_m"] == 2.0
+    assert chosen["selection_support"] == "TWO_SIDED_CYCLIC_DERIVATIVE"
+    assert chosen["total_local_slope"] is not None
+
+
 def test_inverse_coordinates_cannot_leave_declared_research_bounds():
     gamma=2.0
     area=2.0e-19

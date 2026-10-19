@@ -284,20 +284,34 @@ def _cyclic_registry_point(task: tuple[dict, dict, str]) -> dict:
                 if float(point["opening_action_per_cycle"]) > 0.]
     if not positive:
         return {"cyclic_supported": False, "cyclic_curve": points}
-    chosen = min(positive, key=lambda point: abs(math.log10(max(
+    # An HCF action immediately above metastable birth is not a two-sided
+    # cyclic response point: its lower neighbor can have no occupied escape
+    # branch.  Prefer the closest target-rate point whose complete cycle is
+    # supported at both derivative neighbors.  Retain an onset-only fallback
+    # explicitly when the sampled curve contains no such point.
+    ranked = sorted(positive, key=lambda point: abs(math.log10(max(
         float(point["opening_action_per_cycle"]), 1e-300)) + 6.))
-    K = float(chosen["Kmax_MPa_sqrt_m"])
+    chosen = ranked[0]
     adjacent = []
-    for factor in (.99, 1.01):
-        adjacent.append(cyclic_rate(K*factor, kenv, thermal, 300., shape,
-            float(cohesive["activation_area_m2"]),
-            float(cohesive["attempt_frequency_s"]), R=.1, frequency_Hz=1000.,
-            phases=64))
-    actions = [float(point["opening_action_per_cycle"]) for point in adjacent]
-    slope = (math.log(actions[1]/actions[0])/math.log(1.01/.99)
-             if min(actions) > 0. else None)
+    slope = None
+    selection_support = "CYCLIC_ONSET_ONE_SIDED"
+    for candidate in ranked:
+        K = float(candidate["Kmax_MPa_sqrt_m"])
+        trial = [cyclic_rate(K*factor, kenv, thermal, 300., shape,
+                    float(cohesive["activation_area_m2"]),
+                    float(cohesive["attempt_frequency_s"]), R=.1,
+                    frequency_Hz=1000., phases=64)
+                 for factor in (.99, 1.01)]
+        actions = [float(point["opening_action_per_cycle"]) for point in trial]
+        if min(actions) > 0.:
+            chosen = candidate
+            adjacent = trial
+            slope = math.log(actions[1]/actions[0])/math.log(1.01/.99)
+            selection_support = "TWO_SIDED_CYCLIC_DERIVATIVE"
+            break
     return {"cyclic_supported": True, "cyclic_curve": points,
         "chosen": chosen, "total_local_slope": slope,
+        "selection_support": selection_support,
         "target_action_per_cycle": 1e-6}
 
 
@@ -338,7 +352,8 @@ def analytical(args) -> int:
             hcf_slope=cyclic_point.get("total_local_slope")
             accessible_phases=int(hcf_point["accessible_phase_count"])
             accessible_fraction=float(hcf_point.get("accessible_phase_fraction") or 0.)
-            selection_basis="FROZEN_MOVING_BOUNDARY_GAUSS_32_ORDER"
+            selection_basis=("FROZEN_MOVING_BOUNDARY_GAUSS_32_ORDER__"+
+                str(cyclic_point.get("selection_support","UNDECLARED_SUPPORT")))
         if hcf_point is None:
             accessible_fraction=0.
         cid = metric["candidate_id"]+"__"+({SMOOTH_EXPONENTIAL:"S",
