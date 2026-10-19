@@ -42,7 +42,10 @@ def evaluate(task:tuple[dict,int,int])->dict:
     cycles=cyclic["rows"]
     for item in cycles:
         item["finite_difference_local_slope"]=item["local_log_slope"]
+    resolved_slopes=[float(item["local_log_slope"]) for item in cycles
+                     if item.get("local_log_slope") is not None]
     strict_width=float(cyclic["strict_connected_width_log10rate"])
+    moderate_width=float(cyclic["moderate_connected_width_log10rate"])
     midpoint=.5*(float(window["birth_load_Pa"])+float(window["fold_load_Pa"]))/kenv
     checked=connected_barrier(midpoint,kenv,thermal,300.,shape,verify_quadrature=True)
     return {"candidate_id":row["candidate_id"],"complete_row_sha256":row["complete_row_sha256"],
@@ -50,6 +53,12 @@ def evaluate(task:tuple[dict,int,int])->dict:
         "peak_rate_curve":peak,"cyclic_curve":cycles,
         "cyclic_phase_count":phases,
         "cyclic_amplitude_points":len(cycles),
+        "cyclic_resolved_slope_points":len(resolved_slopes),
+        "cyclic_local_slope_min":min(resolved_slopes,default=None),
+        "cyclic_local_slope_max":max(resolved_slopes,default=None),
+        "cyclic_moderate_connected_width_log10K":
+            cyclic["moderate_connected_width_log10K"],
+        "cyclic_moderate_connected_width_log10rate":moderate_width,
         "cyclic_strict_adjacent_width_log10rate":strict_width,
         "strict_internal_reference_pass":strict_width>=2.,
         "barrier_quadrature_relative_error":checked["barrier_quadrature_relative_error"]}
@@ -68,6 +77,9 @@ def main(argv=None)->int:
     for result in results:atomic(args.out/f"{result['candidate_id']}.json",result)
     summary={"schema":"r10.inverse-shape-dense-validation/1","materials":len(results),
         "strict_passes":sum(result["strict_internal_reference_pass"] for result in results),
+        "maximum_cyclic_moderate_width_log10rate":max(
+            (result["cyclic_moderate_connected_width_log10rate"] for result in results),
+            default=0.),
         "maximum_cyclic_strict_width_log10rate":max((result["cyclic_strict_adjacent_width_log10rate"] for result in results),default=0.),
         "maximum_barrier_quadrature_relative_error":max((result["barrier_quadrature_relative_error"] for result in results),default=None),
         "phase_count":args.phases,"amplitude_points_peak_reference":101,

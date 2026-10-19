@@ -95,15 +95,33 @@ def cyclic_evaluate(vector: np.ndarray, base: dict) -> dict:
     target_log_action = math.log10(target_action)
     target = min(supported, key=lambda row: abs(math.log10(max(
         float(row["opening_action_per_cycle"]), 1e-300)) - target_log_action))
+    target_K = float(target["Kmax_MPa_sqrt_m"])
+    # The sparse curve locates an operating region economically, but its broad
+    # central secants are not local slopes.  Qualify the objective with a
+    # dedicated two-sided perturbation of the complete moving-boundary cycle
+    # integral, matching the promotion convention.
+    local = cyclic_rate_curve([.99*target_K, target_K, 1.01*target_K],
+        kenv, thermal, 300., COMPACT_INDEPENDENT,
+        float(effective["activation_area_m2"]),
+        float(effective["attempt_frequency_s"]), R=.1,
+        frequency_Hz=1000., phases=16)
+    local_target = local["rows"][1]
+    if (local_target["opening_action_per_cycle"] <= 0. or
+            local_target["local_log_slope"] is None):
+        return {**metric, "domain_pass":False,
+                "rejection":"NO_TWO_SIDED_LOCAL_CYCLIC_DERIVATIVE"}
     return {**metric,
         "evaluated_cohesive_json":json.dumps(effective,sort_keys=True,
                                                separators=(",",":")),
         "cyclic_curve_json":json.dumps(cyclic["rows"],sort_keys=True,
                                         separators=(",",":")),
-        "cyclic_target_K_MPa_sqrt_m":target["Kmax_MPa_sqrt_m"],
-        "cyclic_target_action_per_cycle":target["opening_action_per_cycle"],
+        "cyclic_local_derivative_curve_json":json.dumps(local["rows"],sort_keys=True,
+                                                           separators=(",",":")),
+        "cyclic_target_K_MPa_sqrt_m":local_target["Kmax_MPa_sqrt_m"],
+        "cyclic_target_action_per_cycle":local_target["opening_action_per_cycle"],
         "cyclic_requested_target_action_per_cycle":target_action,
-        "cyclic_target_local_slope":target["local_log_slope"],
+        "cyclic_target_local_slope":local_target["local_log_slope"],
+        "cyclic_local_slope_perturbation_fraction":.01,
         "cyclic_moderate_connected_width_log10K":
             cyclic["moderate_connected_width_log10K"],
         "cyclic_moderate_connected_width_log10rate":
@@ -186,6 +204,7 @@ def main(argv=None) -> int:
         "best_objective":rows[0].get("objective") if rows else None,
         "hcf_log_rate_penalty_weight":args.rate_weight,
         "target_action_per_cycle":args.target_action_per_cycle,
+        "local_slope_perturbation_fraction":.01,
         "algebraic_tail_registered":False}
     atomic(args.out/"cyclic_inverse_summary.json",payload)
     print(json.dumps(payload,indent=2));return 0
