@@ -62,7 +62,8 @@
         "--candidate-ids", "R10_INVERSE_OPT_002__CM,R10_INVERSE_OPT_008__CM",
         "--amplitude-multipliers", "1.1,1.2",
         "--horizon", "1000000000000", "--max-wall-s", "7200",
-        "--phases", "16", "--path-limit-um", "60", "--seed", "20279018"
+        "--phases", "16", "--minimum-accessible-phase-samples", "4",
+        "--path-limit-um", "60", "--seed", "20279018"
       ],
       "sentinel": "runs/r10_inverse_shape_12h/hcf_bounded_inverse_mechanism_amplitudes/batch_summary.json"
     },
@@ -77,7 +78,8 @@
         "--workers", "2", "--candidate-ids", "R10_INVERSE_OPT_002__CM",
         "--amplitude-multipliers", "1.1,1.2",
         "--horizon", "1000000000000", "--max-wall-s", "7200",
-        "--phases", "16", "--path-limit-um", "60", "--seed", "20279018",
+        "--phases", "16", "--minimum-accessible-phase-samples", "4",
+        "--path-limit-um", "60", "--seed", "20279018",
         "--frozen-initial-plastic-state"
       ],
       "sentinel": "runs/r10_inverse_shape_12h/hcf_bounded_inverse_002_high_frozen/batch_summary.json"
