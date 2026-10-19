@@ -3,7 +3,7 @@ from pathlib import Path
 
 from scripts.r10_finite_compliance_campaign import (
     complete_material_rows, csv_row_count, developed_slope_rows, execution_timing,
-    hcf_event_window_rows, hcf_numerical_qualification_rows, hcf_rows,
+    fracture_rows, hcf_event_window_rows, hcf_numerical_qualification_rows, hcf_rows,
     native_rows, replicate_rate_rows, search_specification, state_effect_rows,
     state_prefix_rows, retained_11566_controls,
 )
@@ -82,6 +82,20 @@ def test_hcf_numerical_qualification_separates_acceptance_and_fallback(tmp_path)
     assert row["first_passage_locators"] == 1
     assert row["maximum_accepted_drift_error"] == 2e-8
     assert row["maximum_accepted_hazard_error"] == 3e-6
+
+
+def test_fracture_rows_join_exact_temperature_receipt_identity(tmp_path):
+    ramp = tmp_path/"fracture"/"ramp_dispositions.csv"
+    ramp.parent.mkdir()
+    ramp.write_text(
+        "candidate_id,temperature_K,status\nCAND,300.0,COMMITTED_SEPARATION\n")
+    receipt = ramp.parent/"CAND"/"T_0300K.json"
+    receipt.parent.mkdir()
+    receipt.write_text(json.dumps({"candidate_id": "CAND", "temperature_K": 300.,
+                                   "complete_row_sha256": "f"*64}))
+    row = fracture_rows(tmp_path)[0]
+    assert row["complete_row_sha256"] == "f"*64
+    assert row["receipt_path"].endswith("CAND/T_0300K.json")
 
 
 def test_campaign_hcf_aggregation_requires_native_schema(tmp_path):

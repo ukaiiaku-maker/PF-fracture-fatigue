@@ -180,6 +180,34 @@ def hcf_numerical_qualification_rows(root: Path) -> list[dict]:
     return rows
 
 
+def fracture_rows(root: Path) -> list[dict]:
+    """Join ramp summaries to their exact complete-material receipt identities."""
+    rows = []
+    for path in sorted(root.rglob("ramp_dispositions.csv")):
+        with path.open(newline="") as stream:
+            for row in csv.DictReader(stream):
+                payload = {"path": str(path.relative_to(root)), **row}
+                try:
+                    temperature = int(round(float(row["temperature_K"])))
+                except (KeyError, TypeError, ValueError):
+                    temperature = None
+                receipt = (path.parent/str(row.get("candidate_id"))/
+                           f"T_{temperature:04d}K.json") if temperature is not None else None
+                if receipt is not None and receipt.is_file():
+                    try:
+                        record = json.loads(receipt.read_text())
+                    except (OSError, json.JSONDecodeError):
+                        record = {}
+                    if (record.get("candidate_id") == row.get("candidate_id") and
+                            float(record.get("temperature_K", float("nan"))) ==
+                            float(row["temperature_K"])):
+                        payload["complete_row_sha256"] = record.get(
+                            "complete_row_sha256")
+                        payload["receipt_path"] = str(receipt.relative_to(root))
+                rows.append(payload)
+    return rows
+
+
 def hcf_rows(root: Path) -> list[dict]:
     rows = []
     metadata = registry_metadata(root)
@@ -788,11 +816,7 @@ def analyze(args) -> int:
     native = native_rows(args.root)
     materials = complete_material_rows(args.root)
     frontier = analytical_frontier(args.root)
-    fractures = []
-    for path in sorted(args.root.rglob("ramp_dispositions.csv")):
-        with path.open(newline="") as stream:
-            for row in csv.DictReader(stream):
-                fractures.append({"path": str(path.relative_to(args.root)), **row})
+    fractures = fracture_rows(args.root)
     two_d = []
     for path in sorted(args.root.rglob("qualification.json")):
         try:
@@ -808,14 +832,13 @@ def analyze(args) -> int:
     native_ids = {row.get("same_complete_material_sha256") for row in native}
     hcf_ids = {row.get("complete_row_sha256") for row in hcf}
     two_d_ids = {row.get("same_complete_material_sha256") for row in two_d}
-    fracture_candidates = {row.get("candidate_id") for row in fractures}
+    fracture_ids = {row.get("complete_row_sha256") for row in fractures}
     for material in materials:
         identity = material.get("complete_row_sha256")
-        candidate = material.get("candidate_id")
         material.update({
             "has_current_native_1d_evidence": identity in native_ids,
             "has_current_hcf_evidence": identity in hcf_ids,
-            "has_same_material_fracture_evidence": candidate in fracture_candidates,
+            "has_same_material_fracture_evidence": identity in fracture_ids,
             "has_exact_2d_evidence": identity in two_d_ids,
         })
     csv_write(out / "hcf_results.csv", hcf)
