@@ -132,6 +132,54 @@ def retained_11566_controls(repository_root: Path = ROOT) -> dict:
     }
 
 
+def hcf_numerical_qualification_rows(root: Path) -> list[dict]:
+    """Summarize accepted acceleration/fallback diagnostics from live checkpoints."""
+    rows = []
+    for path in sorted(root.rglob("high_cycle_live_checkpoint.json")):
+        try:
+            record = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        metadata = record.get("metadata") or {}
+        if not metadata.get("candidate_id"):
+            continue
+        modes = [mode for block in metadata.get("blocks") or []
+                 for mode in block.get("modes") or []]
+        accepted_projective = [mode for mode in modes
+            if mode.get("mode") in {"slow_projective", "projective"} and
+               float(mode.get("cycles") or 0.) > 0.]
+        rows.append({
+            "candidate_id": metadata.get("candidate_id"),
+            "complete_row_sha256": metadata.get("complete_row_sha256"),
+            "temperature_K": metadata.get("temperature_K", record.get("temperature_K")),
+            "R": metadata.get("R"), "frequency_Hz": metadata.get("frequency_Hz"),
+            "phase_count": metadata.get("phase_count"),
+            "hazard_seed": metadata.get("hazard_seed"),
+            "plastic_feedback": metadata.get("plastic_feedback"),
+            "accepted_cycles": metadata.get("accepted_cycles",
+                record.get("cycles_from_engine_time")),
+            "accepted_blocks": len(metadata.get("blocks") or []),
+            "accepted_projective_segments": len(accepted_projective),
+            "projective_rejections": sum(mode.get("mode") == "projective_rejected"
+                                         for mode in modes),
+            "exact_cycle_bursts": sum(mode.get("mode") == "exact_cycle_burst"
+                                      for mode in modes),
+            "first_passage_locators": sum(
+                mode.get("mode") == "first_passage_cycle_locator" for mode in modes),
+            "maximum_accepted_drift_error": max(
+                (float(mode.get("drift_error") or 0.) for mode in accepted_projective),
+                default=0.),
+            "maximum_accepted_hazard_error": max(
+                (float(mode.get("hazard_error") or 0.) for mode in accepted_projective),
+                default=0.),
+            "work_budget_exhausted_blocks": sum(bool(block.get("work_budget_exhausted"))
+                for block in metadata.get("blocks") or []),
+            "checkpoint_sha256": sha256(path),
+            "checkpoint_path": str(path.relative_to(root)),
+        })
+    return rows
+
+
 def hcf_rows(root: Path) -> list[dict]:
     rows = []
     metadata = registry_metadata(root)
@@ -784,6 +832,8 @@ def analyze(args) -> int:
                                  "NO_FICTITIOUS_RATIO_FORMED"),
     })
     csv_write(out / "native_event_windows.csv", hcf_event_window_rows(args.root))
+    numerical_qualifications = hcf_numerical_qualification_rows(args.root)
+    csv_write(out / "hcf_numerical_qualification.csv", numerical_qualifications)
     csv_write(out / "complete_material_vectors.csv", materials)
     csv_write(out / "native_results.csv", native)
     csv_write(out / "fracture_results.csv", fractures)
@@ -846,6 +896,7 @@ def analyze(args) -> int:
             "native_unique_complete_materials": len({row.get("same_complete_material_sha256") for row in native
                                                        if row.get("same_complete_material_sha256")}),
             "hcf_results": len(hcf),
+            "hcf_numerical_qualification_receipts": len(numerical_qualifications),
             "hcf_unique_complete_materials": len({row.get("complete_row_sha256") for row in hcf
                                                    if row.get("complete_row_sha256")}),
             "hcf_accepted_cycles": sum(float(row.get("accepted_cycles") or 0.) for row in hcf),

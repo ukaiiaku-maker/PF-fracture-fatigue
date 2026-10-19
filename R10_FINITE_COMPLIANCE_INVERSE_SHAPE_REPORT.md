@@ -56,6 +56,13 @@ The archived uniform-midpoint method remains available only when reproducing a
 declared historical phase grid.  Candidate slopes use a central difference of
 the complete cycle integral, including the moving accessibility interval.
 
+Checkpoint-level HCF qualification currently spans 59 restart receipts, 158
+accepted projective segments, 196 exact-cycle fallback bursts, 62 rejected
+projections, and 1,329 bracketed first-passage locators.  Maximum accepted
+state-drift and hazard errors are `1.9961e-6` and `9.99999e-6`, respectively;
+no accepted block reports work-budget exhaustion.  These diagnostics are
+exported per checkpoint rather than averaged away.
+
 ## Analytical search result
 
 Four completed 32,768-vector screens preceded the cyclic-consumer correction.

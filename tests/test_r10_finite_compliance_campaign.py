@@ -3,7 +3,7 @@ from pathlib import Path
 
 from scripts.r10_finite_compliance_campaign import (
     complete_material_rows, csv_row_count, developed_slope_rows, execution_timing,
-    hcf_event_window_rows, hcf_rows,
+    hcf_event_window_rows, hcf_numerical_qualification_rows, hcf_rows,
     native_rows, replicate_rate_rows, search_specification, state_effect_rows,
     state_prefix_rows, retained_11566_controls,
 )
@@ -60,6 +60,28 @@ def test_retained_11566_controls_are_hashed_not_reclassified(tmp_path):
     assert len(receipt["controls"]) == 4
     assert all(len(row["result_sha256"]) == 64 for row in receipt["controls"])
     assert "NOT_QUALIFIED_RATE" in receipt["interpretation"]
+
+
+def test_hcf_numerical_qualification_separates_acceptance_and_fallback(tmp_path):
+    path = tmp_path/"case"/"checkpoint"/"high_cycle_live_checkpoint.json"
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({"cycles_from_engine_time": 10., "metadata": {
+        "candidate_id": "C", "complete_row_sha256": "a"*64,
+        "accepted_cycles": 10000., "blocks": [{"work_budget_exhausted": False,
+            "modes": [
+                {"mode": "projective_rejected", "cycles": 0.},
+                {"mode": "slow_projective", "cycles": 9000.,
+                 "drift_error": 2e-8, "hazard_error": 3e-6},
+                {"mode": "exact_cycle_burst", "cycles": 8.},
+                {"mode": "first_passage_cycle_locator", "cycles": 1.2},
+            ]}]}}))
+    row = hcf_numerical_qualification_rows(tmp_path)[0]
+    assert row["accepted_projective_segments"] == 1
+    assert row["projective_rejections"] == 1
+    assert row["exact_cycle_bursts"] == 1
+    assert row["first_passage_locators"] == 1
+    assert row["maximum_accepted_drift_error"] == 2e-8
+    assert row["maximum_accepted_hazard_error"] == 3e-6
 
 
 def test_campaign_hcf_aggregation_requires_native_schema(tmp_path):
