@@ -209,18 +209,26 @@ def analytical_frontier(root: Path) -> dict:
 
 def cyclic_inverse_frontier(root: Path) -> dict:
     tables=sorted(root.rglob("cyclic_inverse_starts.csv"))
-    executions=[];best=None
+    executions=[];best=None;best_current=None
     for path in tables:
-        valid=0;strict=0;local_best=None
+        valid=0;strict=0;local_best=None;local_qualified=False
         with path.open(newline="") as stream:
             for row in csv.DictReader(stream):
                 if row.get("domain_pass") != "True":continue
                 valid+=1;strict+=row.get("cyclic_strict_internal_reference_pass")=="True"
+                local_qualified |= bool(row.get("cyclic_local_slope_perturbation_fraction"))
                 score=float(row.get("objective") or math.inf)
                 if local_best is None or score<local_best[0]:local_best=(score,row)
                 if best is None or score<best[0]:best=(score,row,path)
+                if row.get("cyclic_local_slope_perturbation_fraction"):
+                    if best_current is None or score<best_current[0]:
+                        best_current=(score,row,path)
         executions.append({"table":str(path.relative_to(root)),"valid":valid,
-                           "strict_passes":strict})
+                           "strict_passes":strict,
+                           "local_derivative_qualified":local_qualified})
+    historical_best=best
+    if best_current is not None:
+        best=best_current
     keep=None
     if best is not None:
         keep={key:best[1].get(key) for key in (
@@ -232,7 +240,17 @@ def cyclic_inverse_frontier(root: Path) -> dict:
             "cyclic_strict_connected_width_log10rate",
             "optimized_cohesive_json")}
         keep["table"]=str(best[2].relative_to(root))
+    historical_keep=None
+    if (historical_best is not None and best is not None and
+            (historical_best[2] != best[2] or
+             historical_best[1].get("candidate_id") != best[1].get("candidate_id"))):
+        historical_keep={"candidate_id":historical_best[1].get("candidate_id"),
+            "objective":historical_best[1].get("objective"),
+            "cyclic_target_local_slope":historical_best[1].get("cyclic_target_local_slope"),
+            "table":str(historical_best[2].relative_to(root)),
+            "qualification":"HISTORICAL_SPARSE_SECANT_NOT_CURRENT_FRONTIER"}
     return {"executions":executions,"best":keep,
+            "historical_sparse_best":historical_keep,
             "strict_passes":sum(row["strict_passes"] for row in executions)}
 
 
