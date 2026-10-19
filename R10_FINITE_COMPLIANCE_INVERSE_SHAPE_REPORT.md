@@ -215,6 +215,17 @@ endpoint tolerance was corrected after nominal 60-micrometre values rounded
 slightly below their binary threshold; accepted physics and histories were not
 rerun.
 
+At 1.20 times load, accepted restart state now spans 108 events.  Its canonical
+20--60 micrometre window is cycles `176921.0966--529171.9451`, or
+`1.13555e-10 m/cycle`; the adjacent 1.10--1.20 slope is `7.3447`.  The late
+60--100 micrometre diagnostic gives `1.24028e-10 m/cycle`, close to its own
+20--60 value, while the corresponding late-window slopes are `5.3571` between
+1.05 and 1.10 and `7.8339` between 1.10 and 1.20.  These late slopes span only
+`0.108` and `0.296` rate decades and are stationarity diagnostics, not a
+replacement Paris qualification.  Across 1.05--1.20, the canonical rate span
+is `0.56777` decades with endpoint slope `9.7905`; the aggregate 20--100
+micrometre span is `0.49722` decades with endpoint slope `8.5739`.
+
 The same candidate has physical non-advance through `1e8` cycles at 0.70,
 0.80, and 0.90 times load; 0.95 times has four recurrent events but has not
 reached the developed reporting window.  The full/frozen base comparison is
@@ -222,6 +233,17 @@ event-time identical through four events and both have negligible active
 plastic populations.  Its frozen duplicate was therefore stopped inside an
 unaccepted long block and sealed from the last accepted checkpoint as a
 resource-bounded opening-control comparison.
+
+The unchanged base-load material also completed its 600, 900, and 1200 K
+fatigue holdouts.  Each reached the 60-cell observation limit within one
+accepted cycle: `0.112203`, `4.15911e-4`, and `3.90948e-5` cycles,
+respectively.  They are target-truncated thermal cascades and therefore have no
+developed cyclic rates.  This is a consequential same-material result: the
+same cohesive potential has a nearly flat 14 MPa-sqrt(m) monotonic fracture
+response over 300--1200 K, but its native time-dependent fatigue response is
+strongly thermally activated.  The reporting code explicitly requires events
+in at least two integer cycles before exporting any event-window rate, so these
+cascades cannot be mistaken for HCF evidence.
 
 ## Current decision (campaign still active)
 

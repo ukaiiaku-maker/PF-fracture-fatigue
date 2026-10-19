@@ -124,6 +124,13 @@
 - Its 0.70/0.80/0.90 arms are physical no-advance outcomes through 1e8 cycles;
   0.95 has four recurrent events outside the developed window.  Higher-load
   and protocol arms remain active.
+- Its 1.20 arm now exceeds 100 accepted events.  The 20--60 and 60--100 um
+  windows are 1.13555e-10 and 1.24028e-10 m/cycle; 1.10--1.20 slopes are
+  7.3447 and 7.8339, respectively.  These add stationarity evidence but do not
+  create the required connected moderate two-decade interval.
+- At the unchanged base load, 600/900/1200 K each reaches 60 cells within one
+  cycle (0.112203, 4.15911e-4, and 3.90948e-5 cycles).  They are retained as
+  target-truncated thermal cascades with no developed-rate classification.
 - The full/frozen base histories are event-time identical through four events
   with negligible plastic activity.  The redundant frozen worker was stopped
   inside an unaccepted long block and sealed from its accepted checkpoint.
