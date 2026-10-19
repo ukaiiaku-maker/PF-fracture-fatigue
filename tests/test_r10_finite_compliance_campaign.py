@@ -8,6 +8,7 @@ from scripts.r10_finite_compliance_campaign import (
     state_prefix_rows, retained_11566_controls,
 )
 from scripts import run_r10_inverse_hcf_batch as hcf_batch
+from scripts import r10_finite_compliance_campaign as campaign_module
 from scripts.run_r10_inverse_hcf_batch import resolved_phase_count
 
 
@@ -294,8 +295,39 @@ def test_executed_plan_retains_restart_safe_mechanism_blocks():
         "mechanism_diverse_frozen_hcf"]["argv"]
     assert tasks["mechanism_diverse_full_hcf"]["sentinel"].endswith(
         "batch_summary.json")
+    assert tasks["mechanism_diverse_full_hcf"]["always_run_on_resume"] is True
+    assert tasks["campaign_analysis"]["always_run_on_resume"] is True
     assert all("algebraic" not in " ".join(task["argv"]).lower()
                for task in plan["tasks"])
+
+
+def test_execute_plan_always_resumes_mutable_stages(tmp_path, monkeypatch):
+    monkeypatch.setattr(campaign_module, "ROOT", tmp_path)
+    skipped = tmp_path/"done.json"; skipped.write_text("{}")
+    repeated = tmp_path/"mutable.json"; repeated.write_text("{}")
+    plan = tmp_path/"plan.json"
+    plan.write_text(json.dumps({"tasks": [
+        {"id": "fixed", "argv": ["fixed"], "sentinel": "done.json"},
+        {"id": "mutable", "argv": ["mutable"], "sentinel": "mutable.json",
+         "always_run_on_resume": True},
+    ]}))
+    calls = []
+    class Completed:
+        returncode = 0
+    def fake_run(argv, **kwargs):
+        calls.append(argv)
+        return Completed()
+    monkeypatch.setattr(campaign_module.subprocess, "run", fake_run)
+    class Args: pass
+    args = Args()
+    args.root = tmp_path/"campaign"
+    args.resume = True
+    args.keep_going = False
+    args.plan = plan
+    assert campaign_module.execute_plan(args) == 0
+    assert calls == [["mutable"]]
+    receipts = json.loads((args.root/"campaign_delivery"/"plan_receipts.json").read_text())
+    assert receipts[-1]["always_run_on_resume"] is True
 
 
 def test_hcf_phase_resolution_uses_accessible_cycle_fraction():

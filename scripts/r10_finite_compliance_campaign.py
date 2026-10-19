@@ -1136,7 +1136,8 @@ def execute_plan(args) -> int:
     receipts = []
     for task in plan["tasks"]:
         sentinel = ROOT / task["sentinel"]
-        if args.resume and sentinel.exists():
+        always_run = bool(task.get("always_run_on_resume", False))
+        if args.resume and sentinel.exists() and not always_run:
             receipts.append({"id": task["id"], "status": "SKIPPED_COMPLETE",
                              "sentinel": task["sentinel"]}); continue
         log = args.root / "campaign_delivery" / "logs" / f"{task['id']}.log"
@@ -1146,6 +1147,7 @@ def execute_plan(args) -> int:
                                     stderr=subprocess.STDOUT, check=False)
         receipts.append({"id": task["id"], "status": "COMPLETE" if result.returncode == 0 else "FAILED",
             "returncode": result.returncode, "sentinel": task["sentinel"],
+            "always_run_on_resume": always_run,
             "sentinel_exists": sentinel.exists(), "log": str(log.relative_to(args.root))})
         atomic(args.root / "campaign_delivery" / "plan_receipts.json", receipts)
         if result.returncode and not args.keep_going:

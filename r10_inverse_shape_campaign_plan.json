@@ -52,6 +52,7 @@
     },
     {
       "id": "mechanism_diverse_full_hcf",
+      "always_run_on_resume": true,
       "argv": [
         "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
         "scripts/run_r10_inverse_hcf_batch.py",
@@ -67,6 +68,7 @@
     },
     {
       "id": "mechanism_diverse_frozen_hcf",
+      "always_run_on_resume": true,
       "argv": [
         "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
         "scripts/run_r10_inverse_hcf_batch.py",
@@ -82,6 +84,7 @@
     },
     {
       "id": "campaign_analysis",
+      "always_run_on_resume": true,
       "argv": [
         "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
         "scripts/r10_finite_compliance_campaign.py", "--root", "runs/r10_inverse_shape_12h", "analyze"
@@ -90,6 +93,7 @@
     },
     {
       "id": "campaign_figures",
+      "always_run_on_resume": true,
       "argv": [
         "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
         "scripts/r10_finite_compliance_campaign.py", "--root", "runs/r10_inverse_shape_12h", "plot"
@@ -98,6 +102,7 @@
     },
     {
       "id": "campaign_verification",
+      "always_run_on_resume": true,
       "argv": [
         "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
         "scripts/r10_finite_compliance_campaign.py", "--root", "runs/r10_inverse_shape_12h", "verify"
