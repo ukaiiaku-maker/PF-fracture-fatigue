@@ -1,0 +1,55 @@
+{
+  "allocated": 4096,
+  "qualified": 891,
+  "role_counts": {
+    "CENSORED": 602,
+    "CERAMIC_LIKE": 9,
+    "DBTT": 77,
+    "OTHER": 136,
+    "PEAK_T": 64,
+    "WEAK_T": 3
+  },
+  "schema": "r10.alternative-gstar-joint-registry/1",
+  "selected": [
+    {
+      "candidate_id": "R10_ALT_GSTAR_02143",
+      "candidate_sha256": "bf3610372cdc2fb1d90c34dc229cdd679f8b46b2183d7471ada01ecf26bfd923",
+      "fatigue_rate_width_decades": 4.285318508015634,
+      "fatigue_slope_max": 4.363783911793521,
+      "fatigue_slope_min": 4.060895945524038,
+      "role": "WEAK_T",
+      "root_span": 1.134400995030016,
+      "roots_json": "[3.591870198504424,3.8867790545660346,4.002377291176339,4.047456052358869,4.066905035766694,4.073799253211393,4.07462112720208]"
+    },
+    {
+      "candidate_id": "R10_ALT_GSTAR_02506",
+      "candidate_sha256": "561e0f1489ff2b0bc818a91422b2c286fdf47b1b1cdb5c5b06366bb7e74304a3",
+      "fatigue_rate_width_decades": 4.359043213994515,
+      "fatigue_slope_max": 4.564489921628982,
+      "fatigue_slope_min": 3.985268166703196,
+      "role": "PEAK_T",
+      "root_span": 3.0826453720865836,
+      "roots_json": "[3.5925519403517936,11.074563612906132,7.448713940595971,6.365246564230448,5.910956959538162,5.662579559147215,5.498606515659508]"
+    },
+    {
+      "candidate_id": "R10_ALT_GSTAR_00348",
+      "candidate_sha256": "6cdf0fc68774be4a1d724462f136be74e4ef589bbd6b94e79412e9998ad56748",
+      "fatigue_rate_width_decades": 4.080116580649855,
+      "fatigue_slope_max": 4.347217501968433,
+      "fatigue_slope_min": 3.508418845357316,
+      "role": "DBTT",
+      "root_span": 2.965641561111617,
+      "roots_json": "[3.5253255926510443,8.339694371904816,9.39906088070863,9.886747208100685,10.162090270045328,10.336553326823994,10.45485209401638]"
+    },
+    {
+      "candidate_id": "R10_ALT_GSTAR_02460",
+      "candidate_sha256": "6c2a7acecb8ec0a821752cd6ca866a9780cf57866d5dc9ce23d1df654bf5ed2e",
+      "fatigue_rate_width_decades": 4.134048118656284,
+      "fatigue_slope_max": 4.32698370009096,
+      "fatigue_slope_min": 3.6864020043511627,
+      "role": "CERAMIC_LIKE",
+      "root_span": 2.130344189227616,
+      "roots_json": "[3.546504590778087,3.3959556010447725,3.079226094640673,2.7796033559780353,2.4829903210770397,2.146845197803853,1.6647566194756156]"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "archive": {
+    "path": "R10_ALTERNATIVE_GSTAR_JOINT_EXECUTED.zip",
+    "sha256": "5cbc49bffd7ead2a092bf80ef952706ca1360bf09ca149fe285edf586863c9a1"
+  },
+  "execution_source": {
+    "branch": "codex/r10-fair-czm-vs-arrhenius",
+    "head_before_additive_change": "e0d322c0757288403efe89222efbde596c04e36e",
+    "mechanics": "RESTORED_REDUCED_PRESCRIBED_K_WITH_R4_EFFECTIVE_OPENING_KERNEL",
+    "plasticity": "unchanged EXP_floor emission surface from V3.1 accepted row",
+    "stochastic_event_law": "UNIT_EXPONENTIAL_MARK_THRESHOLD_SCALED_BOUNDED_REWARD"
+  },
+  "native_coverage": {
+    "fatigue_cases": 20,
+    "fatigue_events_per_case": 20,
+    "fatigue_final_extension_um": 117.7965117723998,
+    "fracture_cases": 28,
+    "fracture_events_per_case": 11,
+    "fracture_final_extension_um": 55.0
+  },
+  "tests": {
+    "command": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python -m pytest -q tests/test_r10_alternative_gstar_joint.py tests/test_paris_slope_r9.py",
+    "result": "8 passed in 22.41s"
+  }
+}

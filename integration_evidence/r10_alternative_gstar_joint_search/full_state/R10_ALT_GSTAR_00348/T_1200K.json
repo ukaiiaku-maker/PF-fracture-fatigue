@@ -1,0 +1,896 @@
+{
+  "K_final_event_MPa_sqrt_m": 11.165758182970286,
+  "K_init_MPa_sqrt_m": 10.455906868674173,
+  "Kdot_MPa_sqrt_m_s": 0.005,
+  "Kmax_MPa_sqrt_m": 80.0,
+  "binding": {
+    "archived_parent_control": false,
+    "candidate_id": "R10_ALT_GSTAR_00348",
+    "candidate_sha256": "6cdf0fc68774be4a1d724462f136be74e4ef589bbd6b94e79412e9998ad56748",
+    "complete_v3_row_sha256": "660a5750ca950464b71083fa0f301dabdaf98e2378df20236c0c7b2ed980eccc",
+    "historical_engine_loaded": false,
+    "optimized_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/runs/r10_alternative_gstar_joint_search/alternative_gstar_registry.json",
+      "sha256": "006fc26dd19b67531103942db3d28627be58cc311af665716c5daee4336156f5"
+    },
+    "parent_candidate_id": "V3_ceramic_V2_P25_007",
+    "parent_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json",
+      "sha256": "016af3a9e79fc7489c18e4b9d825b27f4b1b4e830553e61623b5aa9a573af14f"
+    },
+    "source_candidate_id": "P25_TJBSV2_S_004127",
+    "source_complete_bound_row_sha256": "c794af3a2912fa91d587d06ae9177ba87af1da6d30e4ad7310d5f673edf741e3",
+    "translation": "ARCHIVED_COMPLETE_ROW_TO_CURRENT_PERSISTENT_REVERSIBLE_INTERFACES"
+  },
+  "candidate_id": "R10_ALT_GSTAR_00348",
+  "dK_MPa_sqrt_m": 0.05,
+  "deterministic_diagnostic_mark": true,
+  "event_count": 11,
+  "events": [
+    {
+      "K_MPa_sqrt_m": 10.455906868674173,
+      "K_shield_MPa_sqrt_m": -3.536815932592727e-197,
+      "event_advance_um": 5.0,
+      "event_index": 1,
+      "extension_um": 5.0,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 10.455906868674173,
+        "K_shield_MPa_sqrt_m": -3.536815932592727e-197,
+        "accumulated_source_linked_slip": 3.0396041673550043e-180,
+        "cleavage_barrier_J": 3.03557054559056e-19,
+        "cleavage_rate_s-1": 0.020235751518392273,
+        "emitted_total": 1.2339286922944382e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 1.2339286922944375e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.1389075911340574e-180,
+        "opening_stress_Pa": 4171303329.853878,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 11035.777954580491,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 1.172812696477851e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.1389075911340574e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 1.172812696477851e-192,
+      "return_activity": 0.0,
+      "source_activity": 1.2339286922944375e-179
+    },
+    {
+      "K_MPa_sqrt_m": 10.634745152100862,
+      "K_shield_MPa_sqrt_m": -4.657621014800218e-197,
+      "event_advance_um": 5.0,
+      "event_index": 2,
+      "extension_um": 10.0,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 10.634745152100862,
+        "K_shield_MPa_sqrt_m": -4.657621014800218e-197,
+        "accumulated_source_linked_slip": 2.883647651109867e-180,
+        "cleavage_barrier_J": 3.0054420815188325e-19,
+        "cleavage_rate_s-1": 0.03665355347972323,
+        "emitted_total": 2.1723946977776202e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 2.1723946977776192e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 2.949769660500182e-180,
+        "opening_stress_Pa": 4242649482.4671993,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 13236.685556050223,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 1.553510551382542e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 2.949769660500182e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 1.553510551382542e-192,
+      "return_activity": 0.0,
+      "source_activity": 2.1723946977776192e-179
+    },
+    {
+      "K_MPa_sqrt_m": 10.748069308877621,
+      "K_shield_MPa_sqrt_m": -6.303401291380241e-197,
+      "event_advance_um": 5.0,
+      "event_index": 3,
+      "extension_um": 14.999999999999998,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 10.748069308877621,
+        "K_shield_MPa_sqrt_m": -6.303401291380241e-197,
+        "accumulated_source_linked_slip": 2.958126933348435e-180,
+        "cleavage_barrier_J": 2.988020885597951e-19,
+        "cleavage_rate_s-1": 0.05167165084311666,
+        "emitted_total": 3.125748338886592e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 3.125748338886591e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.0170198521505398e-180,
+        "opening_stress_Pa": 4287859279.9962883,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 14704.34738490014,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 2.1209278456343224e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.0170198521505398e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 2.1209278456343224e-192,
+      "return_activity": 0.0,
+      "source_activity": 3.125748338886591e-179
+    },
+    {
+      "K_MPa_sqrt_m": 10.832784065258629,
+      "K_shield_MPa_sqrt_m": -7.473933781012662e-197,
+      "event_advance_um": 5.0,
+      "event_index": 4,
+      "extension_um": 20.0,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 10.832784065258629,
+        "K_shield_MPa_sqrt_m": -7.473933781012662e-197,
+        "accumulated_source_linked_slip": 3.0759273157526372e-180,
+        "cleavage_barrier_J": 2.97578458375632e-19,
+        "cleavage_rate_s-1": 0.06576280173145602,
+        "emitted_total": 4.1160191286325517e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 4.116019128632527e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.13315231328552e-180,
+        "opening_stress_Pa": 4321655578.09058,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 15831.461089762806,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 2.544502123244137e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.13315231328552e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 2.544502123244137e-192,
+      "return_activity": 0.0,
+      "source_activity": 4.116019128632527e-179
+    },
+    {
+      "K_MPa_sqrt_m": 10.90112937499731,
+      "K_shield_MPa_sqrt_m": -9.323685352644573e-197,
+      "event_advance_um": 5.0,
+      "event_index": 5,
+      "extension_um": 24.999999999999996,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 10.90112937499731,
+        "K_shield_MPa_sqrt_m": -9.323685352644573e-197,
+        "accumulated_source_linked_slip": 3.226512267298993e-180,
+        "cleavage_barrier_J": 2.966378261878125e-19,
+        "cleavage_rate_s-1": 0.07915411483987006,
+        "emitted_total": 5.151567121811858e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 5.15156712181181e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.2840215541888886e-180,
+        "opening_stress_Pa": 4348921411.812471,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 16756.293657456506,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 3.2256366301038077e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.2840215541888886e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 3.2256366301038077e-192,
+      "return_activity": 0.0,
+      "source_activity": 5.15156712181181e-179
+    },
+    {
+      "K_MPa_sqrt_m": 10.959170817074577,
+      "K_shield_MPa_sqrt_m": -1.1108198675487792e-196,
+      "event_advance_um": 5.0,
+      "event_index": 6,
+      "extension_um": 29.999999999999996,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 10.959170817074577,
+        "K_shield_MPa_sqrt_m": -1.1108198675487792e-196,
+        "accumulated_source_linked_slip": 3.3648591940848466e-180,
+        "cleavage_barrier_J": 2.958703088318014e-19,
+        "cleavage_rate_s-1": 0.09207534945005606,
+        "emitted_total": 6.233673511068588e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 6.23367351106854e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.423748259486089e-180,
+        "opening_stress_Pa": 4372076597.072563,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 17550.80483275053,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 3.923070487722801e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.423748259486089e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 3.923070487722801e-192,
+      "return_activity": 0.0,
+      "source_activity": 6.23367351106854e-179
+    },
+    {
+      "K_MPa_sqrt_m": 11.010024076396233,
+      "K_shield_MPa_sqrt_m": -1.2807764301669667e-196,
+      "event_advance_um": 5.0,
+      "event_index": 7,
+      "extension_um": 35.0,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 11.010024076396233,
+        "K_shield_MPa_sqrt_m": -1.2807764301669667e-196,
+        "accumulated_source_linked_slip": 3.477787544728415e-180,
+        "cleavage_barrier_J": 2.9522064869092825e-19,
+        "cleavage_rate_s-1": 0.10464594392686939,
+        "emitted_total": 7.362529060643973e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 7.362529060643925e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.538584867199352e-180,
+        "opening_stress_Pa": 4392364112.31219,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 18252.682435437113,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 4.642030483168711e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.538584867199352e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 4.642030483168711e-192,
+      "return_activity": 0.0,
+      "source_activity": 7.362529060643925e-179
+    },
+    {
+      "K_MPa_sqrt_m": 11.054958257664344,
+      "K_shield_MPa_sqrt_m": -1.3010429931963884e-196,
+      "event_advance_um": 5.0,
+      "event_index": 8,
+      "extension_um": 40.0,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 11.054958257664344,
+        "K_shield_MPa_sqrt_m": -1.3010429931963884e-196,
+        "accumulated_source_linked_slip": 3.634830904883063e-180,
+        "cleavage_barrier_J": 2.9466378567732624e-19,
+        "cleavage_rate_s-1": 0.11677701315421271,
+        "emitted_total": 8.544907294452409e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 8.544907294452361e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.6977574213616124e-180,
+        "opening_stress_Pa": 4410290257.055262,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 18876.60337535957,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 4.86594905622536e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.6977574213616124e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 4.86594905622536e-192,
+      "return_activity": 0.0,
+      "source_activity": 8.544907294452361e-179
+    },
+    {
+      "K_MPa_sqrt_m": 11.095294411453917,
+      "K_shield_MPa_sqrt_m": -1.4506247157457087e-196,
+      "event_advance_um": 5.0,
+      "event_index": 9,
+      "extension_um": 44.99999999999999,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 11.095294411453917,
+        "K_shield_MPa_sqrt_m": -1.4506247157457087e-196,
+        "accumulated_source_linked_slip": 3.8049364344477167e-180,
+        "cleavage_barrier_J": 2.941772575468383e-19,
+        "cleavage_rate_s-1": 0.12852029582130803,
+        "emitted_total": 9.782651924942661e-179,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 9.782651924942613e-179,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 3.870376286552405e-180,
+        "opening_stress_Pa": 4426382054.230698,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 19439.151405565717,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 5.639091130492141e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 3.870376286552405e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 5.639091130492141e-192,
+      "return_activity": 0.0,
+      "source_activity": 9.782651924942613e-179
+    },
+    {
+      "K_MPa_sqrt_m": 11.132000505141871,
+      "K_shield_MPa_sqrt_m": -1.586074837309875e-196,
+      "event_advance_um": 5.0,
+      "event_index": 10,
+      "extension_um": 49.99999999999999,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 11.132000505141871,
+        "K_shield_MPa_sqrt_m": -1.586074837309875e-196,
+        "accumulated_source_linked_slip": 3.977051605878977e-180,
+        "cleavage_barrier_J": 2.937452209132471e-19,
+        "cleavage_rate_s-1": 0.13993358853103893,
+        "emitted_total": 1.1076373072773173e-178,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 1.1076373072773111e-178,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 4.045261152644155e-180,
+        "opening_stress_Pa": 4441025666.951199,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 19952.731496745917,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 6.458275969511639e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 4.045261152644155e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 6.458275969511639e-192,
+      "return_activity": 0.0,
+      "source_activity": 1.1076373072773111e-178
+    },
+    {
+      "K_MPa_sqrt_m": 11.165758182970286,
+      "K_shield_MPa_sqrt_m": -1.702450399508243e-196,
+      "event_advance_um": 5.0,
+      "event_index": 11,
+      "extension_um": 54.99999999999999,
+      "hazard_bearing_state": {
+        "K_MPa_sqrt_m": 11.165758182970286,
+        "K_shield_MPa_sqrt_m": -1.702450399508243e-196,
+        "accumulated_source_linked_slip": 4.1509565549821705e-180,
+        "cleavage_barrier_J": 2.933566892694996e-19,
+        "cleavage_rate_s-1": 0.1510597425558508,
+        "emitted_total": 1.2426652532256462e-178,
+        "gross_return_activity": 0.0,
+        "gross_source_activity": 1.24266525322564e-178,
+        "hazard_action_current": 0.0,
+        "hazard_threshold_action": 1.0,
+        "mobile_count": 4.222120919882147e-180,
+        "opening_stress_Pa": 4454493031.925123,
+        "persistent_site_multiplicity_per_system": 96388.78777092867,
+        "radius_over_r0": 1.0,
+        "raw_cleavage_rate_s-1": 20426.17319155364,
+        "reference_tip_radius_m": 1e-06,
+        "remaining_action_to_mark": 1.0,
+        "retained_count": 7.325569647803183e-192,
+        "signed_return": 0.0,
+        "tip_radius_m": 1e-06
+      },
+      "mobile_count": 4.222120919882147e-180,
+      "persistent_site_multiplicity_per_system": 96388.78777092867,
+      "retained_count": 7.325569647803183e-192,
+      "return_activity": 0.0,
+      "source_activity": 1.24266525322564e-178
+    }
+  ],
+  "final_K_MPa_sqrt_m": 11.165758182970286,
+  "final_extension_um": 54.99999999999999,
+  "fixed_avalanche_length": true,
+  "history": [
+    {
+      "K_MPa_sqrt_m": 0.05,
+      "K_shield_MPa_sqrt_m": -8.48611164202474e-215,
+      "extension_um": 0.0,
+      "fired": false,
+      "mobile_count": 3.672566523189657e-187,
+      "retained_count": 5.912104854021425e-209,
+      "step": 1
+    },
+    {
+      "K_MPa_sqrt_m": 4.99999999999999,
+      "K_shield_MPa_sqrt_m": -3.426296503987704e-206,
+      "extension_um": 0.0,
+      "fired": false,
+      "mobile_count": 1.1610857004616505e-184,
+      "retained_count": 8.831107290641255e-202,
+      "step": 100
+    },
+    {
+      "K_MPa_sqrt_m": 10.000000000000007,
+      "K_shield_MPa_sqrt_m": -7.115191039254872e-198,
+      "extension_um": 0.0,
+      "fired": false,
+      "mobile_count": 2.5974000703035436e-180,
+      "retained_count": 2.316067614379969e-193,
+      "step": 200
+    },
+    {
+      "K_MPa_sqrt_m": 10.455906868674173,
+      "K_shield_MPa_sqrt_m": -3.536815932592727e-197,
+      "extension_um": 5.0,
+      "fired": true,
+      "mobile_count": 3.1389075911340574e-180,
+      "retained_count": 1.172812696477851e-192,
+      "step": 210
+    },
+    {
+      "K_MPa_sqrt_m": 10.634745152100862,
+      "K_shield_MPa_sqrt_m": -4.657621014800218e-197,
+      "extension_um": 10.0,
+      "fired": true,
+      "mobile_count": 2.949769660500182e-180,
+      "retained_count": 1.553510551382542e-192,
+      "step": 214
+    },
+    {
+      "K_MPa_sqrt_m": 10.748069308877621,
+      "K_shield_MPa_sqrt_m": -6.303401291380241e-197,
+      "extension_um": 14.999999999999998,
+      "fired": true,
+      "mobile_count": 3.0170198521505398e-180,
+      "retained_count": 2.1209278456343224e-192,
+      "step": 217
+    },
+    {
+      "K_MPa_sqrt_m": 10.832784065258629,
+      "K_shield_MPa_sqrt_m": -7.473933781012662e-197,
+      "extension_um": 20.0,
+      "fired": true,
+      "mobile_count": 3.13315231328552e-180,
+      "retained_count": 2.544502123244137e-192,
+      "step": 219
+    },
+    {
+      "K_MPa_sqrt_m": 10.90112937499731,
+      "K_shield_MPa_sqrt_m": -9.323685352644573e-197,
+      "extension_um": 24.999999999999996,
+      "fired": true,
+      "mobile_count": 3.2840215541888886e-180,
+      "retained_count": 3.2256366301038077e-192,
+      "step": 221
+    },
+    {
+      "K_MPa_sqrt_m": 10.959170817074577,
+      "K_shield_MPa_sqrt_m": -1.1108198675487792e-196,
+      "extension_um": 29.999999999999996,
+      "fired": true,
+      "mobile_count": 3.423748259486089e-180,
+      "retained_count": 3.923070487722801e-192,
+      "step": 223
+    },
+    {
+      "K_MPa_sqrt_m": 11.010024076396233,
+      "K_shield_MPa_sqrt_m": -1.2807764301669667e-196,
+      "extension_um": 35.0,
+      "fired": true,
+      "mobile_count": 3.538584867199352e-180,
+      "retained_count": 4.642030483168711e-192,
+      "step": 225
+    },
+    {
+      "K_MPa_sqrt_m": 11.054958257664344,
+      "K_shield_MPa_sqrt_m": -1.3010429931963884e-196,
+      "extension_um": 40.0,
+      "fired": true,
+      "mobile_count": 3.6977574213616124e-180,
+      "retained_count": 4.86594905622536e-192,
+      "step": 226
+    },
+    {
+      "K_MPa_sqrt_m": 11.095294411453917,
+      "K_shield_MPa_sqrt_m": -1.4506247157457087e-196,
+      "extension_um": 44.99999999999999,
+      "fired": true,
+      "mobile_count": 3.870376286552405e-180,
+      "retained_count": 5.639091130492141e-192,
+      "step": 227
+    },
+    {
+      "K_MPa_sqrt_m": 11.132000505141871,
+      "K_shield_MPa_sqrt_m": -1.586074837309875e-196,
+      "extension_um": 49.99999999999999,
+      "fired": true,
+      "mobile_count": 4.045261152644155e-180,
+      "retained_count": 6.458275969511639e-192,
+      "step": 228
+    },
+    {
+      "K_MPa_sqrt_m": 11.165758182970286,
+      "K_shield_MPa_sqrt_m": -1.702450399508243e-196,
+      "extension_um": 54.99999999999999,
+      "fired": true,
+      "mobile_count": 4.222120919882147e-180,
+      "retained_count": 7.325569647803183e-192,
+      "step": 229
+    }
+  ],
+  "local_strength_Pa": 30000000000.0,
+  "runtime_receipt": {
+    "engine_class": "arrhenius_fracture.reduced_persistent_reference_r2.ReducedPersistentReversibleTipEngine",
+    "final_bound_implementation_identity": null,
+    "historical_replay_identity": "v10.2.3_historical_finite_source_replay",
+    "kinetics": "reversible_signed",
+    "local_strength": {
+      "source": "explicit_spatial_driver_cohesive_ceiling",
+      "value_Pa": 30000000000.0
+    },
+    "material": {
+      "definition": {
+        "c_blunt": 2.6710070092231035,
+        "candidate_id": "R10_ALT_GSTAR_00348",
+        "cleavage": {
+          "parent": {
+            "G00_eV": 0.45044272961934334,
+            "Tref_K": 481.33,
+            "alpha": 0.22058697171901603,
+            "attempt_frequency_s": 1000000000000.0,
+            "exponent": 1.5454311209911598,
+            "floor_fraction": 0.8775742237144637,
+            "floor_max_fraction": 0.95,
+            "floor_min_eV": 0.0001,
+            "gT_eV_per_K": 0.0,
+            "sT_Pa_per_K": 0.0,
+            "sigc0_Pa": 2073551604.9248903
+          },
+          "surface": "KineticSurface(process='cleavage', attempt_frequency_s=1000000000000.0, reference_floor_eV=0.3357313411074163, reference_amplitudes_eV=(0.15143879341031627, 1.2290182599468198, 0.0), bases=(SmoothBroadBasis(sigma_b_Pa=11170059136.539465, exponent=0.6575776455718931, smoothing_ratio=0.0001), Basis(alpha=1.0, sigma_Pa=938627439.9265141, exponent=3.756518227513879), Basis(alpha=1.0, sigma_Pa=2064980367.8383312, exponent=2.0)), entropy_infinity_kB=-14.787695851803935, entropy_amplitudes_kB=(-5.816373868974925, 7.791660217393435, -29.521870259195566), heat_capacity_infinity_kB=1.1041030287742615, heat_capacity_amplitudes_kB=(0.0, 0.0, -79.6292845159769), hits=3.273241435177624, tau_s=6.992153587194454e-07)"
+        },
+        "emission": {
+          "parent": {
+            "G00_eV": 1.6206148624420167,
+            "Tref_K": 481.33,
+            "alpha": 0.3812504687253847,
+            "attempt_frequency_s": 100000000000.0,
+            "exponent": 2.1357398161664602,
+            "floor_fraction": 0.02957268757716202,
+            "floor_max_fraction": 0.95,
+            "floor_min_eV": 0.0001,
+            "gT_eV_per_K": 0.0,
+            "sT_Pa_per_K": 0.0,
+            "sigc0_Pa": 1686576738.9535904
+          },
+          "surface": "ThermodynamicSurface(process='emission', attempt_frequency_s=100000000000.0, reference_floor_eV=0.048062719500310866, reference_amplitudes_eV=(1.572737060804423,), bases=(Basis(alpha=0.3812504687253847, sigma_Pa=1686576738.9535904, exponent=2.125058676401422),), entropy_infinity_kB=-12.361737402854828, entropy_amplitudes_kB=(-592.0614044794708,), heat_capacity_infinity_kB=0.0, heat_capacity_amplitudes_kB=(0.0,))"
+        },
+        "encounter_efficiency": 0.7869294861098416,
+        "max_K_shield_MPa_sqrt_m": 0.0,
+        "name": "P25_TRANSFER_V1_RANK1",
+        "peierls": {
+          "H0_eV": 3.6593758589588106,
+          "activation_entropy_kB": -17.06620840355754,
+          "alpha": 0.26733986329149567,
+          "attempt_frequency_s": 1000000000000.0,
+          "exponent": 1.996950289234519,
+          "stress_ratio": 1.0
+        },
+        "retained_recovery_rate_s": 0.0,
+        "source_refresh_length_m": 0.0,
+        "source_sites_per_system": 141.0590567476921,
+        "taylor": {
+          "H0_eV": 1.1918544578552246,
+          "activation_entropy_kB": 0.8347971364855766,
+          "alpha": 0.5542682043898324,
+          "attempt_frequency_s": 100000000000.0,
+          "exponent": 2.2843412086367607,
+          "stress_ratio": 1.0
+        },
+        "taylor_corr_rho_c_m2": 749611920129.9166,
+        "taylor_corr_scale": 1.818093050430288
+      },
+      "embedded": true,
+      "path": null,
+      "sha256": "822ecd1af7761d3711c41ec69c284904a3a0b046cb7008a027d13f552e9b0074"
+    },
+    "material_family": null,
+    "mechanics_provider": "prescribed_K_reduced_provider",
+    "methods": {
+      "_emit": {
+        "callable": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_source_v10221.py",
+        "file_sha256": "e35e3dbf2cb37d3501eea7af79f08fd2b0ef90befd0c9f8c93c491016a458df1"
+      },
+      "_transport_rates": {
+        "callable": "arrhenius_fracture.reduced_persistent_reference_r2._mean_rate_transport",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/reduced_persistent_reference_r2.py",
+        "file_sha256": "58a615c0e22751a287543ff925ac8c349ace11437665f95962f711a064b4492f"
+      },
+      "advance": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "blunted_radius": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_blunted_radius",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "diagnostics": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_diagnostics",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "evolve": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "local_slip_count": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_local_slip_count",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      }
+    },
+    "model_id": "r2.restored_reduced_persistent_reversible/1",
+    "numerical_options": {
+      "G_Pa": 160000000000.0,
+      "Kdot_MPa_sqrt_m_s": 0.005,
+      "Kmax_MPa_sqrt_m": 80.0,
+      "b_m": 2.74e-10,
+      "blunting_length_um": 0.8204647996828617,
+      "checkpoint_da_um": 5.0,
+      "cleavage_hits": 3.273241435177624,
+      "cleavage_tau_s": 6.992153587194454e-07,
+      "crystal_theta_deg": 45.0,
+      "drive_factors": [
+        0.132886,
+        0.008596
+      ],
+      "forest_density_floor_m2": 5000000000000.0,
+      "max_action_substep": 0.01,
+      "max_dK_step_MPa_sqrt_m": 0.01,
+      "max_internal_steps": 100000,
+      "max_outer_steps": 2000000,
+      "max_translation_substep_m": 5e-08,
+      "mobile_shield_fraction": 0.0,
+      "mpz_length_um": 50.0,
+      "mpz_n_bins": 80,
+      "poisson": 0.28,
+      "r0_m": 1e-06,
+      "shielding_core_m": 2.5e-10,
+      "source_bin_count": 2,
+      "target_extension_um": 100.0,
+      "transport_mode": "validated_scalar",
+      "wake_length_um": 50.0,
+      "wake_n_bins": 0
+    },
+    "owning_arrays": {
+      "accumulated_slip_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "accumulated_slip_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 4.1509565549821705e-180
+      },
+      "available_sites": {
+        "owner": "engine.mpz",
+        "shape": [
+          2
+        ],
+        "sum": 282.1181134953842
+      },
+      "mobile_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "mobile_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 4.222120919882147e-180
+      },
+      "retained_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "retained_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 7.325569647803183e-192
+      },
+      "returned_slip_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "returned_slip_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "site_capacity": {
+        "owner": "engine.mpz",
+        "shape": [
+          2
+        ],
+        "sum": 282.1181134953842
+      },
+      "wake_mobile_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "wake_mobile_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 1.0980577979433263e-178
+      },
+      "wake_retained_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "wake_retained_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 3.095168761853939e-185
+      }
+    },
+    "persistent_invariants": {
+      "advance_refresh": false,
+      "available_equals_capacity": true,
+      "depletion_on_emission": false,
+      "inventory_active": false
+    },
+    "reversible_binding": {
+      "all_expected_methods_bound": true,
+      "expected_method_match": {
+        "advance": true,
+        "blunted_radius": true,
+        "diagnostics": true,
+        "evolve": true,
+        "local_slip_count": true
+      },
+      "installation_count": 1,
+      "installed": true,
+      "model_id": "v10.2.30_intrinsic_signed_mobile_transport_v1",
+      "object_id": 4813531776,
+      "object_type": "arrhenius_fracture.unified_mpz.UnifiedMPZState",
+      "observed_methods": {
+        "advance": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
+        "blunted_radius": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_blunted_radius",
+        "diagnostics": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_diagnostics",
+        "evolve": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+        "local_slip_count": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_local_slip_count"
+      },
+      "schema": "v10.2.30-reversible-runtime-binding/1"
+    },
+    "schema": "r2-resolved-reduced-runtime-receipt/1",
+    "selected_identity": "RESTORED_REDUCED_REFERENCE",
+    "selection": {
+      "definition": {
+        "implicit_max_iterations": 96,
+        "implicit_tolerance": 1e-10,
+        "maximum_front_width_m": 0.0,
+        "minimum_front_width_m": 0.0,
+        "reference_density_m2": 5000000000000.0,
+        "reference_front_width_m": 9.999999999999999e-06,
+        "reference_source_area_m2": 2.5e-11,
+        "rho_site0_m2": 3855551510837146.5,
+        "source_zone_length_m": 2e-06
+      },
+      "embedded": true,
+      "path": null,
+      "sha256": "e9ca4e9cfd18e12c52a0148660fcf7a7f8b84f36b80568e9c2e004e5dda9cfa5"
+    },
+    "signed_kernel_family": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+      "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+    },
+    "source_geography": "tip_surface",
+    "source_geometry": {
+      "front_width_m": 9.999999999999999e-06,
+      "multiplicity_per_system": 96388.78777092867,
+      "rho_width_m2": 5000000000000.0,
+      "source_area_m2": 2.5e-11,
+      "tip_radius_m": 1e-06
+    },
+    "source_lifecycle": "persistent_reusable",
+    "stage": "r10_monotonic_terminal",
+    "state_class": "arrhenius_fracture.unified_mpz.UnifiedMPZState",
+    "taylor_contract": {
+      "elementary_rate": "stable forward-minus-zero-stress",
+      "final_consumer": {
+        "callable": "arrhenius_fracture.reduced_persistent_reference_r2._mean_rate_transport",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/reduced_persistent_reference_r2.py",
+        "file_sha256": "58a615c0e22751a287543ff925ac8c349ace11437665f95962f711a064b4492f"
+      },
+      "finite_window_s": null,
+      "law_id": "MEAN_FORWARD_MINUS_ZERO_RATE_OVER_DENSITY_ORDER",
+      "order": "1+scale*sqrt(rho/rho_c)",
+      "units": "s^-1"
+    }
+  },
+  "schema": "r10.current-deterministic-monotonic-ramp/1",
+  "status": "complete",
+  "target_extension_um": 50.0,
+  "temperature_K": 1200.0,
+  "terminal_hazard_bearing_state": {
+    "K_MPa_sqrt_m": 11.165758182970286,
+    "K_shield_MPa_sqrt_m": -1.702450399508243e-196,
+    "accumulated_source_linked_slip": 4.1509565549821705e-180,
+    "cleavage_barrier_J": 2.933566892694996e-19,
+    "cleavage_rate_s-1": 0.1510597425558508,
+    "emitted_total": 1.2426652532256462e-178,
+    "gross_return_activity": 0.0,
+    "gross_source_activity": 1.24266525322564e-178,
+    "hazard_action_current": 0.0,
+    "hazard_threshold_action": 1.0,
+    "mobile_count": 4.222120919882147e-180,
+    "opening_stress_Pa": 4454493031.925123,
+    "persistent_site_multiplicity_per_system": 96388.78777092867,
+    "radius_over_r0": 1.0,
+    "raw_cleavage_rate_s-1": 20426.17319155364,
+    "reference_tip_radius_m": 1e-06,
+    "remaining_action_to_mark": 1.0,
+    "retained_count": 7.325569647803183e-192,
+    "signed_return": 0.0,
+    "tip_radius_m": 1e-06
+  }
+}

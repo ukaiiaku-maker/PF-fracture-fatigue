@@ -13,7 +13,9 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 
-from arrhenius_fracture.archived_fatigue_material_r9 import build_archived_current_engine
+from arrhenius_fracture.archived_fatigue_material_r9 import (
+    build_archived_current_engine, load_archived_material_binding,
+)
 from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY
 from arrhenius_fracture.reduced_persistent_reference_r2 import advance_signed, runtime_receipt
 from arrhenius_fracture.retained_material_r10 import (
@@ -23,6 +25,10 @@ from arrhenius_fracture.stochastic_avalanche_tip import clear_pending_geometry_e
 
 
 def load(a):
+    if a.kind=="alternative":
+        return load_archived_material_binding(
+            a.alternative_registry,a.alternative_parent_registry,
+            candidate_id=a.identifier)
     if a.kind=="original":return load_strict_original_binding(a.original_registry,a.identifier)
     if a.kind=="parent":return load_parent_binding(a.parent_registry,a.identifier)
     if a.kind=="offspring":return load_offspring_binding(a.offspring_registry,a.identifier)
@@ -105,9 +111,11 @@ def run(binding,T,Kdot,Kmax,dK,target_um,max_steps):
 
 
 def main(argv=None):
-    p=argparse.ArgumentParser();p.add_argument("--kind",choices=("original","parent","offspring","v2"),required=True)
+    p=argparse.ArgumentParser();p.add_argument("--kind",choices=("original","parent","offspring","v2","alternative"),required=True)
     p.add_argument("--identifier",required=True);p.add_argument("--original-registry",type=Path)
     p.add_argument("--parent-registry",type=Path);p.add_argument("--offspring-registry",type=Path)
+    p.add_argument("--alternative-registry",type=Path)
+    p.add_argument("--alternative-parent-registry",type=Path)
     p.add_argument("--v2-rows",type=Path);p.add_argument("--v2-manifest",type=Path)
     p.add_argument("--temperatures",default="300,450,600,750,900,1050,1200")
     p.add_argument("--Kdot",type=float,default=.005);p.add_argument("--Kmax",type=float,default=80.)

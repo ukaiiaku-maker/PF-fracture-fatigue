@@ -1,0 +1,317 @@
+{
+  "acceleration": "PHASE_EXACT_OVERLAP_QUALIFIED_MEAN_BLOCK_STOPS_SHORT_OF_PENDING_EVENT",
+  "archived_surface_contract": {
+    "emission_surface": {
+      "attempt_frequency_s": 100000000000.0,
+      "bases": [
+        {
+          "alpha": 0.3812504687253847,
+          "exponent": 2.125058676401422,
+          "kind": "LEGACY_EXP",
+          "sigma_Pa": 1686576738.9535904
+        }
+      ],
+      "entropy_amplitudes_kB": [
+        -592.0614044794708
+      ],
+      "entropy_infinity_kB": -12.361737402854828,
+      "heat_capacity_amplitudes_kB": [
+        0.0
+      ],
+      "heat_capacity_infinity_kB": 0.0,
+      "process": "emission",
+      "reference_amplitudes_eV": [
+        1.572737060804423
+      ],
+      "reference_floor_eV": 0.048062719500310866
+    },
+    "opening_surface": {
+      "attempt_frequency_s": 1000000000000.0,
+      "bases": [
+        {
+          "exponent": 0.6575776455718931,
+          "kind": "SMOOTH_NORMALIZED_BROAD_V1",
+          "sigma_b_Pa": 11170059136.539465,
+          "smoothing_ratio": 0.0001
+        },
+        {
+          "alpha": 1.0,
+          "exponent": 3.756518227513879,
+          "kind": "LEGACY_EXP",
+          "sigma_Pa": 938627439.9265141
+        },
+        {
+          "alpha": 1.0,
+          "exponent": 2.0,
+          "kind": "LEGACY_EXP",
+          "sigma_Pa": 2064980367.8383312
+        }
+      ],
+      "entropy_amplitudes_kB": [
+        -5.816373868974925,
+        7.791660217393435,
+        -29.521870259195566
+      ],
+      "entropy_infinity_kB": -14.787695851803935,
+      "heat_capacity_amplitudes_kB": [
+        0.0,
+        0.0,
+        -79.6292845159769
+      ],
+      "heat_capacity_infinity_kB": 1.1041030287742615,
+      "hits": 3.273241435177624,
+      "process": "cleavage",
+      "reference_amplitudes_eV": [
+        0.15143879341031627,
+        1.2290182599468198,
+        0.0
+      ],
+      "reference_floor_eV": 0.3357313411074163,
+      "schema": "v10.2.30_v3_thermodynamic_surface_v1",
+      "tau_s": 6.992153587194454e-07
+    }
+  },
+  "binding": {
+    "archived_parent_control": false,
+    "candidate_id": "R10_ALT_GSTAR_00348",
+    "candidate_sha256": "6cdf0fc68774be4a1d724462f136be74e4ef589bbd6b94e79412e9998ad56748",
+    "complete_v3_row_sha256": "660a5750ca950464b71083fa0f301dabdaf98e2378df20236c0c7b2ed980eccc",
+    "historical_engine_loaded": false,
+    "optimized_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/runs/r10_alternative_gstar_joint_search/alternative_gstar_registry.json",
+      "sha256": "006fc26dd19b67531103942db3d28627be58cc311af665716c5daee4336156f5"
+    },
+    "parent_candidate_id": "V3_ceramic_V2_P25_007",
+    "parent_registry": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/v3-fatigue-informed-joint-barrier-search/analysis_outputs/v3_fatigue_informed_joint_barrier_search/v3_complete_candidate_registry.json",
+      "sha256": "016af3a9e79fc7489c18e4b9d825b27f4b1b4e830553e61623b5aa9a573af14f"
+    },
+    "source_candidate_id": "P25_TJBSV2_S_004127",
+    "source_complete_bound_row_sha256": "c794af3a2912fa91d587d06ae9177ba87af1da6d30e4ad7310d5f673edf741e3",
+    "translation": "ARCHIVED_COMPLETE_ROW_TO_CURRENT_PERSISTENT_REVERSIBLE_INTERFACES"
+  },
+  "event_strategy": "UNIT_EXPONENTIAL_MARK_THRESHOLD_SCALED_BOUNDED_REWARD",
+  "kernel_family": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+    "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+  },
+  "loads_DeltaK_MPa_sqrt_m": [
+    4.303586249055167,
+    7.7388645159593334,
+    13.916227261994628,
+    25.028100000000002,
+    45.0
+  ],
+  "loads_Kmax_MPa_sqrt_m": [
+    4.781762498950186,
+    8.598738351065926,
+    15.462474735549586,
+    27.809,
+    50.0
+  ],
+  "local_strength_Pa": 30000000000.0,
+  "local_strength_source": "R3_R4_INDEPENDENT_SPATIAL_COHESIVE_STRENGTH_CONTRACT",
+  "material": {
+    "c_blunt": 2.6710070092231035,
+    "candidate_id": "R10_ALT_GSTAR_00348",
+    "cleavage": {
+      "parent": {
+        "G00_eV": 0.45044272961934334,
+        "Tref_K": 481.33,
+        "alpha": 0.22058697171901603,
+        "attempt_frequency_s": 1000000000000.0,
+        "exponent": 1.5454311209911598,
+        "floor_fraction": 0.8775742237144637,
+        "floor_max_fraction": 0.95,
+        "floor_min_eV": 0.0001,
+        "gT_eV_per_K": 0.0,
+        "sT_Pa_per_K": 0.0,
+        "sigc0_Pa": 2073551604.9248903
+      },
+      "surface": "KineticSurface(process='cleavage', attempt_frequency_s=1000000000000.0, reference_floor_eV=0.3357313411074163, reference_amplitudes_eV=(0.15143879341031627, 1.2290182599468198, 0.0), bases=(SmoothBroadBasis(sigma_b_Pa=11170059136.539465, exponent=0.6575776455718931, smoothing_ratio=0.0001), Basis(alpha=1.0, sigma_Pa=938627439.9265141, exponent=3.756518227513879), Basis(alpha=1.0, sigma_Pa=2064980367.8383312, exponent=2.0)), entropy_infinity_kB=-14.787695851803935, entropy_amplitudes_kB=(-5.816373868974925, 7.791660217393435, -29.521870259195566), heat_capacity_infinity_kB=1.1041030287742615, heat_capacity_amplitudes_kB=(0.0, 0.0, -79.6292845159769), hits=3.273241435177624, tau_s=6.992153587194454e-07)"
+    },
+    "emission": {
+      "parent": {
+        "G00_eV": 1.6206148624420167,
+        "Tref_K": 481.33,
+        "alpha": 0.3812504687253847,
+        "attempt_frequency_s": 100000000000.0,
+        "exponent": 2.1357398161664602,
+        "floor_fraction": 0.02957268757716202,
+        "floor_max_fraction": 0.95,
+        "floor_min_eV": 0.0001,
+        "gT_eV_per_K": 0.0,
+        "sT_Pa_per_K": 0.0,
+        "sigc0_Pa": 1686576738.9535904
+      },
+      "surface": "ThermodynamicSurface(process='emission', attempt_frequency_s=100000000000.0, reference_floor_eV=0.048062719500310866, reference_amplitudes_eV=(1.572737060804423,), bases=(Basis(alpha=0.3812504687253847, sigma_Pa=1686576738.9535904, exponent=2.125058676401422),), entropy_infinity_kB=-12.361737402854828, entropy_amplitudes_kB=(-592.0614044794708,), heat_capacity_infinity_kB=0.0, heat_capacity_amplitudes_kB=(0.0,))"
+    },
+    "encounter_efficiency": 0.7869294861098416,
+    "max_K_shield_MPa_sqrt_m": 0.0,
+    "name": "P25_TRANSFER_V1_RANK1",
+    "peierls": {
+      "H0_eV": 3.6593758589588106,
+      "activation_entropy_kB": -17.06620840355754,
+      "alpha": 0.26733986329149567,
+      "attempt_frequency_s": 1000000000000.0,
+      "exponent": 1.996950289234519,
+      "stress_ratio": 1.0
+    },
+    "retained_recovery_rate_s": 0.0,
+    "source_refresh_length_m": 0.0,
+    "source_sites_per_system": 141.0590567476921,
+    "taylor": {
+      "H0_eV": 1.1918544578552246,
+      "activation_entropy_kB": 0.8347971364855766,
+      "alpha": 0.5542682043898324,
+      "attempt_frequency_s": 100000000000.0,
+      "exponent": 2.2843412086367607,
+      "stress_ratio": 1.0
+    },
+    "taylor_corr_rho_c_m2": 749611920129.9166,
+    "taylor_corr_scale": 1.818093050430288
+  },
+  "mechanics_provider": "RESTORED_REDUCED_PRESCRIBED_K_WITH_R4_EFFECTIVE_OPENING_KERNEL",
+  "packaging_parent": "d27954d862840b408e8ba6aed55c0d7e980fd4e3",
+  "persistent_sites": {
+    "implicit_max_iterations": 96,
+    "implicit_tolerance": 1e-10,
+    "maximum_front_width_m": 0.0,
+    "minimum_front_width_m": 0.0,
+    "reference_density_m2": 5000000000000.0,
+    "reference_front_width_m": 9.999999999999999e-06,
+    "reference_source_area_m2": 2.5e-11,
+    "rho_site0_m2": 3855551510837146.5,
+    "source_zone_length_m": 2e-06
+  },
+  "physical_lengths": {
+    "committed_crack": "checkpoint_advance_total_m",
+    "continuous_mpz": "micro_advance_total_m",
+    "no_double_addition": true
+  },
+  "process_evaluations": {
+    "emission": {
+      "barrier_eV": [
+        1.620799780304734,
+        1.4352382079053039,
+        0.9575737183791952,
+        0.0819173011407652,
+        0.048062803579037715,
+        0.048062719500310866,
+        0.048062719500310866
+      ],
+      "consumer": "persistent_site._emit->manifest.emission",
+      "dG_dsigma_eV_per_Pa": [
+        -1.8556157239943017e-10,
+        -3.316130309627694e-10,
+        -4.3121973524778396e-10,
+        -1.8496750757513583e-10,
+        -4.51393581085456e-12,
+        -4.203936342509946e-18,
+        0.0
+      ],
+      "raw_rate_s-1": [
+        5.912376490219489e-17,
+        7.745675468739496e-14,
+        8.193501625500302e-06,
+        4205812515.500631,
+        15580465774.084167,
+        15580516446.67689,
+        15580516446.67689
+      ],
+      "stress_Pa": [
+        0.0,
+        1000000000.0,
+        2000000000.0,
+        5000000000.0,
+        10000000000.0,
+        20000000000.0,
+        30000000000.0
+      ],
+      "temperature_K": 300.0
+    },
+    "opening": {
+      "barrier_eV": [
+        1.7161883944645524,
+        0.805011259622546,
+        0.4455787017621237,
+        0.41980493173323546,
+        0.3955025666805002,
+        0.3706267371906075,
+        0.3579991545446031
+      ],
+      "consumer": "engine.lambda_cleave->manifest.cleavage",
+      "dG_dsigma_eV_per_Pa": [
+        -9.111771348420063e-10,
+        -6.353048463512145e-10,
+        -2.717222325643908e-10,
+        -7.192212801640197e-12,
+        -4.069509656694458e-12,
+        -1.875170606794854e-12,
+        -1.2627582646004387e-12
+      ],
+      "raw_rate_s-1": [
+        1.4767395019613006e-17,
+        0.02995063602124762,
+        32704.481137605497,
+        88631.38649256715,
+        226907.73846921933,
+        593943.1118113034,
+        968007.900488174
+      ],
+      "stress_Pa": [
+        0.0,
+        1000000000.0,
+        2000000000.0,
+        5000000000.0,
+        10000000000.0,
+        20000000000.0,
+        30000000000.0
+      ],
+      "temperature_K": 300.0
+    }
+  },
+  "random_owner": "PCG64_SEED_SEQUENCE_[seed,1]_PER_AMPLITUDE",
+  "reduced_config": {
+    "G_Pa": 160000000000.0,
+    "Kdot_MPa_sqrt_m_s": 0.005,
+    "Kmax_MPa_sqrt_m": 80.0,
+    "b_m": 2.74e-10,
+    "blunting_length_um": 0.8204647996828617,
+    "checkpoint_da_um": 5.0,
+    "cleavage_hits": 3.273241435177624,
+    "cleavage_tau_s": 6.992153587194454e-07,
+    "crystal_theta_deg": 45.0,
+    "drive_factors": [
+      0.132886,
+      0.008596
+    ],
+    "forest_density_floor_m2": 5000000000000.0,
+    "max_action_substep": 0.01,
+    "max_dK_step_MPa_sqrt_m": 0.01,
+    "max_internal_steps": 100000,
+    "max_outer_steps": 2000000,
+    "max_translation_substep_m": 5e-08,
+    "mobile_shield_fraction": 0.0,
+    "mpz_length_um": 50.0,
+    "mpz_n_bins": 80,
+    "poisson": 0.28,
+    "r0_m": 1e-06,
+    "shielding_core_m": 2.5e-10,
+    "source_bin_count": 2,
+    "target_extension_um": 100.0,
+    "transport_mode": "validated_scalar",
+    "wake_length_um": 50.0,
+    "wake_n_bins": 0
+  },
+  "schema": "r9.production-preflight/1",
+  "source_head": "97aaf1cc2a0963f118deab398a17c6cbf3111acd",
+  "source_tree": "e7823788ef1ce8ac8722799b6ff87120e6ea98a6",
+  "waveform": {
+    "R": 0.1,
+    "frequency_Hz": 1000.0,
+    "phase_count": 64,
+    "start_phase": "KMAX_COSINE_PHASE_ZERO",
+    "temperature_K": 300.0
+  }
+}
