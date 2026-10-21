@@ -1,0 +1,532 @@
+{
+  "assumptions": {
+    "attempt_frequency_s-1": 1000000000000.0,
+    "barrier_representation": "dimensionless effective Gstar/kBT at the unresolved test temperature",
+    "cooperative_hits": 3.273241435177624,
+    "cooperative_tau_s": 6.992153587194454e-07,
+    "event_length_m": 5e-06,
+    "frequency_basis": "provisional reasonable laboratory fatigue frequency authorized by user; not source metadata",
+    "frequency_nominal_Hz": 10.0,
+    "frequency_sensitivity_Hz": [
+      1.0,
+      10.0,
+      20.0
+    ],
+    "local_stress_mapping": "existing K/sqrt(2*pi*r0) mapping",
+    "phase_steps": 32,
+    "temperature_K": null,
+    "tip_radius_m": 1e-06,
+    "waveform": "cosine/sinusoidal existing FatigueWaveform convention; provisional because source waveform remains unresolved"
+  },
+  "calibration_sha256": "a939960d351c1406a65641b0ee9eba57bca34e38a4de0618ab6ab3685f6c704b",
+  "data_informed_model_stress_interval_Pa": [
+    802373667.2224263,
+    24012320129.399727
+  ],
+  "frequency_sensitivity": [
+    {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.778224690813797,
+          "observed_loglog_slope": 3.7092045452619558,
+          "points": 248,
+          "predicted_loglog_slope": 3.3838568101779223,
+          "rmse_log10_rate": 0.7792552791237969
+        },
+        "0.3": {
+          "bias_log10_rate": -0.3721419665645443,
+          "observed_loglog_slope": 3.3783824529342126,
+          "points": 219,
+          "predicted_loglog_slope": 3.173444610002923,
+          "rmse_log10_rate": 0.37280570329629575
+        },
+        "0.5": {
+          "bias_log10_rate": 0.17122021907675292,
+          "observed_loglog_slope": 3.7618960539977753,
+          "points": 171,
+          "predicted_loglog_slope": 2.9505976511494754,
+          "rmse_log10_rate": 0.1826124488974369
+        },
+        "0.7": {
+          "bias_log10_rate": 0.9800845910491417,
+          "observed_loglog_slope": 2.9204577070033,
+          "points": 122,
+          "predicted_loglog_slope": 2.5627317568669588,
+          "rmse_log10_rate": 0.9803552802770545
+        }
+      },
+      "frequency_Hz": 1.0,
+      "optimizer": {
+        "function_evaluations": 29,
+        "message": "`ftol` termination condition is satisfied.",
+        "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+        "status": 2,
+        "success": true,
+        "weighted_cost": 0.05778428419562703
+      },
+      "optimizer_support_points": 160,
+      "parameter_boundary_flags": {
+        "exponent": false,
+        "g_amplitude": false,
+        "g_floor": false,
+        "sigma_b": false
+      },
+      "parameters": {
+        "exponent": 0.23726390961227323,
+        "g_amplitude_Gstar_over_kBT": 34.59052549008311,
+        "g_floor_Gstar_over_kBT": 17.197170691491998,
+        "sigma_b_Pa": 100001051.79176795,
+        "smoothing_ratio": 0.0001
+      },
+      "test_bias_log10_rate": null,
+      "test_points": 0,
+      "test_rmse_log10_rate": null,
+      "train_bias_log10_rate": -0.16532873214386426,
+      "train_points": 760,
+      "train_rmse_log10_rate": 0.6324439808744754
+    },
+    {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.7782233244332286,
+          "observed_loglog_slope": 3.7092045452619558,
+          "points": 248,
+          "predicted_loglog_slope": 3.383884030747628,
+          "rmse_log10_rate": 0.779253735583971
+        },
+        "0.3": {
+          "bias_log10_rate": -0.3721388931478856,
+          "observed_loglog_slope": 3.3783824529342126,
+          "points": 219,
+          "predicted_loglog_slope": 3.173455909884554,
+          "rmse_log10_rate": 0.37280257558574914
+        },
+        "0.5": {
+          "bias_log10_rate": 0.17122419808481223,
+          "observed_loglog_slope": 3.7618960539977753,
+          "points": 171,
+          "predicted_loglog_slope": 2.9505999126846634,
+          "rmse_log10_rate": 0.18261614973765394
+        },
+        "0.7": {
+          "bias_log10_rate": 0.9800889245498262,
+          "observed_loglog_slope": 2.9204577070033,
+          "points": 122,
+          "predicted_loglog_slope": 2.5627277817310214,
+          "rmse_log10_rate": 0.9803596139207162
+        }
+      },
+      "frequency_Hz": 10.0,
+      "optimizer": {
+        "function_evaluations": 38,
+        "message": "`ftol` termination condition is satisfied.",
+        "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+        "status": 2,
+        "success": true,
+        "weighted_cost": 0.05778427681583274
+      },
+      "optimizer_support_points": 160,
+      "parameter_boundary_flags": {
+        "exponent": false,
+        "g_amplitude": false,
+        "g_floor": false,
+        "sigma_b": true
+      },
+      "parameters": {
+        "exponent": 0.23696216037426882,
+        "g_amplitude_Gstar_over_kBT": 34.58728544189939,
+        "g_floor_Gstar_over_kBT": 16.487088086204288,
+        "sigma_b_Pa": 100000596.49194993,
+        "smoothing_ratio": 0.0001
+      },
+      "test_bias_log10_rate": null,
+      "test_points": 0,
+      "test_rmse_log10_rate": null,
+      "train_bias_log10_rate": -0.16532580972532362,
+      "train_points": 760,
+      "train_rmse_log10_rate": 0.6324441477908818
+    },
+    {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.7782181875476168,
+          "observed_loglog_slope": 3.7092045452619558,
+          "points": 248,
+          "predicted_loglog_slope": 3.3840222797114254,
+          "rmse_log10_rate": 0.7792477231543822
+        },
+        "0.3": {
+          "bias_log10_rate": -0.37212577104687955,
+          "observed_loglog_slope": 3.3783824529342126,
+          "points": 219,
+          "predicted_loglog_slope": 3.173527791094102,
+          "rmse_log10_rate": 0.37278908949831124
+        },
+        "0.5": {
+          "bias_log10_rate": 0.17124300926703445,
+          "observed_loglog_slope": 3.7618960539977753,
+          "points": 171,
+          "predicted_loglog_slope": 2.950615988734919,
+          "rmse_log10_rate": 0.18263354190258843
+        },
+        "0.7": {
+          "bias_log10_rate": 0.9801084473661195,
+          "observed_loglog_slope": 2.9204577070033,
+          "points": 122,
+          "predicted_loglog_slope": 2.5626500235048115,
+          "rmse_log10_rate": 0.9803792188708202
+        }
+      },
+      "frequency_Hz": 20.0,
+      "optimizer": {
+        "function_evaluations": 42,
+        "message": "`ftol` termination condition is satisfied.",
+        "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+        "status": 2,
+        "success": true,
+        "weighted_cost": 0.057784273334568266
+      },
+      "optimizer_support_points": 160,
+      "parameter_boundary_flags": {
+        "exponent": false,
+        "g_amplitude": false,
+        "g_floor": false,
+        "sigma_b": true
+      },
+      "parameters": {
+        "exponent": 0.23684685825211044,
+        "g_amplitude_Gstar_over_kBT": 34.59234257714102,
+        "g_floor_Gstar_over_kBT": 16.27241446301589,
+        "sigma_b_Pa": 100000007.58962768,
+        "smoothing_ratio": 0.0001
+      },
+      "test_bias_log10_rate": null,
+      "test_points": 0,
+      "test_rmse_log10_rate": null,
+      "train_bias_log10_rate": -0.165312985799666,
+      "train_points": 760,
+      "train_rmse_log10_rate": 0.6324454481467501
+    }
+  ],
+  "leave_one_R_out": [
+    {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.992084687559641,
+          "observed_loglog_slope": 3.7092045452619558,
+          "points": 248,
+          "predicted_loglog_slope": 2.924101589368125,
+          "rmse_log10_rate": 0.9979162336333515
+        },
+        "0.3": {
+          "bias_log10_rate": -0.6266825487186911,
+          "observed_loglog_slope": 3.3783824529342126,
+          "points": 219,
+          "predicted_loglog_slope": 3.114090129293692,
+          "rmse_log10_rate": 0.6275905485702162
+        },
+        "0.5": {
+          "bias_log10_rate": -0.10112065632763866,
+          "observed_loglog_slope": 3.7618960539977753,
+          "points": 171,
+          "predicted_loglog_slope": 3.158630882791816,
+          "rmse_log10_rate": 0.11180494338317366
+        },
+        "0.7": {
+          "bias_log10_rate": 0.7279464623343169,
+          "observed_loglog_slope": 2.9204577070033,
+          "points": 122,
+          "predicted_loglog_slope": 2.757262846305659,
+          "rmse_log10_rate": 0.728211979786557
+        }
+      },
+      "frequency_Hz": 10.0,
+      "held_out_R": 0.1,
+      "optimizer": {
+        "function_evaluations": 73,
+        "message": "`ftol` termination condition is satisfied.",
+        "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+        "status": 2,
+        "success": true,
+        "weighted_cost": 0.031211189605126935
+      },
+      "optimizer_support_points": 120,
+      "parameter_boundary_flags": {
+        "exponent": false,
+        "g_amplitude": false,
+        "g_floor": false,
+        "sigma_b": false
+      },
+      "parameters": {
+        "exponent": 1.87301366365982,
+        "g_amplitude_Gstar_over_kBT": 1.5681093867535136,
+        "g_floor_Gstar_over_kBT": 17.255691394845538,
+        "sigma_b_Pa": 12637710786.548563,
+        "smoothing_ratio": 0.0001
+      },
+      "test_bias_log10_rate": -0.992084687559641,
+      "test_points": 248,
+      "test_rmse_log10_rate": 0.9979162336333515,
+      "train_bias_log10_rate": -0.12837039452467353,
+      "train_points": 512,
+      "train_rmse_log10_rate": 0.5468138792636411
+    },
+    {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.8985220240926985,
+          "observed_loglog_slope": 3.7092045452619558,
+          "points": 248,
+          "predicted_loglog_slope": 3.336456043204466,
+          "rmse_log10_rate": 0.8996859639412979
+        },
+        "0.3": {
+          "bias_log10_rate": -0.49509631115788505,
+          "observed_loglog_slope": 3.3783824529342126,
+          "points": 219,
+          "predicted_loglog_slope": 3.1421720988052764,
+          "rmse_log10_rate": 0.49573287917696895
+        },
+        "0.5": {
+          "bias_log10_rate": 0.046061679271643265,
+          "observed_loglog_slope": 3.7618960539977753,
+          "points": 171,
+          "predicted_loglog_slope": 2.9333175304338153,
+          "rmse_log10_rate": 0.07937119295059324
+        },
+        "0.7": {
+          "bias_log10_rate": 0.8534263294918786,
+          "observed_loglog_slope": 2.9204577070033,
+          "points": 122,
+          "predicted_loglog_slope": 2.569849512982461,
+          "rmse_log10_rate": 0.8537258813839127
+        }
+      },
+      "frequency_Hz": 10.0,
+      "held_out_R": 0.3,
+      "optimizer": {
+        "function_evaluations": 24,
+        "message": "`ftol` termination condition is satisfied.",
+        "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+        "status": 2,
+        "success": true,
+        "weighted_cost": 0.051733428721736384
+      },
+      "optimizer_support_points": 120,
+      "parameter_boundary_flags": {
+        "exponent": false,
+        "g_amplitude": false,
+        "g_floor": false,
+        "sigma_b": true
+      },
+      "parameters": {
+        "exponent": 0.22991090786623153,
+        "g_amplitude_Gstar_over_kBT": 32.80060488909854,
+        "g_floor_Gstar_over_kBT": 16.522667756011803,
+        "sigma_b_Pa": 100000000.00000793,
+        "smoothing_ratio": 0.0001
+      },
+      "test_bias_log10_rate": -0.49509631115788505,
+      "test_points": 219,
+      "test_rmse_log10_rate": 0.49573287917696895,
+      "train_bias_log10_rate": -0.20487782369968396,
+      "train_points": 541,
+      "train_rmse_log10_rate": 0.7330796756110007
+    },
+    {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.7055232844737703,
+          "observed_loglog_slope": 3.7092045452619558,
+          "points": 248,
+          "predicted_loglog_slope": 3.3187797274221933,
+          "rmse_log10_rate": 0.7070365107943187
+        },
+        "0.3": {
+          "bias_log10_rate": -0.3016876400478222,
+          "observed_loglog_slope": 3.3783824529342126,
+          "points": 219,
+          "predicted_loglog_slope": 2.9792218934353407,
+          "rmse_log10_rate": 0.304522594802596
+        },
+        "0.5": {
+          "bias_log10_rate": 0.23379796946749165,
+          "observed_loglog_slope": 3.7618960539977753,
+          "points": 171,
+          "predicted_loglog_slope": 2.6491225814155053,
+          "rmse_log10_rate": 0.2492626394705679
+        },
+        "0.7": {
+          "bias_log10_rate": 1.0091028967971762,
+          "observed_loglog_slope": 2.9204577070033,
+          "points": 122,
+          "predicted_loglog_slope": 2.0600902330690034,
+          "rmse_log10_rate": 1.0102270302345426
+        }
+      },
+      "frequency_Hz": 10.0,
+      "held_out_R": 0.5,
+      "optimizer": {
+        "function_evaluations": 14,
+        "message": "`ftol` termination condition is satisfied.",
+        "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+        "status": 2,
+        "success": true,
+        "weighted_cost": 0.05351376287770952
+      },
+      "optimizer_support_points": 120,
+      "parameter_boundary_flags": {
+        "exponent": false,
+        "g_amplitude": false,
+        "g_floor": false,
+        "sigma_b": true
+      },
+      "parameters": {
+        "exponent": 0.29835056929288273,
+        "g_amplitude_Gstar_over_kBT": 55.54767232678349,
+        "g_floor_Gstar_over_kBT": 16.913054626748682,
+        "sigma_b_Pa": 100000000.00009882,
+        "smoothing_ratio": 0.0001
+      },
+      "test_bias_log10_rate": 0.23379796946749165,
+      "test_points": 171,
+      "test_rmse_log10_rate": 0.2492626394705679,
+      "train_bias_log10_rate": -0.20021870001818787,
+      "train_points": 589,
+      "train_rmse_log10_rate": 0.6755394745619987
+    },
+    {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.46349224090432856,
+          "observed_loglog_slope": 3.7092045452619558,
+          "points": 248,
+          "predicted_loglog_slope": 3.5814674447139607,
+          "rmse_log10_rate": 0.46436219997377637
+        },
+        "0.3": {
+          "bias_log10_rate": -0.04753338492088522,
+          "observed_loglog_slope": 3.3783824529342126,
+          "points": 219,
+          "predicted_loglog_slope": 3.4670590055595967,
+          "rmse_log10_rate": 0.049920647788025636
+        },
+        "0.5": {
+          "bias_log10_rate": 0.5103885243084665,
+          "observed_loglog_slope": 3.7618960539977753,
+          "points": 171,
+          "predicted_loglog_slope": 3.341522598087732,
+          "rmse_log10_rate": 0.5115698251978228
+        },
+        "0.7": {
+          "bias_log10_rate": 1.360295385323934,
+          "observed_loglog_slope": 2.9204577070033,
+          "points": 122,
+          "predicted_loglog_slope": 3.1282402582663456,
+          "rmse_log10_rate": 1.360392090796367
+        }
+      },
+      "frequency_Hz": 10.0,
+      "held_out_R": 0.7,
+      "optimizer": {
+        "function_evaluations": 15,
+        "message": "`ftol` termination condition is satisfied.",
+        "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+        "status": 2,
+        "success": true,
+        "weighted_cost": 0.01614154812356078
+      },
+      "optimizer_support_points": 120,
+      "parameter_boundary_flags": {
+        "exponent": false,
+        "g_amplitude": false,
+        "g_floor": false,
+        "sigma_b": true
+      },
+      "parameters": {
+        "exponent": 0.15982694273380596,
+        "g_amplitude_Gstar_over_kBT": 29.029143196045705,
+        "g_floor_Gstar_over_kBT": 15.047960263919697,
+        "sigma_b_Pa": 100000000.0000065,
+        "smoothing_ratio": 0.0001
+      },
+      "test_bias_log10_rate": 1.360295385323934,
+      "test_points": 122,
+      "test_rmse_log10_rate": 1.360392090796367,
+      "train_bias_log10_rate": -0.05968565734357302,
+      "train_points": 638,
+      "train_rmse_log10_rate": 0.39346920264061025
+    }
+  ],
+  "limitations": [
+    "No absolute barrier energy or activation volume in SI units is identified without test temperature.",
+    "No QSTE340TM EXP_floor plasticity surface is assigned; this is opening-reference only.",
+    "The overload and closure histories are not fitted or replayed.",
+    "The frequency and waveform are modeling assumptions, not recovered observations."
+  ],
+  "nominal_fit": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": -0.7782233244332286,
+        "observed_loglog_slope": 3.7092045452619558,
+        "points": 248,
+        "predicted_loglog_slope": 3.383884030747628,
+        "rmse_log10_rate": 0.779253735583971
+      },
+      "0.3": {
+        "bias_log10_rate": -0.3721388931478856,
+        "observed_loglog_slope": 3.3783824529342126,
+        "points": 219,
+        "predicted_loglog_slope": 3.173455909884554,
+        "rmse_log10_rate": 0.37280257558574914
+      },
+      "0.5": {
+        "bias_log10_rate": 0.17122419808481223,
+        "observed_loglog_slope": 3.7618960539977753,
+        "points": 171,
+        "predicted_loglog_slope": 2.9505999126846634,
+        "rmse_log10_rate": 0.18261614973765394
+      },
+      "0.7": {
+        "bias_log10_rate": 0.9800889245498262,
+        "observed_loglog_slope": 2.9204577070033,
+        "points": 122,
+        "predicted_loglog_slope": 2.5627277817310214,
+        "rmse_log10_rate": 0.9803596139207162
+      }
+    },
+    "frequency_Hz": 10.0,
+    "optimizer": {
+      "function_evaluations": 38,
+      "message": "`ftol` termination condition is satisfied.",
+      "objective": "block-balanced absolute log-rate (weight 0.25) plus within-R centered shape (weight 1.0)",
+      "status": 2,
+      "success": true,
+      "weighted_cost": 0.05778427681583274
+    },
+    "optimizer_support_points": 160,
+    "parameter_boundary_flags": {
+      "exponent": false,
+      "g_amplitude": false,
+      "g_floor": false,
+      "sigma_b": true
+    },
+    "parameters": {
+      "exponent": 0.23696216037426882,
+      "g_amplitude_Gstar_over_kBT": 34.58728544189939,
+      "g_floor_Gstar_over_kBT": 16.487088086204288,
+      "sigma_b_Pa": 100000596.49194993,
+      "smoothing_ratio": 0.0001
+    },
+    "test_bias_log10_rate": null,
+    "test_points": 0,
+    "test_rmse_log10_rate": null,
+    "train_bias_log10_rate": -0.16532580972532362,
+    "train_points": 760,
+    "train_rmse_log10_rate": 0.6324441477908818
+  },
+  "schema": "qste340tm-conditional-opening-reference/1",
+  "source_csv": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/normalized/qste340tm_constant_amplitude.csv",
+  "source_csv_sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd",
+  "status": "CONDITIONAL_OPENING_REFERENCE_NOT_COMPLETE_MATERIAL"
+}
