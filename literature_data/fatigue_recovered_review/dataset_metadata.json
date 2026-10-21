@@ -1,0 +1,113 @@
+{
+  "schema": "recovered-fatigue-data/1",
+  "date": "2026-10-20",
+  "scope": "Actual supplied measurements normalized; no barrier fit or native model execution.",
+  "source_archive_sha256": "4074cc69440b9b9b50c47acb0b20757b86bf8d18625ed964153e2ff47ce90cd5",
+  "primary_sources": [
+    {
+      "id": "lu2019",
+      "paper_doi": "10.1016/j.engfracmech.2019.03.029",
+      "dataset_doi": "10.17632/8pcx2mgfd4.1",
+      "url": "https://data.mendeley.com/datasets/8pcx2mgfd4/1",
+      "verified_online": "Dataset describes both experiments and model-predicted growth rates. Publisher confirms four load-ratio overload/closure study."
+    },
+    {
+      "id": "weihrauch2024",
+      "paper_doi": "10.1111/ffe.14223",
+      "url": "https://onlinelibrary.wiley.com/doi/10.1111/ffe.14223",
+      "verified_online": "Methods sections 2.1 and 2.3 and supplement file listing; no drawing downloaded."
+    }
+  ],
+  "qste340tm": {
+    "material_identity_source": "Mendeley author dataset title and matching supplied RAR filename",
+    "R_values": [
+      0.1,
+      0.3,
+      0.5,
+      0.7
+    ],
+    "overload_ratio_labels": [
+      1.5,
+      2.0
+    ],
+    "R_and_overload_ratio_source": "fig3/4/5 row 3, parsed independently per workbook",
+    "frequency_Hz": null,
+    "temperature_K": null,
+    "waveform": null,
+    "force_schedule": null,
+    "overload_cycle": null,
+    "specimen_geometry": null,
+    "overload_ratio_definition": "Label retained as OLR; exact force-ratio definition must be read from original methods.",
+    "K_definition": "Headers identify DeltaK or SIF Range in MPa sqrt(m). No effective-K substitution performed.",
+    "known_units": {
+      "crack_length": "mm",
+      "growth_rate": "mm/cycle",
+      "closure_load": "kN"
+    },
+    "primary_views": {
+      "growth_history": "normalized/qste340tm_crack_histories.csv",
+      "growth_rate": "normalized/qste340tm_growth_rates.csv",
+      "closure_load": "normalized/qste340tm_closure_loads.csv",
+      "initial_rate_fit": "normalized/qste340tm_constant_amplitude.csv"
+    },
+    "data_level_import_ready": true,
+    "absolute_Gstar_calibration_ready": false,
+    "missing_before_kinetic_calibration": [
+      "test frequency and waveform",
+      "test temperature or stated interval",
+      "material-specific plasticity/local-stress mapping",
+      "force schedule and overload timing for history validation",
+      "geometry and load convention for comparing closure force to model opening observables"
+    ],
+    "selected_source_policy": "fig3/4/5 primary; later comparisons remain separate; 14 extra experimental-labeled fig15 tail points retained for reconciliation."
+  },
+  "steel316ln": {
+    "material_identity_source": "Published article and matching Supplementary Data S1 filename",
+    "specimens": [
+      "A15",
+      "B3",
+      "B7",
+      "B42 (outlier)",
+      "A1 (1 dpa)",
+      "B5 (1 dpa)",
+      "A6 (3 dpa)"
+    ],
+    "nominal_force_min_N": 300,
+    "nominal_force_max_N": 600,
+    "R": 0.5,
+    "frequency_Hz": 20,
+    "waveform": "sinusoidal",
+    "protocol_source": "Online article section 2.3, not workbook; precracking at 80 Hz is not this test frequency.",
+    "temperature_K": null,
+    "width_W_mm": null,
+    "thickness_nominal_mm": 0.8,
+    "specimen_source": "Online section 2.1; 25 x 24 mm outside dimensions not used as CT W.",
+    "reported_crack_coordinate": "Workbook says Crack Length (mm). Values retained unchanged, starting near 1 mm.",
+    "coordinate_note": "Paper describes distance from grip-hole center; numerical origin/notch correction not verified without drawing. No offset inferred.",
+    "author_labeled_outlier": "B42 (outlier) retained in full table; optional primary unirradiated view excludes it transparently.",
+    "primary_unirradiated_specimens": [
+      "A15",
+      "B3",
+      "B7"
+    ],
+    "data_level_import_ready": true,
+    "absolute_Gstar_calibration_ready": false,
+    "missing_before_kinetic_calibration": [
+      "CT dimension W and source drawing",
+      "unambiguous mapping of reported crack coordinate into geometry",
+      "test temperature or stated interval",
+      "material-specific plasticity/local-stress mapping"
+    ],
+    "plastic_zone_series_available_in_upload": false,
+    "nanoindentation_workbook_available_in_upload": false
+  },
+  "processing_rules": [
+    "All source row order retained; no sorting by DeltaK, interpolation, smoothing, or clipping.",
+    "Original units retained beside SI conversions: mm to m is 1e-3, kN to N is 1e3, MPa sqrt(m) to Pa sqrt(m) is 1e6.",
+    "Author-derived growth rates are not raw instantaneous events. Crack-history and derived-rate views of the same experiment are correlated.",
+    "Negative measured increments retained and flagged; not interpreted as physical crack healing.",
+    "No author model predictions or secondary-material reference data enter primary calibration files.",
+    "Unknown parameters remain null. No default 300 K, 1000 Hz, absolute source-coordinate offset, closure correction, or forced Paris exponent.",
+    "Full dataset, source workbooks, partial pairs, duplicates, and outlier all preserved."
+  ]
+}

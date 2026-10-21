@@ -1,0 +1,56 @@
+{
+  "source_zip": "/mnt/data/fatigue_data.zip",
+  "source_zip_sha256": "4074cc69440b9b9b50c47acb0b20757b86bf8d18625ed964153e2ff47ce90cd5",
+  "zip_crc_test": "PASS",
+  "apple_metadata_entries_excluded_from_dataset": 2,
+  "nested_rar": "raw/data_Lu Yun-chao_20181223.rar",
+  "rar_file_crc_checks": [
+    {
+      "filename": "fig10.xlsx",
+      "expected_crc32": 2266708588,
+      "computed_crc32": 2266708588
+    },
+    {
+      "filename": "fig12.xlsx",
+      "expected_crc32": 1025457065,
+      "computed_crc32": 1025457065
+    },
+    {
+      "filename": "fig13.xlsx",
+      "expected_crc32": 1462247116,
+      "computed_crc32": 1462247116
+    },
+    {
+      "filename": "fig14.xlsx",
+      "expected_crc32": 3033761645,
+      "computed_crc32": 3033761645
+    },
+    {
+      "filename": "fig15.xlsx",
+      "expected_crc32": 1536992927,
+      "computed_crc32": 1536992927
+    },
+    {
+      "filename": "fig16.xlsx",
+      "expected_crc32": 3866368012,
+      "computed_crc32": 3866368012
+    },
+    {
+      "filename": "fig3.xlsx",
+      "expected_crc32": 1138587915,
+      "computed_crc32": 1138587915
+    },
+    {
+      "filename": "fig4.xlsx",
+      "expected_crc32": 3538530841,
+      "computed_crc32": 3538530841
+    },
+    {
+      "filename": "fig5.xlsx",
+      "expected_crc32": 874321700,
+      "computed_crc32": 874321700
+    }
+  ],
+  "publisher_original_checksums_verified": false,
+  "note": "Checks establish integrity of the supplied bytes, not independent publisher authenticity."
+}

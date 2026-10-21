@@ -1,0 +1,13 @@
+block_id,role,R,overload_ratio,points,recommended_use,likelihood_independence
+CA_R0.1,constant_amplitude_rate_and_shape,0.1,,248,one complete R block held out; rotate over four folds,one block; not independent of its matching a(N) history
+CA_R0.3,constant_amplitude_rate_and_shape,0.3,,219,one complete R block held out; rotate over four folds,one block; not independent of its matching a(N) history
+CA_R0.5,constant_amplitude_rate_and_shape,0.5,,171,one complete R block held out; rotate over four folds,one block; not independent of its matching a(N) history
+CA_R0.7,constant_amplitude_rate_and_shape,0.7,,122,one complete R block held out; rotate over four folds,one block; not independent of its matching a(N) history
+OL_R0.1_OLR1.5,paired_history_mechanism_validation,0.1,1.5,248,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"
+OL_R0.1_OLR2.0,paired_history_mechanism_validation,0.1,2.0,242,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"
+OL_R0.3_OLR1.5,paired_history_mechanism_validation,0.3,1.5,226,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"
+OL_R0.3_OLR2.0,paired_history_mechanism_validation,0.3,2.0,247,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"
+OL_R0.5_OLR1.5,paired_history_mechanism_validation,0.5,1.5,196,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"
+OL_R0.5_OLR2.0,paired_history_mechanism_validation,0.5,2.0,226,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"
+OL_R0.7_OLR1.5,paired_history_mechanism_validation,0.7,1.5,129,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"
+OL_R0.7_OLR2.0,paired_history_mechanism_validation,0.7,2.0,122,hold out as a complete protocol history; no barrier refit,"growth-rate, a(N), and closure views are correlated observations"

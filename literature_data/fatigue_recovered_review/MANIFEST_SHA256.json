@@ -1,0 +1,214 @@
+{
+  "schema": "fatigue-import-manifest/1",
+  "self_excluded": true,
+  "files": {
+    "CODEX_DATA_HANDOFF.md": {
+      "bytes": 3447,
+      "sha256": "39f34fd43064e9be092a049db34e50c0ca7de1baecc416d81766b234c570cf98"
+    },
+    "README.md": {
+      "bytes": 12895,
+      "sha256": "ef2233ccd69151b5aa0c839d7eb1d0d218998d0d0882ca5f393b90368d6b8469"
+    },
+    "audit/316ln_specimen_inventory.csv": {
+      "bytes": 862,
+      "sha256": "498672c4d93f135eec2fa617fe7465c1b24ba4bfeae5f7468f0ab36d9c4cade8"
+    },
+    "audit/archive_integrity.json": {
+      "bytes": 1494,
+      "sha256": "b47419d95f6990210924ab234b01ed76fa175ef257b1ae073543a59aa7ec2737"
+    },
+    "audit/data_verification.json": {
+      "bytes": 413,
+      "sha256": "90de07e43e6886e927c166e4709cef8b27eb54b6c20ef0e9755005fc7a063dd7"
+    },
+    "audit/duplicate_curve_audit.csv": {
+      "bytes": 604,
+      "sha256": "f85fd445263e4307329bf39d15e28fccdbd4c92bb0049bfa41bc6d542f47f41f"
+    },
+    "audit/series_inventory.csv": {
+      "bytes": 15646,
+      "sha256": "f9e23d1511ae7726baf0cb6354174aa1d2119fa6192a227e608e1f22acea25cf"
+    },
+    "audit/source_inventory.csv": {
+      "bytes": 1115,
+      "sha256": "645cf12e6180e6538110e0673173e521fefa66b1de6ea9bc1bac54acfe773ec3"
+    },
+    "audit/unpaired_cells.csv": {
+      "bytes": 167,
+      "sha256": "52a6aef6b8ded864e1084d634e11cf76395fde14e4b67a30e9be7723e9aff235"
+    },
+    "dataset_metadata.json": {
+      "bytes": 5136,
+      "sha256": "325d9b6c53aa992b175c89daca13ed6c7573c5361ac5cf39ebdb9556a3be60db"
+    },
+    "figures/qste340tm_R01_overload_comparison.png": {
+      "bytes": 124131,
+      "sha256": "2be859dea4caeb2bc7c12387d4afcf998f797d191bfa8fb691e6f23253c589e9"
+    },
+    "figures/qste340tm_R01_overload_comparison.svg": {
+      "bytes": 118855,
+      "sha256": "58aa3f85d1d632bcedb65dc411186cb719b0f4e1b4713b6c86ad415db570de23"
+    },
+    "figures/qste340tm_constant_amplitude.png": {
+      "bytes": 103764,
+      "sha256": "e54ed8d4275b0e568ff074cda87498502b169178c55f54dd197d1a9130800b13"
+    },
+    "figures/qste340tm_constant_amplitude.svg": {
+      "bytes": 113108,
+      "sha256": "0fd742f8f7ace5802999e77c9dc483d5613bfdebbfcdd916fd75849a384487cb"
+    },
+    "figures/steel316ln_unirradiated_histories.png": {
+      "bytes": 124637,
+      "sha256": "437ef77363b3045f1894874437f3a6316d3f5dfad2634f4ef5c914430f612957"
+    },
+    "figures/steel316ln_unirradiated_histories.svg": {
+      "bytes": 46796,
+      "sha256": "dbcaf37cd9d76de49fe6fc08ff7d2cf35915148798279bce71ffac548d6b354d"
+    },
+    "normalized/lu_comparison_figures_NOT_PRIMARY_CALIBRATION.csv": {
+      "bytes": 1167159,
+      "sha256": "1ce9db7fc69c7afaaeaa625a038cd4d229f1266fd74aa1ada4b1f89e8f3eec30"
+    },
+    "normalized/lu_fig12_transformed_coordinates_NOT_PRIMARY.csv": {
+      "bytes": 3910,
+      "sha256": "ba36387980f38f8c6d1121e1bcd023e30ce0a753792e7967161bf06895150153"
+    },
+    "normalized/qste340tm_additional_fig15_points_REVIEW.csv": {
+      "bytes": 3181,
+      "sha256": "841f041dcf283174c86d900713072bdaca8bc1077e5aebcc6bb0f202fac60af2"
+    },
+    "normalized/qste340tm_closure_loads.csv": {
+      "bytes": 257661,
+      "sha256": "7ddac5591cd9c15da3ce1ef06ee31665abf03c5932de40d4c3829dbdd2fb35fd"
+    },
+    "normalized/qste340tm_constant_amplitude.csv": {
+      "bytes": 150153,
+      "sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd"
+    },
+    "normalized/qste340tm_crack_histories.csv": {
+      "bytes": 436948,
+      "sha256": "037218fd910439a3db6a49d919cc84af93fbbea3c2587cc3ef8bd8b548f0053d"
+    },
+    "normalized/qste340tm_growth_rates.csv": {
+      "bytes": 481762,
+      "sha256": "95a245e7e65bf2b071b8db063897d4337a20256f672bb5bb4760d3217795e887"
+    },
+    "normalized/qste340tm_overload.csv": {
+      "bytes": 331916,
+      "sha256": "1d5bb761e6db7df72e91096e6433e82a61f70d85b8a3a0b1a3c6a31318662584"
+    },
+    "normalized/steel316ln_crack_histories.csv": {
+      "bytes": 284520,
+      "sha256": "f5f994af9b8144b27b16e056331d4232681a1c213b922d5c55138ab996f4d60c"
+    },
+    "normalized/steel316ln_unirradiated_primary.csv": {
+      "bytes": 146377,
+      "sha256": "a4170cfa6c4e079f0fbab655fd68a95967182fa0878b7eee8332f715a4ce5ce4"
+    },
+    "plot_data.py": {
+      "bytes": 2353,
+      "sha256": "3d7cc14d3e1b1a713a708222d2c66612103d4b9937262b4afd3f113989629a10"
+    },
+    "raw/data_Lu Yun-chao_20181223.rar": {
+      "bytes": 291042,
+      "sha256": "b2ece34cd411d76fe8bdf8ff7e8d0684223d9dde3628fc1c0687be859552b108"
+    },
+    "raw/ffe14223-sup-0001-supplementary data - fatigue.xlsx": {
+      "bytes": 30808,
+      "sha256": "a484080146ae4bcd81b3f81841b16e61817287943060db022525a815a2bdc755"
+    },
+    "raw/lu_2019/fig10.xlsx": {
+      "bytes": 39031,
+      "sha256": "a336d120dae488b3eccf6468900522784d5237dcc2458711119dd8d79eeba9d8"
+    },
+    "raw/lu_2019/fig12.xlsx": {
+      "bytes": 12689,
+      "sha256": "feae1ff5457d5d273f8f6727d3c594256ccec1e93a86ec275cff42f509dec170"
+    },
+    "raw/lu_2019/fig13.xlsx": {
+      "bytes": 19941,
+      "sha256": "78100171d7432a6744f4ee1f2daeb3bd83fae7448468151257c3d12701be9272"
+    },
+    "raw/lu_2019/fig14.xlsx": {
+      "bytes": 27341,
+      "sha256": "d779b6309dde734adad33b1c7adf125f255b7fe7839cddb1135fb9609bbc61e5"
+    },
+    "raw/lu_2019/fig15.xlsx": {
+      "bytes": 57187,
+      "sha256": "06f28c8a24c191e4ff52a32ae0d944753b8e9ac781f5581e78664f88744ebcaa"
+    },
+    "raw/lu_2019/fig16.xlsx": {
+      "bytes": 19875,
+      "sha256": "414f32cba269145c6b45775863ca9ded26a23f44d8a7b18c809a5e1e8c70950f"
+    },
+    "raw/lu_2019/fig3.xlsx": {
+      "bytes": 46820,
+      "sha256": "d00a95999a4192ff5c2ba43cab1e105d2b378ab7de96c06bae2d7d6111f66c92"
+    },
+    "raw/lu_2019/fig4.xlsx": {
+      "bytes": 56158,
+      "sha256": "2b040be5ebc32761b39e58b0119bf425a156a09625e7aaab647a96462064b5df"
+    },
+    "raw/lu_2019/fig5.xlsx": {
+      "bytes": 36344,
+      "sha256": "5d721b70815c105d815aadef1a10d4a444c58e7c6fc27c93ab43be68e055d51c"
+    },
+    "raw_sheet_csv/316ln_Irradiated.csv": {
+      "bytes": 15650,
+      "sha256": "1d27b600ed5610beec23082820c3569a32f75718cc9d649b6498373805ed420f"
+    },
+    "raw_sheet_csv/316ln_Non-irradiated.csv": {
+      "bytes": 22401,
+      "sha256": "3ccd9aa79d588b830825b9aa78f2e1a54e00696d555375cad7192f334f5e347e"
+    },
+    "raw_sheet_csv/lu_fig10.csv": {
+      "bytes": 33528,
+      "sha256": "74b163786e141125c23464e2e90e5fe48c84eb1004d97437511a353229f9daf6"
+    },
+    "raw_sheet_csv/lu_fig12.csv": {
+      "bytes": 3631,
+      "sha256": "100df517d7ecd301b2304af1cded93ca1668304e935f53c60f692d11653f4fcf"
+    },
+    "raw_sheet_csv/lu_fig13.csv": {
+      "bytes": 10392,
+      "sha256": "a6c3e53291ec87f595e4f59ae6fdc8bf7e5b41ab5f0ae8948a349b69ea137f65"
+    },
+    "raw_sheet_csv/lu_fig14.csv": {
+      "bytes": 18352,
+      "sha256": "ba449f6e186a18717c49e4b8c05d7f9dbe164de66154d460cd295629acfcc2f7"
+    },
+    "raw_sheet_csv/lu_fig15.csv": {
+      "bytes": 55261,
+      "sha256": "25388179bfbe5a7c852f8575ad7d2125b9e99fc7cb565bea26891830a9d476a7"
+    },
+    "raw_sheet_csv/lu_fig16.csv": {
+      "bytes": 10440,
+      "sha256": "09ea40a25777fb5c2a4a05751408ff68012909402b5de77b473b60872956ab6f"
+    },
+    "raw_sheet_csv/lu_fig3.csv": {
+      "bytes": 37446,
+      "sha256": "b68e647a75758d2247372fd3513d1bb27a4b658d6e8d307259683d81714d0d99"
+    },
+    "raw_sheet_csv/lu_fig4.csv": {
+      "bytes": 51851,
+      "sha256": "93b69dec64302e4d05144a1e93fa04475095f3fa4ce62376c0ddcbc75866a445"
+    },
+    "raw_sheet_csv/lu_fig5.csv": {
+      "bytes": 24662,
+      "sha256": "4e505863eab856fdbec18cb3d8ca6db757e6367b5029efefab94c63b66db3945"
+    },
+    "verify_import.py": {
+      "bytes": 4793,
+      "sha256": "9f66d919aaddecdc921440da93f77e4dbe1ba86a02939f3896032af1dabdccd0"
+    },
+    "workbook_tables.json": {
+      "bytes": 549425,
+      "sha256": "ed4a3e0cc4487093f98f4b91ee8b0897db33830b586dfd01703a41b56866025a"
+    },
+    "workbook_tables_316ln.json": {
+      "bytes": 45571,
+      "sha256": "23fa3e4e188e5a30e056e66c9e84a72e694418fcb15131b014712c5e82ebe183"
+    }
+  }
+}

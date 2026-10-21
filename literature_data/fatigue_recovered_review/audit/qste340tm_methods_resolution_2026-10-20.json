@@ -1,0 +1,45 @@
+{
+  "schema": "qste340tm-methods-resolution/1",
+  "checked_on": "2026-10-20",
+  "paper": {
+    "title": "Effect of single overload on fatigue crack growth in QSTE340TM steel and retardation model modification",
+    "doi": "10.1016/j.engfracmech.2019.03.029",
+    "publisher_url": "https://www.sciencedirect.com/science/article/abs/pii/S0013794418314437",
+    "data_url": "https://data.mendeley.com/datasets/8pcx2mgfd4/1",
+    "full_text_recovered": false,
+    "access_note": "Publisher metadata and indexed primary-article method text were available; the full paywalled article and its dimensioned Fig. 1 were not present locally or available from the publisher text-mining endpoint without entitlement."
+  },
+  "resolved_from_primary_article": {
+    "material": "QSTE340TM automobile sheet steel",
+    "plate_thickness_mm": 2.5,
+    "youngs_modulus_GPa": 194,
+    "yield_strength_MPa": 365,
+    "ultimate_tensile_strength_MPa": 482,
+    "specimen_type": "compact tension (CT)",
+    "specimen_standard": "ASTM E647",
+    "crack_and_closure_measurement": "compliance using a crack-mouth clip gauge",
+    "experiment_scope": "four load-ratio groups with constant-amplitude and single-overload records; overload and closure observations are paired views of those experiments"
+  },
+  "still_unresolved": {
+    "temperature_K": null,
+    "temperature_interval_K": null,
+    "frequency_Hz": null,
+    "waveform": null,
+    "CT_width_W_mm": null,
+    "initial_crack_or_notch_geometry_mm": null,
+    "pin_and_load_line_geometry_mm": null,
+    "force_schedule_N": null,
+    "overload_ratio_definition": null,
+    "overload_cycle_or_crack_length": null,
+    "overload_pulse_sequence": null
+  },
+  "decisions": {
+    "infer_room_temperature": false,
+    "infer_waveform_or_frequency": false,
+    "infer_geometry_from_standard_only": false,
+    "treat_closure_force_as_K_open": false,
+    "fit_author_prediction_curves": false,
+    "absolute_kinetic_Gstar_fit_allowed_now": false,
+    "reason": "The existing Arrhenius clock requires physical time and waveform, while the mechanics and stateful overload comparison require the actual geometry/load history and a material-specific local-stress/plasticity mapping."
+  }
+}
