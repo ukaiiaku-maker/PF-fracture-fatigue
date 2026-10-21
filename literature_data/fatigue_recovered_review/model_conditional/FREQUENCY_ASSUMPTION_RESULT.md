@@ -2,6 +2,10 @@
 
 Date: 20 October 2026
 
+Temperature amendment: the user subsequently supplied the test condition as
+25 °C (298.15 K). `room_temperature_binding.json` records that provenance and
+converts the effective dimensionless barrier to eV without changing the fit.
+
 ## Decision
 
 Use **10 Hz** as the provisional nominal fatigue frequency, with **1 Hz and
@@ -35,9 +39,9 @@ The calculation uses the existing:
 - cooperative completion law (`hits = 3.273241435`, `tau = 6.9921536e-7 s`);
 - 5 micrometre renewal reward.
 
-Because the test temperature remains unresolved, the result is expressed as an
-effective `G*/kBT` surface. No Kelvin value, absolute energy, or SI activation
-volume is inferred. Optimization uses 160 evenly spaced, R-balanced support
+The fit is performed as an effective `G*/kBT` surface and then bound to the
+user-supplied 298.15 K for the reported eV scale. Optimization uses 160 evenly
+spaced, R-balanced support
 points to avoid treating dense neighboring author-reduced points as independent;
 all 760 points are evaluated. The objective includes both absolute log-rate and
 within-R curve shape.
@@ -74,6 +78,7 @@ and closure histories remain reserved for validation after a steel-specific
 plasticity prior/uncertainty model and physical closure observation map are
 defined.
 
-Machine-readable parameters, boundary flags, block metrics, holdouts, and exact
-predictions are in `conditional_opening_reference.json`, `leave_one_R_out.csv`,
-and `opening_reference_predictions.csv`.
+Machine-readable parameters, boundary flags, block metrics, holdouts, exact
+predictions, and temperature provenance are in `conditional_opening_reference.json`,
+`leave_one_R_out.csv`, `opening_reference_predictions.csv`, and
+`room_temperature_binding.json`.

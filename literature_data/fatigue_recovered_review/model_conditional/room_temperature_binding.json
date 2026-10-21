@@ -1,0 +1,39 @@
+{
+  "Gstar_eV_ranges_over_plotted_stress": {
+    "1.0": [
+      0.457352453219514,
+      1.3305594816438464
+    ],
+    "10.0": [
+      0.4391984860195808,
+      1.312232382930669
+    ],
+    "20.0": [
+      0.43372019022876546,
+      1.3068467947290126
+    ]
+  },
+  "claim_limit": "Absolute eV scaling uses the user-supplied 298.15 K, but the opening-reference fit remains non-transferable across R and is not a complete steel material.",
+  "conditional_calibration": "literature_data/fatigue_recovered_review/model_conditional/conditional_opening_reference.json",
+  "conditional_calibration_sha256": "7f13c35dfc49149ac47e2c071fb9ad8e97d7359c44a1ceed89e3f30a4fa5a9b8",
+  "data_informed_model_stress_interval_Pa": [
+    802373667.2224263,
+    24012320129.399727
+  ],
+  "figures": [
+    "qste340tm_deltaK_dadN_fit.png",
+    "qste340tm_deltaK_dadN_fit.svg",
+    "qste340tm_Gstar_vs_stress_298p15K.png",
+    "qste340tm_Gstar_vs_stress_298p15K.svg"
+  ],
+  "frequency_nominal_Hz": 10.0,
+  "frequency_sensitivity_Hz": [
+    1.0,
+    10.0,
+    20.0
+  ],
+  "schema": "qste340tm-room-temperature-binding/1",
+  "temperature_C": 25.0,
+  "temperature_K": 298.15,
+  "temperature_source": "user supplied"
+}
