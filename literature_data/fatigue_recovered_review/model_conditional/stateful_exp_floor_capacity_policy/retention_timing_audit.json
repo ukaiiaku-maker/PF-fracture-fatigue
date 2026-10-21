@@ -1,0 +1,103 @@
+{
+  "alternative_scope": "diagnostic midpoint-phase birth survival; not substituted into fit because it is not the current native process equation",
+  "native_identity": "mu_emit*exp(-mu_escape), verified in arrhenius_fracture/fatigue_v1.py",
+  "records": [
+    {
+      "DeltaK_MPa_sqrt_m": 27.12854,
+      "R": 0.1,
+      "birth_phase_over_native": 6.6596302978236785,
+      "birth_phase_store": 0.012180363855932227,
+      "location": "transition",
+      "mu_emit": 0.04155278323236147,
+      "mu_escape": 3.1232033413025335,
+      "native_full_cycle_store": 0.0018289849903398822,
+      "record_index": 124,
+      "retained_count": 214.6061726087595
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 45.43079,
+      "R": 0.1,
+      "birth_phase_over_native": 26.723427727015224,
+      "birth_phase_store": 0.013680364938103021,
+      "location": "upper",
+      "mu_emit": 0.07421464934843135,
+      "mu_escape": 4.9765405962953695,
+      "native_full_cycle_store": 0.0005119240345157249,
+      "record_index": 247,
+      "retained_count": 235.13324208527501
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 24.31239,
+      "R": 0.3,
+      "birth_phase_over_native": 12.225149955872162,
+      "birth_phase_store": 0.012930060270890387,
+      "location": "transition",
+      "mu_emit": 0.05500404908474141,
+      "mu_escape": 3.951347249765295,
+      "native_full_cycle_store": 0.0010576606681768866,
+      "record_index": 357,
+      "retained_count": 142.34486346741483
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 37.22898,
+      "R": 0.3,
+      "birth_phase_over_native": 75.39510924640417,
+      "birth_phase_store": 0.013985400627844431,
+      "location": "upper",
+      "mu_emit": 0.09679471672503188,
+      "mu_escape": 6.2573208490988765,
+      "native_full_cycle_store": 0.00018549479890184572,
+      "record_index": 466,
+      "retained_count": 158.10968665438406
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 20.13085,
+      "R": 0.5,
+      "birth_phase_over_native": 30.517137576724284,
+      "birth_phase_store": 0.013529237555592728,
+      "location": "transition",
+      "mu_emit": 0.0750811204636776,
+      "mu_escape": 5.1320044603208235,
+      "native_full_cycle_store": 0.0004433324561184142,
+      "record_index": 552,
+      "retained_count": 123.54491046643261
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 27.53624,
+      "R": 0.5,
+      "birth_phase_over_native": 241.91844561668327,
+      "birth_phase_store": 0.014131181748306982,
+      "location": "upper",
+      "mu_emit": 0.12192320127914616,
+      "mu_escape": 7.643608189388094,
+      "native_full_cycle_store": 5.841299828247765e-05,
+      "record_index": 637,
+      "retained_count": 134.32760095988567
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 14.68213,
+      "R": 0.7,
+      "birth_phase_over_native": 309.36265867061036,
+      "birth_phase_store": 0.014103752341262345,
+      "location": "transition",
+      "mu_emit": 0.1262384707657525,
+      "mu_escape": 7.926246099206423,
+      "native_full_cycle_store": 4.558970498207129e-05,
+      "record_index": 699,
+      "retained_count": 23.189402528002233
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 18.07004,
+      "R": 0.7,
+      "birth_phase_over_native": 4767.943648747127,
+      "birth_phase_store": 0.014185456792328282,
+      "location": "upper",
+      "mu_emit": 0.18877504223380281,
+      "mu_escape": 11.05800917322231,
+      "native_full_cycle_store": 2.975172912552311e-06,
+      "record_index": 759,
+      "retained_count": 25.158903633750583
+    }
+  ],
+  "schema": "qste340tm-retention-timing-audit/1"
+}

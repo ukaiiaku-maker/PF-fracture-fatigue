@@ -1,0 +1,397 @@
+{
+  "results": [
+    {
+      "all_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.23937375002918643,
+            "density_final_m2": 282935863102824.56,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.6314352158001024,
+            "retained_count_final": 277.93586310282456,
+            "rmse_log10_rate": 0.3056379114623071
+          },
+          "0.3": {
+            "bias_log10_rate": -0.031599125712020296,
+            "density_final_m2": 171224853449985.62,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.9191725906510246,
+            "retained_count_final": 166.22485344998563,
+            "rmse_log10_rate": 0.12742597922586593
+          },
+          "0.5": {
+            "bias_log10_rate": 0.06302827974555607,
+            "density_final_m2": 122937727931935.45,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.022551814995186,
+            "retained_count_final": 117.93772793193546,
+            "rmse_log10_rate": 0.17660314393375137
+          },
+          "0.7": {
+            "bias_log10_rate": -0.0314343234865977,
+            "density_final_m2": 19623777910791.203,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.389938878121,
+            "retained_count_final": 14.623777910791205,
+            "rmse_log10_rate": 0.138396652435869
+          }
+        },
+        "max_backstress_Pa": 1253742501.24355,
+        "max_density_m2": 282935863102824.56,
+        "max_retained_count": 277.93586310282456,
+        "max_tip_radius_m": 1.0689280940495005e-06,
+        "min_raw_opening_barrier_over_kBT": 16.879975982667016,
+        "overall_bias_log10_rate": 0.0781412234834618,
+        "overall_rmse_log10_rate": 0.21272912213302775
+      },
+      "candidate_starts": [
+        {
+          "heldout_rmse": 0.7562032405534228,
+          "nfev": 120,
+          "start": "historical_control",
+          "success": false,
+          "training_rmse": 0.3461145646713769
+        },
+        {
+          "heldout_rmse": 0.3056379114623071,
+          "nfev": 120,
+          "start": "complete_data_warm_start",
+          "success": false,
+          "training_rmse": 0.1480735154575436
+        }
+      ],
+      "held_out_R": 0.1,
+      "held_out_metrics": {
+        "bias_log10_rate": 0.23937375002918643,
+        "density_final_m2": 282935863102824.56,
+        "observed_loglog_slope": 3.7092045452619558,
+        "points": 248,
+        "predicted_loglog_slope": 3.6314352158001024,
+        "retained_count_final": 277.93586310282456,
+        "rmse_log10_rate": 0.3056379114623071
+      },
+      "optimizer": {
+        "cost": 0.033289842017205404,
+        "elapsed_s": 126.96000289916992,
+        "message": "The maximum number of function evaluations is exceeded.",
+        "nfev": 120,
+        "optimality": 0.004244144870585852,
+        "success": false
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 1.9999999999999998,
+        "emission_G0_298_eV": 0.6722783167860618,
+        "escape_G0_298_eV": 0.5696139583447267,
+        "initial_retained_count": 0.06710080072022936,
+        "opening_amplitude_over_kBT": 87.14188563035592,
+        "opening_exponent": 5.599161976911565,
+        "opening_floor_over_kBT": 18.169585717194177,
+        "opening_sigma_b_Pa": 2524992271.4600387,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 19999999999.992847,
+        "recovery_per_s": 1.0000000000000018e-08
+      },
+      "selected_start": "complete_data_warm_start",
+      "training_rmse_log10_rate": 0.1480735154575436
+    },
+    {
+      "all_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.021222871324293777,
+            "density_final_m2": 233536590881947.2,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.0200974787355332,
+            "retained_count_final": 228.53659088194718,
+            "rmse_log10_rate": 0.16812874002194594
+          },
+          "0.3": {
+            "bias_log10_rate": -0.1086418277747295,
+            "density_final_m2": 157075231140236.5,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.4789297555453143,
+            "retained_count_final": 152.0752311402365,
+            "rmse_log10_rate": 0.17673825140587282
+          },
+          "0.5": {
+            "bias_log10_rate": 0.05652936848089055,
+            "density_final_m2": 132347299567091.45,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.266934107024212,
+            "retained_count_final": 127.34729956709145,
+            "rmse_log10_rate": 0.16348685957957224
+          },
+          "0.7": {
+            "bias_log10_rate": -0.03533849045384053,
+            "density_final_m2": 28139067953171.207,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.6548972282016714,
+            "retained_count_final": 23.139067953171207,
+            "rmse_log10_rate": 0.1270459701577239
+          }
+        },
+        "max_backstress_Pa": 1030907036.8943492,
+        "max_density_m2": 233536590881947.2,
+        "max_retained_count": 228.53659088194718,
+        "max_tip_radius_m": 1.056677074538723e-06,
+        "min_raw_opening_barrier_over_kBT": 17.137254662354085,
+        "overall_bias_log10_rate": -0.031185008152930103,
+        "overall_rmse_log10_rate": 0.16379825616517832
+      },
+      "candidate_starts": [
+        {
+          "heldout_rmse": 0.3767798383659173,
+          "nfev": 120,
+          "start": "historical_control",
+          "success": false,
+          "training_rmse": 0.45071189128669253
+        },
+        {
+          "heldout_rmse": 0.17673825140587282,
+          "nfev": 25,
+          "start": "complete_data_warm_start",
+          "success": true,
+          "training_rmse": 0.15825951771538777
+        }
+      ],
+      "held_out_R": 0.3,
+      "held_out_metrics": {
+        "bias_log10_rate": -0.1086418277747295,
+        "density_final_m2": 157075231140236.5,
+        "observed_loglog_slope": 3.3783824529342126,
+        "points": 219,
+        "predicted_loglog_slope": 2.4789297555453143,
+        "retained_count_final": 152.0752311402365,
+        "rmse_log10_rate": 0.17673825140587282
+      },
+      "optimizer": {
+        "cost": 0.03556795250493755,
+        "elapsed_s": 27.028010368347168,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 25,
+        "optimality": 5.053930573603382e-06,
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 1.9999999125816004,
+        "emission_G0_298_eV": 0.6905245662437222,
+        "escape_G0_298_eV": 0.5737685968163958,
+        "initial_retained_count": 6.751797089971708e-19,
+        "opening_amplitude_over_kBT": 99.99999999994944,
+        "opening_exponent": 9.999999969782907,
+        "opening_floor_over_kBT": 18.20170459693235,
+        "opening_sigma_b_Pa": 2321594975.8959026,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 19999999999.99987,
+        "recovery_per_s": 1.0000000000000018e-08
+      },
+      "selected_start": "complete_data_warm_start",
+      "training_rmse_log10_rate": 0.15825951771538777
+    },
+    {
+      "all_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.019089402540644358,
+            "density_final_m2": 254847443361769.72,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.31284622018934,
+            "retained_count_final": 249.8474433617697,
+            "rmse_log10_rate": 0.1644123386037501
+          },
+          "0.3": {
+            "bias_log10_rate": -0.006967796199820325,
+            "density_final_m2": 200868575134465.25,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 3.2893526007980185,
+            "retained_count_final": 195.86857513446523,
+            "rmse_log10_rate": 0.1272333206834359
+          },
+          "0.5": {
+            "bias_log10_rate": 0.33903821887838975,
+            "density_final_m2": 207050613600145.78,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 3.753067701083815,
+            "retained_count_final": 202.05061360014577,
+            "rmse_log10_rate": 0.3725694440110824
+          },
+          "0.7": {
+            "bias_log10_rate": 0.026046532604903277,
+            "density_final_m2": 57737999061176.086,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 1.5613680193438553,
+            "retained_count_final": 52.73799906117608,
+            "rmse_log10_rate": 0.08941350333198686
+          }
+        },
+        "max_backstress_Pa": 1127038285.2816808,
+        "max_density_m2": 254847443361769.72,
+        "max_retained_count": 249.8474433617697,
+        "max_tip_radius_m": 1.061962165953719e-06,
+        "min_raw_opening_barrier_over_kBT": 17.099432483490055,
+        "overall_bias_log10_rate": 0.07222775422126632,
+        "overall_rmse_log10_rate": 0.2144778296371581
+      },
+      "candidate_starts": [
+        {
+          "heldout_rmse": 0.7807684434786188,
+          "nfev": 119,
+          "start": "historical_control",
+          "success": true,
+          "training_rmse": 0.25613642562305045
+        },
+        {
+          "heldout_rmse": 0.3725694440110824,
+          "nfev": 53,
+          "start": "complete_data_warm_start",
+          "success": true,
+          "training_rmse": 0.1380460022365253
+        }
+      ],
+      "held_out_R": 0.5,
+      "held_out_metrics": {
+        "bias_log10_rate": 0.33903821887838975,
+        "density_final_m2": 207050613600145.78,
+        "observed_loglog_slope": 3.7618960539977753,
+        "points": 171,
+        "predicted_loglog_slope": 3.753067701083815,
+        "retained_count_final": 202.05061360014577,
+        "rmse_log10_rate": 0.3725694440110824
+      },
+      "optimizer": {
+        "cost": 0.025607254777693714,
+        "elapsed_s": 53.325387954711914,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 53,
+        "optimality": 8.934879543229079e-06,
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 1.9999999999999998,
+        "emission_G0_298_eV": 0.7131941452386288,
+        "escape_G0_298_eV": 0.5849933672206102,
+        "initial_retained_count": 8.423718704874166e-19,
+        "opening_amplitude_over_kBT": 99.99999999987593,
+        "opening_exponent": 9.999999999999998,
+        "opening_floor_over_kBT": 18.26101638513655,
+        "opening_sigma_b_Pa": 2331792137.560706,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 17583540058.89106,
+        "recovery_per_s": 1.0000000000000018e-08
+      },
+      "selected_start": "complete_data_warm_start",
+      "training_rmse_log10_rate": 0.1380460022365253
+    },
+    {
+      "all_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.003974481287561999,
+            "density_final_m2": 250934698026897.3,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2576078488519764,
+            "retained_count_final": 245.9346980268973,
+            "rmse_log10_rate": 0.16738627405778708
+          },
+          "0.3": {
+            "bias_log10_rate": -0.03720858065655692,
+            "density_final_m2": 183258797192106.97,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.8954718840283604,
+            "retained_count_final": 178.25879719210695,
+            "rmse_log10_rate": 0.1431021248388309
+          },
+          "0.5": {
+            "bias_log10_rate": 0.04117204261983113,
+            "density_final_m2": 136624473824393.36,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.161989666733515,
+            "retained_count_final": 131.62447382439336,
+            "rmse_log10_rate": 0.17338831510845407
+          },
+          "0.7": {
+            "bias_log10_rate": -0.18512823080880464,
+            "density_final_m2": 10722769072646.14,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.11816547983929933,
+            "retained_count_final": 5.722769072646141,
+            "rmse_log10_rate": 0.23723435539915905
+          }
+        },
+        "max_backstress_Pa": 1109388259.5955133,
+        "max_density_m2": 250934698026897.3,
+        "max_retained_count": 245.9346980268973,
+        "max_tip_radius_m": 1.0609918051106705e-06,
+        "min_raw_opening_barrier_over_kBT": 17.102823039620766,
+        "overall_bias_log10_rate": -0.03247312551813736,
+        "overall_rmse_log10_rate": 0.17562022223726548
+      },
+      "candidate_starts": [
+        {
+          "heldout_rmse": 0.9102449012778075,
+          "nfev": 120,
+          "start": "historical_control",
+          "success": false,
+          "training_rmse": 0.3213576317328526
+        },
+        {
+          "heldout_rmse": 0.23723435539915905,
+          "nfev": 73,
+          "start": "complete_data_warm_start",
+          "success": true,
+          "training_rmse": 0.16117755578574497
+        }
+      ],
+      "held_out_R": 0.7,
+      "held_out_metrics": {
+        "bias_log10_rate": -0.18512823080880464,
+        "density_final_m2": 10722769072646.14,
+        "observed_loglog_slope": 2.9204577070033,
+        "points": 122,
+        "predicted_loglog_slope": 0.11816547983929933,
+        "retained_count_final": 5.722769072646141,
+        "rmse_log10_rate": 0.23723435539915905
+      },
+      "optimizer": {
+        "cost": 0.03927994534624277,
+        "elapsed_s": 67.2361798286438,
+        "message": "`ftol` termination condition is satisfied.",
+        "nfev": 73,
+        "optimality": 1.308427996099909e-06,
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 1.9999999999999998,
+        "emission_G0_298_eV": 0.7341406330763118,
+        "escape_G0_298_eV": 0.5994177013128742,
+        "initial_retained_count": 1.2481373568439903e-16,
+        "opening_amplitude_over_kBT": 13.363453939977338,
+        "opening_exponent": 9.999999999842474,
+        "opening_floor_over_kBT": 18.246572813004974,
+        "opening_sigma_b_Pa": 2403386936.3348255,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 10898358879.852789,
+        "recovery_per_s": 1.0000000000000018e-08
+      },
+      "selected_start": "complete_data_warm_start",
+      "training_rmse_log10_rate": 0.16117755578574497
+    }
+  ],
+  "schema": "qste340tm-fixed-1000-fresh-complete-R-holdouts/1"
+}

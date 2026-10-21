@@ -116,7 +116,7 @@ def build_records(data_root: Path) -> list[dict[str, float | int | str]]:
 
 
 def exp_floor_barrier(name: str, g0_298_eV: float, sigc_298_Pa: float,
-                      prefactor: float) -> ScaledExpFloorBarrier:
+                      prefactor: float, *, exp_n: float = EXP_N) -> ScaledExpFloorBarrier:
     # Retain the established nonzero temperature couplings.  G00 and sigc0 are
     # merely reparameterized so the fitted coordinates are their 298.15 K values.
     base = ExpFloorBarrierParams(
@@ -127,7 +127,7 @@ def exp_floor_barrier(name: str, g0_298_eV: float, sigc_298_Pa: float,
         sT_Pa_per_K=EXP_ST_PA_PER_K,
         Tref_K=EXP_TREF_K,
         a=EXP_A,
-        n=EXP_N,
+        n=exp_n,
         Gfloor_fraction=EXP_FLOOR_FRACTION,
     )
     return ScaledExpFloorBarrier(

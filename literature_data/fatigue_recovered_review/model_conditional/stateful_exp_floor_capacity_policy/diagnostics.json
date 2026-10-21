@@ -1,0 +1,1031 @@
+{
+  "exact_step_samples": [
+    {
+      "capacity": null,
+      "gamma_per_cycle": 0.0,
+      "result": 27.68
+    },
+    {
+      "capacity": null,
+      "gamma_per_cycle": 1e-12,
+      "result": 27.68000030517578
+    },
+    {
+      "capacity": null,
+      "gamma_per_cycle": 0.0001,
+      "result": 25.869724517990704
+    },
+    {
+      "capacity": 1000.0,
+      "gamma_per_cycle": 0.0,
+      "result": 27.304805042047974
+    },
+    {
+      "capacity": 1000.0,
+      "gamma_per_cycle": 1e-12,
+      "result": 27.30480502345688
+    },
+    {
+      "capacity": 1000.0,
+      "gamma_per_cycle": 0.0001,
+      "result": 25.526732500878325
+    }
+  ],
+  "finalist_sensitivity": {
+    "fixed_1000": {
+      "frequency_1Hz": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.1140338857470282,
+            "density_final_m2": 5000000015525.982,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 0.3153344847430717,
+            "retained_count_final": 1.5525982516016138e-08,
+            "rmse_log10_rate": 0.410595723378027
+          },
+          "0.3": {
+            "bias_log10_rate": 0.1458972619304246,
+            "density_final_m2": 5000000000088.885,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 0.00025336168239322354,
+            "retained_count_final": 8.888503489152322e-11,
+            "rmse_log10_rate": 0.3638586818067513
+          },
+          "0.5": {
+            "bias_log10_rate": 0.3931331127169047,
+            "density_final_m2": 5000000000008.873,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.8594880714514843e-16,
+            "retained_count_final": 8.87329246388619e-12,
+            "rmse_log10_rate": 0.4851916040098845
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8471646758334365,
+            "density_final_m2": 5000000000008.845,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 3.990627242129854e-15,
+            "retained_count_final": 8.844351663894082e-12,
+            "rmse_log10_rate": 0.8611027840081819
+          }
+        },
+        "max_backstress_Pa": 0.0700460336854755,
+        "max_density_m2": 5000000015528.152,
+        "max_retained_count": 1.552815255923136e-08,
+        "max_tip_radius_m": 1.000000000003851e-06,
+        "min_raw_opening_barrier_over_kBT": 18.178147163224025,
+        "overall_bias_log10_rate": 0.22927756503127622,
+        "overall_rmse_log10_rate": 0.5149375936240045
+      },
+      "frequency_20Hz": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.6457300603430915,
+            "density_final_m2": 441781241405003.1,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 5.402720540231335,
+            "retained_count_final": 436.78124140500313,
+            "rmse_log10_rate": 0.7338369482585099
+          },
+          "0.3": {
+            "bias_log10_rate": 0.723441041428061,
+            "density_final_m2": 420681383770222.06,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 6.544695725951351,
+            "retained_count_final": 415.68138377022206,
+            "rmse_log10_rate": 0.8277264689365293
+          },
+          "0.5": {
+            "bias_log10_rate": 1.7996137200607967,
+            "density_final_m2": 550398235507866.6,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 10.064543904946179,
+            "retained_count_final": 545.3982355078666,
+            "rmse_log10_rate": 1.8984761668997066
+          },
+          "0.7": {
+            "bias_log10_rate": 1.40121605092492,
+            "density_final_m2": 422952044390053.3,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 13.746938961916834,
+            "retained_count_final": 417.9520443900533,
+            "rmse_log10_rate": 1.5309503948762606
+          }
+        },
+        "max_backstress_Pa": 2460240072.388493,
+        "max_density_m2": 550398235507866.6,
+        "max_retained_count": 545.3982355078666,
+        "max_tip_radius_m": 1.1352587624059508e-06,
+        "min_raw_opening_barrier_over_kBT": 15.692245001612068,
+        "overall_bias_log10_rate": 1.0490222991856164,
+        "overall_rmse_log10_rate": 1.2491369482548802
+      },
+      "legacy_first_load_prefill": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.12814651586667966,
+            "density_final_m2": 259195133866308.3,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.0771908032160247,
+            "retained_count_final": 254.1951338663083,
+            "rmse_log10_rate": 0.2109877360219936
+          },
+          "0.3": {
+            "bias_log10_rate": -2.549925375442778e-05,
+            "density_final_m2": 176640458134573.25,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6385287469549104,
+            "retained_count_final": 171.64045813457324,
+            "rmse_log10_rate": 0.13320363005752775
+          },
+          "0.5": {
+            "bias_log10_rate": 0.20002601428585406,
+            "density_final_m2": 156293804192722.75,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.4266745775939547,
+            "retained_count_final": 151.29380419272275,
+            "rmse_log10_rate": 0.2493883301603747
+          },
+          "0.7": {
+            "bias_log10_rate": -0.00024399172372222865,
+            "density_final_m2": 33915506617474.535,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7214785812497607,
+            "retained_count_final": 28.915506617474534,
+            "rmse_log10_rate": 0.11894492379585203
+          }
+        },
+        "max_backstress_Pa": 1146650307.663177,
+        "max_density_m2": 259195133866308.3,
+        "max_retained_count": 254.1951338663083,
+        "max_tip_radius_m": 1.0630403931988445e-06,
+        "min_raw_opening_barrier_over_kBT": 17.019536460825133,
+        "overall_bias_log10_rate": 0.08677556980388328,
+        "overall_rmse_log10_rate": 0.1894833566803527
+      },
+      "substeps_1": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.011074988689072088,
+            "density_final_m2": 240133242085275.03,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.0973236057663396,
+            "retained_count_final": 235.13324208527501,
+            "rmse_log10_rate": 0.1674231960760683
+          },
+          "0.3": {
+            "bias_log10_rate": -0.07957879380676972,
+            "density_final_m2": 163109686654384.06,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.5798834938691613,
+            "retained_count_final": 158.10968665438406,
+            "rmse_log10_rate": 0.15756352069726293
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09270814492275473,
+            "density_final_m2": 139327600959885.67,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.400541620162873,
+            "retained_count_final": 134.32760095988567,
+            "rmse_log10_rate": 0.17613061192610738
+          },
+          "0.7": {
+            "bias_log10_rate": -0.024219554155679456,
+            "density_final_m2": 30158903633750.582,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7155457844577089,
+            "retained_count_final": 25.158903633750583,
+            "rmse_log10_rate": 0.12165608763485217
+          }
+        },
+        "max_backstress_Pa": 1060663909.1711441,
+        "max_density_m2": 240133242085275.03,
+        "max_retained_count": 235.13324208527501,
+        "max_tip_radius_m": 1.058313044037148e-06,
+        "min_raw_opening_barrier_over_kBT": 17.106419759851775,
+        "overall_bias_log10_rate": -0.00234585720262438,
+        "overall_rmse_log10_rate": 0.16017633276137117
+      },
+      "substeps_2": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.01156846780179999,
+            "density_final_m2": 240225458828208.06,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.0980200325688187,
+            "retained_count_final": 235.22545882820805,
+            "rmse_log10_rate": 0.16749403217499426
+          },
+          "0.3": {
+            "bias_log10_rate": -0.07924111602087384,
+            "density_final_m2": 163175449327604.97,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.58078474450486,
+            "retained_count_final": 158.17544932760495,
+            "rmse_log10_rate": 0.15738170383073047
+          },
+          "0.5": {
+            "bias_log10_rate": 0.0936054503417107,
+            "density_final_m2": 139480742566110.52,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.4020151585065768,
+            "retained_count_final": 134.4807425661105,
+            "rmse_log10_rate": 0.17660015658989595
+          },
+          "0.7": {
+            "bias_log10_rate": -0.024152816864476623,
+            "density_final_m2": 30170967037023.957,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7158105663433536,
+            "retained_count_final": 25.170967037023956,
+            "rmse_log10_rate": 0.12163174153353239
+          }
+        },
+        "max_backstress_Pa": 1061079890.2131395,
+        "max_density_m2": 240225458828208.06,
+        "max_retained_count": 235.22545882820805,
+        "max_tip_radius_m": 1.0583359137893956e-06,
+        "min_raw_opening_barrier_over_kBT": 17.105999439825645,
+        "overall_bias_log10_rate": -0.0018749158457349883,
+        "overall_rmse_log10_rate": 0.16026232525015785
+      },
+      "substeps_4": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.011815268124747067,
+            "density_final_m2": 240271568696187.28,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.0983679836377376,
+            "retained_count_final": 235.27156869618727,
+            "rmse_log10_rate": 0.16753005248743935
+          },
+          "0.3": {
+            "bias_log10_rate": -0.07907235182202463,
+            "density_final_m2": 163208290658959.66,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.581234190763637,
+            "retained_count_final": 158.20829065895964,
+            "rmse_log10_rate": 0.1572911210416201
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09405565679248243,
+            "density_final_m2": 139557516793750.1,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.402750001359979,
+            "retained_count_final": 134.5575167937501,
+            "rmse_log10_rate": 0.17683716886687162
+          },
+          "0.7": {
+            "bias_log10_rate": -0.024123705008932947,
+            "density_final_m2": 30176216939522.76,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7159263188000355,
+            "retained_count_final": 25.17621693952276,
+            "rmse_log10_rate": 0.12162113358904161
+          }
+        },
+        "max_backstress_Pa": 1061287887.484765,
+        "max_density_m2": 240271568696187.28,
+        "max_retained_count": 235.27156869618727,
+        "max_tip_radius_m": 1.0583473490366543e-06,
+        "min_raw_opening_barrier_over_kBT": 17.105789272991537,
+        "overall_bias_log10_rate": -0.0016397805969229503,
+        "overall_rmse_log10_rate": 0.16030649059881708
+      },
+      "substeps_8": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.01193868342615324,
+            "density_final_m2": 240294623996002.3,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.0985418937000015,
+            "retained_count_final": 235.29462399600231,
+            "rmse_log10_rate": 0.16754821317050342
+          },
+          "0.3": {
+            "bias_log10_rate": -0.07898798843917465,
+            "density_final_m2": 163224701320095.5,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.581458619416838,
+            "retained_count_final": 158.2247013200955,
+            "rmse_log10_rate": 0.15724591113667716
+          },
+          "0.5": {
+            "bias_log10_rate": 0.0942811535314745,
+            "density_final_m2": 139595955566124.88,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.403116942864731,
+            "retained_count_final": 134.59595556612487,
+            "rmse_log10_rate": 0.1769562385820763
+          },
+          "0.7": {
+            "bias_log10_rate": -0.024110215650720735,
+            "density_final_m2": 30178646027551.395,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7159800280367974,
+            "retained_count_final": 25.178646027551395,
+            "rmse_log10_rate": 0.12161622079234954
+          }
+        },
+        "max_backstress_Pa": 1061391887.7707819,
+        "max_density_m2": 240294623996002.3,
+        "max_retained_count": 235.29462399600231,
+        "max_tip_radius_m": 1.0583530667510085e-06,
+        "min_raw_opening_barrier_over_kBT": 17.105684187907066,
+        "overall_bias_log10_rate": -0.0015222960973671456,
+        "overall_rmse_log10_rate": 0.1603288667848866
+      }
+    },
+    "fixed_10000": {
+      "frequency_1Hz": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.11053234698283952,
+            "density_final_m2": 285948911246125.44,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 0.30869860102189206,
+            "retained_count_final": 280.9489112461254,
+            "rmse_log10_rate": 0.4104974357455113
+          },
+          "0.3": {
+            "bias_log10_rate": 0.14820481836326063,
+            "density_final_m2": 285945874194827.3,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": -0.006121937597433357,
+            "retained_count_final": 280.9458741948273,
+            "rmse_log10_rate": 0.3653741031426465
+          },
+          "0.5": {
+            "bias_log10_rate": 0.39429472952245,
+            "density_final_m2": 285698700050024.9,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": -0.012949839464540366,
+            "retained_count_final": 280.6987000500249,
+            "rmse_log10_rate": 0.486704280331282
+          },
+          "0.7": {
+            "bias_log10_rate": 0.847949647375331,
+            "density_final_m2": 285493556229865.94,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": -0.02861190582965056,
+            "retained_count_final": 280.49355622986593,
+            "rmse_log10_rate": 0.8621450873173767
+          }
+        },
+        "max_backstress_Pa": 1268964917.6198957,
+        "max_density_m2": 286310443951662.1,
+        "max_retained_count": 281.31044395166214,
+        "max_tip_radius_m": 1.069764990100012e-06,
+        "min_raw_opening_barrier_over_kBT": 18.17536742872803,
+        "overall_bias_log10_rate": 0.23147248539202525,
+        "overall_rmse_log10_rate": 0.5158216243244679
+      },
+      "frequency_20Hz": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.9189632893275983,
+            "density_final_m2": 802721422132077.4,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 6.85066722704824,
+            "retained_count_final": 797.7214221320774,
+            "rmse_log10_rate": 1.0373585428636294
+          },
+          "0.3": {
+            "bias_log10_rate": 0.9547205245431014,
+            "density_final_m2": 774953877759320.8,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 8.071329399990015,
+            "retained_count_final": 769.9538777593207,
+            "rmse_log10_rate": 1.095019273464223
+          },
+          "0.5": {
+            "bias_log10_rate": 2.3947358541092227,
+            "density_final_m2": 1011739862399443.1,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 14.884508133676727,
+            "retained_count_final": 1006.7398623994432,
+            "rmse_log10_rate": 2.5691535377035803
+          },
+          "0.7": {
+            "bias_log10_rate": 1.7242969453167365,
+            "density_final_m2": 813413710073899.0,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 18.227055928188634,
+            "retained_count_final": 808.413710073899,
+            "rmse_log10_rate": 1.9170580703200877
+          }
+        },
+        "max_backstress_Pa": 4541308700.127364,
+        "max_density_m2": 1011739862399443.1,
+        "max_retained_count": 1006.7398623994432,
+        "max_tip_radius_m": 1.249671485875062e-06,
+        "min_raw_opening_barrier_over_kBT": 14.868890725904931,
+        "overall_bias_log10_rate": 1.390593090801977,
+        "overall_rmse_log10_rate": 1.6648570879024103
+      },
+      "legacy_first_load_prefill": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.13824663141605606,
+            "density_final_m2": 546504986124766.25,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2776091462867205,
+            "retained_count_final": 541.5049861247662,
+            "rmse_log10_rate": 0.2116210164490468
+          },
+          "0.3": {
+            "bias_log10_rate": -0.004734312356067627,
+            "density_final_m2": 458303052495992.25,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.712874818714577,
+            "retained_count_final": 453.30305249599223,
+            "rmse_log10_rate": 0.1281891353765495
+          },
+          "0.5": {
+            "bias_log10_rate": 0.20478192003791096,
+            "density_final_m2": 439693472626750.0,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.56185488949963,
+            "retained_count_final": 434.69347262675,
+            "rmse_log10_rate": 0.24960438972638294
+          },
+          "0.7": {
+            "bias_log10_rate": 0.008193957521561252,
+            "density_final_m2": 316341908037696.6,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7664015756507955,
+            "retained_count_final": 311.3419080376966,
+            "rmse_log10_rate": 0.11702464893187985
+          }
+        },
+        "max_backstress_Pa": 2442677991.1045556,
+        "max_density_m2": 546504986124766.25,
+        "max_retained_count": 541.5049861247662,
+        "max_tip_radius_m": 1.134293236558942e-06,
+        "min_raw_opening_barrier_over_kBT": 16.98941167615054,
+        "overall_bias_log10_rate": 0.09113910701225833,
+        "overall_rmse_log10_rate": 0.18858708758054005
+      },
+      "substeps_1": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.011356269758710423,
+            "density_final_m2": 524686503746977.94,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2436042223296564,
+            "retained_count_final": 519.6865037469779,
+            "rmse_log10_rate": 0.15936396662788893
+          },
+          "0.3": {
+            "bias_log10_rate": -0.08788217522157946,
+            "density_final_m2": 443704595861299.8,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6209604415020396,
+            "retained_count_final": 438.7045958612998,
+            "rmse_log10_rate": 0.1577039752131431
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09279847287762241,
+            "density_final_m2": 421498391941677.25,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.4922680260628898,
+            "retained_count_final": 416.49839194167726,
+            "rmse_log10_rate": 0.17163355308688816
+          },
+          "0.7": {
+            "bias_log10_rate": -0.01624709915725051,
+            "density_final_m2": 312491818633942.3,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7577877066357256,
+            "retained_count_final": 307.49181863394233,
+            "rmse_log10_rate": 0.11825688804600692
+          }
+        },
+        "max_backstress_Pa": 2344256872.058301,
+        "max_density_m2": 524686503746977.94,
+        "max_retained_count": 519.6865037469779,
+        "max_tip_radius_m": 1.1288822529292505e-06,
+        "min_raw_opening_barrier_over_kBT": 17.08885939889037,
+        "overall_bias_log10_rate": -0.0033466430374695364,
+        "overall_rmse_log10_rate": 0.15597122402321126
+      },
+      "substeps_2": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.011801590740612045,
+            "density_final_m2": 524774807132156.6,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2443278919745033,
+            "retained_count_final": 519.7748071321566,
+            "rmse_log10_rate": 0.15944708125516224
+          },
+          "0.3": {
+            "bias_log10_rate": -0.08755852431551657,
+            "density_final_m2": 443772512783061.75,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6220241519998635,
+            "retained_count_final": 438.77251278306176,
+            "rmse_log10_rate": 0.15749580118763284
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09367770484034971,
+            "density_final_m2": 421652502991853.94,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.494038204682676,
+            "retained_count_final": 416.6525029918539,
+            "rmse_log10_rate": 0.17209972872358434
+          },
+          "0.7": {
+            "bias_log10_rate": -0.01618147884181115,
+            "density_final_m2": 312503791111928.9,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7580600178011774,
+            "retained_count_final": 307.5037911119289,
+            "rmse_log10_rate": 0.11823637169128308
+          }
+        },
+        "max_backstress_Pa": 2344655200.3120437,
+        "max_density_m2": 524774807132156.6,
+        "max_retained_count": 519.7748071321566,
+        "max_tip_radius_m": 1.1289041521687748e-06,
+        "min_raw_opening_barrier_over_kBT": 17.088456915783887,
+        "overall_bias_log10_rate": -0.0028997042268782964,
+        "overall_rmse_log10_rate": 0.1560513910745289
+      },
+      "substeps_4": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.012024388409552179,
+            "density_final_m2": 524818969014637.3,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2446753622144606,
+            "retained_count_final": 519.8189690146373,
+            "rmse_log10_rate": 0.15949263929654656
+          },
+          "0.3": {
+            "bias_log10_rate": -0.08739677178786767,
+            "density_final_m2": 443806440676788.06,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6225552151814546,
+            "retained_count_final": 438.80644067678804,
+            "rmse_log10_rate": 0.15739215736364706
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09411905461558995,
+            "density_final_m2": 421729801761235.7,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.494922509077365,
+            "retained_count_final": 416.72980176123565,
+            "rmse_log10_rate": 0.17233513687706065
+          },
+          "0.7": {
+            "bias_log10_rate": -0.016152581779741146,
+            "density_final_m2": 312509051126086.9,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7581802839290138,
+            "retained_count_final": 307.5090511260869,
+            "rmse_log10_rate": 0.11822734571893136
+          }
+        },
+        "max_backstress_Pa": 2344854410.4045553,
+        "max_density_m2": 524818969014637.3,
+        "max_retained_count": 519.8189690146373,
+        "max_tip_radius_m": 1.12891510431563e-06,
+        "min_raw_opening_barrier_over_kBT": 17.088255627785546,
+        "overall_bias_log10_rate": -0.0026764491234692327,
+        "overall_rmse_log10_rate": 0.15609380111613247
+      },
+      "substeps_8": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.012135788943329532,
+            "density_final_m2": 524841050868917.6,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2448447591673815,
+            "retained_count_final": 519.8410508689176,
+            "rmse_log10_rate": 0.15951650283603938
+          },
+          "0.3": {
+            "bias_log10_rate": -0.08731589774420034,
+            "density_final_m2": 443823396985299.06,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6228205821074124,
+            "retained_count_final": 438.82339698529904,
+            "rmse_log10_rate": 0.1573404530530285
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09434016949804774,
+            "density_final_m2": 421768513024784.6,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.495364470216866,
+            "retained_count_final": 416.7685130247846,
+            "rmse_log10_rate": 0.17245342576811057
+          },
+          "0.7": {
+            "bias_log10_rate": -0.0161391136120722,
+            "density_final_m2": 312511499209287.2,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7582364377607168,
+            "retained_count_final": 307.5114992092872,
+            "rmse_log10_rate": 0.11822314050379001
+          }
+        },
+        "max_backstress_Pa": 2344954019.569448,
+        "max_density_m2": 524841050868917.6,
+        "max_retained_count": 519.8410508689176,
+        "max_tip_radius_m": 1.1289205806154914e-06,
+        "min_raw_opening_barrier_over_kBT": 17.08815497962478,
+        "overall_bias_log10_rate": -0.002564880032290521,
+        "overall_rmse_log10_rate": 0.1561156193867673
+      }
+    },
+    "uncapped": {
+      "frequency_1Hz": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.11093768275205622,
+            "density_final_m2": 280505056127849.62,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 0.31647662569904567,
+            "retained_count_final": 275.5050561278496,
+            "rmse_log10_rate": 0.40963882191361617
+          },
+          "0.3": {
+            "bias_log10_rate": 0.15109016554123425,
+            "density_final_m2": 280502077924375.56,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": -0.006003289280771353,
+            "retained_count_final": 275.50207792437556,
+            "rmse_log10_rate": 0.3665431254678018
+          },
+          "0.5": {
+            "bias_log10_rate": 0.39720199361105246,
+            "density_final_m2": 280259693192109.94,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": -0.012698860309696322,
+            "retained_count_final": 275.2596931921099,
+            "rmse_log10_rate": 0.48905149079332166
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8508642111970928,
+            "density_final_m2": 280058524376638.0,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": -0.02805738188690564,
+            "retained_count_final": 275.058524376638,
+            "rmse_log10_rate": 0.8650065816479765
+          }
+        },
+        "max_backstress_Pa": 1244376599.6540234,
+        "max_density_m2": 280859583532307.28,
+        "max_retained_count": 275.8595835323073,
+        "max_tip_radius_m": 1.0684131767160121e-06,
+        "min_raw_opening_barrier_over_kBT": 18.173356008348797,
+        "overall_bias_log10_rate": 0.2332936521112574,
+        "overall_rmse_log10_rate": 0.5171048210618328
+      },
+      "frequency_20Hz": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.9487544918388986,
+            "density_final_m2": 806906377921812.2,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 7.018450069904158,
+            "retained_count_final": 801.9063779218122,
+            "rmse_log10_rate": 1.0717638440076485
+          },
+          "0.3": {
+            "bias_log10_rate": 0.9752037840661953,
+            "density_final_m2": 778120567932725.0,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 8.269353582950002,
+            "retained_count_final": 773.120567932725,
+            "rmse_log10_rate": 1.1211096472025313
+          },
+          "0.5": {
+            "bias_log10_rate": 2.4577346306245915,
+            "density_final_m2": 1030431890062056.5,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 15.4288870789501,
+            "retained_count_final": 1025.4318900620565,
+            "rmse_log10_rate": 2.641347816030789
+          },
+          "0.7": {
+            "bias_log10_rate": 1.757407584190967,
+            "density_final_m2": 819750764304772.0,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 18.71798524322916,
+            "retained_count_final": 814.750764304772,
+            "rmse_log10_rate": 1.9574499274810344
+          }
+        },
+        "max_backstress_Pa": 4625626676.416622,
+        "max_density_m2": 1030431890062056.5,
+        "max_retained_count": 1025.4318900620565,
+        "max_tip_radius_m": 1.25430710873539e-06,
+        "min_raw_opening_barrier_over_kBT": 14.75683703959071,
+        "overall_bias_log10_rate": 1.4257066970982193,
+        "overall_rmse_log10_rate": 1.7093418133476088
+      },
+      "legacy_first_load_prefill": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.14201129710233132,
+            "density_final_m2": 542327735767932.6,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.3052055074759332,
+            "retained_count_final": 537.3277357679326,
+            "rmse_log10_rate": 0.21435998623718472
+          },
+          "0.3": {
+            "bias_log10_rate": -0.006561469950278064,
+            "density_final_m2": 452696574439818.5,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.73178396373522,
+            "retained_count_final": 447.6965744398185,
+            "rmse_log10_rate": 0.12649057279445336
+          },
+          "0.5": {
+            "bias_log10_rate": 0.20494253084056394,
+            "density_final_m2": 433865444404786.1,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.563422929093793,
+            "retained_count_final": 428.8654444047861,
+            "rmse_log10_rate": 0.24958345397729526
+          },
+          "0.7": {
+            "bias_log10_rate": 0.009436909958750624,
+            "density_final_m2": 310582021852336.3,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7585518644997689,
+            "retained_count_final": 305.5820218523363,
+            "rmse_log10_rate": 0.11747348751196134
+          }
+        },
+        "max_backstress_Pa": 2423834808.176559,
+        "max_density_m2": 542327735767932.6,
+        "max_retained_count": 537.3277357679326,
+        "max_tip_radius_m": 1.1332572784704472e-06,
+        "min_raw_opening_barrier_over_kBT": 16.98159519480587,
+        "overall_bias_log10_rate": 0.0920767309881201,
+        "overall_rmse_log10_rate": 0.1893032182417524
+      },
+      "substeps_1": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.012680017046123072,
+            "density_final_m2": 520104288291884.6,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2639555579883965,
+            "retained_count_final": 515.1042882918846,
+            "rmse_log10_rate": 0.15870746671791516
+          },
+          "0.3": {
+            "bias_log10_rate": -0.09061765478572811,
+            "density_final_m2": 437985154416761.4,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6464630672804708,
+            "retained_count_final": 432.98515441676136,
+            "rmse_log10_rate": 0.15732703140123028
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09271559754775147,
+            "density_final_m2": 415579432732418.4,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.4892592459350764,
+            "retained_count_final": 410.57943273241835,
+            "rmse_log10_rate": 0.17145830299844744
+          },
+          "0.7": {
+            "bias_log10_rate": -0.014781594868618297,
+            "density_final_m2": 306765458768453.3,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7498079282056583,
+            "retained_count_final": 301.7654587684533,
+            "rmse_log10_rate": 0.11842457763629169
+          }
+        },
+        "max_backstress_Pa": 2323586929.713436,
+        "max_density_m2": 520104288291884.6,
+        "max_retained_count": 515.1042882918846,
+        "max_tip_radius_m": 1.1277458634963874e-06,
+        "min_raw_opening_barrier_over_kBT": 17.082888731388927,
+        "overall_bias_log10_rate": -0.0034863283736077224,
+        "overall_rmse_log10_rate": 0.15561975320328206
+      },
+      "substeps_2": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.013146144926891182,
+            "density_final_m2": 520194332881248.56,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2647477668970675,
+            "retained_count_final": 515.1943328812486,
+            "rmse_log10_rate": 0.15879167561299998
+          },
+          "0.3": {
+            "bias_log10_rate": -0.09027755121014826,
+            "density_final_m2": 438053280627937.06,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.647405996237559,
+            "retained_count_final": 433.05328062793706,
+            "rmse_log10_rate": 0.15711597398430507
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09359066011139895,
+            "density_final_m2": 415733209160032.9,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.4910528958801605,
+            "retained_count_final": 410.73320916003286,
+            "rmse_log10_rate": 0.17192088818006432
+          },
+          "0.7": {
+            "bias_log10_rate": -0.014717023911895699,
+            "density_final_m2": 306777242710353.25,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7500761619427272,
+            "retained_count_final": 301.7772427103532,
+            "rmse_log10_rate": 0.1184051326215761
+          }
+        },
+        "max_backstress_Pa": 2323993112.3752646,
+        "max_density_m2": 520194332881248.56,
+        "max_retained_count": 515.1943328812486,
+        "max_tip_radius_m": 1.1277681945545496e-06,
+        "min_raw_opening_barrier_over_kBT": 17.082478311947177,
+        "overall_bias_log10_rate": -0.003028965541257254,
+        "overall_rmse_log10_rate": 0.15569877496810347
+      },
+      "substeps_4": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.013379688281723832,
+            "density_final_m2": 520239361530868.4,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2651377768988943,
+            "retained_count_final": 515.2393615308683,
+            "rmse_log10_rate": 0.15883606592705243
+          },
+          "0.3": {
+            "bias_log10_rate": -0.09010760464405987,
+            "density_final_m2": 438087313804309.8,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6478769446099597,
+            "retained_count_final": 433.0873138043098,
+            "rmse_log10_rate": 0.15701074700803302
+          },
+          "0.5": {
+            "bias_log10_rate": 0.0940299346695898,
+            "density_final_m2": 415810343084427.6,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.491949031433038,
+            "retained_count_final": 410.8103430844276,
+            "rmse_log10_rate": 0.1721544981490642
+          },
+          "0.7": {
+            "bias_log10_rate": -0.01468862425404052,
+            "density_final_m2": 306782413419292.0,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.7501944840201926,
+            "retained_count_final": 301.78241341929197,
+            "rmse_log10_rate": 0.11839658849617826
+          }
+        },
+        "max_backstress_Pa": 2324196232.3727045,
+        "max_density_m2": 520239361530868.4,
+        "max_retained_count": 515.2393615308683,
+        "max_tip_radius_m": 1.1277793616596553e-06,
+        "min_raw_opening_barrier_over_kBT": 17.082273073260765,
+        "overall_bias_log10_rate": -0.002800389544308798,
+        "overall_rmse_log10_rate": 0.155739991937644
+      },
+      "substeps_8": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 0.01349658992739828,
+            "density_final_m2": 520261879096506.2,
+            "observed_loglog_slope": 3.7092045452619558,
+            "points": 248,
+            "predicted_loglog_slope": 3.2653313113846196,
+            "retained_count_final": 515.2618790965062,
+            "rmse_log10_rate": 0.158858833644124
+          },
+          "0.3": {
+            "bias_log10_rate": -0.09002265289091939,
+            "density_final_m2": 438104322905681.3,
+            "observed_loglog_slope": 3.3783824529342126,
+            "points": 219,
+            "predicted_loglog_slope": 2.6481122868354325,
+            "retained_count_final": 433.10432290568133,
+            "rmse_log10_rate": 0.15695820961245555
+          },
+          "0.5": {
+            "bias_log10_rate": 0.0942500144613032,
+            "density_final_m2": 415848972570165.6,
+            "observed_loglog_slope": 3.7618960539977753,
+            "points": 171,
+            "predicted_loglog_slope": 2.4923969325216326,
+            "retained_count_final": 410.84897257016564,
+            "rmse_log10_rate": 0.17227188731255988
+          },
+          "0.7": {
+            "bias_log10_rate": -0.014675397934035689,
+            "density_final_m2": 306784818096767.1,
+            "observed_loglog_slope": 2.9204577070033,
+            "points": 122,
+            "predicted_loglog_slope": 0.750249689599255,
+            "retained_count_final": 301.78481809676714,
+            "rmse_log10_rate": 0.11839261073046516
+          }
+        },
+        "max_backstress_Pa": 2324297806.9904943,
+        "max_density_m2": 520261879096506.2,
+        "max_retained_count": 515.2618790965062,
+        "max_tip_radius_m": 1.1277849460159334e-06,
+        "min_raw_opening_barrier_over_kBT": 17.082170439146,
+        "overall_bias_log10_rate": -0.0026861220476132614,
+        "overall_rmse_log10_rate": 0.15576102908063666
+      }
+    }
+  },
+  "full_cycle_retention_identity": "source_per_cycle = mu_emit*exp(-mu_escape), identical to FatigueCycleHazardController.integrate_one_cycle",
+  "initialization_primary": "shared fitted retained count; no assignment of pre-first-measurement cycles to first measured DeltaK"
+}
