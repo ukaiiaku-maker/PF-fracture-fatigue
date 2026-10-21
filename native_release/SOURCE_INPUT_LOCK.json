@@ -1,0 +1,57 @@
+{
+  "schema": "native-fracture-source-input-lock/1",
+  "release_status_target": "PACKAGE_READY_FOR_STAGED_NATIVE_CAMPAIGN",
+  "saved_tag": "pre-final-changes-20261017T231804Z",
+  "repositories": {
+    "pf": {
+      "baseline_commit": "23beacdf8acad8c3ed7c7c3a1f2f2f9bdbdd0f3b",
+      "baseline_tree": "878182b86bf33bfb24e581ec75b945e309893953",
+      "calculation_and_campaign_commit": "1b398437198caec55ae5ea688032accec7bd17da",
+      "remote": "https://github.com/ukaiiaku-maker/PF-fracture-fatigue.git",
+      "release_branch": "release/native-fracture-20261021"
+    },
+    "fem": {
+      "commit": "baa27d72c87ba1bb9e5a8b22029e2406e136cf8c",
+      "tree": "c9563db1c2208a5d42bcb1564fd03a6d86860b3f",
+      "calculation_commit": "d522b5421ebdeabe1063cd735739cc1a26ebaa75",
+      "remote": "https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ.git",
+      "release_branch": "release/native-fracture-20261021"
+    }
+  },
+  "artifacts": [
+    {"path": "preservation/PF-fracture-fatigue.pre-final.bundle", "sha256": "3bb8acf999913a01b386a5838e71a283c3db13116faf5441eef397d148458252"},
+    {"path": "preservation/Arrhenius_FEM_CZM_MPZ.pre-final.bundle", "sha256": "1d91fea3ea3cc589c3b2b93b1fb2dbfea37d8ba505c7a5f9aaec2efe578c5af5"},
+    {"path": "preservation/fracture-resumable-state.tar.gz", "sha256": "79cf81605ede9f7595ce70359457f1b799b4a119af8d22a323ae054336c72666"},
+    {"path": "preservation/environment.yml", "sha256": "5f67cb95e24564f748e4dc8f2264c6942662840b472ec091f64afbea84da2621"},
+    {"path": "preservation/PRESERVATION_MANIFEST.json", "sha256": "fc32a60edd94ec1d3bb5a2dfa1d32da7899ab376d22fbd4ab1c23ec6f73b365e"},
+    {"path": "preservation/ORIGINAL_SHA256SUMS", "sha256": "cb55a7b272ca6070b603e04277c14f4b314f72c94ec37018d516db5e0840bb83"}
+  ],
+  "state_archive": {
+    "path": "preservation/fracture-resumable-state.tar.gz",
+    "member_count": 514,
+    "safe_relative_paths_verified": true
+  },
+  "kernel": {
+    "identity": "4fa015d77f1aadf05f77f550366f64cd611f537ae716bbd47870bf9e6fe2f873",
+    "path": "state/preservation/pre-final-changes-20261017T231804Z/external_dependencies/signed_kernel_4fa015d77f1aadf0/family.json",
+    "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+  },
+  "environment": {
+    "specification": "preservation/environment.yml",
+    "python": "3.12.13",
+    "triangle": "20250106",
+    "qualified_interpreter_hint": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python"
+  },
+  "campaign": {
+    "source": "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
+    "source_sha256": "1f2d08c476e841df9ff862efc13c364f0ad1b5ff7790902a8dc502605159bd60",
+    "source_case_count": 699,
+    "main_original_opening_case_count": 663,
+    "deferred_optional_czm_case_count": 36,
+    "main_sequence_sha256": "9cf3c992b59dab15da8a7f1a53ce475da7939c0cae508c30e06e25eb1b973a07"
+  },
+  "known_absences": [
+    "f0e57d81f8cd94dfe10a2fc0b0c458ce9cfdf5d16063aa1e578200dbc36ef63c",
+    "0195e5e2c04e65b550fac9a96c0791aba5ca218f7d738ec0a3f037e3b08fae1e"
+  ]
+}

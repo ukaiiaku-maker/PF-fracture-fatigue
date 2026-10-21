@@ -1,0 +1,11 @@
+{
+  "schema": "native-fracture-target-host/1",
+  "output_root": "/replace/with/large/execution/volume/native-fracture-campaign",
+  "python": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+  "maximum_substantial_workers": 1,
+  "required_memory_reserve_GiB": 12,
+  "largest_declared_case_peak_transient_GiB": 24,
+  "declared_total_retained_output_GiB": 31.65,
+  "admission_rule": "free memory must cover the selected case peak plus 12 GiB reserve; free disk must cover retained output plus transient and checkpoint margins",
+  "production_acknowledgement": "START_STAGED_NATIVE_CAMPAIGN"
+}

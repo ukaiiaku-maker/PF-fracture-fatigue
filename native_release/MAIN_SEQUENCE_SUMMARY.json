@@ -1,0 +1,92 @@
+{
+  "deferred_by_opening_kind": {
+    "bilinear_barrier_activated": 12,
+    "bilinear_czm_classical": 24
+  },
+  "deferred_optional_czm_case_count": 36,
+  "main_by_block": {
+    "P1": 288,
+    "P2": 68,
+    "P3": 18,
+    "P4": 44,
+    "P5": 96,
+    "P6": 64,
+    "P7": 44,
+    "P8": 29,
+    "P9": 12
+  },
+  "main_by_launcher_kind": {
+    "direct_fem_native": 7,
+    "shared_source_attesting_worker": 656
+  },
+  "main_by_release_disposition": {
+    "CONDITIONAL_OR_BLOCKED": 78,
+    "READY_AFTER_TARGET_RESOURCE_ADMISSION": 585
+  },
+  "main_original_opening_case_count": 663,
+  "main_sequence_sha256": "9cf3c992b59dab15da8a7f1a53ce475da7939c0cae508c30e06e25eb1b973a07",
+  "production_execution_authorized_by_profile": false,
+  "protected_axes": {
+    "backend": [
+      "full_fem_czm",
+      "spatial_pf"
+    ],
+    "cavity_mode": [
+      "None",
+      "disabled",
+      "nucleation_growth",
+      "preexisting_equilibrated"
+    ],
+    "crack_path": [
+      "None",
+      "branching_multifront",
+      "single_front"
+    ],
+    "family": [
+      "DBTT",
+      "ceramic",
+      "peak",
+      "weakT"
+    ],
+    "orientation_deg": [
+      "0.0",
+      "30.0",
+      "45.0"
+    ],
+    "rate_factor": [
+      "0.01",
+      "0.1",
+      "1.0",
+      "10.0",
+      "100.0"
+    ],
+    "source_lifecycle": [
+      "None",
+      "persistent_reusable"
+    ],
+    "source_location": [
+      "None",
+      "bulk_uniform",
+      "tip_plus_bulk",
+      "tip_surface"
+    ],
+    "temperature_K": [
+      "1000.0",
+      "1050.0",
+      "1100.0",
+      "1150.0",
+      "1200.0",
+      "1250.0",
+      "1300.0",
+      "300.0",
+      "600.0",
+      "800.0",
+      "900.0",
+      "950.0"
+    ]
+  },
+  "schema": "native-fracture-main-sequence/1",
+  "source": "common_framework_readiness/PROSPECTIVE_CAMPAIGN_V3.jsonl",
+  "source_case_count": 699,
+  "source_sha256": "1f2d08c476e841df9ff862efc13c364f0ad1b5ff7790902a8dc502605159bd60"
+}

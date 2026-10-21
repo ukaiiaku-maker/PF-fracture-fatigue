@@ -1,0 +1,43 @@
+{
+  "schema": "native-fracture-release-verification/1",
+  "verified_utc": "2026-10-21",
+  "solver_advanced": false,
+  "full_suite_rerun": false,
+  "scientific_trajectory_rerun": false,
+  "checks": {
+    "preservation_sha256": "PASS_6_OF_6",
+    "git_bundles": "PASS_COMPLETE_HISTORY_PF_AND_FEM",
+    "annotated_tag_peels": "PASS_EXACT_SAVED_PAIR",
+    "state_archive": "PASS_514_SAFE_RELATIVE_MEMBERS",
+    "restored_signed_kernel": "PASS_SHA256_5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+    "source_calculation_delta": "PASS_NO_CHANGES_UNDER_ARRHENIUS_FRACTURE_SCRIPTS_OR_CONFIG_EXAMPLES",
+    "case_input_paths": "PASS_663_ROWS_ZERO_UNRESOLVED",
+    "shared_worker_plan_construction": "PASS_656_ROWS",
+    "direct_fem_configuration_dry_run": "PASS_7_ROWS",
+    "checkpoint_readability": "PASS_R07_EVENT_R07_POSTEVENT_P3_R09_R10",
+    "operator_validate": "PASS",
+    "operator_start_default": "PASS_DRY_RUN_ONLY",
+    "operator_empty_status_analysis_stop": "PASS"
+  },
+  "checkpoint_readability_detail": {
+    "r07_event": "fem-czm-specimen-checkpoint/1; 36 arrays readable",
+    "r07_postevent": "fem-czm-specimen-checkpoint/1; 36 arrays readable",
+    "p3_combined": "v10.2.30_combined_outer_kinetic_run_state_v2; active vector length 2882",
+    "r09": "latest.v12.pkl full pickle opcode scan readable",
+    "r10": "v11.live-fem-branch-checkpoint/1 JSON and compressed payload prefix readable"
+  },
+  "changed_release_behavior": {
+    "reason": "The frozen V3 matrix routes seven P8 requests through shared-option combinations not accepted by that schema.",
+    "repair": "Bind those existing requests directly to the exact FEM generic current-PF companion with unchanged native arguments.",
+    "targeted_check": "All seven existing FEM configurations returned dry_run=true and the expected model identity; no native step ran."
+  },
+  "host_snapshot": {
+    "platform": "macOS-14.3.1-arm64-arm-64bit",
+    "python": "3.12.13",
+    "physical_memory_GiB": 36.0,
+    "available_memory_GiB_at_check": 6.676,
+    "data_volume_free_KiB_at_check": 10334016,
+    "resource_admission": "NOT_ADMITTED_FOR_LARGE_CAMPAIGN_ON_THIS_SNAPSHOT"
+  },
+  "accepted_evidence_reused_from": "common_framework_readiness/FINAL_SOURCE_QUALIFICATION_20261017.json"
+}

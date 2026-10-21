@@ -1,0 +1,26 @@
+{
+  "schema": "native-fracture-reused-evidence/1",
+  "new_solver_runs": 0,
+  "accepted_receipt": "common_framework_readiness/FINAL_SOURCE_QUALIFICATION_20261017.json",
+  "accepted_scope": {
+    "pf_portable": "1012 passed; 16 external-evidence tests deselected; 257.43 s",
+    "fem": "776 passed plus 16 passing subtests; 520.44 s",
+    "binding_campaign": "40 passed; 699 cases; zero validation errors",
+    "r05": "representative three-level native classical qualification accepted",
+    "r07": "EXP_floor event at step 821 and fresh-process same-physics post-event step 822 accepted",
+    "restart_and_topology": "accepted at the exact scopes linked by the final receipt and preservation manifest"
+  },
+  "identity": {
+    "pf_evidence_head": "23beacdf8acad8c3ed7c7c3a1f2f2f9bdbdd0f3b",
+    "pf_calculation_and_campaign_commit": "1b398437198caec55ae5ea688032accec7bd17da",
+    "fem_evidence_head": "baa27d72c87ba1bb9e5a8b22029e2406e136cf8c",
+    "fem_calculation_commit": "d522b5421ebdeabe1063cd735739cc1a26ebaa75"
+  },
+  "not_reclassified": [
+    "R09 second-generation continuation remains resource-conditional",
+    "two independent historical archive hashes remain absent",
+    "qualification-only material routes are not production selections",
+    "case-level production convergence remains a staged campaign responsibility",
+    "optional fitted-CZM support remains deferred"
+  ]
+}
