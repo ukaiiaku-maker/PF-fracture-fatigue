@@ -1,0 +1,134 @@
+{
+  "metrics": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": -0.6797553299990927,
+        "mobile_final": 3.6497442577212145e-08,
+        "observed_broad_loglog_slope": 3.7092045452619558,
+        "observed_local_slope_q10_q50_q90": [
+          -0.26260718888691736,
+          3.889620773413813,
+          13.105224492796031
+        ],
+        "points": 248,
+        "predicted_broad_loglog_slope": 2.438660038255403,
+        "predicted_local_slope_q10_q50_q90": [
+          1.640723173008462,
+          2.4992623811989443,
+          2.6795279333856183
+        ],
+        "retained_final": 2.253035193725312e-16,
+        "rmse_log10_rate": 0.695947020135569
+      },
+      "0.3": {
+        "bias_log10_rate": -0.3380523493035706,
+        "mobile_final": 4.145258120087528e-10,
+        "observed_broad_loglog_slope": 3.3783824529342126,
+        "observed_local_slope_q10_q50_q90": [
+          -7.9780533875330955,
+          3.0661012852249856,
+          15.341830195853829
+        ],
+        "points": 219,
+        "predicted_broad_loglog_slope": 2.3807373613575336,
+        "predicted_local_slope_q10_q50_q90": [
+          1.45791447035496,
+          2.456762773081492,
+          2.980445903850233
+        ],
+        "retained_final": 2.767049045320797e-18,
+        "rmse_log10_rate": 0.3522586436418625
+      },
+      "0.5": {
+        "bias_log10_rate": 0.14952475898410728,
+        "mobile_final": 5.947786683611506e-22,
+        "observed_broad_loglog_slope": 3.7618960539977753,
+        "observed_local_slope_q10_q50_q90": [
+          -6.584180278179563,
+          3.289566648286239,
+          20.218885216439386
+        ],
+        "points": 171,
+        "predicted_broad_loglog_slope": 2.13856640658314,
+        "predicted_local_slope_q10_q50_q90": [
+          1.379973632202634,
+          2.175736925622391,
+          2.7227298005691223
+        ],
+        "retained_final": 4.218654793254321e-30,
+        "rmse_log10_rate": 0.19473969384396791
+      },
+      "0.7": {
+        "bias_log10_rate": 0.8682847310218029,
+        "mobile_final": 6.312223653618044e-27,
+        "observed_broad_loglog_slope": 2.9204577070033,
+        "observed_local_slope_q10_q50_q90": [
+          -21.3773480557152,
+          2.1784435828768993,
+          17.433572465917997
+        ],
+        "points": 122,
+        "predicted_broad_loglog_slope": 1.3776140327453053,
+        "predicted_local_slope_q10_q50_q90": [
+          0.6959420678533152,
+          1.2864616952636014,
+          1.9438268843837951
+        ],
+        "retained_final": 5.178665466801488e-35,
+        "rmse_log10_rate": 0.8722990484933473
+      }
+    },
+    "max_backstress_Pa": 240775242.77667293,
+    "max_density_m2": 54092943086159.17,
+    "max_mobile_count": 46.38579626153738,
+    "max_retained_count": 2.707146824621798,
+    "max_tip_radius_m": 1.0006713724125062e-06,
+    "overall_bias_log10_rate": -0.14620173074515083,
+    "overall_rmse_log10_rate": 0.5696341856162906
+  },
+  "opening_stress_range_Pa": [
+    320553971.4443903,
+    24012320129.399723
+  ],
+  "optimizer": {
+    "elapsed_s": 177.00113797187805,
+    "kind": "differential_evolution_with_conditional_opening",
+    "message": "Maximum number of iterations has been exceeded.",
+    "nfev": 96,
+    "success": false
+  },
+  "parameters": {
+    "cleavage_backstress_fraction": 1.9999999999999998,
+    "emission_G0_298_eV": 2.5407554170098203,
+    "initial_mobile_count": 46.38579626153738,
+    "initial_retained_count": 2.707146824621798,
+    "initial_source_activity": 1.0,
+    "opening_amplitude_over_kBT": 1.2608582620750552,
+    "opening_exponent": 1.9759285649820524,
+    "opening_floor_over_kBT": 17.38229715757339,
+    "opening_sigma_b_Pa": 9889538414.751896,
+    "plastic_EXP_floor_n": 1.0,
+    "plastic_sigc_298_Pa": 21183365100.94917,
+    "retained_recovery_per_s": 2369.086755662397,
+    "transport_G0_298_eV": 0.8782142487735498
+  },
+  "parameters_vector": [
+    17.38229715757339,
+    1.2608582620750552,
+    2.291477472629568,
+    0.6810384473473289,
+    1.9999999999999998,
+    2.5407554170098203,
+    3.0532162086176453,
+    0.8782142487735498,
+    7.77025982470496,
+    3.8583225268653307,
+    1.3102625307815448
+  ],
+  "profile_weighted_sse": 0.406449254314331,
+  "raw_barrier_over_kBT_range": [
+    17.363437457025917,
+    18.6181728856648
+  ],
+  "start": "bounded_profiled_global"
+}

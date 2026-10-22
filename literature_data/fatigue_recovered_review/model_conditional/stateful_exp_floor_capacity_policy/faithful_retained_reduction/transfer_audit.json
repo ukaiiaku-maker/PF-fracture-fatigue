@@ -1,0 +1,430 @@
+{
+  "experimental_low_mid_high": [
+    {
+      "DeltaK_MPa_sqrt_m": 17.71736,
+      "R": 0.1,
+      "final": [
+        7.424940116581937e-308,
+        3757994.489725053,
+        0.024341514528147996
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "low",
+      "transfers": {
+        "emitted": 3763883.9000690295,
+        "endpoint_mobile_survivor_diagnostic": 36.53356309577789,
+        "escaped": 3427.129956677482,
+        "inventory_balance_residual": 5.688889359589666e-10,
+        "mean_encounter_rate_s": 838188372.6113585,
+        "mean_escape_rate_s": 42085794.81581326,
+        "mean_peierls_rate_s": 1676376745.222717,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 7.424940116581937e-308,
+        "recovered": 2853.9347149454698,
+        "released": 81478.6672119801,
+        "retained_final": 3757994.489725053,
+        "source_activity_final": 0.024341514528147996,
+        "trapped": 3841935.4373243316
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 27.12854,
+      "R": 0.1,
+      "final": [
+        1.0813765061382007e-307,
+        67724278.73654306,
+        0.18502636643997986
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "mid",
+      "transfers": {
+        "emitted": 67816612.4290619,
+        "endpoint_mobile_survivor_diagnostic": 4.014687441558298,
+        "escaped": 41045.33923140749,
+        "inventory_balance_residual": 1.0608346201479435e-08,
+        "mean_encounter_rate_s": 17463095361.63089,
+        "mean_escape_rate_s": 876829448.1929665,
+        "mean_peierls_rate_s": 34926190723.26178,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 1.0813765061382007e-307,
+        "recovered": 51680.007615073,
+        "released": 1066494.9620182551,
+        "retained_final": 67724278.73654306,
+        "source_activity_final": 0.18502636643997986,
+        "trapped": 68842062.05184874
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 45.43079,
+      "R": 0.1,
+      "final": [
+        1.7001005400862016e-307,
+        160495500.64772534,
+        0.25289332943114
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "high",
+      "transfers": {
+        "emitted": 160678728.33283237,
+        "endpoint_mobile_survivor_diagnostic": 2.6926942389509985,
+        "escaped": 60741.99837296453,
+        "inventory_balance_residual": -1.1592055670917034e-07,
+        "mean_encounter_rate_s": 45650305071.00916,
+        "mean_escape_rate_s": 2292121240.613516,
+        "mean_peierls_rate_s": 91300610142.01833,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 1.7001005400862016e-307,
+        "recovered": 122877.34106183471,
+        "released": 1586194.731232673,
+        "retained_final": 160495500.64772534,
+        "source_activity_final": 0.25289332943114,
+        "trapped": 162204181.06569222
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 16.74102,
+      "R": 0.3,
+      "final": [
+        1.0118429313228732e-307,
+        25332984.781731643,
+        0.08874866923455935
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "low",
+      "transfers": {
+        "emitted": 25368858.018726815,
+        "endpoint_mobile_survivor_diagnostic": 9.358756055856313,
+        "escaped": 16888.664706498443,
+        "inventory_balance_residual": 2.1886080503463745e-08,
+        "mean_encounter_rate_s": 5955155963.887517,
+        "mean_escape_rate_s": 299010914.70824385,
+        "mean_peierls_rate_s": 11910311927.775034,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 1.0118429313228732e-307,
+        "recovered": 19376.226616297325,
+        "released": 286287.1258814987,
+        "retained_final": 25332984.781731643,
+        "source_activity_final": 0.08874866923455935,
+        "trapped": 25638256.479901794
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 24.31239,
+      "R": 0.3,
+      "final": [
+        1.43308404734709e-307,
+        114217323.28477617,
+        0.22269019919131128
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "mid",
+      "transfers": {
+        "emitted": 114337599.25781947,
+        "endpoint_mobile_survivor_diagnostic": 3.1815213435639844,
+        "escaped": 33030.93952394917,
+        "inventory_balance_residual": -3.0384398996829987e-08,
+        "mean_encounter_rate_s": 30737836364.00992,
+        "mean_escape_rate_s": 1543359841.973826,
+        "mean_peierls_rate_s": 61475672728.01984,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 1.43308404734709e-307,
+        "recovered": 87636.68784703477,
+        "released": 32654.054441064596,
+        "retained_final": 114217323.28477617,
+        "source_activity_final": 0.22269019919131128,
+        "trapped": 114337222.37273662
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 37.22898,
+      "R": 0.3,
+      "final": [
+        2.134376618934122e-307,
+        202257677.19698045,
+        0.25360712867424706
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "high",
+      "transfers": {
+        "emitted": 202412492.27419978,
+        "endpoint_mobile_survivor_diagnostic": 2.682550009749586,
+        "escaped": 9.708442605446487,
+        "inventory_balance_residual": 1.0303089048591119e-07,
+        "mean_encounter_rate_s": 57426589940.51752,
+        "mean_escape_rate_s": 2883413514.4094634,
+        "mean_peierls_rate_s": 114853179881.03503,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 2.134376618934122e-307,
+        "recovered": 155197.02310428955,
+        "released": 0.0,
+        "retained_final": 202257677.19698045,
+        "source_activity_final": 0.25360712867424706,
+        "trapped": 202412482.5657571
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 15.03523,
+      "R": 0.5,
+      "final": [
+        1.5327983733337043e-307,
+        95454671.97648549,
+        0.18421404995742774
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "low",
+      "transfers": {
+        "emitted": 95527541.286968,
+        "endpoint_mobile_survivor_diagnostic": 4.036409986073733,
+        "escaped": 19.385711889754955,
+        "inventory_balance_residual": -9.587008520384188e-09,
+        "mean_encounter_rate_s": 24489836717.873264,
+        "mean_escape_rate_s": 1229645121.382607,
+        "mean_peierls_rate_s": 48979673435.74653,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 1.5327983733337043e-307,
+        "recovered": 73241.57909826771,
+        "released": 0.0,
+        "retained_final": 95454671.97648549,
+        "source_activity_final": 0.18421404995742774,
+        "trapped": 95527521.90125611
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 20.13085,
+      "R": 0.5,
+      "final": [
+        2.1693421101332905e-307,
+        193952400.25926435,
+        0.2428294531899259
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "mid",
+      "transfers": {
+        "emitted": 194100834.69649518,
+        "endpoint_mobile_survivor_diagnostic": 2.8420659489138758,
+        "escaped": 1.0075859956678517,
+        "inventory_balance_residual": -1.892936896119579e-08,
+        "mean_encounter_rate_s": 53278948208.157326,
+        "mean_escape_rate_s": 2675158658.3157344,
+        "mean_peierls_rate_s": 106557896416.31465,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 2.1693421101332905e-307,
+        "recovered": 148825.08397250948,
+        "released": 0.0,
+        "retained_final": 193952400.25926435,
+        "source_activity_final": 0.2428294531899259,
+        "trapped": 194100833.6889092
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 27.53624,
+      "R": 0.5,
+      "final": [
+        2.9687531969854287e-307,
+        281807154.8496144,
+        0.2539310214932011
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "high",
+      "transfers": {
+        "emitted": 282023010.601599,
+        "endpoint_mobile_survivor_diagnostic": 2.6779657849754686,
+        "escaped": 0.4750527828413219,
+        "inventory_balance_residual": 2.1742254785461768e-07,
+        "mean_encounter_rate_s": 80239723249.79173,
+        "mean_escape_rate_s": 4028870644.253331,
+        "mean_peierls_rate_s": 160479446499.58347,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 2.9687531969854287e-307,
+        "recovered": 216246.93125922699,
+        "released": 0.0,
+        "retained_final": 281807154.8496144,
+        "source_activity_final": 0.2539310214932011,
+        "trapped": 282023010.1265459
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 12.02579,
+      "R": 0.7,
+      "final": [
+        2.93727913607517e-307,
+        262054112.5754615,
+        0.24244417022612635
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "low",
+      "transfers": {
+        "emitted": 262254810.57004294,
+        "endpoint_mobile_survivor_diagnostic": 2.848030922155585,
+        "escaped": 0.47878311767953535,
+        "inventory_balance_residual": -5.42740424824828e-09,
+        "mean_encounter_rate_s": 72997970921.81956,
+        "mean_escape_rate_s": 3665259178.6916533,
+        "mean_peierls_rate_s": 145995941843.63913,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 2.93727913607517e-307,
+        "recovered": 201089.1701259797,
+        "released": 0.0,
+        "retained_final": 262054112.5754615,
+        "source_activity_final": 0.24244417022612635,
+        "trapped": 262254810.09125984
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 14.68213,
+      "R": 0.7,
+      "final": [
+        3.216459730821199e-307,
+        302684899.4811947,
+        0.2522974996081724
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "mid",
+      "transfers": {
+        "emitted": 302916778.1199525,
+        "endpoint_mobile_survivor_diagnostic": 2.701205888180139,
+        "escaped": 0.44757310256300975,
+        "inventory_balance_residual": -5.38018952722652e-08,
+        "mean_encounter_rate_s": 87273443556.35878,
+        "mean_escape_rate_s": 4382036733.508133,
+        "mean_peierls_rate_s": 174546887112.7176,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 3.216459730821199e-307,
+        "recovered": 232269.84551240713,
+        "released": 0.0,
+        "retained_final": 302684899.4811947,
+        "source_activity_final": 0.2522974996081724,
+        "trapped": 302916777.67237943
+      }
+    },
+    {
+      "DeltaK_MPa_sqrt_m": 18.07004,
+      "R": 0.7,
+      "final": [
+        3.3273107416229154e-307,
+        316635941.69395953,
+        0.25440675465024243
+      ],
+      "initial": [
+        0.0,
+        391.6543276467584,
+        1.0
+      ],
+      "position": "high",
+      "transfers": {
+        "emitted": 316878526.7258476,
+        "endpoint_mobile_survivor_diagnostic": 2.6712536477778914,
+        "escaped": 0.4398484234507475,
+        "inventory_balance_residual": -3.6110126411248444e-07,
+        "mean_encounter_rate_s": 92548605613.47774,
+        "mean_escape_rate_s": 4646904864.838095,
+        "mean_peierls_rate_s": 185097211226.95547,
+        "mean_release_rate_s": 1.0,
+        "mobile_final": 3.3273107416229154e-307,
+        "recovered": 242976.24636763637,
+        "released": 0.0,
+        "retained_final": 316635941.69395953,
+        "source_activity_final": 0.25440675465024243,
+        "trapped": 316878526.2859995
+      }
+    }
+  ],
+  "operator_order": [
+    "source_activity_and_mobile_emission",
+    "mobile_retained_exchange",
+    "retained_recovery",
+    "mobile_transport_escape"
+  ],
+  "qualification": "minimal 0-D reduction uses the exact native exchange map and native operator order; it is not a spatial native-owner equivalence claim",
+  "schema": "qste340tm-native-order-transfer-audit/1",
+  "strong_escape_continuation": {
+    "final": [
+      1.1252513204862274e-306,
+      3991229.9351747907,
+      0.21352801677707656
+    ],
+    "transfers": {
+      "emitted": 3991250.355595707,
+      "endpoint_mobile_survivor_diagnostic": 3.683226187802797,
+      "escaped": 20.42042091735273,
+      "inventory_balance_residual": -1.0673630868041073e-09,
+      "mean_encounter_rate_s": 118712760.87763283,
+      "mean_escape_rate_s": 53089960.62381293,
+      "mean_peierls_rate_s": 237425521.75526565,
+      "mean_release_rate_s": 1.0,
+      "mobile_final": 1.1252513204862274e-306,
+      "recovered": 0.0,
+      "released": 0.0,
+      "retained_final": 3991229.9351747907,
+      "source_activity_final": 0.21352801677707656,
+      "trapped": 3991229.9351747907
+    }
+  },
+  "zero_load_continuation": {
+    "final": [
+      10.0,
+      19.96945592049734,
+      0.4
+    ],
+    "transfers": {
+      "emitted": 9.81969717191233e-36,
+      "endpoint_mobile_survivor_diagnostic": 9.819697191158941e-36,
+      "escaped": 0.0,
+      "inventory_balance_residual": 0.0,
+      "mean_encounter_rate_s": 2.5174588808393706e-25,
+      "mean_escape_rate_s": 5.034917761678742e-26,
+      "mean_peierls_rate_s": 5.034917761678741e-25,
+      "mean_release_rate_s": 5.034917761678742e-26,
+      "mobile_final": 10.0,
+      "recovered": 0.030544079502661248,
+      "released": 0.0,
+      "retained_final": 19.96945592049734,
+      "source_activity_final": 0.4,
+      "trapped": 0.0
+    }
+  }
+}

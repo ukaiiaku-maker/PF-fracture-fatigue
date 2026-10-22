@@ -1,0 +1,2007 @@
+{
+  "assumed_frequency_Hz": 10.0,
+  "convergence": {
+    "history": {
+      "1": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797564717785116,
+            "mobile_final": 3.6497442577212145e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.438677419031728,
+            "predicted_local_slope_q10_q50_q90": [
+              1.6407045980635202,
+              2.499272516984673,
+              2.6795558266787975
+            ],
+            "retained_final": 2.253035193725312e-16,
+            "rmse_log10_rate": 0.6959476756501405
+          },
+          "0.3": {
+            "bias_log10_rate": -0.33805232959200204,
+            "mobile_final": 4.145258120087528e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.3807445687955227,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4578951117995493,
+              2.4567679930966397,
+              2.9804845162267046
+            ],
+            "retained_final": 2.767049045320797e-18,
+            "rmse_log10_rate": 0.3522584465368317
+          },
+          "0.5": {
+            "bias_log10_rate": 0.1495256892919076,
+            "mobile_final": 5.947786683611506e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.138561195748196,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3799552969101847,
+              2.175729235845903,
+              2.722750006286488
+            ],
+            "retained_final": 4.218654793254321e-30,
+            "rmse_log10_rate": 0.19474071118738343
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682849243158106,
+            "mobile_final": 6.312223653618044e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.377589222389892,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637365319,
+              1.286434448760167,
+              1.9438104121980686
+            ],
+            "retained_final": 5.178665466801488e-35,
+            "rmse_log10_rate": 0.8722993651618784
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.14620185729772925,
+        "overall_rmse_log10_rate": 0.5696345679276611
+      },
+      "2": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.679747898999484,
+            "mobile_final": 3.6185660021953454e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.4385649690359816,
+            "predicted_local_slope_q10_q50_q90": [
+              1.6407045482278961,
+              2.499272228342488,
+              2.6795534491951107
+            ],
+            "retained_final": 2.2368391320503167e-16,
+            "rmse_log10_rate": 0.6959425812827899
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3380417261614209,
+            "mobile_final": 4.1033485852349786e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.380578868949092,
+            "predicted_local_slope_q10_q50_q90": [
+              1.457895105471851,
+              2.456766144271024,
+              2.978890017794947
+            ],
+            "retained_final": 2.7453607521323834e-18,
+            "rmse_log10_rate": 0.35225211334271017
+          },
+          "0.5": {
+            "bias_log10_rate": 0.1495321615149192,
+            "mobile_final": 5.742739909514028e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.1384217211916816,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3799552969101847,
+              2.175729235544202,
+              2.7233874672362592
+            ],
+            "retained_final": 4.073084300946906e-30,
+            "rmse_log10_rate": 0.19475068128750564
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682916641177612,
+            "mobile_final": 6.317705873825033e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3773803912568616,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637365319,
+              1.2898575013108469,
+              1.943778450665247
+            ],
+            "retained_final": 5.198248111916854e-35,
+            "rmse_log10_rate": 0.8723068504120375
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.14619346623658572,
+        "overall_rmse_log10_rate": 0.5696340153582509
+      },
+      "4": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797439586081252,
+            "mobile_final": 3.593367496746366e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.4385134359438556,
+            "predicted_local_slope_q10_q50_q90": [
+              1.6407045183353133,
+              2.4992720955982297,
+              2.6795512651903657
+            ],
+            "retained_final": 2.2227787439612365e-16,
+            "rmse_log10_rate": 0.6959402336802855
+          },
+          "0.3": {
+            "bias_log10_rate": -0.33803644541969796,
+            "mobile_final": 4.083771850357311e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.38049626751562,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4578950913952038,
+              2.4567644304558645,
+              2.9779358254596873
+            ],
+            "retained_final": 2.7353966932061804e-18,
+            "rmse_log10_rate": 0.35224896003548806
+          },
+          "0.5": {
+            "bias_log10_rate": 0.14953535145866628,
+            "mobile_final": 5.615411053093108e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.138352994454488,
+            "predicted_local_slope_q10_q50_q90": [
+              1.379955296905328,
+              2.175729235365564,
+              2.7237429870601737
+            ],
+            "retained_final": 3.982709474119309e-30,
+            "rmse_log10_rate": 0.19475559785008661
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682950239100495,
+            "mobile_final": 6.319121648230182e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3772762677089132,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637365319,
+              1.2938831500599077,
+              1.9437636049525056
+            ],
+            "retained_final": 5.206973114374367e-35,
+            "rmse_log10_rate": 0.8723105824855112
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.1461894016648302,
+        "overall_rmse_log10_rate": 0.569633813180112
+      },
+      "8": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797411794055848,
+            "mobile_final": 3.554909578077913e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.438478066635126,
+            "predicted_local_slope_q10_q50_q90": [
+              1.640704658756284,
+              2.4992719009885644,
+              2.679547022945912
+            ],
+            "retained_final": 2.199739889052138e-16,
+            "rmse_log10_rate": 0.6959385452075016
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3380340884967347,
+            "mobile_final": 4.1000249431309705e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.380457966641505,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4578950900108576,
+              2.45676238365294,
+              2.9774605039884974
+            ],
+            "retained_final": 2.7478578190502608e-18,
+            "rmse_log10_rate": 0.3522475744303393
+          },
+          "0.5": {
+            "bias_log10_rate": 0.14953665061478613,
+            "mobile_final": 5.521825389165689e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.1383249593622864,
+            "predicted_local_slope_q10_q50_q90": [
+              1.379955296905328,
+              2.175729235302189,
+              2.723831693187162
+            ],
+            "retained_final": 3.91630183018097e-30,
+            "rmse_log10_rate": 0.1947575953126789
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682966359125871,
+            "mobile_final": 6.3192215324960656e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3772263058004819,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637365319,
+              1.2953295470275825,
+              1.943755999980292
+            ],
+            "retained_final": 5.210839517396599e-35,
+            "rmse_log10_rate": 0.8723123734917744
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.14618726452224454,
+        "overall_rmse_log10_rate": 0.5696334870640589
+      }
+    },
+    "waveform": {
+      "128": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797546905704456,
+            "mobile_final": 3.595202712098834e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.438656065511554,
+            "predicted_local_slope_q10_q50_q90": [
+              1.6407045366844581,
+              2.4992722699097327,
+              2.679551653084309
+            ],
+            "retained_final": 1.7028424044205715e-14,
+            "rmse_log10_rate": 0.695946548766217
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3380504757358787,
+            "mobile_final": 4.070342738660357e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.380717723082724,
+            "predicted_local_slope_q10_q50_q90": [
+              1.457895100665193,
+              2.4567644049421498,
+              2.980029723925742
+            ],
+            "retained_final": 2.083668936773378e-16,
+            "rmse_log10_rate": 0.352257352084588
+          },
+          "0.5": {
+            "bias_log10_rate": 0.14952611810506888,
+            "mobile_final": 5.728126310650376e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.138552152114861,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3799552969150415,
+              2.1757292356300466,
+              2.722854927592467
+            ],
+            "retained_final": 3.113992475450924e-28,
+            "rmse_log10_rate": 0.19474138018695625
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682852812674008,
+            "mobile_final": 6.307915770616163e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3775782111037504,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637364618,
+              1.2864344487603254,
+              1.9438003737202514
+            ],
+            "retained_final": 3.9642557884553886e-33,
+            "rmse_log10_rate": 0.8722997614555718
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.14620058807505032,
+        "overall_rmse_log10_rate": 0.5696340725189049
+      },
+      "256": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797545386658529,
+            "mobile_final": 3.590736024772761e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.438654237481229,
+            "predicted_local_slope_q10_q50_q90": [
+              1.6407045316353632,
+              2.499272249562726,
+              2.6795513088489473
+            ],
+            "retained_final": 2.996235799791295e-14,
+            "rmse_log10_rate": 0.6959464528996897
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3380503170182844,
+            "mobile_final": 4.0642231062249615e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.380715416219614,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4578950997506002,
+              2.456764109490984,
+              2.9799915067800615
+            ],
+            "retained_final": 3.66531413875339e-16,
+            "rmse_log10_rate": 0.35225725832972615
+          },
+          "0.5": {
+            "bias_log10_rate": 0.14952615451507614,
+            "mobile_final": 5.710406257788599e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.1385513835424517,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3799552969101847,
+              2.175729235612626,
+              2.722863625068886
+            ],
+            "retained_final": 5.468919639149008e-28,
+            "rmse_log10_rate": 0.19474143695434618
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682853118422219,
+            "mobile_final": 6.3075654521403455e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3775772677700628,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637364618,
+              1.2864344487606738,
+              1.9437995473204348
+            ],
+            "retained_final": 6.983291185009633e-33,
+            "rmse_log10_rate": 0.8722997954005886
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.1462004796701404,
+        "overall_rmse_log10_rate": 0.569634030303739
+      },
+      "32": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797564717785116,
+            "mobile_final": 3.6497442577212145e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.438677419031728,
+            "predicted_local_slope_q10_q50_q90": [
+              1.6407045980635202,
+              2.499272516984673,
+              2.6795558266787975
+            ],
+            "retained_final": 2.253035193725312e-16,
+            "rmse_log10_rate": 0.6959476756501405
+          },
+          "0.3": {
+            "bias_log10_rate": -0.33805232959200204,
+            "mobile_final": 4.145258120087528e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.3807445687955227,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4578951117995493,
+              2.4567679930966397,
+              2.9804845162267046
+            ],
+            "retained_final": 2.767049045320797e-18,
+            "rmse_log10_rate": 0.3522584465368317
+          },
+          "0.5": {
+            "bias_log10_rate": 0.1495256892919076,
+            "mobile_final": 5.947786683611506e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.138561195748196,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3799552969101847,
+              2.175729235845903,
+              2.722750006286488
+            ],
+            "retained_final": 4.218654793254321e-30,
+            "rmse_log10_rate": 0.19474071118738343
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682849243158106,
+            "mobile_final": 6.312223653618044e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.377589222389892,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637365319,
+              1.286434448760167,
+              1.9438104121980686
+            ],
+            "retained_final": 5.178665466801488e-35,
+            "rmse_log10_rate": 0.8722993651618784
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.14620185729772925,
+        "overall_rmse_log10_rate": 0.5696345679276611
+      },
+      "64": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797551872795368,
+            "mobile_final": 3.6102372730642184e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.4386620251641324,
+            "predicted_local_slope_q10_q50_q90": [
+              1.6407045536531555,
+              2.4992723382448694,
+              2.6795528080663846
+            ],
+            "retained_final": 4.640112436635945e-15,
+            "rmse_log10_rate": 0.6959468628382438
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3380509931366071,
+            "mobile_final": 4.090966234997641e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.380725221552248,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4578951037413148,
+              2.4567653973233003,
+              2.9801561824794054
+            ],
+            "retained_final": 5.683270907180769e-17,
+            "rmse_log10_rate": 0.35225765756792465
+          },
+          "0.5": {
+            "bias_log10_rate": 0.1495259986406347,
+            "mobile_final": 5.788147904982124e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.1385546721048723,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3799552969101847,
+              2.1757292356898095,
+              2.7228258466936626
+            ],
+            "retained_final": 8.539992169277744e-29,
+            "rmse_log10_rate": 0.19474119383153615
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682851816338063,
+            "mobile_final": 6.30910573421217e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3775812847363806,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959146637364618,
+              1.2864344487604837,
+              1.943803149874026
+            ],
+            "retained_final": 1.0762052640668315e-33,
+            "rmse_log10_rate": 0.8722996508402181
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.14620094212548568,
+        "overall_rmse_log10_rate": 0.5696342106407878
+      }
+    }
+  },
+  "fixed_constants": {
+    "attempt_frequency_s": 1000000000000.0,
+    "blunting_coefficient": 1.0,
+    "burgers_m": 2.48e-10,
+    "cooperative_hits": 3.273241435177624,
+    "cooperative_tau_s": 6.992153587194454e-07,
+    "event_length_m": 5e-06,
+    "forest_density_floor_m2": 5000000000000.0,
+    "opening_smoothing_ratio": 0.0001,
+    "process_zone_m": 1e-06,
+    "shear_modulus_Pa": 80000000000.0,
+    "tip_radius_m": 1e-06
+  },
+  "frozen_metrics": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": -0.7121612654499844,
+        "mobile_final": 46.38579626153738,
+        "observed_broad_loglog_slope": 3.7092045452619558,
+        "observed_local_slope_q10_q50_q90": [
+          -0.26260718888691736,
+          3.889620773413813,
+          13.105224492796031
+        ],
+        "points": 248,
+        "predicted_broad_loglog_slope": 2.531704539474145,
+        "predicted_local_slope_q10_q50_q90": [
+          1.8573407218408913,
+          2.499149697276383,
+          2.7926859221823706
+        ],
+        "retained_final": 2.707146824621798,
+        "rmse_log10_rate": 0.7258533278817008
+      },
+      "0.3": {
+        "bias_log10_rate": -0.36544929961437383,
+        "mobile_final": 46.38579626153738,
+        "observed_broad_loglog_slope": 3.3783824529342126,
+        "observed_local_slope_q10_q50_q90": [
+          -7.9780533875330955,
+          3.0661012852249856,
+          15.341830195853829
+        ],
+        "points": 219,
+        "predicted_broad_loglog_slope": 2.498388926406284,
+        "predicted_local_slope_q10_q50_q90": [
+          1.6581177956042856,
+          2.6513786435270887,
+          2.8530853888122754
+        ],
+        "retained_final": 2.707146824621798,
+        "rmse_log10_rate": 0.3756847946142027
+      },
+      "0.5": {
+        "bias_log10_rate": 0.12912195288648962,
+        "mobile_final": 46.38579626153738,
+        "observed_broad_loglog_slope": 3.7618960539977753,
+        "observed_local_slope_q10_q50_q90": [
+          -6.584180278179563,
+          3.289566648286239,
+          20.218885216439386
+        ],
+        "points": 171,
+        "predicted_broad_loglog_slope": 2.29261571859781,
+        "predicted_local_slope_q10_q50_q90": [
+          1.5108253492304982,
+          2.369257645886101,
+          2.903822964296769
+        ],
+        "retained_final": 2.707146824621798,
+        "rmse_log10_rate": 0.17169826528644141
+      },
+      "0.7": {
+        "bias_log10_rate": 0.8663015335755998,
+        "mobile_final": 46.38579626153738,
+        "observed_broad_loglog_slope": 2.9204577070033,
+        "observed_local_slope_q10_q50_q90": [
+          -21.3773480557152,
+          2.1784435828768993,
+          17.433572465917997
+        ],
+        "points": 122,
+        "predicted_broad_loglog_slope": 1.522778847902875,
+        "predicted_local_slope_q10_q50_q90": [
+          0.843611920404049,
+          1.526673726252461,
+          2.262999758794762
+        ],
+        "retained_final": 2.707146824621798,
+        "rmse_log10_rate": 0.8696394233973809
+      }
+    },
+    "max_backstress_Pa": 240775242.77667293,
+    "max_density_m2": 54092943086159.17,
+    "max_mobile_count": 46.38579626153738,
+    "max_retained_count": 2.707146824621798,
+    "max_tip_radius_m": 1.0006713724125062e-06,
+    "overall_bias_log10_rate": -0.1695799334306988,
+    "overall_rmse_log10_rate": 0.5836341404154857
+  },
+  "limitations": [
+    "frequency is the user-authorized provisional 10 Hz assumption",
+    "minimal aggregate native-order reduction is not a spatial native 1-D equivalence claim",
+    "positive-R histories do not exercise signed return",
+    "the profiled search is finite and does not prove that all EXP_floor parameterizations fail"
+  ],
+  "metrics": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": -0.6797564717785116,
+        "mobile_final": 3.6497442577212145e-08,
+        "observed_broad_loglog_slope": 3.7092045452619558,
+        "observed_local_slope_q10_q50_q90": [
+          -0.26260718888691736,
+          3.889620773413813,
+          13.105224492796031
+        ],
+        "points": 248,
+        "predicted_broad_loglog_slope": 2.438677419031728,
+        "predicted_local_slope_q10_q50_q90": [
+          1.6407045980635202,
+          2.499272516984673,
+          2.6795558266787975
+        ],
+        "retained_final": 2.253035193725312e-16,
+        "rmse_log10_rate": 0.6959476756501405
+      },
+      "0.3": {
+        "bias_log10_rate": -0.33805232959200204,
+        "mobile_final": 4.145258120087528e-10,
+        "observed_broad_loglog_slope": 3.3783824529342126,
+        "observed_local_slope_q10_q50_q90": [
+          -7.9780533875330955,
+          3.0661012852249856,
+          15.341830195853829
+        ],
+        "points": 219,
+        "predicted_broad_loglog_slope": 2.3807445687955227,
+        "predicted_local_slope_q10_q50_q90": [
+          1.4578951117995493,
+          2.4567679930966397,
+          2.9804845162267046
+        ],
+        "retained_final": 2.767049045320797e-18,
+        "rmse_log10_rate": 0.3522584465368317
+      },
+      "0.5": {
+        "bias_log10_rate": 0.1495256892919076,
+        "mobile_final": 5.947786683611506e-22,
+        "observed_broad_loglog_slope": 3.7618960539977753,
+        "observed_local_slope_q10_q50_q90": [
+          -6.584180278179563,
+          3.289566648286239,
+          20.218885216439386
+        ],
+        "points": 171,
+        "predicted_broad_loglog_slope": 2.138561195748196,
+        "predicted_local_slope_q10_q50_q90": [
+          1.3799552969101847,
+          2.175729235845903,
+          2.722750006286488
+        ],
+        "retained_final": 4.218654793254321e-30,
+        "rmse_log10_rate": 0.19474071118738343
+      },
+      "0.7": {
+        "bias_log10_rate": 0.8682849243158106,
+        "mobile_final": 6.312223653618044e-27,
+        "observed_broad_loglog_slope": 2.9204577070033,
+        "observed_local_slope_q10_q50_q90": [
+          -21.3773480557152,
+          2.1784435828768993,
+          17.433572465917997
+        ],
+        "points": 122,
+        "predicted_broad_loglog_slope": 1.377589222389892,
+        "predicted_local_slope_q10_q50_q90": [
+          0.6959146637365319,
+          1.286434448760167,
+          1.9438104121980686
+        ],
+        "retained_final": 5.178665466801488e-35,
+        "rmse_log10_rate": 0.8722993651618784
+      }
+    },
+    "max_backstress_Pa": 240775242.77667293,
+    "max_density_m2": 54092943086159.17,
+    "max_mobile_count": 46.38579626153738,
+    "max_retained_count": 2.707146824621798,
+    "max_tip_radius_m": 1.0006713724125062e-06,
+    "overall_bias_log10_rate": -0.14620185729772925,
+    "overall_rmse_log10_rate": 0.5696345679276611
+  },
+  "multi_start": [
+    {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6795271125350185,
+            "mobile_final": 0.9663129173452873,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.431357405508806,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4385936418579233,
+              2.408514541763308,
+              2.8349859686003143
+            ],
+            "retained_final": 0.21033881358933276,
+            "rmse_log10_rate": 0.6960112521688543
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3402906250572508,
+            "mobile_final": 0.9971234819357309,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.3396328569331533,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3208586913547689,
+              2.5749504010565016,
+              2.917094066756505
+            ],
+            "retained_final": 0.8865658705956445,
+            "rmse_log10_rate": 0.3555986034472655
+          },
+          "0.5": {
+            "bias_log10_rate": 0.14754519003911148,
+            "mobile_final": 1.0032843599987904,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.047482234682903,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3629850806597856,
+              2.1148986413327755,
+              2.9217493794270246
+            ],
+            "retained_final": 2.7107160724466572,
+            "rmse_log10_rate": 0.1980280244490654
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8722988176495854,
+            "mobile_final": 0.8493315925021064,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.545846633413632,
+            "predicted_local_slope_q10_q50_q90": [
+              0.7137939477392198,
+              1.5023249519060407,
+              4.384474400773799
+            ],
+            "retained_final": 27.771957607209043,
+            "rmse_log10_rate": 0.8755502387018446
+          }
+        },
+        "max_backstress_Pa": 183842912.2975087,
+        "max_density_m2": 33621289199711.152,
+        "max_mobile_count": 1.0032843599987904,
+        "max_retained_count": 27.771957607209043,
+        "max_tip_radius_m": 1.0068874454865877e-06,
+        "overall_bias_log10_rate": -0.14657327308721715,
+        "overall_rmse_log10_rate": 0.5713110816374437
+      },
+      "opening_stress_range_Pa": [
+        802373667.2224263,
+        23930053070.792416
+      ],
+      "optimizer": {
+        "kind": "conditional_opening_profile",
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 2.3617376296691935e-24,
+        "emission_G0_298_eV": 1.6582550715821935,
+        "initial_mobile_count": 0.0,
+        "initial_retained_count": 0.0,
+        "initial_source_activity": 1.0,
+        "opening_amplitude_over_kBT": 1.1046070824639238,
+        "opening_exponent": 2.5029796774213686,
+        "opening_floor_over_kBT": 17.43424986147516,
+        "opening_sigma_b_Pa": 10025660978.43149,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 973153415.1565478,
+        "retained_recovery_per_s": 1.452246531043777e-06,
+        "transport_G0_298_eV": 1.7887915169719055
+      },
+      "parameters_vector": [
+        17.43424986147516,
+        1.1046070824639238,
+        2.30514790402977,
+        0.917481893128369,
+        2.3617376296691935e-24,
+        1.6582550715821935,
+        -0.02721353691621632,
+        1.7887915169719055,
+        -13.442398868753656,
+        0.0,
+        0.0
+      ],
+      "profile_weighted_sse": 0.41062706954812234,
+      "raw_barrier_over_kBT_range": [
+        17.285039090926585,
+        18.514082388397522
+      ],
+      "start": "63be_main"
+    },
+    {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6795271125350185,
+            "mobile_final": 0.9663129173452873,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.431357405508806,
+            "predicted_local_slope_q10_q50_q90": [
+              1.4385936418579233,
+              2.408514541763308,
+              2.8349859686003143
+            ],
+            "retained_final": 0.21033881358933276,
+            "rmse_log10_rate": 0.6960112521688543
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3402906250572508,
+            "mobile_final": 0.9971234819357309,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.3396328569331533,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3208586913547689,
+              2.5749504010565016,
+              2.917094066756505
+            ],
+            "retained_final": 0.8865658705956445,
+            "rmse_log10_rate": 0.3555986034472655
+          },
+          "0.5": {
+            "bias_log10_rate": 0.14754519003911148,
+            "mobile_final": 1.0032843599987904,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.047482234682903,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3629850806597856,
+              2.1148986413327755,
+              2.9217493794270246
+            ],
+            "retained_final": 2.7107160724466572,
+            "rmse_log10_rate": 0.1980280244490654
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8722988176495854,
+            "mobile_final": 0.8493315925021064,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.545846633413632,
+            "predicted_local_slope_q10_q50_q90": [
+              0.7137939477392198,
+              1.5023249519060407,
+              4.384474400773799
+            ],
+            "retained_final": 27.771957607209043,
+            "rmse_log10_rate": 0.8755502387018446
+          }
+        },
+        "max_backstress_Pa": 183842912.2975087,
+        "max_density_m2": 33621289199711.152,
+        "max_mobile_count": 1.0032843599987904,
+        "max_retained_count": 27.771957607209043,
+        "max_tip_radius_m": 1.0068874454865877e-06,
+        "overall_bias_log10_rate": -0.14657327308721715,
+        "overall_rmse_log10_rate": 0.5713110816374437
+      },
+      "opening_stress_range_Pa": [
+        802373667.2224263,
+        23930053070.792416
+      ],
+      "optimizer": {
+        "kind": "conditional_opening_profile",
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 2.3617376296691935e-24,
+        "emission_G0_298_eV": 1.6582550715821935,
+        "initial_mobile_count": 0.0,
+        "initial_retained_count": 0.0,
+        "initial_source_activity": 1.0,
+        "opening_amplitude_over_kBT": 1.1046070824639238,
+        "opening_exponent": 2.5029796774213686,
+        "opening_floor_over_kBT": 17.43424986147516,
+        "opening_sigma_b_Pa": 10025660978.43149,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 973153415.1565478,
+        "retained_recovery_per_s": 1.452246531043777e-06,
+        "transport_G0_298_eV": 1.7887915169719055
+      },
+      "parameters_vector": [
+        17.43424986147516,
+        1.1046070824639238,
+        2.30514790402977,
+        0.917481893128369,
+        2.3617376296691935e-24,
+        1.6582550715821935,
+        -0.02721353691621632,
+        1.7887915169719055,
+        -13.442398868753656,
+        0.0,
+        0.0
+      ],
+      "profile_weighted_sse": 0.41062706954812234,
+      "raw_barrier_over_kBT_range": [
+        17.285039090926585,
+        18.514082388397522
+      ],
+      "start": "active_opening_1GPa"
+    },
+    {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -17.77203293426938,
+            "mobile_final": 0.2113389679474128,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 0.6692752039850733,
+            "predicted_local_slope_q10_q50_q90": [
+              4.549756456181867e-06,
+              0.095537597043067,
+              1.8201853812614068
+            ],
+            "retained_final": 118.44018334996667,
+            "rmse_log10_rate": 17.775840358860336
+          },
+          "0.3": {
+            "bias_log10_rate": -17.509857693642793,
+            "mobile_final": 0.13218520734952044,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 1.917891372938284,
+            "predicted_local_slope_q10_q50_q90": [
+              -5.0718655505695766e-06,
+              2.664471647941913e-06,
+              24.86299144736731
+            ],
+            "retained_final": 295.8965458393519,
+            "rmse_log10_rate": 17.513088164329258
+          },
+          "0.5": {
+            "bias_log10_rate": -17.061682339441568,
+            "mobile_final": 0.23331944611547395,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 6.302583095631895,
+            "predicted_local_slope_q10_q50_q90": [
+              -1.058115511686506e-06,
+              0.015827959153091264,
+              37.794580314294485
+            ],
+            "retained_final": 411.1359555161059,
+            "rmse_log10_rate": 17.07086021627875
+          },
+          "0.7": {
+            "bias_log10_rate": -12.183374984496693,
+            "mobile_final": 6.154977709074173e-10,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 116.30992059926629,
+            "predicted_local_slope_q10_q50_q90": [
+              -1635.134293347935,
+              0.5466465828611764,
+              624.3813346537916
+            ],
+            "retained_final": 42659.449898305174,
+            "rmse_log10_rate": 15.059899389379945
+          }
+        },
+        "max_backstress_Pa": 7605302780.946828,
+        "max_density_m2": 4.898608794234719e+16,
+        "max_mobile_count": 16729.875748208884,
+        "max_retained_count": 48981.08794234719,
+        "max_tip_radius_m": 1.3147309809702106e-05,
+        "overall_bias_log10_rate": -16.639529514157477,
+        "overall_rmse_log10_rate": 17.13083484232729
+      },
+      "opening_stress_range_Pa": [
+        0.0,
+        22388794119.744328
+      ],
+      "optimizer": {
+        "kind": "conditional_opening_profile",
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 1.999999794235611,
+        "emission_G0_298_eV": 1.038708139498976,
+        "initial_mobile_count": 0.0,
+        "initial_retained_count": 0.0,
+        "initial_source_activity": 1.0,
+        "opening_amplitude_over_kBT": 119.99999999999999,
+        "opening_exponent": 7.999998575569838,
+        "opening_floor_over_kBT": 29.999999999999996,
+        "opening_sigma_b_Pa": 1063049800.2428685,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 479272344.7831787,
+        "retained_recovery_per_s": 6.651845831409084e-05,
+        "transport_G0_298_eV": 3.347299319042113
+      },
+      "parameters_vector": [
+        29.999999999999996,
+        119.99999999999999,
+        0.06114194703277885,
+        2.07944136362605,
+        1.999999794235611,
+        1.038708139498976,
+        -0.7354862736608946,
+        3.347299319042113,
+        -9.618031080184567,
+        0.0,
+        0.0
+      ],
+      "profile_weighted_sse": 540979.118342135,
+      "raw_barrier_over_kBT_range": [
+        -73.27652342854901,
+        143.69047801096625
+      ],
+      "start": "63be_excluding_R0p3"
+    },
+    {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -17.77203293426938,
+            "mobile_final": 0.2113389679474128,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 0.6692752039850733,
+            "predicted_local_slope_q10_q50_q90": [
+              4.549756456181867e-06,
+              0.095537597043067,
+              1.8201853812614068
+            ],
+            "retained_final": 118.44018334996667,
+            "rmse_log10_rate": 17.775840358860336
+          },
+          "0.3": {
+            "bias_log10_rate": -17.509857693642793,
+            "mobile_final": 0.13218520734952044,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 1.917891372938284,
+            "predicted_local_slope_q10_q50_q90": [
+              -5.0718655505695766e-06,
+              2.664471647941913e-06,
+              24.86299144736731
+            ],
+            "retained_final": 295.8965458393519,
+            "rmse_log10_rate": 17.513088164329258
+          },
+          "0.5": {
+            "bias_log10_rate": -17.061682339441568,
+            "mobile_final": 0.23331944611547395,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 6.302583095631895,
+            "predicted_local_slope_q10_q50_q90": [
+              -1.058115511686506e-06,
+              0.015827959153091264,
+              37.794580314294485
+            ],
+            "retained_final": 411.1359555161059,
+            "rmse_log10_rate": 17.07086021627875
+          },
+          "0.7": {
+            "bias_log10_rate": -12.183374984496693,
+            "mobile_final": 6.154977709074173e-10,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 116.30992059926629,
+            "predicted_local_slope_q10_q50_q90": [
+              -1635.134293347935,
+              0.5466465828611764,
+              624.3813346537916
+            ],
+            "retained_final": 42659.449898305174,
+            "rmse_log10_rate": 15.059899389379945
+          }
+        },
+        "max_backstress_Pa": 7605302780.946828,
+        "max_density_m2": 4.898608794234719e+16,
+        "max_mobile_count": 16729.875748208884,
+        "max_retained_count": 48981.08794234719,
+        "max_tip_radius_m": 1.3147309809702106e-05,
+        "overall_bias_log10_rate": -16.639529514157477,
+        "overall_rmse_log10_rate": 17.13083484232729
+      },
+      "opening_stress_range_Pa": [
+        0.0,
+        22388794119.744328
+      ],
+      "optimizer": {
+        "kind": "conditional_opening_profile",
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 1.999999794235611,
+        "emission_G0_298_eV": 1.038708139498976,
+        "initial_mobile_count": 0.0,
+        "initial_retained_count": 0.0,
+        "initial_source_activity": 1.0,
+        "opening_amplitude_over_kBT": 119.99999999999999,
+        "opening_exponent": 7.999998575569838,
+        "opening_floor_over_kBT": 29.999999999999996,
+        "opening_sigma_b_Pa": 1063049800.2428685,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 479272344.7831787,
+        "retained_recovery_per_s": 6.651845831409084e-05,
+        "transport_G0_298_eV": 3.347299319042113
+      },
+      "parameters_vector": [
+        29.999999999999996,
+        119.99999999999999,
+        0.06114194703277885,
+        2.07944136362605,
+        1.999999794235611,
+        1.038708139498976,
+        -0.7354862736608946,
+        3.347299319042113,
+        -9.618031080184567,
+        0.0,
+        0.0
+      ],
+      "profile_weighted_sse": 540979.118342135,
+      "raw_barrier_over_kBT_range": [
+        -73.27652342854901,
+        143.69047801096625
+      ],
+      "start": "active_opening_2GPa"
+    },
+    {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -11.103088133295335,
+            "mobile_final": 324719.1145382428,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 69.92806121530613,
+            "predicted_local_slope_q10_q50_q90": [
+              -25134.99712639692,
+              0.0,
+              29781.211065946252
+            ],
+            "retained_final": 55089.62797349612,
+            "rmse_log10_rate": 32.162161226484876
+          },
+          "0.3": {
+            "bias_log10_rate": -6.48724583849407,
+            "mobile_final": 604138.5012691199,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 66.04114379996655,
+            "predicted_local_slope_q10_q50_q90": [
+              -40508.26861560062,
+              0.0,
+              30303.463423065823
+            ],
+            "retained_final": 102448.42838816375,
+            "rmse_log10_rate": 27.376850955564283
+          },
+          "0.5": {
+            "bias_log10_rate": -5.278881529690837,
+            "mobile_final": 32630170.642027445,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 98.36701908501843,
+            "predicted_local_slope_q10_q50_q90": [
+              -31789.252561263616,
+              0.0,
+              30147.119197466123
+            ],
+            "retained_final": 5530936.630306681,
+            "rmse_log10_rate": 24.394896557275022
+          },
+          "0.7": {
+            "bias_log10_rate": -3.885119074238452,
+            "mobile_final": 146127.60923463808,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 71.28812802679656,
+            "predicted_local_slope_q10_q50_q90": [
+              -23475.560748619173,
+              0.0,
+              50610.234356717454
+            ],
+            "retained_final": 24966.598059231943,
+            "rmse_log10_rate": 20.50682425833481
+          }
+        },
+        "max_backstress_Pa": 18064258573651.195,
+        "max_density_m2": 2.7633487068391476e+23,
+        "max_mobile_count": 1431823226.4282176,
+        "max_retained_count": 276334870678.91473,
+        "max_tip_radius_m": 68.53104892837085,
+        "overall_bias_log10_rate": -7.303876268844301,
+        "overall_rmse_log10_rate": 27.475819593445756
+      },
+      "opening_stress_range_Pa": [
+        0.0,
+        18071326738.898224
+      ],
+      "optimizer": {
+        "kind": "conditional_opening_profile",
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 0.6736220263504279,
+        "emission_G0_298_eV": 0.8,
+        "initial_mobile_count": 20.0,
+        "initial_retained_count": 20.0,
+        "initial_source_activity": 1.0,
+        "opening_amplitude_over_kBT": 119.99999998639896,
+        "opening_exponent": 0.15256650243056374,
+        "opening_floor_over_kBT": 29.999999999994436,
+        "opening_sigma_b_Pa": 1221828045.5099297,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 100000000.02302574,
+        "retained_recovery_per_s": 0.10000000000000002,
+        "transport_G0_298_eV": 0.8
+      },
+      "parameters_vector": [
+        29.999999999994436,
+        119.99999998639896,
+        0.20034813522604278,
+        -1.8801546964786862,
+        0.6736220263504279,
+        0.8,
+        -2.3025850927637883,
+        0.8,
+        -2.3025850929940455,
+        3.044522437723423,
+        3.044522437723423
+      ],
+      "profile_weighted_sse": 1.5863970278890655e+20,
+      "raw_barrier_over_kBT_range": [
+        -1259522539.4010637,
+        148.33406752348426
+      ],
+      "start": "active_transfer"
+    },
+    {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": 5.459838859149145,
+            "mobile_final": 2.8617161162695495e-32,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 9.448306482433333,
+            "predicted_local_slope_q10_q50_q90": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "retained_final": 2608190.7030021185,
+            "rmse_log10_rate": 7.322106000782412
+          },
+          "0.3": {
+            "bias_log10_rate": 5.88755433225245,
+            "mobile_final": 7.241506065025755e-35,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 4.1167265457488575,
+            "predicted_local_slope_q10_q50_q90": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "retained_final": 5377376053.018371,
+            "rmse_log10_rate": 7.30834810955431
+          },
+          "0.5": {
+            "bias_log10_rate": 5.445952403130921,
+            "mobile_final": 5.182401595634943e-35,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 15.230335380438069,
+            "predicted_local_slope_q10_q50_q90": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "retained_final": 6990887741.446271,
+            "rmse_log10_rate": 7.8423712483117844
+          },
+          "0.7": {
+            "bias_log10_rate": 5.484553425378308,
+            "mobile_final": 4.2016945986677336e-36,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 24.415118157958037,
+            "predicted_local_slope_q10_q50_q90": [
+              -1786.1934941079326,
+              0.0,
+              669.5659610991714
+            ],
+            "retained_final": 17032804082.114677,
+            "rmse_log10_rate": 8.266578314279393
+          }
+        },
+        "max_backstress_Pa": 25031046947081.758,
+        "max_density_m2": 5.305831321886545e+23,
+        "max_mobile_count": 31935.76561230385,
+        "max_retained_count": 530583132183.6545,
+        "max_tip_radius_m": 131.5846177815463,
+        "overall_bias_log10_rate": 5.583931335083967,
+        "overall_rmse_log10_rate": 7.595645162150196
+      },
+      "opening_stress_range_Pa": [
+        0.0,
+        23794871510.453495
+      ],
+      "optimizer": {
+        "kind": "conditional_opening_profile",
+        "success": true
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 0.010945023110094682,
+        "emission_G0_298_eV": 2.6626382073345183,
+        "initial_mobile_count": 0.0,
+        "initial_retained_count": 391.6543276467584,
+        "initial_source_activity": 1.0,
+        "opening_amplitude_over_kBT": 119.99999999987381,
+        "opening_exponent": 7.82018751939641,
+        "opening_floor_over_kBT": 29.999999999979224,
+        "opening_sigma_b_Pa": 50000000.000240594,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 100000000.02302574,
+        "retained_recovery_per_s": 0.015283713398035801,
+        "transport_G0_298_eV": 2.147366525572241
+      },
+      "parameters_vector": [
+        29.999999999979224,
+        119.99999999987381,
+        -2.995732273549179,
+        2.0567085337321735,
+        0.010945023110094682,
+        2.6626382073345183,
+        -2.3025850927637883,
+        2.147366525572241,
+        -4.180967501337511,
+        0.0,
+        5.972929651399668
+      ],
+      "profile_weighted_sse": 5.848539554317557e+20,
+      "raw_barrier_over_kBT_range": [
+        -2418375395.4066706,
+        29.977210210795473
+      ],
+      "start": "5703_control_vector"
+    },
+    {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6797553299990927,
+            "mobile_final": 3.6497442577212145e-08,
+            "observed_broad_loglog_slope": 3.7092045452619558,
+            "observed_local_slope_q10_q50_q90": [
+              -0.26260718888691736,
+              3.889620773413813,
+              13.105224492796031
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.438660038255403,
+            "predicted_local_slope_q10_q50_q90": [
+              1.640723173008462,
+              2.4992623811989443,
+              2.6795279333856183
+            ],
+            "retained_final": 2.253035193725312e-16,
+            "rmse_log10_rate": 0.695947020135569
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3380523493035706,
+            "mobile_final": 4.145258120087528e-10,
+            "observed_broad_loglog_slope": 3.3783824529342126,
+            "observed_local_slope_q10_q50_q90": [
+              -7.9780533875330955,
+              3.0661012852249856,
+              15.341830195853829
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.3807373613575336,
+            "predicted_local_slope_q10_q50_q90": [
+              1.45791447035496,
+              2.456762773081492,
+              2.980445903850233
+            ],
+            "retained_final": 2.767049045320797e-18,
+            "rmse_log10_rate": 0.3522586436418625
+          },
+          "0.5": {
+            "bias_log10_rate": 0.14952475898410728,
+            "mobile_final": 5.947786683611506e-22,
+            "observed_broad_loglog_slope": 3.7618960539977753,
+            "observed_local_slope_q10_q50_q90": [
+              -6.584180278179563,
+              3.289566648286239,
+              20.218885216439386
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.13856640658314,
+            "predicted_local_slope_q10_q50_q90": [
+              1.379973632202634,
+              2.175736925622391,
+              2.7227298005691223
+            ],
+            "retained_final": 4.218654793254321e-30,
+            "rmse_log10_rate": 0.19473969384396791
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8682847310218029,
+            "mobile_final": 6.312223653618044e-27,
+            "observed_broad_loglog_slope": 2.9204577070033,
+            "observed_local_slope_q10_q50_q90": [
+              -21.3773480557152,
+              2.1784435828768993,
+              17.433572465917997
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3776140327453053,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6959420678533152,
+              1.2864616952636014,
+              1.9438268843837951
+            ],
+            "retained_final": 5.178665466801488e-35,
+            "rmse_log10_rate": 0.8722990484933473
+          }
+        },
+        "max_backstress_Pa": 240775242.77667293,
+        "max_density_m2": 54092943086159.17,
+        "max_mobile_count": 46.38579626153738,
+        "max_retained_count": 2.707146824621798,
+        "max_tip_radius_m": 1.0006713724125062e-06,
+        "overall_bias_log10_rate": -0.14620173074515083,
+        "overall_rmse_log10_rate": 0.5696341856162906
+      },
+      "opening_stress_range_Pa": [
+        320553971.4443903,
+        24012320129.399723
+      ],
+      "optimizer": {
+        "elapsed_s": 177.00113797187805,
+        "kind": "differential_evolution_with_conditional_opening",
+        "message": "Maximum number of iterations has been exceeded.",
+        "nfev": 96,
+        "success": false
+      },
+      "parameters": {
+        "cleavage_backstress_fraction": 1.9999999999999998,
+        "emission_G0_298_eV": 2.5407554170098203,
+        "initial_mobile_count": 46.38579626153738,
+        "initial_retained_count": 2.707146824621798,
+        "initial_source_activity": 1.0,
+        "opening_amplitude_over_kBT": 1.2608582620750552,
+        "opening_exponent": 1.9759285649820524,
+        "opening_floor_over_kBT": 17.38229715757339,
+        "opening_sigma_b_Pa": 9889538414.751896,
+        "plastic_EXP_floor_n": 1.0,
+        "plastic_sigc_298_Pa": 21183365100.94917,
+        "retained_recovery_per_s": 2369.086755662397,
+        "transport_G0_298_eV": 0.8782142487735498
+      },
+      "parameters_vector": [
+        17.38229715757339,
+        1.2608582620750552,
+        2.291477472629568,
+        0.6810384473473289,
+        1.9999999999999998,
+        2.5407554170098203,
+        3.0532162086176453,
+        0.8782142487735498,
+        7.77025982470496,
+        3.8583225268653307,
+        1.3102625307815448
+      ],
+      "profile_weighted_sse": 0.406449254314331,
+      "raw_barrier_over_kBT_range": [
+        17.363437457025917,
+        18.6181728856648
+      ],
+      "start": "bounded_profiled_global"
+    }
+  ],
+  "opening_stress_range_Pa": [
+    320553971.4443915,
+    24012320129.399723
+  ],
+  "optimizer": {
+    "cost": 0.20322462714950765,
+    "jacobian_condition_number": 267.2447109939713,
+    "jacobian_scope": "five conditional opening coordinates only",
+    "jacobian_singular_values": [
+      1.7302557788741704,
+      0.5511271568783683,
+      0.3023263153599609,
+      0.04177148349035055,
+      0.006474424778843248
+    ],
+    "message": "profiled plastic acquisition; `ftol` termination condition is satisfied.",
+    "nfev": 98,
+    "optimality": 2.4159629639738002e-05,
+    "profiled_plastic_curvature": "not estimated; bounded differential-evolution acquisition reported in multi_start",
+    "status": 2,
+    "success": true
+  },
+  "parameter_names": [
+    "opening_floor_over_kBT",
+    "opening_amplitude_over_kBT",
+    "log_opening_sigma_b_GPa",
+    "log_opening_exponent",
+    "cleavage_backstress_fraction",
+    "emission_G0_298_eV",
+    "log_plastic_sigc_298_GPa",
+    "transport_G0_298_eV",
+    "log_retained_recovery_per_s",
+    "log1p_initial_mobile_count",
+    "log1p_initial_retained_count"
+  ],
+  "parameters": {
+    "cleavage_backstress_fraction": 1.999999999999995,
+    "emission_G0_298_eV": 2.5407554170098203,
+    "initial_mobile_count": 46.38579626153738,
+    "initial_retained_count": 2.707146824621798,
+    "initial_source_activity": 1.0,
+    "opening_amplitude_over_kBT": 1.2608618453870986,
+    "opening_exponent": 1.9759445814989158,
+    "opening_floor_over_kBT": 17.382300621916023,
+    "opening_sigma_b_Pa": 9889482963.707878,
+    "plastic_EXP_floor_n": 1.0,
+    "plastic_sigc_298_Pa": 21183365100.94917,
+    "retained_recovery_per_s": 2369.086755662397,
+    "transport_G0_298_eV": 0.8782142487735498
+  },
+  "parameters_vector": [
+    17.382300621916023,
+    1.2608618453870986,
+    2.2914718655731865,
+    0.6810465531322415,
+    1.999999999999995,
+    2.5407554170098203,
+    3.0532162086176453,
+    0.8782142487735498,
+    7.77025982470496,
+    3.8583225268653307,
+    1.3102625307815448
+  ],
+  "population_policy": "uncapped",
+  "raw_barrier_over_kBT_range": [
+    17.363440359051992,
+    18.618180015640995
+  ],
+  "schema": "qste340tm-faithful-native-order-reduction-refit/1",
+  "scope": "state-informed source-order analytical replay; not native spatial 1-D",
+  "signed_return_scope": "inactive for the strictly positive R=0.1--0.7 prescribed waveforms; no signed-return law was removed or refitted",
+  "source_bindings": {
+    "history_csv": "literature_data/fatigue_recovered_review/normalized/qste340tm_crack_histories.csv",
+    "history_sha256": "037218fd910439a3db6a49d919cc84af93fbbea3c2587cc3ef8bd8b548f0053d",
+    "preserved_controls": [
+      "5703aee3",
+      "1bb0928e"
+    ],
+    "rate_csv": "literature_data/fatigue_recovered_review/normalized/qste340tm_constant_amplitude.csv",
+    "rate_sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd"
+  },
+  "stress_independent_opening_comparator": {
+    "definition": "opening amplitude fixed exactly to zero; same fitted plastic trajectory",
+    "metrics": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.259447609232735,
+          "mobile_final": 3.6497442577212145e-08,
+          "observed_broad_loglog_slope": 3.7092045452619558,
+          "observed_local_slope_q10_q50_q90": [
+            -0.26260718888691736,
+            3.889620773413813,
+            13.105224492796031
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": -0.0010125236551457334,
+          "predicted_local_slope_q10_q50_q90": [
+            -1.5207844329766823e-10,
+            0.0,
+            0.0
+          ],
+          "retained_final": 2.253035193725312e-16,
+          "rmse_log10_rate": 0.5030833459983104
+        },
+        "0.3": {
+          "bias_log10_rate": -0.12401561312097906,
+          "mobile_final": 4.145258120087528e-10,
+          "observed_broad_loglog_slope": 3.3783824529342126,
+          "observed_local_slope_q10_q50_q90": [
+            -7.9780533875330955,
+            3.0661012852249856,
+            15.341830195853829
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": -0.0013712585907767476,
+          "predicted_local_slope_q10_q50_q90": [
+            -2.6891592593107184e-10,
+            0.0,
+            0.0
+          ],
+          "retained_final": 2.767049045320797e-18,
+          "rmse_log10_rate": 0.35580243866406464
+        },
+        "0.5": {
+          "bias_log10_rate": 0.1232275544530823,
+          "mobile_final": 5.947786683611506e-22,
+          "observed_broad_loglog_slope": 3.7618960539977753,
+          "observed_local_slope_q10_q50_q90": [
+            -6.584180278179563,
+            3.289566648286239,
+            20.218885216439386
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": -0.0022941703856738356,
+          "predicted_local_slope_q10_q50_q90": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "retained_final": 4.218654793254321e-30,
+          "rmse_log10_rate": 0.31006763313511654
+        },
+        "0.7": {
+          "bias_log10_rate": 0.5773001718022222,
+          "mobile_final": 6.312223653618044e-27,
+          "observed_broad_loglog_slope": 2.9204577070033,
+          "observed_local_slope_q10_q50_q90": [
+            -21.3773480557152,
+            2.1784435828768993,
+            17.433572465917997
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": -0.004431749484660709,
+          "predicted_local_slope_q10_q50_q90": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "retained_final": 5.178665466801488e-35,
+          "rmse_log10_rate": 0.5976241445031018
+        }
+      },
+      "max_backstress_Pa": 240775242.77667293,
+      "max_density_m2": 54092943086159.17,
+      "max_mobile_count": 46.38579626153738,
+      "max_retained_count": 2.707146824621798,
+      "max_tip_radius_m": 1.0006713724125062e-06,
+      "overall_bias_log10_rate": 1.4001070461607637e-07,
+      "overall_rmse_log10_rate": 0.4450082042522717
+    },
+    "parameters": {
+      "cleavage_backstress_fraction": 1.999999999999995,
+      "emission_G0_298_eV": 2.5407554170098203,
+      "initial_mobile_count": 46.38579626153738,
+      "initial_retained_count": 2.707146824621798,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 0.0,
+      "opening_exponent": 1.9759445814989158,
+      "opening_floor_over_kBT": 17.686014927235647,
+      "opening_sigma_b_Pa": 9889482963.707878,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 21183365100.94917,
+      "retained_recovery_per_s": 2369.086755662397,
+      "transport_G0_298_eV": 0.8782142487735498
+    }
+  },
+  "temperature_K": 298.15
+}

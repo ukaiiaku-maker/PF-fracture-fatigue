@@ -1,0 +1,131 @@
+{
+  "metrics": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": 5.459838859149145,
+        "mobile_final": 2.8617161162695495e-32,
+        "observed_broad_loglog_slope": 3.7092045452619558,
+        "observed_local_slope_q10_q50_q90": [
+          -0.26260718888691736,
+          3.889620773413813,
+          13.105224492796031
+        ],
+        "points": 248,
+        "predicted_broad_loglog_slope": 9.448306482433333,
+        "predicted_local_slope_q10_q50_q90": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "retained_final": 2608190.7030021185,
+        "rmse_log10_rate": 7.322106000782412
+      },
+      "0.3": {
+        "bias_log10_rate": 5.88755433225245,
+        "mobile_final": 7.241506065025755e-35,
+        "observed_broad_loglog_slope": 3.3783824529342126,
+        "observed_local_slope_q10_q50_q90": [
+          -7.9780533875330955,
+          3.0661012852249856,
+          15.341830195853829
+        ],
+        "points": 219,
+        "predicted_broad_loglog_slope": 4.1167265457488575,
+        "predicted_local_slope_q10_q50_q90": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "retained_final": 5377376053.018371,
+        "rmse_log10_rate": 7.30834810955431
+      },
+      "0.5": {
+        "bias_log10_rate": 5.445952403130921,
+        "mobile_final": 5.182401595634943e-35,
+        "observed_broad_loglog_slope": 3.7618960539977753,
+        "observed_local_slope_q10_q50_q90": [
+          -6.584180278179563,
+          3.289566648286239,
+          20.218885216439386
+        ],
+        "points": 171,
+        "predicted_broad_loglog_slope": 15.230335380438069,
+        "predicted_local_slope_q10_q50_q90": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "retained_final": 6990887741.446271,
+        "rmse_log10_rate": 7.8423712483117844
+      },
+      "0.7": {
+        "bias_log10_rate": 5.484553425378308,
+        "mobile_final": 4.2016945986677336e-36,
+        "observed_broad_loglog_slope": 2.9204577070033,
+        "observed_local_slope_q10_q50_q90": [
+          -21.3773480557152,
+          2.1784435828768993,
+          17.433572465917997
+        ],
+        "points": 122,
+        "predicted_broad_loglog_slope": 24.415118157958037,
+        "predicted_local_slope_q10_q50_q90": [
+          -1786.1934941079326,
+          0.0,
+          669.5659610991714
+        ],
+        "retained_final": 17032804082.114677,
+        "rmse_log10_rate": 8.266578314279393
+      }
+    },
+    "max_backstress_Pa": 25031046947081.758,
+    "max_density_m2": 5.305831321886545e+23,
+    "max_mobile_count": 31935.76561230385,
+    "max_retained_count": 530583132183.6545,
+    "max_tip_radius_m": 131.5846177815463,
+    "overall_bias_log10_rate": 5.583931335083967,
+    "overall_rmse_log10_rate": 7.595645162150196
+  },
+  "opening_stress_range_Pa": [
+    0.0,
+    23794871510.453495
+  ],
+  "optimizer": {
+    "kind": "conditional_opening_profile",
+    "success": true
+  },
+  "parameters": {
+    "cleavage_backstress_fraction": 0.010945023110094682,
+    "emission_G0_298_eV": 2.6626382073345183,
+    "initial_mobile_count": 0.0,
+    "initial_retained_count": 391.6543276467584,
+    "initial_source_activity": 1.0,
+    "opening_amplitude_over_kBT": 119.99999999987381,
+    "opening_exponent": 7.82018751939641,
+    "opening_floor_over_kBT": 29.999999999979224,
+    "opening_sigma_b_Pa": 50000000.000240594,
+    "plastic_EXP_floor_n": 1.0,
+    "plastic_sigc_298_Pa": 100000000.02302574,
+    "retained_recovery_per_s": 0.015283713398035801,
+    "transport_G0_298_eV": 2.147366525572241
+  },
+  "parameters_vector": [
+    29.999999999979224,
+    119.99999999987381,
+    -2.995732273549179,
+    2.0567085337321735,
+    0.010945023110094682,
+    2.6626382073345183,
+    -2.3025850927637883,
+    2.147366525572241,
+    -4.180967501337511,
+    0.0,
+    5.972929651399668
+  ],
+  "profile_weighted_sse": 5.848539554317557e+20,
+  "raw_barrier_over_kBT_range": [
+    -2418375395.4066706,
+    29.977210210795473
+  ],
+  "start": "5703_control_vector"
+}

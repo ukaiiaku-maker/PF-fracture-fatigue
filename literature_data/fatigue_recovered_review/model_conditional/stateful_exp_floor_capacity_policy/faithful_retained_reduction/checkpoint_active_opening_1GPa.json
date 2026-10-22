@@ -1,0 +1,131 @@
+{
+  "metrics": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": -0.6795271125350185,
+        "mobile_final": 0.9663129173452873,
+        "observed_broad_loglog_slope": 3.7092045452619558,
+        "observed_local_slope_q10_q50_q90": [
+          -0.26260718888691736,
+          3.889620773413813,
+          13.105224492796031
+        ],
+        "points": 248,
+        "predicted_broad_loglog_slope": 2.431357405508806,
+        "predicted_local_slope_q10_q50_q90": [
+          1.4385936418579233,
+          2.408514541763308,
+          2.8349859686003143
+        ],
+        "retained_final": 0.21033881358933276,
+        "rmse_log10_rate": 0.6960112521688543
+      },
+      "0.3": {
+        "bias_log10_rate": -0.3402906250572508,
+        "mobile_final": 0.9971234819357309,
+        "observed_broad_loglog_slope": 3.3783824529342126,
+        "observed_local_slope_q10_q50_q90": [
+          -7.9780533875330955,
+          3.0661012852249856,
+          15.341830195853829
+        ],
+        "points": 219,
+        "predicted_broad_loglog_slope": 2.3396328569331533,
+        "predicted_local_slope_q10_q50_q90": [
+          1.3208586913547689,
+          2.5749504010565016,
+          2.917094066756505
+        ],
+        "retained_final": 0.8865658705956445,
+        "rmse_log10_rate": 0.3555986034472655
+      },
+      "0.5": {
+        "bias_log10_rate": 0.14754519003911148,
+        "mobile_final": 1.0032843599987904,
+        "observed_broad_loglog_slope": 3.7618960539977753,
+        "observed_local_slope_q10_q50_q90": [
+          -6.584180278179563,
+          3.289566648286239,
+          20.218885216439386
+        ],
+        "points": 171,
+        "predicted_broad_loglog_slope": 2.047482234682903,
+        "predicted_local_slope_q10_q50_q90": [
+          1.3629850806597856,
+          2.1148986413327755,
+          2.9217493794270246
+        ],
+        "retained_final": 2.7107160724466572,
+        "rmse_log10_rate": 0.1980280244490654
+      },
+      "0.7": {
+        "bias_log10_rate": 0.8722988176495854,
+        "mobile_final": 0.8493315925021064,
+        "observed_broad_loglog_slope": 2.9204577070033,
+        "observed_local_slope_q10_q50_q90": [
+          -21.3773480557152,
+          2.1784435828768993,
+          17.433572465917997
+        ],
+        "points": 122,
+        "predicted_broad_loglog_slope": 1.545846633413632,
+        "predicted_local_slope_q10_q50_q90": [
+          0.7137939477392198,
+          1.5023249519060407,
+          4.384474400773799
+        ],
+        "retained_final": 27.771957607209043,
+        "rmse_log10_rate": 0.8755502387018446
+      }
+    },
+    "max_backstress_Pa": 183842912.2975087,
+    "max_density_m2": 33621289199711.152,
+    "max_mobile_count": 1.0032843599987904,
+    "max_retained_count": 27.771957607209043,
+    "max_tip_radius_m": 1.0068874454865877e-06,
+    "overall_bias_log10_rate": -0.14657327308721715,
+    "overall_rmse_log10_rate": 0.5713110816374437
+  },
+  "opening_stress_range_Pa": [
+    802373667.2224263,
+    23930053070.792416
+  ],
+  "optimizer": {
+    "kind": "conditional_opening_profile",
+    "success": true
+  },
+  "parameters": {
+    "cleavage_backstress_fraction": 2.3617376296691935e-24,
+    "emission_G0_298_eV": 1.6582550715821935,
+    "initial_mobile_count": 0.0,
+    "initial_retained_count": 0.0,
+    "initial_source_activity": 1.0,
+    "opening_amplitude_over_kBT": 1.1046070824639238,
+    "opening_exponent": 2.5029796774213686,
+    "opening_floor_over_kBT": 17.43424986147516,
+    "opening_sigma_b_Pa": 10025660978.43149,
+    "plastic_EXP_floor_n": 1.0,
+    "plastic_sigc_298_Pa": 973153415.1565478,
+    "retained_recovery_per_s": 1.452246531043777e-06,
+    "transport_G0_298_eV": 1.7887915169719055
+  },
+  "parameters_vector": [
+    17.43424986147516,
+    1.1046070824639238,
+    2.30514790402977,
+    0.917481893128369,
+    2.3617376296691935e-24,
+    1.6582550715821935,
+    -0.02721353691621632,
+    1.7887915169719055,
+    -13.442398868753656,
+    0.0,
+    0.0
+  ],
+  "profile_weighted_sse": 0.41062706954812234,
+  "raw_barrier_over_kBT_range": [
+    17.285039090926585,
+    18.514082388397522
+  ],
+  "start": "active_opening_1GPa"
+}

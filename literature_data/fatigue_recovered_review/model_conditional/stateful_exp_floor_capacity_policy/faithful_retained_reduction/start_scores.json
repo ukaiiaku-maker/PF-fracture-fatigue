@@ -1,0 +1,249 @@
+[
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 2.3617376296691935e-24,
+      "emission_G0_298_eV": 1.6582550715821935,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 0.0,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 1.1046070824639238,
+      "opening_exponent": 2.5029796774213686,
+      "opening_floor_over_kBT": 17.43424986147516,
+      "opening_sigma_b_Pa": 10025660978.43149,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 973153415.1565478,
+      "retained_recovery_per_s": 1.452246531043777e-06,
+      "transport_G0_298_eV": 1.7887915169719055
+    },
+    "start": "63be_main",
+    "weighted_sse": 0.41062706954812234
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 2.3617376296691935e-24,
+      "emission_G0_298_eV": 1.6582550715821935,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 0.0,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 1.1046070824639238,
+      "opening_exponent": 2.5029796774213686,
+      "opening_floor_over_kBT": 17.43424986147516,
+      "opening_sigma_b_Pa": 10025660978.43149,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 973153415.1565478,
+      "retained_recovery_per_s": 1.452246531043777e-06,
+      "transport_G0_298_eV": 1.7887915169719055
+    },
+    "start": "active_opening_1GPa",
+    "weighted_sse": 0.41062706954812234
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 1.999999794235611,
+      "emission_G0_298_eV": 1.038708139498976,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 0.0,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 119.99999999999999,
+      "opening_exponent": 7.999998575569838,
+      "opening_floor_over_kBT": 29.999999999999996,
+      "opening_sigma_b_Pa": 1063049800.2428685,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 479272344.7831787,
+      "retained_recovery_per_s": 6.651845831409084e-05,
+      "transport_G0_298_eV": 3.347299319042113
+    },
+    "start": "63be_excluding_R0p3",
+    "weighted_sse": 540979.118342135
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 1.999999794235611,
+      "emission_G0_298_eV": 1.038708139498976,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 0.0,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 119.99999999999999,
+      "opening_exponent": 7.999998575569838,
+      "opening_floor_over_kBT": 29.999999999999996,
+      "opening_sigma_b_Pa": 1063049800.2428685,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 479272344.7831787,
+      "retained_recovery_per_s": 6.651845831409084e-05,
+      "transport_G0_298_eV": 3.347299319042113
+    },
+    "start": "active_opening_2GPa",
+    "weighted_sse": 540979.118342135
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.6736220263504279,
+      "emission_G0_298_eV": 0.8,
+      "initial_mobile_count": 20.0,
+      "initial_retained_count": 20.0,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 119.99999998639896,
+      "opening_exponent": 0.15256650243056374,
+      "opening_floor_over_kBT": 29.999999999994436,
+      "opening_sigma_b_Pa": 1221828045.5099297,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.10000000000000002,
+      "transport_G0_298_eV": 0.8
+    },
+    "start": "active_transfer",
+    "weighted_sse": 1.5863970278890655e+20
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.010945023110094682,
+      "emission_G0_298_eV": 2.6626382073345183,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 391.6543276467584,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 119.99999999987381,
+      "opening_exponent": 7.82018751939641,
+      "opening_floor_over_kBT": 29.999999999979224,
+      "opening_sigma_b_Pa": 50000000.000240594,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.015283713398035801,
+      "transport_G0_298_eV": 2.147366525572241
+    },
+    "start": "5703_control_vector",
+    "weighted_sse": 5.848539554317557e+20
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.010945023110094682,
+      "emission_G0_298_eV": 2.6626382073345183,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 391.6543276467584,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 119.99999999987381,
+      "opening_exponent": 7.82018751939641,
+      "opening_floor_over_kBT": 29.999999999979224,
+      "opening_sigma_b_Pa": 50000000.000240594,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.015283713398035801,
+      "transport_G0_298_eV": 2.147366525572241
+    },
+    "start": "active_opening_0.6GPa",
+    "weighted_sse": 5.848539554317557e+20
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.010945023110094682,
+      "emission_G0_298_eV": 2.6626382073345183,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 391.6543276467584,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 119.99999999987381,
+      "opening_exponent": 7.82018751939641,
+      "opening_floor_over_kBT": 29.999999999979224,
+      "opening_sigma_b_Pa": 50000000.000240594,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.015283713398035801,
+      "transport_G0_298_eV": 2.147366525572241
+    },
+    "start": "stress_independent_opening",
+    "weighted_sse": 5.848539554317557e+20
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.07235369266691445,
+      "emission_G0_298_eV": 1.2,
+      "initial_mobile_count": 20.0,
+      "initial_retained_count": 100.00000000000003,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 50.30241048928698,
+      "opening_exponent": 1.3432115718459903,
+      "opening_floor_over_kBT": 19.06151231007855,
+      "opening_sigma_b_Pa": 2327661260.489938,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.010000000000000005,
+      "transport_G0_298_eV": 1.0
+    },
+    "start": "active_opening_4GPa",
+    "weighted_sse": 3.5016324301771605e+21
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.1698479801312255,
+      "emission_G0_298_eV": 1.2,
+      "initial_mobile_count": 20.0,
+      "initial_retained_count": 100.00000000000003,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 28.013941322849682,
+      "opening_exponent": 1.298009466196572,
+      "opening_floor_over_kBT": 16.842374143200608,
+      "opening_sigma_b_Pa": 2836109488.9228,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.010000000000000005,
+      "transport_G0_298_eV": 1.0
+    },
+    "start": "balanced_mobile",
+    "weighted_sse": 3.5016324591817154e+21
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.21137074073803244,
+      "emission_G0_298_eV": 2.0,
+      "initial_mobile_count": 0.0,
+      "initial_retained_count": 400.00000000000006,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 26.430392929812754,
+      "opening_exponent": 0.8893788629778178,
+      "opening_floor_over_kBT": 16.009005481005953,
+      "opening_sigma_b_Pa": 50000000.01582519,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.00010000000000000009,
+      "transport_G0_298_eV": 1.5
+    },
+    "start": "high_barrier",
+    "weighted_sse": 6.269324860639613e+21
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.06346652380007951,
+      "emission_G0_298_eV": 1.2,
+      "initial_mobile_count": 5.0,
+      "initial_retained_count": 100.00000000000003,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 25.0,
+      "opening_exponent": 1.0,
+      "opening_floor_over_kBT": 17.0,
+      "opening_sigma_b_Pa": 7999999999.999998,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.0010000000000000002,
+      "transport_G0_298_eV": 2.0
+    },
+    "start": "active_opening_8GPa",
+    "weighted_sse": 1.7296860882565144e+22
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.2,
+      "emission_G0_298_eV": 1.2,
+      "initial_mobile_count": 5.0,
+      "initial_retained_count": 100.00000000000003,
+      "initial_source_activity": 1.0,
+      "opening_amplitude_over_kBT": 25.0,
+      "opening_exponent": 1.0,
+      "opening_floor_over_kBT": 17.0,
+      "opening_sigma_b_Pa": 50000000.01497867,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 100000000.02302574,
+      "retained_recovery_per_s": 0.0010000000000000002,
+      "transport_G0_298_eV": 2.0
+    },
+    "start": "slow_transport",
+    "weighted_sse": 1.7296860882565144e+22
+  }
+]
