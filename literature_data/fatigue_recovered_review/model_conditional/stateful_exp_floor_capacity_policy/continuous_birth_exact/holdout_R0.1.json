@@ -1,0 +1,38 @@
+{
+  "held_out_R": 0.1,
+  "held_out_bias_log10": -0.587716770415558,
+  "held_out_points": 248,
+  "held_out_rmse_log10": 0.6466445144866517,
+  "optimizer": {
+    "message": "The maximum number of function evaluations is exceeded.",
+    "nfev": 50,
+    "success": false
+  },
+  "parameters": {
+    "cleavage_backstress_fraction": 0.07394185983444088,
+    "emission_G0_298_eV": 2.6483060980609694,
+    "escape_G0_298_eV": 2.153947700066915,
+    "initial_retained_count": 219.20809675895282,
+    "opening_amplitude_over_kBT": 9.18516551909537,
+    "opening_exponent": 2.33345650721317,
+    "opening_floor_over_kBT": 19.14176956415943,
+    "opening_sigma_b_Pa": 607033397.7799363,
+    "plastic_EXP_floor_n": 1.0,
+    "plastic_sigc_298_Pa": 140790662.21348867,
+    "recovery_per_s": 0.025459277588648018
+  },
+  "parameters_vector": [
+    19.14176956415943,
+    9.18516551909537,
+    -0.49917146838198057,
+    0.8473506477995679,
+    2.6483060980609694,
+    -1.9604811569639033,
+    2.153947700066915,
+    0.07394185983444088,
+    -3.670675060621186,
+    5.394572993635071
+  ],
+  "train_points": 512,
+  "train_rmse_log10": 0.3912026661900119
+}

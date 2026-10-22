@@ -1,0 +1,155 @@
+[
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 0.06346652380007956,
+      "emission_G0_298_eV": 2.847870124007403,
+      "escape_G0_298_eV": 1.858778359761348,
+      "initial_retained_count": 15.104212146707056,
+      "opening_amplitude_over_kBT": 13.886552417437514,
+      "opening_exponent": 4.812447824063552,
+      "opening_floor_over_kBT": 17.77178972554377,
+      "opening_sigma_b_Pa": 252168564.3521746,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 292706240.20786536,
+      "recovery_per_s": 0.5753643682918924
+    },
+    "start": "bounded_global",
+    "weighted_sse": 0.8052898293158249
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 3.551608586143073e-21,
+      "emission_G0_298_eV": 0.7466292192392953,
+      "escape_G0_298_eV": 0.5775566622866013,
+      "initial_retained_count": 100.00000000000003,
+      "opening_amplitude_over_kBT": 0.9243097537811986,
+      "opening_exponent": 7.360532078520926,
+      "opening_floor_over_kBT": 19.659808852163668,
+      "opening_sigma_b_Pa": 16730576677.861431,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 4160216554.275449,
+      "recovery_per_s": 8.19950755488783e-06
+    },
+    "start": "initial_100",
+    "weighted_sse": 33.199873604061544
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 3.551608586143073e-21,
+      "emission_G0_298_eV": 0.7466292192392953,
+      "escape_G0_298_eV": 0.5775566622866013,
+      "initial_retained_count": 0.0,
+      "opening_amplitude_over_kBT": 0.9243097537811986,
+      "opening_exponent": 7.360532078520926,
+      "opening_floor_over_kBT": 19.659808852163668,
+      "opening_sigma_b_Pa": 16730576677.861431,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 4160216554.275449,
+      "recovery_per_s": 8.19950755488783e-06
+    },
+    "start": "initial_0",
+    "weighted_sse": 34.04132778478924
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 3.551608586143073e-21,
+      "emission_G0_298_eV": 0.7466292192392953,
+      "escape_G0_298_eV": 0.5775566622866013,
+      "initial_retained_count": 499.99999999999943,
+      "opening_amplitude_over_kBT": 0.9243097537811986,
+      "opening_exponent": 7.360532078520926,
+      "opening_floor_over_kBT": 19.659808852163668,
+      "opening_sigma_b_Pa": 16730576677.861431,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 4160216554.275449,
+      "recovery_per_s": 8.19950755488783e-06
+    },
+    "start": "uncapped_phase",
+    "weighted_sse": 42.90483531921287
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 3.551608586143073e-21,
+      "emission_G0_298_eV": 0.7466292192392953,
+      "escape_G0_298_eV": 0.5775566622866013,
+      "initial_retained_count": 499.9999999999999,
+      "opening_amplitude_over_kBT": 0.9243097537811986,
+      "opening_exponent": 7.360532078520926,
+      "opening_floor_over_kBT": 19.659808852163668,
+      "opening_sigma_b_Pa": 16730576677.861431,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 4160216554.275449,
+      "recovery_per_s": 8.19950755488783e-06
+    },
+    "start": "initial_500",
+    "weighted_sse": 42.904835319212985
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 2.2149027864796037e-34,
+      "emission_G0_298_eV": 0.7451178492144519,
+      "escape_G0_298_eV": 0.5777787384981059,
+      "initial_retained_count": 499.99999999999943,
+      "opening_amplitude_over_kBT": 0.9259425471886223,
+      "opening_exponent": 7.316730695504069,
+      "opening_floor_over_kBT": 19.660458456460326,
+      "opening_sigma_b_Pa": 16724136648.305197,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 4150312426.505681,
+      "recovery_per_s": 8.177092986774791e-06
+    },
+    "start": "fixed10000_phase",
+    "weighted_sse": 46.02871040447187
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 3.551608586143073e-21,
+      "emission_G0_298_eV": 0.7466292192392953,
+      "escape_G0_298_eV": 0.5775566622866013,
+      "initial_retained_count": 1499.9999999999998,
+      "opening_amplitude_over_kBT": 0.9243097537811986,
+      "opening_exponent": 7.360532078520926,
+      "opening_floor_over_kBT": 19.659808852163668,
+      "opening_sigma_b_Pa": 16730576677.861431,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 4160216554.275449,
+      "recovery_per_s": 8.19950755488783e-06
+    },
+    "start": "initial_1500",
+    "weighted_sse": 150.22101558655535
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 3.551608586143073e-21,
+      "emission_G0_298_eV": 0.7466292192392953,
+      "escape_G0_298_eV": 0.5775566622866013,
+      "initial_retained_count": 2999.9999999999995,
+      "opening_amplitude_over_kBT": 0.9243097537811986,
+      "opening_exponent": 7.360532078520926,
+      "opening_floor_over_kBT": 19.659808852163668,
+      "opening_sigma_b_Pa": 16730576677.861431,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 4160216554.275449,
+      "recovery_per_s": 8.19950755488783e-06
+    },
+    "start": "initial_3000",
+    "weighted_sse": 196.48121211242025
+  },
+  {
+    "parameters": {
+      "cleavage_backstress_fraction": 1.999094227934967,
+      "emission_G0_298_eV": 0.6886505996174928,
+      "escape_G0_298_eV": 0.5705202206692874,
+      "initial_retained_count": 275.8595835323073,
+      "opening_amplitude_over_kBT": 52.48351333936017,
+      "opening_exponent": 9.874823401736968,
+      "opening_floor_over_kBT": 19.453502148136234,
+      "opening_sigma_b_Pa": 197352160.1114644,
+      "plastic_EXP_floor_n": 1.0,
+      "plastic_sigc_298_Pa": 19999965964.38182,
+      "recovery_per_s": 1.0000000000000018e-08
+    },
+    "start": "uncapped_legacy",
+    "weighted_sse": 11716.396029243164
+  }
+]

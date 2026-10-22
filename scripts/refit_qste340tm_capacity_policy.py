@@ -57,7 +57,7 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def unpack(x: np.ndarray) -> dict[str, float]:
+def unpack(x: np.ndarray, opening_model: str = "single_smooth_broad") -> dict[str, float]:
     out = {
         "opening_floor_over_kBT": float(x[0]),
         "opening_amplitude_over_kBT": float(x[1]),
@@ -70,7 +70,15 @@ def unpack(x: np.ndarray) -> dict[str, float]:
         "recovery_per_s": float(math.exp(x[8])),
         "initial_retained_count": float(math.expm1(x[9])),
     }
-    out["plastic_EXP_floor_n"] = float(math.exp(x[10])) if len(x) > 10 else 1.0
+    if opening_model == "two_scale_smooth_broad":
+        out.update({
+            "opening_secondary_amplitude_over_kBT": float(x[10]),
+            "opening_secondary_sigma_b_Pa": float(math.exp(x[11]) * 1e9),
+            "opening_secondary_exponent": float(math.exp(x[12])),
+        })
+        out["plastic_EXP_floor_n"] = float(math.exp(x[13])) if len(x) > 13 else 1.0
+    else:
+        out["plastic_EXP_floor_n"] = float(math.exp(x[10])) if len(x) > 10 else 1.0
     return out
 
 
@@ -114,8 +122,9 @@ def exact_retained_step(n: float, source: float, recovery: float,
     return max(float(new), 0.), float(source_transfer), float(recovery_transfer)
 
 
-def stress_cycle(delta_k: float, r: float, n: float) -> tuple[np.ndarray, float, float]:
-    phase = 2 * math.pi * (np.arange(PHASE_STEPS) + .5) / PHASE_STEPS
+def stress_cycle(delta_k: float, r: float, n: float,
+                 n_phase: int = PHASE_STEPS) -> tuple[np.ndarray, float, float]:
+    phase = 2 * math.pi * (np.arange(n_phase) + .5) / n_phase
     fraction = .5 * (1 + r) + .5 * (1 - r) * np.cos(phase)
     radius = TIP_RADIUS_M + C_BLUNT * BURGERS_M * n
     stress = delta_k / (1 - r) * 1e6 * fraction / math.sqrt(2 * math.pi * radius)
@@ -140,6 +149,13 @@ def retained_source_per_cycle(lam_emit: np.ndarray, lam_escape: np.ndarray,
     elif mode == "birth_phase_resolved":
         remaining_escape = np.cumsum((lam_escape * dt)[::-1])[::-1]
         source = float(np.sum(lam_emit * dt * np.exp(-np.minimum(remaining_escape, 700.0))))
+    elif mode == "continuous_birth_exact":
+        exposure = np.asarray(lam_escape, dtype=float) * dt
+        after = np.cumsum(exposure[::-1])[::-1] - exposure
+        phi1 = np.ones_like(exposure)
+        active = np.abs(exposure) > 1.0e-12
+        phi1[active] = -np.expm1(-exposure[active]) / exposure[active]
+        source = float(np.sum(lam_emit * dt * phi1 * np.exp(-np.minimum(after, 700.0))))
     else:
         raise ValueError(f"unknown retention timing mode: {mode}")
     return mu_emit, mu_escape, source
@@ -149,9 +165,16 @@ def evaluate(x: np.ndarray, records: list[dict], policy: str,
              interval_substeps: int = 1, evolve: bool = True,
              legacy_prefill: bool = False,
              frequency_hz: float = NOMINAL_FREQUENCY_HZ,
-             retention_timing: str = "native_full_cycle") -> dict[str, np.ndarray]:
-    p = unpack(x); capacity = POLICIES[policy]
+             retention_timing: str = "native_full_cycle",
+             waveform_steps: int = PHASE_STEPS,
+             opening_model: str = "single_smooth_broad") -> dict[str, np.ndarray]:
+    p = unpack(x, opening_model); capacity = POLICIES[policy]
     opening = SmoothBroadBasis(p["opening_sigma_b_Pa"], p["opening_exponent"], SMOOTHING_RATIO)
+    opening_secondary = None
+    if opening_model == "two_scale_smooth_broad":
+        opening_secondary = SmoothBroadBasis(
+            p["opening_secondary_sigma_b_Pa"],
+            p["opening_secondary_exponent"], SMOOTHING_RATIO)
     emit = exp_floor_barrier("qste_emit", p["emission_G0_298_eV"], p["plastic_sigc_298_Pa"], 1e11, exp_n=p["plastic_EXP_floor_n"])
     peierls = exp_floor_barrier("qste_peierls", p["escape_G0_298_eV"], p["plastic_sigc_298_Pa"], 1e12, exp_n=p["plastic_EXP_floor_n"])
     taylor = exp_floor_barrier("qste_taylor", p["escape_G0_298_eV"], p["plastic_sigc_298_Pa"], 1e11, exp_n=p["plastic_EXP_floor_n"])
@@ -174,7 +197,7 @@ def evaluate(x: np.ndarray, records: list[dict], policy: str,
                 for j in range(max(interval_substeps, 1)):
                     frac = (j + .5) / max(interval_substeps, 1)
                     dki = dk if (pos == 0 and legacy_prefill) else prior_dk + frac * (dk - prior_dk)
-                    s, _, b = stress_cycle(dki, r, n)
+                    s, _, b = stress_cycle(dki, r, n, waveform_steps)
                     se = np.maximum(s - b, 0.)
                     le = emit.rate(se, TEMPERATURE_K)
                     lp = peierls.rate(se, TEMPERATURE_K); lt = taylor.rate(se, TEMPERATURE_K)
@@ -183,7 +206,7 @@ def evaluate(x: np.ndarray, records: list[dict], policy: str,
                     n, _, _ = exact_retained_step(n, source, p["recovery_per_s"] / frequency_hz,
                                                   delta / max(interval_substeps, 1), capacity)
             prior_cycles = cycles; prior_dk = dk
-            s, radius, b = stress_cycle(dk, r, n); se = np.maximum(s - b, 0.)
+            s, radius, b = stress_cycle(dk, r, n, waveform_steps); se = np.maximum(s - b, 0.)
             le = emit.rate(se, TEMPERATURE_K); lp = peierls.rate(se, TEMPERATURE_K)
             lt = taylor.rate(se, TEMPERATURE_K)
             lx = 1 / (1 / np.maximum(lp, 1e-300) + 1 / np.maximum(lt, 1e-300))
@@ -195,7 +218,10 @@ def evaluate(x: np.ndarray, records: list[dict], policy: str,
             store = source / max(mu_e, 1e-300)
             cf = 1. if capacity is None else max(1 - n / capacity, 0.)
             open_s = np.maximum(s - p["cleavage_backstress_fraction"] * b, 0.)
-            raw = p["opening_floor_over_kBT"] + p["opening_amplitude_over_kBT"] * opening.value(open_s) - embrittlement_eV(n) / (KB_EV_PER_K * TEMPERATURE_K)
+            raw = p["opening_floor_over_kBT"] + p["opening_amplitude_over_kBT"] * opening.value(open_s)
+            if opening_secondary is not None:
+                raw = raw + p["opening_secondary_amplitude_over_kBT"] * opening_secondary.value(open_s)
+            raw = raw - embrittlement_eV(n) / (KB_EV_PER_K * TEMPERATURE_K)
             elementary = ATTEMPT_FREQUENCY_S * np.exp(-np.clip(raw, 0., 700.))
             completed = gammainc(COOPERATIVE_HITS, np.minimum(elementary * COOPERATIVE_TAU_S, 1e12)) / COOPERATIVE_TAU_S
             out["prediction"][i] = max(EVENT_LENGTH_M * float(np.mean(completed)) / frequency_hz, 1e-300)

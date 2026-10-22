@@ -31,3 +31,37 @@ def test_birth_phase_retention_exceeds_full_cycle_for_positive_escape():
     _, _, native = retained_source_per_cycle(emit, escape, 10.0, "native_full_cycle")
     _, _, resolved = retained_source_per_cycle(emit, escape, 10.0, "birth_phase_resolved")
     assert resolved > native > 0.0
+
+
+def test_continuous_birth_constant_coefficients_are_exact():
+    for panels in (1, 2, 8, 32, 128):
+        emit = np.full(panels, 2.0)
+        escape = np.full(panels, 5.0)
+        _, _, got = retained_source_per_cycle(emit, escape, 10.0, "continuous_birth_exact")
+        expected = 2.0 / 5.0 * (1.0 - math.exp(-0.5))
+        np.testing.assert_allclose(got, expected, rtol=2e-15)
+
+
+def test_continuous_birth_zero_limits_and_survivor_bounds():
+    _, _, zero_source = retained_source_per_cycle(np.zeros(4), np.ones(4), 2.0, "continuous_birth_exact")
+    _, _, zero_escape = retained_source_per_cycle(np.ones(4), np.zeros(4), 2.0, "continuous_birth_exact")
+    assert zero_source == 0.0
+    assert zero_escape == 0.5
+    _, _, late = retained_source_per_cycle(np.array([0.0, 0.0, 0.0, 4.0]), np.full(4, 100.0), 1.0, "continuous_birth_exact")
+    assert 0.0 < late < 1.0
+
+
+def test_event_free_restart_matches_one_frozen_coefficient_step():
+    initial, source, recovery = 37.0, 2.5e-4, 7.0e-5
+    first, admitted_1, recovered_1 = exact_retained_step(
+        initial, source, recovery, 1234.5, None
+    )
+    restarted, admitted_2, recovered_2 = exact_retained_step(
+        first, source, recovery, 8765.5, None
+    )
+    direct, admitted, recovered = exact_retained_step(
+        initial, source, recovery, 10000.0, None
+    )
+    np.testing.assert_allclose(restarted, direct, rtol=2e-14)
+    np.testing.assert_allclose(admitted_1 + admitted_2, admitted, rtol=2e-14)
+    np.testing.assert_allclose(recovered_1 + recovered_2, recovered, rtol=2e-14)

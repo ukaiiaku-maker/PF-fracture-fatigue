@@ -1,0 +1,80 @@
+{
+  "metrics": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": -0.39421246846082214,
+        "density_final_m2": 79675068880845.3,
+        "observed_loglog_slope": 3.7092045452619558,
+        "points": 248,
+        "predicted_loglog_slope": 0.9516991837405168,
+        "retained_count_final": 74.67506888084529,
+        "rmse_log10_rate": 0.5100146107405308
+      },
+      "0.3": {
+        "bias_log10_rate": -0.1833232320966259,
+        "density_final_m2": 78652178107361.19,
+        "observed_loglog_slope": 3.3783824529342126,
+        "points": 219,
+        "predicted_loglog_slope": 0.16052315918961807,
+        "retained_count_final": 73.65217810736118,
+        "rmse_log10_rate": 0.3692272685601993
+      },
+      "0.5": {
+        "bias_log10_rate": 0.07420587616572709,
+        "density_final_m2": 77914658641912.1,
+        "observed_loglog_slope": 3.7618960539977753,
+        "points": 171,
+        "predicted_loglog_slope": -0.21651504087091894,
+        "retained_count_final": 72.9146586419121,
+        "rmse_log10_rate": 0.312484546613363
+      },
+      "0.7": {
+        "bias_log10_rate": 0.5033304423561515,
+        "density_final_m2": 76281939874660.83,
+        "observed_loglog_slope": 2.9204577070033,
+        "points": 122,
+        "predicted_loglog_slope": -0.155262871097068,
+        "retained_count_final": 71.28193987466082,
+        "rmse_log10_rate": 0.5310074134653026
+      }
+    },
+    "max_backstress_Pa": 381594377.5041442,
+    "max_density_m2": 89593736402493.2,
+    "max_retained_count": 84.5937364024932,
+    "max_tip_radius_m": 1.0209792466278182e-06,
+    "min_raw_opening_barrier_over_kBT": 17.669753752723956,
+    "overall_bias_log10_rate": -0.08396968581007257,
+    "overall_rmse_log10_rate": 0.43749025196919655
+  },
+  "optimizer": {
+    "message": "`ftol` termination condition is satisfied.",
+    "nfev": 45,
+    "success": true
+  },
+  "parameters": {
+    "cleavage_backstress_fraction": 1.9997529566919943,
+    "emission_G0_298_eV": 0.7995253287047023,
+    "escape_G0_298_eV": 0.8177915482489525,
+    "initial_retained_count": 2.629903225647115e-23,
+    "opening_amplitude_over_kBT": 0.10041399274312562,
+    "opening_exponent": 9.9999998084414,
+    "opening_floor_over_kBT": 17.97770423297097,
+    "opening_sigma_b_Pa": 99992540595.87675,
+    "plastic_EXP_floor_n": 1.0,
+    "plastic_sigc_298_Pa": 1996306447.9842494,
+    "recovery_per_s": 0.20270740443371774
+  },
+  "parameters_vector": [
+    17.97770423297097,
+    0.10041399274312562,
+    4.605095589164585,
+    2.3025850738381854,
+    0.7995253287047023,
+    0.6912986971588193,
+    0.8177915482489525,
+    1.9997529566919943,
+    -1.5959916971646235,
+    2.629903225647115e-23
+  ],
+  "start": "initial_0"
+}

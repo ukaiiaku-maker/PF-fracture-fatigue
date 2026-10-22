@@ -1,0 +1,80 @@
+{
+  "metrics": {
+    "block_metrics": {
+      "0.1": {
+        "bias_log10_rate": -0.33848399161002485,
+        "density_final_m2": 125500864735060.02,
+        "observed_loglog_slope": 3.7092045452619558,
+        "points": 248,
+        "predicted_loglog_slope": -0.0002107990118322509,
+        "retained_count_final": 120.50086473506,
+        "rmse_log10_rate": 0.5479603216825039
+      },
+      "0.3": {
+        "bias_log10_rate": -0.203057154057135,
+        "density_final_m2": 125500753235327.28,
+        "observed_loglog_slope": 3.3783824529342126,
+        "points": 219,
+        "predicted_loglog_slope": -0.0002709940229059179,
+        "retained_count_final": 120.50075323532728,
+        "rmse_log10_rate": 0.3903517436140903
+      },
+      "0.5": {
+        "bias_log10_rate": 0.044113672954819154,
+        "density_final_m2": 125489838310517.92,
+        "observed_loglog_slope": 3.7618960539977753,
+        "points": 171,
+        "predicted_loglog_slope": -0.0005722706657192831,
+        "retained_count_final": 120.48983831051792,
+        "rmse_log10_rate": 0.28779813470551724
+      },
+      "0.7": {
+        "bias_log10_rate": 0.49812932881062727,
+        "density_final_m2": 125480998965938.03,
+        "observed_loglog_slope": 2.9204577070033,
+        "points": 122,
+        "predicted_loglog_slope": -0.001256329678275889,
+        "retained_count_final": 120.48099896593803,
+        "rmse_log10_rate": 0.5215008984700172
+      }
+    },
+    "max_backstress_Pa": 543640447.1462919,
+    "max_density_m2": 125516913756486.12,
+    "max_retained_count": 120.51691375648612,
+    "max_tip_radius_m": 1.0298881946116084e-06,
+    "min_raw_opening_barrier_over_kBT": 17.718908773880035,
+    "overall_bias_log10_rate": -0.07907675061530017,
+    "overall_rmse_log10_rate": 0.45186408692055013
+  },
+  "optimizer": {
+    "message": "The maximum number of function evaluations is exceeded.",
+    "nfev": 140,
+    "success": false
+  },
+  "parameters": {
+    "cleavage_backstress_fraction": 0.6781443641630807,
+    "emission_G0_298_eV": 1.130960572726381,
+    "escape_G0_298_eV": 0.5175367174829564,
+    "initial_retained_count": 120.51691375648612,
+    "opening_amplitude_over_kBT": 4.457693149124515e-09,
+    "opening_exponent": 8.402924638894953,
+    "opening_floor_over_kBT": 18.291009570129116,
+    "opening_sigma_b_Pa": 33964794926.061016,
+    "plastic_EXP_floor_n": 1.0,
+    "plastic_sigc_298_Pa": 9491306982.631666,
+    "recovery_per_s": 1.0383931628690788e-08
+  },
+  "parameters_vector": [
+    18.291009570129116,
+    4.457693149124515e-09,
+    3.5253245448232127,
+    2.1285798165487253,
+    1.130960572726381,
+    2.2503763252287636,
+    0.5175367174829564,
+    0.6781443641630807,
+    -18.383006261300384,
+    4.8000534609644
+  ],
+  "start": "initial_500"
+}
