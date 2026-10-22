@@ -1,0 +1,162 @@
+{
+  "fixed_conditions": {
+    "R_values": [
+      0.1,
+      0.3,
+      0.5,
+      0.7
+    ],
+    "empirical_retained_capacity": null,
+    "endpoint_survivor_as_retained_source": false,
+    "frequency_Hz": 10.0,
+    "frequency_status": "provisional assumption",
+    "material_count": 1,
+    "reported_DeltaK_convention": "DeltaK; Kmax = DeltaK/(1-R)",
+    "temperature_C": 25.0,
+    "temperature_K": 298.15
+  },
+  "input_files": [
+    {
+      "bytes": 150153,
+      "path": "literature_data/fatigue_recovered_review/normalized/qste340tm_constant_amplitude.csv",
+      "sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd"
+    },
+    {
+      "bytes": 72594,
+      "path": "literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/faithful_retained_reduction/fit_faithful_reduction.json",
+      "sha256": "6dd1229caebda8df316fe91753f9bd874fd22eda28caa35dd11f1eb278b2fbfd"
+    }
+  ],
+  "integrity_note": "execution_manifest.json omits its own hash to avoid a circular digest",
+  "output_files": [
+    {
+      "bytes": 1002253,
+      "path": "joint_search.json",
+      "sha256": "ec3d2bda85f99aaff7cb1f5ab5584e3b2f83396870b4c78f350d58f3f64706a7"
+    },
+    {
+      "bytes": 111627,
+      "path": "joint_predictions.csv",
+      "sha256": "3f5ac7540d6d996b4a7ba97704ea3d5491bffacd1089cab9ed845a87ea473287"
+    },
+    {
+      "bytes": 1480,
+      "path": "fixed_Kmax_contrasts.csv",
+      "sha256": "ed246a7eb0b1737cfe565ba08e31b6a5d54a4ac05409ff43386972424e5d4a0f"
+    },
+    {
+      "bytes": 98621,
+      "path": "native_transfer_correspondence.json",
+      "sha256": "2d6137487c717a89b1833ae7d9bce0b283fb733fc34d5207aec6c97f55afa72e"
+    },
+    {
+      "bytes": 317520,
+      "path": "joint_fit_DeltaK.png",
+      "sha256": "2bf40ca6ecf16a51be6016b65fee6c771e522e341389c108fc017cbd7a195eea"
+    },
+    {
+      "bytes": 308634,
+      "path": "joint_fit_Kmax.png",
+      "sha256": "b14b813555fc4a8512ba14a93c8d1dfd57f6e603bd08fbfbf51571d839b6f1d4"
+    },
+    {
+      "bytes": 5930,
+      "path": "README.md",
+      "sha256": "ee6bca591b1d3d835286e9330bb06a075cb6690425d04fc95c1ac1bef16695c9"
+    }
+  ],
+  "replay": [
+    "python verify_import.py",
+    "python scripts/qualify_qste340tm_native_transfer.py --panels 32 128 512 2048",
+    "python scripts/continue_qste340tm_native_joint_search.py --iterations 6 --substeps 1 --waveform 32",
+    "python scripts/finalize_qste340tm_joint_search.py",
+    "python scripts/package_qste340tm_native_joint_search.py",
+    "python -m pytest -q tests/test_qste340tm_faithful_reduction.py tests/test_qste340tm_native_joint_search.py"
+  ],
+  "repository": {
+    "branch": "codex/qste340tm-native-transfer-joint-search",
+    "dirty_source_snapshot": true,
+    "starting_commit": "3c840232",
+    "starting_commit_full": "3c840232f873e36c3c0f4ed7922a51779eeeb2d5",
+    "worktree_head_when_packaged": "3c840232f873e36c3c0f4ed7922a51779eeeb2d5"
+  },
+  "runtime": {
+    "dependencies": {
+      "matplotlib": "3.11.0",
+      "numpy": "2.5.1",
+      "pytest": "9.1.1",
+      "scipy": "1.18.0"
+    },
+    "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/arrhenius-sharp-front-v10-codex/bin/python",
+    "platform": "macOS-14.3.1-arm64-arm-64bit",
+    "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 17:06:14) [Clang 19.1.7 ]"
+  },
+  "schema": "qste340tm-native-joint-search-execution-manifest/1",
+  "source_files": [
+    {
+      "bytes": 18658,
+      "path": "arrhenius_fracture/unified_mpz.py",
+      "sha256": "ef26d6ee99805197f006a83387b3b2e968005cf5d57250c12495c21fcd93a1a2"
+    },
+    {
+      "bytes": 14253,
+      "path": "arrhenius_fracture/continuum_source_tip.py",
+      "sha256": "dea7fbda0f28e13e30aba8d2ce5e3d0ad37ac9dff96245b3b1529c70e1dd4ea0"
+    },
+    {
+      "bytes": 7517,
+      "path": "arrhenius_fracture/material_manifest.py",
+      "sha256": "c467321726f0f1b82249bdee3cde997e9778675431f08d10f2540c408c6e9707"
+    },
+    {
+      "bytes": 29072,
+      "path": "scripts/calibrate_qste340tm_stateful_exp_floor.py",
+      "sha256": "b1f9ed3931b602066e53cf68f44327cd108f878ae4b34dd50d3d9fb6f4af219f"
+    },
+    {
+      "bytes": 10193,
+      "path": "scripts/qste340tm_faithful_reduction.py",
+      "sha256": "a85edfadac827a63153be13d567655108241f31e592212b518a05eef2c7f6a53"
+    },
+    {
+      "bytes": 32757,
+      "path": "scripts/refit_qste340tm_faithful_reduction.py",
+      "sha256": "9f8b0a26246d1a30eb202576961b1d59792ec0c576506e9397f94179efc6b87b"
+    },
+    {
+      "bytes": 15762,
+      "path": "scripts/fatigue_informed_joint_barrier_v3_v10230.py",
+      "sha256": "a45fc049ade5cce663fba173a3184ab805a591fc44ce47fc6f486729d5e000e1"
+    },
+    {
+      "bytes": 11283,
+      "path": "scripts/qualify_qste340tm_native_transfer.py",
+      "sha256": "f944a62dfbee17983b23a2c3e281ca3fbcef30cdf122ce826a2c7f2218910d56"
+    },
+    {
+      "bytes": 15956,
+      "path": "scripts/continue_qste340tm_native_joint_search.py",
+      "sha256": "da19856247688f4dd673bad661127ab7252fc315d5f4e357067456f846fadb3a"
+    },
+    {
+      "bytes": 4380,
+      "path": "scripts/finalize_qste340tm_joint_search.py",
+      "sha256": "47a11e33ce46a0d0e7b86dbd685f07c7db209b9598e918d747f72f38df180004"
+    },
+    {
+      "bytes": 5048,
+      "path": "scripts/package_qste340tm_native_joint_search.py",
+      "sha256": "6501e548c0d44e9ac6376da91923635199889874135ed9ebbd59ddb4b0c907e7"
+    },
+    {
+      "bytes": 2928,
+      "path": "tests/test_qste340tm_faithful_reduction.py",
+      "sha256": "76c5ea57a2d39e443e6c5a1ed5af903e0ce65dbfe08071b9fe9af7c912789f26"
+    },
+    {
+      "bytes": 2820,
+      "path": "tests/test_qste340tm_native_joint_search.py",
+      "sha256": "982a9e27f985c19bddf8f43295051b66c7229a57e3ab79e98a962eefd8ebbff4"
+    }
+  ]
+}
