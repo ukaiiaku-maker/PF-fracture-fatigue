@@ -1,0 +1,23 @@
+{
+  "schema": "qste340tm-first-support-restart-correction/1",
+  "candidate_id": "transport_dominated",
+  "restart_identity_sha256": "3d95794e9698de684e22e37a82eca0a232a9944b095b7741906041c97a0e2535",
+  "affected_cursor": {
+    "R": 0.5,
+    "current_observation_position": 0,
+    "current_load_substep": 0,
+    "target_cycle": 17078.0
+  },
+  "defect": "a live native checkpoint inside the first support was ignored because the outer cursor remained 0/0",
+  "observed_pre_restart_engine_time_s": 1012.0999999999548,
+  "observed_post_restart_overwrite_engine_time_s": 105.8000000000015,
+  "scientific_state_loss": "uncommitted computation only; no completed support row was overwritten or used",
+  "correction": "restore when a continuing R block has both a live checkpoint and an active_observation, including cursor 0/0",
+  "post_correction_probe": {
+    "restored_engine_time_s": 105.8000000000015,
+    "subsequent_engine_time_s": 182.50000000000023,
+    "restart_advanced_from_saved_state": true
+  },
+  "acceptance_rules_changed": false,
+  "physical_inputs_changed": false
+}

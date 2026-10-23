@@ -1,0 +1,378 @@
+{
+  "all_common_runtime_receipt_fields_equal": true,
+  "common_runtime_receipt_equal": {
+    "engine_class": true,
+    "kinetics": true,
+    "mechanics_provider": true,
+    "methods": true,
+    "model_id": true,
+    "numerical_options": true,
+    "persistent_invariants": true,
+    "reversible_binding": true,
+    "signed_kernel_family": true,
+    "source_geography": true,
+    "source_geometry": true,
+    "source_lifecycle": true,
+    "state_class": true,
+    "taylor_contract": true
+  },
+  "completed_cache": {
+    "elapsed_s": 441.80667901039124,
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_native_refit/candidate_cache/sustained_active_f8f63fdfca0e.json",
+    "recomputed_pre_wall_identity": "f8f63fdfca0edf87493af2c41140a97add72d0d5e74d965e935e183e6e0ee64e",
+    "recorded_identity": "f8f63fdfca0edf87493af2c41140a97add72d0d5e74d965e935e183e6e0ee64e",
+    "sha256": "18156caebb8229db077e3c62a87289206ba9d728d1df9dcbe45669668911b0e9",
+    "status": "complete"
+  },
+  "current_initial_runtime_receipt": {
+    "engine_class": "arrhenius_fracture.reduced_persistent_reference_r2.ReducedPersistentReversibleTipEngine",
+    "final_bound_implementation_identity": "qste340tm.restored-r2-r9-alternative-gstar-exp-floor/1",
+    "historical_replay_identity": "v10.2.3_historical_finite_source_replay",
+    "kinetics": "reversible_signed",
+    "local_strength": {
+      "source": "explicit_spatial_driver_cohesive_ceiling",
+      "value_Pa": 30000000000.0
+    },
+    "material": {
+      "definition": {
+        "c_blunt": 2.6710070092231035,
+        "candidate_id": "QSTE340TM_RESTORED_ALTERNATIVE_GSTAR_EXP_FLOOR",
+        "cleavage": {
+          "parent": {
+            "G00_eV": 0.45044272961934334,
+            "Tref_K": 481.33,
+            "alpha": 0.22058697171901603,
+            "attempt_frequency_s": 1000000000000.0,
+            "exponent": 1.5454311209911598,
+            "floor_fraction": 0.8775742237144637,
+            "floor_max_fraction": 0.95,
+            "floor_min_eV": 0.0001,
+            "gT_eV_per_K": 0.0,
+            "sT_Pa_per_K": 0.0,
+            "sigc0_Pa": 2073551604.9248903
+          },
+          "surface": "KineticSurface(process='cleavage', attempt_frequency_s=1000000000000.0, reference_floor_eV=0.33702746475100176, reference_amplitudes_eV=(0.1685679361156157, 1.210592993597935, 0.0), bases=(SmoothBroadBasis(sigma_b_Pa=8899237488.692366, exponent=0.6025516273413153, smoothing_ratio=0.0001), Basis(alpha=1.0, sigma_Pa=938627439.9265141, exponent=3.756518227513879), Basis(alpha=1.0, sigma_Pa=2064980367.8383312, exponent=2.0)), entropy_infinity_kB=-29.290747885668754, entropy_amplitudes_kB=(-6.474260106612236, 8.49932722468522, 13.76931807026267), heat_capacity_infinity_kB=40.72244957089424, heat_capacity_amplitudes_kB=(0.0, 0.0, -85.98299641162157), hits=3.273241435177624, tau_s=6.992153587194454e-07)"
+        },
+        "emission": {
+          "G00_eV": 1.92063012,
+          "Tref_K": 481.33,
+          "alpha": 0.0845685,
+          "attempt_frequency_s": 100000000000.0,
+          "exponent": 1.0,
+          "floor_fraction": 0.02,
+          "floor_max_fraction": 0.95,
+          "floor_min_eV": 0.0001,
+          "gT_eV_per_K": 0.003934,
+          "sT_Pa_per_K": -656400.0,
+          "sigc0_Pa": 1379760648.0
+        },
+        "encounter_efficiency": 0.7869294861098416,
+        "max_K_shield_MPa_sqrt_m": 0.0,
+        "name": "QSTE340TM_RESTORED_ALTERNATIVE_GSTAR_EXP_FLOOR",
+        "peierls": {
+          "H0_eV": 2.22063012,
+          "activation_entropy_kB": -45.65217429017896,
+          "alpha": 0.0845685,
+          "attempt_frequency_s": 1000000000000.0,
+          "exponent": 1.0,
+          "stress_ratio": 1.0
+        },
+        "retained_recovery_rate_s": 0.0,
+        "source_refresh_length_m": 0.0,
+        "source_sites_per_system": 141.0590567476921,
+        "taylor": {
+          "H0_eV": 2.22063012,
+          "activation_entropy_kB": -45.65217429017896,
+          "alpha": 0.0845685,
+          "attempt_frequency_s": 100000000000.0,
+          "exponent": 1.0,
+          "stress_ratio": 1.0
+        },
+        "taylor_corr_rho_c_m2": 749611920129.9166,
+        "taylor_corr_scale": 1.818093050430288
+      },
+      "embedded": true,
+      "path": null,
+      "sha256": "af81bfb56018cc1b14465ed168a11810dd2620a121c50b2f8abb5cd683982b80"
+    },
+    "material_family": "QSTE340TM_RESTORED_ALTERNATIVE_GSTAR_EXP_FLOOR",
+    "mechanics_provider": "prescribed_K_reduced_provider",
+    "methods": {
+      "_emit": {
+        "callable": "arrhenius_fracture.persistent_site_source_v10221._persistent_emit",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_source_v10221.py",
+        "file_sha256": "e35e3dbf2cb37d3501eea7af79f08fd2b0ef90befd0c9f8c93c491016a458df1"
+      },
+      "_transport_rates": {
+        "callable": "arrhenius_fracture.reduced_persistent_reference_r2._mean_rate_transport",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/reduced_persistent_reference_r2.py",
+        "file_sha256": "58a615c0e22751a287543ff925ac8c349ace11437665f95962f711a064b4492f"
+      },
+      "advance": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "blunted_radius": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_blunted_radius",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "diagnostics": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_diagnostics",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "evolve": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      },
+      "local_slip_count": {
+        "callable": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_local_slip_count",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+        "file_sha256": "2f7823bd16204347ce73d2e59dc9c0bee4e4d1f16bbe363e50fa12f35985a109"
+      }
+    },
+    "model_id": "r2.restored_reduced_persistent_reversible/1",
+    "numerical_options": {
+      "G_Pa": 80000000000.0,
+      "Kdot_MPa_sqrt_m_s": 0.005,
+      "Kmax_MPa_sqrt_m": 80.0,
+      "b_m": 2.48e-10,
+      "blunting_length_um": 0.8204647996828617,
+      "checkpoint_da_um": 5.0,
+      "cleavage_hits": 3.273241435177624,
+      "cleavage_tau_s": 6.992153587194454e-07,
+      "crystal_theta_deg": 45.0,
+      "drive_factors": [
+        0.132886,
+        0.008596
+      ],
+      "forest_density_floor_m2": 5000000000000.0,
+      "max_action_substep": 0.01,
+      "max_dK_step_MPa_sqrt_m": 0.01,
+      "max_internal_steps": 100000,
+      "max_outer_steps": 2000000,
+      "max_translation_substep_m": 5e-08,
+      "mobile_shield_fraction": 0.0,
+      "mpz_length_um": 50.0,
+      "mpz_n_bins": 80,
+      "poisson": 0.3,
+      "r0_m": 1e-06,
+      "shielding_core_m": 2.5e-10,
+      "source_bin_count": 2,
+      "target_extension_um": 100.0,
+      "transport_mode": "validated_scalar",
+      "wake_length_um": 50.0,
+      "wake_n_bins": 0
+    },
+    "owning_arrays": {
+      "accumulated_slip_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "accumulated_slip_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "available_sites": {
+        "owner": "engine.mpz",
+        "shape": [
+          2
+        ],
+        "sum": 282.1181134953842
+      },
+      "mobile_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "mobile_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "retained_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "retained_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "returned_slip_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "returned_slip_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "site_capacity": {
+        "owner": "engine.mpz",
+        "shape": [
+          2
+        ],
+        "sum": 282.1181134953842
+      },
+      "wake_mobile_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "wake_mobile_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "wake_retained_negative": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      },
+      "wake_retained_positive": {
+        "owner": "engine.mpz",
+        "shape": [
+          2,
+          80
+        ],
+        "sum": 0.0
+      }
+    },
+    "persistent_invariants": {
+      "advance_refresh": false,
+      "available_equals_capacity": true,
+      "depletion_on_emission": false,
+      "inventory_active": false
+    },
+    "reversible_binding": {
+      "all_expected_methods_bound": true,
+      "expected_method_match": {
+        "advance": true,
+        "blunted_radius": true,
+        "diagnostics": true,
+        "evolve": true,
+        "local_slip_count": true
+      },
+      "installation_count": 1,
+      "installed": true,
+      "model_id": "v10.2.30_intrinsic_signed_mobile_transport_v1",
+      "object_id": 5083977712,
+      "object_type": "arrhenius_fracture.unified_mpz.UnifiedMPZState",
+      "observed_methods": {
+        "advance": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
+        "blunted_radius": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_blunted_radius",
+        "diagnostics": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_diagnostics",
+        "evolve": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_evolve_scalar",
+        "local_slip_count": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_local_slip_count"
+      },
+      "schema": "v10.2.30-reversible-runtime-binding/1"
+    },
+    "schema": "r2-resolved-reduced-runtime-receipt/1",
+    "selected_identity": "ALTERNATIVE_GSTAR_PRODUCTION_OBSERVER",
+    "selection": {
+      "definition": {
+        "implicit_max_iterations": 96,
+        "implicit_tolerance": 1e-10,
+        "maximum_front_width_m": 0.0,
+        "minimum_front_width_m": 0.0,
+        "reference_density_m2": 5000000000000.0,
+        "reference_front_width_m": 9.999999999999999e-06,
+        "reference_source_area_m2": 2.5e-11,
+        "rho_site0_m2": 3855551510837146.5,
+        "source_zone_length_m": 2e-06
+      },
+      "embedded": true,
+      "path": null,
+      "sha256": "e9ca4e9cfd18e12c52a0148660fcf7a7f8b84f36b80568e9c2e004e5dda9cfa5"
+    },
+    "signed_kernel_family": {
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+      "sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c"
+    },
+    "source_geography": "tip_surface",
+    "source_geometry": {
+      "front_width_m": 9.999999999999999e-06,
+      "multiplicity_per_system": 96388.78777092867,
+      "rho_width_m2": 5000000000000.0,
+      "source_area_m2": 2.5e-11,
+      "tip_radius_m": 1e-06
+    },
+    "source_lifecycle": "persistent_reusable",
+    "stage": "active_cache_provenance_current_initial",
+    "state_class": "arrhenius_fracture.unified_mpz.UnifiedMPZState",
+    "taylor_contract": {
+      "elementary_rate": "stable forward-minus-zero-stress",
+      "final_consumer": {
+        "callable": "arrhenius_fracture.reduced_persistent_reference_r2._mean_rate_transport",
+        "file": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/arrhenius_fracture/reduced_persistent_reference_r2.py",
+        "file_sha256": "58a615c0e22751a287543ff925ac8c349ace11437665f95962f711a064b4492f"
+      },
+      "finite_window_s": null,
+      "law_id": "MEAN_FORWARD_MINUS_ZERO_RATE_OVER_DENSITY_ORDER",
+      "order": "1+scale*sqrt(rho/rho_c)",
+      "units": "s^-1"
+    }
+  },
+  "history_forcing": {
+    "completed_cache": "two endpoint support loads per R; each long interval held at endpoint load",
+    "equivalent_to_new_primary": false,
+    "new_primary": "every_observation_linear_midpoint_load"
+  },
+  "identity_difference": {
+    "completed_record_reuse_scope": "historical two-support/eight-phase fixed-local-window comparator",
+    "only_added_field": {
+      "candidate_wall_limit_s": 360
+    },
+    "physical_or_numerical_input_changed": false
+  },
+  "schema": "qste340tm-active-cache-provenance/1",
+  "stopped_cache": {
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_native_refit/candidate_cache/sustained_active_23478e586bb6.json",
+    "reason": "native candidate exceeded declared 360 s wall limit",
+    "recomputed_wall_identity": "23478e586bb6d9584de323be9699527ab2ef83b89010a83c24ae3de1099cf7a2",
+    "recorded_identity": "23478e586bb6d9584de323be9699527ab2ef83b89010a83c24ae3de1099cf7a2",
+    "sha256": "573d33bb9e6e6663144acff4095a89250973be618944f906cbbb8264d178452d",
+    "status": "rejected"
+  }
+}

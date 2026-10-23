@@ -1,0 +1,79 @@
+{
+  "all_passed": true,
+  "candidate": {
+    "emission_G0_298_eV": 1.2,
+    "peierls_G0_298_eV": 1.5,
+    "plastic_sigc_298_Pa": 1500000000.0,
+    "taylor_G0_298_eV": 1.5
+  },
+  "checks": [
+    {
+      "R": 0.1,
+      "case": "initial",
+      "ledger_delta_equal": true,
+      "maximum_absolute_state_difference": 0.0,
+      "maximum_scaled_state_difference": 0.0,
+      "passed": true,
+      "plastic_totals_equal": true,
+      "production_hazard_action_per_cycle": 4.925756143559163,
+      "state_only_hazard_action_per_cycle": 0.0,
+      "state_vector_length": 2242,
+      "transition_signature_equal": true
+    },
+    {
+      "R": 0.1,
+      "case": "completed_R_0.1",
+      "ledger_delta_equal": true,
+      "maximum_absolute_state_difference": 0.0,
+      "maximum_scaled_state_difference": 0.0,
+      "passed": true,
+      "plastic_totals_equal": true,
+      "production_hazard_action_per_cycle": 298.1378966378111,
+      "state_only_hazard_action_per_cycle": 0.0,
+      "state_vector_length": 2242,
+      "transition_signature_equal": true
+    },
+    {
+      "R": 0.3,
+      "case": "completed_R_0.3",
+      "ledger_delta_equal": true,
+      "maximum_absolute_state_difference": 0.0,
+      "maximum_scaled_state_difference": 0.0,
+      "passed": true,
+      "plastic_totals_equal": true,
+      "production_hazard_action_per_cycle": 423.1597244950342,
+      "state_only_hazard_action_per_cycle": 0.0,
+      "state_vector_length": 2242,
+      "transition_signature_equal": true
+    },
+    {
+      "R": 0.5,
+      "case": "completed_R_0.5",
+      "ledger_delta_equal": true,
+      "maximum_absolute_state_difference": 0.0,
+      "maximum_scaled_state_difference": 0.0,
+      "passed": true,
+      "plastic_totals_equal": true,
+      "production_hazard_action_per_cycle": 598.8901290606993,
+      "state_only_hazard_action_per_cycle": 0.0,
+      "state_vector_length": 2242,
+      "transition_signature_equal": true
+    },
+    {
+      "R": 0.7,
+      "case": "completed_R_0.7",
+      "ledger_delta_equal": true,
+      "maximum_absolute_state_difference": 0.0,
+      "maximum_scaled_state_difference": 0.0,
+      "passed": true,
+      "plastic_totals_equal": true,
+      "production_hazard_action_per_cycle": 1095.5355491233959,
+      "state_only_hazard_action_per_cycle": 0.0,
+      "state_vector_length": 2242,
+      "transition_signature_equal": true
+    }
+  ],
+  "phase_count": 8,
+  "schema": "qste340tm-state-only-opening-qualification/1",
+  "scope": "fixed-window, crack-event-suppressed state evolution only; final opening predictions and receipts retain the production opening implementation"
+}

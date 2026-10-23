@@ -1,0 +1,90 @@
+{
+  "active_observation": {
+    "midpoint_DeltaK_MPa_sqrt_m": 17.71736,
+    "observation_id": "lu_fig4_A_B",
+    "source_order": 1,
+    "substep_target_cycle": 9210.0,
+    "target_cycle": 9210.0
+  },
+  "completed_observation_rows": [],
+  "completed_process_rows": [],
+  "current_load_substep": 0,
+  "current_observation_position": 0,
+  "current_r_index": 0,
+  "identity": {
+    "payload": {
+      "accepted_cycle_roundoff_policy": "snap_to_integer_within_1e-6_cycle",
+      "alignment": "index_rank",
+      "candidate_id": "transport_dominated",
+      "frequency_Hz": 10.0,
+      "history_input_sha256": "037218fd910439a3db6a49d919cc84af93fbbea3c2587cc3ef8bd8b548f0053d",
+      "history_mode": "adaptive_2_supports_per_R_piecewise_linear_observed_load",
+      "kernel_sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+      "load_substep_cycle_partition": "nearest_integer_boundaries_exact_observed_endpoint",
+      "load_substeps": 4,
+      "moving_frame_policy": "fixed_local_window_reported_DeltaK_owns_remote_geometry",
+      "opening_during_state_replay": "production opening observer",
+      "phase_count": 8,
+      "plastic": {
+        "emission_G0_298_eV": 0.8,
+        "peierls_G0_298_eV": 0.7,
+        "plastic_sigc_298_Pa": 1000000000.0,
+        "taylor_G0_298_eV": 2.5
+      },
+      "premeasurement": true,
+      "rate_input_sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd",
+      "runtime_model_id": "qste340tm.restored-r2-r9-alternative-gstar-exp-floor/1",
+      "schema": "qste340tm-restored-active-chronological/1",
+      "state_only_acceleration": false,
+      "support_points_per_R": 2,
+      "temperature_K": 298.15
+    },
+    "sha256": "12d8f3fb5f7cf3e88bbc045e2f0955c98fb50e15464db4cbe7b0dd0eadeae388"
+  },
+  "interval_modes": [],
+  "interval_start_ledgers": {
+    "engine.N_em": 0.0,
+    "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,1]": 0.0,
+    "mpz.cumulative_gross_return_activity": 0.0,
+    "mpz.cumulative_gross_source_activity": 0.0,
+    "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+    "mpz.emitted_total": 0.0,
+    "mpz.escaped_total": 0.0,
+    "mpz.signed_line_content_emitted_total": 0.0,
+    "mpz.signed_source_activations_total": 0.0
+  },
+  "schema": "qste340tm-active-outer-checkpoint/1",
+  "slices": [
+    {
+      "active_context": {
+        "midpoint_DeltaK_MPa_sqrt_m": 17.71736,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 1,
+        "substep_target_cycle": 9210.0,
+        "target_cycle": 9210.0
+      },
+      "elapsed_s": 101.2199434999784,
+      "finished_unix_s": 1792722945.86065,
+      "status": "running"
+    }
+  ],
+  "status": "running"
+}

@@ -1,0 +1,2223 @@
+{
+  "absolute_frontier_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/transport_dominated_3d95794e9698.json",
+  "candidate_summary": [
+    {
+      "absolute_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.35450132550351715,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 0.26172049904716954,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.03787211035055975,
+              0.04003637202081507,
+              1.0168409010854251
+            ],
+            "rmse_log10_rate": 0.5340523960036049
+          },
+          "0.3": {
+            "bias_log10_rate": -0.18267005705338704,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": -0.0868316267479208,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.102288170958127,
+              -0.08025819032081927,
+              -0.051722310178050165
+            ],
+            "rmse_log10_rate": 0.3876392216979343
+          },
+          "0.5": {
+            "bias_log10_rate": 0.05082527489118322,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": -0.12455828121409325,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.14730133646838794,
+              -0.12584911395970266,
+              -0.09741394839397799
+            ],
+            "rmse_log10_rate": 0.29811524361030045
+          },
+          "0.7": {
+            "bias_log10_rate": 0.48633232542937394,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": -0.042861241105881326,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.11971247238989235,
+              -0.035791291106988865,
+              -0.0017033833134973975
+            ],
+            "rmse_log10_rate": 0.5109030978048055
+          }
+        },
+        "overall_bias_log10_rate": -0.07881237567208955,
+        "overall_rmse_log10_rate": 0.4452709573137003,
+        "shape_rmse_log10": 0.3302932210985444
+      },
+      "candidate_id": "sustained_active",
+      "fitted_absolute_opening": {
+        "broad_amplitude_eV": 3.8055211454116434e-42,
+        "broad_exponent": 4.999998934003048,
+        "broad_sigma_Pa": 11271948270.13747,
+        "floor_eV": 0.46018910215214814,
+        "guard_amplitude_eV": 0.22150412339177478
+      },
+      "history_mode": "historical_endpoint_support",
+      "identity": "f8f63fdfca0edf87493af2c41140a97add72d0d5e74d965e935e183e6e0ee64e",
+      "maximum_accumulated_slip_count": 290.3585139715047,
+      "maximum_mobile_count": 294.1677554500862,
+      "maximum_retained_count": 6.36463548548784e-07,
+      "maximum_tip_radius_m": 1.0586943828998934e-06,
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_native_refit/candidate_cache/sustained_active_f8f63fdfca0e.json",
+      "plastic_coordinates": {
+        "emission_G0_298_eV": 1.2,
+        "peierls_G0_298_eV": 1.5,
+        "plastic_sigc_298_Pa": 1500000000.0,
+        "taylor_G0_298_eV": 1.5
+      },
+      "sha256": "18156caebb8229db077e3c62a87289206ba9d728d1df9dcbe45669668911b0e9",
+      "shape_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6597390237644092,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.3014802958995544,
+            "predicted_local_slope_q10_q50_q90": [
+              1.2689796662672053,
+              2.3851501170838674,
+              2.604948437501116
+            ],
+            "rmse_log10_rate": 0.6809004997832497
+          },
+          "0.3": {
+            "bias_log10_rate": -0.3365116132634721,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.295089854739872,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3529640358437063,
+              2.2241765163134914,
+              2.70591041340831
+            ],
+            "rmse_log10_rate": 0.3533289700572933
+          },
+          "0.5": {
+            "bias_log10_rate": 0.1309692447739281,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.2488633649768976,
+            "predicted_local_slope_q10_q50_q90": [
+              1.2944254445865226,
+              2.4233212720791926,
+              2.891533821588382
+            ],
+            "rmse_log10_rate": 0.17580688888407575
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8652865305936539,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.3356048545404553,
+            "predicted_local_slope_q10_q50_q90": [
+              0.4895880215651687,
+              1.3176360058748742,
+              2.378022180344942
+            ],
+            "rmse_log10_rate": 0.869607445505263
+          }
+        },
+        "overall_bias_log10_rate": -0.14388239948619266,
+        "overall_rmse_log10_rate": 0.5617912443710826,
+        "shape_rmse_log10": 0.12999544095296003
+      },
+      "state_opening_seed": null,
+      "support_count": 8
+    },
+    {
+      "absolute_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.35451708722293274,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 0.26169263143681615,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.0375718015030543,
+              0.040084707399306925,
+              1.0164858493496924
+            ],
+            "rmse_log10_rate": 0.5340662313219492
+          },
+          "0.3": {
+            "bias_log10_rate": -0.1826945313211567,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": -0.08664626912813227,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.10211607095825456,
+              -0.07987645667526522,
+              -0.05484895328122543
+            ],
+            "rmse_log10_rate": 0.38763521567194587
+          },
+          "0.5": {
+            "bias_log10_rate": 0.05080046095655356,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": -0.12376496537601638,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.14706243013779385,
+              -0.12376246338999408,
+              -0.09722601898192806
+            ],
+            "rmse_log10_rate": 0.29805194654372724
+          },
+          "0.7": {
+            "bias_log10_rate": 0.4863973817311567,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": -0.04176410635081119,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.12041199469058483,
+              -0.03601842760804175,
+              -0.001720083748068646
+            ],
+            "rmse_log10_rate": 0.5109475988677844
+          }
+        },
+        "overall_bias_log10_rate": -0.07881971131032744,
+        "overall_rmse_log10_rate": 0.4452740300739443,
+        "shape_rmse_log10": 0.3302734228747924
+      },
+      "candidate_id": "sustained_active",
+      "fitted_absolute_opening": {
+        "broad_amplitude_eV": 2.279473970555065e-29,
+        "broad_exponent": 4.999999994532172,
+        "broad_sigma_Pa": 11229860065.603708,
+        "floor_eV": 0.46018724139587,
+        "guard_amplitude_eV": 0.2210393701764555
+      },
+      "history_mode": "adaptive_8_supports_per_R_piecewise_linear_observed_load",
+      "identity": "23b19aa6590c67b1d7b3c7488367f879157d1575a379f0384877c741b344969b",
+      "maximum_accumulated_slip_count": 105.66840463291126,
+      "maximum_mobile_count": 105.66848369397036,
+      "maximum_retained_count": 8.949341636464606e-12,
+      "maximum_tip_radius_m": 1.0213602891029868e-06,
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/sustained_active_23b19aa6590c.json",
+      "plastic_coordinates": {
+        "emission_G0_298_eV": 1.2,
+        "peierls_G0_298_eV": 1.5,
+        "plastic_sigc_298_Pa": 1500000000.0,
+        "taylor_G0_298_eV": 1.5
+      },
+      "sha256": "84abff5e2ef49182fd2d181b492ad0084bd95e0f372eed8ee6e7fb262070120d",
+      "shape_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.6594609270937711,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.2970242093856776,
+            "predicted_local_slope_q10_q50_q90": [
+              1.2849833842177987,
+              2.36708870311989,
+              2.5931496272041046
+            ],
+            "rmse_log10_rate": 0.6808017863017601
+          },
+          "0.3": {
+            "bias_log10_rate": -0.33653579924976923,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.2979135339688224,
+            "predicted_local_slope_q10_q50_q90": [
+              1.395453758961048,
+              2.235180510876148,
+              2.6947165232723593
+            ],
+            "rmse_log10_rate": 0.35329306382644343
+          },
+          "0.5": {
+            "bias_log10_rate": 0.13007034503914694,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.263962946599288,
+            "predicted_local_slope_q10_q50_q90": [
+              1.328955130325994,
+              2.3929258197011904,
+              2.8804181499251627
+            ],
+            "rmse_log10_rate": 0.17422855250067876
+          },
+          "0.7": {
+            "bias_log10_rate": 0.8659315949774853,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.370419123474683,
+            "predicted_local_slope_q10_q50_q90": [
+              0.5207754875900719,
+              1.3884642028288,
+              2.4419760955534002
+            ],
+            "rmse_log10_rate": 0.8700592425912745
+          }
+        },
+        "overall_bias_log10_rate": -0.14389732416579923,
+        "overall_rmse_log10_rate": 0.5617473556177704,
+        "shape_rmse_log10": 0.12976153398527937
+      },
+      "state_opening_seed": null,
+      "support_count": 32
+    },
+    {
+      "absolute_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.42839293761604375,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 0.9045656012806556,
+            "predicted_local_slope_q10_q50_q90": [
+              0.259237660677718,
+              0.4887519849801265,
+              3.0981200575069923
+            ],
+            "rmse_log10_rate": 0.544656784848829
+          },
+          "0.3": {
+            "bias_log10_rate": -0.27616620068179293,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 0.8429808750688513,
+            "predicted_local_slope_q10_q50_q90": [
+              0.310525644709719,
+              0.5741370785974595,
+              2.444670414618304
+            ],
+            "rmse_log10_rate": 0.376276215017078
+          },
+          "0.5": {
+            "bias_log10_rate": 0.18168080959237454,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 2.62488990176288,
+            "predicted_local_slope_q10_q50_q90": [
+              0.7341422052348889,
+              2.06157321471656,
+              6.578606086433865
+            ],
+            "rmse_log10_rate": 0.2193930930330181
+          },
+          "0.7": {
+            "bias_log10_rate": 0.5229149059289238,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.448928998696501,
+            "predicted_local_slope_q10_q50_q90": [
+              0.6693268421720404,
+              1.3074033630426811,
+              2.8949097092772718
+            ],
+            "rmse_log10_rate": 0.5292391328978652
+          }
+        },
+        "overall_bias_log10_rate": -0.09455106515061412,
+        "overall_rmse_log10_rate": 0.4397645540826252,
+        "shape_rmse_log10": 0.2453751541241404
+      },
+      "candidate_id": "transport_dominated",
+      "fitted_absolute_opening": {
+        "broad_amplitude_eV": 0.041797111449610964,
+        "broad_exponent": 4.999999999999998,
+        "broad_sigma_Pa": 6793605196.442087,
+        "floor_eV": 0.4209593080097743,
+        "guard_amplitude_eV": 9.725004701255983e-41
+      },
+      "history_mode": "adaptive_2_supports_per_R_piecewise_linear_observed_load",
+      "identity": "3d95794e9698de684e22e37a82eca0a232a9944b095b7741906041c97a0e2535",
+      "maximum_accumulated_slip_count": 269092.29960005963,
+      "maximum_mobile_count": 104001.26777632188,
+      "maximum_retained_count": 6.015425129331427e-05,
+      "maximum_tip_radius_m": 5.539553416948806e-05,
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/transport_dominated_3d95794e9698.json",
+      "plastic_coordinates": {
+        "emission_G0_298_eV": 0.8,
+        "peierls_G0_298_eV": 0.7,
+        "plastic_sigc_298_Pa": 1000000000.0,
+        "taylor_G0_298_eV": 2.5
+      },
+      "sha256": "9d685ef088ddcdd1d7fe4952240944f153941309b17535974b4b6f2bcf759e34",
+      "shape_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.5603317380601648,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.5230525518113525,
+            "predicted_local_slope_q10_q50_q90": [
+              0.993352956968613,
+              2.080671812996684,
+              4.055549262764134
+            ],
+            "rmse_log10_rate": 0.5858983222395705
+          },
+          "0.3": {
+            "bias_log10_rate": -0.344445137581426,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.3847977578872834,
+            "predicted_local_slope_q10_q50_q90": [
+              1.0963681441514381,
+              2.286497513987115,
+              3.955718732881724
+            ],
+            "rmse_log10_rate": 0.36768391309641213
+          },
+          "0.5": {
+            "bias_log10_rate": 0.2886516808001167,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 3.413672901269138,
+            "predicted_local_slope_q10_q50_q90": [
+              2.0947224505980557,
+              3.376528483027755,
+              4.224790630627922
+            ],
+            "rmse_log10_rate": 0.2993666993115181
+          },
+          "0.7": {
+            "bias_log10_rate": 0.6161317611851282,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 3.361079068585524,
+            "predicted_local_slope_q10_q50_q90": [
+              1.9439674355508032,
+              3.4631548389313593,
+              4.570025729128702
+            ],
+            "rmse_log10_rate": 0.6183141525259209
+          }
+        },
+        "overall_bias_log10_rate": -0.11824768932611522,
+        "overall_rmse_log10_rate": 0.48219180326344746,
+        "shape_rmse_log10": 0.12720683404592248
+      },
+      "state_opening_seed": {
+        "broad_amplitude_eV": 2.279473970555065e-29,
+        "broad_exponent": 4.999999994532172,
+        "broad_sigma_Pa": 11229860065.603708,
+        "floor_eV": 0.46018724139587,
+        "guard_amplitude_eV": 0.2210393701764555
+      },
+      "support_count": 8
+    },
+    {
+      "absolute_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.35901531864300923,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 0.26720029329906214,
+            "predicted_local_slope_q10_q50_q90": [
+              0.010888936976471088,
+              0.15450597403764732,
+              0.6995207545645201
+            ],
+            "rmse_log10_rate": 0.5367487263347047
+          },
+          "0.3": {
+            "bias_log10_rate": -0.18472146375088638,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": -0.06402214898051142,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.07431833618993551,
+              -0.06494709253581732,
+              -0.057788928114950976
+            ],
+            "rmse_log10_rate": 0.38662075618930547
+          },
+          "0.5": {
+            "bias_log10_rate": 0.050347186622758125,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": -0.09834030486042632,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.13126058604757418,
+              -0.10700549645116553,
+              -0.05147371841690074
+            ],
+            "rmse_log10_rate": 0.2960909161636213
+          },
+          "0.7": {
+            "bias_log10_rate": 0.49338199467505717,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": -0.016653662634507533,
+            "predicted_local_slope_q10_q50_q90": [
+              -0.06904125957498763,
+              -0.00883665613832818,
+              -4.767857649312646e-05
+            ],
+            "rmse_log10_rate": 0.5172059254286757
+          }
+        },
+        "overall_bias_log10_rate": -0.07985240437113393,
+        "overall_rmse_log10_rate": 0.44693479464433383,
+        "shape_rmse_log10": 0.3289560799753887
+      },
+      "candidate_id": "trapping_dominated",
+      "fitted_absolute_opening": {
+        "broad_amplitude_eV": 4.3211817575338314e-41,
+        "broad_exponent": 4.999994325703166,
+        "broad_sigma_Pa": 7473298024.019385,
+        "floor_eV": 0.4600357088610167,
+        "guard_amplitude_eV": 0.06158014609676219
+      },
+      "history_mode": "adaptive_2_supports_per_R_piecewise_linear_observed_load",
+      "identity": "c224f83bc45de0035a3a4a7d881b64b8202a4b0cdeb71c426b9f6faeda4fb950",
+      "maximum_accumulated_slip_count": 6593.176653400461,
+      "maximum_mobile_count": 6593.176653400462,
+      "maximum_retained_count": 3.9649603602826526e-25,
+      "maximum_tip_radius_m": 2.3327745404403846e-06,
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/trapping_dominated_c224f83bc45d.json",
+      "plastic_coordinates": {
+        "emission_G0_298_eV": 0.8,
+        "peierls_G0_298_eV": 2.8,
+        "plastic_sigc_298_Pa": 1200000000.0,
+        "taylor_G0_298_eV": 0.8
+      },
+      "sha256": "99e043d641ea95e152338b11581dc71d49b6efb134654a6d185151bff33feba9",
+      "shape_metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.5898511934714308,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": 2.461992578748594,
+            "predicted_local_slope_q10_q50_q90": [
+              1.0976863273629762,
+              2.341785187890082,
+              3.16648788086776
+            ],
+            "rmse_log10_rate": 0.6117661119063681
+          },
+          "0.3": {
+            "bias_log10_rate": -0.30442397022610623,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 2.640224409899394,
+            "predicted_local_slope_q10_q50_q90": [
+              1.3299175476963114,
+              2.578496754884327,
+              3.270547374225225
+            ],
+            "rmse_log10_rate": 0.31688124707101206
+          },
+          "0.5": {
+            "bias_log10_rate": 0.09457348723807764,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": 3.101184315292517,
+            "predicted_local_slope_q10_q50_q90": [
+              2.247870547356797,
+              3.0544573307865903,
+              3.449363429231198
+            ],
+            "rmse_log10_rate": 0.10797946320161345
+          },
+          "0.7": {
+            "bias_log10_rate": 0.7997074508184024,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 3.4319196643114234,
+            "predicted_local_slope_q10_q50_q90": [
+              2.803605951026384,
+              3.4879631158277107,
+              3.6843014674959704
+            ],
+            "rmse_log10_rate": 0.8004086770392401
+          }
+        },
+        "overall_bias_log10_rate": -0.1305468028195734,
+        "overall_rmse_log10_rate": 0.5064844177815356,
+        "shape_rmse_log10": 0.10776989131053742
+      },
+      "state_opening_seed": {
+        "broad_amplitude_eV": 2.279473970555065e-29,
+        "broad_exponent": 4.999999994532172,
+        "broad_sigma_Pa": 11229860065.603708,
+        "floor_eV": 0.46018724139587,
+        "guard_amplitude_eV": 0.2210393701764555
+      },
+      "support_count": 8
+    }
+  ],
+  "claim_assessment": "bounded negative with a near-frontier improvement for the qualified fixed-local-window replay: transport-active state improves pooled RMSE over the common constant, but does not recover all four measured slopes or matched-Kmax history offsets. This is not a negative test of the unresolved 6-13 mm native translation path.",
+  "constant_controls": {
+    "equal_history_optimal_common_constant": {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.33868527009833765,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": -3.210344870663522e-15,
+            "predicted_local_slope_q10_q50_q90": [
+              -8.697043085703625e-13,
+              0.0,
+              1.5006662579253368e-12
+            ],
+            "rmse_log10_rate": 0.5480647948296895
+          },
+          "0.3": {
+            "bias_log10_rate": -0.20326260696163262,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": 6.462180389665127e-16,
+            "predicted_local_slope_q10_q50_q90": [
+              -1.8189894035458565e-12,
+              0.0,
+              1.8189894035458565e-12
+            ],
+            "rmse_log10_rate": 0.39043547177216115
+          },
+          "0.5": {
+            "bias_log10_rate": 0.04395815697171831,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": -2.0715091675848528e-15,
+            "predicted_local_slope_q10_q50_q90": [
+              -2.1600499167107046e-12,
+              0.0,
+              1.4779288903810084e-12
+            ],
+            "rmse_log10_rate": 0.287731763716751
+          },
+          "0.7": {
+            "bias_log10_rate": 0.49798972008825,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 2.307237440658898e-15,
+            "predicted_local_slope_q10_q50_q90": [
+              -2.7284841053187847e-12,
+              0.0,
+              3.637978807091713e-12
+            ],
+            "rmse_log10_rate": 0.5213480391832731
+          }
+        },
+        "overall_bias_log10_rate": -0.07925903581059861,
+        "overall_rmse_log10_rate": 0.45188845070082256,
+        "shape_rmse_log10": 0.3385594423074651
+      },
+      "rate_m_per_cycle": 7.247469580143068e-08
+    },
+    "pooled_optimal_common_constant": {
+      "metrics": {
+        "block_metrics": {
+          "0.1": {
+            "bias_log10_rate": -0.25942623428773826,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "points": 248,
+            "predicted_broad_loglog_slope": -2.5530040001375307e-15,
+            "predicted_local_slope_q10_q50_q90": [
+              -7.162270776461807e-13,
+              0.0,
+              9.094947017729282e-13
+            ],
+            "rmse_log10_rate": 0.5029605135463838
+          },
+          "0.3": {
+            "bias_log10_rate": -0.12400357115103329,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "points": 219,
+            "predicted_broad_loglog_slope": -1.1362230092799007e-15,
+            "predicted_local_slope_q10_q50_q90": [
+              -1.8189894035458565e-12,
+              0.0,
+              1.0345502232667068e-12
+            ],
+            "rmse_log10_rate": 0.3556698692429825
+          },
+          "0.5": {
+            "bias_log10_rate": 0.12321719278231766,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "points": 171,
+            "predicted_broad_loglog_slope": -7.035509635499164e-16,
+            "predicted_local_slope_q10_q50_q90": [
+              -3.637978807091713e-12,
+              0.0,
+              1.0800249583553523e-12
+            ],
+            "rmse_log10_rate": 0.30990276682268725
+          },
+          "0.7": {
+            "bias_log10_rate": 0.5772487558988494,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "points": 122,
+            "predicted_broad_loglog_slope": 1.018294920766101e-15,
+            "predicted_local_slope_q10_q50_q90": [
+              -1.8189894035458565e-12,
+              0.0,
+              6.59383658785373e-12
+            ],
+            "rmse_log10_rate": 0.5975166464906558
+          }
+        },
+        "overall_bias_log10_rate": 7.385904753295779e-16,
+        "overall_rmse_log10_rate": 0.44488332978339834,
+        "shape_rmse_log10": 0.3385594423074651
+      },
+      "rate_m_per_cycle": 8.698521414474577e-08
+    }
+  },
+  "exact_final_support_opening_checks": [
+    {
+      "R": 0.1,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 5.3738236108498466e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -3.423433655093052e-05,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 5.374247232481787e-08,
+      "series_id": "lu_fig4_A_B",
+      "source_order": 248,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.3,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 5.182580145545783e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -1.3052693952846614e-05,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 5.1827359100141625e-08,
+      "series_id": "lu_fig4_M_N",
+      "source_order": 219,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.5,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 5.416491157336854e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -1.196874445010257e-05,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 5.416640432758245e-08,
+      "series_id": "lu_fig4_G_H",
+      "source_order": 171,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.7,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 6.703736095885064e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -1.355037145361058e-05,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 6.703945261635818e-08,
+      "series_id": "lu_fig4_S_T",
+      "source_order": 122,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.1,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 3.894072626866756e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -0.00013457416669686304,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 3.8952794641650075e-08,
+      "series_id": "lu_fig4_A_B",
+      "source_order": 248,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.3,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 3.129280406066275e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -4.308475916663989e-05,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 3.1295908658722616e-08,
+      "series_id": "lu_fig4_M_N",
+      "source_order": 219,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.5,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 3.9865693932092094e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -2.9850214403494135e-05,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 3.9868434101395776e-08,
+      "series_id": "lu_fig4_G_H",
+      "source_order": 171,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.7,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "transport_dominated",
+      "exact_production_prediction_m_per_cycle": 6.982076889001899e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -3.8951840755283644e-05,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 6.982703139058182e-08,
+      "series_id": "lu_fig4_S_T",
+      "source_order": 122,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.1,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 7.395390395576865e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -7.984461477879366e-07,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 7.395403991942112e-08,
+      "series_id": "lu_fig4_A_B",
+      "source_order": 248,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.3,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 7.421898167358729e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": 4.613791337794958e-06,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 7.42181932015019e-08,
+      "series_id": "lu_fig4_M_N",
+      "source_order": 219,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.5,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 7.212974636874256e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": 3.278295292525057e-06,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 7.212920189552139e-08,
+      "series_id": "lu_fig4_G_H",
+      "source_order": 171,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.7,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 7.159254452481372e-08,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": 1.4711983921538504e-08,
+      "mode": "absolute",
+      "phase_frozen_prediction_m_per_cycle": 7.159254209957373e-08,
+      "series_id": "lu_fig4_S_T",
+      "source_order": 122,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.1,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 1.1789696296219197e-07,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -0.00022480940943513168,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 1.1795800727382445e-07,
+      "series_id": "lu_fig4_A_B",
+      "source_order": 248,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.3,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 1.315445141952847e-07,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -0.00017999505419624828,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 1.3159904463537637e-07,
+      "series_id": "lu_fig4_M_N",
+      "source_order": 219,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.5,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 1.556636185599525e-07,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -0.00016488307382838186,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 1.5572272861038178e-07,
+      "series_id": "lu_fig4_G_H",
+      "source_order": 171,
+      "stochastic_state_preserved": true
+    },
+    {
+      "R": 0.7,
+      "active_state_evolves_during_exact_cycle": true,
+      "candidate_id": "trapping_dominated",
+      "exact_production_prediction_m_per_cycle": 2.087985213668499e-07,
+      "geometry_preserved": true,
+      "log10_exact_over_phase_frozen": -7.152701524902414e-05,
+      "mode": "shape",
+      "phase_frozen_prediction_m_per_cycle": 2.0883291269707625e-07,
+      "series_id": "lu_fig4_S_T",
+      "source_order": 122,
+      "stochastic_state_preserved": true
+    }
+  ],
+  "fitting_weights": {
+    "absolute_objective": "each observation in R block carries 1/sqrt(n_R), so each of the four histories contributes equal total squared weight",
+    "headline_overall_rmse": "unweighted pooled RMSE over all 760 observations",
+    "matched_Kmax_and_slopes": "diagnostic summaries of the same observations; not added as independent likelihood data",
+    "shape_objective": "concatenates 0.5 times the block-balanced absolute residual with the block-balanced within-history centered residual"
+  },
+  "frequency_Hz": 10.0,
+  "frequency_status": "provisional assumed value; active sensitivity remains unresolved",
+  "historical_vs_chronological_representation": {
+    "chronological_supports_per_R": 8,
+    "historical_supports_per_R": 2,
+    "rows": [
+      {
+        "R": 0.1,
+        "chronological_K_shield_Pa_sqrt_m": -4.001801802889528e-20,
+        "chronological_accumulated_slip_count": 6.992103138951212,
+        "chronological_mobile_count": 6.9921031313658935,
+        "chronological_retained_count": 5.914841420135779e-22,
+        "chronological_returned_slip_count": 0.0,
+        "chronological_tip_radius_m": 1.0014134153440164e-06,
+        "historical_K_shield_Pa_sqrt_m": -0.00015756369558247996,
+        "historical_accumulated_slip_count": 44.884971039890836,
+        "historical_mobile_count": 48.48418756430872,
+        "historical_retained_count": 6.36463548548784e-07,
+        "historical_returned_slip_count": 0.0,
+        "historical_tip_radius_m": 1.0090732509979869e-06,
+        "scaled_difference_K_shield_Pa_sqrt_m": 0.9999999999999998,
+        "scaled_difference_accumulated_slip_count": -0.844221729969769,
+        "scaled_difference_mobile_count": -0.8557859070631705,
+        "scaled_difference_retained_count": -0.999999999999999,
+        "scaled_difference_returned_slip_count": 0.0,
+        "scaled_difference_tip_radius_m": -0.007590960959865682
+      },
+      {
+        "R": 0.3,
+        "chronological_K_shield_Pa_sqrt_m": -9.7107071181791e-18,
+        "chronological_accumulated_slip_count": 12.901952460908058,
+        "chronological_mobile_count": 12.901952474592887,
+        "chronological_retained_count": 2.3001599387386906e-19,
+        "chronological_returned_slip_count": 0.0,
+        "chronological_tip_radius_m": 1.0026080590079444e-06,
+        "historical_K_shield_Pa_sqrt_m": -8.714145815410349e-07,
+        "historical_accumulated_slip_count": 64.16587861134853,
+        "historical_mobile_count": 73.25155899889657,
+        "historical_retained_count": 3.9649500204334205e-08,
+        "historical_returned_slip_count": 0.0,
+        "historical_tip_radius_m": 1.0129707808350754e-06,
+        "scaled_difference_K_shield_Pa_sqrt_m": 0.9999999999888564,
+        "scaled_difference_accumulated_slip_count": -0.7989281415586167,
+        "scaled_difference_mobile_count": -0.8238678787056636,
+        "scaled_difference_retained_count": -0.9999999999941988,
+        "scaled_difference_returned_slip_count": 0.0,
+        "scaled_difference_tip_radius_m": -0.010230030345582257
+      },
+      {
+        "R": 0.5,
+        "chronological_K_shield_Pa_sqrt_m": -3.993241289803527e-15,
+        "chronological_accumulated_slip_count": 32.96598399659494,
+        "chronological_mobile_count": 32.965983936441155,
+        "chronological_retained_count": 1.1818996526846777e-16,
+        "chronological_returned_slip_count": 0.0,
+        "chronological_tip_radius_m": 1.0066638930641372e-06,
+        "historical_K_shield_Pa_sqrt_m": -4.0788343095549065e-05,
+        "historical_accumulated_slip_count": 112.86910211430931,
+        "historical_mobile_count": 133.88429901028326,
+        "historical_retained_count": 5.373511923379157e-07,
+        "historical_returned_slip_count": 0.0,
+        "historical_tip_radius_m": 1.0228158706505661e-06,
+        "scaled_difference_K_shield_Pa_sqrt_m": 0.9999999999020985,
+        "scaled_difference_accumulated_slip_count": -0.7079272947240396,
+        "scaled_difference_mobile_count": -0.7537725918562779,
+        "scaled_difference_retained_count": -0.9999999997800507,
+        "scaled_difference_returned_slip_count": 0.0,
+        "scaled_difference_tip_radius_m": -0.015791676732739256
+      },
+      {
+        "R": 0.7,
+        "chronological_K_shield_Pa_sqrt_m": -1.240291323213912e-11,
+        "chronological_accumulated_slip_count": 105.66840463291126,
+        "chronological_mobile_count": 105.66848369397036,
+        "chronological_retained_count": 3.7877792830470584e-13,
+        "chronological_returned_slip_count": 0.0,
+        "chronological_tip_radius_m": 1.0213602891029868e-06,
+        "historical_K_shield_Pa_sqrt_m": -6.006360071667344e-08,
+        "historical_accumulated_slip_count": 290.3585139715047,
+        "historical_mobile_count": 294.1677554500862,
+        "historical_retained_count": 1.883768653944465e-09,
+        "historical_returned_slip_count": 0.0,
+        "historical_tip_radius_m": 1.0586943828998934e-06,
+        "scaled_difference_K_shield_Pa_sqrt_m": 0.9997935036680428,
+        "scaled_difference_accumulated_slip_count": -0.636076093696769,
+        "scaled_difference_mobile_count": -0.6407883538007279,
+        "scaled_difference_retained_count": -0.9997989254532337,
+        "scaled_difference_returned_slip_count": 0.0,
+        "scaled_difference_tip_radius_m": -0.035264278719080284
+      }
+    ],
+    "scope": "combined history-forcing/support-density difference; not a pure support-convergence estimate"
+  },
+  "native_acceleration_profile": {
+    "accepted_cycles_by_mode": {
+      "exact_cycle_burst": 2232.0,
+      "periodic_search": 0.0,
+      "projective_rejected": 0.0,
+      "slow_projective": 753052.0
+    },
+    "failure_counts": {
+      "discrete_transition_in_dmd_burst": 22,
+      "discrete_transition_inside_cycle": 12,
+      "dmd_hazard_validation_failed": 8,
+      "dmd_state_validation_failed": 4,
+      "maximum_iterations": 7,
+      "periodic_iteration_diverged": 9
+    },
+    "maximum_reported_drift_error": 2.1098692231191332e-06,
+    "maximum_reported_hazard_error": 9.999812849712295e-06,
+    "mode_counts": {
+      "exact_cycle_burst": 37,
+      "periodic_search": 28,
+      "projective_rejected": 17,
+      "slow_projective": 31
+    }
+  },
+  "native_translation_domain": {
+    "decision": "no full native translation executed: every measured history exceeds the qualified signed-kernel domain; extrapolation or population reset was rejected",
+    "kernel_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/integration_evidence/r4_same_engine_coupled_spatial/dependencies/signed_kernel_family.json",
+    "kernel_sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+    "measured_extension_by_R_m": {
+      "0.1": 0.013071000000000001,
+      "0.3": 0.011467400000000003,
+      "0.5": 0.0098493,
+      "0.7": 0.006361700000000001
+    },
+    "measured_to_qualified_domain_ratio_by_R": {
+      "0.1": 11.124255319148936,
+      "0.3": 9.75948936170213,
+      "0.5": 8.382382978723404,
+      "0.7": 5.414212765957448
+    },
+    "qualified_extension_levels_m": [
+      0.0,
+      0.0002,
+      0.0004,
+      0.0006000000000000001,
+      0.0008,
+      0.001,
+      0.001175
+    ],
+    "qualified_maximum_extension_m": 0.001175
+  },
+  "primary_identity": {
+    "payload": {
+      "accepted_cycle_roundoff_policy": "snap_to_integer_within_1e-6_cycle",
+      "alignment": "index_rank",
+      "candidate_id": "transport_dominated",
+      "frequency_Hz": 10.0,
+      "history_input_sha256": "037218fd910439a3db6a49d919cc84af93fbbea3c2587cc3ef8bd8b548f0053d",
+      "history_mode": "adaptive_2_supports_per_R_piecewise_linear_observed_load",
+      "kernel_sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+      "load_substep_cycle_partition": "nearest_integer_boundaries_exact_observed_endpoint",
+      "load_substeps": 4,
+      "moving_frame_policy": "fixed_local_window_reported_DeltaK_owns_remote_geometry",
+      "opening_during_state_replay": "production opening observer",
+      "phase_count": 8,
+      "plastic": {
+        "emission_G0_298_eV": 0.8,
+        "peierls_G0_298_eV": 0.7,
+        "plastic_sigc_298_Pa": 1000000000.0,
+        "taylor_G0_298_eV": 2.5
+      },
+      "premeasurement": true,
+      "rate_input_sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd",
+      "runtime_model_id": "qste340tm.restored-r2-r9-alternative-gstar-exp-floor/1",
+      "schema": "qste340tm-restored-active-chronological/1",
+      "state_only_acceleration": false,
+      "state_opening_seed": {
+        "broad_amplitude_eV": 2.279473970555065e-29,
+        "broad_exponent": 4.999999994532172,
+        "broad_sigma_Pa": 11229860065.603708,
+        "floor_eV": 0.46018724139587,
+        "guard_amplitude_eV": 0.2210393701764555
+      },
+      "support_points_per_R": 2,
+      "temperature_K": 298.15
+    },
+    "sha256": "3d95794e9698de684e22e37a82eca0a232a9944b095b7741906041c97a0e2535"
+  },
+  "primary_metrics": {
+    "absolute": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.42839293761604375,
+          "observed_broad_loglog_slope": 3.7092045452619424,
+          "observed_local_slope_q10_q50_q90": [
+            -1.1893271109844399,
+            4.624546638737456,
+            20.036003937075332
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": 0.9045656012806556,
+          "predicted_local_slope_q10_q50_q90": [
+            0.259237660677718,
+            0.4887519849801265,
+            3.0981200575069923
+          ],
+          "rmse_log10_rate": 0.544656784848829
+        },
+        "0.3": {
+          "bias_log10_rate": -0.27616620068179293,
+          "observed_broad_loglog_slope": 3.378382452934224,
+          "observed_local_slope_q10_q50_q90": [
+            -21.49112684298525,
+            3.351924014688848,
+            31.910501350176094
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": 0.8429808750688513,
+          "predicted_local_slope_q10_q50_q90": [
+            0.310525644709719,
+            0.5741370785974595,
+            2.444670414618304
+          ],
+          "rmse_log10_rate": 0.376276215017078
+        },
+        "0.5": {
+          "bias_log10_rate": 0.18168080959237454,
+          "observed_broad_loglog_slope": 3.761896053997772,
+          "observed_local_slope_q10_q50_q90": [
+            -23.201726740416802,
+            4.2230982983671765,
+            30.34575933634551
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": 2.62488990176288,
+          "predicted_local_slope_q10_q50_q90": [
+            0.7341422052348889,
+            2.06157321471656,
+            6.578606086433865
+          ],
+          "rmse_log10_rate": 0.2193930930330181
+        },
+        "0.7": {
+          "bias_log10_rate": 0.5229149059289238,
+          "observed_broad_loglog_slope": 2.9204577070032967,
+          "observed_local_slope_q10_q50_q90": [
+            -33.25300307393081,
+            1.5632445319006365,
+            21.073954675986215
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": 1.448928998696501,
+          "predicted_local_slope_q10_q50_q90": [
+            0.6693268421720404,
+            1.3074033630426811,
+            2.8949097092772718
+          ],
+          "rmse_log10_rate": 0.5292391328978652
+        }
+      },
+      "overall_bias_log10_rate": -0.09455106515061412,
+      "overall_rmse_log10_rate": 0.4397645540826252,
+      "shape_rmse_log10": 0.2453751541241404
+    },
+    "shape": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.5603317380601648,
+          "observed_broad_loglog_slope": 3.7092045452619424,
+          "observed_local_slope_q10_q50_q90": [
+            -1.1893271109844399,
+            4.624546638737456,
+            20.036003937075332
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": 2.5230525518113525,
+          "predicted_local_slope_q10_q50_q90": [
+            0.993352956968613,
+            2.080671812996684,
+            4.055549262764134
+          ],
+          "rmse_log10_rate": 0.5858983222395705
+        },
+        "0.3": {
+          "bias_log10_rate": -0.344445137581426,
+          "observed_broad_loglog_slope": 3.378382452934224,
+          "observed_local_slope_q10_q50_q90": [
+            -21.49112684298525,
+            3.351924014688848,
+            31.910501350176094
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": 2.3847977578872834,
+          "predicted_local_slope_q10_q50_q90": [
+            1.0963681441514381,
+            2.286497513987115,
+            3.955718732881724
+          ],
+          "rmse_log10_rate": 0.36768391309641213
+        },
+        "0.5": {
+          "bias_log10_rate": 0.2886516808001167,
+          "observed_broad_loglog_slope": 3.761896053997772,
+          "observed_local_slope_q10_q50_q90": [
+            -23.201726740416802,
+            4.2230982983671765,
+            30.34575933634551
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": 3.413672901269138,
+          "predicted_local_slope_q10_q50_q90": [
+            2.0947224505980557,
+            3.376528483027755,
+            4.224790630627922
+          ],
+          "rmse_log10_rate": 0.2993666993115181
+        },
+        "0.7": {
+          "bias_log10_rate": 0.6161317611851282,
+          "observed_broad_loglog_slope": 2.9204577070032967,
+          "observed_local_slope_q10_q50_q90": [
+            -33.25300307393081,
+            1.5632445319006365,
+            21.073954675986215
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": 3.361079068585524,
+          "predicted_local_slope_q10_q50_q90": [
+            1.9439674355508032,
+            3.4631548389313593,
+            4.570025729128702
+          ],
+          "rmse_log10_rate": 0.6183141525259209
+        }
+      },
+      "overall_bias_log10_rate": -0.11824768932611522,
+      "overall_rmse_log10_rate": 0.48219180326344746,
+      "shape_rmse_log10": 0.12720683404592248
+    }
+  },
+  "primary_opening_coordinates": {
+    "absolute": {
+      "broad_amplitude_eV": 0.041797111449610964,
+      "broad_exponent": 4.999999999999998,
+      "broad_sigma_Pa": 6793605196.442087,
+      "floor_eV": 0.4209593080097743,
+      "guard_amplitude_eV": 9.725004701255983e-41
+    },
+    "shape": {
+      "broad_amplitude_eV": 0.023539519315914068,
+      "broad_exponent": 4.847727987035057,
+      "broad_sigma_Pa": 4650361594.584746,
+      "floor_eV": 0.4423516883030818,
+      "guard_amplitude_eV": 0.05388400739998125
+    }
+  },
+  "primary_plastic_coordinates": {
+    "emission_G0_298_eV": 0.8,
+    "peierls_G0_298_eV": 0.7,
+    "plastic_sigc_298_Pa": 1000000000.0,
+    "taylor_G0_298_eV": 2.5
+  },
+  "restart_inventory": [
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 17.94782897183358,
+        "observation_id": "lu_fig4_S_T",
+        "source_order": 122,
+        "substep_target_cycle": 308955.0,
+        "target_cycle": 308955.0
+      },
+      "candidate_id": "sustained_active",
+      "completed_support_count": 32,
+      "current_load_substep": 0,
+      "current_observation_position": 0,
+      "current_r_index": 4,
+      "identity_sha256": "23b19aa6590c67b1d7b3c7488367f879157d1575a379f0384877c741b344969b",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/sustained_active_23b19aa6590c",
+      "resume_command": null,
+      "resume_supported_by_current_runner": false,
+      "state_only_acceleration": false,
+      "state_opening_seed": null,
+      "status": "complete"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 18.009912667701865,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 36,
+        "substep_target_cycle": 22501.75,
+        "target_cycle": 62377.0
+      },
+      "candidate_id": "sustained_active",
+      "completed_support_count": 1,
+      "current_load_substep": 0,
+      "current_observation_position": 1,
+      "current_r_index": 0,
+      "identity_sha256": "55235bd644319d11b6dfab0923d2836efbc425e632bb306301c1abd3b4c21bdb",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/sustained_active_55235bd64431",
+      "resume_command": null,
+      "resume_supported_by_current_runner": false,
+      "state_only_acceleration": true,
+      "state_opening_seed": null,
+      "status": "interrupted_restartable"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 21.485418698795183,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 72,
+        "substep_target_cycle": 85887.0,
+        "target_cycle": 93724.0
+      },
+      "candidate_id": "sustained_active",
+      "completed_support_count": 2,
+      "current_load_substep": 2,
+      "current_observation_position": 2,
+      "current_r_index": 0,
+      "identity_sha256": "b97ec2d161436d0bcaa60d8ef53d53fc85d8b7366b93630c5e143543d5da8bb7",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/sustained_active_b97ec2d16143",
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate sustained_active --support-points 8 --load-substeps 4 --phase-count 8 --state-only-opening-diagnostic",
+      "resume_supported_by_current_runner": true,
+      "state_only_acceleration": true,
+      "state_opening_seed": null,
+      "status": "running"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 18.01019,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 5,
+        "substep_target_cycle": 16297.0,
+        "target_cycle": 17102.0
+      },
+      "candidate_id": "sustained_active",
+      "completed_support_count": 4,
+      "current_load_substep": 0,
+      "current_observation_position": 4,
+      "current_r_index": 0,
+      "identity_sha256": "d55587310e1ceb0fb41bad276423d7742e794816f3c32ea4ea8386c12c8e12e0",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/sustained_active_d55587310e1c",
+      "resume_command": null,
+      "resume_supported_by_current_runner": false,
+      "state_only_acceleration": false,
+      "state_opening_seed": null,
+      "status": "interrupted_restartable"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 18.009913565217392,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 36,
+        "substep_target_cycle": 22502.0,
+        "target_cycle": 62377.0
+      },
+      "candidate_id": "sustained_active",
+      "completed_support_count": 1,
+      "current_load_substep": 0,
+      "current_observation_position": 1,
+      "current_r_index": 0,
+      "identity_sha256": "fa95604a453a0dedc482397e5050011be9de92d16e0761ae5b7e217eef0d65d7",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/sustained_active_fa95604a453a",
+      "resume_command": null,
+      "resume_supported_by_current_runner": false,
+      "state_only_acceleration": true,
+      "state_opening_seed": null,
+      "status": "interrupted_restartable"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 17.71736,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 1,
+        "substep_target_cycle": 9210.0,
+        "target_cycle": 9210.0
+      },
+      "candidate_id": "transport_dominated",
+      "completed_support_count": 0,
+      "current_load_substep": 0,
+      "current_observation_position": 0,
+      "current_r_index": 0,
+      "identity_sha256": "12d8f3fb5f7cf3e88bbc045e2f0955c98fb50e15464db4cbe7b0dd0eadeae388",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/transport_dominated_12d8f3fb5f7c",
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate transport_dominated --support-points 2 --load-substeps 4 --phase-count 8",
+      "resume_supported_by_current_runner": true,
+      "state_only_acceleration": false,
+      "state_opening_seed": null,
+      "status": "running"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 16.58581520920502,
+        "observation_id": "lu_fig4_S_T",
+        "source_order": 122,
+        "substep_target_cycle": 308955.0,
+        "target_cycle": 308955.0
+      },
+      "candidate_id": "transport_dominated",
+      "completed_support_count": 8,
+      "current_load_substep": 0,
+      "current_observation_position": 0,
+      "current_r_index": 4,
+      "identity_sha256": "3d95794e9698de684e22e37a82eca0a232a9944b095b7741906041c97a0e2535",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/transport_dominated_3d95794e9698",
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate transport_dominated --support-points 2 --load-substeps 4 --phase-count 8 --state-opening-seed-result results/completed_candidates/sustained_active_23b19aa6590c.json --state-opening-seed-mode absolute",
+      "resume_supported_by_current_runner": true,
+      "state_only_acceleration": false,
+      "state_opening_seed": {
+        "broad_amplitude_eV": 2.279473970555065e-29,
+        "broad_exponent": 4.999999994532172,
+        "broad_sigma_Pa": 11229860065.603708,
+        "floor_eV": 0.46018724139587,
+        "guard_amplitude_eV": 0.2210393701764555
+      },
+      "status": "complete"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 21.811106172392524,
+        "observation_id": "lu_fig4_G_H",
+        "source_order": 171,
+        "substep_target_cycle": 234777.0,
+        "target_cycle": 234777.0
+      },
+      "candidate_id": "transport_dominated",
+      "completed_support_count": 5,
+      "current_load_substep": 3,
+      "current_observation_position": 1,
+      "current_r_index": 2,
+      "identity_sha256": "b09b3ba992a0aa9cabde193830595a6908efcc84df60d7cd535d7db95f3c13a1",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/transport_dominated_b09b3ba992a0",
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate transport_dominated --support-points 2 --load-substeps 4 --phase-count 8 --state-only-opening-diagnostic",
+      "resume_supported_by_current_runner": true,
+      "state_only_acceleration": true,
+      "state_opening_seed": null,
+      "status": "interrupted_restartable"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 19.035385525348296,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 36,
+        "substep_target_cycle": 49085.25,
+        "target_cycle": 62377.0
+      },
+      "candidate_id": "transport_dominated",
+      "completed_support_count": 1,
+      "current_load_substep": 2,
+      "current_observation_position": 1,
+      "current_r_index": 0,
+      "identity_sha256": "e0accb79ce2c25a93f0cfc041314e357a3c2fed6bcf4c6cfc4dd64263e159435",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/transport_dominated_e0accb79ce2c",
+      "resume_command": null,
+      "resume_supported_by_current_runner": false,
+      "state_only_acceleration": false,
+      "state_opening_seed": null,
+      "status": "interrupted_restartable"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 16.427678047324353,
+        "observation_id": "lu_fig4_G_H",
+        "source_order": 171,
+        "substep_target_cycle": 125928.0,
+        "target_cycle": 234777.0
+      },
+      "candidate_id": "trapping_dominated",
+      "completed_support_count": 5,
+      "current_load_substep": 1,
+      "current_observation_position": 1,
+      "current_r_index": 2,
+      "identity_sha256": "1c5d0445eb51480fef7c1cf2621a6e41dd1e39191080a8db0321eaad0b79dc6b",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/trapping_dominated_1c5d0445eb51",
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate trapping_dominated --support-points 2 --load-substeps 4 --phase-count 8 --state-only-opening-diagnostic",
+      "resume_supported_by_current_runner": true,
+      "state_only_acceleration": true,
+      "state_opening_seed": null,
+      "status": "interrupted_restartable"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 16.58581520920502,
+        "observation_id": "lu_fig4_S_T",
+        "source_order": 122,
+        "substep_target_cycle": 308955.0,
+        "target_cycle": 308955.0
+      },
+      "candidate_id": "trapping_dominated",
+      "completed_support_count": 8,
+      "current_load_substep": 0,
+      "current_observation_position": 0,
+      "current_r_index": 4,
+      "identity_sha256": "c224f83bc45de0035a3a4a7d881b64b8202a4b0cdeb71c426b9f6faeda4fb950",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/trapping_dominated_c224f83bc45d",
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate trapping_dominated --support-points 2 --load-substeps 4 --phase-count 8 --state-opening-seed-result results/completed_candidates/sustained_active_23b19aa6590c.json --state-opening-seed-mode absolute",
+      "resume_supported_by_current_runner": true,
+      "state_only_acceleration": false,
+      "state_opening_seed": {
+        "broad_amplitude_eV": 2.279473970555065e-29,
+        "broad_exponent": 4.999999994532172,
+        "broad_sigma_Pa": 11229860065.603708,
+        "floor_eV": 0.46018724139587,
+        "guard_amplitude_eV": 0.2210393701764555
+      },
+      "status": "complete"
+    },
+    {
+      "active_observation": {
+        "midpoint_DeltaK_MPa_sqrt_m": 17.71736,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 1,
+        "substep_target_cycle": 9210.0,
+        "target_cycle": 9210.0
+      },
+      "candidate_id": "trapping_dominated",
+      "completed_support_count": 0,
+      "current_load_substep": 0,
+      "current_observation_position": 0,
+      "current_r_index": 0,
+      "identity_sha256": "c7e9bc0c71a77e49ba3650c04f294e611f10f770b71fb79f4a1ee3663eddf026",
+      "restart_root": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/trapping_dominated_c7e9bc0c71a7",
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate trapping_dominated --support-points 2 --load-substeps 4 --phase-count 8",
+      "resume_supported_by_current_runner": true,
+      "state_only_acceleration": false,
+      "state_opening_seed": null,
+      "status": "running"
+    }
+  ],
+  "same_parameter_frozen_metrics": {
+    "absolute": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": 1.3795804705159058,
+          "observed_broad_loglog_slope": 3.7092045452619424,
+          "observed_local_slope_q10_q50_q90": [
+            -1.1893271109844399,
+            4.624546638737456,
+            20.036003937075332
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": 1.3839591220866996,
+          "predicted_local_slope_q10_q50_q90": [
+            0.13969127085988475,
+            1.331640905132224,
+            4.865152287738916
+          ],
+          "rmse_log10_rate": 1.4063619774479026
+        },
+        "0.3": {
+          "bias_log10_rate": 1.6952399854688123,
+          "observed_broad_loglog_slope": 3.378382452934224,
+          "observed_local_slope_q10_q50_q90": [
+            -21.49112684298525,
+            3.351924014688848,
+            31.910501350176094
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": 1.0023092011153758,
+          "predicted_local_slope_q10_q50_q90": [
+            0.36017845971985024,
+            0.9795967058187216,
+            2.27180821479982
+          ],
+          "rmse_log10_rate": 1.711418938050079
+        },
+        "0.5": {
+          "bias_log10_rate": 2.1296372946768987,
+          "observed_broad_loglog_slope": 3.761896053997772,
+          "observed_local_slope_q10_q50_q90": [
+            -23.201726740416802,
+            4.2230982983671765,
+            30.34575933634551
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": 0.7197637630112883,
+          "predicted_local_slope_q10_q50_q90": [
+            0.004063837037392659,
+            0.8702454401018258,
+            1.5228107678358356
+          ],
+          "rmse_log10_rate": 2.14213444549385
+        },
+        "0.7": {
+          "bias_log10_rate": 2.6380441217209567,
+          "observed_broad_loglog_slope": 2.9204577070032967,
+          "observed_local_slope_q10_q50_q90": [
+            -33.25300307393081,
+            1.5632445319006365,
+            21.073954675986215
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": 3.050584037316722e-06,
+          "predicted_local_slope_q10_q50_q90": [
+            -4.547473508864641e-13,
+            2.7284841053187847e-12,
+            3.634340828284621e-05
+          ],
+          "rmse_log10_rate": 2.6425530758167026
+        }
+      },
+      "overall_bias_log10_rate": 1.8413195707175276,
+      "overall_rmse_log10_rate": 1.9086230961465156,
+      "shape_rmse_log10": 0.23677604321410947
+    },
+    "shape": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": 0.4183991206977359,
+          "observed_broad_loglog_slope": 3.7092045452619424,
+          "observed_local_slope_q10_q50_q90": [
+            -1.1893271109844399,
+            4.624546638737456,
+            20.036003937075332
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": 0.5599357432077882,
+          "predicted_local_slope_q10_q50_q90": [
+            0.07128515113186043,
+            0.48469616569099117,
+            0.949913339633929
+          ],
+          "rmse_log10_rate": 0.5564206892909253
+        },
+        "0.3": {
+          "bias_log10_rate": 0.6849811804574594,
+          "observed_broad_loglog_slope": 3.378382452934224,
+          "observed_local_slope_q10_q50_q90": [
+            -21.49112684298525,
+            3.351924014688848,
+            31.910501350176094
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": 0.565236577411614,
+          "predicted_local_slope_q10_q50_q90": [
+            0.19556226644908747,
+            0.5725646284980428,
+            0.9950153405994117
+          ],
+          "rmse_log10_rate": 0.7391027633131437
+        },
+        "0.5": {
+          "bias_log10_rate": 1.012088888583497,
+          "observed_broad_loglog_slope": 3.761896053997772,
+          "observed_local_slope_q10_q50_q90": [
+            -23.201726740416802,
+            4.2230982983671765,
+            30.34575933634551
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": 0.007144650289373398,
+          "predicted_local_slope_q10_q50_q90": [
+            7.275957614183426e-12,
+            2.8196504899824504e-06,
+            0.07755589384032646
+          ],
+          "rmse_log10_rate": 1.0511327672487314
+        },
+        "0.7": {
+          "bias_log10_rate": 1.4664825161675379,
+          "observed_broad_loglog_slope": 2.9204577070032967,
+          "observed_local_slope_q10_q50_q90": [
+            -33.25300307393081,
+            1.5632445319006365,
+            21.073954675986215
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": 3.3845349472622347e-15,
+          "predicted_local_slope_q10_q50_q90": [
+            -1.8189894035458565e-12,
+            0.0,
+            2.2737367544323206e-12
+          ],
+          "rmse_log10_rate": 1.4745782403357723
+        }
+      },
+      "overall_bias_log10_rate": 0.7970420097018943,
+      "overall_rmse_log10_rate": 0.9252485643173833,
+      "shape_rmse_log10": 0.29675107174330984
+    }
+  },
+  "schema": "qste340tm-active-calibration-assessment/1",
+  "shape_frontier": {
+    "candidate_id": "trapping_dominated",
+    "identity": "c224f83bc45de0035a3a4a7d881b64b8202a4b0cdeb71c426b9f6faeda4fb950",
+    "metrics": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.5898511934714308,
+          "observed_broad_loglog_slope": 3.7092045452619424,
+          "observed_local_slope_q10_q50_q90": [
+            -1.1893271109844399,
+            4.624546638737456,
+            20.036003937075332
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": 2.461992578748594,
+          "predicted_local_slope_q10_q50_q90": [
+            1.0976863273629762,
+            2.341785187890082,
+            3.16648788086776
+          ],
+          "rmse_log10_rate": 0.6117661119063681
+        },
+        "0.3": {
+          "bias_log10_rate": -0.30442397022610623,
+          "observed_broad_loglog_slope": 3.378382452934224,
+          "observed_local_slope_q10_q50_q90": [
+            -21.49112684298525,
+            3.351924014688848,
+            31.910501350176094
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": 2.640224409899394,
+          "predicted_local_slope_q10_q50_q90": [
+            1.3299175476963114,
+            2.578496754884327,
+            3.270547374225225
+          ],
+          "rmse_log10_rate": 0.31688124707101206
+        },
+        "0.5": {
+          "bias_log10_rate": 0.09457348723807764,
+          "observed_broad_loglog_slope": 3.761896053997772,
+          "observed_local_slope_q10_q50_q90": [
+            -23.201726740416802,
+            4.2230982983671765,
+            30.34575933634551
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": 3.101184315292517,
+          "predicted_local_slope_q10_q50_q90": [
+            2.247870547356797,
+            3.0544573307865903,
+            3.449363429231198
+          ],
+          "rmse_log10_rate": 0.10797946320161345
+        },
+        "0.7": {
+          "bias_log10_rate": 0.7997074508184024,
+          "observed_broad_loglog_slope": 2.9204577070032967,
+          "observed_local_slope_q10_q50_q90": [
+            -33.25300307393081,
+            1.5632445319006365,
+            21.073954675986215
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": 3.4319196643114234,
+          "predicted_local_slope_q10_q50_q90": [
+            2.803605951026384,
+            3.4879631158277107,
+            3.6843014674959704
+          ],
+          "rmse_log10_rate": 0.8004086770392401
+        }
+      },
+      "overall_bias_log10_rate": -0.1305468028195734,
+      "overall_rmse_log10_rate": 0.5064844177815356,
+      "shape_rmse_log10": 0.10776989131053742
+    },
+    "opening_coordinates": {
+      "broad_amplitude_eV": 0.026425430418452345,
+      "broad_exponent": 3.313115264109216,
+      "broad_sigma_Pa": 12289942196.638382,
+      "floor_eV": 0.44516317768264735,
+      "guard_amplitude_eV": 0.08283836922520398
+    },
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/trapping_dominated_c224f83bc45d.json",
+    "plastic_coordinates": {
+      "emission_G0_298_eV": 0.8,
+      "peierls_G0_298_eV": 2.8,
+      "plastic_sigc_298_Pa": 1200000000.0,
+      "taylor_G0_298_eV": 0.8
+    }
+  },
+  "source_csv_sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd",
+  "state_only_longitudinal_qualification": {
+    "available": true,
+    "comparison_rows": [
+      {
+        "R": 0.1,
+        "cycles": 9210.0,
+        "production_K_shield_Pa_sqrt_m": -3.886808188284576e-19,
+        "production_accumulated_slip_count": 0.29013382444291913,
+        "production_gross_source_activity": 0.2859021482571015,
+        "production_mobile_count": 0.38477863185897104,
+        "production_retained_count": 1.882094275483108e-20,
+        "production_returned_slip_count": 0.0,
+        "production_tip_radius_m": 1.0000586489631426e-06,
+        "scaled_difference_K_shield_Pa_sqrt_m": 0.0,
+        "scaled_difference_accumulated_slip_count": 0.0,
+        "scaled_difference_gross_source_activity": 0.0,
+        "scaled_difference_mobile_count": 0.0,
+        "scaled_difference_retained_count": 0.0,
+        "scaled_difference_returned_slip_count": 0.0,
+        "scaled_difference_tip_radius_m": 0.0,
+        "state_only_K_shield_Pa_sqrt_m": -3.886808188284576e-19,
+        "state_only_accumulated_slip_count": 0.29013382444291913,
+        "state_only_gross_source_activity": 0.2859021482571015,
+        "state_only_mobile_count": 0.38477863185897104,
+        "state_only_retained_count": 1.882094275483108e-20,
+        "state_only_returned_slip_count": 0.0,
+        "state_only_tip_radius_m": 1.0000586489631426e-06
+      },
+      {
+        "R": 0.1,
+        "cycles": 62377.0,
+        "production_K_shield_Pa_sqrt_m": -2.543442552504474e-20,
+        "production_accumulated_slip_count": 1.960361535354966,
+        "production_gross_source_activity": 1.9548907456400708,
+        "production_mobile_count": 1.9603615429974912,
+        "production_retained_count": 5.430615190850151e-22,
+        "production_returned_slip_count": 0.0,
+        "production_tip_radius_m": 1.0003962763447316e-06,
+        "scaled_difference_K_shield_Pa_sqrt_m": -0.9965522854235012,
+        "scaled_difference_accumulated_slip_count": 0.0006144987293773966,
+        "scaled_difference_gross_source_activity": -6.899981772362947e-05,
+        "scaled_difference_mobile_count": 0.17885239457490018,
+        "scaled_difference_retained_count": 0.9983253227151938,
+        "scaled_difference_returned_slip_count": 0.0,
+        "scaled_difference_tip_radius_m": 2.4356446150551734e-07,
+        "state_only_K_shield_Pa_sqrt_m": -7.377184207305552e-18,
+        "state_only_accumulated_slip_count": 1.9615669157322722,
+        "state_only_gross_source_activity": 1.954755858534952,
+        "state_only_mobile_count": 2.3873436761501994,
+        "state_only_retained_count": 3.2427830962540726e-19,
+        "state_only_returned_slip_count": 0.0,
+        "state_only_tip_radius_m": 1.0003965200057713e-06
+      }
+    ],
+    "decision": "state-only observer remains diagnostic-only; production opening observer is required because DMD hazard validation changes the accepted projected state path",
+    "long_projective_propagation_qualified": false,
+    "maximum_absolute_scaled_difference_by_field": {
+      "K_shield_Pa_sqrt_m": 0.9965522854235012,
+      "accumulated_slip_count": 0.0006144987293773966,
+      "gross_source_activity": 6.899981772362947e-05,
+      "mobile_count": 0.17885239457490018,
+      "retained_count": 0.9983253227151938,
+      "returned_slip_count": 0.0,
+      "tip_radius_m": 2.4356446150551734e-07
+    },
+    "scope": "same sustained-active chronological history through available common supports"
+  },
+  "sustained_chronological_control": {
+    "absolute_metrics": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.35451708722293274,
+          "observed_broad_loglog_slope": 3.7092045452619424,
+          "observed_local_slope_q10_q50_q90": [
+            -1.1893271109844399,
+            4.624546638737456,
+            20.036003937075332
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": 0.26169263143681615,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.0375718015030543,
+            0.040084707399306925,
+            1.0164858493496924
+          ],
+          "rmse_log10_rate": 0.5340662313219492
+        },
+        "0.3": {
+          "bias_log10_rate": -0.1826945313211567,
+          "observed_broad_loglog_slope": 3.378382452934224,
+          "observed_local_slope_q10_q50_q90": [
+            -21.49112684298525,
+            3.351924014688848,
+            31.910501350176094
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": -0.08664626912813227,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.10211607095825456,
+            -0.07987645667526522,
+            -0.05484895328122543
+          ],
+          "rmse_log10_rate": 0.38763521567194587
+        },
+        "0.5": {
+          "bias_log10_rate": 0.05080046095655356,
+          "observed_broad_loglog_slope": 3.761896053997772,
+          "observed_local_slope_q10_q50_q90": [
+            -23.201726740416802,
+            4.2230982983671765,
+            30.34575933634551
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": -0.12376496537601638,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.14706243013779385,
+            -0.12376246338999408,
+            -0.09722601898192806
+          ],
+          "rmse_log10_rate": 0.29805194654372724
+        },
+        "0.7": {
+          "bias_log10_rate": 0.4863973817311567,
+          "observed_broad_loglog_slope": 2.9204577070032967,
+          "observed_local_slope_q10_q50_q90": [
+            -33.25300307393081,
+            1.5632445319006365,
+            21.073954675986215
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": -0.04176410635081119,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.12041199469058483,
+            -0.03601842760804175,
+            -0.001720083748068646
+          ],
+          "rmse_log10_rate": 0.5109475988677844
+        }
+      },
+      "overall_bias_log10_rate": -0.07881971131032744,
+      "overall_rmse_log10_rate": 0.4452740300739443,
+      "shape_rmse_log10": 0.3302734228747924
+    },
+    "identity": {
+      "payload": {
+        "alignment": "index_rank",
+        "candidate_id": "sustained_active",
+        "frequency_Hz": 10.0,
+        "history_input_sha256": "037218fd910439a3db6a49d919cc84af93fbbea3c2587cc3ef8bd8b548f0053d",
+        "history_mode": "adaptive_8_supports_per_R_piecewise_linear_observed_load",
+        "kernel_sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+        "load_substeps": 4,
+        "moving_frame_policy": "fixed_local_window_reported_DeltaK_owns_remote_geometry",
+        "phase_count": 8,
+        "plastic": {
+          "emission_G0_298_eV": 1.2,
+          "peierls_G0_298_eV": 1.5,
+          "plastic_sigc_298_Pa": 1500000000.0,
+          "taylor_G0_298_eV": 1.5
+        },
+        "premeasurement": true,
+        "rate_input_sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd",
+        "runtime_model_id": "qste340tm.restored-r2-r9-alternative-gstar-exp-floor/1",
+        "schema": "qste340tm-restored-active-chronological/1",
+        "support_points_per_R": 8,
+        "temperature_K": 298.15
+      },
+      "sha256": "23b19aa6590c67b1d7b3c7488367f879157d1575a379f0384877c741b344969b"
+    },
+    "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/sustained_active_23b19aa6590c.json",
+    "plastic_coordinates": {
+      "emission_G0_298_eV": 1.2,
+      "peierls_G0_298_eV": 1.5,
+      "plastic_sigc_298_Pa": 1500000000.0,
+      "taylor_G0_298_eV": 1.5
+    },
+    "same_parameter_frozen_absolute_metrics": {
+      "block_metrics": {
+        "0.1": {
+          "bias_log10_rate": -0.3544913427514099,
+          "observed_broad_loglog_slope": 3.7092045452619424,
+          "observed_local_slope_q10_q50_q90": [
+            -1.1893271109844399,
+            4.624546638737456,
+            20.036003937075332
+          ],
+          "points": 248,
+          "predicted_broad_loglog_slope": 0.26150919548150475,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.037601007806381405,
+            0.03965684770209173,
+            1.015416933490906
+          ],
+          "rmse_log10_rate": 0.5340648900850116
+        },
+        "0.3": {
+          "bias_log10_rate": -0.18271653145420028,
+          "observed_broad_loglog_slope": 3.378382452934224,
+          "observed_local_slope_q10_q50_q90": [
+            -21.49112684298525,
+            3.351924014688848,
+            31.910501350176094
+          ],
+          "points": 219,
+          "predicted_broad_loglog_slope": -0.08675402435295237,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.10209029691613977,
+            -0.07989568178709305,
+            -0.054862685783416465
+          ],
+          "rmse_log10_rate": 0.3876551252893756
+        },
+        "0.5": {
+          "bias_log10_rate": 0.050714426770773965,
+          "observed_broad_loglog_slope": 3.761896053997772,
+          "observed_local_slope_q10_q50_q90": [
+            -23.201726740416802,
+            4.2230982983671765,
+            30.34575933634551
+          ],
+          "points": 171,
+          "predicted_broad_loglog_slope": -0.12418062138777447,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.14705625330179828,
+            -0.12413382346039725,
+            -0.09498329074995127
+          ],
+          "rmse_log10_rate": 0.29806813924114767
+        },
+        "0.7": {
+          "bias_log10_rate": 0.48634753383860824,
+          "observed_broad_loglog_slope": 2.9204577070032967,
+          "observed_local_slope_q10_q50_q90": [
+            -33.25300307393081,
+            1.5632445319006365,
+            21.073954675986215
+          ],
+          "points": 122,
+          "predicted_broad_loglog_slope": -0.04139146180840126,
+          "predicted_local_slope_q10_q50_q90": [
+            -0.1174543164474926,
+            -0.03413400194517635,
+            -0.0015098641206350294
+          ],
+          "rmse_log10_rate": 0.5108939971236024
+        }
+      },
+      "overall_bias_log10_rate": -0.07884500958514074,
+      "overall_rmse_log10_rate": 0.4452710654795916,
+      "shape_rmse_log10": 0.3302896946352195
+    }
+  },
+  "temperature_K": 298.15,
+  "unresolved": [
+    "native signed-kernel translation/remapping beyond 1.175 mm for the measured 6-13 mm extension",
+    "active-state frequency sensitivity around the provisional 10 Hz assumption",
+    "independent off-support refinement for the adaptive chronological history",
+    "R=0.5 rate/history identifier mismatch"
+  ]
+}

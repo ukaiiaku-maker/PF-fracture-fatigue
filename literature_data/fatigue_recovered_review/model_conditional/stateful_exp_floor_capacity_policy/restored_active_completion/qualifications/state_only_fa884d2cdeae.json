@@ -1,0 +1,27 @@
+{
+  "all_passed": true,
+  "candidate": {
+    "emission_G0_298_eV": 0.8,
+    "peierls_G0_298_eV": 2.8,
+    "plastic_sigc_298_Pa": 1200000000.0,
+    "taylor_G0_298_eV": 0.8
+  },
+  "checks": [
+    {
+      "R": 0.1,
+      "case": "initial",
+      "ledger_delta_equal": true,
+      "maximum_absolute_state_difference": 0.0,
+      "maximum_scaled_state_difference": 0.0,
+      "passed": true,
+      "plastic_totals_equal": true,
+      "production_hazard_action_per_cycle": 4.853916413869947,
+      "state_only_hazard_action_per_cycle": 0.0,
+      "state_vector_length": 2242,
+      "transition_signature_equal": true
+    }
+  ],
+  "phase_count": 8,
+  "schema": "qste340tm-state-only-opening-qualification/1",
+  "scope": "fixed-window, crack-event-suppressed state evolution only; final opening predictions and receipts retain the production opening implementation"
+}

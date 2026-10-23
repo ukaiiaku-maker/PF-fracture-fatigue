@@ -1,0 +1,667 @@
+{
+  "active_observation": {
+    "midpoint_DeltaK_MPa_sqrt_m": 21.485418698795183,
+    "observation_id": "lu_fig4_A_B",
+    "source_order": 72,
+    "substep_target_cycle": 85887.0,
+    "target_cycle": 93724.0
+  },
+  "completed_observation_rows": [
+    {
+      "K_shield_Pa_sqrt_m": -3.886808188284576e-19,
+      "R": 0.1,
+      "accumulated_slip_count": 0.29013382444291913,
+      "block_index": 0,
+      "crack_length_m": 0.0102752,
+      "cycles": 9210.0,
+      "gross_return_activity": 0.0,
+      "gross_source_activity": 0.2859021482571015,
+      "interval_process": {
+        "accepted_cycles": 9210.000000000002,
+        "accepted_seconds": 921.0000000000002,
+        "ledger_delta": {
+          "engine.N_em": 0.38477863185897104,
+          "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,1]": 3.9837387776325405e-13,
+          "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[1,1]": 7.263461774463928e-14,
+          "mpz.cumulative_gross_return_activity": 0.0,
+          "mpz.cumulative_gross_source_activity": 0.2859021482571015,
+          "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+          "mpz.emitted_total": 0.28590214825717636,
+          "mpz.escaped_total": 4.710084955078934e-13,
+          "mpz.signed_line_content_emitted_total": 0.28590214825717636,
+          "mpz.signed_source_activations_total": 0.3133487544897934
+        },
+        "load_interpolation": "initial measured load held through premeasurement exposure",
+        "modes": [
+          {
+            "converged": false,
+            "current_map_residual": 1.0,
+            "cycles": 0.0,
+            "distance_from_current": 0.0,
+            "failure_reason": "discrete_transition_inside_cycle",
+            "fixed_point_residual": 1.0,
+            "iterations": 1,
+            "map_evaluations": 2,
+            "mode": "periodic_search",
+            "next_retry_cycles": 32.0
+          },
+          {
+            "attempts": 0,
+            "cycles": 0.0,
+            "drift_error": 0.0,
+            "failure_reason": "discrete_transition_in_dmd_burst",
+            "hazard_error": 0.0,
+            "mode": "projective_rejected",
+            "next_retry_cycles": 8.0
+          },
+          {
+            "cycles": 8.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 16,
+            "projective_failure": "discrete_transition_in_dmd_burst",
+            "requested_burst_cycles": 8
+          },
+          {
+            "attempts": 8,
+            "burst_cycles": 24,
+            "cycles": 9202.0,
+            "drift_error": 2.3644519068601914e-14,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 9178.0
+          }
+        ],
+        "moving_frame": {
+          "reason": "accepted kernel extension domain is 0.001175 m; no extrapolation or state reset",
+          "status": "not_applied_fixed_local_window"
+        },
+        "requested_cycles": 9210.0
+      },
+      "load_substeps": 1,
+      "maximum_forest_density_m2": 5000000000000.0,
+      "mean_encounter_rate_s": 1.934607193296283e-11,
+      "mean_forest_density_m2": 5000000000000.0,
+      "mean_peierls_rate_s": 4.916850181481814e-11,
+      "mean_taylor_density_order": 5.695511050183538,
+      "mean_taylor_elementary_rate_s": 31109643487.38556,
+      "mean_taylor_release_rate_s": 5462133812.624779,
+      "mobile_count": 0.38477863185897104,
+      "net_slip_count": 0.08853879970766483,
+      "observation_id": "lu_fig4_A_B",
+      "opening_stress_at_Kmax_Pa": 7853329709.768778,
+      "persistent_site_multiplicity_per_system": 94716.89267749338,
+      "phase_count": 8,
+      "prescribed_advance_m": 0.0,
+      "retained_count": 1.882094275483108e-20,
+      "returned_slip_count": 0.0,
+      "source_activity_mean": 1.0,
+      "source_order": 1,
+      "support_is_evolved": true,
+      "support_observation_position": 0,
+      "support_state_id": "sustained_active:R0.1:obs0:cycle9210",
+      "tip_radius_m": 1.0000586489631426e-06
+    },
+    {
+      "K_shield_Pa_sqrt_m": -7.377184207305552e-18,
+      "R": 0.1,
+      "accumulated_slip_count": 1.9615669157322722,
+      "block_index": 35,
+      "crack_length_m": 0.0121107,
+      "cycles": 62377.0,
+      "gross_return_activity": 0.0,
+      "gross_source_activity": 1.954755858534952,
+      "interval_process": {
+        "accepted_cycles": 53166.999999996806,
+        "accepted_seconds": 5316.699999999681,
+        "ledger_delta": {
+          "engine.N_em": 2.002565044291228,
+          "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,1]": 2.488560283768019e-11,
+          "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[1,1]": 6.471200889960708e-12,
+          "mpz.cumulative_gross_return_activity": 0.0,
+          "mpz.cumulative_gross_source_activity": 1.6688537102778507,
+          "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+          "mpz.emitted_total": 1.6688537102754044,
+          "mpz.escaped_total": 3.1356803727640895e-11,
+          "mpz.signed_line_content_emitted_total": 1.6688537102754044,
+          "mpz.signed_source_activations_total": 1.8290636664529476
+        },
+        "load_interpolation": "4-point midpoint quadrature of piecewise-linear ordered observed DeltaK(N)",
+        "modes": [
+          {
+            "cycles": 16.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 32,
+            "projective_failure": null,
+            "requested_burst_cycles": 16
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13276.0,
+            "drift_error": 1.188959821096111e-15,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13252.0
+          },
+          {
+            "cycles": 32.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 64,
+            "projective_failure": null,
+            "requested_burst_cycles": 32
+          },
+          {
+            "converged": false,
+            "current_map_residual": 4.637547683378261e-05,
+            "cycles": 0.0,
+            "distance_from_current": 3.710072557968086e-05,
+            "failure_reason": "maximum_iterations",
+            "fixed_point_residual": 4.637365823320414e-05,
+            "iterations": 40,
+            "map_evaluations": 41,
+            "mode": "periodic_search",
+            "next_retry_cycles": 64.0
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13260.0,
+            "drift_error": 3.747296489517277e-14,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13236.0
+          },
+          {
+            "cycles": 64.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 128,
+            "projective_failure": null,
+            "requested_burst_cycles": 64
+          },
+          {
+            "converged": false,
+            "current_map_residual": 3.25878617825003e-05,
+            "cycles": 0.0,
+            "distance_from_current": 2.6070459342185178e-05,
+            "failure_reason": "maximum_iterations",
+            "fixed_point_residual": 3.25869512810071e-05,
+            "iterations": 40,
+            "map_evaluations": 41,
+            "mode": "periodic_search",
+            "next_retry_cycles": 128.0
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13227.0,
+            "drift_error": 8.781210744364795e-17,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13203.0
+          },
+          {
+            "cycles": 128.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 256,
+            "projective_failure": null,
+            "requested_burst_cycles": 128
+          },
+          {
+            "converged": false,
+            "current_map_residual": 2.4137851251530287e-05,
+            "cycles": 0.0,
+            "distance_from_current": 1.9310374223576918e-05,
+            "failure_reason": "maximum_iterations",
+            "fixed_point_residual": 2.4137342096216622e-05,
+            "iterations": 40,
+            "map_evaluations": 41,
+            "mode": "periodic_search",
+            "next_retry_cycles": 256.0
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13164.0,
+            "drift_error": 6.034838349614417e-17,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13140.0
+          }
+        ],
+        "moving_frame": {
+          "reason": "accepted kernel extension domain is 0.001175 m; no extrapolation or state reset",
+          "status": "not_applied_fixed_local_window"
+        },
+        "requested_cycles": 53167.0
+      },
+      "load_substeps": 4,
+      "maximum_forest_density_m2": 5000000000000.0,
+      "mean_encounter_rate_s": 6.612599340389681e-11,
+      "mean_forest_density_m2": 5000000000000.0,
+      "mean_peierls_rate_s": 1.6806078453302942e-10,
+      "mean_taylor_density_order": 5.695511050183538,
+      "mean_taylor_elementary_rate_s": 31109643487.406578,
+      "mean_taylor_release_rate_s": 5462133812.628469,
+      "mobile_count": 2.3873436761501994,
+      "net_slip_count": 0.5986023194595508,
+      "observation_id": "lu_fig4_A_B",
+      "opening_stress_at_Kmax_Pa": 8873492097.114613,
+      "persistent_site_multiplicity_per_system": 87239.33392110736,
+      "phase_count": 8,
+      "prescribed_advance_m": 0.0,
+      "retained_count": 3.2427830962540726e-19,
+      "returned_slip_count": 0.0,
+      "source_activity_mean": 1.0,
+      "source_order": 36,
+      "support_is_evolved": true,
+      "support_observation_position": 1,
+      "support_state_id": "sustained_active:R0.1:obs1:cycle62377",
+      "tip_radius_m": 1.0003965200057713e-06
+    }
+  ],
+  "completed_process_rows": [
+    {
+      "R": 0.1,
+      "cycles": 9210.0,
+      "observation_id": "lu_fig4_A_B",
+      "process": {
+        "accepted_cycles": 9210.000000000002,
+        "accepted_seconds": 921.0000000000002,
+        "ledger_delta": {
+          "engine.N_em": 0.38477863185897104,
+          "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,1]": 3.9837387776325405e-13,
+          "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[1,1]": 7.263461774463928e-14,
+          "mpz.cumulative_gross_return_activity": 0.0,
+          "mpz.cumulative_gross_source_activity": 0.2859021482571015,
+          "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+          "mpz.emitted_total": 0.28590214825717636,
+          "mpz.escaped_total": 4.710084955078934e-13,
+          "mpz.signed_line_content_emitted_total": 0.28590214825717636,
+          "mpz.signed_source_activations_total": 0.3133487544897934
+        },
+        "load_interpolation": "initial measured load held through premeasurement exposure",
+        "modes": [
+          {
+            "converged": false,
+            "current_map_residual": 1.0,
+            "cycles": 0.0,
+            "distance_from_current": 0.0,
+            "failure_reason": "discrete_transition_inside_cycle",
+            "fixed_point_residual": 1.0,
+            "iterations": 1,
+            "map_evaluations": 2,
+            "mode": "periodic_search",
+            "next_retry_cycles": 32.0
+          },
+          {
+            "attempts": 0,
+            "cycles": 0.0,
+            "drift_error": 0.0,
+            "failure_reason": "discrete_transition_in_dmd_burst",
+            "hazard_error": 0.0,
+            "mode": "projective_rejected",
+            "next_retry_cycles": 8.0
+          },
+          {
+            "cycles": 8.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 16,
+            "projective_failure": "discrete_transition_in_dmd_burst",
+            "requested_burst_cycles": 8
+          },
+          {
+            "attempts": 8,
+            "burst_cycles": 24,
+            "cycles": 9202.0,
+            "drift_error": 2.3644519068601914e-14,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 9178.0
+          }
+        ],
+        "moving_frame": {
+          "reason": "accepted kernel extension domain is 0.001175 m; no extrapolation or state reset",
+          "status": "not_applied_fixed_local_window"
+        },
+        "requested_cycles": 9210.0
+      },
+      "source_order": 1,
+      "support_state_id": "sustained_active:R0.1:obs0:cycle9210"
+    },
+    {
+      "R": 0.1,
+      "cycles": 62377.0,
+      "observation_id": "lu_fig4_A_B",
+      "process": {
+        "accepted_cycles": 53166.999999996806,
+        "accepted_seconds": 5316.699999999681,
+        "ledger_delta": {
+          "engine.N_em": 2.002565044291228,
+          "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+          "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[0,1]": 2.488560283768019e-11,
+          "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+          "mpz.cumulative_escaped_mobile[1,1]": 6.471200889960708e-12,
+          "mpz.cumulative_gross_return_activity": 0.0,
+          "mpz.cumulative_gross_source_activity": 1.6688537102778507,
+          "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_returned_mobile[0,0]": 0.0,
+          "mpz.cumulative_returned_mobile[0,1]": 0.0,
+          "mpz.cumulative_returned_mobile[1,0]": 0.0,
+          "mpz.cumulative_returned_mobile[1,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+          "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+          "mpz.emitted_total": 1.6688537102754044,
+          "mpz.escaped_total": 3.1356803727640895e-11,
+          "mpz.signed_line_content_emitted_total": 1.6688537102754044,
+          "mpz.signed_source_activations_total": 1.8290636664529476
+        },
+        "load_interpolation": "4-point midpoint quadrature of piecewise-linear ordered observed DeltaK(N)",
+        "modes": [
+          {
+            "cycles": 16.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 32,
+            "projective_failure": null,
+            "requested_burst_cycles": 16
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13276.0,
+            "drift_error": 1.188959821096111e-15,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13252.0
+          },
+          {
+            "cycles": 32.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 64,
+            "projective_failure": null,
+            "requested_burst_cycles": 32
+          },
+          {
+            "converged": false,
+            "current_map_residual": 4.637547683378261e-05,
+            "cycles": 0.0,
+            "distance_from_current": 3.710072557968086e-05,
+            "failure_reason": "maximum_iterations",
+            "fixed_point_residual": 4.637365823320414e-05,
+            "iterations": 40,
+            "map_evaluations": 41,
+            "mode": "periodic_search",
+            "next_retry_cycles": 64.0
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13260.0,
+            "drift_error": 3.747296489517277e-14,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13236.0
+          },
+          {
+            "cycles": 64.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 128,
+            "projective_failure": null,
+            "requested_burst_cycles": 64
+          },
+          {
+            "converged": false,
+            "current_map_residual": 3.25878617825003e-05,
+            "cycles": 0.0,
+            "distance_from_current": 2.6070459342185178e-05,
+            "failure_reason": "maximum_iterations",
+            "fixed_point_residual": 3.25869512810071e-05,
+            "iterations": 40,
+            "map_evaluations": 41,
+            "mode": "periodic_search",
+            "next_retry_cycles": 128.0
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13227.0,
+            "drift_error": 8.781210744364795e-17,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13203.0
+          },
+          {
+            "cycles": 128.0,
+            "event_within_guard": false,
+            "mode": "exact_cycle_burst",
+            "next_burst_cycles": 256,
+            "projective_failure": null,
+            "requested_burst_cycles": 128
+          },
+          {
+            "converged": false,
+            "current_map_residual": 2.4137851251530287e-05,
+            "cycles": 0.0,
+            "distance_from_current": 1.9310374223576918e-05,
+            "failure_reason": "maximum_iterations",
+            "fixed_point_residual": 2.4137342096216622e-05,
+            "iterations": 40,
+            "map_evaluations": 41,
+            "mode": "periodic_search",
+            "next_retry_cycles": 256.0
+          },
+          {
+            "attempts": 1,
+            "burst_cycles": 24,
+            "cycles": 13164.0,
+            "drift_error": 6.034838349614417e-17,
+            "hazard_error": 0.0,
+            "mode": "slow_projective",
+            "projected_cycles": 13140.0
+          }
+        ],
+        "moving_frame": {
+          "reason": "accepted kernel extension domain is 0.001175 m; no extrapolation or state reset",
+          "status": "not_applied_fixed_local_window"
+        },
+        "requested_cycles": 53167.0
+      },
+      "source_order": 36,
+      "support_state_id": "sustained_active:R0.1:obs1:cycle62377"
+    }
+  ],
+  "current_load_substep": 2,
+  "current_observation_position": 2,
+  "current_r_index": 0,
+  "identity": {
+    "payload": {
+      "accepted_cycle_roundoff_policy": "snap_to_integer_within_1e-6_cycle",
+      "alignment": "index_rank",
+      "candidate_id": "sustained_active",
+      "frequency_Hz": 10.0,
+      "history_input_sha256": "037218fd910439a3db6a49d919cc84af93fbbea3c2587cc3ef8bd8b548f0053d",
+      "history_mode": "adaptive_8_supports_per_R_piecewise_linear_observed_load",
+      "kernel_sha256": "5aa74370e6419104684c52bbcf93323f905d2752d1bba59252f9b0b35c77e07c",
+      "load_substep_cycle_partition": "nearest_integer_boundaries_exact_observed_endpoint",
+      "load_substeps": 4,
+      "moving_frame_policy": "fixed_local_window_reported_DeltaK_owns_remote_geometry",
+      "opening_during_state_replay": "zero observer; opening is postprocessed on the unchanged state path",
+      "phase_count": 8,
+      "plastic": {
+        "emission_G0_298_eV": 1.2,
+        "peierls_G0_298_eV": 1.5,
+        "plastic_sigc_298_Pa": 1500000000.0,
+        "taylor_G0_298_eV": 1.5
+      },
+      "premeasurement": true,
+      "rate_input_sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd",
+      "runtime_model_id": "qste340tm.restored-r2-r9-alternative-gstar-exp-floor/1",
+      "schema": "qste340tm-restored-active-chronological/1",
+      "state_only_acceleration": true,
+      "support_points_per_R": 8,
+      "temperature_K": 298.15
+    },
+    "sha256": "b97ec2d161436d0bcaa60d8ef53d53fc85d8b7366b93630c5e143543d5da8bb7"
+  },
+  "interval_modes": [
+    {
+      "cycles": 256.0,
+      "event_within_guard": false,
+      "mode": "exact_cycle_burst",
+      "next_burst_cycles": 256,
+      "projective_failure": null,
+      "requested_burst_cycles": 256
+    },
+    {
+      "converged": false,
+      "current_map_residual": 1.9510049360325e-05,
+      "cycles": 0.0,
+      "distance_from_current": 1.5608100391311285e-05,
+      "failure_reason": "maximum_iterations",
+      "fixed_point_residual": 1.9509710871074146e-05,
+      "iterations": 40,
+      "map_evaluations": 41,
+      "mode": "periodic_search",
+      "next_retry_cycles": 512.0
+    },
+    {
+      "attempts": 1,
+      "burst_cycles": 24,
+      "cycles": 7581.0,
+      "drift_error": 8.412467433547726e-18,
+      "hazard_error": 0.0,
+      "mode": "slow_projective",
+      "projected_cycles": 7557.0
+    },
+    {
+      "cycles": 256.0,
+      "event_within_guard": false,
+      "mode": "exact_cycle_burst",
+      "next_burst_cycles": 256,
+      "projective_failure": null,
+      "requested_burst_cycles": 256
+    },
+    {
+      "attempts": 1,
+      "burst_cycles": 24,
+      "cycles": 7581.0,
+      "drift_error": 6.165308245229596e-15,
+      "hazard_error": 0.0,
+      "mode": "slow_projective",
+      "projected_cycles": 7557.0
+    }
+  ],
+  "interval_start_ledgers": {
+    "engine.N_em": 2.3873436761501994,
+    "mpz.cumulative_cancelled_source_slip[0,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[0,1]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,0]": 0.0,
+    "mpz.cumulative_cancelled_source_slip[1,1]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[0,1]": 2.5283976715443443e-11,
+    "mpz.cumulative_escaped_mobile[1,0]": 0.0,
+    "mpz.cumulative_escaped_mobile[1,1]": 6.543835507705347e-12,
+    "mpz.cumulative_gross_return_activity": 0.0,
+    "mpz.cumulative_gross_source_activity": 1.954755858534952,
+    "mpz.cumulative_physical_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_physical_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_returned_mobile[0,0]": 0.0,
+    "mpz.cumulative_returned_mobile[0,1]": 0.0,
+    "mpz.cumulative_returned_mobile[1,0]": 0.0,
+    "mpz.cumulative_returned_mobile[1,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[0,1]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,0]": 0.0,
+    "mpz.cumulative_source_slip_wake_transfer[1,1]": 0.0,
+    "mpz.emitted_total": 1.9547558585325808,
+    "mpz.escaped_total": 3.182781222314879e-11,
+    "mpz.signed_line_content_emitted_total": 1.9547558585325808,
+    "mpz.signed_source_activations_total": 2.142412420942741
+  },
+  "schema": "qste340tm-active-outer-checkpoint/1",
+  "slices": [
+    {
+      "active_context": {
+        "midpoint_DeltaK_MPa_sqrt_m": 21.485418698795183,
+        "observation_id": "lu_fig4_A_B",
+        "source_order": 72,
+        "substep_target_cycle": 85887.0,
+        "target_cycle": 93724.0
+      },
+      "elapsed_s": 202.58987924997928,
+      "finished_unix_s": 1792722067.237474,
+      "status": "running"
+    }
+  ],
+  "status": "running"
+}

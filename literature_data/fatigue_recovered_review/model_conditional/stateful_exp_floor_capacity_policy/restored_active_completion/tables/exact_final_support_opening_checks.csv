@@ -1,0 +1,17 @@
+candidate_id,mode,R,series_id,source_order,exact_production_prediction_m_per_cycle,phase_frozen_prediction_m_per_cycle,log10_exact_over_phase_frozen,active_state_evolves_during_exact_cycle,geometry_preserved,stochastic_state_preserved
+transport_dominated,absolute,0.1,lu_fig4_A_B,248,5.3738236108498466e-08,5.374247232481787e-08,-3.423433655093052e-05,True,True,True
+transport_dominated,absolute,0.3,lu_fig4_M_N,219,5.182580145545783e-08,5.1827359100141625e-08,-1.3052693952846614e-05,True,True,True
+transport_dominated,absolute,0.5,lu_fig4_G_H,171,5.416491157336854e-08,5.416640432758245e-08,-1.196874445010257e-05,True,True,True
+transport_dominated,absolute,0.7,lu_fig4_S_T,122,6.703736095885064e-08,6.703945261635818e-08,-1.355037145361058e-05,True,True,True
+transport_dominated,shape,0.1,lu_fig4_A_B,248,3.894072626866756e-08,3.8952794641650075e-08,-0.00013457416669686304,True,True,True
+transport_dominated,shape,0.3,lu_fig4_M_N,219,3.129280406066275e-08,3.1295908658722616e-08,-4.308475916663989e-05,True,True,True
+transport_dominated,shape,0.5,lu_fig4_G_H,171,3.9865693932092094e-08,3.9868434101395776e-08,-2.9850214403494135e-05,True,True,True
+transport_dominated,shape,0.7,lu_fig4_S_T,122,6.982076889001899e-08,6.982703139058182e-08,-3.8951840755283644e-05,True,True,True
+trapping_dominated,absolute,0.1,lu_fig4_A_B,248,7.395390395576865e-08,7.395403991942112e-08,-7.984461477879366e-07,True,True,True
+trapping_dominated,absolute,0.3,lu_fig4_M_N,219,7.421898167358729e-08,7.42181932015019e-08,4.613791337794958e-06,True,True,True
+trapping_dominated,absolute,0.5,lu_fig4_G_H,171,7.212974636874256e-08,7.212920189552139e-08,3.278295292525057e-06,True,True,True
+trapping_dominated,absolute,0.7,lu_fig4_S_T,122,7.159254452481372e-08,7.159254209957373e-08,1.4711983921538504e-08,True,True,True
+trapping_dominated,shape,0.1,lu_fig4_A_B,248,1.1789696296219197e-07,1.1795800727382445e-07,-0.00022480940943513168,True,True,True
+trapping_dominated,shape,0.3,lu_fig4_M_N,219,1.315445141952847e-07,1.3159904463537637e-07,-0.00017999505419624828,True,True,True
+trapping_dominated,shape,0.5,lu_fig4_G_H,171,1.556636185599525e-07,1.5572272861038178e-07,-0.00016488307382838186,True,True,True
+trapping_dominated,shape,0.7,lu_fig4_S_T,122,2.087985213668499e-07,2.0883291269707625e-07,-7.152701524902414e-05,True,True,True
