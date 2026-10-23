@@ -57,6 +57,10 @@ from arrhenius_fracture.qste340tm_restored_binding import (
     opening_surface,
     plastic_vector,
 )
+from arrhenius_fracture.qste340tm_slope_priority import (
+    SlopePriorityObjective,
+    qualify_opening_surface,
+)
 from arrhenius_fracture.reduced_persistent_reference_r2 import runtime_receipt
 
 
@@ -365,6 +369,7 @@ def block_arrays(records: list[dict[str, Any]]) -> tuple[np.ndarray, np.ndarray,
 def fit_opening(mode: str, base_surface: Any, records: list[dict[str, Any]],
                 stress: np.ndarray) -> dict[str, Any]:
     r_values, observed, weights = block_arrays(records)
+    slope_objective = SlopePriorityObjective.from_records(records)
     starts = [
         np.array([0.456, 1.0e-6, math.log(.2e9), math.log(1.75), 0.0]),
         np.array([0.447, .031, math.log(9.8e9), math.log(2.2), 0.0]),
@@ -380,9 +385,28 @@ def fit_opening(mode: str, base_surface: Any, records: list[dict[str, Any]],
         for r_value in R_VALUES:
             mask = r_values == r_value
             centered[mask] = error[mask]-np.mean(error[mask])
-        primary = error*weights if mode == "absolute" else np.r_[.5*error*weights, centered*weights]
-        invalid = max(0.0, 1.0e-5-float(np.min(barrier)))*1.0e5
-        return np.r_[primary, invalid]
+        if mode == "absolute":
+            primary = error*weights
+        elif mode == "shape":
+            primary = np.r_[.5*error*weights, centered*weights]
+        elif mode in {"slope_priority", "slope_priority_weak_offset"}:
+            primary = slope_objective.residuals(
+                prediction,
+                offset_weight=0.01 if mode.endswith("weak_offset") else 0.0,
+            )
+        else:
+            raise ValueError(f"unknown opening fit mode {mode!r}")
+        surface = opening_surface(base_surface, unpack_opening(vector))
+        audit_stress = np.linspace(0.0, 30.0e9, 401)
+        audit_barrier = np.asarray(surface.G_eV(audit_stress, TEMPERATURE_K))
+        audit_derivative = np.asarray(
+            surface.dG_dsigma_eV_per_Pa(audit_stress, TEMPERATURE_K)
+        )
+        # Fixed-length smooth penalties keep optimization inside the activated,
+        # stress-assisted contract. Final eligibility uses the denser audit.
+        invalid_barrier = np.maximum(1.0e-5-audit_barrier, 0.0) * 1.0e5
+        invalid_derivative = np.maximum(audit_derivative-1.0e-18, 0.0) * 1.0e12
+        return np.r_[primary, invalid_barrier, invalid_derivative]
 
     solutions = []
     for start in starts:
@@ -399,6 +423,15 @@ def fit_opening(mode: str, base_surface: Any, records: list[dict[str, Any]],
         solutions.append((float(residual(result.x)@residual(result.x)), result))
     objective, solution = min(solutions, key=lambda item: item[0])
     prediction, barrier = predict(base_surface, solution.x, stress)
+    surface = opening_surface(base_surface, unpack_opening(solution.x))
+    barrier_qualification = qualify_opening_surface(
+        surface,
+        temperature_K=TEMPERATURE_K,
+        visited_stress_Pa=stress,
+    )
+    slope_evaluation = slope_objective.evaluate(
+        prediction, barrier_pass=barrier_qualification["passed"],
+    )
     return {
         "mode": mode,
         "objective": objective,
@@ -407,6 +440,8 @@ def fit_opening(mode: str, base_surface: Any, records: list[dict[str, Any]],
         "prediction": prediction.tolist(),
         "minimum_barrier_eV": float(np.min(barrier)),
         "maximum_barrier_eV": float(np.max(barrier)),
+        "barrier_qualification": barrier_qualification,
+        "slope_priority_evaluation": slope_evaluation,
         "solver_success": bool(solution.success),
         "solver_message": str(solution.message),
         "solver_nfev": int(solution.nfev),

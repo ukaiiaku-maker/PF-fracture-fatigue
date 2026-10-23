@@ -35,9 +35,14 @@ from arrhenius_fracture.qste340tm_restored_binding import (
 )
 from scripts.complete_qste340tm_active_calibration import (
     CANDIDATES,
+    CYCLE_SCHEDULE_POLICY,
+    NATIVE_CYCLE_TOLERANCE,
     OUT,
+    SCHEMA,
     _checkpoint_dir,
     _restore_fixed_window_checkpoint,
+    bind_exact_observation_states,
+    prepare_observation_schedule,
 )
 from scripts.refit_qste340tm_restored_native import (
     ALT_REGISTRY,
@@ -89,17 +94,112 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def candidate_records() -> list[tuple[Path, dict[str, Any]]]:
-    paths = [HISTORICAL]
+def calibration_exclusion_reason(data: dict[str, Any],
+                                 records: list[dict[str, Any]]) -> str | None:
+    """Gate primary selection on the corrected, complete observation-state path.
+
+    Legacy sparse fits may remain useful labelled comparisons.  Their smaller
+    error cannot make them eligible for the corrected calibration frontier.
+    This gate checks source/time ownership and the states used for predictions;
+    it does not certify native load/phase convergence or parameter optimality.
+    """
+    if data.get("status") != "complete":
+        return "not_complete"
+    if data.get("schema") != SCHEMA or data.get("calibration_eligible") is not True:
+        return "legacy_or_diagnostic_result_not_calibration_eligible"
+    payload = data.get("identity", {}).get("payload", {})
+    if (payload.get("schema") != SCHEMA
+            or payload.get("calibration_eligible") is not True
+            or payload.get("observation_state_binding") != "exact_R_source_order_and_verified_native_cycle"
+            or payload.get("observation_cycle_schedule_policy") != CYCLE_SCHEDULE_POLICY):
+        return "incompatible_observation_state_identity"
+    if payload.get("state_only_acceleration", False) or data.get("state_only_acceleration", False):
+        return "state_only_observer_not_long_path_qualified"
+    try:
+        if int(payload.get("support_points_per_R", 1)) > 0:
+            return "sparse_support_identity"
+        if int(payload.get("phase_count", 0)) <= 0:
+            return "invalid_phase_count"
+        if payload.get("alignment") != "index_rank":
+            return "analyzer_requires_index_rank_observation_alignment"
+        if not math.isclose(float(payload.get("frequency_Hz", float("nan"))),
+                            FREQUENCY_HZ, rel_tol=0.0, abs_tol=1.0e-12):
+            return "analyzer_frequency_mismatch"
+        scheduled = prepare_observation_schedule(records)
+        if data.get("observation_count") != len(scheduled):
+            return "observation_count_mismatch"
+        supports = data.get("support_states", [])
+        states = data.get("states", [])
+        if data.get("genuine_evolved_support_count") != len(scheduled):
+            return "genuine_support_count_mismatch"
+        exact = bind_exact_observation_states(scheduled, supports)
+        bound_states = bind_exact_observation_states(scheduled, states)
+        source_keys = [(float(r["R"]), int(r["source_order"])) for r in scheduled]
+        if [(float(s["R"]), int(s["source_order"])) for s in states] != source_keys:
+            return "prediction_state_order_mismatch"
+        for observation, support, state in zip(scheduled, exact, bound_states):
+            if state["support_state_id"] != support["support_state_id"]:
+                return "prediction_state_support_identity_mismatch"
+            for field in ("tip_radius_m", "K_shield_Pa_sqrt_m"):
+                value = float(state[field])
+                if not math.isfinite(value) or value != float(support[field]):
+                    return "prediction_state_does_not_match_evolved_support"
+            if float(state["tip_radius_m"]) <= 0.0:
+                return "nonpositive_native_radius"
+            # Check the stored observation ownership, not values overwritten by
+            # bind_exact_observation_states while building an ordered copy.
+        for observation, state in zip(scheduled, states):
+            if (state.get("observation_source_order") != observation["source_order"]
+                    or state.get("observation_id") != observation["series_id"]):
+                return "stored_observation_identity_mismatch"
+            for field, expected in (("observation_cycles", observation["cycles"]),
+                                    ("mapped_cycles", observation["mapped_cycles"])):
+                if not math.isclose(float(state[field]), float(expected), rel_tol=0.0,
+                                    abs_tol=NATIVE_CYCLE_TOLERANCE):
+                    return "stored_observation_time_mismatch"
+        for mode in ("absolute", "shape"):
+            fit = data["fits"][mode]
+            for field in ("prediction", "frozen_prediction"):
+                values = np.asarray(fit[field], dtype=float)
+                if values.shape != (len(scheduled),) or not np.all(np.isfinite(values) & (values > 0.0)):
+                    return "invalid_prediction_vector"
+            for metric in ("overall_rmse_log10_rate", "shape_rmse_log10"):
+                if not math.isfinite(float(fit["metrics"][metric])):
+                    return "nonfinite_fit_metric"
+    except (KeyError, TypeError, ValueError, RuntimeError, OverflowError) as error:
+        return f"invalid_observation_state_record: {error}"
+    return None
+
+
+def candidate_records(records: list[dict[str, Any]] | None = None,
+                      *, excluded: list[dict[str, Any]] | None = None,
+                      ) -> list[tuple[Path, dict[str, Any]]]:
+    records = (prepare_observation_schedule(build_records("index_rank", premeasurement=True))
+               if records is None else prepare_observation_schedule(records))
+    paths = [HISTORICAL] if HISTORICAL.is_file() else []
     paths.extend(sorted((OUT / "completed_candidates").glob("*.json")))
     seen: set[str] = set()
     output = []
     for path in paths:
         data = load(path)
         identity = data.get("identity_sha256", data.get("identity", {}).get("sha256", str(path)))
-        if identity in seen or data.get("status") != "complete":
+        if identity in seen:
             continue
         seen.add(identity)
+        reason = calibration_exclusion_reason(data, records)
+        if reason is not None:
+            if excluded is not None:
+                excluded.append({
+                    "path": str(path.resolve()), "sha256": digest(path),
+                    "candidate_id": data.get("candidate_id"), "identity": identity,
+                    "schema": data.get("schema"), "status": data.get("status"),
+                    "role": "excluded_comparator_only", "calibration_eligible": False,
+                    "exclusion_reason": reason,
+                    "support_count": len(data.get("support_states", data.get("support_rows", []))),
+                    "absolute_metrics": data.get("fits", {}).get("absolute", {}).get("metrics"),
+                    "shape_metrics": data.get("fits", {}).get("shape", {}).get("metrics"),
+                })
+            continue
         output.append((path, data))
     return output
 
@@ -235,7 +335,11 @@ def restart_inventory() -> list[dict[str, Any]]:
                 " --state-opening-seed-result results/completed_candidates/"
                 "sustained_active_23b19aa6590c.json --state-opening-seed-mode absolute"
             )
-        current_resume_supported = "accepted_cycle_roundoff_policy" in payload
+        current_resume_supported = (
+            payload.get("schema") == SCHEMA
+            and payload.get("observation_cycle_schedule_policy") == CYCLE_SCHEDULE_POLICY
+            and payload.get("observation_state_binding") == "exact_R_source_order_and_verified_native_cycle"
+        )
         rows.append({
             "restart_root": str(path.parent.resolve()),
             "identity_sha256": progress["identity"]["sha256"],
@@ -258,9 +362,9 @@ def restart_inventory() -> list[dict[str, Any]]:
 
 def prediction_rows(records: list[dict[str, Any]], primary: dict[str, Any],
                     shape_frontier: dict[str, Any]) -> list[dict[str, Any]]:
-    absolute = np.asarray(primary["fits"]["absolute"]["prediction"])
-    frozen = np.asarray(primary["fits"]["absolute"]["frozen_prediction"])
-    shape = np.asarray(shape_frontier["fits"]["shape"]["prediction"])
+    absolute = np.asarray(primary["fits"]["slope_priority"]["prediction"])
+    frozen = np.asarray(primary["fits"]["slope_priority"]["frozen_prediction"])
+    shape = np.asarray(shape_frontier["fits"]["slope_priority_weak_offset"]["prediction"])
     rows = []
     for record, state, pa, pf, ps in zip(records, primary["states"], absolute, frozen, shape):
         rows.append({
@@ -268,14 +372,16 @@ def prediction_rows(records: list[dict[str, Any]], primary: dict[str, Any],
             "observation_source_order": record["source_order"],
             "R": record["R"],
             "cycles": record["cycles"],
+            "mapped_cycles": record["mapped_cycles"],
+            "cycle_rounding_delta": record["cycle_rounding_delta"],
             "crack_length_m": record["crack_length_m"],
             "DeltaK_MPa_sqrt_m": record["DeltaK_MPa_sqrt_m"],
             "Kmax_MPa_sqrt_m": record["DeltaK_MPa_sqrt_m"]/(1.0-record["R"]),
             "observed_dadn_m_per_cycle": record["observed_dadn_m_per_cycle"],
-            "active_absolute_prediction_m_per_cycle": float(pa),
+            "active_slope_priority_prediction_m_per_cycle": float(pa),
             "same_parameter_frozen_prediction_m_per_cycle": float(pf),
-            "active_shape_frontier_prediction_m_per_cycle": float(ps),
-            "absolute_residual_log10": float(math.log10(pa/record["observed_dadn_m_per_cycle"])),
+            "active_weak_offset_prediction_m_per_cycle": float(ps),
+            "slope_priority_residual_log10": float(math.log10(pa/record["observed_dadn_m_per_cycle"])),
             "support_state_id": state["support_state_id"],
             "support_source_order": state["source_order"],
             "support_cycles": state["cycles"],
@@ -332,7 +438,7 @@ def exact_final_support_checks(parent: Any, primary: dict[str, Any],
     plastic = PlasticCoordinates(**primary["plastic_coordinates"])
     rows = []
     restart = Path(primary["restart_root"])
-    for mode in ("absolute", "shape"):
+    for mode in ("slope_priority", "slope_priority_weak_offset"):
         opening = OpeningCoordinates(**primary["fits"][mode]["coordinates"])
         for r_value in R_VALUES:
             engine = build_engine(material_binding(parent, plastic), kernel_family_path=R4_KERNEL_FAMILY)
@@ -346,7 +452,8 @@ def exact_final_support_checks(parent: Any, primary: dict[str, Any],
                 R=r_value, frequency_Hz=FREQUENCY_HZ,
             )
             exact = one_cycle_map(
-                engine, _NativePhaseController(8), waveform, TEMPERATURE_K,
+                engine, _NativePhaseController(int(primary["identity"]["payload"]["phase_count"])),
+                waveform, TEMPERATURE_K,
             )
             exact_prediction = EVENT_LENGTH_M*exact.hazard_action_per_cycle
             approximate = float(primary["fits"][mode]["prediction"][index])
@@ -376,9 +483,9 @@ def figures(records: list[dict[str, Any]], primary: dict[str, Any],
     r = np.asarray([row["R"] for row in records])
     dk = np.asarray([row["DeltaK_MPa_sqrt_m"] for row in records])
     obs = np.asarray([row["observed_dadn_m_per_cycle"] for row in records])
-    active = np.asarray(primary["fits"]["absolute"]["prediction"])
-    frozen = np.asarray(primary["fits"]["absolute"]["frozen_prediction"])
-    shape = np.asarray(shape_frontier["fits"]["shape"]["prediction"])
+    active = np.asarray(primary["fits"]["slope_priority"]["prediction"])
+    frozen = np.asarray(primary["fits"]["slope_priority"]["frozen_prediction"])
+    shape = np.asarray(shape_frontier["fits"]["slope_priority_weak_offset"]["prediction"])
     colors = {0.1: "#0072B2", 0.3: "#E69F00", 0.5: "#009E73", 0.7: "#CC79A7"}
     ymin = min(obs.min(), active.min(), shape.min())*.65
     ymax = max(obs.max(), active.max(), shape.max())*1.55
@@ -388,8 +495,8 @@ def figures(records: list[dict[str, Any]], primary: dict[str, Any],
         mask = r == rv
         order = np.argsort(dk[mask])
         axis.scatter(dk[mask], obs[mask], s=11, color="#444444", alpha=.48, label="measured")
-        axis.plot(dk[mask][order], active[mask][order], color=colors[rv], lw=2.0, label="active absolute fit")
-        axis.plot(dk[mask][order], shape[mask][order], color="#D55E00", lw=1.4, ls="--", label="active shape frontier")
+        axis.plot(dk[mask][order], active[mask][order], color=colors[rv], lw=2.0, label="slope-priority fit")
+        axis.plot(dk[mask][order], shape[mask][order], color="#D55E00", lw=1.4, ls="--", label="weak-offset refinement")
         axis.set(xscale="log", yscale="log", xlim=(xmin, xmax), ylim=(ymin, ymax),
                  xlabel=r"$\Delta K$ (MPa$\sqrt{m}$)")
         axis.text(.04, .93, f"R = {rv:.1f}", transform=axis.transAxes, va="top")
@@ -409,7 +516,7 @@ def figures(records: list[dict[str, Any]], primary: dict[str, Any],
         order = np.argsort(dk[mask])
         axis.scatter(dk[mask], obs[mask], s=11, color="#444444", alpha=.48, label="measured")
         axis.plot(dk[mask][order], active[mask][order], color=colors[rv], lw=2.0,
-                  label="active absolute fit")
+                  label="slope-priority fit")
         axis.plot(dk[mask][order], frozen[mask][order], color="#56B4E9", lw=1.7, ls=":",
                   label="same parameters, frozen state")
         axis.set(xscale="log", yscale="log", xlim=(xmin, xmax),
@@ -488,7 +595,7 @@ def figures(records: list[dict[str, Any]], primary: dict[str, Any],
     fig, axis = plt.subplots(figsize=(6.8, 4.8))
     axis.scatter(rv, [row["observed_dadn_m_per_cycle"] for row in block], s=52,
                  color="#333333", label="nearest measured point", zorder=3)
-    axis.plot(rv, [row["active_absolute_prediction"] for row in block], marker="o",
+    axis.plot(rv, [row["active_slope_priority_prediction"] for row in block], marker="o",
               color="#0072B2", label="active absolute fit")
     axis.plot(rv, [row["same_parameter_frozen_prediction"] for row in block], marker="s",
               color="#56B4E9", ls=":", label="same parameters, frozen state")
@@ -502,18 +609,29 @@ def figures(records: list[dict[str, Any]], primary: dict[str, Any],
 
 
 def main() -> int:
-    records = build_records("index_rank", premeasurement=True)
-    sustained_control = load(PRIMARY)
-    historical = load(HISTORICAL)
+    records = prepare_observation_schedule(build_records("index_rank", premeasurement=True))
+    excluded_comparators = []
+    candidates = candidate_records(records, excluded=excluded_comparators)
+    if not candidates:
+        raise RuntimeError(
+            "no completed schema-2 calibration has exact evolved states for every observation; "
+            "legacy/sparse results are comparator-only. Complete the repaired runner with "
+            "--support-points 0 before selecting a primary fit."
+        )
+    sustained_control = load(PRIMARY) if PRIMARY.is_file() else None
+    historical = load(HISTORICAL) if HISTORICAL.is_file() else None
     parent = load_parent_binding(ALT_REGISTRY, PARENT_REGISTRY, candidate_id=PARENT_CANDIDATE)
-    candidates = candidate_records()
+    barrier_admissible = [item for item in candidates if
+                          item[1]["fits"]["slope_priority"]["barrier_qualification"]["passed"]]
+    if not barrier_admissible:
+        raise RuntimeError("no completed schema-2 candidate has a physically admissible slope-priority barrier")
     absolute_frontier_path, primary = min(
-        candidates,
-        key=lambda item: item[1]["fits"]["absolute"]["metrics"]["overall_rmse_log10_rate"],
+        barrier_admissible,
+        key=lambda item: item[1]["fits"]["slope_priority"]["slope_priority_evaluation"]["primary_score"],
     )
     shape_frontier_path, shape_frontier = min(
-        candidates,
-        key=lambda item: item[1]["fits"]["shape"]["metrics"]["shape_rmse_log10"],
+        barrier_admissible,
+        key=lambda item: item[1]["fits"]["slope_priority_weak_offset"]["slope_priority_evaluation"]["primary_score"],
     )
     candidate_summary = []
     for path, candidate in candidates:
@@ -524,11 +642,17 @@ def main() -> int:
             "identity": candidate.get("identity_sha256", candidate.get("identity", {}).get("sha256")),
             "plastic_coordinates": candidate["plastic_coordinates"],
             "support_count": len(states),
+            "calibration_eligible": True,
+            "phase_count": candidate["identity"]["payload"]["phase_count"],
+            "load_substeps": candidate["identity"]["payload"]["load_substeps"],
+            "observation_cycle_schedule_policy": CYCLE_SCHEDULE_POLICY,
             "history_mode": candidate.get("history_mode", "historical_endpoint_support"),
             "state_opening_seed": candidate.get("state_opening_seed"),
             "fitted_absolute_opening": candidate["fits"]["absolute"]["coordinates"],
             "absolute_metrics": candidate["fits"]["absolute"]["metrics"],
             "shape_metrics": candidate["fits"]["shape"]["metrics"],
+            "slope_priority_evaluation": candidate["fits"]["slope_priority"]["slope_priority_evaluation"],
+            "slope_priority_barrier": candidate["fits"]["slope_priority"]["barrier_qualification"],
             "maximum_mobile_count": max(row["mobile_count"] for row in states),
             "maximum_retained_count": max(row["retained_count"] for row in states),
             "maximum_accumulated_slip_count": max(row["accumulated_slip_count"] for row in states),
@@ -536,32 +660,45 @@ def main() -> int:
         })
     prediction_table = prediction_rows(records, primary, shape_frontier)
     states = primary["states"]
-    stress = _stress_trace(records, states, 8)
+    stress = _stress_trace(records, states, int(primary["identity"]["payload"]["phase_count"]))
     absolute_surface_table = surface_rows(
-        parent, primary["fits"]["absolute"], stress, "primary_absolute",
+        parent, primary["fits"]["slope_priority"], stress, "primary_slope_priority",
     )
-    shape_stress = _stress_trace(records, shape_frontier["states"], 8)
+    shape_stress = _stress_trace(
+        records, shape_frontier["states"], int(shape_frontier["identity"]["payload"]["phase_count"]),
+    )
     shape_surface_table = surface_rows(
-        parent, shape_frontier["fits"]["shape"], shape_stress,
-        "active_shape_frontier",
+        parent, shape_frontier["fits"]["slope_priority_weak_offset"], shape_stress,
+        "weak_offset_refinement",
     )
     surface_table = absolute_surface_table+shape_surface_table
     matched = fixed_kmax(records, {
-        "active_absolute_prediction": np.asarray(primary["fits"]["absolute"]["prediction"]),
-        "same_parameter_frozen_prediction": np.asarray(primary["fits"]["absolute"]["frozen_prediction"]),
+        "active_slope_priority_prediction": np.asarray(primary["fits"]["slope_priority"]["prediction"]),
+        "same_parameter_frozen_prediction": np.asarray(primary["fits"]["slope_priority"]["frozen_prediction"]),
     })
     exact_checks = exact_final_support_checks(parent, primary, records)
     if shape_frontier.get("restart_root") != primary.get("restart_root"):
         exact_checks.extend(exact_final_support_checks(parent, shape_frontier, records))
-    representation = support_representation_comparison(historical, sustained_control)
-    state_only_comparison = state_only_longitudinal_comparison(sustained_control)
+    representation = (
+        support_representation_comparison(historical, sustained_control)
+        if historical is not None and sustained_control is not None
+        else {"available": False, "rows": [], "scope": "optional legacy comparison inputs unavailable"}
+    )
+    representation["role"] = "legacy_comparator_only_not_repaired_history_convergence"
+    state_only_comparison = (
+        state_only_longitudinal_comparison(sustained_control)
+        if sustained_control is not None
+        else {"available": False, "long_projective_propagation_qualified": False}
+    )
+    state_only_comparison["role"] = "legacy_observer_diagnostic_only"
     restarts = restart_inventory()
     write_csv(TABLE/"chronological_predictions.csv", prediction_table)
     write_csv(TABLE/"genuine_support_state_history.csv", primary["support_states"])
     write_csv(TABLE/"opening_surface_actual_sampled_stresses.csv", surface_table)
     write_csv(TABLE/"matched_peak_comparison.csv", matched)
     write_csv(TABLE/"exact_final_support_opening_checks.csv", exact_checks)
-    write_csv(TABLE/"historical_vs_chronological_final_states.csv", representation["rows"])
+    if representation["rows"]:
+        write_csv(TABLE/"historical_vs_chronological_final_states.csv", representation["rows"])
     if state_only_comparison.get("comparison_rows"):
         write_csv(TABLE/"production_vs_state_only_common_supports.csv",
                   state_only_comparison["comparison_rows"])
@@ -576,7 +713,7 @@ def main() -> int:
     }
     kernel_limit = max(kernel["cumulative_crack_path_extension_levels_m"])
     summary = {
-        "schema": "qste340tm-active-calibration-assessment/1",
+        "schema": "qste340tm-active-calibration-assessment/2",
         "source_csv_sha256": digest(DATA/"normalized/qste340tm_constant_amplitude.csv"),
         "temperature_K": TEMPERATURE_K,
         "frequency_Hz": FREQUENCY_HZ,
@@ -594,13 +731,13 @@ def main() -> int:
             "matched_Kmax_and_slopes": "diagnostic summaries of the same observations; not added as independent likelihood data",
         },
         "primary_identity": primary["identity"],
-        "absolute_frontier_path": str(absolute_frontier_path.resolve()),
+        "slope_priority_frontier_path": str(absolute_frontier_path.resolve()),
         "primary_plastic_coordinates": primary["plastic_coordinates"],
         "primary_opening_coordinates": {
-            mode: primary["fits"][mode]["coordinates"] for mode in ("absolute", "shape")
+            mode: primary["fits"][mode]["coordinates"] for mode in ("slope_priority", "slope_priority_weak_offset")
         },
         "primary_metrics": {
-            mode: primary["fits"][mode]["metrics"] for mode in ("absolute", "shape")
+            mode: primary["fits"][mode]["metrics"] for mode in ("slope_priority", "slope_priority_weak_offset")
         },
         "shape_frontier": {
             "path": str(shape_frontier_path.resolve()),
@@ -609,18 +746,22 @@ def main() -> int:
                 "identity_sha256", shape_frontier.get("identity", {}).get("sha256")
             ),
             "plastic_coordinates": shape_frontier["plastic_coordinates"],
-            "opening_coordinates": shape_frontier["fits"]["shape"]["coordinates"],
-            "metrics": shape_frontier["fits"]["shape"]["metrics"],
+            "opening_coordinates": shape_frontier["fits"]["slope_priority_weak_offset"]["coordinates"],
+            "metrics": shape_frontier["fits"]["slope_priority_weak_offset"]["metrics"],
         },
         "same_parameter_frozen_metrics": {
-            mode: primary["fits"][mode]["frozen_metrics"] for mode in ("absolute", "shape")
+            mode: primary["fits"][mode]["frozen_metrics"] for mode in ("slope_priority", "slope_priority_weak_offset")
         },
         "sustained_chronological_control": {
+            "available": True,
+            "role": "legacy_comparator_only_not_calibration_frontier",
             "path": str(PRIMARY.resolve()),
             "identity": sustained_control["identity"],
             "plastic_coordinates": sustained_control["plastic_coordinates"],
             "absolute_metrics": sustained_control["fits"]["absolute"]["metrics"],
             "same_parameter_frozen_absolute_metrics": sustained_control["fits"]["absolute"]["frozen_metrics"],
+        } if sustained_control is not None else {
+            "available": False, "role": "optional_legacy_comparator_only",
         },
         "constant_controls": controls,
         "native_translation_domain": {
@@ -638,21 +779,28 @@ def main() -> int:
             ),
         },
         "candidate_summary": candidate_summary,
+        "excluded_comparators": excluded_comparators,
+        "candidate_selection_policy": (
+            "schema-2 calibration_eligible production histories with exact source/time/state "
+            "binding for all observations; legacy and diagnostic metrics never select the primary"
+        ),
         "native_acceleration_profile": acceleration_profile(primary),
         "historical_vs_chronological_representation": representation,
         "state_only_longitudinal_qualification": state_only_comparison,
         "restart_inventory": restarts,
         "exact_final_support_opening_checks": exact_checks,
         "claim_assessment": (
-            "bounded negative with a near-frontier improvement for the qualified fixed-local-window "
-            "replay: transport-active state improves pooled RMSE over the common constant, but does "
-            "not recover all four measured slopes or matched-Kmax history offsets. This is not a "
-            "negative test of the unresolved 6-13 mm native translation path."
+            "Conditional fixed-local-window calibration with verified observation-state ownership. "
+            "Scientific interpretation requires comparison of the measured residuals, load/phase "
+            "refinement, continuous plastic-parameter optimization, and the stated model/data "
+            "qualifications. No physical conclusion is assigned automatically from legacy metrics."
         ),
         "unresolved": [
             "native signed-kernel translation/remapping beyond 1.175 mm for the measured 6-13 mm extension",
             "active-state frequency sensitivity around the provisional 10 Hz assumption",
-            "independent off-support refinement for the adaptive chronological history",
+            "load-quadrature and phase refinement at the same material/opening parameters",
+            "continuous outer plastic-parameter optimization beyond the three fixed candidates",
+            "sensitivity to nearest-whole-cycle scheduling of mapped observations",
             "R=0.5 rate/history identifier mismatch",
         ],
     }
@@ -664,7 +812,7 @@ def main() -> int:
     print(json.dumps({
         "assessment": str(OUT/"active_calibration_assessment.json"),
         "candidate_count": len(candidate_summary),
-        "absolute_rmse": primary["fits"]["absolute"]["metrics"]["overall_rmse_log10_rate"],
+        "slope_priority_score": primary["fits"]["slope_priority"]["slope_priority_evaluation"]["primary_score"],
         "pooled_constant_rmse": controls["pooled_optimal_common_constant"]["metrics"]["overall_rmse_log10_rate"],
         "figures": len(list(FIG.glob("*.png"))),
     }, indent=2))

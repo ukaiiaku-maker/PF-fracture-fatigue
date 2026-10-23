@@ -29,6 +29,7 @@ sys.path.insert(0, str(ROOT))
 from arrhenius_fracture.current_coupled_execution_r4 import R4_KERNEL_FAMILY
 from arrhenius_fracture.fatigue_v1 import FatigueWaveform
 from arrhenius_fracture.paris_slope_r9 import _NativePhaseController
+from arrhenius_fracture import persistent_site_high_cycle_checkpoint_v10230 as native_checkpoint
 from arrhenius_fracture.persistent_site_high_cycle_checkpoint_v10230 import (
     restore_checkpoint,
     write_checkpoint,
@@ -74,8 +75,114 @@ from scripts.refit_qste340tm_restored_native import (
 
 
 OUT = DATA / "model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion"
-SCHEMA = "qste340tm-restored-active-chronological/1"
-HISTORY_MODE = "every_observation_linear_midpoint_load"
+SCHEMA = "qste340tm-restored-active-chronological/2"
+HISTORY_MODE = "every_observation_native_state_nearest_whole_cycle"
+CYCLE_SCHEDULE_POLICY = "nearest_whole_cycle_half_up_preserve_mapped_cycles_v1"
+NATIVE_CYCLE_TOLERANCE = 1.0e-6
+
+
+def prepare_observation_schedule(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Preserve source order while assigning explicit whole-cycle native targets.
+
+    In particular, R=0.5 has fractionally mapped N values.  The schedule uses
+    whole cycles to preserve explicit phase ownership and rounds N once, with
+    at most 0.5 cycle displacement.  The original mapped coordinate remains
+    available for review.
+    This is a time-coordinate approximation, not a fitted or interpolated state.
+    """
+    scheduled = []
+    seen = set()
+    previous: dict[float, tuple[float, int]] = {}
+    for record in records:
+        row = dict(record)
+        r_value = float(row["R"])
+        order = int(row["source_order"])
+        key = (r_value, order)
+        if r_value not in R_VALUES or key in seen:
+            raise ValueError(f"invalid or duplicate source observation {key}")
+        mapped = float(row.get("mapped_cycles", row["cycles"]))
+        if not math.isfinite(mapped) or mapped < 0.0:
+            raise ValueError(f"invalid mapped cycle coordinate for {key}: {mapped}")
+        target = int(math.floor(mapped + 0.5))
+        if r_value in previous:
+            prior_mapped, prior_target = previous[r_value]
+            if mapped <= prior_mapped or target <= prior_target:
+                raise ValueError(
+                    f"whole-cycle scheduling does not preserve distinct chronological "
+                    f"observations at {key}; resolve the measured-time mapping explicitly"
+                )
+        delta = float(target) - mapped
+        if abs(delta) > 0.5 + 1.0e-10:
+            raise ValueError(f"cycle rounding exceeds half a cycle for {key}")
+        row.update({
+            "mapped_cycles": mapped,
+            "cycles": float(target),
+            "cycle_rounding_delta": delta,
+            "cycle_schedule_policy": CYCLE_SCHEDULE_POLICY,
+        })
+        scheduled.append(row)
+        seen.add(key)
+        previous[r_value] = (mapped, target)
+    return scheduled
+
+
+def assert_native_cycle_target(engine: Any, target_cycle: float,
+                               frequency_Hz: float) -> float:
+    """Verify the actual native cursor before declaring an observation evolved."""
+    native_cycle = float(engine.t) * float(frequency_Hz)
+    if not math.isfinite(native_cycle) or not math.isclose(
+        native_cycle, float(target_cycle), rel_tol=0.0,
+        abs_tol=NATIVE_CYCLE_TOLERANCE,
+    ):
+        raise RuntimeError(
+            f"native observation incomplete: actual cycle {native_cycle:.16g}, "
+            f"requested cycle {float(target_cycle):.16g}"
+        )
+    return native_cycle
+
+
+def bind_exact_observation_states(records: list[dict[str, Any]],
+                                  support_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Bind by source identity AND native time; never fill a missing state."""
+    state_by_key = {}
+    for state in support_rows:
+        key = (float(state["R"]), int(state["source_order"]))
+        if key in state_by_key:
+            raise RuntimeError(f"duplicate evolved native state for {key}")
+        state_by_key[key] = state
+    rows = []
+    for observation in records:
+        key = (float(observation["R"]), int(observation["source_order"]))
+        if key not in state_by_key:
+            raise RuntimeError(
+                f"missing evolved native state for observation {key}; "
+                "held or interpolated support states cannot enter calibration"
+            )
+        source = state_by_key.pop(key)
+        target = float(observation["cycles"])
+        if not source.get("support_is_evolved", False):
+            raise RuntimeError(f"observation {key} is not an evolved native state")
+        for field in ("cycles", "native_cycles"):
+            if field not in source or not math.isclose(
+                float(source[field]), target, rel_tol=0.0,
+                abs_tol=NATIVE_CYCLE_TOLERANCE,
+            ):
+                raise RuntimeError(f"native state time mismatch for {key}: {field}")
+        state = dict(source)
+        state.update({
+            "observation_id": observation["series_id"],
+            "observation_source_order": observation["source_order"],
+            "observation_cycles": target,
+            "mapped_cycles": observation["mapped_cycles"],
+            "cycle_rounding_delta": observation["cycle_rounding_delta"],
+            "cycle_schedule_policy": CYCLE_SCHEDULE_POLICY,
+            "observation_crack_length_m": observation["crack_length_m"],
+            "support_is_evolved": True,
+        })
+        rows.append(state)
+    if state_by_key:
+        raise RuntimeError("native states contain observations outside the fitted source history")
+    return rows
 
 CANDIDATES = {
     "sustained_active": PlasticCoordinates(1.2, 1.5e9, 1.5, 1.5),
@@ -85,7 +192,7 @@ CANDIDATES = {
 
 
 class ScheduleSliceExpired(BaseException):
-    """Escape solver-internal Exception handlers after a live checkpoint."""
+    """Escape solver-internal handlers only at a committed restart boundary."""
 
 
 def canonical_hash(value: Any) -> str:
@@ -122,7 +229,7 @@ def _identity(candidate_id: str, plastic: PlasticCoordinates, phase_count: int,
               state_opening_seed: OpeningCoordinates | None = None) -> dict[str, Any]:
     history_mode = (
         HISTORY_MODE if support_points <= 0
-        else f"adaptive_{int(support_points)}_supports_per_R_piecewise_linear_observed_load"
+        else f"diagnostic_{int(support_points)}_supports_per_R_piecewise_linear_observed_load"
     )
     payload = {
         "schema": SCHEMA,
@@ -145,8 +252,11 @@ def _identity(candidate_id: str, plastic: PlasticCoordinates, phase_count: int,
         "state_opening_seed": (
             asdict(state_opening_seed) if state_opening_seed is not None else None
         ),
-        "load_substep_cycle_partition": "nearest_integer_boundaries_exact_observed_endpoint",
+        "load_substep_cycle_partition": "nearest_integer_boundaries_exact_scheduled_observation_endpoint",
         "accepted_cycle_roundoff_policy": "snap_to_integer_within_1e-6_cycle",
+        "observation_cycle_schedule_policy": CYCLE_SCHEDULE_POLICY,
+        "observation_state_binding": "exact_R_source_order_and_verified_native_cycle",
+        "calibration_eligible": support_points <= 0 and not state_only_acceleration,
         "runtime_model_id": MODEL_ID,
         "kernel_sha256": sha256(Path(R4_KERNEL_FAMILY)),
         "rate_input_sha256": sha256(DATA / "normalized/qste340tm_constant_amplitude.csv"),
@@ -169,6 +279,9 @@ def write_active_cache_provenance(parent: Any) -> dict[str, Any]:
     binding = material_binding(parent, plastic)
     engine = build_engine(binding, kernel_family_path=R4_KERNEL_FAMILY)
     current_receipt = runtime_receipt(engine, stage="active_cache_provenance_current_initial")
+    # Object identity is process-local and would otherwise rewrite provenance
+    # on every restart; implementation identity is carried by the stable fields.
+    current_receipt.get("reversible_binding", {}).pop("object_id", None)
     old_receipt = old["runtime_receipt"]
     common_paths = [
         "engine_class", "state_class", "model_id", "kinetics", "mechanics_provider",
@@ -376,6 +489,7 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
                       slice_seconds: int, alignment: str,
                       state_only_acceleration: bool,
                       state_opening_seed: OpeningCoordinates | None) -> dict[str, Any]:
+    records = prepare_observation_schedule(records)
     identity = _identity(
         candidate_id, plastic, phase_count, load_substeps, support_points,
         frequency_Hz, alignment, state_only_acceleration, state_opening_seed,
@@ -386,7 +500,7 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
     progress = _load_json(progress_path, _new_progress(identity))
     if progress["identity"]["sha256"] != identity["sha256"]:
         raise RuntimeError("active outer checkpoint identity mismatch")
-    if progress.get("status") == "complete":
+    if progress.get("status") in {"complete", "diagnostic_complete"}:
         return progress
     progress["status"] = "running"
     atomic_json(progress_path, progress)
@@ -394,11 +508,29 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
     started = time.monotonic()
     deadline = started + max(int(slice_seconds), 1)
     old_handler = signal.getsignal(signal.SIGALRM)
+    original_native_writer = native_checkpoint.write_checkpoint
+    expiry_requested = False
 
     def expire(_signum: int, _frame: Any) -> None:
-        raise ScheduleSliceExpired()
+        # Never raise asynchronously: the native NPZ/JSON pair and the outer
+        # observation/cursor commit both contain multiple writes.
+        nonlocal expiry_requested
+        expiry_requested = True
+
+    def slice_expired() -> bool:
+        return expiry_requested or time.monotonic() >= deadline
+
+    def checkpoint_then_yield(*args: Any, **kwargs: Any) -> Any:
+        payload = original_native_writer(*args, **kwargs)
+        if payload is not None and slice_expired():
+            raise ScheduleSliceExpired()
+        return payload
 
     signal.signal(signal.SIGALRM, expire)
+    # Native maybe_write_checkpoint resolves this module global.  The runner's
+    # direct imported writer remains unchanged, so both observation snapshots
+    # and the complete outer cursor commit finish before the explicit check.
+    native_checkpoint.write_checkpoint = checkpoint_then_yield
     signal.alarm(max(int(slice_seconds), 1))
     active_context: dict[str, Any] = {}
     try:
@@ -431,6 +563,8 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
                     raise RuntimeError("outer cursor exists without native active-state checkpoint")
                 _restore_fixed_window_checkpoint(engine, checkpoint_dir)
             initial_receipt = runtime_receipt(engine, stage=f"active_chronological_R_{r_value}_restored")
+            if slice_expired():
+                raise ScheduleSliceExpired()
 
             for position in range(observation_position, len(block)):
                 row = block[position]
@@ -513,9 +647,11 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
                             finally:
                                 _restore_environment(previous_env)
                             raise ScheduleSliceExpired()
+                    assert_native_cycle_target(engine, substep_target_cycle, frequency_Hz)
                     progress["current_load_substep"] = substep + 1
                     atomic_json(progress_path, progress)
 
+                native_cycles = assert_native_cycle_target(engine, target_cycle, frequency_Hz)
                 before = progress["interval_start_ledgers"]
                 process = {
                     "requested_cycles": target_cycle-prior_cycle,
@@ -538,41 +674,56 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
                     "support_state_id": f"{candidate_id}:R{r_value}:obs{position}:cycle{target_cycle:.12g}",
                     "support_is_evolved": True,
                     "support_observation_position": position,
+                    "native_cycles": native_cycles,
+                    "mapped_cycles": row["mapped_cycles"],
+                    "cycle_rounding_delta": row["cycle_rounding_delta"],
+                    "cycle_schedule_policy": CYCLE_SCHEDULE_POLICY,
                     "phase_count": phase_count,
                     "load_substeps": substeps,
                 })
+                observation_checkpoint = checkpoint_dir / "observations" / f"source_{int(row['source_order']):06d}"
+                state["native_checkpoint_path"] = str(observation_checkpoint.resolve())
+                # Commit both the live restart and the separate observation
+                # checkpoint before advancing the outer observation cursor.
+                for destination in (checkpoint_dir, observation_checkpoint):
+                    previous_env = _set_checkpoint_environment(destination)
+                    try:
+                        write_checkpoint(
+                            engine,
+                            waveform=FatigueWaveform(
+                                Kmax=end_dk/(1.0-r_value)*1.0e6,
+                                R=r_value, frequency_Hz=frequency_Hz,
+                            ),
+                            temperature_K=TEMPERATURE_K,
+                            reason="qste_observation_interval_complete",
+                            metadata={
+                                "identity_sha256": identity["sha256"],
+                                "observation_id": row["series_id"],
+                                "source_order": row["source_order"],
+                                "support_state_id": state["support_state_id"],
+                                "mapped_cycles": row["mapped_cycles"],
+                                "native_cycles": native_cycles,
+                                "cycle_rounding_delta": row["cycle_rounding_delta"],
+                                "cycle_schedule_policy": CYCLE_SCHEDULE_POLICY,
+                                "next_observation_position": position+1,
+                            },
+                        )
+                    finally:
+                        _restore_environment(previous_env)
                 progress["completed_observation_rows"].append(state)
                 progress["completed_process_rows"].append({
                     "observation_id": row["series_id"],
                     "support_state_id": state["support_state_id"],
                     "R": r_value, "source_order": row["source_order"],
-                    "cycles": target_cycle, "process": process,
+                    "cycles": target_cycle, "mapped_cycles": row["mapped_cycles"],
+                    "cycle_rounding_delta": row["cycle_rounding_delta"], "process": process,
                 })
                 progress["interval_start_ledgers"] = None
                 progress["interval_modes"] = []
                 progress["current_observation_position"] = position + 1
                 progress["current_load_substep"] = 0
-                previous_env = _set_checkpoint_environment(checkpoint_dir)
-                try:
-                    write_checkpoint(
-                        engine,
-                        waveform=FatigueWaveform(
-                            Kmax=end_dk/(1.0-r_value)*1.0e6,
-                            R=r_value, frequency_Hz=frequency_Hz,
-                        ),
-                        temperature_K=TEMPERATURE_K,
-                        reason="qste_observation_interval_complete",
-                        metadata={
-                            "identity_sha256": identity["sha256"],
-                            "observation_id": row["series_id"],
-                            "support_state_id": state["support_state_id"],
-                            "next_observation_position": position+1,
-                        },
-                    )
-                finally:
-                    _restore_environment(previous_env)
                 atomic_json(progress_path, progress)
-                if time.monotonic() >= deadline:
+                if slice_expired():
                     raise ScheduleSliceExpired()
 
             progress["current_r_index"] = r_index + 1
@@ -580,6 +731,8 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
             progress["current_load_substep"] = 0
             progress["last_runtime_receipt"] = initial_receipt
             atomic_json(progress_path, progress)
+            if r_index + 1 < len(R_VALUES) and slice_expired():
+                raise ScheduleSliceExpired()
 
         progress["status"] = "history_complete"
     except ScheduleSliceExpired:
@@ -591,6 +744,7 @@ def run_history_slice(candidate_id: str, plastic: PlasticCoordinates, parent: An
         }
     finally:
         signal.alarm(0)
+        native_checkpoint.write_checkpoint = original_native_writer
         signal.signal(signal.SIGALRM, old_handler)
         progress["slices"].append({
             "finished_unix_s": time.time(),
@@ -608,6 +762,7 @@ def finalize_candidate(candidate_id: str, plastic: PlasticCoordinates, parent: A
                        frequency_Hz: float, alignment: str,
                        state_only_acceleration: bool,
                        state_opening_seed: OpeningCoordinates | None) -> dict[str, Any]:
+    records = prepare_observation_schedule(records)
     support_rows = progress["completed_observation_rows"]
     expected_supports = sum(
         min(len([row for row in records if row["R"] == r_value]), support_points)
@@ -618,30 +773,47 @@ def finalize_candidate(candidate_id: str, plastic: PlasticCoordinates, parent: A
         raise RuntimeError(
             f"chronological support history incomplete: {len(support_rows)}/{expected_supports} supports"
         )
-    rows = []
-    for r_value in R_VALUES:
-        observations = [row for row in records if row["R"] == r_value]
-        supports = [row for row in support_rows if row["R"] == r_value]
-        support_cycles = np.asarray([float(row["cycles"]) for row in supports])
-        for observation in observations:
-            index = int(np.searchsorted(support_cycles, float(observation["cycles"]), side="right")-1)
-            index = max(min(index, len(supports)-1), 0)
-            state = dict(supports[index])
-            state.update({
-                "observation_id": observation["series_id"],
-                "observation_source_order": observation["source_order"],
-                "observation_cycles": observation["cycles"],
-                "observation_crack_length_m": observation["crack_length_m"],
-                "support_is_evolved": bool(math.isclose(
-                    float(observation["cycles"]), float(supports[index]["cycles"]),
-                    rel_tol=0.0, abs_tol=1.0e-9,
-                )),
-            })
-            rows.append(state)
+    identity = _identity(
+        candidate_id, plastic, phase_count, load_substeps, support_points,
+        frequency_Hz, alignment, state_only_acceleration, state_opening_seed,
+    )
+    if support_points > 0 or state_only_acceleration:
+        # Sparse native states are useful diagnostics.  They cannot define a
+        # calibrated 760-observation history without qualified state output.
+        result = {
+            "schema": SCHEMA,
+            "identity": identity,
+            "candidate_id": candidate_id,
+            "plastic_coordinates": asdict(plastic),
+            "status": "diagnostic_complete",
+            "calibration_eligible": False,
+            "diagnostic_reason": (
+                "sparse_native_supports" if support_points > 0
+                else "state_only_acceleration_not_long_path_qualified"
+            ),
+            "observation_count": len(records),
+            "genuine_evolved_support_count": len(support_rows),
+            "support_states": support_rows,
+            "process_rows": progress["completed_process_rows"],
+            "history_mode": identity["payload"]["history_mode"],
+            "state_only_acceleration": bool(state_only_acceleration),
+            "slices": progress["slices"],
+            "claim_limit": "native support diagnostics only; no all-observation fit or predictions",
+        }
+        path = OUT / "diagnostic_candidates" / f"{candidate_id}_{identity['sha256'][:12]}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        atomic_json(path, result)
+        return result
+    rows = bind_exact_observation_states(records, support_rows)
+    if not math.isclose(float(frequency_Hz), FREQUENCY_HZ, rel_tol=0.0, abs_tol=1.0e-12):
+        raise ValueError(
+            "the imported opening fitter currently divides by its fixed FREQUENCY_HZ; "
+            "wire frequency through that interface before calibrating another frequency"
+        )
     stress = _stress_trace(records, rows, phase_count)
     base_surface = parent.manifest.cleavage.surface
     fits = {mode: fit_opening(mode, base_surface, records, stress)
-            for mode in ("absolute", "shape")}
+            for mode in ("absolute", "shape", "slope_priority", "slope_priority_weak_offset")}
     frozen = frozen_stress(records, phase_count)
     final_receipts = {}
     for mode, fit in fits.items():
@@ -667,6 +839,7 @@ def finalize_candidate(candidate_id: str, plastic: PlasticCoordinates, parent: A
         "candidate_id": candidate_id,
         "plastic_coordinates": asdict(plastic),
         "status": "complete",
+        "calibration_eligible": True,
         "observation_count": len(rows),
         "genuine_evolved_support_count": len(support_rows),
         "history_mode": progress["identity"]["payload"]["history_mode"],
@@ -694,12 +867,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate", choices=tuple(CANDIDATES), required=True)
     parser.add_argument("--phase-count", type=int, default=8)
     parser.add_argument("--load-substeps", type=int, default=2)
-    parser.add_argument("--support-points", type=int, default=8,
-                        help="evolved supports per R; <=0 evolves every observation")
+    parser.add_argument("--support-points", type=int, default=0,
+                        help="<=0 calibrates every observation; positive values produce sparse diagnostics only")
     parser.add_argument("--frequency-hz", type=float, default=FREQUENCY_HZ)
     parser.add_argument("--alignment", choices=("index_rank", "deltaK_crack_length"), default="index_rank")
-    parser.add_argument("--slice-seconds", type=int, default=600)
-    parser.add_argument("--max-slices", type=int, default=1)
+    parser.add_argument("--slice-seconds", type=int, default=600,
+                        help="soft scheduling interval; expiry waits for a committed checkpoint or observation")
+    parser.add_argument("--max-slices", type=int, default=0,
+                        help="<=0 continues checkpointed scheduling until complete; positive values bound this invocation")
     parser.add_argument(
         "--state-only-opening-diagnostic", action="store_true",
         help="diagnostic only: omit opening from DMD validation; not production-qualified",
@@ -712,12 +887,17 @@ def main(argv: list[str] | None = None) -> int:
         "--state-opening-seed-mode", choices=("absolute", "shape"), default="absolute",
     )
     args = parser.parse_args(argv)
+    if args.frequency_hz <= 0.0 or not math.isfinite(args.frequency_hz):
+        parser.error("frequency must be finite and positive")
+    if (args.support_points <= 0 and not args.state_only_opening_diagnostic
+            and not math.isclose(args.frequency_hz, FREQUENCY_HZ, rel_tol=0.0, abs_tol=1.0e-12)):
+        parser.error("calibration frequency must match the imported opening fitter until frequency is wired through it")
     OUT.mkdir(parents=True, exist_ok=True)
     parent = load_parent_binding(ALT_REGISTRY, PARENT_REGISTRY, candidate_id=PARENT_CANDIDATE)
     provenance = write_active_cache_provenance(parent)
     if not provenance["all_common_runtime_receipt_fields_equal"]:
         raise RuntimeError("completed active cache differs from current common runtime")
-    records = build_records(args.alignment, premeasurement=True)
+    records = prepare_observation_schedule(build_records(args.alignment, premeasurement=True))
     plastic = CANDIDATES[args.candidate]
     state_only_acceleration = bool(args.state_only_opening_diagnostic)
     state_opening_seed = None
@@ -729,7 +909,9 @@ def main(argv: list[str] | None = None) -> int:
     if state_only_acceleration:
         qualify_local_state_only_observer(parent, plastic, records, args.phase_count)
     progress = None
-    for _ in range(max(int(args.max_slices), 1)):
+    slices_run = 0
+    while args.max_slices <= 0 or slices_run < args.max_slices:
+        slices_run += 1
         progress = run_history_slice(
             args.candidate, plastic, parent, records,
             phase_count=args.phase_count, load_substeps=args.load_substeps,
@@ -747,7 +929,7 @@ def main(argv: list[str] | None = None) -> int:
             "current_observation_position": progress["current_observation_position"],
             "current_load_substep": progress["current_load_substep"],
         }, sort_keys=True), flush=True)
-        if progress["status"] in {"history_complete", "complete"}:
+        if progress["status"] in {"history_complete", "complete", "diagnostic_complete"}:
             break
     if progress is None:
         raise RuntimeError("active history did not start")
@@ -760,17 +942,27 @@ def main(argv: list[str] | None = None) -> int:
             state_only_acceleration=state_only_acceleration,
             state_opening_seed=state_opening_seed,
         )
-        progress["status"] = "complete"
+        progress["status"] = result["status"]
         atomic_json(
             OUT / "restarts" / f"{args.candidate}_{progress['identity']['sha256'][:12]}" / "outer_progress.json",
             progress,
         )
-        print(json.dumps({
+        summary = {
             "candidate": args.candidate,
-            "status": "complete",
-            "absolute_rmse": result["fits"]["absolute"]["metrics"]["overall_rmse_log10_rate"],
-            "shape_rmse": result["fits"]["shape"]["metrics"]["shape_rmse_log10"],
-        }, indent=2), flush=True)
+            "status": result["status"],
+            "calibration_eligible": result["calibration_eligible"],
+            "genuine_evolved_support_count": result["genuine_evolved_support_count"],
+        }
+        if result["calibration_eligible"]:
+            summary.update({
+                "absolute_rmse": result["fits"]["absolute"]["metrics"]["overall_rmse_log10_rate"],
+                "shape_rmse": result["fits"]["shape"]["metrics"]["shape_rmse_log10"],
+                "slope_priority_score": result["fits"]["slope_priority"]["slope_priority_evaluation"]["primary_score"],
+                "slope_priority_eligible": result["fits"]["slope_priority"]["slope_priority_evaluation"]["eligible"],
+            })
+        print(json.dumps(summary, indent=2), flush=True)
+        return 0
+    if progress["status"] in {"complete", "diagnostic_complete"}:
         return 0
     return 75
 

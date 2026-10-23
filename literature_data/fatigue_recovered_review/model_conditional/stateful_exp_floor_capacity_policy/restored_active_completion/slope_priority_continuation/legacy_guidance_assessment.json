@@ -1,0 +1,554 @@
+{
+  "schema": "qste340tm-slope-priority-legacy-guidance/1",
+  "role": "legacy stale-state diagnostic only; not a repaired native calibration",
+  "source_candidate": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/trapping_dominated_c224f83bc45d.json",
+  "observation_count": 760,
+  "fits": {
+    "slope_priority": {
+      "coordinates": {
+        "floor_eV": 0.755689276441698,
+        "broad_amplitude_eV": 0.855396690862038,
+        "broad_sigma_Pa": 100000000.00962554,
+        "broad_exponent": 0.228558392086732,
+        "guard_amplitude_eV": 0.06430047401663054
+      },
+      "metrics": {
+        "overall_rmse_log10_rate": 18.68288285494166,
+        "overall_bias_log10_rate": -18.674987582175525,
+        "shape_rmse_log10": 0.02422832595820227,
+        "block_metrics": {
+          "0.1": {
+            "points": 248,
+            "rmse_log10_rate": 19.217357349116707,
+            "bias_log10_rate": -19.217347693459306,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "predicted_broad_loglog_slope": 3.6236743440979695,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              3.0087792768869805,
+              3.688153276706771,
+              4.301908172240383
+            ]
+          },
+          "0.3": {
+            "points": 219,
+            "rmse_log10_rate": 18.860595296249947,
+            "bias_log10_rate": -18.86058672363468,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "predicted_broad_loglog_slope": 3.4840578309768313,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              2.9861741512730076,
+              3.5285841749197857,
+              4.048146022639412
+            ]
+          },
+          "0.5": {
+            "points": 171,
+            "rmse_log10_rate": 18.383492781786988,
+            "bias_log10_rate": -18.38345683798201,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "predicted_broad_loglog_slope": 3.360806558600155,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              2.995791422772527,
+              3.4077223584172316,
+              3.8134172906866297
+            ]
+          },
+          "0.7": {
+            "points": 122,
+            "rmse_log10_rate": 17.64795365470223,
+            "bias_log10_rate": -17.647940350037487,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "predicted_broad_loglog_slope": 3.122198807454975,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              2.877092335679663,
+              3.162769850378936,
+              3.46198968871704
+            ]
+          }
+        }
+      },
+      "slope_priority_evaluation": {
+        "primary_score": 2.6040100889491486,
+        "offset_score": 343.60736696086985,
+        "barrier_pass": true,
+        "shape_pass": false,
+        "eligible": false,
+        "worst_normalized_violation": {
+          "R": 0.7,
+          "normalized_violation": 2.0700666113528636
+        },
+        "blocks": {
+          "0.1": {
+            "points": 248,
+            "bias_log10_rate": -19.217347693459306,
+            "centered_rmse_log10": 0.019264276371215604,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 3.7092045452619993,
+            "predicted_global_slope": 3.6236743440981667,
+            "global_slope_error": -0.08553020116383259,
+            "global_slope_tolerance": 0.3709204545261999,
+            "observed_regional_slopes": [
+              4.493104104532127,
+              3.6417662821688985,
+              3.085475648116982
+            ],
+            "predicted_regional_slopes": [
+              4.1742044719082685,
+              3.609828520635672,
+              2.993889853219266
+            ],
+            "regional_slope_errors": [
+              -0.31889963262385823,
+              -0.03193776153322636,
+              -0.0915857948977159
+            ],
+            "regional_slope_tolerances": [
+              0.6739656156798189,
+              0.5462649423253347,
+              0.4628213472175473
+            ],
+            "shape_pass": true,
+            "worst_normalized_violation": 0.4731689943888146
+          },
+          "0.3": {
+            "points": 219,
+            "bias_log10_rate": -18.86058672363468,
+            "centered_rmse_log10": 0.01798246870835178,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 3.378382452934147,
+            "predicted_global_slope": 3.4840578309765142,
+            "global_slope_error": 0.10567537804236737,
+            "global_slope_tolerance": 0.3378382452934147,
+            "observed_regional_slopes": [
+              3.6383751893117515,
+              3.4486714987082068,
+              2.869354491709107
+            ],
+            "predicted_regional_slopes": [
+              3.948060298500124,
+              3.479998032091578,
+              2.910529127567896
+            ],
+            "regional_slope_errors": [
+              0.30968510918837255,
+              0.03132653338337121,
+              0.041174635858789
+            ],
+            "regional_slope_tolerances": [
+              0.5457562783967627,
+              0.517300724806231,
+              0.43040317375636605
+            ],
+            "shape_pass": true,
+            "worst_normalized_violation": 0.5674421375382377
+          },
+          "0.5": {
+            "points": 171,
+            "bias_log10_rate": -18.38345683798201,
+            "centered_rmse_log10": 0.03635304755854626,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 3.7618960539977975,
+            "predicted_global_slope": 3.3608065586002405,
+            "global_slope_error": -0.401089495397557,
+            "global_slope_tolerance": 0.37618960539977975,
+            "observed_regional_slopes": [
+              3.4286834858222424,
+              4.148449269290969,
+              3.398307630633582
+            ],
+            "predicted_regional_slopes": [
+              3.721066729329611,
+              3.3707859806645506,
+              2.8630182852552664
+            ],
+            "regional_slope_errors": [
+              0.29238324350736855,
+              -0.7776632886264188,
+              -0.5352893453783159
+            ],
+            "regional_slope_tolerances": [
+              0.5143025228733363,
+              0.6222673903936454,
+              0.5097461445950373
+            ],
+            "shape_pass": false,
+            "worst_normalized_violation": 1.2497252798904825
+          },
+          "0.7": {
+            "points": 122,
+            "bias_log10_rate": -17.647940350037487,
+            "centered_rmse_log10": 0.021670256959143944,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 2.920457707003954,
+            "predicted_global_slope": 3.122198807457149,
+            "global_slope_error": 0.20174110045319527,
+            "global_slope_tolerance": 0.2920457707003954,
+            "observed_regional_slopes": [
+              2.602086592782846,
+              3.0749005474359734,
+              3.0492389160725035
+            ],
+            "predicted_regional_slopes": [
+              3.4100604791181515,
+              3.163794832863171,
+              2.6089904896729186
+            ],
+            "regional_slope_errors": [
+              0.8079738863353056,
+              0.08889428542719768,
+              -0.44024842639958495
+            ],
+            "regional_slope_tolerances": [
+              0.3903129889174269,
+              0.461235082115396,
+              0.4573858374108755
+            ],
+            "shape_pass": false,
+            "worst_normalized_violation": 2.0700666113528636
+          }
+        }
+      },
+      "barrier_qualification": {
+        "passed": true,
+        "checks": {
+          "finite": true,
+          "positive_barrier": true,
+          "nonincreasing_barrier": true,
+          "nonnegative_activation_volume": true
+        },
+        "temperature_K": 298.15,
+        "stress_domain_Pa": [
+          0.0,
+          30000000000.0
+        ],
+        "visited_stress_range_Pa": [
+          927788185.0707254,
+          17335630062.346447
+        ],
+        "minimum_G_eV": 0.7658120829942727,
+        "maximum_G_eV": 1.6732571357605939,
+        "maximum_dG_dsigma_eV_per_Pa": 0.0,
+        "minimum_activation_volume_m3": -0.0,
+        "maximum_activation_volume_m3": 8.454243968971241e-28,
+        "entropy_range_kB": [
+          -29.965617260958943,
+          -8.835232575347298
+        ],
+        "enthalpy_range_eV": [
+          0.0039013816674452473,
+          1.3336939422427012
+        ],
+        "stress_cap_occupancy_fraction": 0.0
+      },
+      "solver_nfev": 74
+    },
+    "slope_priority_weak_offset": {
+      "coordinates": {
+        "floor_eV": 0.4204540410237035,
+        "broad_amplitude_eV": 0.8553178476762299,
+        "broad_sigma_Pa": 100000000.00000052,
+        "broad_exponent": 0.22776826903378591,
+        "guard_amplitude_eV": 0.06432524720307725
+      },
+      "metrics": {
+        "overall_rmse_log10_rate": 0.5638970617940308,
+        "overall_bias_log10_rate": -0.1517526982442102,
+        "shape_rmse_log10": 0.024228175040407227,
+        "block_metrics": {
+          "0.1": {
+            "points": 248,
+            "rmse_log10_rate": 0.6943806394626723,
+            "bias_log10_rate": -0.694113403571048,
+            "observed_broad_loglog_slope": 3.7092045452619424,
+            "predicted_broad_loglog_slope": 3.62368200127713,
+            "observed_local_slope_q10_q50_q90": [
+              -1.1893271109844399,
+              4.624546638737456,
+              20.036003937075332
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              3.008678163253967,
+              3.6882053987160646,
+              4.301867664937632
+            ]
+          },
+          "0.3": {
+            "points": 219,
+            "rmse_log10_rate": 0.3378305517869586,
+            "bias_log10_rate": -0.3373516460295143,
+            "observed_broad_loglog_slope": 3.378382452934224,
+            "predicted_broad_loglog_slope": 3.4840530061425294,
+            "observed_local_slope_q10_q50_q90": [
+              -21.49112684298525,
+              3.351924014688848,
+              31.910501350176094
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              2.9860676251702443,
+              3.5286000156245336,
+              4.048183655868593
+            ]
+          },
+          "0.5": {
+            "points": 171,
+            "rmse_log10_rate": 0.14442843411791795,
+            "bias_log10_rate": 0.1397781304487703,
+            "observed_broad_loglog_slope": 3.761896053997772,
+            "predicted_broad_loglog_slope": 3.360792961538232,
+            "observed_local_slope_q10_q50_q90": [
+              -23.201726740416802,
+              4.2230982983671765,
+              30.34575933634551
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              2.995697480893341,
+              3.4077186507092847,
+              3.813468561776517
+            ]
+          },
+          "0.7": {
+            "points": 122,
+            "rmse_log10_rate": 0.8755634654577732,
+            "bias_log10_rate": 0.8752952753585577,
+            "observed_broad_loglog_slope": 2.9204577070032967,
+            "predicted_broad_loglog_slope": 3.122150355522734,
+            "observed_local_slope_q10_q50_q90": [
+              -33.25300307393081,
+              1.5632445319006365,
+              21.073954675986215
+            ],
+            "predicted_local_slope_q10_q50_q90": [
+              2.8769715602570614,
+              3.1627196831984747,
+              3.462021096126591
+            ]
+          }
+        }
+      },
+      "slope_priority_evaluation": {
+        "primary_score": 2.60411578349169,
+        "offset_score": 0.3453198237281435,
+        "barrier_pass": true,
+        "shape_pass": false,
+        "eligible": false,
+        "worst_normalized_violation": {
+          "R": 0.7,
+          "normalized_violation": 2.070112946434176
+        },
+        "blocks": {
+          "0.1": {
+            "points": 248,
+            "bias_log10_rate": -0.694113403571048,
+            "centered_rmse_log10": 0.019262799474765845,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 3.7092045452619993,
+            "predicted_global_slope": 3.6236820012771913,
+            "global_slope_error": -0.08552254398480796,
+            "global_slope_tolerance": 0.3709204545261999,
+            "observed_regional_slopes": [
+              4.493104104532127,
+              3.6417662821688985,
+              3.085475648116982
+            ],
+            "predicted_regional_slopes": [
+              4.174206915709521,
+              3.609865052313988,
+              2.9938092816641713
+            ],
+            "regional_slope_errors": [
+              -0.3188971888226053,
+              -0.03190122985491062,
+              -0.09166636645281079
+            ],
+            "regional_slope_tolerances": [
+              0.6739656156798189,
+              0.5462649423253347,
+              0.4628213472175473
+            ],
+            "shape_pass": true,
+            "worst_normalized_violation": 0.4731653683859503
+          },
+          "0.3": {
+            "points": 219,
+            "bias_log10_rate": -0.3373516460295143,
+            "centered_rmse_log10": 0.017981897615609786,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 3.378382452934147,
+            "predicted_global_slope": 3.4840530061424473,
+            "global_slope_error": 0.10567055320830043,
+            "global_slope_tolerance": 0.3378382452934147,
+            "observed_regional_slopes": [
+              3.6383751893117515,
+              3.4486714987082068,
+              2.869354491709107
+            ],
+            "predicted_regional_slopes": [
+              3.9481051820327058,
+              3.4800020672534053,
+              2.91043952031682
+            ],
+            "regional_slope_errors": [
+              0.30972999272095425,
+              0.031330568545198556,
+              0.0410850286077129
+            ],
+            "regional_slope_tolerances": [
+              0.5457562783967627,
+              0.517300724806231,
+              0.43040317375636605
+            ],
+            "shape_pass": true,
+            "worst_normalized_violation": 0.5675243785208125
+          },
+          "0.5": {
+            "points": 171,
+            "bias_log10_rate": 0.1397781304487703,
+            "centered_rmse_log10": 0.03635446093673119,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 3.7618960539977975,
+            "predicted_global_slope": 3.3607929615382552,
+            "global_slope_error": -0.40110309245954223,
+            "global_slope_tolerance": 0.37618960539977975,
+            "observed_regional_slopes": [
+              3.4286834858222424,
+              4.148449269290969,
+              3.398307630633582
+            ],
+            "predicted_regional_slopes": [
+              3.7211113153255746,
+              3.3707736499689505,
+              2.8629387860094218
+            ],
+            "regional_slope_errors": [
+              0.29242782950333224,
+              -0.7776756193220189,
+              -0.5353688446241605
+            ],
+            "regional_slope_tolerances": [
+              0.5143025228733363,
+              0.6222673903936454,
+              0.5097461445950373
+            ],
+            "shape_pass": false,
+            "worst_normalized_violation": 1.249745095641381
+          },
+          "0.7": {
+            "points": 122,
+            "bias_log10_rate": 0.8752952753585577,
+            "centered_rmse_log10": 0.021669401916345747,
+            "centered_tolerance_log10": 0.05,
+            "observed_global_slope": 2.920457707003954,
+            "predicted_global_slope": 3.122150355523313,
+            "global_slope_error": 0.20169264851935909,
+            "global_slope_tolerance": 0.2920457707003954,
+            "observed_regional_slopes": [
+              2.602086592782846,
+              3.0749005474359734,
+              3.0492389160725035
+            ],
+            "predicted_regional_slopes": [
+              3.41007856430223,
+              3.163745094373536,
+              2.608891955844589
+            ],
+            "regional_slope_errors": [
+              0.8079919715193844,
+              0.08884454693756272,
+              -0.4403469602279144
+            ],
+            "regional_slope_tolerances": [
+              0.3903129889174269,
+              0.461235082115396,
+              0.4573858374108755
+            ],
+            "shape_pass": false,
+            "worst_normalized_violation": 2.070112946434176
+          }
+        }
+      },
+      "barrier_qualification": {
+        "passed": true,
+        "checks": {
+          "finite": true,
+          "positive_barrier": true,
+          "nonincreasing_barrier": true,
+          "nonnegative_activation_volume": true
+        },
+        "temperature_K": 298.15,
+        "stress_domain_Pa": [
+          0.0,
+          30000000000.0
+        ],
+        "visited_stress_range_Pa": [
+          927788185.0707254,
+          17335630062.346447
+        ],
+        "minimum_G_eV": 0.4308110121839761,
+        "maximum_G_eV": 1.337967830343238,
+        "maximum_dG_dsigma_eV_per_Pa": 0.0,
+        "minimum_activation_volume_m3": -0.0,
+        "maximum_activation_volume_m3": 8.439509102335268e-28,
+        "entropy_range_kB": [
+          -29.96879252006867,
+          -8.836541432580333
+        ],
+        "enthalpy_range_eV": [
+          -0.3311455501693651,
+          0.9984046368253454
+        ],
+        "stress_cap_occupancy_fraction": 0.0
+      },
+      "solver_nfev": 60
+    }
+  },
+  "repaired_native_runs": [
+    {
+      "progress_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/trapping_dominated_37c522caf370/outer_progress.json",
+      "identity_sha256": "37c522caf37077f77a32c0625d77ce9157a0663f6cf43ff02e4604ecf8f3d67e",
+      "status": "interrupted_restartable",
+      "completed_observations": 26,
+      "required_observations": 760,
+      "current_r_index": 0,
+      "current_observation_position": 26,
+      "current_load_substep": 1,
+      "phase_count": 8,
+      "load_substeps": 2,
+      "calibration_eligible_when_complete": true,
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate trapping_dominated --phase-count 8 --load-substeps 2 --support-points 0 --frequency-hz 10 --alignment index_rank --slice-seconds 600 --max-slices 1 --state-opening-seed-result literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/trapping_dominated_c224f83bc45d.json --state-opening-seed-mode shape"
+    },
+    {
+      "progress_path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/restarts/trapping_dominated_7dbc627fd1b4/outer_progress.json",
+      "identity_sha256": "7dbc627fd1b4c539a6e7cb8a0847851bfceca508a8000b240212fbb4ac3f9fb6",
+      "status": "interrupted_restartable",
+      "completed_observations": 23,
+      "required_observations": 760,
+      "current_r_index": 0,
+      "current_observation_position": 23,
+      "current_load_substep": 0,
+      "phase_count": 4,
+      "load_substeps": 1,
+      "calibration_eligible_when_complete": true,
+      "resume_command": "python scripts/complete_qste340tm_active_calibration.py --candidate trapping_dominated --phase-count 4 --load-substeps 1 --support-points 0 --frequency-hz 10 --alignment index_rank --slice-seconds 600 --max-slices 1 --state-opening-seed-result literature_data/fatigue_recovered_review/model_conditional/stateful_exp_floor_capacity_policy/restored_active_completion/completed_candidates/trapping_dominated_c224f83bc45d.json --state-opening-seed-mode shape"
+    }
+  ]
+}

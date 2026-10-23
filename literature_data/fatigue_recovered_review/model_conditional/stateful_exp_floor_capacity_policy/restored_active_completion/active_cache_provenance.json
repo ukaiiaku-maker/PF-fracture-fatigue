@@ -297,7 +297,6 @@
       "installation_count": 1,
       "installed": true,
       "model_id": "v10.2.30_intrinsic_signed_mobile_transport_v1",
-      "object_id": 5083977712,
       "object_type": "arrhenius_fracture.unified_mpz.UnifiedMPZState",
       "observed_methods": {
         "advance": "arrhenius_fracture.persistent_site_reversible_transport_v10230._reversible_advance",
@@ -357,7 +356,7 @@
   "history_forcing": {
     "completed_cache": "two endpoint support loads per R; each long interval held at endpoint load",
     "equivalent_to_new_primary": false,
-    "new_primary": "every_observation_linear_midpoint_load"
+    "new_primary": "every_observation_native_state_nearest_whole_cycle"
   },
   "identity_difference": {
     "completed_record_reuse_scope": "historical two-support/eight-phase fixed-local-window comparator",
