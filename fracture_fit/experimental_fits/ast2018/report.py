@@ -98,13 +98,16 @@ def _onset_metrics(data,scenario,summaries):
     indexed={(r["level"],r["condition_id"]):r for r in summaries}
     out={}
     for level in ("reduced","spatial"):
-        errors=[];supported=0
+        errors=[];supported=0;within=0
         for row in data.toughness_scenario(scenario):
             if row["observable"]!="Kq_Jcontinuous_onset":continue
             pred=indexed.get((level,row["condition_id"]),{}).get("onset_K_Jcontinuous_MPa_sqrt_m")
             if pred is None:continue
-            supported+=1;errors.append(pred-float(row["value"]))
+            target=float(row["value"])
+            supported+=1;errors.append(pred-target)
+            within+=abs(pred-target)<=max(.2,.05*target)
         out[level]={"n_supported":supported,"n_observed":23,
+                    "n_within_working_tolerance":within,
                     "mean_absolute_error_MPa_sqrt_m":float(np.mean(np.abs(errors))) if errors else None,
                     "mean_signed_error_MPa_sqrt_m":float(np.mean(errors)) if errors else None}
     return out
@@ -334,10 +337,11 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         "## Working fit and source scenarios", "",
         "- The fitted mask contains 23 Table 1 continuous-J onset summaries, eight J resistance curves, supported Fig. 2 loading branches, and three relative-stiffness histories. Table 1 and Fig. 5 means are used once per source scenario. Digitized curve blocks use fixed quadrature and robust working tolerances; these costs are not a probability likelihood or confidence intervals.",
         "- `TABLE_PRIMARY` retains 7.6 and 5.8 MPa√m at 75 and 100 °C, 1.6 MPa√m/s. `FIGURE5_ALTERNATIVE` substitutes only the separately digitized 8.858 and 7.5652 MPa√m centers. The 75 °C cleavage summary remains distinct and unchanged.",
-        "", "| Scenario | Analytical working cost | 0-D onset MAE | 1-D onset MAE | Supported 0-D / 1-D onsets |", "|---|---:|---:|---:|---:|"]
+        "", "| Scenario | Analytical working cost | 0-D onset MAE | 1-D onset MAE | Supported 0-D / 1-D onsets | Within working tolerance, 0-D / 1-D |", "|---|---:|---:|---:|---:|---:|"]
     for s in SCENARIOS:
         a=onset[s];r=a["reduced"];q=a["spatial"]
-        lines.append(f"| {s} | {best[s]['cost']:.4g} | {r['mean_absolute_error_MPa_sqrt_m']} | {q['mean_absolute_error_MPa_sqrt_m']} | {r['n_supported']} / {q['n_supported']} of 23 |")
+        lines.append(f"| {s} | {best[s]['cost']:.4g} | {r['mean_absolute_error_MPa_sqrt_m']} | {q['mean_absolute_error_MPa_sqrt_m']} | {r['n_supported']} / {q['n_supported']} of 23 | {r['n_within_working_tolerance']} / {q['n_within_working_tolerance']} of 23 |")
+    lines.append("\nThe onset count uses the fitted working tolerance `max(0.2, 0.05 × observed K)` MPa√m. Paired 0-D/1-D agreement measures transfer between the native approximations; experimental agreement is quantified by the separate onset counts and curve residuals.")
     for s in SCENARIOS:
         row=searches[s]
         lines.append(f"\n- {s} space-filling search: {row['n_valid']} valid completed objectives of {row['n_requested']} proposed vectors; {row.get('n_watchdog_rejections',0)} watchdog rejections. Inference is conditional on this numerical search coverage.")
