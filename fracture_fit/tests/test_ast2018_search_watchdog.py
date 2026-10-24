@@ -21,3 +21,24 @@ def test_stalled_candidate_is_recorded_as_numerical_rejection(monkeypatch):
     assert "TimeoutError" in row["error"]
     assert row["completed_condition_progress"][0]["condition_id"] == "test_condition"
     assert campaign._WORKER.progress_callback is None
+
+
+def test_watchdog_escapes_native_exception_recovery(monkeypatch):
+    class CatchingObjective:
+        case_calls=0
+        progress_callback=None
+
+        def evaluate(self,_x,*,detail):
+            self.case_calls+=1
+            while True:
+                try:
+                    time.sleep(.01)
+                except Exception:
+                    # The native solver can legitimately catch ordinary
+                    # numerical exceptions. The watchdog must escape it.
+                    continue
+
+    monkeypatch.setattr(campaign,"_WORKER",CatchingObjective())
+    row=_score_bounded([.5]*7,.02)
+    assert row["watchdog_timeout"]
+    assert row["runtime_s"]<.5

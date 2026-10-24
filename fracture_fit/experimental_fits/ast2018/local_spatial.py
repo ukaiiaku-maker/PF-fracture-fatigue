@@ -42,8 +42,12 @@ def _init(source_dir,data_dir,scenario,assumptions):
     _CTX=objective
 
 
+class _CandidateTimeout(BaseException):
+    """Escape native broad ``except Exception`` recovery paths."""
+
+
 def _timeout(_signum,_frame):
-    raise TimeoutError("per-candidate spatial local objective runtime limit")
+    raise _CandidateTimeout("per-candidate spatial local objective runtime limit")
 
 
 def _runtime_plot(run_dir,scenario,rows):
@@ -79,6 +83,11 @@ def _score(x,timeout_s=3600.0):
                 "details":detail,"runtime_s":perf_counter()-t,
                 "case_calls":_CTX.case_calls-before,"error":None,
                 "watchdog_timeout":False,"completed_condition_progress":progress}
+    except _CandidateTimeout as exc:
+        return {"x":x,"cost":1e300,"details":[],"runtime_s":perf_counter()-t,
+                "case_calls":_CTX.case_calls-before,
+                "error":f"TimeoutError: {exc}","watchdog_timeout":True,
+                "completed_condition_progress":progress}
     except Exception as exc:
         return {"x":x,"cost":1e300,"details":[],"runtime_s":perf_counter()-t,
                 "case_calls":_CTX.case_calls-before,

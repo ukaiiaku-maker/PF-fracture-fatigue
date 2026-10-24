@@ -28,11 +28,17 @@ from .native import historical_start, load_native
 from .objective import PARAMETERS,material_from_normalized, normalized_start, physically_admissible
 
 
+class _CandidateTimeout(BaseException):
+    """Escape native broad ``except Exception`` recovery paths."""
+
+
 def _timeout(_signum, _frame):
-    raise TimeoutError("per-candidate analytical objective runtime limit")
+    raise _CandidateTimeout("per-candidate analytical objective runtime limit")
 
 
 def _score_bounded(x, limit_s):
+    started=perf_counter()
+    before=campaign._WORKER.case_calls
     progress=[]
     campaign._WORKER.progress_callback=lambda cid,status,count: progress.append(
         {"condition_id":cid,"status":status,"case_index":count})
@@ -40,6 +46,10 @@ def _score_bounded(x, limit_s):
     signal.setitimer(signal.ITIMER_REAL,limit_s)
     try:
         row=campaign._score(x)
+    except _CandidateTimeout as exc:
+        row={"x":x,"cost":1e300,"runtime_s":perf_counter()-started,
+             "case_calls":campaign._WORKER.case_calls-before,
+             "details":[],"error":f"TimeoutError: {exc}"}
     finally:
         signal.setitimer(signal.ITIMER_REAL,0)
         signal.signal(signal.SIGALRM,old_handler)
