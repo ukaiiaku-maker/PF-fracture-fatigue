@@ -79,7 +79,7 @@ def _onsets(figdir,data,run_dir,scenario,summary):
                 pred=summary.get((level,r["condition_id"]),{}).get("onset_K_Jcontinuous_MPa_sqrt_m")
                 if pred is not None:xx.append(float(r["temperature_C"]));yy.append(pred)
             ax.scatter(xx,yy,marker=marker,s=25,color=color,label="0-D" if level=="reduced" else "1-D")
-        ax.text(.03,.95,f"initial K̇ = {rate:g} MPa√m/s",transform=ax.transAxes,va="top",fontsize=8)
+        ax.set_title(f"initial K̇ = {rate:g} MPa√m/s",loc="left",fontsize=8)
         ax.set_xlabel("Temperature (°C)")
         ax.set_ylabel("Onset Kq,J at Δa=0.2 µm (MPa√m)")
         ax.legend(fontsize=7)
@@ -107,7 +107,7 @@ def _cleavage(figdir,data,summary):
                 if pred is not None:xx.append(float(r["temperature_C"]));yy.append(pred)
             ax.scatter(xx,yy,s=22,marker="x",color=color,
                        label="0-D ligament endpoint" if level=="reduced" else "1-D ligament endpoint")
-        ax.text(.03,.95,f"initial K̇ = {rate:g} MPa√m/s",transform=ax.transAxes,va="top",fontsize=8)
+        ax.set_title(f"initial K̇ = {rate:g} MPa√m/s",loc="left",fontsize=8)
         ax.set_xlabel("Temperature (°C)")
         ax.set_ylabel("Final cleavage Kq (MPa√m)")
         ax.legend(fontsize=6)
