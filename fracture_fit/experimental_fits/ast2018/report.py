@@ -341,7 +341,7 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
     for s in SCENARIOS:
         a=onset[s];r=a["reduced"];q=a["spatial"]
         lines.append(f"| {s} | {best[s]['cost']:.4g} | {r['mean_absolute_error_MPa_sqrt_m']} | {q['mean_absolute_error_MPa_sqrt_m']} | {r['n_supported']} / {q['n_supported']} of 23 | {r['n_within_working_tolerance']} / {q['n_within_working_tolerance']} of 23 |")
-    lines.append("\nThe onset count uses the fitted working tolerance `max(0.2, 0.05 × observed K)` MPa√m. Paired 0-D/1-D agreement measures transfer between the native approximations; experimental agreement is quantified by the separate onset counts and curve residuals.")
+    lines.append("\nThe onset count uses the fitted working tolerance `max(0.2, 0.05 × observed K)` MPa√m. Paired 0-D/1-D agreement measures transfer between the native approximations; experimental agreement is quantified by the separate onset counts and curve residuals. The two scenario costs use different supplied onset centers and are reported as source sensitivity, not as a likelihood ratio or source-selection probability.")
     for s in SCENARIOS:
         row=searches[s]
         lines.append(f"\n- {s} space-filling search: {row['n_valid']} valid completed objectives of {row['n_requested']} proposed vectors; {row.get('n_watchdog_rejections',0)} watchdog rejections. Inference is conditional on this numerical search coverage.")
