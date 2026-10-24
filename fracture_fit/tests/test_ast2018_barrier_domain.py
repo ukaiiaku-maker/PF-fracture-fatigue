@@ -2,7 +2,9 @@
 import pytest
 import numpy as np
 from types import SimpleNamespace
+import json
 
+from experimental_fits.ast2018 import barriers
 from experimental_fits.ast2018.barriers import _stress_domains
 from experimental_fits.ast2018.spatial import _event_rate_audit
 
@@ -46,4 +48,22 @@ def test_reverse_signed_transport_stress_counts_in_visited_barrier_domain():
     rates=_event_rate_audit(State(),candidate,physics,1.0,300.0)
     assert rates["peierls_effective_stress_max_Pa"]==2.0
     assert rates["taylor_effective_stress_max_Pa"]==1.0
+
+
+def test_terminal_ligament_marker_is_not_a_committed_barrier_event(tmp_path,monkeypatch):
+    event={"cleavage_effective_stress_Pa":3.0,
+           "emission_effective_stress_min_Pa":1.0,
+           "emission_effective_stress_max_Pa":2.0,
+           "peierls_effective_stress_min_Pa":4.0,
+           "peierls_effective_stress_max_Pa":5.0,
+           "taylor_effective_stress_min_Pa":6.0,
+           "taylor_effective_stress_max_Pa":7.0}
+    folder=tmp_path/"confirmation_table_primary/spatial/case"
+    folder.mkdir(parents=True)
+    (folder/"events.json").write_text(json.dumps([event,
+        {"terminal_ligament_failure":True,"K_pre_MPa_sqrt_m":10.0}]))
+    monkeypatch.setattr(barriers.AstData,"load",lambda _:SimpleNamespace(
+        condition=lambda _:{"temperature_K":300.0}))
+    assert barriers._visited_events(tmp_path,"TABLE_PRIMARY")==[
+        ("case",300.0,event)]
 

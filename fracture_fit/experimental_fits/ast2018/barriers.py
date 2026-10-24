@@ -40,6 +40,8 @@ def _visited_events(run_dir:Path,scenario:str):
         condition_id=path.parent.name
         T=float(data.condition(condition_id)["temperature_K"])
         for event in json.loads(path.read_text()):
+            if event.get("terminal_ligament_failure"):
+                continue
             if not all(key in event for keys in EVENT_STRESSES.values() for key in keys):
                 raise RuntimeError(f"missing state-dependent event stresses: {path}")
             rows.append((condition_id,T,event))
