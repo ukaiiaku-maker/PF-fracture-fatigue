@@ -2,7 +2,9 @@
 import numpy as np
 
 from experimental_fits.ast2018.objective import PARAMETERS
-from experimental_fits.ast2018.report import _annotate_local_identifiability,_onset_metrics
+from experimental_fits.ast2018.report import (_annotate_local_identifiability,
+    _onset_metrics,_curve_support_metrics)
+import pytest
 
 
 def test_exact_zero_working_sensitivity_is_marked_in_parameter_table():
@@ -34,3 +36,16 @@ def test_report_counts_onsets_inside_declared_working_tolerance():
     result=_onset_metrics(Data(),"TABLE_PRIMARY",rows)
     assert result["reduced"]["n_supported"]==2
     assert result["reduced"]["n_within_working_tolerance"]==1
+
+
+def test_full_j_support_audit_requires_all_eight_curves_and_629_points():
+    rows=[]
+    for level in ("reduced","spatial"):
+        for i in range(8):
+            rows.append({"level":level,"all_points":79 if i<5 else 78,
+                         "covered_all_points":40,"all_629_support_cost":1.0})
+    result=_curve_support_metrics(rows,"TABLE_PRIMARY")
+    assert result["spatial"]["all_points"]==629
+    assert result["spatial"]["covered_points"]==320
+    with pytest.raises(RuntimeError,match="incomplete full J support"):
+        _curve_support_metrics(rows[:-1],"TABLE_PRIMARY")

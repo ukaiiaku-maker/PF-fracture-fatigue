@@ -133,6 +133,20 @@ def _annotate_local_identifiability(rows:list[dict],scenario:str,jacobian:np.nda
     return flat
 
 
+def _curve_support_metrics(rows:list[dict],scenario:str):
+    result={}
+    for level in ("reduced","spatial"):
+        selected=[row for row in rows if row["level"]==level]
+        points=sum(int(row["all_points"]) for row in selected)
+        covered=sum(int(row["covered_all_points"]) for row in selected)
+        if len(selected)!=8 or points!=629 or covered<0 or covered>points:
+            raise RuntimeError(f"incomplete full J support audit: {scenario} {level}")
+        result[level]={"all_points":points,"covered_points":covered,
+                       "all_point_cost":sum(float(row["all_629_support_cost"])
+                                            for row in selected)}
+    return result
+
+
 def build_report(source:Path,data_dir:Path,run_dir:Path):
     data=AstData.load(data_dir)
     integrity=_load(run_dir/"input_integrity.json")
@@ -319,6 +333,8 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
     with parameter_file.open("w",newline="") as stream:
         writer=csv.DictWriter(stream,fieldnames=list(params[0]));writer.writeheader();writer.writerows(params)
     onset={s:_onset_metrics(data,s,confirmation[s]) for s in SCENARIOS}
+    j_support={s:_curve_support_metrics(_load(run_dir/f"curve_support_{s.lower()}.json"),s)
+               for s in SCENARIOS}
     lines=["# Ast 2018 tungsten joint fit", "",
         "Experimental source: [Ast et al., Materials & Design 152 (2018) 168–180](https://doi.org/10.1016/j.matdes.2018.04.009). The supplied verified extraction, rather than a new digitization, is the numerical input.","",
         "## Source and executed model", "",
@@ -376,6 +392,17 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
             level=row["level"];status=row["status"]
             statuses[level][status]=statuses[level].get(status,0)+1
         lines.append(f"- {s}: 0-D statuses `{statuses['reduced']}`; 1-D statuses `{statuses['spatial']}`. Per-condition event, force, J, stiffness and native state diagnostics are in `confirmation_{s.lower()}/`.")
+        for level in ("reduced","spatial"):
+            support=j_support[s][level]
+            lines.append(f"- {s} {level}: the direct prediction reaches {support['covered_points']} of {support['all_points']} supplied J-curve support points; full-point working cost is {support['all_point_cost']:.4g}. The uncovered points remain residual evidence outside the model trajectory's J range.")
+        outcomes=_load(run_dir/f"no_cleavage_outcomes_{s.lower()}.json")
+        for level in ("reduced","spatial"):
+            selected=[row for row in outcomes if row["level"]==level]
+            if len(selected)!=8:
+                raise RuntimeError(f"incomplete no-cleavage endpoint audit: {s} {level}")
+            survived=sum(row["check_status"]=="survived_through_observed_nominal_K"
+                         for row in selected)
+            lines.append(f"- {s} {level}: {survived} of 8 separately loaded no-cleavage endpoints were survived to their observed nominal K; this is a qualitative endpoint check.")
     lines.extend(["- `curve_support_*.json` compares the search's fixed 25-node curve quadrature, all 213 flagged fit-subset graphical samples, and all 629 J-curve samples without increasing a curve's weight through raster density. The eight full observed and predicted J curves, onset/cleavage panels, nominal-K traces, stiffness panels and residual blocks have PNG and SVG versions in `figures_*/`. `unchanged_transfer_*` figures use the analytical vector before any conditional 1-D refinement and include native activation, backstress and source-multiplicity histories.",
         "- `barriers_*/barrier_surfaces.csv` contains executed G*, H*, S*, V*, floor/cap flags and elementary rates over each mechanism's effective stress range visited at confirmed spatial events. Cleavage also has the effective multi-hit rate. `barrier_visited_event_rates.csv` records native state-dependent cleavage, source activation, mobile encounter and retained release rates at each event; carrier-weighted rates are undefined where the relevant carrier population is zero. The inherited sublinear emission stress exponent makes V* undefined exactly at zero stress; that row is flagged rather than assigned a finite volume. `barrier_sensitivity_envelope.csv` brackets these fields across the retained center and nearby conditional profile vectors under the declared working-cost threshold; it is not a confidence band. The code's G00/H0 fields are reference free energies, not physical activation enthalpies.","",
         "## Unsupported channels and model limits", "",
