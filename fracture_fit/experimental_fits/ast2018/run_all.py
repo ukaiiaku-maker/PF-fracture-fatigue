@@ -22,6 +22,7 @@ from .outcomes import check_endpoints
 from .plots import make_all
 from .refine import refine
 from .report import build_report
+from .selection import archive_superseded_final,retained_vector_path
 from .runtime import account
 
 
@@ -97,8 +98,10 @@ def run_all(source:Path,archive:Path,run_dir:Path,*,workers=8,
         if _needs_local(priority_rows,observed) and not local.exists():
             local_refine(source,run_dir,scenario,analytical,indices=(0,3,6),
                          step=.04,rounds=3,workers=workers)
-        retained=local if local.exists() else analytical
+        retained=retained_vector_path(run_dir,scenario)
         xr=json.loads(retained.read_text())["x"]
+        if retained.name.endswith("_profile_seeded.json"):
+            archive_superseded_final(run_dir,scenario,xr)
         final=run_dir/f"confirmation_{scenario.lower()}/summary.json"
         if not _exists_complete(final,62):
             confirm_all(source,data_dir,run_dir,scenario,xr,assumptions,

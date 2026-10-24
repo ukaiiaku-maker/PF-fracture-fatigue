@@ -13,6 +13,7 @@ from .config import AstAssumptions
 from .native import historical_start,load_native
 from .objective import PARAMETERS,material_from_normalized
 from .provenance import forward_adapter_sha256
+from .selection import retained_vector_path
 from .runtime import account
 
 
@@ -183,8 +184,8 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         if (len(endpoint)!=16 or not endpoint_vector["validation_endpoint_horizon"] or
             any(r["status"].startswith("numerical") for r in endpoint)):
             raise RuntimeError(f"incomplete endpoint-validation trajectories in {s}")
-        retained=run_dir/f"best_1d_refined_{s.lower()}.json"
-        retained_x=_load(retained)["x"] if retained.exists() else best[s]["x"]
+        retained=retained_vector_path(run_dir,s)
+        retained_x=_load(retained)["x"]
         if endpoint_vector["x"]!=retained_x:
             raise RuntimeError(f"endpoint validation vector differs from final retained vector in {s}")
         if final_vector["x"]!=retained_x:
@@ -192,9 +193,12 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         if any(vector.get("forward_adapter_sha256")!=forward_hash for vector in
                (priority_vector,final_vector,endpoint_vector)):
             raise RuntimeError(f"paired forward adapter changed across confirmation stages: {s}")
-        if retained.exists():
+        if retained.name.startswith("best_1d_refined_"):
+            audit_stem=(f"spatial_local_runtime_audit_{s.lower()}_profile_seeded"
+                        if retained.name.endswith("_profile_seeded.json") else
+                        f"spatial_local_runtime_audit_{s.lower()}")
             for extension in ("png","svg"):
-                path=run_dir/f"spatial_local_runtime_audit_{s.lower()}.{extension}"
+                path=run_dir/f"{audit_stem}.{extension}"
                 if not path.exists():
                     raise RuntimeError(f"missing direct 1-D local runtime audit: {path}")
         observed_pairs={(row["level"],row["condition_id"]) for row in confirmation[s]}
@@ -322,8 +326,8 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
                                       scenario,"analytical",
                                       AstAssumptions(**cfg[scenario]["ast_assumptions"]),
                                       data.conditions[0]))
-        local=run_dir/f"best_1d_refined_{scenario.lower()}.json"
-        if local.exists():params.extend(_parameter_rows(
+        local=retained_vector_path(run_dir,scenario)
+        if local.name.startswith("best_1d_refined_"):params.extend(_parameter_rows(
             source,local,scenario,"local_1d_refined",
             AstAssumptions(**cfg[scenario]["ast_assumptions"]),data.conditions[0]))
     for row in params:
