@@ -147,6 +147,7 @@ def make_barrier_outputs(source:Path,run_dir:Path,scenario:str,vector_path:Path)
         writer=csv.DictWriter(stream,fieldnames=list(envelope[0]))
         writer.writeheader();writer.writerows(envelope)
     receipt.update({"visited_event_stress_domains_Pa":domains,
+                    "stress_coordinate":"native mechanism-specific nonnegative barrier argument; Peierls and Taylor include local resolved stress and Taylor forest-spacing factor",
                     "temperature_min_K":T_min,"temperature_max_K":T_max,
                     "n_spatial_events":len(events),
                     "profile_sensitivity_envelope_vectors":vectors,
@@ -174,7 +175,7 @@ def make_barrier_outputs(source:Path,run_dir:Path,scenario:str,vector_path:Path)
                                    color=colors[j],lw=1,label=f"{T:.0f} K")
         for row,(key,ylabel) in enumerate(metrics):
             ax=axes[row,col]
-            ax.set_xlabel("Physical stress (GPa)")
+            ax.set_xlabel("Effective barrier stress (GPa)")
             ax.set_ylabel(ylabel)
             ax.text(.03,.95,name,transform=ax.transAxes,va="top",fontsize=8)
             if row==0:ax.legend(fontsize=7)
@@ -195,7 +196,7 @@ def make_barrier_outputs(source:Path,run_dir:Path,scenario:str,vector_path:Path)
                         physics.cleavage_correlation_time_s),1e-300) for v in d],
                     color=colors[j],lw=1,ls="--",label=f"multi-hit {T:.0f} K")
         ax.set_yscale("log")
-        ax.set_xlabel("Physical stress (GPa)")
+        ax.set_xlabel("Effective barrier stress (GPa)")
         ax.set_ylabel("Rate (s⁻¹)")
         ax.text(.03,.95,name,transform=ax.transAxes,va="top",fontsize=8)
         ax.legend(fontsize=6)
