@@ -46,6 +46,10 @@ class _CandidateTimeout(BaseException):
     """Escape native broad ``except Exception`` recovery paths."""
 
 
+class _CandidateNumericalReject(BaseException):
+    """A required 1-D case failed before a full local objective was available."""
+
+
 def _timeout(_signum,_frame):
     raise _CandidateTimeout("per-candidate spatial local objective runtime limit")
 
@@ -73,8 +77,11 @@ def _score(x,timeout_s=3600.0):
     t=perf_counter()
     before=_CTX.case_calls
     progress=[]
-    _CTX.progress_callback=lambda cid,status,count:progress.append(
-        {"condition_id":cid,"status":status,"case_index":count})
+    def record_progress(cid,status,count):
+        progress.append({"condition_id":cid,"status":status,"case_index":count})
+        if status.startswith("numerical"):
+            raise _CandidateNumericalReject(f"{cid}: {status}")
+    _CTX.progress_callback=record_progress
     old_handler=signal.signal(signal.SIGALRM,_timeout)
     signal.setitimer(signal.ITIMER_REAL,timeout_s)
     try:
@@ -87,6 +94,11 @@ def _score(x,timeout_s=3600.0):
         return {"x":x,"cost":1e300,"details":[],"runtime_s":perf_counter()-t,
                 "case_calls":_CTX.case_calls-before,
                 "error":f"TimeoutError: {exc}","watchdog_timeout":True,
+                "completed_condition_progress":progress}
+    except _CandidateNumericalReject as exc:
+        return {"x":x,"cost":1e300,"details":[],"runtime_s":perf_counter()-t,
+                "case_calls":_CTX.case_calls-before,
+                "error":f"NumericalReject: {exc}","watchdog_timeout":False,
                 "completed_condition_progress":progress}
     except Exception as exc:
         return {"x":x,"cost":1e300,"details":[],"runtime_s":perf_counter()-t,
