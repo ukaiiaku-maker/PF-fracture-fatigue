@@ -119,7 +119,8 @@ def run_all(source:Path,archive:Path,run_dir:Path,*,workers=8,
         if not (run_dir/f"sensitivity_{scenario.lower()}.json").exists():
             analyze_sensitivity(source,run_dir,scenario,analytical,workers=workers)
         if not all((run_dir/f"barriers_{scenario.lower()}/{filename}").exists()
-                   for filename in ("barrier_surfaces.csv","barrier_sensitivity_envelope.csv",
+                   for filename in ("barrier_surfaces.csv","barrier_visited_event_rates.csv",
+                                    "barrier_sensitivity_envelope.csv",
                                     "barrier_receipt.json","barrier_derivatives.svg",
                                     "barrier_rates.svg")):
             make_barrier_outputs(source,run_dir,scenario,retained)
