@@ -32,6 +32,10 @@ class _CandidateTimeout(BaseException):
     """Escape native broad ``except Exception`` recovery paths."""
 
 
+class _CandidateNumericalReject(BaseException):
+    """Stop scoring a vector once a required forward case fails numerically."""
+
+
 def _timeout(_signum, _frame):
     raise _CandidateTimeout("per-candidate analytical objective runtime limit")
 
@@ -40,8 +44,11 @@ def _score_bounded(x, limit_s):
     started=perf_counter()
     before=campaign._WORKER.case_calls
     progress=[]
-    campaign._WORKER.progress_callback=lambda cid,status,count: progress.append(
-        {"condition_id":cid,"status":status,"case_index":count})
+    def record_progress(cid,status,count):
+        progress.append({"condition_id":cid,"status":status,"case_index":count})
+        if status.startswith("numerical"):
+            raise _CandidateNumericalReject(f"{cid}: {status}")
+    campaign._WORKER.progress_callback=record_progress
     old_handler=signal.signal(signal.SIGALRM,_timeout)
     signal.setitimer(signal.ITIMER_REAL,limit_s)
     try:
@@ -50,12 +57,18 @@ def _score_bounded(x, limit_s):
         row={"x":x,"cost":1e300,"runtime_s":perf_counter()-started,
              "case_calls":campaign._WORKER.case_calls-before,
              "details":[],"error":f"TimeoutError: {exc}"}
+    except _CandidateNumericalReject as exc:
+        row={"x":x,"cost":1e300,"runtime_s":perf_counter()-started,
+             "case_calls":campaign._WORKER.case_calls-before,
+             "details":[],"error":f"NumericalReject: {exc}"}
     finally:
         signal.setitimer(signal.ITIMER_REAL,0)
         signal.signal(signal.SIGALRM,old_handler)
         campaign._WORKER.progress_callback=None
     row["watchdog_limit_s"]=limit_s
     row["watchdog_timeout"]=bool(row.get("error") and "TimeoutError" in row["error"])
+    row["early_numerical_rejection"]=bool(row.get("error") and
+                                          "NumericalReject" in row["error"])
     row["completed_condition_progress"]=progress
     return row
 
@@ -65,12 +78,17 @@ def _audit_plot(run_dir,rows,scenario):
     elapsed=np.array([r.get("runtime_s",0) for r in rows],dtype=float)
     cost=np.array([r.get("cost",1e300) for r in rows],dtype=float)
     timed=np.array([bool(r.get("watchdog_timeout")) for r in rows])
+    rejected=np.array([bool(r.get("early_numerical_rejection")) for r in rows])
     valid=np.isfinite(cost)&(cost<1e299)&~timed
     ax.scatter(elapsed[valid],cost[valid],s=12,color="#1f77b4",label="completed objective")
     if np.any(timed):
         ax.scatter(elapsed[timed],np.full(np.count_nonzero(timed),
                    max(1.0,float(np.max(cost[valid])) if np.any(valid) else 1.0)),
                    marker="x",color="#d62728",label="watchdog rejection")
+    if np.any(rejected):
+        ax.scatter(elapsed[rejected],np.full(np.count_nonzero(rejected),
+                   max(1.0,float(np.max(cost[valid])) if np.any(valid) else 1.0)),
+                   marker="+",color="#d95f02",label="numerical rejection")
     ax.set_xlabel("Candidate runtime (s)")
     ax.set_ylabel("Working cost; timeout markers at top")
     ax.legend(fontsize=8)

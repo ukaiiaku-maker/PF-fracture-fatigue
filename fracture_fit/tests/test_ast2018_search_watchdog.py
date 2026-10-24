@@ -42,3 +42,25 @@ def test_watchdog_escapes_native_exception_recovery(monkeypatch):
     row=_score_bounded([.5]*7,.02)
     assert row["watchdog_timeout"]
     assert row["runtime_s"]<.5
+
+
+def test_required_numerical_failure_rejects_candidate_immediately(monkeypatch):
+    class FailedObjective:
+        case_calls=0
+        progress_callback=None
+
+        def evaluate(self,_x,*,detail):
+            self.case_calls+=1
+            self.progress_callback("cold_required","numerical_maximum_steps",
+                                   self.case_calls)
+            raise AssertionError("scoring must stop at the failed condition")
+
+    monkeypatch.setattr(campaign,"_WORKER",FailedObjective())
+    row=_score_bounded([.5]*7,900)
+    assert row["cost"]==1e300
+    assert row["early_numerical_rejection"]
+    assert not row["watchdog_timeout"]
+    assert row["case_calls"]==1
+    assert row["completed_condition_progress"]==[
+        {"condition_id":"cold_required","status":"numerical_maximum_steps",
+         "case_index":1}]
