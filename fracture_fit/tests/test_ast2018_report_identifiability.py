@@ -20,6 +20,18 @@ def test_exact_zero_working_sensitivity_is_marked_in_parameter_table():
     assert all(row["status"]=="optimized; locally unidentifiable" for row in rows[1:])
 
 
+def test_near_zero_working_sensitivity_is_marked_in_parameter_table():
+    rows=[{"scenario":"FIGURE5_ALTERNATIVE","stage":"analytical","code_key":key,
+           "status":"fitted","profile_status":"conditional profile",
+           "local_jacobian_column_norm":""} for key,_,_ in PARAMETERS]
+    jacobian=np.zeros((3,len(PARAMETERS)))
+    jacobian[0,0]=1.0
+    jacobian[1,-1]=1e-10
+    flat=_annotate_local_identifiability(rows,"FIGURE5_ALTERNATIVE",jacobian)
+    assert PARAMETERS[-1][0] in flat
+    assert "near-zero" in rows[-1]["profile_status"]
+
+
 def test_report_counts_onsets_inside_declared_working_tolerance():
     class Data:
         def toughness_scenario(self,_):

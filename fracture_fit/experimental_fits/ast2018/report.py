@@ -117,19 +117,22 @@ def _annotate_local_identifiability(rows:list[dict],scenario:str,jacobian:np.nda
     if jacobian.ndim!=2 or jacobian.shape[1]!=len(PARAMETERS):
         raise RuntimeError(f"invalid fitted Jacobian shape for {scenario}")
     norms=np.linalg.norm(jacobian,axis=0)
+    relative_floor=1e-8*float(np.max(norms))
     flat=[]
     for index,(key,_,_) in enumerate(PARAMETERS):
         if not np.isfinite(norms[index]):
             raise RuntimeError(f"nonfinite local sensitivity for {scenario}: {key}")
-        if norms[index]==0:
+        if norms[index]<=relative_floor:
             flat.append(key)
         for row in rows:
             if (row["scenario"]==scenario and row["stage"]=="analytical" and
                 row["code_key"]==key):
                 row["local_jacobian_column_norm"]=float(norms[index])
-                if norms[index]==0:
+                if norms[index]<=relative_floor:
                     row["status"]="optimized; locally unidentifiable"
-                    row["profile_status"]+="; exact zero local finite-difference sensitivity"
+                    row["profile_status"]+=("; exact zero local finite-difference sensitivity"
+                        if norms[index]==0 else
+                        "; near-zero local finite-difference sensitivity relative to largest fitted column")
     return flat
 
 
@@ -377,7 +380,7 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         sens=_load(run_dir/f"identifiability_{s.lower()}/sensitivity.json")
         values=sens["singular_values"]
         lines.append(f"- {s}: normalized sensitivity singular values: {', '.join(f'{v:.3g}' for v in values)}. Conditional profile costs and bound hits are in `identifiability_{s.lower()}/profiles.json`; these are sensitivity intervals, not statistical confidence intervals.")
-        lines.append(f"- {s}: exact-zero local Jacobian columns at the recorded normalized finite-difference step: {', '.join('`'+key+'`' for key in flat_keys[s]) or 'none'}. Such optimized coordinates are not independently identified by these working observables at this vector.")
+        lines.append(f"- {s}: locally zero or below 1e-8 of the largest fitted Jacobian-column norm at the recorded normalized finite-difference step: {', '.join('`'+key+'`' for key in flat_keys[s]) or 'none'}. Such optimized coordinates are not independently identified by these working observables at this vector.")
         profiles=_load(run_dir/f"identifiability_{s.lower()}/profiles.json")
         grouped={}
         for profile in profiles:
