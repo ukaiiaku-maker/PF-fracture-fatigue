@@ -19,8 +19,11 @@ from .search_bounded import _score_bounded
 
 def _runtime_plot(run_dir,scenario,rows):
     fig,ax=plt.subplots(figsize=(7,4))
-    valid=[r for r in rows if r.get("error") is None]
-    rejected=[r for r in rows if r.get("error") is not None]
+    def completed(row):
+        return (row.get("error") is None and
+                (row.get("case_calls",0)>0 or bool(row.get("details"))))
+    valid=[r for r in rows if completed(r)]
+    rejected=[r for r in rows if not completed(r)]
     if valid:ax.scatter([r["runtime_s"] for r in valid],[r["cost"] for r in valid],
                         s=13,color="#1f77b4",label="completed objective")
     if rejected:ax.scatter([r["runtime_s"] for r in rejected],

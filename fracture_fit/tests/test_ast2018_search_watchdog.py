@@ -64,3 +64,16 @@ def test_required_numerical_failure_rejects_candidate_immediately(monkeypatch):
     assert row["completed_condition_progress"]==[
         {"condition_id":"cold_required","status":"numerical_maximum_steps",
          "case_index":1}]
+
+
+def test_zero_forward_case_constraint_penalty_is_not_a_completed_objective(monkeypatch):
+    class Objective:
+        case_calls=0
+        progress_callback=None
+    monkeypatch.setattr(campaign,"_WORKER",Objective())
+    monkeypatch.setattr(campaign,"_score",lambda x:{"x":x,"cost":838750.0,
+        "runtime_s":0.0,"case_calls":0,"details":[],"error":None})
+    row=_score_bounded([.5]*7,100)
+    assert row["cost"]==1e300
+    assert row["error"]=="InadmissibleCandidate: material constraints"
+    assert row["inadmissible_candidate"]

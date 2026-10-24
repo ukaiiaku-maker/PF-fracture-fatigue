@@ -53,6 +53,10 @@ def _score_bounded(x, limit_s):
     signal.setitimer(signal.ITIMER_REAL,limit_s)
     try:
         row=campaign._score(x)
+        if (row.get("error") is None and row.get("case_calls")==0 and
+            not row.get("details")):
+            row["error"]="InadmissibleCandidate: material constraints"
+            row["cost"]=1e300
     except _CandidateTimeout as exc:
         row={"x":x,"cost":1e300,"runtime_s":perf_counter()-started,
              "case_calls":campaign._WORKER.case_calls-before,
@@ -69,6 +73,8 @@ def _score_bounded(x, limit_s):
     row["watchdog_timeout"]=bool(row.get("error") and "TimeoutError" in row["error"])
     row["early_numerical_rejection"]=bool(row.get("error") and
                                           "NumericalReject" in row["error"])
+    row["inadmissible_candidate"]=bool(row.get("error") and
+                                       "InadmissibleCandidate" in row["error"])
     row["completed_condition_progress"]=progress
     return row
 
@@ -78,8 +84,11 @@ def _audit_plot(run_dir,rows,scenario):
     elapsed=np.array([r.get("runtime_s",0) for r in rows],dtype=float)
     cost=np.array([r.get("cost",1e300) for r in rows],dtype=float)
     timed=np.array([bool(r.get("watchdog_timeout")) for r in rows])
-    rejected=np.array([bool(r.get("early_numerical_rejection")) for r in rows])
-    valid=np.isfinite(cost)&(cost<1e299)&~timed
+    rejected=np.array([bool(r.get("early_numerical_rejection")) or
+                       bool(r.get("inadmissible_candidate")) or
+                       (r.get("error") is None and r.get("case_calls")==0 and
+                        not r.get("details")) for r in rows])
+    valid=np.isfinite(cost)&(cost<1e299)&~timed&~rejected
     ax.scatter(elapsed[valid],cost[valid],s=12,color="#1f77b4",label="completed objective")
     if np.any(timed):
         ax.scatter(elapsed[timed],np.full(np.count_nonzero(timed),
@@ -88,7 +97,7 @@ def _audit_plot(run_dir,rows,scenario):
     if np.any(rejected):
         ax.scatter(elapsed[rejected],np.full(np.count_nonzero(rejected),
                    max(1.0,float(np.max(cost[valid])) if np.any(valid) else 1.0)),
-                   marker="+",color="#d95f02",label="numerical rejection")
+                   marker="+",color="#d95f02",label="early or constraint rejection")
     ax.set_xlabel("Candidate runtime (s)")
     ax.set_ylabel("Working cost; timeout markers at top")
     ax.legend(fontsize=8)
