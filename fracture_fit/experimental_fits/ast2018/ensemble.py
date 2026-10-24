@@ -17,6 +17,7 @@ from .data import AstData
 from .mechanics import continuous_onset_K,observe_like_ast
 from .native import historical_start,load_native
 from .objective import material_from_normalized
+from .provenance import forward_adapter_sha256
 from .reduced import predict_reduced
 from .spatial import predict_spatial
 
@@ -81,7 +82,8 @@ def run(source:Path,data_dir:Path,run_dir:Path,scenario:str,vector:Path,
     basis={"scenario":scenario,"level":level,"vector":x,
            "seeds":seeds,"condition_ids":selected,
            "source_commit":cfg["source_receipt"]["commit"],
-           "adapter_sha256":cfg["adapter_sha256"]}
+           "search_adapter_sha256":cfg["adapter_sha256"],
+           "forward_adapter_sha256":forward_adapter_sha256()}
     basis_path=output/"checkpoint_basis.json"
     if basis_path.exists() and json.loads(basis_path.read_text())!=basis:
         raise RuntimeError("stochastic ensemble checkpoint basis changed")

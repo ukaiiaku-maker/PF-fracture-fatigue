@@ -12,6 +12,7 @@ from .data import AstData
 from .config import AstAssumptions
 from .native import historical_start,load_native
 from .objective import PARAMETERS,material_from_normalized
+from .provenance import forward_adapter_sha256
 from .runtime import account
 
 
@@ -126,6 +127,7 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
     if any(len(confirmation[s])!=62 for s in SCENARIOS):
         raise RuntimeError("final paired confirmation must contain 31 conditions at each level")
     for s in SCENARIOS:
+        forward_hash=forward_adapter_sha256()
         search=searches[s]
         if search["n_requested"]!=cfg[s]["starts"] or not search.get("best"):
             raise RuntimeError(f"incomplete bounded analytical search in {s}")
@@ -135,6 +137,7 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         priority_vector=_load(run_dir/f"confirmation_{s.lower()}_priority11/vector.json")
         if priority_vector["x"]!=best[s]["x"]:
             raise RuntimeError(f"priority confirmation is not at the unchanged analytical vector: {s}")
+        final_vector=_load(run_dir/f"confirmation_{s.lower()}/vector.json")
         endpoint=_load(run_dir/f"confirmation_{s.lower()}_endpoint_validation/summary.json")
         endpoint_vector=_load(run_dir/f"confirmation_{s.lower()}_endpoint_validation/vector.json")
         if (len(endpoint)!=16 or not endpoint_vector["validation_endpoint_horizon"] or
@@ -144,6 +147,11 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         retained_x=_load(retained)["x"] if retained.exists() else best[s]["x"]
         if endpoint_vector["x"]!=retained_x:
             raise RuntimeError(f"endpoint validation vector differs from final retained vector in {s}")
+        if final_vector["x"]!=retained_x:
+            raise RuntimeError(f"final confirmation vector differs from retained vector in {s}")
+        if any(vector.get("forward_adapter_sha256")!=forward_hash for vector in
+               (priority_vector,final_vector,endpoint_vector)):
+            raise RuntimeError(f"paired forward adapter changed across confirmation stages: {s}")
         if retained.exists():
             for extension in ("png","svg"):
                 path=run_dir/f"spatial_local_runtime_audit_{s.lower()}.{extension}"
@@ -192,6 +200,11 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
             if not (run_dir/artifact).exists():raise RuntimeError(f"missing {artifact}")
         reduced_ensemble=_load(run_dir/f"ensemble_{s.lower()}_reduced/summary.json")
         spatial_ensemble=_load(run_dir/f"ensemble_{s.lower()}_spatial/summary.json")
+        for level in ("reduced","spatial"):
+            ensemble_basis=_load(run_dir/f"ensemble_{s.lower()}_{level}/checkpoint_basis.json")
+            if ensemble_basis.get("forward_adapter_sha256")!=forward_hash or \
+               ensemble_basis["vector"]!=retained_x:
+                raise RuntimeError(f"ensemble does not match final forward adapter/vector: {s} {level}")
         if len(reduced_ensemble)!=31 or len(spatial_ensemble)!=11:
             raise RuntimeError(f"incomplete stochastic ensemble for {s}")
         figures=run_dir/f"figures_{s.lower()}"
@@ -279,6 +292,7 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         "Experimental source: [Ast et al., Materials & Design 152 (2018) 168–180](https://doi.org/10.1016/j.matdes.2018.04.009). The supplied verified extraction, rather than a new digitization, is the numerical input.","",
         "## Source and executed model", "",
         f"- Native source: `{cfg['TABLE_PRIMARY']['source_receipt']['commit']}` at `{cfg['TABLE_PRIMARY']['source_receipt']['repository']}`.",
+        f"- Frozen 0-D search adapter SHA-256: `{cfg['TABLE_PRIMARY']['adapter_sha256']}`; paired forward-wrapper SHA-256: `{forward_adapter_sha256()}`. Separate hashes expose spatial localization changes without reinterpreting a previously checkpointed 0-D search.",
         f"- Supplied extraction archive SHA-256: `{cfg['TABLE_PRIMARY']['archive_sha256']}`. Its internal SHA256SUMS verified {integrity['verified_file_count']} files (`input_integrity.json`).",
         "- The same seven active material coordinates are shared across temperatures, rates and fitted observable families. Shape exponents, EXP-floor fractions, stress thermal slopes, source density, attempt frequencies, Taylor correlation and blunting remain fixed under the stated historical starting convention; separate sensitivity runs probe selected assumptions.",
         "- Search candidates have a 900 s per-vector numerical watchdog. Every timeout is checkpointed as an invalid objective evaluation with its completed-condition trace; it cannot be interpreted as a material prediction. `search_runtime_audit_*` plots show completed costs and watchdog rejections.",

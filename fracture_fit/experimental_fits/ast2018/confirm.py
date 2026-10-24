@@ -18,6 +18,7 @@ from .data import AstData
 from .mechanics import basic_J_at_failure,continuous_onset_K,lefm_Kq_at_failure,observe_like_ast
 from .native import historical_start,load_native
 from .objective import WorkingObjective,material_from_normalized,robust_quadrature_residual
+from .provenance import forward_adapter_sha256
 from .reduced import predict_reduced
 from .spatial import predict_spatial
 
@@ -128,7 +129,8 @@ def confirm_all(source:Path,data_dir:Path,run_dir:Path,scenario:str,x:list[float
     output.mkdir(parents=True,exist_ok=True)
     basis={"x":x,"scenario":scenario,
         "assumptions":asdict(assumptions),"levels":list(levels),
-        "validation_endpoint_horizon":validation_endpoint_horizon}
+        "validation_endpoint_horizon":validation_endpoint_horizon,
+        "forward_adapter_sha256":forward_adapter_sha256()}
     basis_path=output/"vector.json"
     if basis_path.exists() and json.loads(basis_path.read_text())!=basis:
         raise RuntimeError("paired confirmation vector or convention changed on resume")

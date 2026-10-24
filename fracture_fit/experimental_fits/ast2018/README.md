@@ -25,6 +25,9 @@ before starting or resuming. Keep the native checkout at the pinned commit recor
 `ANALYTICAL_1D_MODEL_REFERENCE.txt` and the package source fixed while a search is running;
 the campaign configuration records the adapter hash. Search proposals and
 completed scores are append-only JSONL under `runs/`.
+Each confirmation and ensemble stage separately records the forward-wrapper
+hash, so a diagnostics change cannot be mixed silently with an earlier paired
+history on resume.
 
 The complete launcher limits each initial search vector to 900 seconds. A
 timeout is recorded as a numerical rejection with condition progress and a
