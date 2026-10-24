@@ -11,6 +11,7 @@ from time import perf_counter
 import numpy as np
 
 from .config import AstAssumptions
+from .campaign import _append_jsonl,_load_existing
 from .data import AstData
 from .native import historical_start,load_native
 from .objective import WorkingObjective
@@ -77,11 +78,26 @@ def analyze(source:Path,run_dir:Path,scenario:str,vector_path:Path,*,workers=8):
         ("emission_prefactor_double","physics",{"emission_nu0_s":physics.emission_nu0_s*2}),
     ])
     tasks=[source_args+(name,kind,value) for name,kind,value in variants]
-    results=[]
+    basis={"scenario":scenario,"vector":x,"assumptions":cfg["ast_assumptions"],
+           "variants":[{"name":name,"kind":kind,"override":value}
+                       for name,kind,value in variants]}
+    basis_path=run_dir/f"sensitivity_basis_{scenario.lower()}.json"
+    if basis_path.exists() and json.loads(basis_path.read_text())!=basis:
+        raise RuntimeError("fixed-vector sensitivity checkpoint basis changed")
+    basis_path.write_text(json.dumps(basis,indent=2,allow_nan=False)+"\n")
+    checkpoint=run_dir/f"sensitivity_calls_{scenario.lower()}.jsonl"
+    completed=_load_existing(checkpoint)
+    names={name for name,_,_ in variants}
+    if set(completed)-names:
+        raise RuntimeError("unknown fixed-vector sensitivity checkpoint key")
+    results=list(completed.values())
     with ProcessPoolExecutor(max_workers=workers) as pool:
-        futures={pool.submit(_variant_task,spec):spec[5] for spec in tasks}
+        futures={pool.submit(_variant_task,spec):spec[5] for spec in tasks
+                 if spec[5] not in completed}
         for future in as_completed(futures):
-            row=future.result();results.append(row)
+            row=future.result();row["key"]=row["variant"]
+            _append_jsonl(checkpoint,row)
+            results.append(row)
             print(f"sensitivity {len(results)}/{len(tasks)} {row['variant']} "
                   f"cost={row['cost']:.5g}",flush=True)
     baseline=next(row for row in results if row["variant"]=="baseline")
