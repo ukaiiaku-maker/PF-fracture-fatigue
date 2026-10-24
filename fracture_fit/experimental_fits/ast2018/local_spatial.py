@@ -128,7 +128,7 @@ def local_refine(source:Path,run_dir:Path,scenario:str,start_vector:Path,
     cfg=json.loads((run_dir/f"config_{scenario.lower()}.json").read_text())
     data_dir=run_dir/"input/Ast2018_joint_fit_data"
     x=json.loads(start_vector.read_text())["x"]
-    output,state_path,best,_=_output_paths(run_dir,scenario,tag)
+    output,state_path,best_path,_=_output_paths(run_dir,scenario,tag)
     state=(json.loads(state_path.read_text()) if state_path.exists() else
            {"round":0,"x":x,"cost":1e300,"step":step,
             "watchdog_limit_s":timeout_s,
@@ -177,13 +177,13 @@ def local_refine(source:Path,run_dir:Path,scenario:str,start_vector:Path,
             temp=state_path.with_suffix(".tmp")
             temp.write_text(json.dumps(state,indent=2,allow_nan=False)+"\n")
             os.replace(temp,state_path)
-    best.write_text(json.dumps({"x":state["x"],"cost_priority11":state["cost"],
+    best_path.write_text(json.dumps({"x":state["x"],"cost_priority11":state["cost"],
         "scenario":scenario,"stage":"local_1d_refinement",
         "tag":tag,
         "source_analytical_vector":str(start_vector),
         "condition_ids":list(PRIORITY11),"rounds":state["round"]},
         indent=2,allow_nan=False)+"\n")
-    return best
+    return best_path
 
 
 def main():
