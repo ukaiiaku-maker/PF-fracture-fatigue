@@ -13,6 +13,11 @@ def test_runtime_counts_profile_seeded_and_archived_confirmations(tmp_path):
     final.mkdir(parents=True)
     (final/'summary.json').write_text(json.dumps([
         {'runtime_s':3.0,'status':'complete'}]))
+    ensemble=archived/'ensemble_figure5_alternative_spatial'
+    ensemble.mkdir()
+    (ensemble/'runs.json').write_text(json.dumps([
+        {'runtime_s':4.0,'status':'complete'}]))
     stages=account(tmp_path)['stages']
     assert stages['spatial_local_profile_seeded_figure5_alternative']['forward_case_calls']==11
     assert stages['confirmation_figure5_alternative_superseded']['forward_case_calls']==1
+    assert stages['ensemble_figure5_alternative_spatial_superseded']['forward_case_calls']==1

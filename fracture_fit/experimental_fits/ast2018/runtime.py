@@ -35,7 +35,8 @@ def account(run_dir:Path):
                             min(float(r["completed_unix_s"])-float(r.get("runtime_s",0))
                                 for r in rows),
                          "artifact":str(path)}
-        for suffix in ("","_priority11","_endpoint_validation"):
+        for suffix in ("","_priority11","_endpoint_validation",
+                       "_profile_candidate_143"):
             path=run_dir/f"confirmation_{scenario}{suffix}/summary.json"
             if not path.exists():continue
             rows=json.loads(path.read_text())
@@ -106,6 +107,15 @@ def account(run_dir:Path):
                     "sum_process_runtime_s":sum(r["runtime_s"] for r in rows),
                     "numerical_failures":sum(r["status"].startswith("numerical") for r in rows),
                     "artifact":str(path)}
+            old_path=archive/f"ensemble_{scenario}_{level}/runs.json"
+            if old_path.exists():
+                old_rows=json.loads(old_path.read_text())
+                stages[f"ensemble_{scenario}_{level}_superseded"]={
+                    "forward_case_calls":len(old_rows),
+                    "sum_process_runtime_s":sum(r["runtime_s"] for r in old_rows),
+                    "numerical_failures":sum(r["status"].startswith("numerical")
+                                             for r in old_rows),
+                    "artifact":str(old_path)}
     result={"stages":stages,
             "total_completed_search_refine_case_calls":sum(
                 v.get("forward_case_calls",0) for k,v in stages.items()
