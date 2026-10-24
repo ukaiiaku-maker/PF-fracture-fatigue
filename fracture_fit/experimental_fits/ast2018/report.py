@@ -110,6 +110,26 @@ def _onset_metrics(data,scenario,summaries):
     return out
 
 
+def _annotate_local_identifiability(rows:list[dict],scenario:str,jacobian:np.ndarray):
+    if jacobian.ndim!=2 or jacobian.shape[1]!=len(PARAMETERS):
+        raise RuntimeError(f"invalid fitted Jacobian shape for {scenario}")
+    norms=np.linalg.norm(jacobian,axis=0)
+    flat=[]
+    for index,(key,_,_) in enumerate(PARAMETERS):
+        if not np.isfinite(norms[index]):
+            raise RuntimeError(f"nonfinite local sensitivity for {scenario}: {key}")
+        if norms[index]==0:
+            flat.append(key)
+        for row in rows:
+            if (row["scenario"]==scenario and row["stage"]=="analytical" and
+                row["code_key"]==key):
+                row["local_jacobian_column_norm"]=float(norms[index])
+                if norms[index]==0:
+                    row["status"]="optimized; locally unidentifiable"
+                    row["profile_status"]+="; exact zero local finite-difference sensitivity"
+    return flat
+
+
 def build_report(source:Path,data_dir:Path,run_dir:Path):
     data=AstData.load(data_dir)
     integrity=_load(run_dir/"input_integrity.json")
@@ -189,6 +209,7 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
                          f"ensemble_{s.lower()}_spatial/summary.json",
                          f"ensemble_{s.lower()}_spatial/runs.json",
                          f"identifiability_{s.lower()}/sensitivity.json",
+                         f"identifiability_{s.lower()}/scaled_jacobian.npz",
                          f"identifiability_{s.lower()}/profiles.json",
                          f"barriers_{s.lower()}/barrier_surfaces.csv",
                          f"barriers_{s.lower()}/barrier_visited_event_rates.csv",
@@ -285,6 +306,12 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         if local.exists():params.extend(_parameter_rows(
             source,local,scenario,"local_1d_refined",
             AstAssumptions(**cfg[scenario]["ast_assumptions"]),data.conditions[0]))
+    for row in params:
+        row["local_jacobian_column_norm"]=""
+    flat_keys={}
+    for scenario in SCENARIOS:
+        jacobian=np.load(run_dir/f"identifiability_{scenario.lower()}/scaled_jacobian.npz")["jacobian"]
+        flat_keys[scenario]=_annotate_local_identifiability(params,scenario,jacobian)
     parameter_file=run_dir/"fitted_parameter_table.csv"
     with parameter_file.open("w",newline="") as stream:
         writer=csv.DictWriter(stream,fieldnames=list(params[0]));writer.writeheader();writer.writerows(params)
@@ -330,6 +357,7 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         sens=_load(run_dir/f"identifiability_{s.lower()}/sensitivity.json")
         values=sens["singular_values"]
         lines.append(f"- {s}: normalized sensitivity singular values: {', '.join(f'{v:.3g}' for v in values)}. Conditional profile costs and bound hits are in `identifiability_{s.lower()}/profiles.json`; these are sensitivity intervals, not statistical confidence intervals.")
+        lines.append(f"- {s}: exact-zero local Jacobian columns at the recorded normalized finite-difference step: {', '.join('`'+key+'`' for key in flat_keys[s]) or 'none'}. Such optimized coordinates are not independently identified by these working observables at this vector.")
     lines.extend(["- Radius, specimen geometry, MPZ/source zone, attempt-frequency, source-density, physical event length and working-weight variations are recorded in each `sensitivity_*.json`. The fitted barriers are conditional on these assumptions.","",
         "- `holdouts_*.json` gives local conditional leave-one-condition-out training probes at a cold, warm and hot condition, with direct held-out costs. This is a sensitivity check around the selected fit rather than a global cross-validation refit.","",
         "## Direct 1-D transfer and residuals",""])
