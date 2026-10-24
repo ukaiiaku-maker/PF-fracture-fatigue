@@ -10,6 +10,8 @@ From `fracture_fit`, using an environment with NumPy, SciPy, Matplotlib, and
 the native source dependencies installed:
 
 ```sh
+git clone https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ.git /path/to/Arrhenius_FEM_CZM_MPZ
+git -C /path/to/Arrhenius_FEM_CZM_MPZ checkout ce2bf9d4e868468b6979f0fc8398de95ce983367
 python -m experimental_fits.ast2018.run_all \
   --native-source /path/to/Arrhenius_FEM_CZM_MPZ \
   --archive Ast2018_tungsten_joint_fit_data.zip \

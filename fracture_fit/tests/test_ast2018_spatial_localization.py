@@ -4,11 +4,13 @@ import numpy as np
 
 from experimental_fits.ast2018.config import AstAssumptions
 from experimental_fits.ast2018.mechanics import Specimen
+from experimental_fits.ast2018 import spatial as spatial_adapter
 from experimental_fits.ast2018.spatial import predict_spatial
 
 
-def test_spatial_first_passage_bisection_does_not_force_full_translation():
+def test_spatial_first_passage_bisection_does_not_force_full_translation(monkeypatch):
     moves=[]
+    monkeypatch.setattr(spatial_adapter,"_event_rate_audit",lambda *args:{})
 
     class State:
         def __init__(self, _candidate, _physics):

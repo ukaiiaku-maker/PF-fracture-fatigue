@@ -2,12 +2,54 @@
 from __future__ import annotations
 
 import copy
-from math import sqrt
+from math import pi, sqrt
 
 import numpy as np
 
 from .mechanics import HistoryPoint, Specimen
 from .reduced import Prediction
+
+
+def _event_rate_audit(state, candidate, physics, K_MPa_sqrt_m, T_K):
+    """State-dependent native rate diagnostics at a committed event threshold."""
+    rates = state.local_rates(K_MPa_sqrt_m, T_K)
+    mobile = np.maximum(state.mobile_m2, 0)
+    retained = np.maximum(state.retained_m2, 0)
+    forest = state.forest_density_m2()
+    spacing = 1 / (2 * np.sqrt(forest))
+    jump = physics.jump_fraction_of_forest_spacing * spacing
+    phi = spacing / max(physics.b_m, 1e-30)
+    if np.isfinite(physics.taylor_phi_max):
+        phi = np.minimum(phi, physics.taylor_phi_max)
+    p_stress = candidate.peierls.stress_fraction * rates["tau_eff_Pa"]
+    t_stress = candidate.taylor.stress_fraction * rates["tau_eff_Pa"] * phi
+    emission_stress = np.asarray(rates["emission_effective_stress_Pa"], dtype=float)
+    mobile_total = float(np.sum(mobile))
+    retained_total = float(np.sum(retained))
+    shield = state.K_shield_MPa_sqrt_m()
+    cleavage_sigma = (max(K_MPa_sqrt_m - shield, 0) * 1e6 /
+                      sqrt(2 * pi * max(state.tip_radius_m(), physics.b_m, 1e-30)))
+    multiplicity = float(state.source_geometry()["multiplicity_per_system"])
+    return {"rho_mobile_sum_m2":mobile_total,
+            "rho_retained_sum_m2":retained_total,
+            "shielding_pre_MPa_sqrt_m":float(shield),
+            "cleavage_effective_stress_Pa":float(cleavage_sigma),
+            "emission_effective_stress_min_Pa":float(np.min(emission_stress)),
+            "emission_effective_stress_max_Pa":float(np.max(emission_stress)),
+            "peierls_effective_stress_min_Pa":float(np.min(np.maximum(p_stress,0))),
+            "peierls_effective_stress_max_Pa":float(np.max(np.maximum(p_stress,0))),
+            "taylor_effective_stress_min_Pa":float(np.min(np.maximum(t_stress,0))),
+            "taylor_effective_stress_max_Pa":float(np.max(np.maximum(t_stress,0))),
+            "cleavage_effective_rate_s":float(state.cleavage_rate_s(K_MPa_sqrt_m,T_K)),
+            "emission_effective_activations_s":float(multiplicity*np.sum(
+                np.maximum(rates["emission_rate_per_site_s"],0))),
+            "peierls_effective_encounter_s":float(np.sum(mobile*rates["encounter_s"][:,None,:])/
+                mobile_total) if mobile_total>0 else None,
+            "taylor_effective_release_s":float(np.sum(retained*rates["taylor_completion_s"][:,None,:])/
+                retained_total) if retained_total>0 else None,
+            "peierls_mobile_weighted_signed_rate_s":float(np.sum(
+                mobile*rates["peierls_velocity_m_s"][:,None,:])/
+                max(np.sum(mobile*jump[:,None,:]),1e-30)) if mobile_total>0 else None}
 
 
 def _plastic_displacement_rate(state, specimen: Specimen, force_N: float,
@@ -153,6 +195,7 @@ def predict_spatial(spatial,candidate,physics,specimen:Specimen,T_K:float,
                                             max(K-state.K_shield_MPa_sqrt_m(),0)))
                 pre=state.source_geometry()
                 back=float(np.mean(state.backstress_state()[2]))
+                rate_audit=_event_rate_audit(state,candidate,physics,K,T_K)
                 remaining=assumptions.event_advance_m-(committed_path+da_step)
                 if remaining>1e-15:state.translate_tip(remaining)
                 extension+=assumptions.event_advance_m
@@ -171,6 +214,7 @@ def predict_spatial(spatial,candidate,physics,specimen:Specimen,T_K:float,
                                "cumulative_external_plastic_work_J_per_m":
                                    float(state.external_plastic_work_J_per_m),
                                "cumulative_activations":float(np.sum(state.cumulative_source_activations))})
+                events[-1].update(rate_audit)
                 action=0.0;committed_path=0.0
                 threshold=1.0 if deterministic_threshold else float(rng.exponential())
             else:

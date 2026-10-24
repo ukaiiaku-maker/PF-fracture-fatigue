@@ -66,6 +66,14 @@ def test_spatial_confirmation_integrates_small_source_work(tmp_path):
                            assumptions,deterministic_threshold=True)
     assert result.status=="complete",result.numerical_failure
     assert result.events[0]["cumulative_external_plastic_work_J_per_m"]>0
+    event=result.events[0]
+    for key in ("cleavage_effective_stress_Pa", "cleavage_effective_rate_s",
+                "emission_effective_activations_s", "peierls_effective_stress_max_Pa",
+                "taylor_effective_stress_max_Pa"):
+        assert event[key]>=0
+    assert event["emission_effective_stress_max_Pa"]>=event["emission_effective_stress_min_Pa"]
+    assert event["rho_mobile_sum_m2"]>=0
+    assert event["rho_retained_sum_m2"]>=0
     assert result.history[-1].plastic_u_m>0
 
 
