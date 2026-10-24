@@ -47,4 +47,5 @@ def surface_diagnostics(surface,stress_Pa:float,T_K:float,nu0_s:float)->dict:
             "elementary_rate_s":nu0_s*exp(exponent),"A_eV":A,"c_Pa":c,
             "floor_eV":F,"floor_branch":floor_branch,
             "A_lower_clip":A_raw<=1e-12,"c_lower_clip":c_raw<=1.0,
-            "outer_zero_clip":outer_clip,"exponent_clip":exponent==-700.0}
+            "outer_zero_clip":outer_clip,"exponent_clip":exponent==-700.0,
+            "V_zero_stress_singularity":stress_Pa==0 and n<1}

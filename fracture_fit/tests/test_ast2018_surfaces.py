@@ -38,3 +38,9 @@ def test_floor_branch_and_zero_stress_limit():
     assert d["V_eV_per_Pa"]==0
     assert d["G_eV"]==pytest.approx(s.G00_eV+s.gT_eV_per_K*(400-s.Tref_K))
     assert d["S_eV_per_K"]==pytest.approx(-s.gT_eV_per_K)
+
+
+def test_sublinear_stress_exponent_marks_undefined_zero_stress_volume():
+    d=surface_diagnostics(Surface(exp_n=.8),0,400,1e12)
+    assert d["V_zero_stress_singularity"]
+    assert d["V_m3"]!=d["V_m3"]
