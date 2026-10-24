@@ -14,8 +14,11 @@ def _jsonl(path):
 def account(run_dir:Path):
     stages={}
     for scenario in ("table_primary","figure5_alternative"):
-        for stage in ("search","refine","spatial_local"):
-            path=run_dir/f"{stage}_{scenario}.jsonl"
+        stage_paths=[(stage,run_dir/f"{stage}_{scenario}.jsonl")
+                     for stage in ("search","refine","spatial_local")]
+        stage_paths.append(("spatial_local_profile_seeded",
+                            run_dir/f"spatial_local_{scenario}_profile_seeded.jsonl"))
+        for stage,path in stage_paths:
             rows=_jsonl(path)
             if not rows:continue
             key=f"{stage}_{scenario}"
@@ -41,6 +44,16 @@ def account(run_dir:Path):
                          "sum_process_runtime_s":sum(float(r["runtime_s"]) for r in rows),
                          "numerical_failures":sum(r["status"].startswith("numerical") for r in rows),
                          "artifact":str(path)}
+        archive=run_dir/f"superseded_{scenario}_before_profile_seeded"
+        for suffix in ("","_endpoint_validation"):
+            path=archive/f"confirmation_{scenario}{suffix}/summary.json"
+            if not path.exists():continue
+            rows=json.loads(path.read_text())
+            stages[f"confirmation_{scenario}{suffix}_superseded"]={
+                "forward_case_calls":len(rows),
+                "sum_process_runtime_s":sum(float(r["runtime_s"]) for r in rows),
+                "numerical_failures":sum(r["status"].startswith("numerical") for r in rows),
+                "artifact":str(path)}
         path=run_dir/f"identifiability_{scenario}/sensitivity.json"
         if path.exists():
             row=json.loads(path.read_text())
