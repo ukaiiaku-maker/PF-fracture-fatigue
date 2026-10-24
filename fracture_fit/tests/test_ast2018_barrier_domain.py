@@ -1,7 +1,10 @@
 """Barrier plots must use effective stresses from the confirmed 1-D state."""
 import pytest
+import numpy as np
+from types import SimpleNamespace
 
 from experimental_fits.ast2018.barriers import _stress_domains
+from experimental_fits.ast2018.spatial import _event_rate_audit
 
 
 def test_effective_mechanism_stress_domains_are_distinct():
@@ -18,4 +21,29 @@ def test_effective_mechanism_stress_domains_are_distinct():
     event["taylor_effective_stress_max_Pa"]=-1.0
     with pytest.raises(RuntimeError,match="Taylor"):
         _stress_domains([("condition",300.0,event)])
+
+
+def test_reverse_signed_transport_stress_counts_in_visited_barrier_domain():
+    class State:
+        mobile_m2=np.ones((1,2,1))
+        retained_m2=np.ones((1,2,1))
+        def local_rates(self,*args):
+            return {"tau_eff_Pa":np.array([[-2.0]]),
+                    "emission_effective_stress_Pa":np.array([1.0]),
+                    "emission_rate_per_site_s":np.array([1.0]),
+                    "encounter_s":np.array([[1.0]]),
+                    "taylor_completion_s":np.array([[1.0]]),
+                    "peierls_velocity_m_s":np.array([[-1.0]])}
+        def forest_density_m2(self):return np.ones((1,1))
+        def K_shield_MPa_sqrt_m(self):return 0.0
+        def tip_radius_m(self):return 1.0
+        def source_geometry(self):return {"multiplicity_per_system":1.0}
+        def cleavage_rate_s(self,*args):return 1.0
+    candidate=SimpleNamespace(peierls=SimpleNamespace(stress_fraction=1.0),
+                              taylor=SimpleNamespace(stress_fraction=1.0))
+    physics=SimpleNamespace(jump_fraction_of_forest_spacing=1.0,
+                            b_m=1.0,taylor_phi_max=float("inf"))
+    rates=_event_rate_audit(State(),candidate,physics,1.0,300.0)
+    assert rates["peierls_effective_stress_max_Pa"]==2.0
+    assert rates["taylor_effective_stress_max_Pa"]==1.0
 
