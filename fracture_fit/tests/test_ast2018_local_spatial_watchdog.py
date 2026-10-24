@@ -1,6 +1,18 @@
 """Direct spatial refinement must reject an incomplete required condition."""
 
 from experimental_fits.ast2018 import local_spatial
+from pathlib import Path
+import pytest
+
+
+def test_profile_seeded_local_refinement_has_isolated_checkpoint_paths():
+    root=Path('runs/example')
+    default=local_spatial._output_paths(root,'FIGURE5_ALTERNATIVE')
+    seeded=local_spatial._output_paths(root,'FIGURE5_ALTERNATIVE','profile_seeded')
+    assert not set(default).intersection(seeded)
+    assert seeded[2].name=='best_1d_refined_figure5_alternative_profile_seeded.json'
+    with pytest.raises(ValueError):
+        local_spatial._output_paths(root,'FIGURE5_ALTERNATIVE','../unsafe')
 
 
 def test_spatial_local_score_stops_after_required_numerical_failure(monkeypatch):

@@ -54,7 +54,17 @@ def _timeout(_signum,_frame):
     raise _CandidateTimeout("per-candidate spatial local objective runtime limit")
 
 
-def _runtime_plot(run_dir,scenario,rows):
+def _output_paths(run_dir:Path,scenario:str,tag:str=""):
+    if tag and (not tag.replace("_","").isalnum()):
+        raise ValueError("spatial local tag must be alphanumeric or underscores")
+    suffix=f"_{scenario.lower()}"+(f"_{tag}" if tag else "")
+    return (run_dir/f"spatial_local{suffix}.jsonl",
+            run_dir/f"spatial_local_state{suffix}.json",
+            run_dir/f"best_1d_refined{suffix}.json",
+            run_dir/f"spatial_local_runtime_audit{suffix}")
+
+
+def _runtime_plot(run_dir,scenario,rows,tag=""):
     fig,ax=plt.subplots(figsize=(7,4))
     valid=[r for r in rows if r.get("error") is None]
     rejected=[r for r in rows if r.get("error") is not None]
@@ -67,7 +77,7 @@ def _runtime_plot(run_dir,scenario,rows):
     ax.set_ylabel("Working cost; rejections at top")
     ax.legend(fontsize=8)
     fig.tight_layout()
-    root=run_dir/f"spatial_local_runtime_audit_{scenario.lower()}"
+    root=_output_paths(run_dir,scenario,tag)[3]
     fig.savefig(root.with_suffix(".png"),dpi=180)
     fig.savefig(root.with_suffix(".svg"))
     plt.close(fig)
@@ -114,12 +124,11 @@ def _score(x,timeout_s=3600.0):
 
 def local_refine(source:Path,run_dir:Path,scenario:str,start_vector:Path,
                  *,indices=(0,3,6),step=.04,rounds=3,workers=8,
-                 timeout_s=3600.0):
+                 timeout_s=3600.0,tag=""):
     cfg=json.loads((run_dir/f"config_{scenario.lower()}.json").read_text())
     data_dir=run_dir/"input/Ast2018_joint_fit_data"
     x=json.loads(start_vector.read_text())["x"]
-    output=run_dir/f"spatial_local_{scenario.lower()}.jsonl"
-    state_path=run_dir/f"spatial_local_state_{scenario.lower()}.json"
+    output,state_path,best,_=_output_paths(run_dir,scenario,tag)
     state=(json.loads(state_path.read_text()) if state_path.exists() else
            {"round":0,"x":x,"cost":1e300,"step":step,
             "watchdog_limit_s":timeout_s,
@@ -137,7 +146,7 @@ def local_refine(source:Path,run_dir:Path,scenario:str,start_vector:Path,
             row.update({"key":center_key,"stage":"unchanged_material_1d_confirmation",
                         "completed_unix_s":time()})
             _append_jsonl(output,row);evaluated[center_key]=row
-            _runtime_plot(run_dir,scenario,list(evaluated.values()))
+            _runtime_plot(run_dir,scenario,list(evaluated.values()),tag)
         state["cost"]=evaluated[center_key]["cost"]
         for current_round in range(state["round"],rounds):
             proposals={}
@@ -153,7 +162,7 @@ def local_refine(source:Path,run_dir:Path,scenario:str,start_vector:Path,
                 row.update({"key":key,"stage":"local_direct_1d",
                             "round":current_round,"completed_unix_s":time()})
                 _append_jsonl(output,row);evaluated[key]=row
-                _runtime_plot(run_dir,scenario,list(evaluated.values()))
+                _runtime_plot(run_dir,scenario,list(evaluated.values()),tag)
                 print(f"1-D local round {current_round+1} "
                       f"{len([k for k in proposals if k in evaluated])}/{len(proposals)} "
                       f"cost={row['cost']:.5g} error={row['error']}",flush=True)
@@ -168,9 +177,9 @@ def local_refine(source:Path,run_dir:Path,scenario:str,start_vector:Path,
             temp=state_path.with_suffix(".tmp")
             temp.write_text(json.dumps(state,indent=2,allow_nan=False)+"\n")
             os.replace(temp,state_path)
-    best=run_dir/f"best_1d_refined_{scenario.lower()}.json"
     best.write_text(json.dumps({"x":state["x"],"cost_priority11":state["cost"],
         "scenario":scenario,"stage":"local_1d_refinement",
+        "tag":tag,
         "source_analytical_vector":str(start_vector),
         "condition_ids":list(PRIORITY11),"rounds":state["round"]},
         indent=2,allow_nan=False)+"\n")
@@ -188,10 +197,11 @@ def main():
     parser.add_argument("--rounds",type=int,default=3)
     parser.add_argument("--timeout-s",type=float,default=3600.0)
     parser.add_argument("--workers",type=int,default=8)
+    parser.add_argument("--tag",default="")
     args=parser.parse_args()
     local_refine(args.native_source,args.run_dir,args.scenario,args.vector,
                  indices=tuple(args.indices),rounds=args.rounds,workers=args.workers,
-                 timeout_s=args.timeout_s)
+                 timeout_s=args.timeout_s,tag=args.tag)
 
 
 if __name__=="__main__":main()
