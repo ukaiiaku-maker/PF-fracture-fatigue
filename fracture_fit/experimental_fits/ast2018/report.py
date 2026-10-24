@@ -380,11 +380,11 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         "## Working fit and source scenarios", "",
         "- The fitted mask contains 23 Table 1 continuous-J onset summaries, eight J resistance curves, supported Fig. 2 loading branches, and three relative-stiffness histories. Table 1 and Fig. 5 means are used once per source scenario. Digitized curve blocks use fixed quadrature and robust working tolerances; these costs are not a probability likelihood or confidence intervals.",
         "- `TABLE_PRIMARY` retains 7.6 and 5.8 MPa√m at 75 and 100 °C, 1.6 MPa√m/s. `FIGURE5_ALTERNATIVE` substitutes only the separately digitized 8.858 and 7.5652 MPa√m centers. The 75 °C cleavage summary remains distinct and unchanged.",
-        "", "| Scenario | Analytical working cost | 0-D onset MAE | 1-D onset MAE | Supported 0-D / 1-D onsets | Within working tolerance, 0-D / 1-D |", "|---|---:|---:|---:|---:|---:|"]
+        "", "| Scenario | Analytical search working cost | Retained 0-D onset MAE | Retained 1-D onset MAE | Supported 0-D / 1-D onsets | Within working tolerance, 0-D / 1-D |", "|---|---:|---:|---:|---:|---:|"]
     for s in SCENARIOS:
         a=onset[s];r=a["reduced"];q=a["spatial"]
         lines.append(f"| {s} | {best[s]['cost']:.4g} | {r['mean_absolute_error_MPa_sqrt_m']} | {q['mean_absolute_error_MPa_sqrt_m']} | {r['n_supported']} / {q['n_supported']} of 23 | {r['n_within_working_tolerance']} / {q['n_within_working_tolerance']} of 23 |")
-    lines.append("\nThe onset count uses the fitted working tolerance `max(0.2, 0.05 × observed K)` MPa√m. Paired 0-D/1-D agreement measures transfer between the native approximations; experimental agreement is quantified by the separate onset counts and curve residuals. The two scenario costs use different supplied onset centers and are reported as source sensitivity, not as a likelihood ratio or source-selection probability.")
+    lines.append("\nThe analytical search cost is at the bounded-search vector; onset predictions in this table are at each scenario's retained vector after any local 1-D refinement. The onset count uses the fitted working tolerance `max(0.2, 0.05 × observed K)` MPa√m. Paired 0-D/1-D agreement measures transfer between the native approximations; experimental agreement is quantified by the separate onset counts and curve residuals. The two scenario costs use different supplied onset centers and are reported as source sensitivity, not as a likelihood ratio or source-selection probability.")
     for s in SCENARIOS:
         row=searches[s]
         lines.append(f"\n- {s} space-filling search: {row['n_valid']} valid completed objectives of {row['n_requested']} proposed vectors; {row.get('n_watchdog_rejections',0)} watchdog rejections. Inference is conditional on this numerical search coverage.")
@@ -416,8 +416,8 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         minimum=min(float(point["cost"]) for point in profiles)
         if minimum+1e-8<float(best[s]["cost"]):
             lines.append(f"- {s}: a conditional profile found working cost {minimum:.4g}, below the bounded-search candidate's {float(best[s]['cost']):.4g}. The bounded search is therefore a local result, not a demonstrated global minimum. The profile point was checked separately with the paired 1-D model before any later local refinement.")
-    lines.extend(["- Radius, specimen geometry, MPZ/source zone, attempt-frequency, source-density, physical event length and working-weight variations are recorded in each `sensitivity_*.json`. The fitted barriers are conditional on these assumptions.","",
-        "- `holdouts_*.json` gives local conditional leave-one-condition-out training probes at a cold, warm and hot condition, with direct held-out costs. This is a sensitivity check around the selected fit rather than a global cross-validation refit.","",
+    lines.extend(["- Radius, specimen geometry, MPZ/source zone, attempt-frequency, source-density, physical event length and working-weight variations around each analytical search candidate are recorded in `sensitivity_*.json`. The fitted barriers are conditional on these assumptions.","",
+        "- `holdouts_*.json` gives local conditional leave-one-condition-out training probes at a cold, warm and hot condition, with direct held-out costs. This is a sensitivity check around the analytical search candidate rather than a global cross-validation refit or a held-out test of the later local 1-D vector.","",
         "## Direct 1-D transfer and residuals",""])
     for s in SCENARIOS:
         convergence=_load(run_dir/f"convergence_{s.lower()}.json")
