@@ -3,7 +3,7 @@ import numpy as np
 
 from experimental_fits.ast2018.objective import PARAMETERS
 from experimental_fits.ast2018.report import (_annotate_local_identifiability,
-    _onset_metrics,_curve_support_metrics)
+    _onset_metrics,_curve_support_metrics,_paired_working_cost)
 import pytest
 
 
@@ -61,3 +61,13 @@ def test_full_j_support_audit_requires_all_eight_curves_and_629_points():
     assert result["spatial"]["covered_points"]==320
     with pytest.raises(RuntimeError,match="incomplete full J support"):
         _curve_support_metrics(rows[:-1],"TABLE_PRIMARY")
+
+
+def test_paired_cost_comparison_requires_every_spatial_case():
+    rows=[{"level":"spatial","condition_id":"a","numerical_failure":False,
+           "residual_blocks":[{"cost":1.5},{"cost":2.5}]},
+          {"level":"spatial","condition_id":"b","numerical_failure":False,
+           "residual_blocks":[{"cost":3.0}]}]
+    assert _paired_working_cost(rows,"spatial",{"a","b"})==7.0
+    with pytest.raises(RuntimeError,match="incomplete paired"):
+        _paired_working_cost(rows,"spatial",{"a","c"})

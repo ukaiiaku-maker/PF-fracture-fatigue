@@ -151,6 +151,17 @@ def _curve_support_metrics(rows:list[dict],scenario:str):
     return result
 
 
+def _paired_working_cost(rows:list[dict],level:str,condition_ids:set[str])->float:
+    selected=[row for row in rows if row["level"]==level and
+              row["condition_id"] in condition_ids]
+    if len(selected)!=len(condition_ids) or any(row["numerical_failure"] for row in selected):
+        raise RuntimeError("incomplete paired working-cost comparison")
+    costs=[block["cost"] for row in selected for block in row["residual_blocks"]]
+    if not costs or any(cost is None for cost in costs):
+        raise RuntimeError("unsupported paired working-cost block")
+    return float(sum(costs))
+
+
 def build_report(source:Path,data_dir:Path,run_dir:Path):
     data=AstData.load(data_dir)
     integrity=_load(run_dir/"input_integrity.json")
@@ -186,6 +197,15 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
             raise RuntimeError(f"incomplete endpoint-validation trajectories in {s}")
         retained=retained_vector_path(run_dir,s)
         retained_x=_load(retained)["x"]
+        if retained.name.endswith("_profile_seeded.json"):
+            archive=run_dir/f"superseded_{s.lower()}_before_profile_seeded"
+            manifest=_load(archive/"manifest.json")
+            if manifest["new_x"]!=retained_x or len(_load(
+                archive/f"confirmation_{s.lower()}/summary.json"))!=62:
+                raise RuntimeError(f"incomplete superseded final-vector archive in {s}")
+            candidate=_load(run_dir/f"confirmation_{s.lower()}_profile_candidate_143/summary.json")
+            if len(candidate)!=22 or any(row["numerical_failure"] for row in candidate):
+                raise RuntimeError(f"incomplete profile-seeded candidate transfer in {s}")
         if endpoint_vector["x"]!=retained_x:
             raise RuntimeError(f"endpoint validation vector differs from final retained vector in {s}")
         if final_vector["x"]!=retained_x:
@@ -393,6 +413,9 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
             costs=[float(point["cost"]) for point in points]
             offsets=[float(point["fixed_normalized"]) for point in points]
             lines.append(f"- {s} `{key}` conditional profile: normalized fixed points {', '.join(f'{v:.3f}' for v in offsets)}; reoptimized costs {', '.join(f'{v:.4g}' for v in costs)}. Cost span {max(costs)-min(costs):.4g} across the tested points.")
+        minimum=min(float(point["cost"]) for point in profiles)
+        if minimum+1e-8<float(best[s]["cost"]):
+            lines.append(f"- {s}: a conditional profile found working cost {minimum:.4g}, below the bounded-search candidate's {float(best[s]['cost']):.4g}. The bounded search is therefore a local result, not a demonstrated global minimum. The profile point was checked separately with the paired 1-D model before any later local refinement.")
     lines.extend(["- Radius, specimen geometry, MPZ/source zone, attempt-frequency, source-density, physical event length and working-weight variations are recorded in each `sensitivity_*.json`. The fitted barriers are conditional on these assumptions.","",
         "- `holdouts_*.json` gives local conditional leave-one-condition-out training probes at a cold, warm and hot condition, with direct held-out costs. This is a sensitivity check around the selected fit rather than a global cross-validation refit.","",
         "## Direct 1-D transfer and residuals",""])
@@ -418,6 +441,16 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
             survived=sum(row["check_status"]=="survived_through_observed_nominal_K"
                          for row in selected)
             lines.append(f"- {s} {level}: {survived} of 8 separately loaded no-cleavage endpoints were survived to their observed nominal K; this is a qualitative endpoint check.")
+        retained=retained_vector_path(run_dir,s)
+        if retained.name.endswith("_profile_seeded.json"):
+            archive=run_dir/f"superseded_{s.lower()}_before_profile_seeded"
+            candidate=_load(run_dir/f"confirmation_{s.lower()}_profile_candidate_143/summary.json")
+            old=_load(archive/f"confirmation_{s.lower()}/summary.json")
+            ids={row["condition_id"] for row in candidate}
+            old_cost=_paired_working_cost(old,"spatial",ids)
+            candidate_cost=_paired_working_cost(candidate,"spatial",ids)
+            final_cost=_paired_working_cost(rows,"spatial",ids)
+            lines.append(f"- {s}: the profile-discovered vector had direct 1-D priority-11 working cost {candidate_cost:.4g}; the earlier locally refined vector had {old_cost:.4g}; the retained profile-seeded local 1-D vector has {final_cost:.4g}. These are separate paired stages; the earlier complete trajectories are preserved under `{archive.name}/`.")
     lines.extend(["- `curve_support_*.json` compares the search's fixed 25-node curve quadrature, all 213 flagged fit-subset graphical samples, and all 629 J-curve samples without increasing a curve's weight through raster density. The eight full observed and predicted J curves, onset/cleavage panels, nominal-K traces, stiffness panels and residual blocks have PNG and SVG versions in `figures_*/`. `unchanged_transfer_*` figures use the analytical vector before any conditional 1-D refinement and include native activation, backstress and source-multiplicity histories.",
         "- `barriers_*/barrier_surfaces.csv` contains executed G*, H*, S*, V*, floor/cap flags and elementary rates over each mechanism's effective stress range visited at confirmed spatial events. Cleavage also has the effective multi-hit rate. `barrier_visited_event_rates.csv` records native state-dependent cleavage, source activation, mobile encounter and retained release rates at each event; carrier-weighted rates are undefined where the relevant carrier population is zero. The inherited sublinear emission stress exponent makes V* undefined exactly at zero stress; that row is flagged rather than assigned a finite volume. `barrier_sensitivity_envelope.csv` brackets these fields across the retained center and nearby conditional profile vectors under the declared working-cost threshold; it is not a confidence band. The code's G00/H0 fields are reference free energies, not physical activation enthalpies.","",
         "## Unsupported channels and model limits", "",
