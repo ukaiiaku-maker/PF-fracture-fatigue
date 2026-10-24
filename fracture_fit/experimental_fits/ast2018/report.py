@@ -378,6 +378,14 @@ def build_report(source:Path,data_dir:Path,run_dir:Path):
         values=sens["singular_values"]
         lines.append(f"- {s}: normalized sensitivity singular values: {', '.join(f'{v:.3g}' for v in values)}. Conditional profile costs and bound hits are in `identifiability_{s.lower()}/profiles.json`; these are sensitivity intervals, not statistical confidence intervals.")
         lines.append(f"- {s}: exact-zero local Jacobian columns at the recorded normalized finite-difference step: {', '.join('`'+key+'`' for key in flat_keys[s]) or 'none'}. Such optimized coordinates are not independently identified by these working observables at this vector.")
+        profiles=_load(run_dir/f"identifiability_{s.lower()}/profiles.json")
+        grouped={}
+        for profile in profiles:
+            grouped.setdefault(profile["parameter_key"],[]).append(profile)
+        for key,points in sorted(grouped.items()):
+            costs=[float(point["cost"]) for point in points]
+            offsets=[float(point["fixed_normalized"]) for point in points]
+            lines.append(f"- {s} `{key}` conditional profile: normalized fixed points {', '.join(f'{v:.3f}' for v in offsets)}; reoptimized costs {', '.join(f'{v:.4g}' for v in costs)}. Cost span {max(costs)-min(costs):.4g} across the tested points.")
     lines.extend(["- Radius, specimen geometry, MPZ/source zone, attempt-frequency, source-density, physical event length and working-weight variations are recorded in each `sensitivity_*.json`. The fitted barriers are conditional on these assumptions.","",
         "- `holdouts_*.json` gives local conditional leave-one-condition-out training probes at a cold, warm and hot condition, with direct held-out costs. This is a sensitivity check around the selected fit rather than a global cross-validation refit.","",
         "## Direct 1-D transfer and residuals",""])
