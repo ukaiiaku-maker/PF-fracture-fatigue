@@ -1,0 +1,659 @@
+CODEX IMPLEMENTATION HANDOFF
+Joint fit of Ast 2018 tungsten data with the analytical reduction and 1-D confirmation
+Prepared 24 October 2026
+
+PURPOSE AND EXECUTION SCOPE
+
+Implement and complete a joint experimental fit of the extracted Ast et al.
+(2018) tungsten microcantilever data. Use the existing fast stateful analytical
+reduction for parameter search, fitting, profiling and most sensitivity work.
+Use the paired spatial 1-D model to confirm the fitted parameters and, where
+necessary, refine them locally. Do not execute a 2-D solver, a 2-D smoke test,
+a new 2-D calibration, or a historical large campaign launcher.
+
+The existing fast code calls itself a zero-dimensional (0-D) mean-field
+screening model. It evolves internal state and crack growth; it is not a
+closed-form formula for toughness. This is the useful meaning of 'analytical
+model' for this fitting campaign. Keep its approximation visible and use 1-D
+confirmation to determine whether the inferred barriers transfer.
+
+This handoff requests implementation and execution by Codex. The attached
+package itself contains instructions, verified source references and extracted
+experimental data. No model fitting or new simulation was performed to prepare
+it. The configuration template describes the interface to implement; it is not
+an existing repository command-line interface.
+
+Continue autonomously through the adapter, fit, uncertainty/sensitivity work,
+1-D confirmation and final figures/report. Do not stop after a repository
+inventory, plan, preflight or first successful fit. Preserve the user's work
+and existing results in an isolated branch/worktree or new output directory.
+Repair ordinary implementation and numerical problems within this scope.
+The prohibition on 2-D applies even where old repository instructions prescribe
+2-D promotion gates. Do not introduce approval checkpoints between these steps.
+
+1. SOURCE OF TRUTH AND THE MODEL PAIR
+
+Primary repository:
+  https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ
+Verified branch:
+  codex/oneD-v3-stateful-voiding-reduction
+Pinned source commit:
+  ce2bf9d4e868468b6979f0fc8398de95ce983367
+
+Use these paired native implementations at that commit:
+
+  FAST MODEL
+  arrhenius_fracture/zero_d_persistent_v913.py
+    run_zero_d_rcurve(candidate, physics, loading_map, temperature_K,
+                      settings=ZeroDRunSettings(...))
+
+  SPATIAL 1-D CONFIRMATION
+  arrhenius_fracture/emergent_gnd_rcurve_v913.py
+    run_autonomous_rcurve(candidate, physics, loading_map, temperature_K, ...)
+    RCurveLoadingMap
+
+  SHARED PHYSICS AND STATE
+  arrhenius_fracture/emergent_gnd_types_v912.py
+    ExpFloorSurface, PTMechanism and foundational parameter types
+  arrhenius_fracture/emergent_gnd_types_v913.py
+    CandidateParameters and CommonPhysics for persistent sites
+  arrhenius_fracture/emergent_gnd_state_v913.py
+    EmergentGNDState, width, source multiplicity and implicit emission
+  Follow its state/energy inheritance chain when using spatial work or fluxes.
+
+Read the matching background files:
+  README_MPZ_V9_13_PERSISTENT_SITES.md
+  README_V9_13_AUTONOMOUS_RCURVE_CALIBRATION.md
+  README_V9_13_ZERO_D_LARGE_PERSISTENT_SEARCH.md
+
+Use ANALYTICAL_1D_MODEL_REFERENCE.txt for the equations, parameter meanings,
+actual approximation differences and source map. MODEL_SOURCES.json supplies
+immutable links and hashes of the inspected files. A permalink is:
+  https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/zero_d_persistent_v913.py
+
+This pin selects a verified internally paired reduced model for the new fit.
+It does not assert that it is identical to every later PF/FEM implementation.
+If an existing local workspace contains a newer, explicitly accepted matching
+analytical/1-D pair, retain that workspace and record the selected source and
+equation differences before using it. Do not silently substitute a different
+law or move the user's branch to an old commit. The default for a fresh fitting
+workspace is the pinned direct pair above.
+
+Current PF background, for reading only:
+  https://github.com/ukaiiaku-maker/PF-fracture-fatigue
+  branch codex/shared-fracture-fatigue-options-v1
+  commit 23beacdf8acad8c3ed7c7c3a1f2f2f9bdbdd0f3b
+The default FEM main branch is older than the relevant working branches.
+Use pinned sources, not 'latest main'. Both repositories use the Python
+namespace arrhenius_fracture, so keep the fitting environment attached to one
+selected checkout and verify imported file locations once.
+
+Do not substitute these similarly named modules:
+  * PF analytical_screen_v1028.py: frozen-state, no-feedback K-ramp indicators,
+    with synthetic DBTT/weak-T scores. It does not predict a complete R-curve.
+  * reduced_fracture_v2/predictive.py::run_zero_d_predictive: a different
+    provider-calibrated surrogate, including large hazard/translation factors.
+  * reduced_fracture_v2/kinetics.py::SharedBarrierHazardCore: an audit helper,
+    not the actual native state-advancement law.
+The selected direct 0-D/1-D pair does not require those provider scale factors.
+Historical class labels, target DBTT temperatures and screening cutoffs are not
+experimental data and must not enter the Ast fitting objective.
+
+Concrete construction examples are included in the model-reference appendix:
+  candidates/v9_13_persistent_sites_top5_registry.csv
+  mpz_v9_13_persistent_sites_common_physics.json
+  mpz_v9_13_v10222_transfer_common_physics.json
+  runs/v9_13_v10222_rcurve_alpha0p95_all50_v1/v9_13_R_curve_calibrated_common_physics.json
+  runs/v9_13_v10222_rcurve_alpha0p95_all50_v1/v9_13_R_curve_calibrated_loading_map.json
+Use candidate_from_registry_row in emergent_gnd_campaign_v913.py and the small
+load_physics helper in scripts/run_mpz_v9_13_persistent_top5.py as schema and
+constructor references. Importing the guarded loader does not launch a campaign.
+The registry prefixes cleave_* and emit_* map to candidate.cleavage/emission;
+the loader converts GPa fields to Pa. Historical rows are starting points only.
+
+The calibrated/transfer fixture sets shielding_orientation_factors=(0,0) and
+mobile_transport_velocity_scale=0, and contains archived extension-dependent
+emission geometry. These settings concern the old trajectory. Do not silently
+carry them into Ast or describe that fixture as active spatial shielding.
+Its zero transport scale also makes the native velocity-based Orowan plastic
+power zero, although Peierls encounters can still occur. Those reduced energy
+diagnostics are explicitly not a full J-integral; copying them cannot provide
+the required Ast plastic-work history.
+Construct and serialize the Ast configuration, including active/disabled
+mechanisms, geometry projections and normalization. Distinguish an engine's
+capability from what the selected configuration actually executes. Do not turn
+off a troublesome mechanism just to make 0-D and 1-D agree. Fixed numerical
+resolution and active mechanism choices must be documented before optimization.
+
+2. EXPERIMENTAL INPUTS
+
+Use the supplied Ast2018_joint_fit_data directory. Do not redigitize the paper
+or silently replace source values. Begin with its README.txt, FIT_GUIDE.txt,
+SOURCE.json and metadata/fitting_contract.json.
+
+Main files:
+  data/table1_conditions.csv                 31 temperature/rate conditions
+  data/table1_toughness_long.csv             42 nonmissing toughness values
+  data/J_R_curves.csv                         8 curves, 629 graphical samples
+  data/K_displacement_curves.csv             18 traces, 1,796 samples
+  data/relative_stiffness.csv                 3 traces, 356 samples
+  data/figure5_observations.csv              58 presentation records
+  data/source_discrepancies.csv               2 conflicting onset entries
+  data/no_cleavage_endpoints.csv              8 nominal-K endpoints/outcomes
+  data/A2_time_history.csv                    2 channels, 473 samples
+  data/example_curve_authorfit_onsets.csv     8 dependent author-fit readouts
+  data/BDT_assignments.csv                    4 derived transition assignments
+  metadata/known_specimen_links.csv           explicit same-specimen links
+  metadata/experiment.json                    geometry, protocol and definitions
+
+The table reports 73 tests summed across conditions. This is not the number of
+independent tabulated statistics and is not a known subgroup count for each
+observable. The rate groups are 0.05, 0.2, 0.5 and 1.6 MPa sqrt(m)/s. The actual
+temperature range is 183.15-773.15 K, including data below the old 300 K campaign
+range. Use the complete experimental grid, not an old 300-1200 K model grid.
+
+J curves: rate 0.2 at 21, 100, 250 C; rate 0.5 at 21, 100, 250 C;
+rate 1.6 at 100, 500 C.
+The initial-fit sample_for_fit subset has 213 samples; retain all 629 for final
+plots and a quadrature/refinement check. Do not call digitized rows raw tests.
+
+Run two explicit data scenarios:
+  TABLE_PRIMARY: retain the Table 1 onset values at 75 C/1.6 and 100 C/1.6.
+  FIGURE5_ALTERNATIVE: replace only those two values with the independently
+    digitized Fig. 5b centers. Read their exact stored values from the CSV.
+    Select observable=Kq_Jcontinuous_onset as well as condition_id; preserve
+    any cleavage measurement at the same temperature/rate.
+Table 1 gives 7.6 and 5.8 MPa sqrt(m); the graphical alternatives are approximately
+8.858 and 7.565 MPa sqrt(m). Do not average the versions. Do not attach the
+incompatible plotted min/max ranges to the Table 1 means. The source version is
+the accepted manuscript; the publisher-final discrepancy has not been resolved.
+
+Table 1 and Fig. 5 means overlap. Fig. 3a/b and Fig. 2a at 21, 100, 250 C
+and rate 0.2 are
+the same specimens. The other individual specimen identities are unavailable.
+Example curves are not necessarily equal to condition means. The author-fit
+onsets, J-to-K transforms and BDT assignments are dependent summaries. Treat
+them as checks rather than independent extra residuals alongside their parents.
+
+3. PHYSICS THAT MUST REMAIN COMMON
+
+Use one material parameter vector across all temperatures, rates and observable
+types. Use the same vector for initial 1-D confirmation. Geometry and legitimate
+measurement origins may be specimen inputs/nuisance parameters; no separate
+barrier, arbitrary toughness offset or hidden rate multiplier for every curve.
+
+The selected pair uses four EXP-floor barrier surfaces: cleavage, emission,
+Peierls motion and Taylor release. At nonnegative physical stress sigma:
+
+  A(T) = G00 + gT*(T-Tref)
+  c(T) = sigc0 + sT*(T-Tref)
+  G*(sigma,T) = F(T) + [A(T)-F(T)] exp[-exp_a*(sigma/c(T))^exp_n]
+  lambda = nu0 exp[-G*/(kB*T)]
+
+Use the source's exact piecewise floor F(T), positivity guards and eV/J
+conversion, specified in the model reference. Tref defaults to 481.33 K.
+G00_eV is a reference free-energy barrier, not zero-temperature enthalpy.
+PTMechanism.H0_eV also fills that reference-free-energy slot despite its name.
+Do not add -sigma*V or an extra entropy exponential to this existing G*.
+
+The native pair shares these elementary surfaces but has explicit reduction
+differences. The 0-D Peierls/Taylor updates use forward elementary rates. The
+inherited 1-D implementation uses a signed forward-minus-reverse combination,
+lambda(max(tau,0))-lambda(max(-tau,0)), and clips Taylor release nonnegative.
+Spatial transport, signed shielding and state translation also differ from the
+mean-field reduction. Preserve and quantify these differences at matched
+parameters; do not assume that shared surfaces guarantee identical kinetics.
+
+The persistent source state, density-dependent front width, accumulated-slip
+blunting, implicit backstress-limited emission, Peierls encounters, Taylor
+release, multi-hit cleavage clock and translation convention remain active.
+The selected persistent v9.13 contract has no source depletion, no source
+refresh on advance and no explicit recovery. Do not optimize inactive inherited
+fields or introduce extra mechanisms solely to improve an experimental fit.
+
+Keep physical normalization explicit: source area/multiplicity, activation to
+line-content conversion, b, slip orientation, density units, front width,
+process-zone size and event advance. These affect effective rates; they are
+not interchangeable optimizer knobs. Historical parameter sets are initial
+guesses, not established tungsten calibrations.
+
+4. IMPLEMENT A COMMON AST MECHANICS AND OBSERVATION ADAPTER
+
+This is necessary new fitting work. The current direct runners return event K,
+displacement, extension and state. They do not by themselves return Ast's
+elastic-plastic J, reaction-force/work history, measured stiffness or a distinct
+classification of final unstable cleavage. Do not relabel their event K as
+every experimental toughness quantity.
+
+Use proposed interfaces of this form (new interfaces, not existing APIs):
+  predict_case(level, material, specimen, protocol, event_sequence)
+  observe_like_ast(predicted_history, specimen, observable_definition)
+
+Return a lightweight time/event history with F, imposed u, a, elastic compliance,
+plastic displacement/work needed by the observer, native drive variables and
+selected internal state. Make the observation evaluator identical for 0-D and 1-D.
+Keep distinct variables for nominal initial-notch K, current-crack elastic K,
+local/effective kinetic drive K, and J-equivalent Kq.
+
+4.1 Geometry and displacement control
+
+Use Ast geometry inputs, not the archived calibration geometry. Nominal B=4 um,
+W=6 um, specimen length 15 um; L lies 11-14 um, initial notch a0 lies 2-2.5 um.
+The notch radius is not supplied. E(T) and nu(T) are in Table 1. Read the exact
+metadata, use SI internally, and report all assumed/measured geometry fields.
+Do not treat a guessed radius as a measured quantity or let an unrestricted
+per-curve radius absorb barrier differences.
+For the isotropic elastic convention used in the paper, also set the native
+shear modulus G(T)=E(T)/[2*(1+nu(T))] consistently in each condition's physics.
+Do not update the J conversion but inadvertently retain a different fixed shear
+modulus in backstress. The historical b_m=2.74e-10 is an explicit model input;
+retain its provenance and keep b out of the barrier optimizer.
+
+For the published force normalization define, in SI units:
+  f(x)=1.24+28.08*x-59.44*x^2+90.40*x^3
+  kappa(a)=L*f(a/W)/(B*W^(3/2))
+  K_el,current=F*kappa(a)
+  K_nominal=F*kappa(a0)
+The latter matches the Fig. 2 initial-crack normalization. Convert Pa sqrt(m)
+to MPa sqrt(m) explicitly. Delta a=a-a0, never total a.
+
+A practical fast mechanics implementation is a scalar cantilever reduction:
+  u(t) = C_e(a,T)*F(t) + u_pl(z,a,T)
+where z is the native state. Cache smooth geometry/compliance coefficients and
+solve scalar force equilibrium at each accepted state update. Include any
+fixed instrument compliance consistently, with its status as an assumption.
+For a linear-elastic specimen segment, the consistency relation is
+  dC_e/da = 2*B*kappa(a)^2/Eprime, Eprime=E/(1-nu^2).
+This supplies an inexpensive compliance-increment check using the paper's
+geometry factor. The initial notched compliance needs its own justified
+beam/section calculation or constrained initial-slope estimate; do not infer
+it by extrapolating the geometry polynomial beyond its valid notch range.
+
+The plastic load-point displacement must come from the existing plastic-slip/
+transport state through a documented beam/virtual-work or equivalent reduced
+mechanical calculation. For example, a unit-force virtual-work projection
+uses u_pl=integral(sigma_hat_unit_force:epsilon_pl dV), with consistent signs,
+active volume and slip normalization. If an Orowan conversion is needed,
+derive it from the same native mobile density, Burgers vector and transport
+flux; identify this as a new observable closure and check its units/work.
+Do not equate total emission count to global plastic displacement without that
+mapping, fit an arbitrary u_pl function, or set u_pl=0 after yielding simply
+to avoid the required mechanics.
+
+The existing RCurveLoadingMap stores K/U coefficients. It is sufficient only
+where the stated linear mechanical relation applies. With evolving u_pl,
+introduce the minimal mechanical callback/outer solver needed to drive the
+native state with the current force-derived loading. Retain the native
+barrier/state updates rather than changing their physical law.
+
+Ast imposed displacement rate. Quoted Kdot labels apply to the initial elastic
+segment only. Where the exact speed is absent, infer the corresponding initial
+speed consistently from the quoted slope and the compliance associated with
+the imposed/measured displacement:
+  v_u = Kdot_0*C_total,initial/kappa(a0)
+Use specimen compliance if displacement is corrected to specimen displacement;
+include instrument compliance if it is included in that displacement and in
+force equilibrium. Use Kdot in SI. This is a protocol inference, not a second
+independent fit parameter. Respect the reported range 5-150 nm/s and include
+the geometry/protocol inference in sensitivity work. If the initial-slope data
+are insufficient, retain a bounded protocol nuisance tied to those inputs.
+Do not independently choose both Kdot and speed inconsistently.
+
+Use A2 as a representative protocol check: Kdot decreases during plasticity.
+It describes a room-temperature 150 nm/s example, not a complete time record for
+every condition. Do not replicate its waveform across all specimens.
+
+4.2 Evaluate the paper's observables
+
+LEFM Kq: use the paper's 95% loading-line force construction, or maximum load
+up to a physically predicted failure endpoint for a purely linear response,
+with the initial notch geometry. A prescribed load ceiling, numerical timeout
+or unfinished run does not define a predicted fracture toughness.
+
+Basic-J at final cleavage:
+  J_basic = K_el^2/Eprime + eta*A_pl/[B*(W-a)], eta=2.
+Keep this observer distinct from the continuous method. Verify and explicitly
+encode which crack length is used in its elastic K and ligament terms. The
+accepted manuscript explicitly specifies initial a0 for LEFM and evolving a_i
+for the continuous method, but its abbreviated basic-J equation uses a without
+fully resolving that convention. Do not silently inherit the current-crack
+observer. Record any unresolved convention as an assumption and assess its
+sensitivity; use the paper's referenced method if accessible.
+
+Continuous-J:
+  J_pl,i = [J_pl,i-1 + eta*(A_pl,i-A_pl,i-1)/(B*(W-a_i-1))]
+            *[1-(a_i-a_i-1)/(W-a_i-1)]
+  J_i = K_el,current,i^2/Eprime + J_pl,i.
+
+Match the force/crack-length and plastic-area conventions in Ast equations 1-6
+(accepted PDF pages 7-8). Reconstruct A_pl from the predicted force-displacement
+history and its elastic/unloading part according to that observation method.
+A_pl is not automatically the model's entire internal dissipation, external
+work divided by crack advance, or arbitrary accumulated plastic-state scalar.
+Check elastic and known-work limiting examples. Document observation sampling
+and ensure it does not create a step-size-dependent J estimate.
+
+Continuous-J onset is the predicted resistance-curve value at Delta a=0.2 um,
+using a declared smooth-trend/crossing convention comparable to the authors'
+fit, followed by Kq,J=sqrt(Eprime*Jq). It is not first emission, first yield,
+first atomic opening or necessarily first discrete crack event.
+Verify that the trajectory reaches the required extension before interpolation.
+The native 1-D checkpoint_K helper clamps an out-of-range request to its final
+K, whereas the 0-D helper returns NaN. Do not let that clamp create a fictitious
+0.2 um onset for a truncated or physically terminated trajectory.
+When K is MPa sqrt(m), E is GPa and J is N/m:
+  J=1000*K^2*(1-nu^2)/E_GPa.
+Do not compare J(meanK) to meanJ as if they were identical.
+
+Final unstable cleavage must be a separate outcome of the modeled mechanical/
+kinetic history. It may be identified through the native rapid propagation/
+loss-of-stability/ligament-failure definition when available. Do not call every
+small crack advance final cleavage or fit a new arbitrary temperature-dependent
+threshold to reproduce Fig. 5a. Specify any instrument-time/endpoint criterion
+before optimization. If this output is not supported, complete the supported
+joint fit and report the cleavage channel as an unmodeled validation target;
+do not claim a complete fit to it. Neither upgrading to 1-D nor to another wrapper
+automatically supplies a missing global mechanics observation.
+
+Stiffness: evaluate the same normalized small oscillation/tangent or unloading
+compliance approximation used by the paper, with the convention recorded.
+Freeze or evolve kinetic state during the virtual probe according to the actual
+probe timescale assumption; its frequency is not recovered from this extraction.
+
+4.3 Event advance, localization and statistical interpretation
+
+Build Ast RCurveLoadingMap/geometry inputs independently of the measured crack
+trajectory. Leave reference_event_K/U empty for an experimental prediction.
+The input path can specify allowed straight crack increments and geometry; it
+must not prescribe the measured event times/loads or a(loading) response.
+
+Separate physical advance per completed event from numerical mesh/output
+spacing. If va=da_event*lambda, changing da_event changes speed unless the
+coarse-graining/site/hit normalization changes consistently. Do not take a 5 um
+legacy event, interpolate through its jump and call the 200 nm crossing measured
+stable-growth onset. Establish a physically stated micro-scale event/reward
+mapping and profile remaining reward/source assumptions. Do not conceal a
+changed reward by fitting a hidden prefactor. Refine numerical integration at
+fixed physical event convention.
+
+The fast source runner currently records the first load step crossing a hazard
+target. Bound that bias and add within-step localization/replay or adequate
+adaptive integration if needed. A smaller dt must not change physical tau_c,
+source count, event reward or the cooperative-hit law.
+
+Preserve the native multi-hit rate P(m,lambda_raw*tau_c)/tau_c for m>1, with
+tau_c physical. Threshold actions are a declared event/ensemble convention,
+not free nuisance parameters for every observation. For a first-event process
+S=exp(-H), H=1 is the 63.2% quantile, not generally a mean event time. Use fixed
+common random numbers when sampling thresholds so optimizer comparisons are
+reproducible. A deterministic representative trajectory may initialize the
+fit, but label it as such; check the final reported conditional/ensemble
+statistic rather than silently equating a threshold crossing with a mean.
+
+5. FIT PARAMETERS AND IDENTIFIABILITY
+
+Start with a small shared vector: cleavage and emission reference barriers,
+their thermal slopes, and one effective stress scale for each mechanism.
+Profile/release P/T barrier parameters only when state-history/curve sensitivities
+provide additional information. Use physically meaningful transforms for
+positive parameters and evaluate every proposed surface over the entire
+experimental temperature/stress domain before accepting an optimizer step.
+
+Remove the exact EXP-floor scale redundancy. Away from numerical clips,
+  sigc0->c*sigc0, sT->c*sT, exp_a->c^exp_n*exp_a
+leaves the barrier unchanged. Fix exp_a under the selected source convention
+or fit sigma_eff(T)=sigc(T)/exp_a^(1/exp_n) with a canonical back-transform.
+Do not independently free all three. Fix initial shape exponents/floor fractions;
+profile them later if required. Negative activation entropy must remain allowed
+where compatible with the source law; do not impose an unjustified S>=0 bound.
+Taylor's cooperative factor uses only taylor_corr_scale divided by the square
+root of taylor_corr_rho_c_m2. Fix one of those fields or fit their combination;
+do not count both as independently recoverable material parameters.
+
+For the principal result adopt and report the source attempt-frequency
+convention (cleavage/emission defaults 1e12/1e11 s^-1, P/T explicit fields).
+Do not independently free attempt frequency, source density, an entropy offset
+and event reward when their rate effects compensate. Profile plausible source/
+prefactor/radius alternatives and report conditional barrier estimates.
+Source density enters persistent multiplicity and later mechanical evolution;
+its initial rate product with emission attempt frequency is not independent
+information. Do not claim that multiple rate curves automatically remove that
+compensation.
+
+Set initial numerical bounds from the exact source parameter ranges and
+physical geometry, then record them before optimization. Broad bounds are
+acceptable; numerical floor/cap saturation is not a substitute for a physical
+domain. Bound hits, flat directions and inactive parameters must be reported,
+not hidden by a tight Hessian uncertainty estimate. No source-specific hazard
+multiplier, synthetic class-score term, imposed DBTT temperature or fitted
+per-temperature barrier is permitted.
+
+Keep known E(T), nu(T), orientation and units outside the material fit vector.
+Treat unreported a0,L,r0 and machine/zero offsets as constrained nuisance inputs
+with their source/assumption recorded. Use common/global or hierarchical
+assumptions where individual geometry is unknown, rather than free independent
+geometry for each summary statistic. Use several geometry scenarios to expose
+barrier-geometry compensation.
+
+Report the actual executed surfaces:
+  G*(sigma,T)
+  S*=-partial G*/partial T at fixed physical stress and frozen state
+  H*=G*+T*S*
+  V*=-partial G*/partial sigma
+Include floor-branch flags and rate curves on common physical stress/T ranges.
+Do not label the code's G00 or H0 fields as physical enthalpy. The complete
+derivatives and units are in ANALYTICAL_1D_MODEL_REFERENCE.txt.
+
+6. WORKING OBJECTIVE AND DEPENDENCE
+
+The files do not supply a complete statistical covariance model. Use a
+documented robust working composite objective, not a falsely precise likelihood.
+The following is a proposed computational design, not a measured noise model:
+
+  L(theta,eta) = sum_c W_c sum_f w_cf
+                [sum_i q_cfi rho(r_cfi/s_cfi)] / [sum_i q_cfi]
+                + documented nuisance regularization.
+
+Here c is a condition/specimen group, f an observable family, q quadrature
+weights over curve support, s fixed working scales, and rho a robust loss of
+the standardized residual. Map this convention explicitly to an optimizer's
+API (SciPy's loss function is specified in terms of squared residuals).
+For each condition normalize the available family weights; choose and freeze
+them before fitting. The objective must not grow merely because a raster line
+was digitized more densely. Record residual costs by observable and condition.
+Do not multiply unknown per-observable sample counts by the full table n.
+
+Freeze the selected observation mask, quadrature denominators and residual
+vector length before optimization. A candidate ending before observed support
+must not improve its score by dropping unmatched points or renormalizing over
+its surviving segment. Use a declared endpoint/domain-coverage contribution
+for physical early termination and a separate failure status/penalty for
+numerical failure. Do not extrapolate through a physical termination.
+Unsupported-channel exclusions are determined by adapter capability before
+fitting, not by how well a parameter candidate performs.
+
+For J curves, use the extraction's increasing-J ordering. On a monotone modeled
+loading segment, compare Delta a_model(J_i) with Delta a_i; otherwise use an
+ordered parametric curve distance with x/y working scales. Do not interpolate
+the noisy, negative and nonmonotone observed Delta a as if it were a clean time
+axis. Preserve visible horizontal spans as extraction diagnostics, not hard
+confidence bounds. Never turn plot truncation into a physical stopping event.
+
+For Fig. 2 traces honor the extracted branch and fit_role fields. Fit supported
+loading branches; do not treat graphical connector interiors across a cleavage
+drop as time-resolved observations. Include unloading only if the mechanical
+observer represents that protocol. Fig. 2a has horizontal display offsets and
+supports a relative loading origin; Fig. 2b/c have numerical displacement axes.
+Use only a justified, bounded origin nuisance where needed, never a free
+horizontal stretch that changes the loading rate.
+
+Possible declared starting scales are K: max(0.2 MPa sqrt(m), 5% of observed K),
+crack extension: 50 nm, J: max(10 N/m, 5% of observed J), nominal-K trace:
+0.1 MPa sqrt(m), relative stiffness: 0.03. These are analyst-chosen working
+tolerances, not Ast SDs.
+Use digitization information as a resolution floor, not as the entire specimen
+noise. Inspect residuals and repeat meaningful weight/scale changes (e.g.half/
+double a family weight); retain conclusions that survive those choices.
+
+Use each Table 1/Fig. 5 mean once in a selected source scenario. Min/max intervals
+can be displayed and used for explicit range sensitivity; they are not SD/SEM.
+Derived author-fit onsets/BDT points remain checks. For the linked example
+specimens, nominal K, stiffness and J are correlated channels from one test.
+
+No-cleavage endpoints combine an outcome and a maximum nominal K. They are not
+low measured cleavage toughnesses or direct censored bounds on J-equivalent K.
+Use them as outcome checks until a specified full history and observation design
+support a quantitative survival term. Unknown subgroup counts preclude invented
+binomial likelihoods. A solver timeout/numerical failure is not a physical
+non-cleavage observation: give it a separate status and handle/repair it.
+
+Table 1 means concern the applicable measurement subset: basic J for cleaved
+specimens, continuous J where crack growth is evaluable. Match the corresponding
+statistic where ensembles are used. Individual example curves and condition
+means can differ legitimately. Hold out complete conditions/linked channels,
+not random pixels, for prediction checks.
+
+7. COMPUTATIONAL WORKFLOW
+
+A. Prepare the adapter and establish numerical cost
+  * Verify the selected imports/source pin, read the native constructors,
+    load the attached data and initialize material/geometry objects.
+  * Implement the shared Ast mechanics/observation evaluator and proposed
+    adapter APIs. Add only focused tests needed for units, work/elastic
+    limits, onset, rate convention, dependence and model parameter mapping.
+  * Time one complete analytical objective evaluation and a small cold/warm/
+    plastic set of 1-D histories. Count real forward calls, including finite-
+    difference Jacobian calls. Do not promise runtime from parameter count.
+  * Cache geometry, reduction coefficients and immutable data. Cache responses
+    by exact material/geometry/protocol/event/solver-version key. Never reuse
+    a state from a different candidate without an explicit continuation rule.
+
+B. Primary analytical fitting
+  * Start with approximately 128-256 space-filling candidate vectors in the
+    initial nonredundant active subspace, using the complete required condition
+    grid and reduced curve quadrature. The count is a performance default,
+    not permission to omit experimental temperatures/rates.
+  * Refine roughly 8-12 promising diverse starts with bounded optimization.
+    Robust scipy.optimize.least_squares is appropriate for smooth residuals;
+    use a derivative-free/global initializer where event boundaries make
+    finite-difference derivatives unreliable. Verify best objectives with
+    tighter integration/localization and common event sequences.
+  * Warm-start FIGURE5_ALTERNATIVE from the TABLE_PRIMARY solutions, but retain
+    some independent starts to avoid assuming both sources share one optimum.
+  * Release additional P/T/state parameters in small meaningful groups if
+    residual trends and sensitivities justify them. Do not free every inherited
+    dataclass field at once. Finish with a joint optimization of the selected
+    shared vector rather than separate permanent per-observable fits.
+
+C. Information and sensitivity
+  * Inspect scaled sensitivity singular values, correlated parameter
+    combinations, multiple minima and bound hits.
+  * Profile influential barrier parameters/combinations by reoptimizing the
+    others. Use the fast model for the bulk of profiles and source/geometry/
+    weight/event-convention sensitivity work. Label profile-cost intervals as
+    sensitivity intervals unless a defensible probabilistic likelihood exists.
+  * Check condition-level holdouts and all 629 J support points. Monte Carlo
+    averaging, if needed, should be increased until its numerical fluctuation
+    is smaller than the declared working tolerances, not until it creates
+    artificial confidence from large sample counts.
+
+D. 1-D confirmation at unchanged material parameters
+  * First check the eight J-curve conditions plus (-90 C, 0.2), (0 C, 0.05),
+    and (75 C, 1.6): 11 unique conditions spanning rates and response regimes.
+  * Use identical geometry/protocol assumptions, physical event convention,
+    common stochastic draws where applicable and the shared observer. Record
+    native approximation differences; do not force the numerical state
+    translation of 0-D and 1-D to be identical merely to improve agreement.
+  * For the selected native 1-D transfer, explicitly serialize
+      translation_mode='hazard_coupled'
+      translation_action_exponent=0.95
+    as documented in the matching calibration README. Its default exponent
+    is 1.0; do not rely on that default. The 0-D translation remains its native
+    mean-field approximation. This setting is historical transfer evidence,
+    not a new Ast-fitted material parameter.
+  * Evaluate the final retained fit across all 31 conditions with 1-D at least
+    once at the declared representative event/statistic convention; reuse
+    histories for every applicable observable. Where ensemble confirmation is
+    necessary, expand selected representative conditions first.
+  * Before comparing, declare a practical 0-D-to-1-D tolerance as a fraction of
+    each working experimental tolerance. Compare both observed quantities
+    and state mechanisms. A small total cost can conceal a systematic family
+    mismatch. Report the paired residuals, not just an aggregate pass flag.
+
+E. Local 1-D fallback when reduction error matters
+  * If 1-D changes finalist rankings, response mechanisms or inferred barriers
+    materially, retain the analytical result and use 1-D to refine influential
+    parameters locally around the analytical candidate set.
+  * A local discrepancy/surrogate correction may be trained on paired 0-D/1-D
+    predictions within that parameter neighborhood. It must approximate the
+    model difference, not fit an arbitrary temperature-dependent bias directly
+    to experiments. Verify all final claims with direct 1-D calls.
+  * Do not perform a global 1-D population search or escalate to 2-D. If the
+    required observables cannot be reproduced in this model family, deliver
+    the best fit, residual evidence and remaining identifiable barrier
+    combinations; do not manufacture a successful fit by changing definitions.
+
+Use parallel independent cases with bounded workers and avoid BLAS/thread
+oversubscription. Checkpoint completed forward cases and optimizer states.
+The template defaults to at most 8 workers and roughly 128 initial starts; adapt
+search density to measured cost. Aim for a complete first result on a reasonable
+workstation timescale, then spend effort on demonstrated remaining uncertainties.
+Do not launch old hundred-thousand-candidate scripts or run every profile with
+1-D. Reduce optional search/uncertainty density before sacrificing the primary
+experimental grid, observation fidelity or final 1-D confirmation.
+
+8. IMPLEMENTATION LAYOUT AND DELIVERABLES
+
+Create a focused package such as experimental_fits/ast2018/ in the selected
+repository, with new modules for dataset loading, parameter mapping, the
+cantilever/observation adapter, residual construction, analytical optimization,
+1-D confirmation, uncertainty and plotting. Exact new names are implementation
+choices; the reference native entrypoints above are existing names.
+
+Supply a documented single launcher for the complete campaign and separate
+resume/analysis commands. Default to 2-D disabled and check this at runner entry.
+The launcher must use the existing data, not search/redigitize it each time.
+Do not alter historical simulations or global package defaults just to fit Ast.
+
+Final outputs must include:
+  * FIT_REPORT: what was fitted, selected model versions, observer equations,
+    protocol/geometry/event assumptions, unsupported channels if any, and
+    scientific conclusions from the fit.
+  * Parameter tables with exact code keys, units, bounds, fixed/fitted/profiled
+    status, source scenario and attempts/source-count conventions.
+  * Fitted G*,H*,S*,V* and elementary/effective rates over the stress/T domain
+    actually visited, with uncertainty/sensitivity and floor/cap indicators.
+  * Predicted versus observed onset K and cleavage K against T for every rate,
+    eight J curves, available nominal K/stiffness histories and outcome checks.
+  * Analytical-versus-1-D overlays at unchanged parameters and any separate
+    local 1-D-refined result; do not present refinement as original confirmation.
+  * Residuals and cost contributions by condition/observable; source-alternative,
+    geometry/radius, prefactor/source and weighting sensitivity tables.
+  * Machine-readable predictions, resolved configuration, source commit/import
+    receipt, runtime/call counts, seeds and a complete reproduction command.
+
+Every subplot must have its own x-axis label. Use no grid lines and no large
+plot titles above axes. Use legends or small internal panel annotations. Export
+PNG plus vector PDF/SVG. Keep crack extension, nominal K, local drive K and
+J-equivalent K labels unambiguous. Include familiar fracture observables in the
+main figures; numerical imposed displacement is a supporting variable.
+
+COMPLETION CRITERION
+
+The task is complete when the joint analytical fit has been executed with
+documented observation operators, both source scenarios have been assessed,
+the final parameter inference has received direct 1-D confirmation/refinement,
+and the full report/data/figures are delivered. A poor fit or a flat parameter
+direction is a scientific result and should be reported honestly. A preflight,
+one fitted curve, an onset-only fit labelled as a full R-curve fit, a fit to
+synthetic class scores, or a silently rescaled surrogate is not completion.
+
+References
+Ast et al. (2018), Materials & Design 152, 168-180:
+  https://doi.org/10.1016/j.matdes.2018.04.009
+Native model source links: MODEL_SOURCES.json and ANALYTICAL_1D_MODEL_REFERENCE.txt.
+SciPy bounded/robust least_squares implementation documentation:
+  https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.least_squares.html
+Profile-based identifiability background (interpret statistically only when
+the observation model supports a likelihood):
+  https://doi.org/10.1093/bioinformatics/btp358

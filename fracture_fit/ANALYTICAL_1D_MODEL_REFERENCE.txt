@@ -1,0 +1,977 @@
+ANALYTICAL AND 1-D MODEL REFERENCE FOR THE AST FITTING PROJECT
+============================================================
+Source inspection date: 24 October 2026
+
+Purpose
+-------
+This document specifies an existing fast, stateful model and its spatial 1-D
+counterpart for a joint fit to the Ast fracture measurements. It accompanies
+CODEX_AST_FITTING_INSTRUCTIONS.txt, which defines the experimental observation
+rules, fitting stages, working objective, sensitivity analysis and delivery
+criteria. A statistical likelihood requires an additional justified noise model.
+
+The proposed fast engine is the native v9.13 zero-dimensional persistent-site
+model in Arrhenius_FEM_CZM_MPZ. It is a mean-field reduction with analytical
+barrier expressions and inexpensive state updates; it is not a closed-form
+formula for toughness. The source calls it a screening fidelity and requires
+confirmation with the paired autonomous 1-D model. Use the fast engine for most
+parameter evaluations, and the 1-D engine at the same parameters for confirmation
+or a necessary local refinement. Neither engine requires a new 2-D simulation.
+
+The source equations and interfaces below are verified by inspection. Their
+suitability for Ast's specimens, temperature range and measurements remains an
+experimental modelling question. No solver, fit or new validation was run in
+preparing this reference. Historical candidate files are initialization and
+schema examples, not established tungsten barrier measurements.
+
+
+1. SOURCE VERSION AND FILE MAP
+==============================
+
+Primary repository:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ
+
+Inspected branch: codex/oneD-v3-stateful-voiding-reduction
+Pinned commit: ce2bf9d4e868468b6979f0fc8398de95ce983367
+
+Use this immutable commit for the implementation described here. The branch
+also contains later V2/V3 wrappers; selecting the branch does not mean those
+wrappers or their additional physics should be enabled. The native v9.13 pair
+is the subject of this document. A different accepted baseline must be selected
+explicitly and its equations remapped before fitting.
+
+The principal files and entry points are:
+
+  arrhenius_fracture/emergent_gnd_types_v912.py
+    ExpFloorSurface; PTMechanism; foundational parameter dataclasses.
+
+  arrhenius_fracture/emergent_gnd_types_v913.py
+    CandidateParameters and CommonPhysics for persistent sources, blunting,
+    physical front-width limits, source conversion and transport controls.
+
+  arrhenius_fracture/zero_d_persistent_v913.py
+    reduction_geometry; ZeroDState; ZeroDRunSettings; ZeroDResult;
+    run_zero_d_rcurve(candidate, physics, loading_map, temperature_K,
+                      settings=...).
+
+  arrhenius_fracture/emergent_gnd_state_v913.py
+    EmergentGNDState; source_geometry; backstress_state;
+    solve_backstress_limited_activations; local_rates; translate_tip;
+    cleavage_rate_s. These overrides define the active persistent-source law.
+
+  arrhenius_fracture/emergent_gnd_rcurve_v913.py
+    RCurveLoadingMap; RCurveResult; run_autonomous_rcurve(...).
+    This predicts event loads under displacement control. Constitutive replay
+    of an already supplied K/dt/da history is a different operation.
+
+  arrhenius_fracture/emergent_gnd_state_v912.py
+    Inherited signed rates, forest interactions and analytical spatial kernels.
+
+  arrhenius_fracture/emergent_gnd_state_v912_stiff.py
+    Inherited coupled finite-volume transport/storage/release integration and
+    exact frozen-coefficient opposite-sign annihilation.
+
+  arrhenius_fracture/emergent_gnd_state_v912_energy.py
+    Inherited diagnostic Orowan work and stored-line-energy bookkeeping.
+    These diagnostics do not feed back into the constitutive rates.
+
+  arrhenius_fracture/emergent_gnd_campaign_v913.py
+    candidate_from_registry_row(row), the canonical candidate constructor.
+
+  arrhenius_fracture/emergent_gnd_contract_v913.py
+    effective_candidate_parameters; ACTIVE_CANDIDATE_PARAMETER_FIELDS;
+    PERSISTENT_INACTIVE_REGISTRY_FIELDS; candidate fingerprints.
+
+  scripts/run_mpz_v9_13_persistent_top5.py
+    load_physics(Path) -> (CommonPhysics, metadata); load_rows(Path).
+    Reuse or wrap these input helpers, not the historical campaign objective.
+
+Permanent source URLs are collected in Section 12. Background explanations in
+the repository include README_MPZ_V9_13_PERSISTENT_SITES.md,
+README_V9_13_AUTONOMOUS_RCURVE_CALIBRATION.md and
+README_V9_13_ZERO_D_LARGE_PERSISTENT_SEARCH.md.
+
+
+2. EXACT EXP-FLOOR BARRIER AND ELEMENTARY RATE
+============================================
+
+Use T in kelvin, stress in pascals, barriers in electronvolts, and rates in s^-1.
+In this document mu denotes the shear modulus, stored as CommonPhysics.G_Pa;
+G* denotes activation free energy. Poisson's ratio is nu, distinct from the
+attempt frequency nu0.
+
+For each mechanism j, ExpFloorSurface defines:
+
+  sigma_plus = max(sigma, 0)
+  A(T) = max[G00 + gT (T - Tref), 1e-12]                       [eV]
+  c(T) = max[sigc0 + sT (T - Tref), 1]                        [Pa]
+  F(T) = min[fmax A(T), max(Fmin, f A(T))]                    [eV]
+  a = max(exp_a, 0)
+  n = max(exp_n, 1e-9)
+  q = [sigma_plus / c(T)]^n
+
+  G*(sigma,T) = max{F(T) + [A(T) - F(T)] exp(-a q), 0}        [eV]
+
+Defaults are Tref = 481.33 K, Fmin = 1e-4 eV and fmax = 0.95. The floor
+fraction f, characteristic stress c, thermal slopes and shape parameters
+belong to the declared surface. Avoid accepting a parameter vector merely
+because numerical clips keep it evaluable: impose and report the physical
+domain over the full experimental temperature and stress range.
+
+The forward elementary rate is:
+
+  lambda_j(sigma,T) = nu0_j exp[-G*_j(sigma,T) / (kB T)].
+
+The implementation uses EV_TO_J = 1.602176634e-19 J/eV and
+KB_J_PER_K = 1.380649e-23 J/K, with the exponent clipped to [-700,0].
+Equivalently use kB_eV = KB_J_PER_K / EV_TO_J.
+
+Stress lowering is already inside G*. Do not subtract an additional sigma V*
+term. Temperature dependence is already inside G*. Do not add another
+exp(S*/kB) multiplier. The derivatives in Section 3 describe this surface;
+they are not extra adjustable terms in the rate.
+
+2.1 Meaning of the energy and entropy keys
+-----------------------------------------
+
+ExpFloorSurface.G00_eV is the zero-stress free energy at Tref on an unclipped
+branch. It is not a zero-temperature enthalpy. PTMechanism.H0_eV is also
+inserted into the G00_eV position when constructing a surface. Keep that key
+for file compatibility, but describe it as the stored reference barrier.
+
+Cleavage and emission attempts come from CommonPhysics.cleavage_nu0_s and
+CommonPhysics.emission_nu0_s, whose code defaults are 1e12 and 1e11 s^-1.
+Peierls and Taylor attempts come from their PTMechanism.nu0_s fields.
+
+For either Peierls or Taylor, PTMechanism.surface(parent_emission) constructs:
+
+  G00_PT = H0_PT
+  gT_PT = -activation_entropy_kB_PT * kB_eV
+  sigc0_PT = stress_scale_PT * sigc0_emission
+  sT_PT = stress_scale_PT * sT_emission
+  exp_a_PT, exp_n_PT = that PT mechanism's independent shape fields
+  floor_fraction_PT = floor_fraction_emission
+  floor_min_PT = floor_min_emission * max(R, 1e-12)
+  R = max(H0_PT,0) / max(G00_emission,1e-30)
+  floor_max_fraction_PT = floor_max_fraction_emission
+  Tref_PT = Tref_emission.
+
+PTMechanism.stress_fraction projects the actual drive; its default is
+1/sqrt(3). PTMechanism.stress_scale changes the characteristic stress of the
+surface; its default is 1. They serve different roles. Do not project or
+rescale a stress twice when building an Ast adapter.
+
+
+3. THERMODYNAMIC DIAGNOSTICS AND IDENTIFIABILITY
+==============================================
+
+3.1 Derivatives of the executed surface
+--------------------------------------
+
+Differentiate at fixed physical stress and frozen external state. Away from
+max/min boundaries, define B = exp(-a q), A' = dA/dT, F' = dF/dT and c' = dc/dT.
+Then, for the positive-barrier branch:
+
+  dG*/dT|sigma,state = F' + (A' - F') B
+                    + (A - F) B a n q c'/c
+
+  S*(sigma,T) = -dG*/dT|sigma,state                         [eV/K]
+  H*(sigma,T) = G*(sigma,T) + T S*(sigma,T)                 [eV]
+
+  V*(sigma,T) = -dG*/dsigma
+              = (A - F) B (a n/c) (sigma/c)^(n-1)          [eV/Pa]
+    for sigma > 0.
+
+Multiply V* by EV_TO_J to obtain m^3, and divide S* by kB_eV to report S*/kB.
+For sigma < 0 the max(sigma,0) convention gives zero stress derivative.
+At sigma = 0 the derivative can be one-sided; n < 1 can give a divergent
+right derivative. Do not report a value evaluated at an arbitrary small
+positive stress as an exact zero-stress activation volume.
+
+Use A' = gT and c' = sT when their affine branches are active, and zero when
+the corresponding numerical lower clip is active. The floor derivative is
+F' = f A' for the fractional floor, F' = 0 for the fixed absolute floor, and
+F' = fmax A' when the upper fraction cap is active. The outer zero-barrier
+clip, if active, also changes derivatives. At a branch boundary report
+one-sided derivatives or mark the derivative undefined.
+
+The full entropy is generally stress dependent, including when
+activation_entropy_kB is a constant PT input. The floor and temperature-
+dependent characteristic stress affect S*. Differentiating at fixed
+sigma/c(T) would omit the last term and would answer a different question.
+
+At zero stress on an unclipped branch:
+
+  S* = -gT
+  H* = G00 - gT Tref.
+
+For a PT surface, H*(0) = H0_code + activation_entropy_kB * kB_eV * Tref.
+The distinction can be substantial. At frozen stress/state and constant nu0,
+the slope of ln(lambda) versus 1/T gives this H*, whereas a fitted macroscopic
+transition slope also reflects changing state, stress and event statistics.
+
+3.2 Parameter combinations that cannot be separated by arbitrary fitting
+------------------------------------------------------------------------
+
+On the physically admissible branch where c(T) is not numerically clipped,
+the transformation
+
+  sigc0 -> z sigc0,  sT -> z sT,  exp_a -> z^exp_n exp_a
+
+leaves an EXP-floor surface unchanged. Fix exp_a or fit the effective stress
+scale c(T)/exp_a^(1/exp_n), then record a canonical back-transformation.
+Where PT surfaces inherit emission stress scales, preserve those linkages
+when choosing a nonredundant parameterization.
+
+Taylor's cooperative order is
+
+  m_T(rho) = 1 + taylor_corr_scale * sqrt(rho / taylor_corr_rho_c_m2).
+
+Only taylor_corr_scale/sqrt(taylor_corr_rho_c_m2), equivalently the correlation
+length defined below, enters this expression. Fix one field or fit that
+combination. Freeing both introduces an exact redundant direction.
+
+Persistent source multiplicity and emission attempt frequency enter emission
+through rho_source0_m2 * nu0_emission. They should not both be free without an
+independent constraint. Attempt frequencies and entropy also compensate:
+locally a rate with G* = H* - T S* constrains ln(nu0) + S*/kB and H*, rather
+than providing independent unconstrained estimates of all three.
+
+A defensible initial active set consists of the cleavage and emission
+reference barriers, thermal slopes and one stress scale per independent
+surface. Release Peierls/Taylor reference barriers or thermal slopes only
+when sensitivities show additional information. Initially fix or profile
+shape exponents, floors, stress thermal slopes, source density, radius,
+blunting and the nonredundant Taylor correlation parameter in documented
+groups. This is a proposed fit design, not a claim that Ast uniquely resolves
+each microscopic barrier. Keep a fixed attempt-frequency convention for the
+principal fit and profile credible alternatives. The main fitting document
+specifies how to assess distinguishable parameter combinations.
+
+
+4. THE FAST STATEFUL 0-D MODEL
+==============================
+
+4.1 State and geometry normalization
+------------------------------------
+
+ZeroDState stores mobile density rho_M,s and retained density rho_R,s in m^-2,
+local slip counts gamma_s, cumulative source activations, elapsed time and
+path extension. The native runner initializes the population and slip states
+to zero. rho_forest_floor_m2 is a background forest contribution, not an
+initial retained population. A different physical initial condition would
+need an explicit adapter extension and independent justification.
+
+The conversion from a source activation to the reduced state is fixed by
+reduction_geometry(physics). Define:
+
+  dx = mpz_length_m / n_bins
+  x_i = (i + 1/2) dx
+  h = max(blunting_length_m, dx, |b|, 1e-30)
+  w_i = exp(-x_i/h)
+  Z = max(sum_i w_i, 1e-30)
+  n_src = clip[ceil(max(source_zone_length_m,dx)/dx), 1, n_bins]
+  w_src = sum_{i < n_src} w_i / n_src
+  A_cell = dx h
+  c_line,s = activation_to_line_content_per_system[s]
+
+  q_rho,s = c_line,s w_src / max(Z A_cell, 1e-30)             [m^-2]
+  q_gamma,s = c_line,s w_src                                 [dimensionless]
+  c_arc = reference_source_area_m2
+          / max(r0_m reference_front_width_m, 1e-30).
+
+These are geometry and normalization choices shared with the spatial
+construction, not independent optimizer multipliers. The strip width h is
+different from the physical along-front source width w below. n_bins is a
+spatial numerical parameter, even though it enters this reduction mapping.
+
+4.2 Dynamic width, radius, source multiplicity and backstress
+------------------------------------------------------------
+
+Let rho_s = max(rho_M,s,0) + max(rho_R,s,0). Then:
+
+  rho_w = max(rho_forest_floor + sum_s rho_s, rho_reference)
+  w_min = max(minimum_front_width_m, |b|)
+  w_max = max(maximum_front_width_m,w_min), if the configured maximum > 0;
+          max(reference_front_width_m,w_min), otherwise
+  w = clip[w_reference sqrt(rho_reference/rho_w), w_min, w_max]
+
+  r = max[r0 + max(c_blunt,0) |b| max(blunting_slip_fraction,0)
+                sum_s max(gamma_s,0), r0]
+  M_s = rho_source0 c_arc r w
+
+For K in MPa sqrt(m):
+
+  sigma_applied = 1e6 max(K,0) / sqrt[2 pi max(r,b)]           [Pa]
+  d_s = |projection_s| sigma_applied
+  C_back = max(persistent_backstress_scale,0) mu |b|
+           / max(|taylor.stress_fraction|,1e-6)
+  sigma_back,s = C_back sqrt(rho_s).
+
+The same M applies to each reduced system in this implementation. Projection
+factors come from emission_schmid_factors or the configured extension table.
+The table uses the last breakpoint not exceeding current path extension,
+with endpoint clamping. A measured specimen orientation or independently
+computed projection belongs here; a temperature-dependent curve-fit factor
+does not.
+
+4.3 Implicit persistent emission
+--------------------------------
+
+For an interval dt, solve separately for each system:
+
+  Delta N_s = M_s dt lambda_emit[
+      d_s - C_back sqrt(rho_s + q_rho,s Delta N_s), T].
+
+The rate function in this root is zero for nonpositive net drive. If
+d_s <= C_back sqrt(rho_s), the solution is zero. The upper root bracket is
+the activation count at mechanical blocking; no explicit arbitrary density
+saturation or source-exhaustion factor is added. The state update is:
+
+  rho_M,s += q_rho,s Delta N_s
+  gamma_s += q_gamma,s Delta N_s
+  cumulative_activations_s += Delta N_s.
+
+Source sites persist after activation. Inherited source_refresh and explicit
+recovery parameters are inactive in the v9.13 contract and are zeroed by the
+candidate parser. Do not fit them because they remain visible in a dataclass.
+
+4.4 Peierls encounters and Taylor release
+----------------------------------------
+
+After emission define:
+
+  rho_f = max[rho_forest_floor + sum_s(rho_M,s + rho_R,s), 1]
+  ell = 1 / (2 sqrt(rho_f))                                  [m]
+  jump = jump_fraction_of_forest_spacing * ell
+  L_mfp = mean_free_path_coefficient / sqrt(rho_f)
+  phi_T = ell / max(b,1e-30), capped by taylor_phi_max if finite
+  L_corr = taylor_corr_scale / [2 sqrt(max(taylor_corr_rho_c,1e-300))]
+  m_T = max[1 + 2 L_corr sqrt(rho_f), 1].
+
+With the projected drive d_s calculated at the start of the interval:
+
+  v_P,s = jump lambda_P(max(stress_fraction_P d_s,0),T)
+  k_enc,s = max(encounter_efficiency,0) |v_P,s| / max(L_mfp,1e-30)
+  k_rel,s = lambda_T(max(stress_fraction_T d_s phi_T,0),T) / m_T.
+
+These are forward elementary P/T rates in the native 0-D reduction. The
+spatial 1-D engine uses signed forward-minus-reverse rates instead; see
+Section 6. This difference can matter at small stress and high temperature.
+
+For each system, holding these rates fixed during the exchange substep:
+
+  rho_total = rho_M + rho_R
+  k_sum = k_enc + k_rel
+  rho_R,eq = (k_enc/k_sum) rho_total
+  rho_R,new = rho_R,eq + (rho_R,old - rho_R,eq) exp(-k_sum dt)
+  rho_M,new = rho_total - rho_R,new.
+
+When k_sum = 0 the populations are unchanged. The implementation clips the
+exponential argument to [-700,0] and guards nonnegative populations. This is
+exact exchange at frozen rates, not a claim of an exact solution to the fully
+coupled time-dependent state. Geometry is updated after exchange, and cleavage
+is evaluated using the resulting tip radius. There is no additional explicit
+recovery, spatial escape or opposite-sign annihilation in this 0-D state.
+
+4.5 Translation after a crack event
+-----------------------------------
+
+The model represents each reduced population as a uniform source-zone profile
+when calculating event translation. Let p_i = 1 in source bins and 0 elsewhere.
+For a path advance d, define O_ji(d) as the fractional overlap of the translated
+old bin [i dx-d,(i+1)dx-d] with new bin [j dx,(j+1)dx], divided by dx. Content
+outside [0,L_MPZ] is discarded. Then:
+
+  R(d) = clip{sum_j w_j sum_i O_ji(d) p_i / max(sum_i w_i p_i,1e-30), 0, 1}.
+
+Multiply rho_M, rho_R and local gamma by R(d), and advance the path coordinate
+by d. Cumulative activation totals are not reset. R is a computed geometric
+retention fraction; it is not a free loss parameter.
+
+
+5. CLEAVAGE CLOCK, LOADING AND RENEWAL
+=====================================
+
+The raw cleavage rate uses its EXP-floor surface. Let m = cleavage_hits and
+tau_c = cleavage_correlation_time_s. Both direct v9.13 engines use:
+
+  lambda_eff = lambda_raw,                    if m <= 1 + 1e-12
+  lambda_eff = P[m,min(lambda_raw tau_c,1e12)] / tau_c, otherwise,
+
+where P is the regularized lower incomplete gamma function, implemented by
+scipy.special.gammainc. tau_c is a physical correlation time, not the numerical
+dt. Preserve this nonlinearity; replacing it by lambda_raw/m would define a
+different model.
+
+RCurveLoadingMap supplies a geometry coefficient A_j and action threshold Q_j
+for each event, with path and projected crack advances. At event j:
+
+  K = A_j U
+  Udot = nominal_dU_m / nominal_dt_s
+  Q(t) = integral lambda_eff(t) dt.
+
+An event is accepted when Q reaches Q_j. The prescribed path advance translates
+state; the projected advance sets the R-curve abscissa. The next interval uses
+the next geometry entry and a reset action clock, while retaining the translated
+material state. Thresholds and event lengths specify a physical/statistical
+protocol; they must not become separate fit parameters for each observed point.
+
+The native 0-D loop uses dU = nominal_dU * load_increment_factor and the same
+factor on dt. It evaluates state at the midpoint load, accumulates the returned
+post-update cleavage rate times dt, and records the first step exceeding the
+threshold at the endpoint displacement. It has no exact within-step event root.
+A new fast adapter must assess this load-step error and, if needed, improve
+event localization consistently. Changing the step should not change Udot.
+
+The 1-D runner uses adaptive hazard-limited increments and threshold localization.
+Its historical calibrated transfer uses translation_mode='hazard_coupled' and
+translation_action_exponent=0.95, whereas the function's exponent default is 1.
+This advances the process-zone coordinate through a fraction (Q/Q_j)^p of the
+event's path advance during the waiting interval. The 0-D reduction translates
+at event commitment. Keep this difference visible. Do not change the 1-D mode
+only to make its output match 0-D; declare and record the selected convention.
+
+A unit threshold is not automatically a mean event time under a varying rate.
+The Ast observer must specify whether predicted means, quantiles or replicate
+distributions are compared with the reported statistic. Reuse fixed event
+streams across parameter evaluations and record the actual threshold arrays.
+
+
+6. THE SPATIAL 1-D MODEL AND ITS CONFIGURATION
+=============================================
+
+6.1 Populations, source geometry and kernels
+--------------------------------------------
+
+The spatial state stores rho_M,s,q,i, rho_R,s,q,i and accumulated slip density
+for each system s, Burgers sign q in {-,+}, and ahead-of-tip bin i. Initialization
+sets these densities to zero. It forms tip-weighted unsigned density and local
+slip using the same w_i, Z and A_cell as Section 4:
+
+  rho_tip,s = sum_i w_i sum_q(rho_M,s,q,i + rho_R,s,q,i) / Z
+  gamma_local = blunting_slip_fraction A_cell
+                sum_{s,q,i} w_i accumulated_slip_density_s,q,i.
+
+Width, backstress and radius use these moments. The spatial c_arc denominator
+uses max(r0,b,1e-30) * reference_front_width; the 0-D uses max(r0*w_ref,1e-30).
+For the intended domain r0 >= b they agree. Require a physical radius domain
+when constructing Ast inputs rather than relying on mismatched guardrails.
+
+The same implicit emission root is solved per system. With activation count
+Delta N_s and conversion c_line,s, the increment
+
+  Delta rho = c_line,s Delta N_s / (n_src A_cell)
+
+is added uniformly to mobile density and accumulated slip density in source
+bins, on that system's specified emission sign. Source inventory is retained.
+
+Signed GND density is retained positive minus retained negative density:
+g_s,i = rho_R,s,+,i - rho_R,s,-,i. Let r_c = core_regularization_b * b,
+Delta_ij = x_i - x_j, and P_st = gnd_stress_projection_matrix[s,t]. The native
+analytical kernels are:
+
+  B_ij = [mu b / (2 pi max(1-nu,1e-12))]
+         Delta_ij / (Delta_ij^2 + r_c^2) * A_cell
+  tau_GND,s,i = sum_t P_st sum_j B_ij g_t,j                  [Pa]
+
+  C_i = [mu b / max(1-nu,1e-12)]
+        A_cell / [1e6 sqrt(2 pi max(x_i,r_c))]
+  K_shield = sum_{s,i} shielding_orientation_factors_s g_s,i C_i
+                                                                  [MPa sqrt(m)]
+  K_eff = max(K_applied - K_shield,0).
+
+The native class permits explicit mechanical-kernel replacement. Such a change
+must be declared and justified by geometry, not fitted as an arbitrary shielding
+scale. Signed shielding can be negative; retain the source sign convention.
+
+6.2 Local stress and signed mechanism rates
+-------------------------------------------
+
+For system s and bin i:
+
+  sigma_shielded = 1e6 K_eff / sqrt(2 pi r)
+  tau_eff,s,i = projection_s sigma_shielded + tau_GND,s,i
+  rho_f,s,i = max[rho_forest_floor
+                 + sum_t forest_interaction_matrix_st
+                   sum_q(rho_M,t,q,i + rho_R,t,q,i), 1].
+
+The inherited signed rate is exactly:
+
+  L_j(tau,T) = lambda_j(max(tau,0),T) - lambda_j(max(-tau,0),T).
+
+Use local forest spacing, jump length, mean free path, phi_T and m_T as in
+Section 4, now per system/bin. Then:
+
+  v_P = jump L_P(stress_fraction_P tau_eff,T)
+  v_transport = max(mobile_transport_velocity_scale,0) v_P
+  k_enc = max(encounter_efficiency,0) |v_P| / max(L_mfp,1e-30)
+  k_rel = max[L_T(stress_fraction_T tau_eff phi_T,T),0] / m_T.
+
+Emission uses the nonnegative magnitude |projection_s| sigma_shielded minus
+the tip-weighted persistent backstress, through the implicit root. It does not
+insert tau_GND into that source-root drive. Cleavage uses K_eff and dynamic r,
+except that the diagnostic neutral option explicitly sets shielding to zero.
+
+6.3 Coupled spatial evolution and annihilation
+----------------------------------------------
+
+For each system and sign q = +/-1, the frozen-rate transport/exchange operator
+corresponds to:
+
+  d rho_M,q/dt = -d(q v_transport rho_M,q)/dx
+                 - k_enc rho_M,q + k_rel rho_R,q
+  d rho_R,q/dt = k_enc rho_M,q - k_rel rho_R,q.
+
+The v9.13 recovery rate is zero. The inherited stiff solver advances this
+operator together using conservative upwind finite volumes and backward Euler,
+with unknowns interleaved as [rho_M,0,rho_R,0,rho_M,1,rho_R,1,...]. For cell
+velocities u = q v_transport, interior face velocities are arithmetic means;
+boundary face velocities equal their adjacent cell values. The transport
+matrix A has:
+
+  A_i,i = [-max(u_{i+1/2},0) + min(u_{i-1/2},0)] / dx
+  A_i,i-1 = max(u_{i-1/2},0) / dx
+  A_i,i+1 = -min(u_{i+1/2},0) / dx.
+
+Boundary inflow from outside the domain is zero. The coupled solve applies
+(I-h B) y_new = y_old with these transport entries and the local exchange
+terms. It uses configured coupled-operator substeps; preserve those numerical
+settings and record environment overrides.
+
+Opposite retained signs also annihilate within a system/bin. For positive
+populations a,b and k_ann = 4 * annihilation_capture_radius_b * b_Burgers
+* |v_transport|, the frozen reaction is da/dt = db/dt = -k_ann a b. Equal
+populations update to a/(1+k_ann a dt). For unequal populations, let
+d = max(a,b)-min(a,b) and z = min(a,b)/max(a,b) * exp(-k_ann d dt);
+the new smaller population is d z/(1-z), and the difference d is preserved.
+The source implements near-equality tolerances and floating-point guards.
+
+The spatial step applies half annihilation and half coupled evolution,
+midpoint persistent emission, refreshed-rate half coupled evolution, then
+half annihilation. The energy subclass adds diagnostic work quadrature around
+this evolution without changing its constitutive laws. Translation applies
+the same conservative bin-overlap map O_ji to all three density fields; it is
+not the 0-D single-profile retention approximation.
+
+6.4 Capability is different from the historical selected configuration
+---------------------------------------------------------------------
+
+The archived calibrated CommonPhysics fixture sets:
+
+  shielding_orientation_factors = (0,0)
+  mobile_transport_velocity_scale = 0.
+
+Consequently its explicit K_shield contribution is zero, and its spatial
+Peierls advection is zero. Its velocity-driven annihilation is also zero.
+Encounter storage remains active because k_enc uses the unscaled v_P. Local
+GND stress is a separate calculation and is not disabled merely by zero
+shielding factors. The spatial model still differs from the 0-D through its
+resolved state, local rates, integration and translation.
+
+Do not claim that running the native 1-D fixture automatically restores active
+shielding or transport. An Ast configuration must explicitly justify these
+choices. A change in them defines a different physical configuration and must
+not be hidden as a numerical confirmation adjustment.
+
+The inherited energy diagnostic uses
+
+  gamma_dot_s,i = b sum_q(rho_M,s,q,i) v_transport,s,i
+  P_external = A_cell sum_{s,i}(tau_external,s,i gamma_dot_s,i)
+
+per unit crack-front thickness, with analogous shielding/internal/effective
+power terms. Thus this Orowan plastic-power diagnostic is zero in the archived
+zero-transport configuration even though the source/storage state evolves.
+The source explicitly describes this diagnostic as reduced bookkeeping, not
+a complete J-integral or measured plastic work. It cannot be relabelled as
+Ast's A_pl to avoid constructing the observation model.
+
+
+7. WHAT THE AST ADAPTER MUST ADD
+================================
+
+The existing runners return eventwise kinetic K, displacement, crack extension
+and state diagnostics. They do not supply the full experimental reaction-force
+history, cantilever compliance, elastic-plastic J evaluation, or classification
+of final unstable cleavage. The new Ast mechanics and observation adapter must
+establish those mappings before the joint fitting objective is meaningful.
+
+At every experimental temperature set:
+
+  mu(T) = E(T) / [2 (1 + nu(T))]
+
+from the Ast elastic-property convention or documented interpolation. Do not
+retain the historical G_Pa=160.15625 GPa merely because it is a code default.
+Likewise, use Ast dimensions, initial notch/crack, loading position, orientation,
+actual rate and displacement reference. The old 1 micrometre radius, 50
+micrometre MPZ and transferred 50 micrometre loading map are not Ast geometry.
+Lengths such as source-zone and correlation width require their own physical
+interpretation; they are not interchangeable with specimen width.
+
+The native law can be evaluated below 300 K, but this does not establish prior
+qualification there. Apply domain checks across all Ast conditions, including
+the 183.15 K data and the high-temperature data up to 773.15 K. Kelvin conversion
+and evaluation of E(T), nu(T) and the barrier surfaces must use the same T.
+
+Distinguish kinetic K, nominal initial-notch K and J-equivalent K. In elastic
+conditions J_el=K^2/E' may be appropriate under the declared geometry/constraint
+convention. It does not create the plastic-work contribution required for Ast's
+elastic-plastic J. A fast beam/compliance or reduced-work calculation can be
+implemented, but its assumptions and verification must be explicit.
+
+Finite event advances must resolve the experimental onset protocol. A 5
+micrometre event default from a different wrapper cannot resolve a 0.2
+micrometre onset. Physical event size and numerical output spacing are separate
+choices: refining an event length without preserving its rate/advance convention
+can change the predicted crack-growth speed.
+
+A further implementation guard is mandatory. Native 1-D RCurveResult.checkpoint_K
+returns the first accepted event at or beyond the requested extension, but
+clamps to the last event if the requested extension was never reached. The
+0-D helper returns NaN outside coverage. The Ast observer must independently
+check achieved_projected_extension_m before using either helper. Neither native
+helper is the paper's fitted onset construction. Follow the experimental
+onset definition in CODEX_AST_FITTING_INSTRUCTIONS.txt.
+
+Computational statuses such as a displacement cap, maximum load-step count or
+loading-map exhaustion are not automatically experimental right censoring.
+Keep numerical failure, incomplete trajectories and physically observed
+censoring distinct in the observer.
+
+
+8. NATIVE API AND CONSTRUCTION EXAMPLES
+======================================
+
+These are documentation examples, not executed results or commands to launch
+the old campaign.
+
+8.1 Load a historical schema fixture
+------------------------------------
+
+    from pathlib import Path
+    import csv
+    import json
+
+    from arrhenius_fracture.emergent_gnd_campaign_v913 import (
+        candidate_from_registry_row,
+    )
+    from arrhenius_fracture.emergent_gnd_rcurve_v913 import RCurveLoadingMap
+    from scripts.run_mpz_v9_13_persistent_top5 import load_physics
+
+    root = Path('.')  # checkout pinned to the commit in Section 1
+    registry = root / 'candidates/v9_13_persistent_sites_top5_registry.csv'
+    with registry.open(newline='') as stream:
+        rows = list(csv.DictReader(stream))
+    row = next(r for r in rows
+               if r['candidate_id'] == 'v912_targeted_local_peak_013476_0368')
+    candidate = candidate_from_registry_row(row)
+
+    fixture = root / 'runs/v9_13_v10222_rcurve_alpha0p95_all50_v1'
+    physics, metadata = load_physics(
+        fixture / 'v9_13_R_curve_calibrated_common_physics.json'
+    )
+    loading = RCurveLoadingMap.from_dict(json.loads(
+        (fixture / 'v9_13_R_curve_calibrated_loading_map.json').read_text()
+    ))
+
+These objects demonstrate the native schema. Construct separate Ast inputs
+before calculating an Ast fitting objective. Importing this script's input helper
+does not run its guarded main campaign, but a maintained fitting package should
+wrap or extract the loader rather than importing campaign objectives.
+
+load_physics accepts a raw CommonPhysics dictionary or a payload under the
+'common_physics' key. It converts vector/matrix values to tuples, constructs
+CommonPhysics and calls validate(). CommonPhysics is immutable; construct a
+new object for a temperature-dependent modulus rather than modifying an old
+state's physics halfway through a condition.
+
+8.2 Construct a new Ast loading-map payload
+------------------------------------------
+
+The following function documents the complete native schema. Its arrays and
+scalar arguments must be generated by the new mechanics/event adapter, not
+copied from experimental toughness ordinates.
+
+    def make_ast_loading_map(A, action_targets, path_da, projected_da,
+                             dU, displacement_rate, seed, temperature_K,
+                             provenance):
+        return RCurveLoadingMap.from_dict({
+            'K_per_U_MPa_sqrt_m_per_m': list(A),
+            'threshold_actions': list(action_targets),
+            'path_advances_m': list(path_da),
+            'projected_advances_m': list(projected_da),
+            'nominal_dU_m': dU,
+            'nominal_dt_s': dU / displacement_rate,
+            'seed': int(seed),
+            'reference_candidate_id': 'ast_geometry_only',
+            'reference_temperature_K': temperature_K,
+            'reference_event_K_MPa_sqrt_m': [],
+            'reference_event_U_m': [],
+            'provenance': provenance,
+        })
+
+All four event arrays must have the same nonzero length and positive finite
+entries. dU and dt must be positive finite values. A has units
+(MPa sqrt(m))/m. Action targets are dimensionless; both crack-advance arrays
+are in metres. The optional reference-event arrays must be empty or have one
+value per event. Empty arrays avoid injecting measured event loads into the
+new forward map. The reference ID above is a provenance label, not a candidate
+whose predicted trajectory is supplied to the solver.
+
+8.3 Call the paired native engines
+----------------------------------
+
+These calls demonstrate the existing interfaces. Once plastic load-point
+displacement evolves, a static K/U map alone does not implement the full Ast
+mechanics. The new fitting runner must couple the native updates to the scalar
+equilibrium callback described in the main instructions and then apply the
+common experimental observer. These native calls alone are not a J-R fit.
+
+    from arrhenius_fracture.zero_d_persistent_v913 import (
+        ZeroDRunSettings, run_zero_d_rcurve,
+    )
+    from arrhenius_fracture.emergent_gnd_rcurve_v913 import run_autonomous_rcurve
+
+    fast = run_zero_d_rcurve(
+        candidate, ast_physics, ast_loading, temperature_K,
+        settings=ZeroDRunSettings(
+            target_projected_extension_m=target_extension,
+            load_increment_factor=declared_load_step_factor,
+            maximum_applied_displacement_m=displacement_limit,
+            maximum_load_steps=step_budget,
+        ),
+    )
+
+    spatial = run_autonomous_rcurve(
+        candidate, ast_physics, ast_loading, temperature_K,
+        target_projected_extension_m=target_extension,
+        max_hazard_increment=declared_hazard_increment,
+        maximum_applied_displacement_m=displacement_limit,
+        maximum_integration_substeps=substep_budget,
+        minimum_resolved_source_activations=declared_activation_resolution,
+        translation_mode='hazard_coupled',
+        translation_action_exponent=declared_translation_exponent,
+    )
+
+The symbolic arguments above are configuration values that Codex must define
+and serialize. Both calls receive the same candidate, Ast condition and
+declared physical geometry. Numerical resolution controls are not material
+fit coordinates. The 1-D API also accepts emission_drive_provider, an optional
+callback for a declared source-drive projection; leaving it unset uses the
+configured projection or extension table.
+
+
+9. INITIALIZATION FIELD AND UNIT APPENDIX
+=========================================
+
+9.1 Registry candidate fields
+-----------------------------
+
+The registry prefixes are 'cleave_' and 'emit_'; the object attributes are
+candidate.cleavage and candidate.emission. For either registry prefix:
+
+  Registry suffix        Native surface field       Unit / conversion
+  G00_eV                 G00_eV                     eV, reference free energy
+  gT_eV_per_K            gT_eV_per_K                eV/K
+  sigc0_GPa              sigc0_Pa                   multiply by 1e9
+  sT_GPa_per_K           sT_Pa_per_K                multiply by 1e9
+  exp_a                  exp_a                      dimensionless
+  exp_n                  exp_n                      dimensionless
+  floor_frac             floor_fraction             dimensionless
+
+The shared Tref_K defaults to 481.33. Peierls and Taylor each use:
+
+  <mechanism>_H0_eV                    eV, stored reference free energy
+  <mechanism>_activation_entropy_kB    dimensionless input; see Section 3
+  <mechanism>_exp_a                    dimensionless
+  <mechanism>_exp_n                    dimensionless
+  <mechanism>_nu0_s                    s^-1.
+
+Other active candidate keys are:
+
+  rho_source0_m2             m^-2, persistent areal source density
+  taylor_corr_rho_c_m2       m^-2, correlation reference density
+  taylor_corr_scale         dimensionless, correlated with the preceding key
+  c_blunt                   dimensionless multiplier of b times local slip.
+
+In the active-field parser only Tref and the PT prefactors have defaults:
+Tref_K=481.33, peierls_nu0_s=1e12, taylor_nu0_s=1e11. Other active fields must
+be present and finite. The parser sets source_refresh_length_m and explicit
+recovery fields to zero regardless of inactive historical CSV columns.
+Serializing the effective parameter fingerprint avoids fitting a field that
+the native candidate constructor silently excludes.
+
+9.2 CommonPhysics fields that require explicit Ast review
+---------------------------------------------------------
+
+  Field family                                  Unit / role
+  G_Pa, nu                                      Pa; dimensionless elasticity
+  b_m, r0_m                                     m; Burgers magnitude and radius
+  mpz_length_m, source_zone_length_m             m; ahead-of-tip geometry
+  active_strip_width_m, blunting_length_m        m; declare native usage
+  reference_source_area_m2                      m^2; source normalization
+  reference_front_width_m                      m; along-front reference width
+  minimum_front_width_m, maximum_front_width_m  m; physical width limits
+  reference_density_m2, rho_forest_floor_m2      m^-2
+  activation_to_line_content_per_system         dimensionless per-system conversion
+  emission_signs                                per-system sign convention
+  emission_schmid_factors                       dimensionless drive projections
+  emission_geometry_extension_m                m; ordered path breakpoints
+  emission_geometry_factors                    per-breakpoint, per-system factors
+  shielding_orientation_factors                dimensionless signed-kernel weights
+  forest_interaction_matrix                    dimensionless, nonnegative entries
+  gnd_stress_projection_matrix                 dimensionless stress projection
+  mean_free_path_coefficient                   dimensionless
+  jump_fraction_of_forest_spacing              dimensionless
+  encounter_efficiency                         dimensionless encounter multiplier
+  taylor_phi_max                               dimensionless stress amplification cap
+  mobile_transport_velocity_scale              dimensionless spatial velocity scale
+  persistent_backstress_scale                  dimensionless backstress multiplier
+  blunting_slip_fraction                       dimensionless slip convention
+  core_regularization_b                        core radius in Burgers magnitudes
+  annihilation_capture_radius_b                capture radius in Burgers magnitudes
+  cleavage_nu0_s, emission_nu0_s                s^-1
+  cleavage_hits                               dimensionless multi-hit order
+  cleavage_correlation_time_s                  s; physical correlation time
+  n_bins, n_systems                            integers; resolution and system count
+  implicit_tolerance, implicit_max_iterations   source-root numerical controls
+  min_substep_s, moving_tip_cfl                 time/CFL numerical controls
+  coupled_moving_tip_enabled                   boolean algorithm selection.
+
+Legacy defaults include G_Pa=160156250000, nu=0.28, b_m=2.74e-10,
+r0_m=1e-6, mpz_length_m=5e-5, active_strip_width_m=1e-5, n_bins=80 and
+n_systems=2. These exact defaults document the code; they are not an Ast
+material or geometry prescription. In v9.13 the density cell area uses
+dx*max(blunting_length_m,dx,|b|), so do not assume active_strip_width_m alone
+controls the effective state normalization.
+
+
+10. HISTORICAL FIXTURES AND SEED ROLES
+=====================================
+
+The following tracked files provide concrete reproducibility references:
+
+  candidates/v9_13_persistent_sites_top5_registry.csv
+    Five historical DBTT candidate rows. The first/reference ID is
+    v912_targeted_local_peak_013476_0368. These are implementation seeds,
+    not Ast-fitted values or independently measured tungsten priors.
+
+  mpz_v9_13_persistent_sites_common_physics.json
+    Basic valid CommonPhysics fixture; metadata identifies the normalization
+    as legacy_1d_unit_line_content.
+
+  runs/v9_13_v10222_rcurve_alpha0p95_all50_v1/
+    v9_13_R_curve_calibrated_common_physics.json
+    Historical transferred configuration. It has zero shielding factors,
+    zero spatial velocity scale, an extension-varying emission projection,
+    activation-to-line conversion 0.9124087591240877 per system,
+    encounter_efficiency=9.160246308716648 and taylor_phi_max=20.
+    These are archived configuration choices, not free barrier parameters
+    to transfer to Ast without review.
+
+  runs/v9_13_v10222_rcurve_alpha0p95_all50_v1/
+    v9_13_R_curve_calibrated_loading_map.json
+    Sixteen events, seed 3621, reference temperature 300 K, reference
+    candidate ID as above, nominal_dU_m=2e-7 and nominal_dt_s=8.4.
+    Provenance identifies an archived theta45, 50 micrometre-width campaign.
+    K/U came from that archive, not Ast. Use it only to understand the schema.
+
+  mpz_v9_13_v10222_transfer_common_physics.json
+    Additional provenance records analytical_1d_signed_shielding_active=false
+    for the historical archive. This is not evidence that Ast shielding is
+    negligible, and it does not require rerunning that archive.
+
+The loading-map seed and stored event arrays serve the stochastic event clock.
+The old zero-D search's Sobol default seed 913100 serves an optimizer/population
+role. They are distinct. A new fit should record optimizer initialization seeds,
+fixed event-stream seeds and the full event arrays separately. Reuse common
+event streams when comparing parameter vectors, and additional fixed streams
+for predictive uncertainty. Do not optimize a seed to improve an individual
+curve. No inaccessible old 110 micrometre loading-map archive is needed to use
+the tracked schema examples above.
+
+
+11. MODULES THAT MUST REMAIN DISTINCT
+====================================
+
+reduced_fracture_v2/predictive.py::run_zero_d_predictive is a different fast
+provider surrogate. Its FEM/CZM lifecycle includes an explicit progress
+calibration of 5.7e-9 with a source-density correction and lower plateau,
+translation over six source-zone lengths, and a default 5 micrometre event
+advance. Those settings are not needed by the direct v9.13 pair and must not
+be mistaken for universal microscopic rate prefactors.
+
+reduced_fracture_v2/kinetics.py::SharedBarrierHazardCore is an audit helper
+with simplified rates and fixed 1e13 prefactors. It is not the authoritative
+full native closure used to advance this persistent-site model.
+
+The V3 voiding wrapper and fatigue models are outside this fracture-only Ast
+workflow. Their presence in the pinned repository does not make them part of
+the selected forward model.
+
+The separate PF-fracture-fatigue repository is useful background:
+branch codex/shared-fracture-fatigue-options-v1, inspected commit
+23beacdf8acad8c3ed7c7c3a1f2f2f9bdbdd0f3b.
+
+Its analytical_screen_v1028.py performs frozen-state heuristic screening;
+it is not a stateful J-R forward predictor. Its scores must not become the
+Ast experimental objective. Its current state engines and release laws have their own
+conventions. Do not combine its material manifest or rate routines with the
+FEM native pair without an explicit versioned model change. The exact
+piecewise barrier derivatives in PF material_manifest.py may be useful as a
+reference for a reporting utility, provided the selected FEM barrier is
+verified to match and the FEM state/rate law is preserved.
+
+
+12. IMMUTABLE SOURCE LINKS
+==========================
+
+Barrier and PT types:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_types_v912.py
+
+Persistent-source configuration:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_types_v913.py
+
+Fast stateful 0-D model:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/zero_d_persistent_v913.py
+
+Persistent spatial state:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_state_v913.py
+
+Native loading map and autonomous 1-D runner:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_rcurve_v913.py
+
+Inherited kernels and signed rates:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_state_v912.py
+
+Inherited spatial integrator:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_state_v912_stiff.py
+
+Inherited energy diagnostics and their limits:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_state_v912_energy.py
+
+Candidate constructor and active-field contract:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_campaign_v913.py
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/arrhenius_fracture/emergent_gnd_contract_v913.py
+
+Physics loader:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/scripts/run_mpz_v9_13_persistent_top5.py
+
+Candidate and basic physics fixtures:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/candidates/v9_13_persistent_sites_top5_registry.csv
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/mpz_v9_13_persistent_sites_common_physics.json
+
+Historical calibrated physics and loading fixtures:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/runs/v9_13_v10222_rcurve_alpha0p95_all50_v1/v9_13_R_curve_calibrated_common_physics.json
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/runs/v9_13_v10222_rcurve_alpha0p95_all50_v1/v9_13_R_curve_calibrated_loading_map.json
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/mpz_v9_13_v10222_transfer_common_physics.json
+
+Background documentation:
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/README_MPZ_V9_13_PERSISTENT_SITES.md
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/README_V9_13_AUTONOMOUS_RCURVE_CALIBRATION.md
+https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ/blob/ce2bf9d4e868468b6979f0fc8398de95ce983367/README_V9_13_ZERO_D_LARGE_PERSISTENT_SEARCH.md
+
+Separate PF background and analytical-screen source:
+https://github.com/ukaiiaku-maker/PF-fracture-fatigue/tree/23beacdf8acad8c3ed7c7c3a1f2f2f9bdbdd0f3b
+https://github.com/ukaiiaku-maker/PF-fracture-fatigue/blob/23beacdf8acad8c3ed7c7c3a1f2f2f9bdbdd0f3b/arrhenius_fracture/analytical_screen_v1028.py
+https://github.com/ukaiiaku-maker/PF-fracture-fatigue/blob/23beacdf8acad8c3ed7c7c3a1f2f2f9bdbdd0f3b/arrhenius_fracture/material_manifest.py
