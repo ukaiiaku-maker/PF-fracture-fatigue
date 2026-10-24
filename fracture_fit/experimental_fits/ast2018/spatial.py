@@ -78,7 +78,7 @@ def predict_spatial(spatial,candidate,physics,specimen:Specimen,T_K:float,
     events=[];steps=0;max_dH=0.0
     target=(assumptions.target_extension_m if required_extension_m is None else required_extension_m)
 
-    def trial(fraction,old_state,du,old_committed_path,force_full_path=False):
+    def trial(fraction,old_state,du,old_committed_path):
         dt=fraction*du/speed
         unew=u+fraction*du
         a=specimen.a0_m+extension
@@ -95,7 +95,6 @@ def predict_spatial(spatial,candidate,physics,specimen:Specimen,T_K:float,
             fraction_path=min(max((action+Hpred)/threshold,0.0),1.0)**translation_action_exponent
             da_step=max(assumptions.event_advance_m*fraction_path-old_committed_path,0.0)
             da_step=min(da_step,assumptions.event_advance_m-old_committed_path)
-            if force_full_path: da_step=assumptions.event_advance_m-old_committed_path
             resolved=spatial._state_advance_is_resolved(
                 znew,.5*(K0+K1),T_K,dt,minimum_expected_activations=0.0)
             if resolved and da_step>0:
@@ -134,10 +133,10 @@ def predict_spatial(spatial,candidate,physics,specimen:Specimen,T_K:float,
                 lo,hi=0.0,1.0
                 for _ in range(assumptions.localization_bisections):
                     mid=.5*(lo+hi)
-                    result=trial(mid,old,du,committed_path,True)
+                    result=trial(mid,old,du,committed_path)
                     if action+result[5]>=threshold:hi=mid
                     else:lo=mid
-                znew,unew,uplnew,Fnew,dt,dH,da_step=trial(hi,old,du,committed_path,True)
+                znew,unew,uplnew,Fnew,dt,dH,da_step=trial(hi,old,du,committed_path)
                 state,u,upl,force=znew,unew,uplnew,Fnew;time+=dt
                 K=specimen.current_K_MPa_sqrt_m(force,specimen.a0_m+extension)
                 if extension+assumptions.event_advance_m>=specimen.W_m-specimen.a0_m:
