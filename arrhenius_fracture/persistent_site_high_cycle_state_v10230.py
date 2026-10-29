@@ -36,11 +36,19 @@ MPZ_ACTIVE_ARRAYS = (
     "wake_retained_negative",
     "wake_slip_positive",
     "wake_slip_negative",
+    "bulk_tip_signed_count",
+    "bulk_tip_opening_count",
 )
 
 ENGINE_ACTIVE_SCALARS = (
     "W_emit",
     "K_prev",
+)
+
+MPZ_ACTIVE_SCALARS = (
+    "source_passage_slip_count",
+    "forward_passage_slip_count",
+    "bulk_tip_opening_slip_count",
 )
 
 MPZ_LEDGER_SCALARS = (
@@ -50,6 +58,8 @@ MPZ_LEDGER_SCALARS = (
     "signed_line_content_emitted_total",
     "cumulative_gross_source_activity",
     "cumulative_gross_return_activity",
+    "bulk_tip_absorbed_absolute_total",
+    "bulk_tip_absorbed_opening_total",
 )
 
 MPZ_LEDGER_ARRAYS = (
@@ -207,6 +217,14 @@ def serialize_active_state(
         stop = cursor + flat.size
         fields.append(StateField("mpz", name, tuple(array.shape), cursor, stop, 1.0))
         cursor = stop
+
+    for name in MPZ_ACTIVE_SCALARS:
+        if not hasattr(mpz, name):
+            continue
+        flat = np.asarray([_finite(getattr(mpz, name))], dtype=float)
+        values.append(flat)
+        fields.append(StateField("mpz", name, (), cursor, cursor + 1, 1.0))
+        cursor += 1
 
     for name in ENGINE_ACTIVE_SCALARS:
         if not hasattr(engine, name):

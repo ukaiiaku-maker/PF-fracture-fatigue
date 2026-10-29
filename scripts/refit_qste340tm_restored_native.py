@@ -524,6 +524,24 @@ def evaluate_candidate(candidate_id: str, plastic: PlasticCoordinates, parent: A
     path = directory / f"{candidate_id}_{identity[:12]}.json"
     if path.is_file() and not force:
         return json.loads(path.read_text())
+    # A wall-clock limit is scheduler metadata, not material or numerical
+    # identity.  Reuse an already complete result at the exact physical scope
+    # instead of rerunning it solely because a later invocation changed that
+    # limit.  Rejected/partial rows are never reused through this path.
+    if not force:
+        for prior_path in sorted(directory.glob(f"{candidate_id}_*.json")):
+            prior = json.loads(prior_path.read_text())
+            if (prior.get("status") == "complete"
+                    and prior.get("evaluator_identity") == MODEL_ID
+                    and prior.get("plastic_coordinates") == asdict(plastic)
+                    and int(prior.get("points_per_R", -1)) == int(points)
+                    and int(prior.get("phase_count", -1)) == int(phases)):
+                reused = copy.deepcopy(prior)
+                reused["cache_reuse"] = {
+                    "source": str(prior_path.resolve()),
+                    "policy": "exact physical/numerical identity; wall limit excluded",
+                }
+                return reused
     print(f"[{candidate_id}] native history start", flush=True)
     old_handler = signal.getsignal(signal.SIGALRM)
     try:
@@ -714,7 +732,7 @@ def make_plots(records: list[dict[str, Any]], finalists: dict[str, Any],
                 panel.plot(x[order], prediction[mask][order], color=color, ls=style, lw=1.8, label=label)
             panel.set(xscale="log", yscale="log", title=f"R={r_value:.1f}",
                       xlabel=(r"$\Delta K$ (MPa$\sqrt{m}$)" if axis == "DeltaK" else r"$K_{max}$ (MPa$\sqrt{m}$)"))
-            panel.grid(True, which="both", alpha=.2)
+            panel.grid(False)
         axes[0,0].set_ylabel("da/dN (m/cycle)"); axes[1,0].set_ylabel("da/dN (m/cycle)")
         handles, labels = axes[0,0].get_legend_handles_labels()
         fig.legend(handles, labels, ncol=4, loc="upper center", bbox_to_anchor=(.5,.98), frameon=False)
@@ -727,7 +745,7 @@ def make_plots(records: list[dict[str, Any]], finalists: dict[str, Any],
             residual = np.log10(prediction[mask]/observed[mask])
             panel.plot(dk[mask], residual, color=color, ls=style, lw=1.6, label=label)
         panel.axhline(0, color="#555555", lw=.8); panel.set(title=f"R={r_value:.1f}", xlabel=r"$\Delta K$ (MPa$\sqrt{m}$)")
-        panel.grid(True, alpha=.2)
+        panel.grid(False)
     axes[0,0].set_ylabel("log10 prediction/data"); axes[1,0].set_ylabel("log10 prediction/data")
     fig.tight_layout(); fig.savefig(OUT/"restored_residuals.png", dpi=240, bbox_inches="tight"); plt.close(fig)
 
@@ -742,7 +760,7 @@ def make_plots(records: list[dict[str, Any]], finalists: dict[str, Any],
         panel.plot(x, mobile, label="mobile"); panel.plot(x, retained, label="retained")
         panel.plot(x, slip, label="net slip"); panel.plot(x, returned, label="returned slip")
         panel.set(title=f"R={r_value:.1f}", xlabel="source order", yscale="symlog", ylabel="native count")
-        panel.grid(True, alpha=.2)
+        panel.grid(False)
     handles, labels = axes[0,0].get_legend_handles_labels(); fig.legend(handles, labels, ncol=4, loc="upper center", frameon=False)
     fig.tight_layout(rect=(0,0,1,.94)); fig.savefig(OUT/"restored_state_histories.png", dpi=240, bbox_inches="tight"); plt.close(fig)
 
@@ -753,7 +771,7 @@ def make_plots(records: list[dict[str, Any]], finalists: dict[str, Any],
         surface = opening_surface(base_surface, unpack_opening(vector))
         axis.plot(stress/1e9, surface.G_eV(stress, TEMPERATURE_K), color=color, label=mode)
     axis.set(xlabel="production opening stress (GPa)", ylabel=r"$G^*$ (eV)", title="Restored-runtime alternative opening barriers at 298.15 K")
-    axis.grid(True, alpha=.2); axis.legend(frameon=False); fig.tight_layout(); fig.savefig(OUT/"restored_Gstar.png", dpi=240, bbox_inches="tight"); plt.close(fig)
+    axis.grid(False); axis.legend(frameon=False); fig.tight_layout(); fig.savefig(OUT/"restored_Gstar.png", dpi=240, bbox_inches="tight"); plt.close(fig)
 
 
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -770,6 +788,11 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--initial-candidates", type=int, default=16)
+    parser.add_argument("--initial-start", type=int, default=0)
+    parser.add_argument("--initial-stop", type=int)
+    parser.add_argument("--initial-only", action="store_true",
+                        help="evaluate only the requested disjoint initial slice")
+    parser.add_argument("--progress-file", type=Path)
     parser.add_argument("--local-candidates", type=int, default=4)
     parser.add_argument("--coarse-support", type=int, default=4)
     parser.add_argument("--coarse-phase", type=int, default=8)
@@ -781,11 +804,21 @@ def main(argv: list[str] | None = None) -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     records = build_records("index_rank", premeasurement=True)
     parent = load_parent_binding(ALT_REGISTRY, PARENT_REGISTRY, candidate_id=PARENT_CANDIDATE)
+    vectors = candidate_vectors(args.initial_candidates)
+    stop = args.initial_candidates if args.initial_stop is None else args.initial_stop
+    if not 0 <= args.initial_start <= stop <= args.initial_candidates:
+        raise ValueError("initial slice must lie within the declared candidate count")
+    progress_path = args.progress_file or OUT/"search_progress.json"
     initial = []
-    for candidate_id, plastic in candidate_vectors(args.initial_candidates):
+    for candidate_id, plastic in vectors[args.initial_start:stop]:
         result = evaluate_candidate(candidate_id, plastic, parent, records, args.coarse_support, args.coarse_phase, force=args.force, max_wall_s=args.candidate_wall_s)
         initial.append(result)
-        atomic_json(OUT/"search_progress.json", {"stage":"initial", "completed":len(initial), "results":initial})
+        atomic_json(progress_path, {"stage":"initial", "slice":[args.initial_start,stop],
+                    "completed":len(initial), "results":initial})
+    if args.initial_only:
+        return 0
+    if args.initial_start != 0 or stop != args.initial_candidates:
+        raise ValueError("a sliced initial search must use --initial-only")
     complete = [row for row in initial if row.get("status") == "complete"]
     if not complete:
         raise RuntimeError("no initial native candidate completed")

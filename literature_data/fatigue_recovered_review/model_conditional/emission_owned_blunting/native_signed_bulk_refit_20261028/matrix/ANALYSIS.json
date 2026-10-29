@@ -1,0 +1,26 @@
+{
+  "block_bias_span_log10": 0.9332739238025043,
+  "case_count": 16,
+  "continuum_bulk_plasticity": true,
+  "developed_interevent_count": 16,
+  "loading_control": "fixed_local_kmax",
+  "material_fit": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/fit.json",
+  "native_2d_bias_log10_vs_experiment": -0.041395948418168106,
+  "native_2d_bias_log10_vs_signed_bulk_1d": -0.043671487977262904,
+  "native_2d_block_biases_log10_vs_experiment": {
+    "0.1": -0.4352613155874264,
+    "0.3": -0.26914332786719924,
+    "0.5": 0.04080824156687543,
+    "0.7": 0.4980126082150778
+  },
+  "native_2d_rmse_log10_vs_experiment": 0.38360484893938207,
+  "native_2d_rmse_log10_vs_signed_bulk_1d": 0.16631645504946022,
+  "native_2d_slopes": {
+    "0.1": 2.4742171413245857,
+    "0.3": 2.067672284901113,
+    "0.5": 2.340706723016677,
+    "0.7": 2.4286791828342813
+  },
+  "schema": "qste340tm-native-signed-bulk-analysis/1",
+  "signed_GND_tip_absorption": true
+}

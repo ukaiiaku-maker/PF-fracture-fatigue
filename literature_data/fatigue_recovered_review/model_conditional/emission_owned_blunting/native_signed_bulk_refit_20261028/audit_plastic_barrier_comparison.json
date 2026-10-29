@@ -1,0 +1,156 @@
+{
+  "background_forest_density_m-2": 5000000000000.0,
+  "barrier_contract": {
+    "emission": "EXP_floor(emission_G0, sigma_eff)",
+    "note": "Peierls and Taylor share the fitted transport energy surface in this 1-D reduction; attempt-frequency and downstream rate operators differ.",
+    "peierls": "EXP_floor(transport_G0, sigma_eff/sqrt(3))",
+    "taylor": "EXP_floor(transport_G0, sigma_eff/sqrt(3) * spacing(rho)/b)"
+  },
+  "burgers_m": 2.48e-10,
+  "curves": [
+    {
+      "barrier_eV_ranges": {
+        "emission": [
+          0.4981741227947841,
+          0.7392106055606265
+        ],
+        "peierls_runtime_mapping": [
+          0.306749841844422,
+          0.38542829060400097
+        ],
+        "taylor_runtime_envelope": [
+          0.007708565812080019,
+          0.38542829060400097
+        ]
+      },
+      "effective_stress_Pa": [
+        0.0,
+        13620614405.229332
+      ],
+      "forest_density_m-2": [
+        5000000000016.475,
+        5073794603945.368,
+        5567566357937.622
+      ],
+      "label": "Signed bulk",
+      "parameters": {
+        "blunting_length_m": 1.7353324956183803e-05,
+        "cleavage_backstress_fraction": 1.5681874331284933,
+        "emission_G0_298_eV": 0.7392106055606263,
+        "forward_slip_blunting_coefficient": 591.1111710249604,
+        "initial_mobile_count": 4741.455970969419,
+        "initial_retained_count": 1.6474723375453433e-11,
+        "opening_amplitude_over_kBT": 32.038570733521986,
+        "opening_exponent": 0.08872089681533074,
+        "opening_floor_over_kBT": 12.81800803283095,
+        "opening_sigma_b_Pa": 65182576.56221928,
+        "opening_smoothing_ratio": 0.0001,
+        "plastic_sigc_298_Pa": 3522536345.540295,
+        "retained_recovery_per_s": 5.61292721265342,
+        "source_slip_blunting_coefficient": 482.48785394840144,
+        "transport_G0_298_eV": 0.38542829060400086
+      },
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/fit.json"
+    },
+    {
+      "barrier_eV_ranges": {
+        "emission": [
+          0.48224243683577017,
+          0.7253024235741101
+        ],
+        "peierls_runtime_mapping": [
+          0.46661655607318475,
+          0.5909119163149974
+        ],
+        "taylor_runtime_envelope": [
+          0.011818238326299949,
+          0.5909119163149974
+        ]
+      },
+      "effective_stress_Pa": [
+        0.0,
+        16048465434.03039
+      ],
+      "forest_density_m-2": [
+        5000000000220.897,
+        13359663195600.8,
+        38389276229774.94
+      ],
+      "label": "No bulk, best refit",
+      "parameters": {
+        "blunting_length_m": 2.5319679761652434e-06,
+        "cleavage_backstress_fraction": 2.0,
+        "emission_G0_298_eV": 0.7253024235741102,
+        "forward_slip_blunting_coefficient": 781.4533872595562,
+        "initial_mobile_count": 4722.143514075938,
+        "initial_retained_count": 0.0038576559296733376,
+        "opening_amplitude_over_kBT": 11.362746643712159,
+        "opening_exponent": 1.0,
+        "opening_floor_over_kBT": 7.321920316485294,
+        "opening_sigma_b_Pa": 86930441927.51172,
+        "opening_smoothing_ratio": 0.0001,
+        "plastic_sigc_298_Pa": 3405327243.3238163,
+        "retained_recovery_per_s": 0.0013709208184358773,
+        "source_slip_blunting_coefficient": 147.88287494903858,
+        "transport_G0_298_eV": 0.5909119163149974
+      },
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_matched_refit_20261028/fit.json"
+    },
+    {
+      "barrier_eV_ranges": {
+        "emission": [
+          0.4822448474213927,
+          0.7253046927266831
+        ],
+        "peierls_runtime_mapping": [
+          0.4666168764496084,
+          0.5909116808850599
+        ],
+        "taylor_runtime_envelope": [
+          0.011818233617701197,
+          0.5909116808850599
+        ]
+      },
+      "effective_stress_Pa": [
+        0.0,
+        16048587264.929476
+      ],
+      "forest_density_m-2": [
+        5000000000220.811,
+        13359403990971.855,
+        38388967902897.48
+      ],
+      "label": "No bulk, repeat refit",
+      "parameters": {
+        "blunting_length_m": 2.531934050493853e-06,
+        "cleavage_backstress_fraction": 2.0,
+        "emission_G0_298_eV": 0.725304692726683,
+        "forward_slip_blunting_coefficient": 781.4518836105336,
+        "initial_mobile_count": 4722.112922621789,
+        "initial_retained_count": 0.0038404787045669287,
+        "opening_amplitude_over_kBT": 29.070038185513962,
+        "opening_exponent": 0.0820747574179271,
+        "opening_floor_over_kBT": 13.588032641104176,
+        "opening_sigma_b_Pa": 50437599.92353584,
+        "opening_smoothing_ratio": 0.0001,
+        "plastic_sigc_298_Pa": 3405342933.2758584,
+        "retained_recovery_per_s": 0.0013709173893991823,
+        "source_slip_blunting_coefficient": 147.88145782301274,
+        "transport_G0_298_eV": 0.5909116808850599
+      },
+      "path": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_equal_effort_control_20261028/fit.json"
+    }
+  ],
+  "effective_tip_stress_grid_Pa": [
+    0.0,
+    16851016628.175951
+  ],
+  "outputs": [
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_plastic_barrier_comparison.png",
+    "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_plastic_barrier_comparison.svg"
+  ],
+  "process_zone_m": 1e-06,
+  "resolved_stress_fraction": 0.5773502691896258,
+  "schema": "qste340tm-audit-plastic-barrier-comparison/1",
+  "temperature_K": 298.15
+}

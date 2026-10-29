@@ -1,0 +1,23 @@
+{
+  "schema": "qste340tm-native-signed-bulk-acquisition-candidate/1",
+  "status": "research_candidate_not_final_fit",
+  "parent": "resolved_increment_1d/released_sloping_barrier_search/fit.json",
+  "acquisition_reason": "retain the signed-bulk high-R suppression while restoring the low-R high-DeltaK rate through permitted opening-barrier curvature",
+  "parameters": {
+    "blunting_length_m": 5.5576743532943505e-06,
+    "cleavage_backstress_fraction": 1.6394752840428962e-34,
+    "emission_G0_298_eV": 0.8991514012082426,
+    "forward_slip_blunting_coefficient": 163.04402133488398,
+    "initial_mobile_count": 382.3880633719838,
+    "initial_retained_count": 0.6731883058699863,
+    "opening_amplitude_over_kBT": 13.026743804241374,
+    "opening_exponent": 3.0,
+    "opening_floor_over_kBT": 10.1,
+    "opening_sigma_b_Pa": 15000000000.0,
+    "opening_smoothing_ratio": 0.0001,
+    "plastic_sigc_298_Pa": 1789447080.3218987,
+    "retained_recovery_per_s": 0.3815551213160423,
+    "source_slip_blunting_coefficient": 101.45128024180238,
+    "transport_G0_298_eV": 0.8162129355055648
+  }
+}

@@ -1,0 +1,465 @@
+{
+  "schema": "qste340tm-signed-bulk-extended-event-window/1",
+  "extended_matrix": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events",
+  "accepted_matrix": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix",
+  "material_fit": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/fit.json",
+  "target_events": 7,
+  "event_length_m": 5e-06,
+  "cases_reproducing_accepted_first_three_events": 0,
+  "windows": {
+    "accepted_waits_1_2": {
+      "slopes": {
+        "0.1": 2.5062485667417587,
+        "0.3": 1.6965505824217726,
+        "0.5": 2.2511529474209477,
+        "0.7": 2.784554095351468
+      },
+      "block_biases_log10": {
+        "0.1": -0.4298585283342571,
+        "0.3": -0.2845491703681324,
+        "0.5": 0.05945104921822035,
+        "0.7": 0.5459283736714413
+      },
+      "case_count": 16,
+      "rmse_log10_vs_experiment": 0.4063853423730828,
+      "bias_log10_vs_experiment": -0.027257068953181945,
+      "block_bias_span_log10": 0.9757869020056984
+    },
+    "late_waits_4_6": {
+      "slopes": {
+        "0.1": 2.4765554070540805,
+        "0.3": 1.6797687356733757,
+        "0.5": 2.0464603544580635,
+        "0.7": 1.9968146738419745
+      },
+      "block_biases_log10": {
+        "0.1": -0.43521714777345644,
+        "0.3": -0.17511204934718494,
+        "0.5": 0.23504076789668862,
+        "0.7": 0.8240804386691678
+      },
+      "case_count": 16,
+      "rmse_log10_vs_experiment": 0.5157911772928764,
+      "bias_log10_vs_experiment": 0.11219800236130378,
+      "block_bias_span_log10": 1.2592975864426244
+    }
+  },
+  "cases": [
+    {
+      "R": 0.1,
+      "DeltaK": 18.0,
+      "status": "completed",
+      "event_cycles": [
+        113.0,
+        446.0,
+        739.0,
+        1045.0,
+        1370.0,
+        1665.0,
+        1953.0
+      ],
+      "waits": [
+        333.0,
+        293.0,
+        306.0,
+        325.0,
+        295.0,
+        288.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 1.597444089456869e-08,
+      "late_waits_4_6": 1.6519823788546257e-08,
+      "late_over_accepted_log10": 0.014579743745025853
+    },
+    {
+      "R": 0.1,
+      "DeltaK": 24.0,
+      "status": "completed",
+      "event_cycles": [
+        52.0,
+        160.0,
+        255.0,
+        351.0,
+        450.0,
+        543.0,
+        633.0
+      ],
+      "waits": [
+        108.0,
+        95.0,
+        96.0,
+        99.0,
+        93.0,
+        90.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 4.926108374384237e-08,
+      "late_waits_4_6": 5.319148936170213e-08,
+      "late_over_accepted_log10": 0.03333818864953306
+    },
+    {
+      "R": 0.1,
+      "DeltaK": 32.0,
+      "status": "completed",
+      "event_cycles": [
+        33.0,
+        75.0,
+        142.0,
+        220.0,
+        311.0,
+        383.0,
+        448.0
+      ],
+      "waits": [
+        42.0,
+        67.0,
+        78.0,
+        91.0,
+        72.0,
+        65.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 9.174311926605506e-08,
+      "late_waits_4_6": 6.578947368421053e-08,
+      "late_over_accepted_log10": -0.14441709000414893
+    },
+    {
+      "R": 0.1,
+      "DeltaK": 40.0,
+      "status": "completed",
+      "event_cycles": [
+        27.0,
+        69.0,
+        111.0,
+        150.0,
+        189.0,
+        223.0,
+        256.0
+      ],
+      "waits": [
+        42.0,
+        42.0,
+        39.0,
+        39.0,
+        34.0,
+        33.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 1.1904761904761906e-07,
+      "late_waits_4_6": 1.4150943396226417e-07,
+      "late_over_accepted_log10": 0.07506467985279265
+    },
+    {
+      "R": 0.3,
+      "DeltaK": 17.0,
+      "status": "completed",
+      "event_cycles": [
+        57.0,
+        252.0,
+        410.0,
+        561.0,
+        712.0,
+        844.0,
+        969.0
+      ],
+      "waits": [
+        195.0,
+        158.0,
+        151.0,
+        151.0,
+        132.0,
+        125.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 2.8328611898017e-08,
+      "late_waits_4_6": 3.6764705882352945e-08,
+      "late_over_accepted_log10": 0.11320580135362387
+    },
+    {
+      "R": 0.3,
+      "DeltaK": 23.0,
+      "status": "completed",
+      "event_cycles": [
+        32.0,
+        107.0,
+        171.0,
+        233.0,
+        295.0,
+        350.0,
+        402.0
+      ],
+      "waits": [
+        75.0,
+        64.0,
+        62.0,
+        62.0,
+        55.0,
+        52.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 7.194244604316547e-08,
+      "late_waits_4_6": 8.875739644970415e-08,
+      "late_over_accepted_log10": 0.09121935469610278
+    },
+    {
+      "R": 0.3,
+      "DeltaK": 30.0,
+      "status": "completed",
+      "event_cycles": [
+        24.0,
+        79.0,
+        127.0,
+        170.0,
+        210.0,
+        246.0,
+        279.0
+      ],
+      "waits": [
+        55.0,
+        48.0,
+        43.0,
+        40.0,
+        36.0,
+        33.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 9.70873786407767e-08,
+      "late_waits_4_6": 1.3761467889908257e-07,
+      "late_over_accepted_log10": 0.15150198582022983
+    },
+    {
+      "R": 0.3,
+      "DeltaK": 36.0,
+      "status": "completed",
+      "event_cycles": [
+        21.0,
+        47.0,
+        120.0,
+        181.0,
+        229.0,
+        269.0,
+        304.0
+      ],
+      "waits": [
+        26.0,
+        73.0,
+        61.0,
+        48.0,
+        40.0,
+        35.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 1.0101010101010101e-07,
+      "late_waits_4_6": 1.2195121951219514e-07,
+      "late_over_accepted_log10": 0.08182134221383329
+    },
+    {
+      "R": 0.5,
+      "DeltaK": 15.5,
+      "status": "completed",
+      "event_cycles": [
+        29.0,
+        161.0,
+        258.0,
+        353.0,
+        442.0,
+        514.0,
+        578.0
+      ],
+      "waits": [
+        132.0,
+        97.0,
+        95.0,
+        89.0,
+        72.0,
+        64.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 4.366812227074236e-08,
+      "late_waits_4_6": 6.666666666666667e-08,
+      "late_over_accepted_log10": 0.18374422328420673
+    },
+    {
+      "R": 0.5,
+      "DeltaK": 19.0,
+      "status": "completed",
+      "event_cycles": [
+        23.0,
+        110.0,
+        177.0,
+        239.0,
+        296.0,
+        342.0,
+        382.0
+      ],
+      "waits": [
+        87.0,
+        67.0,
+        62.0,
+        57.0,
+        46.0,
+        40.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 6.493506493506494e-08,
+      "late_waits_4_6": 1.048951048951049e-07,
+      "late_over_accepted_log10": 0.20827594242708256
+    },
+    {
+      "R": 0.5,
+      "DeltaK": 23.0,
+      "status": "completed",
+      "event_cycles": [
+        19.0,
+        71.0,
+        113.0,
+        152.0,
+        188.0,
+        219.0,
+        247.0
+      ],
+      "waits": [
+        52.0,
+        42.0,
+        39.0,
+        36.0,
+        31.0,
+        28.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 1.0638297872340426e-07,
+      "late_waits_4_6": 1.5789473684210527e-07,
+      "late_over_accepted_log10": 0.17149550736653213
+    },
+    {
+      "R": 0.5,
+      "DeltaK": 27.0,
+      "status": "completed",
+      "event_cycles": [
+        18.0,
+        53.0,
+        85.0,
+        115.0,
+        142.0,
+        166.0,
+        188.0
+      ],
+      "waits": [
+        35.0,
+        32.0,
+        30.0,
+        27.0,
+        24.0,
+        22.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 1.492537313432836e-07,
+      "late_waits_4_6": 2.0547945205479454e-07,
+      "late_over_accepted_log10": 0.13884320163605177
+    },
+    {
+      "R": 0.7,
+      "DeltaK": 12.0,
+      "status": "completed",
+      "event_cycles": [
+        19.0,
+        138.0,
+        237.0,
+        317.0,
+        377.0,
+        424.0,
+        463.0
+      ],
+      "waits": [
+        119.0,
+        99.0,
+        80.0,
+        60.0,
+        47.0,
+        39.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 4.587155963302753e-08,
+      "late_waits_4_6": 1.0273972602739727e-07,
+      "late_over_accepted_log10": 0.3501948968758489
+    },
+    {
+      "R": 0.7,
+      "DeltaK": 14.0,
+      "status": "completed",
+      "event_cycles": [
+        17.0,
+        84.0,
+        153.0,
+        208.0,
+        249.0,
+        282.0,
+        310.0
+      ],
+      "waits": [
+        67.0,
+        69.0,
+        55.0,
+        41.0,
+        33.0,
+        28.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 7.352941176470589e-08,
+      "late_waits_4_6": 1.4705882352941178e-07,
+      "late_over_accepted_log10": 0.3010299956639812
+    },
+    {
+      "R": 0.7,
+      "DeltaK": 16.0,
+      "status": "completed",
+      "event_cycles": [
+        16.0,
+        61.0,
+        109.0,
+        149.0,
+        180.0,
+        206.0,
+        228.0
+      ],
+      "waits": [
+        45.0,
+        48.0,
+        40.0,
+        31.0,
+        26.0,
+        22.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 1.0752688172043012e-07,
+      "late_waits_4_6": 1.8987341772151902e-07,
+      "late_over_accepted_log10": 0.24694711631917496
+    },
+    {
+      "R": 0.7,
+      "DeltaK": 18.0,
+      "status": "completed",
+      "event_cycles": [
+        16.0,
+        45.0,
+        87.0,
+        119.0,
+        144.0,
+        165.0,
+        184.0
+      ],
+      "waits": [
+        29.0,
+        42.0,
+        32.0,
+        25.0,
+        21.0,
+        19.0
+      ],
+      "first_three_events_match_accepted": false,
+      "accepted_waits_1_2": 1.4084507042253522e-07,
+      "late_waits_4_6": 2.3076923076923078e-07,
+      "late_over_accepted_log10": 0.21443625113190093
+    }
+  ]
+}

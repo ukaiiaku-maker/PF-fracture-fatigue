@@ -1,0 +1,117 @@
+{
+  "schema": "qste340tm-matched-1d-control-comparison/1",
+  "no_bulk_rmse_log10": 0.3087992072448591,
+  "signed_bulk_rmse_log10": 0.29523348393431903,
+  "signed_bulk_minus_no_bulk_rmse_log10": -0.013565723310540068,
+  "relative_RMSE_reduction_fraction": 0.043930563914250174,
+  "no_bulk_block_metrics": {
+    "0.1": {
+      "bias_log10_rate": -0.3749925104444549,
+      "forward_slip_final": 0.3651599720145771,
+      "observed_slope": 3.7092045452619558,
+      "predicted_slope": 3.5100208463575995,
+      "radius_range_m": [
+        1e-06,
+        1.885640286346891e-06
+      ],
+      "rmse_log10_rate": 0.3810056263722677,
+      "source_slip_final": 15.019413703245618
+    },
+    "0.3": {
+      "bias_log10_rate": -0.16020616482754615,
+      "forward_slip_final": 0.843221316807631,
+      "observed_slope": 3.3783824529342126,
+      "predicted_slope": 3.5506322026675345,
+      "radius_range_m": [
+        1e-06,
+        2.2180339422615247e-06
+      ],
+      "rmse_log10_rate": 0.16750460380236298,
+      "source_slip_final": 20.98890204964294
+    },
+    "0.5": {
+      "bias_log10_rate": 0.07259686295040034,
+      "forward_slip_final": 2.43100110917605,
+      "observed_slope": 3.7618960539977753,
+      "predicted_slope": 3.8810910383745503,
+      "radius_range_m": [
+        1e-06,
+        3.7574449879704546e-06
+      ],
+      "rmse_log10_rate": 0.10335795893140194,
+      "source_slip_final": 29.802637127351545
+    },
+    "0.7": {
+      "bias_log10_rate": 0.4622455579553262,
+      "forward_slip_final": 12.067392165431102,
+      "observed_slope": 2.9204577070033,
+      "predicted_slope": 2.894640419853992,
+      "radius_range_m": [
+        1e-06,
+        6.374056958344384e-06
+      ],
+      "rmse_log10_rate": 0.48331899114122895,
+      "source_slip_final": 42.24476452004452
+    }
+  },
+  "signed_bulk_block_metrics": {
+    "0.1": {
+      "bias_log10_rate": -0.3579697824601363,
+      "forward_slip_final": 0.0024609374370367734,
+      "observed_slope": 3.7092045452619558,
+      "predicted_slope": 3.572895450915434,
+      "radius_range_m": [
+        1e-06,
+        2.861842104596271e-06
+      ],
+      "rmse_log10_rate": 0.3602954067513296,
+      "source_slip_final": 15.476149353361885
+    },
+    "0.3": {
+      "bias_log10_rate": -0.15794779042252527,
+      "forward_slip_final": 0.0029820595124707733,
+      "observed_slope": 3.3783824529342126,
+      "predicted_slope": 3.386289662595489,
+      "radius_range_m": [
+        1e-06,
+        3.771846345932618e-06
+      ],
+      "rmse_log10_rate": 0.16016347198323758,
+      "source_slip_final": 21.826218254034394
+    },
+    "0.5": {
+      "bias_log10_rate": 0.057726869809644886,
+      "forward_slip_final": 0.004494557125226491,
+      "observed_slope": 3.7618960539977753,
+      "predicted_slope": 3.837146077753578,
+      "radius_range_m": [
+        1e-06,
+        5.8591168955913835e-06
+      ],
+      "rmse_log10_rate": 0.08405822521350297,
+      "source_slip_final": 33.6753245823606
+    },
+    "0.7": {
+      "bias_log10_rate": 0.4579190020325872,
+      "forward_slip_final": 0.010800131031720894,
+      "observed_slope": 2.9204577070033,
+      "predicted_slope": 3.162794110584854,
+      "radius_range_m": [
+        1e-06,
+        1.0213180301586993e-05
+      ],
+      "rmse_log10_rate": 0.4723854264201607,
+      "source_slip_final": 70.33529110993989
+    }
+  },
+  "decision": "signed bulk gives a modest aggregate improvement under matched independent optimization",
+  "comparison_contract": {
+    "local_refinement_count": 4,
+    "mechanical_bank_count": 20,
+    "mechanical_bank_seed": 20261028,
+    "opening_profile": "DE popsize=7 maxiter=32 polish=true",
+    "same_as_signed_bulk": true
+  },
+  "no_bulk_fit": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_matched_refit_20261028/fit.json",
+  "signed_bulk_fit": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/fit.json"
+}

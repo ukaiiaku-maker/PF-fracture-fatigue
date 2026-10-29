@@ -1,0 +1,242 @@
+{
+  "advection_step_m": 2.5e-07,
+  "barrier_over_kBT_range": [
+    16.74990818308225,
+    18.66185958798063
+  ],
+  "comparison_contract": {
+    "local_refinement_count": 4,
+    "mechanical_bank_count": 20,
+    "mechanical_bank_seed": 20261028,
+    "opening_profile": "DE popsize=7 maxiter=32 polish=true",
+    "same_as_signed_bulk": true
+  },
+  "elapsed_s": 741.9584279060364,
+  "final_phases": 48,
+  "fit_phases": 6,
+  "full_data_opening_profile_SSE": 0.446626853195911,
+  "metrics": {
+    "blocks": {
+      "0.1": {
+        "bias_log10_rate": -0.3749925104444549,
+        "forward_slip_final": 0.3651599720145771,
+        "observed_slope": 3.7092045452619558,
+        "predicted_slope": 3.5100208463575995,
+        "radius_range_m": [
+          1e-06,
+          1.885640286346891e-06
+        ],
+        "rmse_log10_rate": 0.3810056263722677,
+        "source_slip_final": 15.019413703245618
+      },
+      "0.3": {
+        "bias_log10_rate": -0.16020616482754615,
+        "forward_slip_final": 0.843221316807631,
+        "observed_slope": 3.3783824529342126,
+        "predicted_slope": 3.5506322026675345,
+        "radius_range_m": [
+          1e-06,
+          2.2180339422615247e-06
+        ],
+        "rmse_log10_rate": 0.16750460380236298,
+        "source_slip_final": 20.98890204964294
+      },
+      "0.5": {
+        "bias_log10_rate": 0.07259686295040034,
+        "forward_slip_final": 2.43100110917605,
+        "observed_slope": 3.7618960539977753,
+        "predicted_slope": 3.8810910383745503,
+        "radius_range_m": [
+          1e-06,
+          3.7574449879704546e-06
+        ],
+        "rmse_log10_rate": 0.10335795893140194,
+        "source_slip_final": 29.802637127351545
+      },
+      "0.7": {
+        "bias_log10_rate": 0.4622455579553262,
+        "forward_slip_final": 12.067392165431102,
+        "observed_slope": 2.9204577070033,
+        "predicted_slope": 2.894640419853992,
+        "radius_range_m": [
+          1e-06,
+          6.374056958344384e-06
+        ],
+        "rmse_log10_rate": 0.48331899114122895,
+        "source_slip_final": 42.24476452004452
+      }
+    },
+    "maximum_backstress_Pa": 2361413618.4622846,
+    "maximum_population_density_m-2": 4722147371731868.0,
+    "maximum_radius_m": 6.374056958344384e-06,
+    "overall_bias_log10_rate": -0.07799377770051207,
+    "overall_rmse_log10_rate": 0.3087992072448591
+  },
+  "multi_start": [
+    {
+      "SSE": 0.5591488592396862,
+      "label": "perturb_019",
+      "nfev": 31
+    },
+    {
+      "SSE": 0.685106715939712,
+      "label": "perturb_017",
+      "nfev": 28
+    },
+    {
+      "SSE": 1.0547236901184855,
+      "label": "fixed_shape_control",
+      "nfev": 14
+    },
+    {
+      "SSE": 1.18891468855537,
+      "label": "perturb_001",
+      "nfev": 4
+    }
+  ],
+  "opening_profiles": [
+    {
+      "label": "fixed_shape_control",
+      "opening_profile_SSE": 1.3504588132053807
+    },
+    {
+      "label": "native_unit_blunting",
+      "opening_profile_SSE": 1.9084271136468955
+    },
+    {
+      "label": "source_owned",
+      "opening_profile_SSE": 1.9083502437641646
+    },
+    {
+      "label": "forward_plastic",
+      "opening_profile_SSE": 1.9327273568453451
+    },
+    {
+      "label": "mixed_blunting",
+      "opening_profile_SSE": 1.8944735039925948
+    },
+    {
+      "label": "slow_transport",
+      "opening_profile_SSE": 1.9089246907584037
+    },
+    {
+      "label": "perturb_000",
+      "opening_profile_SSE": 1.86530811771399
+    },
+    {
+      "label": "perturb_001",
+      "opening_profile_SSE": 1.4960505167219622
+    },
+    {
+      "label": "perturb_002",
+      "opening_profile_SSE": 1.7796059288000436
+    },
+    {
+      "label": "perturb_003",
+      "opening_profile_SSE": 1.7402483666924133
+    },
+    {
+      "label": "perturb_004",
+      "opening_profile_SSE": 1.8739389021247632
+    },
+    {
+      "label": "perturb_005",
+      "opening_profile_SSE": 1.7477171302137848
+    },
+    {
+      "label": "perturb_006",
+      "opening_profile_SSE": 135.14530767790123
+    },
+    {
+      "label": "perturb_007",
+      "opening_profile_SSE": 1.85875643770361
+    },
+    {
+      "label": "perturb_008",
+      "opening_profile_SSE": 3.973984581642321
+    },
+    {
+      "label": "perturb_009",
+      "opening_profile_SSE": 1.8459583337702712
+    },
+    {
+      "label": "perturb_010",
+      "opening_profile_SSE": 1.78236769461556
+    },
+    {
+      "label": "perturb_011",
+      "opening_profile_SSE": 1.7771228949021372
+    },
+    {
+      "label": "perturb_012",
+      "opening_profile_SSE": 1.9899361634736306
+    },
+    {
+      "label": "perturb_013",
+      "opening_profile_SSE": 6.6034952366632655
+    },
+    {
+      "label": "perturb_014",
+      "opening_profile_SSE": 2.6206441800353235
+    },
+    {
+      "label": "perturb_015",
+      "opening_profile_SSE": 6.935329535308576
+    },
+    {
+      "label": "perturb_016",
+      "opening_profile_SSE": 1.9605676184833907
+    },
+    {
+      "label": "perturb_017",
+      "opening_profile_SSE": 0.8897254429459869
+    },
+    {
+      "label": "perturb_018",
+      "opening_profile_SSE": 1.7802483152686754
+    },
+    {
+      "label": "perturb_019",
+      "opening_profile_SSE": 1.6078898532791759
+    }
+  ],
+  "parameters": {
+    "blunting_length_m": 2.5319679761652434e-06,
+    "cleavage_backstress_fraction": 2.0,
+    "emission_G0_298_eV": 0.7253024235741102,
+    "forward_slip_blunting_coefficient": 781.4533872595562,
+    "initial_mobile_count": 4722.143514075938,
+    "initial_retained_count": 0.0038576559296733376,
+    "opening_amplitude_over_kBT": 11.362746643712159,
+    "opening_exponent": 1.0,
+    "opening_floor_over_kBT": 7.321920316485294,
+    "opening_sigma_b_Pa": 86930441927.51172,
+    "opening_smoothing_ratio": 0.0001,
+    "plastic_sigc_298_Pa": 3405327243.3238163,
+    "retained_recovery_per_s": 0.0013709208184358773,
+    "source_slip_blunting_coefficient": 147.88287494903858,
+    "transport_G0_298_eV": 0.5909119163149974
+  },
+  "parameters_vector": [
+    7.321920316485294,
+    11.362746643712159,
+    4.465108280794969,
+    0.0,
+    2.0,
+    0.7253024235741102,
+    1.2253410416865522,
+    0.5909119163149974,
+    -6.592272634675308,
+    8.460229855645759,
+    0.003850234255757113,
+    4.996420574973847,
+    6.661155502861387,
+    0.928996856557889
+  ],
+  "schema": "qste340tm-no-bulk-matched-refit/1",
+  "selected_start": "perturb_019",
+  "source_fit": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/released_sloping_barrier_search/fit.json",
+  "status": "executed",
+  "support_points": 64,
+  "total_points": 760
+}

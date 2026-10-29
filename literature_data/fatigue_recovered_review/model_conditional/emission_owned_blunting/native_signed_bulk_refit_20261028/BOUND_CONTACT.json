@@ -1,0 +1,31 @@
+{
+  "schema": "qste340tm-native-opening-bound-contact/1",
+  "fit_sha256": "f93696bba83207db098e4bda8f02f6e8fdf70bb4b8bfe1493491e82ab6c1bfdc",
+  "coordinates": {
+    "opening_amplitude_over_kBT": {
+      "value": 69.99999999969688,
+      "lower": 2.0,
+      "upper": 70.0,
+      "contact": "upper"
+    },
+    "opening_exponent": {
+      "value": 0.4999999999974239,
+      "lower": 0.02,
+      "upper": 0.5,
+      "contact": "upper"
+    },
+    "opening_floor_over_kBT": {
+      "value": 17.083923690100974,
+      "lower": 6.0,
+      "upper": 28.0,
+      "contact": null
+    },
+    "opening_sigma_b_Pa": {
+      "value": 271849296.9547652,
+      "lower": 10000000.0,
+      "upper": 2000000000.0,
+      "contact": null
+    }
+  },
+  "warning": "Amplitude and exponent contact upper acquisition bounds; this is not an interior optimum. The exponent cap is narrower than the 1.0 bound used in the earlier 1-D lineage."
+}

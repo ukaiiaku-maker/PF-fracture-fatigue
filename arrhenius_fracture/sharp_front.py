@@ -667,24 +667,55 @@ def build_engine(args, mat) -> FrontEngine:
         eb.H0_eV = args.emit_H0_eV
 
     material_manifest = getattr(args, 'material_manifest', None)
+    material_manifest_object = getattr(args, 'material_manifest_object', None)
     material_class = getattr(args, 'material_class', None)
-    if material_manifest or material_class:
-        manifest_path = material_manifest or default_manifest_path(material_class)
-        manifest = MaterialManifest.from_csv(manifest_path)
+    if material_manifest_object is not None or material_manifest or material_class:
+        if material_manifest_object is not None:
+            if not isinstance(material_manifest_object, MaterialManifest):
+                raise TypeError('material_manifest_object must be a MaterialManifest')
+            manifest = material_manifest_object
+        else:
+            manifest_path = material_manifest or default_manifest_path(material_class)
+            manifest = MaterialManifest.from_csv(manifest_path)
+        # A kinetic opening surface owns its cooperative completion law.  CLI
+        # defaults must not silently replace the material's accepted hits/tau.
+        cleavage_surface = getattr(manifest.cleavage, 'surface', None)
+        if cleavage_surface is not None:
+            if hasattr(cleavage_surface, 'hits'):
+                f.m_hits = float(cleavage_surface.hits)
+            if hasattr(cleavage_surface, 'tau_s'):
+                f.tau_c = float(cleavage_surface.tau_s)
         mpz_cfg = MPZConfig(
             length_m=float(getattr(args, 'mpz_length_um', 100.0)) * 1.0e-6,
             n_bins=int(getattr(args, 'mpz_n_bins', 200)),
             source_bin_count=int(getattr(args, 'mpz_source_bins', 2)),
             blunting_length_m=float(getattr(args, 'mpz_blunting_length_um', 0.5)) * 1.0e-6,
+            forward_slip_blunting_coefficient=max(float(getattr(
+                args, 'mpz_forward_slip_blunting_coefficient', 0.0
+            ) or 0.0), 0.0),
+            analytical_source_slip_ledger=bool(getattr(
+                args, 'mpz_analytical_source_slip_ledger', False
+            )),
+            passage_count_normalization=max(float(getattr(
+                args, 'mpz_passage_count_normalization', 1.0
+            ) or 1.0), 1.0e-30),
             wake_length_m=float(getattr(args, 'wake_length_um', 100.0)) * 1.0e-6,
             wake_n_bins=int(getattr(args, 'wake_n_bins', 0)),
             wake_shielding=bool(getattr(args, 'wake_shielding', True)),
             wake_shield_projection=float(getattr(args, 'wake_shield_projection', 1.0)),
         )
         f.L_pz = mpz_cfg.length_m
-        return UnifiedMPZFrontEngine(
+        engine = UnifiedMPZFrontEngine(
             f, cb, eb, mat.G, mat.nu, mat.b, manifest, mpz_cfg
         )
+        initial_mobile = max(float(getattr(args, 'mpz_initial_mobile_count', 0.0)), 0.0)
+        initial_retained = max(float(getattr(args, 'mpz_initial_retained_count', 0.0)), 0.0)
+        nsrc = max(min(engine.mpz.cfg.source_bin_count, engine.mpz.n_bins), 1)
+        if initial_mobile:
+            engine.mpz.mobile[:, :nsrc] = initial_mobile / (engine.mpz.n_systems * nsrc)
+        if initial_retained:
+            engine.mpz.retained[:, :nsrc] = initial_retained / (engine.mpz.n_systems * nsrc)
+        return engine
     return FrontEngine(f, cb, eb, mat.G, mat.nu, mat.b)
 
 
@@ -920,6 +951,57 @@ def _render_field_snapshots(out, T, mesh, snaps, max_cols=4):
     path = os.path.join(out, f'field_snapshots_{int(T)}K.png')
     fig.savefig(path, dpi=140, bbox_inches='tight')
     plt.close(fig)
+
+    # Also preserve publication-sized views of the final accepted spatial
+    # state.  The combined history panel is useful for evolution, while these
+    # standalone exports make the crack, dislocation and stress fields legible
+    # without cropping a rasterized multi-panel figure after the calculation.
+    final = pick[-1]
+    tri_final = tri
+    if tri_final is None:
+        tri_final = mtri.Triangulation(final['nodes'][:, 0] * 1e3,
+                                       final['nodes'][:, 1] * 1e3,
+                                       final['elems'])
+    standalone = (
+        ('crack_field', final['d'], 'gouraud', 'inferno', 0.0, 1.0,
+         'Crack damage / committed sharp front', 'damage d'),
+        ('dislocation_field', np.log10(np.maximum(final['rho_gp'], 1.0)),
+         'flat', 'viridis', 10.0,
+         max(16.0, float(np.nanmax(np.log10(np.maximum(final['rho_gp'], 1.0))))),
+         'Dislocation-density field', r'$\log_{10}\rho$ (m$^{-2}$)'),
+        ('stress_field', final['s1_gp'] / 1e6, 'flat', 'magma', 0.0,
+         max(float(np.nanmax(final['s1_gp'])) / 1e6, 1.0),
+         'Maximum-principal-stress field', r'$\sigma_1$ (MPa)'),
+    )
+    for stem, values, shading, cmap, vmin, vmax, title, cbar_label in standalone:
+        fig_one, ax_one = plt.subplots(figsize=(8.2, 5.3), constrained_layout=True)
+        im_one = ax_one.tripcolor(tri_final, values, shading=shading, cmap=cmap,
+                                  vmin=vmin, vmax=vmax, rasterized=True)
+        for item in final.get('front_paths', []):
+            try:
+                _, _, front_points = item
+                front_points = np.asarray(front_points, float)
+                if front_points.ndim == 2 and front_points.shape[0] >= 2:
+                    ax_one.plot(front_points[:, 0] * 1e3,
+                                front_points[:, 1] * 1e3,
+                                color='cyan', lw=1.8, zorder=4)
+                    ax_one.plot(front_points[-1, 0] * 1e3,
+                                front_points[-1, 1] * 1e3,
+                                marker='o', color='cyan', ms=4, zorder=5)
+            except Exception:
+                pass
+        ax_one.set_aspect('equal')
+        ax_one.set_xlabel('x (mm)')
+        ax_one.set_ylabel('y (mm)')
+        ax_one.set_title(
+            f'{title} — T={T:.0f} K, step {final["step"]}, '
+            f'KJ={final["KJ"]/1e6:.2f} MPa sqrt(m), '
+            f'a={final["a_tip"]*1e3:.3f} mm')
+        colorbar = fig_one.colorbar(im_one, ax=ax_one, shrink=0.88)
+        colorbar.set_label(cbar_label)
+        fig_one.savefig(os.path.join(out, f'{stem}_{int(T)}K.png'),
+                        dpi=180, bbox_inches='tight')
+        plt.close(fig_one)
     return path
 
 
@@ -1108,6 +1190,15 @@ def run_2d(args):
     from .coalescence import first_path_intersection
 
     cfg = make_emergent_config()
+    # Research bindings may change the complete material while retaining this
+    # exact spatial solver.  These overrides are explicit and are written to
+    # run_args; the historical tungsten defaults remain unchanged otherwise.
+    if getattr(args, 'elastic_E_Pa', None) is not None:
+        cfg.material.E = float(args.elastic_E_Pa)
+    if getattr(args, 'elastic_nu', None) is not None:
+        cfg.material.nu = float(args.elastic_nu)
+    if getattr(args, 'burgers_m', None) is not None:
+        cfg.material.b = float(args.burgers_m)
     cfg.mesh.nx = args.nx
     cfg.mesh.ny = args.ny
     cfg.mesh.tip_h_fine = getattr(args, 'tip_h_fine', 0.0) or 0.0
@@ -1360,12 +1451,49 @@ def run_2d(args):
         a_killed = a_tip
         deflect = bool(getattr(args, 'crystal_aniso', False))
         max_fronts = int(getattr(args, 'max_fronts', 32) or 32)
+        fatigue_loading_control = str(getattr(
+            args, 'fatigue_loading_control', 'fixed_displacement'
+        ) or 'fixed_displacement')
+        fixed_local_kmax = fatigue_loading_control == 'fixed_local_kmax'
+        fixed_reaction = fatigue_loading_control == 'fixed_reaction'
+        calibrated_fixed_displacement = (
+            fatigue_loading_control == 'calibrated_fixed_displacement')
+        displacement_calibration_pending = calibrated_fixed_displacement
+        fatigue_target_Kmax = getattr(args, 'fatigue_target_Kmax_MPa_sqrt_m', None)
+        fatigue_target_reaction = getattr(
+            args, 'fatigue_target_reaction_N_per_m', None)
+        if fixed_local_kmax or fixed_reaction or calibrated_fixed_displacement:
+            if not fatigue_mode:
+                raise ValueError(f'{fatigue_loading_control} requires --fatigue-cycles')
+            if deflect:
+                raise ValueError(
+                    f'{fatigue_loading_control} is currently qualified for the single straight '
+                    'primary front only; anisotropic multifront control is unresolved'
+                )
+            if (fatigue_target_reaction is not None
+                    and (not np.isfinite(fatigue_target_reaction)
+                         or fatigue_target_reaction <= 0.0)):
+                raise ValueError('fixed_reaction target must be positive and finite')
+            if (fixed_local_kmax or calibrated_fixed_displacement
+                    or fatigue_target_reaction is None) and (
+                    fatigue_target_Kmax is None
+                    or not np.isfinite(fatigue_target_Kmax)
+                    or fatigue_target_Kmax <= 0.0):
+                raise ValueError(
+                    f'{fatigue_loading_control} requires a positive finite '
+                    '--fatigue-target-Kmax-MPa-sqrt-m'
+                )
+            if fatigue_target_Kmax is not None:
+                fatigue_target_Kmax = float(fatigue_target_Kmax) * 1.0e6
+            if fatigue_target_reaction is not None:
+                fatigue_target_reaction = float(fatigue_target_reaction)
 
         d = np.zeros(mesh.nn)
         d[(x <= a_tip) & (np.abs(y) <= half_h)] = 1.0
         u = np.zeros(mesh.ndof)
         ep_gp = np.zeros((3, mesh.ne))
         rho_gp = np.full(mesh.ne, eng.f.rho0)
+        rho_advection_reference_gp = rho_gp.copy()
 
         # Spatial process-zone state used by the v8 fatigue adapter.  The old
         # scalar N_em ledger remains the V1 reduction, but the 2-D driver now
@@ -1376,13 +1504,26 @@ def run_2d(args):
         # 2-D projection fields remain available for legacy fatigue runs and
         # diagnostics, but must not overwrite the moving state.
         pz_spatial_state = (fatigue_mode
+                            and not bool(getattr(eng, 'unified_mpz_active', False))
                             and getattr(eng, 'state_model', 'legacy_scalar') != 'moving_pz'
                             and (not bool(getattr(args, 'no_pz_spatial_state', False))))
         pz_store_gp = np.zeros(mesh.ne)   # retained PZ dislocation/event density proxy [count/m^2]
         pz_mobile_gp = np.zeros(mesh.ne)  # mobile emitted content before escape/storage [count/m^2]
         pz_escape_gp = np.zeros(mesh.ne)  # escaped/glided content audit [count/m^2]
         pz_emit_gp = np.zeros(mesh.ne)    # cumulative emitted content audit [count/m^2]
-        cyclic_mechanics_enabled = fatigue_mode and (not bool(getattr(args, 'no_cyclic_mechanics', False)))
+        bulk_plasticity_enabled = not bool(getattr(args, 'tip_only_plasticity', False))
+        incremental_opening_advection = bool(getattr(
+            args, 'incremental_opening_advection', False))
+        opening_advection_operator = None
+        opening_advection_rows = []
+        signed_gnd_reload_rows = []
+        opening_signed_gnd_field = None
+        signed_gnd_tip_absorption = bool(getattr(
+            args, 'signed_gnd_tip_absorption', False))
+        cyclic_mechanics_enabled = (
+            fatigue_mode and bulk_plasticity_enabled
+            and (not bool(getattr(args, 'no_cyclic_mechanics', False)))
+        )
         cyclic_mechanics_updates = 0
         cyclic_plastic_work_acc = 0.0
         Kc_first = None
@@ -1408,6 +1549,40 @@ def run_2d(args):
             # event solves; no hazard is discarded. Child engines inherit this.
             eng.f.max_advances_per_step = 1
             print(f"  crack backend: {crack_backend.name} (Arrhenius event criterion; CZM geometry; one topology event/solve)")
+        if incremental_opening_advection:
+            if not fatigue_mode:
+                raise ValueError('incremental opening advection requires fatigue mode')
+            if deflect or crack_backend.name != 'sharp_wake':
+                raise ValueError(
+                    'incremental opening advection is currently qualified only '
+                    'for the straight single-front sharp-wake backend')
+            if not bulk_plasticity_enabled:
+                raise ValueError(
+                    'incremental opening advection requires element bulk plasticity')
+            if not bool(getattr(eng, 'unified_mpz_active', False)):
+                raise ValueError(
+                    'incremental opening advection requires the moving unified MPZ')
+            micro_um = float(getattr(args, 'opening_advection_step_um', 0.1) or 0.0)
+            if not np.isfinite(micro_um) or micro_um <= 0.0:
+                raise ValueError('opening advection step must be positive and finite')
+            retained_fraction = getattr(args, 'opening_advection_retained_fraction', None)
+            if retained_fraction is None:
+                retained_fraction = float(eng.manifest.encounter_efficiency)
+            retained_fraction = float(retained_fraction)
+            if not np.isfinite(retained_fraction) or not (0.0 <= retained_fraction <= 1.0):
+                raise ValueError('opening advection retained fraction must be in [0,1]')
+            opening_duration = getattr(args, 'opening_advection_duration_s', None)
+            if opening_duration is None:
+                opening_duration = float(eng.f.tau_c)
+            opening_duration = float(opening_duration)
+            if not np.isfinite(opening_duration) or opening_duration < 0.0:
+                raise ValueError('opening advection duration must be finite and nonnegative')
+            capture_um = getattr(args, 'opening_advection_capture_width_um', None)
+            capture_width_m = (float(capture_um) * 1.0e-6 if capture_um is not None
+                               else float(eng.mpz.length_m))
+            if not np.isfinite(capture_width_m) or capture_width_m <= 0.0:
+                raise ValueError('opening advection capture width must be positive and finite')
+            eng.defer_mpz_advance = True
 
         def _backend_crack_segments():
             logs = getattr(crack_backend, 'advance_log', None)
@@ -1415,6 +1590,149 @@ def run_2d(args):
                 return None
             return [(np.array([r['x0'], r['y0']], dtype=float),
                      np.array([r['x1'], r['y1']], dtype=float)) for r in logs]
+
+        def _single_front_mechanics_at_U(U_trial, u_seed):
+            """Elastic equilibrium and primary-tip J for a frozen material state."""
+            Kmat, Rint, sigma_t, seq_t, s1_t, psi_t = assemble_mechanics(
+                mesh, u_seed, ep_gp, rho_gp, d, D,
+                mat, cohesive_network=cohesive_network)
+            u_t, F_t = solve_dirichlet(
+                Kmat, Rint, u_seed, bnd, 0.5 * U_trial, -0.5 * U_trial)
+            Kmat, Rint, sigma_t, seq_t, s1_t, psi_t = assemble_mechanics(
+                mesh, u_t, ep_gp, rho_gp, d, D,
+                mat, cohesive_network=cohesive_network)
+            _, K_t, _ = compute_J_integral(
+                mesh, u_t, sigma_t, psi_t, d, np.array([a_tip, 0.0]),
+                np.array([1.0, 0.0]), mat,
+                ell=max(r_J_cluster_ell, 3.0 * (mesh.hbar_tip if mesh.hbar_tip > 0 else mesh.hbar)),
+                crack_segments=_backend_crack_segments())
+            return (u_t, F_t, sigma_t, seq_t, s1_t, psi_t, max(float(K_t), 0.0))
+
+        def _solve_primary_local_kmax(U_guess, u_seed):
+            """Bracket and solve the frozen-state displacement giving target J-K."""
+            if not (fixed_local_kmax
+                    or (fixed_reaction and fatigue_target_reaction is None)
+                    or displacement_calibration_pending):
+                result = _single_front_mechanics_at_U(U_guess, u_seed)
+                return float(U_guess), result
+            target = float(fatigue_target_Kmax)
+            rtol = max(float(getattr(args, 'fatigue_k_control_rtol', 2.0e-3)), 1.0e-8)
+            # Plastic residual stress can make K(U=0) exceed the requested
+            # maximum.  Search both signs of applied displacement and select
+            # the crossing closest to the previously accepted boundary state.
+            # This keeps the controller on a continuous branch without assuming
+            # that the post-plasticity K(U) curve passes below target at U=0.
+            span = max(abs(float(U_guess)), 1.0e-8)
+            bracket = None
+            best_U, best = float(U_guess), _single_front_mechanics_at_U(U_guess, u_seed)
+            if abs(best[-1] - target) / target <= rtol:
+                return best_U, best
+            for _expand in range(10):
+                points = np.linspace(-span, 2.0 * span, 17)
+                sampled = []
+                for point in points:
+                    result = _single_front_mechanics_at_U(float(point), u_seed)
+                    sampled.append((float(point), result, result[-1] - target))
+                    if abs(result[-1] - target) < abs(best[-1] - target):
+                        best_U, best = float(point), result
+                    if abs(result[-1] - target) / target <= rtol:
+                        return float(point), result
+                crossings = []
+                for left, right in zip(sampled[:-1], sampled[1:]):
+                    if left[2] * right[2] <= 0.0:
+                        crossings.append((left, right))
+                if crossings:
+                    bracket = min(
+                        crossings,
+                        key=lambda pair: abs(0.5 * (pair[0][0] + pair[1][0]) - float(U_guess)),
+                    )
+                    break
+                span *= 2.0
+            if bracket is None:
+                raise RuntimeError(
+                    'fixed_local_kmax failed to bracket the requested primary-tip K: '
+                    f'target={target/1e6:.6g}, nearest={best[-1]/1e6:.6g}'
+                )
+            (lo, res_lo, f_lo), (hi, res_hi, f_hi) = bracket
+            for _ in range(32):
+                mid = 0.5 * (lo + hi)
+                res_mid = _single_front_mechanics_at_U(mid, best[0])
+                if abs(res_mid[-1] - target) / target <= rtol:
+                    return mid, res_mid
+                f_mid = res_mid[-1] - target
+                if f_lo * f_mid <= 0.0:
+                    hi, res_hi, f_hi = mid, res_mid, f_mid
+                else:
+                    lo, res_lo, f_lo = mid, res_mid, f_mid
+                if abs(res_mid[-1] - target) < abs(best[-1] - target):
+                    best_U, best = mid, res_mid
+            if abs(best[-1] - target) / target > rtol:
+                raise RuntimeError(
+                    'fixed_local_kmax did not converge within tolerance: '
+                    f'target={target/1e6:.6g}, solved={best[-1]/1e6:.6g}, rtol={rtol:.3g}'
+                )
+            return best_U, best
+
+        def _solve_primary_reaction(U_guess, u_seed):
+            """Hold the accepted top-reaction amplitude as compliance evolves."""
+            if not fixed_reaction:
+                result = _single_front_mechanics_at_U(U_guess, u_seed)
+                return float(U_guess), result
+            target = float(fatigue_target_reaction)
+            rtol = max(float(getattr(args, 'fatigue_reaction_control_rtol', 2.0e-3)), 1.0e-8)
+            best_U, best = float(U_guess), _single_front_mechanics_at_U(U_guess, u_seed)
+            if abs(abs(float(best[1])) - target) / target <= rtol:
+                return best_U, best
+            span = max(abs(float(U_guess)), 1.0e-8)
+            bracket = None
+            for _expand in range(10):
+                points = np.linspace(-span, 2.0 * span, 17)
+                sampled = []
+                for point in points:
+                    result = _single_front_mechanics_at_U(float(point), u_seed)
+                    residual = abs(float(result[1])) - target
+                    sampled.append((float(point), result, residual))
+                    if abs(residual) < abs(abs(float(best[1])) - target):
+                        best_U, best = float(point), result
+                    if abs(residual) / target <= rtol:
+                        return float(point), result
+                crossings = [
+                    (left, right) for left, right in zip(sampled[:-1], sampled[1:])
+                    if left[2] * right[2] <= 0.0
+                ]
+                if crossings:
+                    bracket = min(
+                        crossings,
+                        key=lambda pair: abs(
+                            0.5 * (pair[0][0] + pair[1][0]) - float(U_guess)
+                        ),
+                    )
+                    break
+                span *= 2.0
+            if bracket is None:
+                raise RuntimeError(
+                    'fixed_reaction failed to bracket the requested reaction: '
+                    f'target={target:.6g}, nearest={abs(float(best[1])):.6g}'
+                )
+            (lo, _, f_lo), (hi, _, _) = bracket
+            for _ in range(32):
+                mid = 0.5 * (lo + hi)
+                result = _single_front_mechanics_at_U(mid, best[0])
+                f_mid = abs(float(result[1])) - target
+                if abs(f_mid) / target <= rtol:
+                    return mid, result
+                if f_lo * f_mid <= 0.0:
+                    hi = mid
+                else:
+                    lo, f_lo = mid, f_mid
+                if abs(f_mid) < abs(abs(float(best[1])) - target):
+                    best_U, best = mid, result
+            if abs(abs(float(best[1])) - target) / target > rtol:
+                raise RuntimeError(
+                    'fixed_reaction did not converge within tolerance: '
+                    f'target={target:.6g}, solved={abs(float(best[1])):.6g}, rtol={rtol:.3g}'
+                )
+            return best_U, best
 
         def _pz_kernel(point_xy, engine_for_scale=None, radius_factor=None):
             """Gaussian element weights around a sharp-front process zone.
@@ -1465,6 +1783,7 @@ def run_2d(args):
             branches contribute through the spatial near-tip field.
             """
             if (not pz_spatial_state or front is None
+                    or bool(getattr(front.get('eng'), 'unified_mpz_active', False))
                     or getattr(front.get('eng'), 'state_model', 'legacy_scalar') == 'moving_pz'):
                 return 0.0
             N_field = _field_count_near(pz_store_gp, front['xy'], front['eng'])
@@ -1558,9 +1877,389 @@ def run_2d(args):
             cyclic_plastic_work_acc += max(dWp_cycle, 0.0)
             return max(dWp_cycle, 0.0)
 
+        def _commit_incremental_opening_event(engine, distance_m, Umax, T_local):
+            """Resolve or reuse the protocol-local moving-tip transfer operator."""
+            nonlocal a_tip, a_killed, u, ep_gp, rho_gp, sigma_gp, psi_gp, s1_gp
+            nonlocal Ftop, dot_ep, Uapp, opening_advection_operator
+            nonlocal opening_signed_gnd_field
+            nonlocal cyclic_plastic_work_acc
+            from .incremental_opening_advection import (
+                density_profile_in_active_zone,
+                incoming_material_profile,
+                operator_from_states,
+            )
+            from .signed_gnd_projection import (
+                signed_gnd_density, signed_profiles, shielding_from_profiles,
+                swept_tip_content,
+            )
+
+            distance = max(float(distance_m), 0.0)
+            if distance <= 0.0:
+                return {"mode": "zero_distance", "distance_m": 0.0}
+            if opening_advection_operator is not None:
+                if not opening_advection_operator.admissible:
+                    raise RuntimeError(
+                        "incremental opening-advection operator is an inadmissible "
+                        "unsigned-density upper bound; a signed 2-D state owner is "
+                        "required before coarse reuse")
+                old_tip = float(a_tip)
+                state_owner = str(getattr(
+                    args, 'opening_advection_state_owner', 'unsigned_density'))
+                swept = None
+                if state_owner == 'signed_gnd' and signed_gnd_tip_absorption:
+                    gnd_pre = signed_gnd_density(
+                        mesh.nodes, mesh.elems, ep_gp, mat.b,
+                        slip_angles_deg=(45.0, -45.0))
+                    swept = swept_tip_content(
+                        triangles=gnd_pre['triangles'],
+                        rho_signed_m2=gnd_pre['rho_signed_m2'],
+                        directions=gnd_pre['directions'], old_tip_x_m=old_tip,
+                        new_tip_x_m=old_tip + distance,
+                        capture_width_m=capture_width_m)
+                a_tip = min(old_tip + distance, cfg.geometry.Lx - 2e-5)
+                band = ((x > a_killed - 0.5 * mesh.hbar) & (x <= a_tip)
+                        & (np.abs(y) <= half_h))
+                d[band] = 1.0
+                a_killed = a_tip
+                audit = engine.commit_deferred_mpz_increment(distance)
+                if swept is not None:
+                    absorbed = engine.mpz.register_bulk_tip_absorption(
+                        swept['signed_count_by_system_face'],
+                        swept['opening_count_by_system_face'])
+                    audit.update({
+                        'bulk_tip_absorbed_opening_count': absorbed,
+                        'bulk_tip_absorbed_absolute_count': (
+                            swept['absolute_count_total']),
+                        'bulk_tip_signed_count_by_system_face': (
+                            swept['signed_count_by_system_face'].tolist()),
+                        'bulk_tip_opening_count_by_system_face': (
+                            swept['opening_count_by_system_face'].tolist()),
+                        'bulk_tip_absorption_scope': swept['scope'],
+                    })
+                audit.update(opening_advection_operator.apply(engine.mpz))
+                if opening_signed_gnd_field is not None:
+                    from .signed_gnd_projection import signed_profiles, shielding_from_profiles
+                    ga, gw = signed_profiles(
+                        triangles=opening_signed_gnd_field['triangles'],
+                        rho_signed_m2=opening_signed_gnd_field['rho_signed_m2'],
+                        tip_x_m=a_tip, active_length_m=engine.mpz.length_m,
+                        active_bins=engine.mpz.n_bins,
+                        wake_length_m=engine.mpz.wake_length_m,
+                        wake_bins=engine.mpz.wake_n_bins,
+                        capture_width_m=capture_width_m)
+                    kk = shielding_from_profiles(
+                        ga, gw, active_x_m=engine.mpz.x, wake_x_m=engine.mpz.wake_x,
+                        orientation_factors=engine.mpz.orientation_factors,
+                        G_Pa=engine.G, nu=engine.nu, burgers_m=engine.b,
+                        core_m=engine.mpz.cfg.shielding_core_m,
+                        wake_projection=engine.mpz.cfg.wake_shield_projection)
+                    engine.external_signed_gnd_K_Pa_sqrt_m = kk['total_K_Pa_sqrt_m']
+                    audit.update({
+                        'signed_gnd_active_K_Pa_sqrt_m': kk['active_K_Pa_sqrt_m'],
+                        'signed_gnd_wake_K_Pa_sqrt_m': kk['wake_K_Pa_sqrt_m'],
+                        'signed_gnd_total_K_Pa_sqrt_m': kk['total_K_Pa_sqrt_m'],
+                    })
+                audit.update({"mode": "coarse_operator", "distance_m": distance})
+                opening_advection_rows.append(dict(audit, event_index=int(engine.n_adv)))
+                return audit
+
+            micro_m = float(args.opening_advection_step_um) * 1.0e-6
+            n_micro = max(int(np.ceil(distance / micro_m)), 1)
+            ds = distance / n_micro
+            dt_sub = opening_duration / n_micro
+            pre = engine.mpz.copy()
+            pre_radius_m = float(engine.r_eff())
+            pure = pre.copy()
+            pure.advance(distance)
+            pure.convect_forward_blunting(distance)
+            inherited_total = 0.0
+            generated_total = 0.0
+            bulk_tip_opening_total = 0.0
+            event_rows = []
+            for micro in range(n_micro):
+                old_tip = float(a_tip)
+                new_tip = min(old_tip + ds, cfg.geometry.Lx - 2e-5)
+                actual_ds = max(new_tip - old_tip, 0.0)
+                if actual_ds <= 0.0:
+                    break
+
+                rho_before = rho_gp.copy()
+                excess_before = np.maximum(
+                    rho_before - rho_advection_reference_gp, 0.0)
+                incoming = incoming_material_profile(
+                    centers_x=cx_e, centers_y=cy_e, areas=mesh.area_e,
+                    excess_density_m2=excess_before,
+                    old_tip_x_m=old_tip, new_tip_x_m=new_tip,
+                    length_m=engine.mpz.length_m, n_bins=engine.mpz.n_bins,
+                    capture_width_m=capture_width_m,
+                    element_vertices=mesh.nodes[mesh.elems],
+                ) * retained_fraction
+                state_owner = str(getattr(
+                    args, 'opening_advection_state_owner', 'unsigned_density'))
+                swept = None
+                if state_owner == 'signed_gnd' and signed_gnd_tip_absorption:
+                    gnd_pre = signed_gnd_density(
+                        mesh.nodes, mesh.elems, ep_gp, mat.b,
+                        slip_angles_deg=(45.0, -45.0))
+                    swept = swept_tip_content(
+                        triangles=gnd_pre['triangles'],
+                        rho_signed_m2=gnd_pre['rho_signed_m2'],
+                        directions=gnd_pre['directions'], old_tip_x_m=old_tip,
+                        new_tip_x_m=new_tip, capture_width_m=capture_width_m)
+
+                a_tip = new_tip
+                band = ((x > a_killed - 0.5 * mesh.hbar) & (x <= a_tip)
+                        & (np.abs(y) <= half_h))
+                d[band] = 1.0
+                a_killed = a_tip
+                adv = engine.commit_deferred_mpz_increment(actual_ds)
+                bulk_tip_opening = 0.0
+                if swept is not None:
+                    bulk_tip_opening = engine.mpz.register_bulk_tip_absorption(
+                        swept['signed_count_by_system_face'],
+                        swept['opening_count_by_system_face'])
+                    bulk_tip_opening_total += bulk_tip_opening
+
+                if fixed_local_kmax:
+                    Uapp, controlled = _solve_primary_local_kmax(Uapp, u)
+                    u, Ftop, sigma_gp, seq_gp, s1_gp, psi_gp, _ = controlled
+                else:
+                    Kmat, Rint, sigma_gp, seq_gp, s1_gp, psi_gp = assemble_mechanics(
+                        mesh, u, ep_gp, rho_gp, d, D, mat,
+                        cohesive_network=cohesive_network)
+                    u, Ftop = solve_dirichlet(
+                        Kmat, Rint, u, bnd, 0.5 * Umax, -0.5 * Umax)
+                    Kmat, Rint, sigma_gp, seq_gp, s1_gp, psi_gp = assemble_mechanics(
+                        mesh, u, ep_gp, rho_gp, d, D, mat,
+                        cohesive_network=cohesive_network)
+
+                pinfo = {"dWp_accepted_gp": np.zeros(mesh.ne)}
+                if dt_sub > 0.0:
+                    try:
+                        ep_gp, rho_gp, dot_ep, pinfo = update_plasticity(
+                            ep_gp, rho_gp, sigma_gp, mat, T_local, dt_sub,
+                            plast_model, cfg.dislocations, return_info=True)
+                    except TypeError:
+                        ep_gp, rho_gp, dot_ep = update_plasticity(
+                            ep_gp, rho_gp, sigma_gp, mat, T_local, dt_sub,
+                            plast_model, cfg.dislocations)
+                    cyclic_plastic_work_acc += max(float(np.sum(
+                        np.asarray(pinfo.get('dWp_accepted_gp', 0.0)) * mesh.area_e)), 0.0)
+                generated_density = np.maximum(rho_gp - rho_before, 0.0)
+                generated = density_profile_in_active_zone(
+                    centers_x=cx_e, centers_y=cy_e, areas=mesh.area_e,
+                    density_m2=generated_density, tip_x_m=a_tip,
+                    length_m=engine.mpz.length_m, n_bins=engine.mpz.n_bins,
+                    capture_width_m=capture_width_m,
+                    element_vertices=mesh.nodes[mesh.elems],
+                ) * retained_fraction
+                if state_owner == 'unsigned_density':
+                    inherited = engine.mpz.inject_retained_profile(
+                        incoming, owner="bulk_inherited")
+                    generated_count = engine.mpz.inject_retained_profile(
+                        generated, owner="opening_generated")
+                    engine.mpz.register_forward_passage(generated_count)
+                else:
+                    # Scalar SSD density remains exclusively in the FE
+                    # hardening field.  Signed state is observed from the
+                    # compatible plastic-distortion curl below.
+                    inherited = 0.0
+                    generated_count = 0.0
+
+                gnd = signed_gnd_density(
+                    mesh.nodes, mesh.elems, ep_gp, mat.b,
+                    slip_angles_deg=(45.0, -45.0))
+                gnd_active, gnd_wake = signed_profiles(
+                    triangles=gnd['triangles'], rho_signed_m2=gnd['rho_signed_m2'],
+                    tip_x_m=a_tip, active_length_m=engine.mpz.length_m,
+                    active_bins=engine.mpz.n_bins,
+                    wake_length_m=engine.mpz.wake_length_m,
+                    wake_bins=engine.mpz.wake_n_bins,
+                    capture_width_m=capture_width_m)
+                gnd_K = shielding_from_profiles(
+                    gnd_active, gnd_wake, active_x_m=engine.mpz.x,
+                    wake_x_m=engine.mpz.wake_x,
+                    orientation_factors=engine.mpz.orientation_factors,
+                    G_Pa=engine.G, nu=engine.nu, burgers_m=engine.b,
+                    core_m=engine.mpz.cfg.shielding_core_m,
+                    wake_projection=engine.mpz.cfg.wake_shield_projection)
+                if state_owner == 'signed_gnd':
+                    opening_signed_gnd_field = gnd
+                    engine.external_signed_gnd_K_Pa_sqrt_m = gnd_K['total_K_Pa_sqrt_m']
+                inherited_total += inherited
+                generated_total += generated_count
+                event_rows.append({
+                    "event_index": int(engine.n_adv), "microstep": micro + 1,
+                    "old_tip_m": old_tip, "new_tip_m": a_tip,
+                    "increment_m": actual_ds, "dt_s": dt_sub,
+                    "inherited_count": inherited,
+                    "opening_generated_count": generated_count,
+                    "bulk_tip_absorbed_opening_count": bulk_tip_opening,
+                    "bulk_tip_absorbed_absolute_count": (
+                        0.0 if swept is None else swept['absolute_count_total']),
+                    "bulk_tip_signed_count_by_system_face": (
+                        None if swept is None else
+                        swept['signed_count_by_system_face'].tolist()),
+                    "bulk_tip_opening_count_by_system_face": (
+                        None if swept is None else
+                        swept['opening_count_by_system_face'].tolist()),
+                    "retained_count": engine.mpz.retained_count,
+                    "wake_retained_count": engine.mpz.wake_retained_count,
+                    "K_shield_Pa_sqrt_m": engine.K_shield(),
+                    "signed_gnd_active_count": float(np.sum(gnd_active)),
+                    "signed_gnd_wake_count": float(np.sum(gnd_wake)),
+                    "signed_gnd_abs_count": float(
+                        np.sum(np.abs(gnd_active)) + np.sum(np.abs(gnd_wake))),
+                    "signed_gnd_active_K_Pa_sqrt_m": gnd_K['active_K_Pa_sqrt_m'],
+                    "signed_gnd_wake_K_Pa_sqrt_m": gnd_K['wake_K_Pa_sqrt_m'],
+                    "signed_gnd_total_K_Pa_sqrt_m": gnd_K['total_K_Pa_sqrt_m'],
+                    "tip_radius_m": engine.r_eff(),
+                    "pending_advance_m": float(adv.get('mpz_pending_advance_m', 0.0)),
+                })
+
+            opening_advection_operator = operator_from_states(
+                explicit=engine.mpz, pure_advection=pure, distance_m=distance,
+                temperature_K=T_local,
+                Kmax_Pa_sqrt_m=fatigue_target_Kmax if fixed_local_kmax else float(KJ),
+                R=float(getattr(args, 'R', 0.1) or 0.0), microsteps=n_micro,
+                event_duration_s=opening_duration,
+                inherited_count=inherited_total,
+                opening_generated_count=generated_total,
+            )
+            opening_advection_operator.total_shield_Pa_sqrt_m = float(engine.K_shield())
+            _operator_kmax = max(
+                float(opening_advection_operator.calibration_Kmax_Pa_sqrt_m), 1.0)
+            opening_advection_operator.shield_over_applied_Kmax = (
+                opening_advection_operator.total_shield_Pa_sqrt_m / _operator_kmax)
+            opening_advection_operator.admissible = bool(
+                opening_advection_operator.shield_over_applied_Kmax <= 1.0)
+            if state_owner == 'signed_gnd':
+                event_K = float(opening_advection_operator.calibration_Kmax_Pa_sqrt_m)
+                for fraction in (0.0, 0.25, 0.5, 1.0, 2.0, 4.0,
+                                 8.0, 16.0, 32.0, 64.0, 100.0):
+                    offset = fraction * engine.mpz.length_m
+                    ga, gw = signed_profiles(
+                        triangles=gnd['triangles'], rho_signed_m2=gnd['rho_signed_m2'],
+                        tip_x_m=a_tip + offset,
+                        active_length_m=engine.mpz.length_m,
+                        active_bins=engine.mpz.n_bins,
+                        wake_length_m=engine.mpz.wake_length_m,
+                        wake_bins=engine.mpz.wake_n_bins,
+                        capture_width_m=capture_width_m)
+                    kk = shielding_from_profiles(
+                        ga, gw, active_x_m=engine.mpz.x, wake_x_m=engine.mpz.wake_x,
+                        orientation_factors=engine.mpz.orientation_factors,
+                        G_Pa=engine.G, nu=engine.nu, burgers_m=engine.b,
+                        core_m=engine.mpz.cfg.shielding_core_m,
+                        wake_projection=engine.mpz.cfg.wake_shield_projection)
+                    moved = engine.mpz.copy()
+                    moved.advance(offset)
+                    moved.convect_forward_blunting(offset)
+                    radius = float(moved.blunted_radius(engine.f.r0, engine.b))
+                    blunting_increment = event_K * (
+                        np.sqrt(radius / max(pre_radius_m, 1.0e-30)) - 1.0)
+                    def reload_root(*, external_K, cycles=1.0, remove_wake=False,
+                                    remove_blunting=False):
+                        trial = copy.copy(engine)
+                        trial.mpz = moved.copy()
+                        trial.external_signed_gnd_K_Pa_sqrt_m = float(external_K)
+                        if remove_wake:
+                            trial.mpz.wake_mobile[:] = 0.0
+                            trial.mpz.wake_retained[:] = 0.0
+                        if remove_blunting:
+                            trial.mpz.source_passage_slip_count = 0.0
+                            trial.mpz.forward_passage_slip_count = 0.0
+                            trial.mpz.bulk_tip_opening_slip_count = 0.0
+                            trial.mpz.accumulated_slip[:] = 0.0
+                        target = max(1.0 - float(trial.B), 1.0e-12)
+                        def residual(Kmax):
+                            wave = FatigueWaveform(
+                                Kmax=float(Kmax), R=float(getattr(args, 'R', 0.1)),
+                                frequency_Hz=float(getattr(args, 'frequency_Hz', 10.0)),
+                                closure_clip=not bool(getattr(args, 'no_closure_clip', False)))
+                            return float(cycles) * float(
+                                fatigue_controller.integrate_one_cycle(
+                                    trial, wave, T_local).mu_cleave) - target
+                        lo, hi = 0.0, max(event_K * 2.0, 1.0e6)
+                        while residual(hi) < 0.0 and hi < 2.0e9:
+                            hi *= 2.0
+                        if residual(hi) < 0.0:
+                            return float('nan')
+                        for _ in range(70):
+                            mid = 0.5 * (lo + hi)
+                            if residual(mid) >= 0.0:
+                                hi = mid
+                            else:
+                                lo = mid
+                        return hi
+
+                    signed_gnd_reload_rows.append({
+                        'offset_over_Lpz': fraction, 'offset_m': offset,
+                        **kk, 'tip_radius_m': radius,
+                        'blunting_increment_K_Pa_sqrt_m': blunting_increment,
+                        'reload_K_estimate_Pa_sqrt_m': (
+                            event_K + kk['total_K_Pa_sqrt_m'] + blunting_increment),
+                        'one_cycle_Kmax_complete_Pa_sqrt_m': reload_root(
+                            external_K=kk['total_K_Pa_sqrt_m']),
+                        'reload_25cycle_Kmax_complete_Pa_sqrt_m': reload_root(
+                            external_K=kk['total_K_Pa_sqrt_m'], cycles=25.0),
+                        'reload_25cycle_Kmax_without_gnd_Pa_sqrt_m': reload_root(
+                            external_K=0.0, cycles=25.0),
+                        'reload_25cycle_Kmax_without_wake_Pa_sqrt_m': reload_root(
+                            external_K=kk['active_K_Pa_sqrt_m'], cycles=25.0,
+                            remove_wake=True),
+                        'reload_25cycle_Kmax_without_blunting_Pa_sqrt_m': reload_root(
+                            external_K=kk['total_K_Pa_sqrt_m'], cycles=25.0,
+                            remove_blunting=True),
+                    })
+            opening_advection_rows.extend(event_rows)
+            receipt = opening_advection_operator.as_dict()
+            receipt.update({
+                "retained_fraction": retained_fraction,
+                "capture_width_m": capture_width_m,
+                "coarse_operator_reused_only_within_same_run": True,
+                "state_owner": state_owner,
+                "signed_gnd_assumption": "zero_plastic_spin_symmetric_distortion",
+            })
+            with open(os.path.join(args.out, 'incremental_advection_operator.json'), 'w') as handle:
+                json.dump(receipt, handle, indent=2, sort_keys=True)
+                handle.write('\n')
+            return {
+                "mode": "explicit_microsteps", "distance_m": distance,
+                "microsteps": n_micro, "inherited_count": inherited_total,
+                "opening_generated_count": generated_total,
+                "bulk_tip_absorbed_opening_count": bulk_tip_opening_total,
+            }
+
         fronts = None
         branch_on = False
         remesh_on = False
+
+        # These block-limit helpers are shared by the single-front and
+        # multifront fatigue paths.  They must exist before the single-front
+        # trial path is evaluated; the multifront branch below also defines
+        # topology helpers, but fatigue horizon ownership is not conditional
+        # on crystallographic deflection.
+        def _fatigue_cycles_remaining():
+            if not fatigue_mode:
+                return float('inf')
+            cmax = float(getattr(args, 'cycles_max', float('inf')) or float('inf'))
+            if not np.isfinite(cmax):
+                return float('inf')
+            return max(cmax - float(fatigue_cycles_total_accepted), 0.0)
+
+        def _diag_with_remaining(pred, req):
+            rem = _fatigue_cycles_remaining()
+            old_max = float(fatigue_controller.cfg.max_block_cycles)
+            try:
+                if np.isfinite(rem):
+                    fatigue_controller.cfg.max_block_cycles = (
+                        min(old_max, rem) if np.isfinite(old_max) else rem
+                    )
+                return fatigue_controller.choose_block_cycles_diagnostic(pred, req)
+            finally:
+                fatigue_controller.cfg.max_block_cycles = old_max
+
         if deflect:
             from .crystal import (bcc_cleavage_traces, near_tip_stress_tensor,
                                    pick_cleavage_plane, cleavage_branch_candidates,
@@ -2694,7 +3393,12 @@ def run_2d(args):
                     u, Ftop = solve_dirichlet(Kmat, Rint, u, bnd, Uy_top, Uy_bot)
                     Kmat, Rint, sigma_gp, seq_gp, s1_gp, psi_gp = assemble_mechanics(
                         mesh, u, ep_gp, rho_gp, d, D, mat, cohesive_network=cohesive_network)
-                    if fatigue_mode and cyclic_mechanics_enabled:
+                    if not bulk_plasticity_enabled:
+                        # Tip-only control: retain the full elastic FEM/J solve
+                        # and the complete front-local MPZ kinetics, but do not
+                        # evolve element plastic strain or bulk rho fields.
+                        dot_ep = np.zeros(mesh.ne)
+                    elif fatigue_mode and cyclic_mechanics_enabled:
                         # In fatigue mode the plastic strain/dislocation state is
                         # advanced by the explicit cyclic mechanics block after the
                         # Kmax/J predictor chooses an accepted cycle count.  Do not
@@ -2704,6 +3408,30 @@ def run_2d(args):
                         ep_gp, rho_gp, dot_ep = update_plasticity(
                             ep_gp, rho_gp, sigma_gp, mat, T, dt_cur,
                             plast_model, cfg.dislocations)
+
+                if fixed_local_kmax:
+                    Uapp, controlled = _solve_primary_local_kmax(Uapp, u)
+                    u, Ftop, sigma_gp, seq_gp, s1_gp, psi_gp, _ = controlled
+                    Uy_top, Uy_bot = 0.5 * Uapp, -0.5 * Uapp
+                elif fixed_reaction:
+                    if fatigue_target_reaction is None:
+                        # Establish the force amplitude on the virgin/current
+                        # accepted geometry from the requested experimental K,
+                        # then retain that reaction as compliance changes.
+                        Uapp, controlled = _solve_primary_local_kmax(Uapp, u)
+                        fatigue_target_reaction = abs(float(controlled[1]))
+                    else:
+                        Uapp, controlled = _solve_primary_reaction(Uapp, u)
+                    u, Ftop, sigma_gp, seq_gp, s1_gp, psi_gp, _ = controlled
+                    Uy_top, Uy_bot = 0.5 * Uapp, -0.5 * Uapp
+                elif displacement_calibration_pending:
+                    # Match the requested virgin/current-state K exactly once,
+                    # then retain this boundary displacement as compliance and
+                    # crack state evolve.
+                    Uapp, controlled = _solve_primary_local_kmax(Uapp, u)
+                    displacement_calibration_pending = False
+                    u, Ftop, sigma_gp, seq_gp, s1_gp, psi_gp, _ = controlled
+                    Uy_top, Uy_bot = 0.5 * Uapp, -0.5 * Uapp
 
                 h_local = mesh.hbar_tip if mesh.hbar_tip > 0 else mesh.hbar
                 pred_primary = 0.0
@@ -2833,6 +3561,14 @@ def run_2d(args):
             # only the existing sharp-front renewal law below can advance it.
             if fatigue_mode and cyclic_mechanics_enabled and fatigue_cycles_accepted > 0.0:
                 _run_cyclic_mechanics_block(Uapp, fatigue_cycles_accepted, T)
+                if fixed_local_kmax:
+                    Uapp, controlled = _solve_primary_local_kmax(Uapp, u)
+                    u, Ftop, sigma_gp, seq_gp, s1_gp, psi_gp, _ = controlled
+                    Uapp_accepted = Uapp
+                elif fixed_reaction:
+                    Uapp, controlled = _solve_primary_reaction(Uapp, u)
+                    u, Ftop, sigma_gp, seq_gp, s1_gp, psi_gp, _ = controlled
+                    Uapp_accepted = Uapp
                 # Recompute J-derived Kmax from the post-cycle residual stress and
                 # plastic/dislocation state.  Keep the already accepted cycle block
                 # size so this is a mechanics correction, not a hidden adaptive gate.
@@ -3318,7 +4054,17 @@ def run_2d(args):
                         Kc_first = KJ; Kc_first_step = len(hist['sigma_back'])
                     n_events = max(int(info.get('n_fire', 1)), 1)
                     for _iev in range(n_events):
-                        if crack_backend.name == 'sharp_wake':
+                        if incremental_opening_advection:
+                            transfer_audit = _commit_incremental_opening_event(
+                                eng, da_phys, Uapp, T)
+                            info['incremental_advection_mode'] = transfer_audit.get('mode')
+                            info['incremental_advection_inherited_count'] = float(
+                                transfer_audit.get('inherited_count',
+                                                   transfer_audit.get('coarse_operator_active_retained', 0.0)
+                                                   + transfer_audit.get('coarse_operator_wake_retained', 0.0)))
+                            info['incremental_advection_generated_count'] = float(
+                                transfer_audit.get('opening_generated_count', 0.0))
+                        elif crack_backend.name == 'sharp_wake':
                             len1_m = da_phys
                             a_tip = min(a_tip + len1_m, cfg.geometry.Lx - 2e-5)
                             if a_tip - a_killed >= mesh.hbar or a_tip >= cfg.geometry.Lx - 3e-5:
@@ -3415,6 +4161,12 @@ def run_2d(args):
                          float(info.get('mpz_retained_count', info.get('N_em', 0.0))),
                          float(info.get('mpz_available_site_fraction', 1.0)),
                          float(info.get('mpz_local_slip_count', 0.0)),
+                         float(info.get('mpz_source_passage_slip_count', 0.0)),
+                         float(info.get('mpz_forward_passage_slip_count', 0.0)),
+                         float(info.get('mpz_blunted_radius_m', info.get('r_eff', 0.0))),
+                         float(info.get('mpz_bulk_tip_opening_slip_count', 0.0)),
+                         float(info.get('mpz_bulk_tip_absorbed_absolute_total', 0.0)),
+                         float(info.get('mpz_bulk_tip_absorbed_opening_total', 0.0)),
                          float(info.get('mpz_escaped_total', 0.0)),
                          float(info.get('mpz_recovered_total', 0.0)),
                          float(info.get('mpz_wake_retained_total', 0.0))))
@@ -3578,7 +4330,10 @@ def run_2d(args):
                 else 'outer_driver_step_committed')
             stop_after_events = int(
                 os.environ.get('V10230_STOP_AFTER_COMMITTED_EVENTS', '0') or 0)
-            committed_events_now = max(len(fronts[0].get('path', [])) - 1, 0)
+            committed_events_now = (
+                max(len(fronts[0].get('path', [])) - 1, 0)
+                if deflect else int(getattr(eng, 'n_adv', 0))
+            )
             if stop_after_events > 0 and committed_events_now >= stop_after_events:
                 print(f"  [T={T:.0f}K] graceful interruption after "
                       f"{committed_events_now} committed geometry events")
@@ -3603,6 +4358,11 @@ def run_2d(args):
                           'sigma_cleave_eff_Pa,cleave_barrier_kind_code,'
                           'front_state_model_code,mpz_K_shield_Pa_sqrt_m,mpz_mobile_count,'
                           'mpz_retained_count,mpz_available_site_fraction,mpz_local_slip_count,'
+                          'mpz_source_passage_slip_count,'
+                          'mpz_forward_passage_slip_count,mpz_blunted_radius_m,'
+                          'mpz_bulk_tip_opening_slip_count,'
+                          'mpz_bulk_tip_absorbed_absolute_total,'
+                          'mpz_bulk_tip_absorbed_opening_total,'
                           'mpz_escaped_total,mpz_recovered_total,mpz_wake_retained_total',
                    comments='')
         if branch_rows:
@@ -3636,6 +4396,22 @@ def run_2d(args):
                               'dN_peierls_block,dN_taylor_block,storage_fraction,'
                               'mu_emit_per_cycle,mu_escape_per_cycle,'
                               'pz_store_count,pz_mobile_count,pz_escape_count', comments='')
+        if incremental_opening_advection and opening_advection_rows:
+            with open(os.path.join(args.out, f'incremental_advection_history_{tag}.json'), 'w') as fp:
+                json.dump({
+                    'schema': 'incremental-opening-advection-history/1',
+                    'temperature_K': float(T),
+                    'rows': opening_advection_rows,
+                }, fp, indent=2, sort_keys=True)
+        if signed_gnd_reload_rows:
+            with open(os.path.join(args.out, f'signed_gnd_reload_scan_{tag}.json'), 'w') as fp:
+                json.dump({
+                    'schema': 'signed-gnd-post-advance-reload-scan/1',
+                    'temperature_K': float(T),
+                    'scope': ('frozen-state local-drive estimate; selected points '
+                              'require full FEM reload'),
+                    'rows': signed_gnd_reload_rows,
+                }, fp, indent=2, sort_keys=True)
         # Preserve the full front-local process-zone profiles at the same
         # accepted states used for the bounded field-snapshot history.  These
         # are diagnostics for microstructure evolution, not a replacement for
@@ -4176,6 +4952,13 @@ def _build_parser():
     p.add_argument('--mpz-length-um', type=float, default=100.0)
     p.add_argument('--mpz-source-bins', type=int, default=2)
     p.add_argument('--mpz-blunting-length-um', type=float, default=0.5)
+    p.add_argument('--mpz-forward-slip-blunting-coefficient', type=float, default=0.0,
+                   help='Opt-in coefficient multiplying the moving-tip ledger of gross mobile passage through the forward MPZ boundary. 0 preserves source-only blunting.')
+    p.add_argument('--mpz-analytical-source-slip-ledger', action='store_true',
+                   help='Use a scalar gross-source-slip blunting ledger with exponential moving-tip convection, matching the QSTE analytical reduction. Default preserves the historical spatial source-slip field.')
+    p.add_argument('--mpz-passage-count-normalization', type=float, default=1.0,
+                   dest='mpz_passage_count_normalization',
+                   help='Divide native gross source/forward passage counts by this factor before applying transferred analytical blunting coefficients. Default 1 preserves historical native behavior.')
     p.add_argument('--wake-length-um', type=float, default=100.0)
     p.add_argument('--wake-n-bins', type=int, default=0)
     p.add_argument('--wake-shielding', action=argparse.BooleanOptionalAction, default=True)
@@ -4426,6 +5209,23 @@ def _build_parser():
                    help='Enable cyclic-fatigue coupling inside --mode 2d: each active v8 front uses its local J-derived Kmax, integrates hazards over K(t), updates the front-local process-zone ledger, then uses the existing sharp-front cleavage renewal clock for advance/branching.')
     p.add_argument('--fatigue-hold-load', action='store_true',
                    help='For --mode 2d --fatigue-cycles comparison/tuning runs, ramp by --dU on the first accepted step and then hold the same displacement amplitude for the remaining fatigue blocks. This gives a near-constant local Kmax test analogous to V1.')
+    p.add_argument('--fatigue-loading-control',
+                   choices=['fixed_displacement', 'calibrated_fixed_displacement',
+                            'fixed_local_kmax', 'fixed_reaction'],
+                   default='fixed_displacement', dest='fatigue_loading_control',
+                   help='fixed_displacement preserves the historical uncalibrated boundary condition. calibrated_fixed_displacement solves the requested initial K once and then holds that exact displacement. fixed_local_kmax re-solves the boundary displacement after each plastic-state update so primary-tip J-derived Kmax equals --fatigue-target-Kmax-MPa-sqrt-m. fixed_reaction first calibrates that virgin-state K (unless an explicit reaction is supplied) and then holds the top-reaction amplitude as compliance evolves.')
+    p.add_argument('--fatigue-target-Kmax-MPa-sqrt-m', type=float, default=None,
+                   dest='fatigue_target_Kmax_MPa_sqrt_m',
+                   help='Required primary-tip local Kmax for fixed_local_kmax [MPa sqrt(m)].')
+    p.add_argument('--fatigue-k-control-rtol', type=float, default=2.0e-3,
+                   dest='fatigue_k_control_rtol',
+                   help='Relative primary-tip J-derived Kmax tolerance for fixed_local_kmax.')
+    p.add_argument('--fatigue-target-reaction-N-per-m', type=float, default=None,
+                   dest='fatigue_target_reaction_N_per_m',
+                   help='Optional top-reaction amplitude per unit thickness for fixed_reaction. If omitted, the controller first solves the requested target Kmax on the initial state, records its reaction, and holds that reaction thereafter.')
+    p.add_argument('--fatigue-reaction-control-rtol', type=float, default=2.0e-3,
+                   dest='fatigue_reaction_control_rtol',
+                   help='Relative top-reaction tolerance for fixed_reaction.')
     p.add_argument('--R', type=float, default=0.1,
                    help='Fatigue load ratio Kmin/Kmax for --fatigue-cycles.')
     p.add_argument('--frequency-Hz', type=float, default=1.0e3, dest='frequency_Hz',
@@ -4479,6 +5279,25 @@ def _build_parser():
                    help='Optional transport coefficient for PZ fields. Default uses --rho-transport-c; 0 disables PZ-field transport.')
     p.add_argument('--no-cyclic-mechanics', action='store_true',
                    help='Disable full 2-D cyclic mechanics in fatigue mode and use the scalar K(t) mechanics surrogate only.')
+    p.add_argument('--tip-only-plasticity', action='store_true',
+                   help='Keep full elastic 2-D FEM/J mechanics and front-local MPZ plasticity, but disable element-level bulk plastic-strain/rho evolution.')
+    p.add_argument('--incremental-opening-advection', action='store_true',
+                   help='Opt-in research mode: calibrate the first moving-MPZ crack transaction with explicit 2-D geometry/plasticity substeps, then reuse its conservative additive transfer operator for later events at the same protocol state.')
+    p.add_argument('--opening-advection-step-um', type=float, default=0.1, dest='opening_advection_step_um',
+                   help='Maximum explicit crack increment used by --incremental-opening-advection [um].')
+    p.add_argument('--opening-advection-duration-s', type=float, default=None, dest='opening_advection_duration_s',
+                   help='Total time assigned to the explicitly resolved opening event. Default is the accepted cooperative completion time tau_s.')
+    p.add_argument('--opening-advection-capture-width-um', type=float, default=None, dest='opening_advection_capture_width_um',
+                   help='Width used to area-integrate resolved bulk defect density into the 1-D MPZ. Default equals the active MPZ length.')
+    p.add_argument('--opening-advection-retained-fraction', type=float, default=None, dest='opening_advection_retained_fraction',
+                   help='Fraction of resolved positive bulk defect content entering the retained MPZ owner. Default uses the material encounter efficiency.')
+    p.add_argument('--opening-advection-state-owner',
+                   choices=['unsigned_density', 'signed_gnd'],
+                   default='unsigned_density', dest='opening_advection_state_owner',
+                   help='unsigned_density is the historical upper-bound diagnostic; signed_gnd keeps SSD density in FE hardening and observes signed zero-spin Nye/GND content.')
+    p.add_argument('--signed-gnd-tip-absorption', action=argparse.BooleanOptionalAction,
+                   default=False, dest='signed_gnd_tip_absorption',
+                   help='With signed_gnd ownership, book signed GND content swept by each crack increment into explicit lower/upper-face ledgers and let only its opening-effective projection contribute to blunting through the existing c_blunt law. This is crack-swept absorption, not a continuous bulk-mobile flux model.')
     p.add_argument('--cyclic-mechanics-phases', type=int, default=0, dest='cyclic_mechanics_phases',
                    help='Number of FEM/plasticity phases per accepted fatigue block. 0=min(n_phase,24).')
     p.add_argument('--cyclic-mechanics-stagger', type=int, default=1, dest='cyclic_mechanics_stagger',

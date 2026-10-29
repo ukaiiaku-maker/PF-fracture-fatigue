@@ -72,7 +72,8 @@ def _reversible_blunted_radius(mpz: Any, r0: float, b: float) -> float:
         float(r0)
         + max(float(mpz.manifest.c_blunt), 0.0)
         * abs(float(b))
-        * _reversible_local_slip_count(mpz),
+        * (_reversible_local_slip_count(mpz)
+           + max(float(getattr(mpz, "bulk_tip_opening_slip_count", 0.0)), 0.0)),
         float(r0),
     )
 

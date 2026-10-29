@@ -1,0 +1,1173 @@
+{
+  "rows": [
+    {
+      "K_shield_Pa_sqrt_m": -1396.8987073151225,
+      "bulk_tip_absorbed_absolute_count": 53.470384631179684,
+      "bulk_tip_absorbed_opening_count": 18.90492869611716,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          11.345997935804274
+        ],
+        [
+          0.0,
+          7.558930760312887
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          10.690045402335922,
+          16.045664159471546
+        ],
+        [
+          -16.044732671098558,
+          -10.689942398273656
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 1,
+      "new_tip_m": 0.0005002380952380953,
+      "old_tip_m": 0.0005,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 4.761904761904751e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 156.83845253329406,
+      "signed_gnd_active_K_Pa_sqrt_m": 432.859868668369,
+      "signed_gnd_active_count": 0.01804108807015581,
+      "signed_gnd_total_K_Pa_sqrt_m": -1562.26010361535,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1995.119972283719,
+      "signed_gnd_wake_count": -0.14005417604477088,
+      "tip_radius_m": 3.380161698882067e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -902.4404792093973,
+      "bulk_tip_absorbed_absolute_count": 6.39122533158559,
+      "bulk_tip_absorbed_opening_count": 2.259612425477296,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          1.6038195446826118
+        ],
+        [
+          0.0,
+          0.6557928807946841
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.9302386181541038,
+          2.268143351689192
+        ],
+        [
+          -2.2654121756147294,
+          -0.9274311861275648
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 2,
+      "new_tip_m": 0.0005004761904761905,
+      "old_tip_m": 0.0005002380952380953,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 4.523809523809502e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 157.9991967140585,
+      "signed_gnd_active_K_Pa_sqrt_m": 426.55541012955655,
+      "signed_gnd_active_count": 0.016162132438828358,
+      "signed_gnd_total_K_Pa_sqrt_m": -1018.9829411710816,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1445.5383513006382,
+      "signed_gnd_wake_count": -0.1327931636827202,
+      "tip_radius_m": 3.6181062637933138e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -708.287969297584,
+      "bulk_tip_absorbed_absolute_count": 1.8946980166495455,
+      "bulk_tip_absorbed_opening_count": 0.6694800436111739,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.2789030871385893
+        ],
+        [
+          0.0,
+          0.3905769564725846
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.5557957992070272,
+          0.3944285284191182
+        ],
+        [
+          -0.39211446002946504,
+          -0.5523592289939352
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 3,
+      "new_tip_m": 0.0005007142857142858,
+      "old_tip_m": 0.0005004761904761905,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 4.285714285714253e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 159.31958977108943,
+      "signed_gnd_active_K_Pa_sqrt_m": 338.4010181584599,
+      "signed_gnd_active_count": 0.014245287480618263,
+      "signed_gnd_total_K_Pa_sqrt_m": -803.3402360229084,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1141.7412541813683,
+      "signed_gnd_wake_count": -0.1256873292765448,
+      "tip_radius_m": 3.6625379683159176e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -632.8398173304216,
+      "bulk_tip_absorbed_absolute_count": 1.6373042235268598,
+      "bulk_tip_absorbed_opening_count": 0.5786562660093026,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.2551730265486355
+        ],
+        [
+          0.0,
+          0.32348323946066715
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.4596983149468072,
+          0.3608691548968702
+        ],
+        [
+          -0.3592623692375233,
+          -0.4574743844456591
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 4,
+      "new_tip_m": 0.000500952380952381,
+      "old_tip_m": 0.0005007142857142858,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 4.047619047619004e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 160.69954865572623,
+      "signed_gnd_active_K_Pa_sqrt_m": 280.7408708169969,
+      "signed_gnd_active_count": 0.013256226563986617,
+      "signed_gnd_total_K_Pa_sqrt_m": -715.1124673584563,
+      "signed_gnd_wake_K_Pa_sqrt_m": -995.8533381754532,
+      "signed_gnd_wake_count": -0.12083978669929252,
+      "tip_radius_m": 3.695496513778957e-06,
+      "wake_retained_count": 0.007089178892098786
+    },
+    {
+      "K_shield_Pa_sqrt_m": -550.331925402959,
+      "bulk_tip_absorbed_absolute_count": 1.181785060881305,
+      "bulk_tip_absorbed_opening_count": 0.4178346694471653,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.1944567114260501
+        ],
+        [
+          0.0,
+          0.22337795802111524
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.3171868230318208,
+          0.27500331859319127
+        ],
+        [
+          -0.27369078148762394,
+          -0.3159041377686691
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 5,
+      "new_tip_m": 0.0005011904761904763,
+      "old_tip_m": 0.000500952380952381,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 3.809523809523755e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 162.0971740114299,
+      "signed_gnd_active_K_Pa_sqrt_m": 271.02572516631335,
+      "signed_gnd_active_count": 0.011995211990892818,
+      "signed_gnd_total_K_Pa_sqrt_m": -623.8946894297842,
+      "signed_gnd_wake_K_Pa_sqrt_m": -894.9204145960975,
+      "signed_gnd_wake_count": -0.1175424255545181,
+      "tip_radius_m": 3.7087625138029955e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -419.14168514038374,
+      "bulk_tip_absorbed_absolute_count": 1.1603290006052467,
+      "bulk_tip_absorbed_opening_count": 0.4105247289665252,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.20689958207126738
+        ],
+        [
+          0.0,
+          0.20362514689525782
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.2891181700973352,
+          0.2926001950145116
+        ],
+        [
+          -0.29064119111391246,
+          -0.28796944437948735
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 6,
+      "new_tip_m": 0.0005014285714285715,
+      "old_tip_m": 0.0005011904761904763,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 3.571428571428506e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 163.50913819503464,
+      "signed_gnd_active_K_Pa_sqrt_m": 271.11907947311556,
+      "signed_gnd_active_count": 0.009198731012408423,
+      "signed_gnd_total_K_Pa_sqrt_m": -486.2803206727476,
+      "signed_gnd_wake_K_Pa_sqrt_m": -757.3994001458632,
+      "signed_gnd_wake_count": -0.11406322101289845,
+      "tip_radius_m": 3.720973055996977e-06,
+      "wake_retained_count": 0.007089178892098786
+    },
+    {
+      "K_shield_Pa_sqrt_m": -390.17785493475566,
+      "bulk_tip_absorbed_absolute_count": 1.297879432071416,
+      "bulk_tip_absorbed_opening_count": 0.45913490551017644,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.23338756991834209
+        ],
+        [
+          0.0,
+          0.22574733559183435
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.32095054573308796,
+          0.3300598666678184
+        ],
+        [
+          -0.3276140760069469,
+          -0.31925494366356266
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 7,
+      "new_tip_m": 0.0005016666666666668,
+      "old_tip_m": 0.0005014285714285715,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 3.333333333333257e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 164.65001083126424,
+      "signed_gnd_active_K_Pa_sqrt_m": 168.2630624159574,
+      "signed_gnd_active_count": 0.002461404832999836,
+      "signed_gnd_total_K_Pa_sqrt_m": -452.32645548266737,
+      "signed_gnd_wake_K_Pa_sqrt_m": -620.5895178986248,
+      "signed_gnd_wake_count": -0.10990066459598324,
+      "tip_radius_m": 3.7388337555727555e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -496.4034615879873,
+      "bulk_tip_absorbed_absolute_count": 1.2691080257440546,
+      "bulk_tip_absorbed_opening_count": 0.44868152954761764,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.22541711685245866
+        ],
+        [
+          0.0,
+          0.223264412695159
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.3174951934252924,
+          0.31878794384378784
+        ],
+        [
+          -0.3170813280462166,
+          -0.31574356042875773
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 8,
+      "new_tip_m": 0.000501904761904762,
+      "old_tip_m": 0.0005016666666666668,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 3.095238095238008e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 165.82917118948512,
+      "signed_gnd_active_K_Pa_sqrt_m": 12.836772600610857,
+      "signed_gnd_active_count": -0.0035722662930983695,
+      "signed_gnd_total_K_Pa_sqrt_m": -554.5313535562454,
+      "signed_gnd_wake_K_Pa_sqrt_m": -567.3681261568563,
+      "signed_gnd_wake_count": -0.10644131304619009,
+      "tip_radius_m": 3.755200252508056e-06,
+      "wake_retained_count": 0.007089178892098786
+    },
+    {
+      "K_shield_Pa_sqrt_m": -644.9955922267566,
+      "bulk_tip_absorbed_absolute_count": 1.2314024760566284,
+      "bulk_tip_absorbed_opening_count": 0.4351122304843005,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.22022709595228077
+        ],
+        [
+          0.0,
+          0.21488513453201974
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.3049842231185503,
+          0.31144814589775643
+        ],
+        [
+          -0.3110766354327722,
+          -0.3038934716075494
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 9,
+      "new_tip_m": 0.0005021428571428573,
+      "old_tip_m": 0.000501904761904762,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 2.857142857142759e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 166.41202335051926,
+      "signed_gnd_active_K_Pa_sqrt_m": -120.01179545910418,
+      "signed_gnd_active_count": -0.009222490650334203,
+      "signed_gnd_total_K_Pa_sqrt_m": -699.7941091093453,
+      "signed_gnd_wake_K_Pa_sqrt_m": -579.7823136502411,
+      "signed_gnd_wake_count": -0.10499218537759702,
+      "tip_radius_m": 3.769720065945676e-06,
+      "wake_retained_count": 0.007089178892098786
+    },
+    {
+      "K_shield_Pa_sqrt_m": -837.067700658062,
+      "bulk_tip_absorbed_absolute_count": 1.1058703523018512,
+      "bulk_tip_absorbed_opening_count": 0.3906897275549549,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.19622991298065223
+        ],
+        [
+          0.0,
+          0.19445981457430264
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.2754757869608173,
+          0.27751100428053066
+        ],
+        [
+          -0.27787585395296704,
+          -0.2750077071075361
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 10,
+      "new_tip_m": 0.0005023809523809525,
+      "old_tip_m": 0.0005021428571428573,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 2.61904761904751e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 167.2709585601075,
+      "signed_gnd_active_K_Pa_sqrt_m": -269.0881390339855,
+      "signed_gnd_active_count": -0.014712241923527714,
+      "signed_gnd_total_K_Pa_sqrt_m": -889.0503558287091,
+      "signed_gnd_wake_K_Pa_sqrt_m": -619.9622167947236,
+      "signed_gnd_wake_count": -0.10488316771548511,
+      "tip_radius_m": 3.7787265587288608e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1001.8886059384382,
+      "bulk_tip_absorbed_absolute_count": 0.8354755468421962,
+      "bulk_tip_absorbed_opening_count": 0.2952057352326761,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.14772814622585767
+        ],
+        [
+          0.0,
+          0.14747758900681848
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.20776477181370853,
+          0.20891914793684369
+        ],
+        [
+          -0.21022682057211606,
+          -0.20856480651952797
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 11,
+      "new_tip_m": 0.0005026190476190477,
+      "old_tip_m": 0.0005023809523809525,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 2.380952380952261e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 168.11940457236844,
+      "signed_gnd_active_K_Pa_sqrt_m": -353.8629106988701,
+      "signed_gnd_active_count": -0.018683583867978193,
+      "signed_gnd_total_K_Pa_sqrt_m": -1051.4491727539607,
+      "signed_gnd_wake_K_Pa_sqrt_m": -697.5862620550906,
+      "signed_gnd_wake_count": -0.10700345199109051,
+      "tip_radius_m": 3.776184995448274e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1128.4409970020006,
+      "bulk_tip_absorbed_absolute_count": 0.8196430028687021,
+      "bulk_tip_absorbed_opening_count": 0.289558626311462,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.14343204765610423
+        ],
+        [
+          0.0,
+          0.14612657865535775
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.20554223373148722,
+          0.2028435470742067
+        ],
+        [
+          -0.2046030327054224,
+          -0.20665418935758578
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 12,
+      "new_tip_m": 0.000502857142857143,
+      "old_tip_m": 0.0005026190476190477,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 2.142857142857012e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 168.784476048516,
+      "signed_gnd_active_K_Pa_sqrt_m": -419.96682750243417,
+      "signed_gnd_active_count": -0.021880659607349084,
+      "signed_gnd_total_K_Pa_sqrt_m": -1175.8892737320457,
+      "signed_gnd_wake_K_Pa_sqrt_m": -755.9224462296115,
+      "signed_gnd_wake_count": -0.10987015462279714,
+      "tip_radius_m": 3.7730023493538354e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1298.7039916348738,
+      "bulk_tip_absorbed_absolute_count": 0.7591859712668754,
+      "bulk_tip_absorbed_opening_count": 0.26809271034243803,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.1350770071010242
+        ],
+        [
+          0.0,
+          0.13301570324141385
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.18681105432754605,
+          0.19102773540703527
+        ],
+        [
+          -0.19323456999969166,
+          -0.18811261153260234
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 13,
+      "new_tip_m": 0.0005030952380952382,
+      "old_tip_m": 0.000502857142857143,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 1.9047619047617628e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 169.97047021472943,
+      "signed_gnd_active_K_Pa_sqrt_m": -512.9405258702063,
+      "signed_gnd_active_count": -0.024385437784804065,
+      "signed_gnd_total_K_Pa_sqrt_m": -1344.2889084057133,
+      "signed_gnd_wake_K_Pa_sqrt_m": -831.348382535507,
+      "signed_gnd_wake_count": -0.11337579280552745,
+      "tip_radius_m": 3.767294525514612e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1434.9610129243315,
+      "bulk_tip_absorbed_absolute_count": 0.7241673475270871,
+      "bulk_tip_absorbed_opening_count": 0.25571722779535533,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.13329219435208875
+        ],
+        [
+          0.0,
+          0.1224250334432666
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.17100075317730762,
+          0.18850362901119438
+        ],
+        [
+          -0.19152782266913773,
+          -0.17313514266944738
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 14,
+      "new_tip_m": 0.0005033333333333335,
+      "old_tip_m": 0.0005030952380952382,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 1.6666666666665138e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 171.06444051803655,
+      "signed_gnd_active_K_Pa_sqrt_m": -543.5510060578672,
+      "signed_gnd_active_count": -0.02427047567108387,
+      "signed_gnd_total_K_Pa_sqrt_m": -1478.8861580163793,
+      "signed_gnd_wake_K_Pa_sqrt_m": -935.3351519585121,
+      "signed_gnd_wake_count": -0.11854550417265841,
+      "tip_radius_m": 3.7601836677593186e-06,
+      "wake_retained_count": 0.007089178892098788
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1508.525209348927,
+      "bulk_tip_absorbed_absolute_count": 0.8516390390384678,
+      "bulk_tip_absorbed_opening_count": 0.3009397662493011,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.15549101406106924
+        ],
+        [
+          0.0,
+          0.14544875218823183
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.2029341979604499,
+          0.21989750091230975
+        ],
+        [
+          -0.22311174219086724,
+          -0.20569559797484088
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 15,
+      "new_tip_m": 0.0005035714285714287,
+      "old_tip_m": 0.0005033333333333335,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 1.4285714285712647e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 171.87181233415103,
+      "signed_gnd_active_K_Pa_sqrt_m": -526.6405567247857,
+      "signed_gnd_active_count": -0.022941976867010272,
+      "signed_gnd_total_K_Pa_sqrt_m": -1550.9596084676887,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1024.319051742903,
+      "signed_gnd_wake_count": -0.12449400400778643,
+      "tip_radius_m": 3.758580900565401e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1547.3801265948775,
+      "bulk_tip_absorbed_absolute_count": 0.8849574164476854,
+      "bulk_tip_absorbed_opening_count": 0.31275292230517676,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.16043471458578065
+        ],
+        [
+          0.0,
+          0.1523182077193961
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.2125918251691733,
+          0.22688894924266761
+        ],
+        [
+          -0.23006616688271228,
+          -0.21541047515313225
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 16,
+      "new_tip_m": 0.000503809523809524,
+      "old_tip_m": 0.0005035714285714287,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 1.1904761904760157e-06,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 172.96233239617,
+      "signed_gnd_active_K_Pa_sqrt_m": -499.6571375196727,
+      "signed_gnd_active_count": -0.02137375559915533,
+      "signed_gnd_total_K_Pa_sqrt_m": -1588.4659364229228,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1088.8087989032501,
+      "signed_gnd_wake_count": -0.13045467502237784,
+      "tip_radius_m": 3.7584135005377335e-06,
+      "wake_retained_count": 0.007089178892098788
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1532.4506646404325,
+      "bulk_tip_absorbed_absolute_count": 0.8232895714359942,
+      "bulk_tip_absorbed_opening_count": 0.2913680105521996,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.1447712325140046
+        ],
+        [
+          0.0,
+          0.14659677803819499
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.20402101890316876,
+          0.2047374404627741
+        ],
+        [
+          -0.20721196036823766,
+          -0.20731915170181367
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 17,
+      "new_tip_m": 0.0005040476190476192,
+      "old_tip_m": 0.000503809523809524,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 9.523809523807666e-07,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 174.2904930592177,
+      "signed_gnd_active_K_Pa_sqrt_m": -442.1442033343992,
+      "signed_gnd_active_count": -0.018414381121495182,
+      "signed_gnd_total_K_Pa_sqrt_m": -1572.3087958745818,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1130.1645925401826,
+      "signed_gnd_wake_count": -0.13624859123711985,
+      "tip_radius_m": 3.755689527502915e-06,
+      "wake_retained_count": 0.007089178892098788
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1492.2638296768866,
+      "bulk_tip_absorbed_absolute_count": 0.8874124311180949,
+      "bulk_tip_absorbed_opening_count": 0.3141309608672168,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.1574039877453784
+        ],
+        [
+          0.0,
+          0.15672697312183845
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.21852332801269558,
+          0.2226028542411226
+        ],
+        [
+          -0.22464083788568928,
+          -0.22164541097858748
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 18,
+      "new_tip_m": 0.0005042857142857145,
+      "old_tip_m": 0.0005040476190476192,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 7.142857142855176e-07,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 175.56191021525333,
+      "signed_gnd_active_K_Pa_sqrt_m": -384.0308014120601,
+      "signed_gnd_active_count": -0.014882213494806118,
+      "signed_gnd_total_K_Pa_sqrt_m": -1530.9981422545898,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1146.9673408425297,
+      "signed_gnd_wake_count": -0.1413730249264944,
+      "tip_radius_m": 3.7557264194159005e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1448.1576344537575,
+      "bulk_tip_absorbed_absolute_count": 0.9899027694796074,
+      "bulk_tip_absorbed_opening_count": 0.3503973870210302,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.1738554642604888
+        ],
+        [
+          0.0,
+          0.1765419227605414
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.24658443785826867,
+          0.24586875544985423
+        ],
+        [
+          -0.2477815946761035,
+          -0.24966798149538105
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 19,
+      "new_tip_m": 0.0005045238095238097,
+      "old_tip_m": 0.0005042857142857145,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 4.7619047619026855e-07,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 176.42023368819417,
+      "signed_gnd_active_K_Pa_sqrt_m": -316.0150195118549,
+      "signed_gnd_active_count": -0.010993752942878743,
+      "signed_gnd_total_K_Pa_sqrt_m": -1485.858124468934,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1169.843104957079,
+      "signed_gnd_wake_count": -0.1463111894962026,
+      "tip_radius_m": 3.7601023399233565e-06,
+      "wake_retained_count": 0.007089178892098789
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1338.7972038713149,
+      "bulk_tip_absorbed_absolute_count": 0.9981755938767595,
+      "bulk_tip_absorbed_opening_count": 0.35341512046059653,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.17547501029834228
+        ],
+        [
+          0.0,
+          0.17794011016225422
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.24851898301524541,
+          0.24815913942147422
+        ],
+        [
+          -0.2498521543584174,
+          -0.2516453170816225
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 20,
+      "new_tip_m": 0.000504761904761905,
+      "old_tip_m": 0.0005045238095238097,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 2.380952380950195e-07,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 177.47782767778452,
+      "signed_gnd_active_K_Pa_sqrt_m": -198.78174415419926,
+      "signed_gnd_active_count": -0.007303332495910642,
+      "signed_gnd_total_K_Pa_sqrt_m": -1375.5424633904186,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1176.7607192362193,
+      "signed_gnd_wake_count": -0.15108344428985276,
+      "tip_radius_m": 3.764779723780518e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "K_shield_Pa_sqrt_m": -1198.8419961984123,
+      "bulk_tip_absorbed_absolute_count": 0.9101884802809779,
+      "bulk_tip_absorbed_opening_count": 0.32302324067471777,
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.0,
+          0.1630621368107116
+        ],
+        [
+          0.0,
+          0.15996110386400614
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          0.2231528916532235,
+          0.23060468538724546
+        ],
+        [
+          -0.23021174070386025,
+          -0.2262191625366488
+        ]
+      ],
+      "dt_s": 3.329596946283073e-08,
+      "event_index": 1,
+      "increment_m": 2.3809523809524905e-07,
+      "inherited_count": 0.0,
+      "microstep": 21,
+      "new_tip_m": 0.0005050000000000002,
+      "old_tip_m": 0.000504761904761905,
+      "opening_generated_count": 0.0,
+      "pending_advance_m": 0.0,
+      "retained_count": 0.0,
+      "signed_gnd_abs_count": 178.8276439290867,
+      "signed_gnd_active_K_Pa_sqrt_m": -126.97416389453429,
+      "signed_gnd_active_count": -0.004515224661021611,
+      "signed_gnd_total_K_Pa_sqrt_m": -1234.701138964847,
+      "signed_gnd_wake_K_Pa_sqrt_m": -1107.7269750703126,
+      "signed_gnd_wake_count": -0.15377803649346333,
+      "tip_radius_m": 3.765756769342444e-06,
+      "wake_retained_count": 0.007089178892098787
+    },
+    {
+      "active_mobile_postcommit": 0.0,
+      "active_retained_postcommit": 0.0,
+      "bulk_tip_absorbed_absolute_count": 5.144815306941648,
+      "bulk_tip_absorbed_opening_count": 1.825137617899609,
+      "bulk_tip_absorption_scope": "crack_swept_signed_GND_not_continuous_mobile_flux",
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          1.086450682785871,
+          0.0
+        ],
+        [
+          0.7386869351137381,
+          0.0
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          -1.5364732904452885,
+          -1.02929791739397
+        ],
+        [
+          1.044661081985663,
+          1.5343830171167259
+        ]
+      ],
+      "coarse_operator_active_retained": 0.0,
+      "coarse_operator_forward_passage": 0.0,
+      "coarse_operator_wake_retained": 0.0046925049187744065,
+      "distance_m": 5e-06,
+      "event_index": 2,
+      "forward_blunting_survival": 0.7496647136156819,
+      "mode": "coarse_operator",
+      "mpz_pending_advance_m": 0.0,
+      "signed_gnd_active_K_Pa_sqrt_m": 68.07561883138078,
+      "signed_gnd_total_K_Pa_sqrt_m": 245.5352412330085,
+      "signed_gnd_wake_K_Pa_sqrt_m": 177.4596224016277,
+      "source_sites_refreshed": 282.11810834235905,
+      "wake_mobile": 0.0,
+      "wake_mobile_postcommit": 0.0,
+      "wake_retained": 7.000445501713081e-06,
+      "wake_retained_postcommit": 7.0004455019905725e-06,
+      "wake_slip": 282.1181083423593
+    },
+    {
+      "active_mobile_postcommit": 0.0,
+      "active_retained_postcommit": 0.0,
+      "bulk_tip_absorbed_absolute_count": 4.580978655818066,
+      "bulk_tip_absorbed_opening_count": 1.4915424201744547,
+      "bulk_tip_absorption_scope": "crack_swept_signed_GND_not_continuous_mobile_flux",
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.8755781591659303,
+          0.0
+        ],
+        [
+          0.6159642610085244,
+          0.0
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          -1.2382545076101272,
+          -1.2432733052519627
+        ],
+        [
+          0.8711050118553764,
+          1.2283458311005995
+        ]
+      ],
+      "coarse_operator_active_retained": 0.0,
+      "coarse_operator_forward_passage": 0.0,
+      "coarse_operator_wake_retained": 0.0046925049187744065,
+      "distance_m": 5e-06,
+      "event_index": 3,
+      "forward_blunting_survival": 0.7496647136156819,
+      "mode": "coarse_operator",
+      "mpz_pending_advance_m": 0.0,
+      "signed_gnd_active_K_Pa_sqrt_m": 245.9924975439601,
+      "signed_gnd_total_K_Pa_sqrt_m": -194.99449538912882,
+      "signed_gnd_wake_K_Pa_sqrt_m": -440.9869929330889,
+      "source_sites_refreshed": 282.11811276415244,
+      "wake_mobile": 0.0,
+      "wake_mobile_postcommit": 0.0,
+      "wake_retained": 2.5957410994929504e-06,
+      "wake_retained_postcommit": 2.5957411088490485e-06,
+      "wake_slip": 282.11811276415244
+    },
+    {
+      "active_mobile_postcommit": 0.0,
+      "active_retained_postcommit": 0.0,
+      "bulk_tip_absorbed_absolute_count": 6.949837027419417,
+      "bulk_tip_absorbed_opening_count": 2.4665477868308123,
+      "bulk_tip_absorption_scope": "crack_swept_signed_GND_not_continuous_mobile_flux",
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          1.793917170941576,
+          0.0
+        ],
+        [
+          0.6726306158892361,
+          0.0
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          -2.536981992919551,
+          -1.006994496472134
+        ],
+        [
+          0.9512433394579257,
+          2.4546171985698058
+        ]
+      ],
+      "coarse_operator_active_retained": 0.0,
+      "coarse_operator_forward_passage": 0.0,
+      "coarse_operator_wake_retained": 0.0046925049187744065,
+      "distance_m": 5e-06,
+      "event_index": 4,
+      "forward_blunting_survival": 0.7496647136156819,
+      "mode": "coarse_operator",
+      "mpz_pending_advance_m": 0.0,
+      "signed_gnd_active_K_Pa_sqrt_m": -255.76035305444498,
+      "signed_gnd_total_K_Pa_sqrt_m": -942.9536912469205,
+      "signed_gnd_wake_K_Pa_sqrt_m": -687.1933381924755,
+      "source_sites_refreshed": 282.1181134486656,
+      "wake_mobile": 0.0,
+      "wake_mobile_postcommit": 0.0,
+      "wake_retained": 1.3670963595983397e-06,
+      "wake_retained_postcommit": 1.3670965143150622e-06,
+      "wake_slip": 282.1181134486655
+    },
+    {
+      "active_mobile_postcommit": 0.0,
+      "active_retained_postcommit": 0.0,
+      "bulk_tip_absorbed_absolute_count": 0.8560753226343014,
+      "bulk_tip_absorbed_opening_count": 0.30093863111612557,
+      "bulk_tip_absorption_scope": "crack_swept_signed_GND_not_continuous_mobile_flux",
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.2962734905316564,
+          0.0
+        ],
+        [
+          0.0046651405844691735,
+          0.0
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          -0.4189939884814853,
+          -0.16874812304807096
+        ],
+        [
+          0.006597505084933453,
+          0.2617357060198118
+        ]
+      ],
+      "coarse_operator_active_retained": 0.0,
+      "coarse_operator_forward_passage": 0.0,
+      "coarse_operator_wake_retained": 0.0046925049187744065,
+      "distance_m": 5e-06,
+      "event_index": 5,
+      "forward_blunting_survival": 0.7496647136156819,
+      "mode": "coarse_operator",
+      "mpz_pending_advance_m": 0.0,
+      "signed_gnd_active_K_Pa_sqrt_m": -55.26235728395574,
+      "signed_gnd_total_K_Pa_sqrt_m": -704.1845588016631,
+      "signed_gnd_wake_K_Pa_sqrt_m": -648.9222015177074,
+      "source_sites_refreshed": 282.1181134707129,
+      "wake_mobile": 0.0,
+      "wake_mobile_postcommit": 0.0,
+      "wake_retained": 2.8700141451675825e-06,
+      "wake_retained_postcommit": 2.8700149783372084e-06,
+      "wake_slip": 282.1181134707129
+    },
+    {
+      "active_mobile_postcommit": 0.0,
+      "active_retained_postcommit": 0.0,
+      "bulk_tip_absorbed_absolute_count": 3.1258852804626147,
+      "bulk_tip_absorbed_opening_count": 1.061173892575686,
+      "bulk_tip_absorption_scope": "crack_swept_signed_GND_not_continuous_mobile_flux",
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.4717614394390173,
+          0.0
+        ],
+        [
+          0.5894124531366687,
+          0.0
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          -0.6671714258593119,
+          -1.3793461760851105
+        ],
+        [
+          0.8335550850574732,
+          0.24581259346071932
+        ]
+      ],
+      "coarse_operator_active_retained": 0.0,
+      "coarse_operator_forward_passage": 0.0,
+      "coarse_operator_wake_retained": 0.0046925049187744065,
+      "distance_m": 5e-06,
+      "event_index": 6,
+      "forward_blunting_survival": 0.7496647136156819,
+      "mode": "coarse_operator",
+      "mpz_pending_advance_m": 0.0,
+      "signed_gnd_active_K_Pa_sqrt_m": -78.60421271630139,
+      "signed_gnd_total_K_Pa_sqrt_m": -430.78435986354407,
+      "signed_gnd_wake_K_Pa_sqrt_m": -352.1801471472427,
+      "source_sites_refreshed": 282.11811349531223,
+      "wake_mobile": 0.0,
+      "wake_mobile_postcommit": 0.0,
+      "wake_retained": 5.0735410644016e-06,
+      "wake_retained_postcommit": 5.073548933994087e-06,
+      "wake_slip": 282.1181134953122
+    },
+    {
+      "active_mobile_postcommit": 0.0,
+      "active_retained_postcommit": 0.0,
+      "bulk_tip_absorbed_absolute_count": 3.233995983451706,
+      "bulk_tip_absorbed_opening_count": 1.205895295891627,
+      "bulk_tip_absorption_scope": "crack_swept_signed_GND_not_continuous_mobile_flux",
+      "bulk_tip_opening_count_by_system_face": [
+        [
+          0.7151553339986579,
+          0.0
+        ],
+        [
+          0.4907399618929689,
+          0.0
+        ]
+      ],
+      "bulk_tip_signed_count_by_system_face": [
+        [
+          -1.0113823725443627,
+          -0.8870470160585234
+        ],
+        [
+          0.6940111097074926,
+          0.6415554851413277
+        ]
+      ],
+      "coarse_operator_active_retained": 0.0,
+      "coarse_operator_forward_passage": 0.0,
+      "coarse_operator_wake_retained": 0.0046925049187744065,
+      "distance_m": 5e-06,
+      "event_index": 7,
+      "forward_blunting_survival": 0.7496647136156819,
+      "mode": "coarse_operator",
+      "mpz_pending_advance_m": 0.0,
+      "signed_gnd_active_K_Pa_sqrt_m": -264.55041195068134,
+      "signed_gnd_total_K_Pa_sqrt_m": -1237.612618724991,
+      "signed_gnd_wake_K_Pa_sqrt_m": -973.0622067743097,
+      "source_sites_refreshed": 282.118113495378,
+      "wake_mobile": 0.0,
+      "wake_mobile_postcommit": 0.0,
+      "wake_retained": 1.5701874173601576e-05,
+      "wake_retained_postcommit": 1.570191658336462e-05,
+      "wake_slip": 282.1181134953779
+    }
+  ],
+  "schema": "incremental-opening-advection-history/1",
+  "temperature_K": 298.15
+}

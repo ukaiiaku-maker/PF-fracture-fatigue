@@ -1,0 +1,38 @@
+[
+  {
+    "T": 298.15,
+    "Kc_first_MPa_sqrt_m": 44.48471084663558,
+    "a_final_mm": 0.5150000000000002,
+    "n_advances": 0,
+    "n_advances_primary": 0,
+    "n_advances_branch": 0,
+    "n_fronts": 1,
+    "n_active_fronts_final": 1,
+    "n_coalesced": 0,
+    "n_stagnant_retired": 0,
+    "branch_length_dx_mm": 0.0,
+    "N_em_final": 0.0,
+    "W_emit_J_per_m": 0.003254657732300716,
+    "sigma_back_init_GPa": 0.0,
+    "r_eff_over_r0_init": 1.0668072997639335,
+    "N_em_init": 31.079771152742417,
+    "hbar_tip_m": 3.622095427872452e-07,
+    "n_nodes": 1397,
+    "deflection_deg": 0.0,
+    "path_span_dy_mm": 0.0,
+    "branched": false,
+    "mode": "brittle",
+    "shelf": {
+      "lambda_c_max": 4.368528296242117,
+      "lambda_e_max": 12563367.156587213,
+      "t_min_fire_s": 0.22891004296806713,
+      "clock_completable": true,
+      "lambda_e_shelf": 12563367.156587213,
+      "lambda_c_shelf": 4.368528296242117,
+      "t_emit_min": 7.9596495711397e-08,
+      "t_cleave_min": 0.22891004296806713,
+      "t_total": 600.0,
+      "material_class": "QSTE340TM_EMISSION_OWNED_BLUNTING_MAIN_2D"
+    }
+  }
+]

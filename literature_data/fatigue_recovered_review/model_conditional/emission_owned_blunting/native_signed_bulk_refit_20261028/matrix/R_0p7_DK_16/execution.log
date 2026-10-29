@@ -1,0 +1,126 @@
+========================================================================
+  SHARP-FRONT 2D  (FEM supplies K_J; engine is the only advance law)
+  FATIGUE MODE: for each active v8 front, local J-derived Kmax is cycled with R=0.7, f=10 Hz; cycle blocks update the front-local process-zone ledger before the existing cleavage renewal clock is allowed to fire.
+  mesh GRADED 1397 nodes, hbar_tip=3.622e-07 m (global 7.032e-05 m)  (resolution only)
+  da_phys=5.000e-06 m, local J outer radius=1.500e-05 m, cluster J outer radius=4.446e-04 m  (physical, mesh-independent)
+  process zone RESOLVED: hbar_tip=3.62e-07 m < L_pz=5.6e-06 m
+========================================================================
+  [T=298K] step    1  KJ= 53.318  sig_tip= 21.26GPa  B=  0.000  N_em=  2865.80  a=0.500mm
+  [T=298K] step    2  KJ= 53.370  sig_tip=  0.00GPa  B=  0.000  N_em=  1634.84  a=0.500mm
+  [T=298K] step    3  KJ= 53.307  sig_tip=  0.00GPa  B=  0.000  N_em=   932.62  a=0.500mm
+  [T=298K] step    4  KJ= 53.400  sig_tip=  0.00GPa  B=  0.000  N_em=   532.03  a=0.500mm
+  [T=298K] step    5  KJ= 53.324  sig_tip=  0.00GPa  B=  0.000  N_em=   303.51  a=0.500mm
+  [T=298K] step    6  KJ= 53.347  sig_tip=  0.00GPa  B=  0.018  N_em=   173.14  a=0.500mm
+  [T=298K] step    7  KJ= 53.305  sig_tip=  8.45GPa  B=  0.088  N_em=    98.77  a=0.500mm
+  [T=298K] step    8  KJ= 53.357  sig_tip= 13.47GPa  B=  0.179  N_em=    56.35  a=0.500mm
+  [T=298K] step    9  KJ= 53.303  sig_tip= 16.30GPa  B=  0.278  N_em=    32.14  a=0.500mm
+  [T=298K] step   10  KJ= 53.347  sig_tip= 17.95GPa  B=  0.380  N_em=    18.34  a=0.500mm
+  [T=298K] step   11  KJ= 53.367  sig_tip= 18.88GPa  B=  0.484  N_em=    10.46  a=0.500mm
+  [T=298K] step   12  KJ= 53.346  sig_tip= 19.40GPa  B=  0.588  N_em=     5.97  a=0.500mm
+  [T=298K] step   13  KJ= 53.355  sig_tip= 19.71GPa  B=  0.693  N_em=     3.40  a=0.500mm
+  [T=298K] step   14  KJ= 53.323  sig_tip= 19.87GPa  B=  0.798  N_em=     1.94  a=0.500mm
+  [T=298K] step   15  KJ= 53.336  sig_tip= 19.97GPa  B=  0.903  N_em=     1.11  a=0.500mm
+  [T=298K] step   16  KJ= 53.394  sig_tip= 20.05GPa  B=  0.008  N_em=     0.63  a=0.505mm  << ADVANCE
+  [T=298K] step   17  KJ= 53.323  sig_tip=  7.80GPa  B=  0.022  N_em=    35.84  a=0.505mm
+  [T=298K] step   18  KJ= 53.280  sig_tip=  6.85GPa  B=  0.035  N_em=    37.42  a=0.505mm
+  [T=298K] step   19  KJ= 53.336  sig_tip=  6.81GPa  B=  0.048  N_em=    35.71  a=0.505mm
+  [T=298K] step   20  KJ= 53.349  sig_tip=  6.85GPa  B=  0.062  N_em=    33.11  a=0.505mm
+  [T=298K] step   21  KJ= 53.347  sig_tip=  6.92GPa  B=  0.077  N_em=    30.28  a=0.505mm
+  [T=298K] step   22  KJ= 53.334  sig_tip=  6.98GPa  B=  0.092  N_em=    27.43  a=0.505mm
+  [T=298K] step   23  KJ= 53.269  sig_tip=  7.04GPa  B=  0.109  N_em=    24.61  a=0.505mm
+  [T=298K] step   24  KJ= 53.332  sig_tip=  7.12GPa  B=  0.126  N_em=    21.98  a=0.505mm
+  [T=298K] step   25  KJ= 53.309  sig_tip=  7.19GPa  B=  0.144  N_em=    19.45  a=0.505mm
+  [T=298K] step   26  KJ= 53.277  sig_tip=  7.24GPa  B=  0.162  N_em=    17.07  a=0.505mm
+  [T=298K] step   27  KJ= 53.311  sig_tip=  7.31GPa  B=  0.181  N_em=    14.88  a=0.505mm
+  [T=298K] step   28  KJ= 53.311  sig_tip=  7.36GPa  B=  0.201  N_em=    12.86  a=0.505mm
+  [T=298K] step   29  KJ= 53.296  sig_tip=  7.41GPa  B=  0.221  N_em=    11.03  a=0.505mm
+  [T=298K] step   30  KJ= 53.290  sig_tip=  7.46GPa  B=  0.242  N_em=     9.37  a=0.505mm
+  [T=298K] step   31  KJ= 53.371  sig_tip=  7.51GPa  B=  0.264  N_em=     7.92  a=0.505mm
+  [T=298K] step   32  KJ= 53.336  sig_tip=  7.54GPa  B=  0.285  N_em=     6.64  a=0.505mm
+  [T=298K] step   33  KJ= 53.371  sig_tip=  7.58GPa  B=  0.308  N_em=     5.52  a=0.505mm
+  [T=298K] step   34  KJ= 53.291  sig_tip=  7.60GPa  B=  0.330  N_em=     4.55  a=0.505mm
+  [T=298K] step   35  KJ= 53.438  sig_tip=  7.64GPa  B=  0.353  N_em=     3.74  a=0.505mm
+  [T=298K] step   36  KJ= 53.374  sig_tip=  7.65GPa  B=  0.376  N_em=     3.05  a=0.505mm
+  [T=298K] step   37  KJ= 53.297  sig_tip=  7.66GPa  B=  0.399  N_em=     2.47  a=0.505mm
+  [T=298K] step   38  KJ= 53.355  sig_tip=  7.68GPa  B=  0.422  N_em=     1.99  a=0.505mm
+  [T=298K] step   39  KJ= 53.244  sig_tip=  7.68GPa  B=  0.446  N_em=     1.60  a=0.505mm
+  [T=298K] step   40  KJ= 53.243  sig_tip=  7.69GPa  B=  0.469  N_em=     1.28  a=0.505mm
+  [T=298K] step   41  KJ= 53.287  sig_tip=  7.70GPa  B=  0.492  N_em=     1.02  a=0.505mm
+  [T=298K] step   42  KJ= 53.266  sig_tip=  7.71GPa  B=  0.516  N_em=     0.81  a=0.505mm
+  [T=298K] step   43  KJ= 53.273  sig_tip=  7.71GPa  B=  0.540  N_em=     0.64  a=0.505mm
+  [T=298K] step   44  KJ= 53.290  sig_tip=  7.72GPa  B=  0.563  N_em=     0.51  a=0.505mm
+  [T=298K] step   45  KJ= 53.311  sig_tip=  7.73GPa  B=  0.587  N_em=     0.40  a=0.505mm
+  [T=298K] step   46  KJ= 53.332  sig_tip=  7.73GPa  B=  0.611  N_em=     0.32  a=0.505mm
+  [T=298K] step   47  KJ= 53.352  sig_tip=  7.74GPa  B=  0.635  N_em=     0.25  a=0.505mm
+  [T=298K] step   48  KJ= 53.370  sig_tip=  7.74GPa  B=  0.659  N_em=     0.20  a=0.505mm
+  [T=298K] step   49  KJ= 53.388  sig_tip=  7.75GPa  B=  0.683  N_em=     0.16  a=0.505mm
+  [T=298K] step   50  KJ= 53.404  sig_tip=  7.75GPa  B=  0.707  N_em=     0.12  a=0.505mm
+  [T=298K] step   51  KJ= 53.419  sig_tip=  7.75GPa  B=  0.731  N_em=     0.10  a=0.505mm
+  [T=298K] step   52  KJ= 53.432  sig_tip=  7.76GPa  B=  0.755  N_em=     0.08  a=0.505mm
+  [T=298K] step   53  KJ= 53.295  sig_tip=  7.74GPa  B=  0.779  N_em=     0.06  a=0.505mm
+  [T=298K] step   54  KJ= 53.338  sig_tip=  7.74GPa  B=  0.803  N_em=     0.05  a=0.505mm
+  [T=298K] step   55  KJ= 53.372  sig_tip=  7.75GPa  B=  0.827  N_em=     0.04  a=0.505mm
+  [T=298K] step   56  KJ= 53.399  sig_tip=  7.75GPa  B=  0.851  N_em=     0.03  a=0.505mm
+  [T=298K] step   57  KJ= 53.421  sig_tip=  7.76GPa  B=  0.875  N_em=     0.02  a=0.505mm
+  [T=298K] step   58  KJ= 53.439  sig_tip=  7.76GPa  B=  0.899  N_em=     0.02  a=0.505mm
+  [T=298K] step   59  KJ= 53.305  sig_tip=  7.74GPa  B=  0.923  N_em=     0.01  a=0.505mm
+  [T=298K] step   60  KJ= 53.343  sig_tip=  7.74GPa  B=  0.947  N_em=     0.01  a=0.505mm
+  [T=298K] step   61  KJ= 53.374  sig_tip=  7.75GPa  B=  0.971  N_em=     0.01  a=0.505mm
+  [T=298K] step   62  KJ= 53.400  sig_tip=  7.75GPa  B=  0.995  N_em=     0.01  a=0.505mm
+  [T=298K] step   63  KJ= 53.421  sig_tip=  7.76GPa  B=  0.019  N_em=     0.01  a=0.510mm  << ADVANCE
+  [T=298K] step   64  KJ= 53.384  sig_tip=  7.65GPa  B=  0.032  N_em=    33.33  a=0.510mm
+  [T=298K] step   65  KJ= 53.417  sig_tip=  6.79GPa  B=  0.045  N_em=    35.87  a=0.510mm
+  [T=298K] step   66  KJ= 53.294  sig_tip=  6.70GPa  B=  0.057  N_em=    34.42  a=0.510mm
+  [T=298K] step   67  KJ= 53.337  sig_tip=  6.74GPa  B=  0.070  N_em=    32.10  a=0.510mm
+  [T=298K] step   68  KJ= 53.373  sig_tip=  6.80GPa  B=  0.084  N_em=    29.53  a=0.510mm
+  [T=298K] step   69  KJ= 53.403  sig_tip=  6.87GPa  B=  0.098  N_em=    26.92  a=0.510mm
+  [T=298K] step   70  KJ= 53.428  sig_tip=  6.94GPa  B=  0.113  N_em=    24.36  a=0.510mm
+  [T=298K] step   71  KJ= 53.300  sig_tip=  6.98GPa  B=  0.129  N_em=    21.81  a=0.510mm
+  [T=298K] step   72  KJ= 53.336  sig_tip=  7.05GPa  B=  0.145  N_em=    19.44  a=0.510mm
+  [T=298K] step   73  KJ= 53.367  sig_tip=  7.11GPa  B=  0.162  N_em=    17.22  a=0.510mm
+  [T=298K] step   74  KJ= 53.394  sig_tip=  7.17GPa  B=  0.180  N_em=    15.16  a=0.510mm
+  [T=298K] step   75  KJ= 53.417  sig_tip=  7.22GPa  B=  0.198  N_em=    13.25  a=0.510mm
+  [T=298K] step   76  KJ= 53.437  sig_tip=  7.27GPa  B=  0.217  N_em=    11.49  a=0.510mm
+  [T=298K] step   77  KJ= 53.305  sig_tip=  7.30GPa  B=  0.236  N_em=     9.86  a=0.510mm
+  [T=298K] step   78  KJ= 53.336  sig_tip=  7.34GPa  B=  0.256  N_em=     8.43  a=0.510mm
+  [T=298K] step   79  KJ= 53.362  sig_tip=  7.38GPa  B=  0.276  N_em=     7.16  a=0.510mm
+  [T=298K] step   80  KJ= 53.386  sig_tip=  7.41GPa  B=  0.296  N_em=     6.05  a=0.510mm
+  [T=298K] step   81  KJ= 53.406  sig_tip=  7.44GPa  B=  0.317  N_em=     5.08  a=0.510mm
+  [T=298K] step   82  KJ= 53.425  sig_tip=  7.47GPa  B=  0.338  N_em=     4.24  a=0.510mm
+  [T=298K] step   83  KJ= 53.291  sig_tip=  7.47GPa  B=  0.359  N_em=     3.50  a=0.510mm/Users/shen/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/zm/6j1kp1m523d_mt4vlnq45zdr0000gn/T/matplotlib-7igs3szi because there was an issue with the default path ({configdir}); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+
+  [T=298K] step   84  KJ= 53.319  sig_tip=  7.50GPa  B=  0.380  N_em=     2.89  a=0.510mm
+  [T=298K] step   85  KJ= 53.343  sig_tip=  7.51GPa  B=  0.401  N_em=     2.38  a=0.510mm
+  [T=298K] step   86  KJ= 53.365  sig_tip=  7.53GPa  B=  0.423  N_em=     1.95  a=0.510mm
+  [T=298K] step   87  KJ= 53.385  sig_tip=  7.54GPa  B=  0.445  N_em=     1.59  a=0.510mm
+  [T=298K] step   88  KJ= 53.402  sig_tip=  7.55GPa  B=  0.467  N_em=     1.29  a=0.510mm
+  [T=298K] step   89  KJ= 53.418  sig_tip=  7.56GPa  B=  0.489  N_em=     1.05  a=0.510mm
+  [T=298K] step   90  KJ= 53.432  sig_tip=  7.57GPa  B=  0.511  N_em=     0.85  a=0.510mm
+  [T=298K] step   91  KJ= 53.296  sig_tip=  7.56GPa  B=  0.533  N_em=     0.69  a=0.510mm
+  [T=298K] step   92  KJ= 53.319  sig_tip=  7.57GPa  B=  0.555  N_em=     0.55  a=0.510mm
+  [T=298K] step   93  KJ= 53.339  sig_tip=  7.57GPa  B=  0.577  N_em=     0.44  a=0.510mm
+  [T=298K] step   94  KJ= 53.358  sig_tip=  7.58GPa  B=  0.599  N_em=     0.36  a=0.510mm
+  [T=298K] step   95  KJ= 53.375  sig_tip=  7.58GPa  B=  0.621  N_em=     0.29  a=0.510mm
+  [T=298K] step   96  KJ= 53.391  sig_tip=  7.59GPa  B=  0.643  N_em=     0.23  a=0.510mm
+  [T=298K] step   97  KJ= 53.405  sig_tip=  7.59GPa  B=  0.665  N_em=     0.18  a=0.510mm
+  [T=298K] step   98  KJ= 53.418  sig_tip=  7.59GPa  B=  0.688  N_em=     0.15  a=0.510mm
+  [T=298K] step   99  KJ= 53.429  sig_tip=  7.59GPa  B=  0.710  N_em=     0.12  a=0.510mm
+  [T=298K] step  100  KJ= 53.291  sig_tip=  7.58GPa  B=  0.732  N_em=     0.09  a=0.510mm
+  [T=298K] step  101  KJ= 53.310  sig_tip=  7.58GPa  B=  0.754  N_em=     0.08  a=0.510mm
+  [T=298K] step  102  KJ= 53.328  sig_tip=  7.58GPa  B=  0.776  N_em=     0.06  a=0.510mm
+  [T=298K] step  103  KJ= 53.345  sig_tip=  7.58GPa  B=  0.798  N_em=     0.05  a=0.510mm
+  [T=298K] step  104  KJ= 53.360  sig_tip=  7.59GPa  B=  0.821  N_em=     0.04  a=0.510mm
+  [T=298K] step  105  KJ= 53.374  sig_tip=  7.59GPa  B=  0.843  N_em=     0.03  a=0.510mm
+  [T=298K] step  106  KJ= 53.387  sig_tip=  7.59GPa  B=  0.865  N_em=     0.02  a=0.510mm
+  [T=298K] step  107  KJ= 53.399  sig_tip=  7.59GPa  B=  0.887  N_em=     0.02  a=0.510mm
+  [T=298K] step  108  KJ= 53.410  sig_tip=  7.59GPa  B=  0.910  N_em=     0.02  a=0.510mm
+  [T=298K] step  109  KJ= 53.420  sig_tip=  7.60GPa  B=  0.932  N_em=     0.01  a=0.510mm
+  [T=298K] step  110  KJ= 53.429  sig_tip=  7.60GPa  B=  0.954  N_em=     0.01  a=0.510mm
+  [T=298K] step  111  KJ= 53.438  sig_tip=  7.60GPa  B=  0.977  N_em=     0.01  a=0.510mm
+  [T=298K] step  112  KJ= 53.297  sig_tip=  7.58GPa  B=  0.999  N_em=     0.01  a=0.510mm
+  [T=298K] step  113  KJ= 53.312  sig_tip=  7.58GPa  B=  0.021  N_em=     0.01  a=0.515mm  << ADVANCE
+  [T=298K] graceful interruption after 3 committed geometry events
+  == T=298K: Kc_first=53.394 MPa*sqrt(m), advances=0 (prim 0, branch 0), n_fronts=1, max_reach=0.515 mm, mode=brittle
+  saved literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/toughness_vs_temperature.png

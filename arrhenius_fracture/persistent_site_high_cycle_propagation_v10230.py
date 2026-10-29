@@ -149,9 +149,13 @@ def propagate_stationary_cycles(
         event_near = False
     else:
         cycles_to_event = remaining_action / dH
-        safe_whole = max(math.floor(cycles_to_event - guard), 0)
+        # A positive subnormal action can overflow this ratio to infinity.
+        # That means no event is reachable in any finite requested block; it is
+        # a supported right-censor, not a numerical failure at floor(inf).
+        safe_whole = (math.floor(requested) if not math.isfinite(cycles_to_event)
+                      else max(math.floor(cycles_to_event - guard), 0))
         whole = min(math.floor(requested), safe_whole)
-        event_near = cycles_to_event <= requested + guard
+        event_near = math.isfinite(cycles_to_event) and cycles_to_event <= requested + guard
 
     whole = float(max(whole, 0))
     ledger = {key: whole * value for key, value in cycle.ledger_delta_per_cycle.items()}

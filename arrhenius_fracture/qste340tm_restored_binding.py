@@ -35,6 +35,25 @@ STEEL_POISSON = 0.30
 STEEL_B_M = 2.48e-10
 FAMILY = "QSTE340TM_RESTORED_ALTERNATIVE_GSTAR_EXP_FLOOR"
 MODEL_ID = "qste340tm.restored-r2-r9-alternative-gstar-exp-floor/1"
+EXCLUDED_PRODUCTION_MODEL_IDS = frozenset({
+    "qste340tm.reduced-signed-population-taylor-internal-stress/1",
+})
+
+
+def assert_production_model_eligible(engine: Any) -> None:
+    """Reject comparison-only closures from QSTE production/search paths."""
+    installed = {
+        getattr(engine, "_qste_internal_stress_model", None),
+        getattr(getattr(engine, "mpz", None), "_reversible_mobile_internal_stress_model", None),
+    }
+    if getattr(engine, "_qste_reduced_internal_stress_enabled", False):
+        installed.add("qste340tm.reduced-signed-population-taylor-internal-stress/1")
+    forbidden = sorted(EXCLUDED_PRODUCTION_MODEL_IDS.intersection(installed))
+    if forbidden:
+        raise ValueError(
+            "comparison-only internal-stress closure is not eligible for QSTE production/search: "
+            + ", ".join(forbidden)
+        )
 
 
 @dataclass(frozen=True)
@@ -171,6 +190,49 @@ def material_binding(
     )
 
 
+def material_binding_with_opening_surface(
+    parent: ArchivedMaterialBinding,
+    plastic: PlasticCoordinates,
+    surface: Any,
+    *,
+    family: str,
+    model_id: str,
+    opening_family: str,
+    opening_provenance: dict[str, Any],
+) -> ArchivedMaterialBinding:
+    """Install a complete alternative opening provider without changing plasticity.
+
+    The helper intentionally starts from ``material_binding`` so every emission,
+    Peierls, Taylor, source, transport, geometry and recovery owner is identical
+    to Model A.  Only the complete cleavage adapter is replaced.
+    """
+    base = material_binding(parent, plastic)
+    parent_adapter = parent.manifest.cleavage
+    if not isinstance(parent_adapter, ThermodynamicBarrierAdapter):
+        raise TypeError("QSTE binding requires the authorized barrier adapter")
+    cleavage = ThermodynamicBarrierAdapter(
+        surface=surface, parent=dict(parent_adapter.parent),
+    )
+    manifest = replace(
+        base.manifest, name=str(family), candidate_id=str(family), cleavage=cleavage,
+    )
+    config = replace(
+        base.reduced_config,
+        cleavage_hits=float(surface.hits), cleavage_tau_s=float(surface.tau_s),
+    )
+    provenance = dict(base.provenance)
+    provenance.update({
+        "qste_model_id": str(model_id), "family": str(family),
+        "opening_family": str(opening_family),
+        "opening_complete_provider_replaced": True,
+        "opening_provenance": dict(opening_provenance),
+    })
+    return ArchivedMaterialBinding(
+        base.optimized_row, base.parent_row, manifest, config,
+        base.persistent_sites, provenance,
+    )
+
+
 def build_engine(binding: ArchivedMaterialBinding, *, kernel_family_path: str | Path) -> Any:
     engine = build_archived_current_engine(
         binding,
@@ -180,12 +242,15 @@ def build_engine(binding: ArchivedMaterialBinding, *, kernel_family_path: str | 
     if getattr(engine.mpz, "_r2_taylor_law_id", None) != TAYLOR_LAW_ID:
         raise RuntimeError("restored mean-rate Taylor consumer is not the final bound method")
     engine._r10_opening_execution_identity = "ALTERNATIVE_GSTAR_PRODUCTION_OBSERVER"
-    engine._r10_material_family = FAMILY
-    engine._r10_final_bound_implementation_identity = MODEL_ID
+    engine._r10_material_family = binding.provenance.get("family", FAMILY)
+    engine._r10_final_bound_implementation_identity = binding.provenance.get(
+        "qste_model_id", MODEL_ID,
+    )
+    assert_production_model_eligible(engine)
     return engine
 
 
-def install_opening(engine: Any, surface: KineticSurface) -> None:
+def install_opening(engine: Any, surface: Any) -> None:
     adapter = ThermodynamicBarrierAdapter(
         surface=surface,
         parent=dict(engine.manifest.cleavage.parent),
@@ -205,7 +270,8 @@ def plastic_vector(value: PlasticCoordinates) -> list[float]:
 
 
 __all__ = [
-    "FAMILY", "MODEL_ID", "OpeningCoordinates", "PlasticCoordinates",
+    "EXCLUDED_PRODUCTION_MODEL_IDS", "FAMILY", "MODEL_ID", "OpeningCoordinates", "PlasticCoordinates",
+    "assert_production_model_eligible",
     "TEMPERATURE_K", "build_engine", "install_opening", "load_parent_binding",
-    "material_binding", "opening_surface", "plastic_vector",
+    "material_binding", "material_binding_with_opening_surface", "opening_surface", "plastic_vector",
 ]

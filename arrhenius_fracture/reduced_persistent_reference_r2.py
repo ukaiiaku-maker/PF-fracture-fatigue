@@ -91,6 +91,9 @@ class ReducedPersistentReversibleTipEngine(
                 factors > 0.0, 1.0, 0.0
             )
             self.mpz._anisotropic_drive_reliable = True
+        if getattr(self, "_qste_reduced_internal_stress_enabled", False):
+            from .qste340tm_reduced_internal_stress import update_reduced_internal_stress
+            update_reduced_internal_stress(self.mpz)
         return KineticMovingTipFrontEngine._plastic_half_step(
             self, dt, temperature_K, opening_stress_Pa
         )

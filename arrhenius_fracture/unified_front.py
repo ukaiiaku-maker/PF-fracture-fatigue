@@ -23,6 +23,7 @@ class UnifiedMPZFrontEngine:
     """
 
     unified_mpz_active = True
+    state_model = "moving_pz"
 
     def __init__(self, fcfg, cleave_barrier, emit_barrier, G_shear: float, nu: float, b: float,
                  manifest: MaterialManifest, mpz_cfg: MPZConfig):
@@ -44,6 +45,8 @@ class UnifiedMPZFrontEngine:
         self.t = 0.0
         self.K_prev = None
         self._lambda_c_prev = None
+        self.defer_mpz_advance = False
+        self._pending_mpz_advance_m = 0.0
 
     @property
     def N_em(self) -> float:
@@ -79,7 +82,8 @@ class UnifiedMPZFrontEngine:
         return self.mpz.blunted_radius(self.f.r0, self.b)
 
     def K_shield(self):
-        return self.mpz.shielding_K(self.G, self.nu, self.b)
+        return (self.mpz.shielding_K(self.G, self.nu, self.b)
+                + float(getattr(self, 'external_signed_gnd_K_Pa_sqrt_m', 0.0)))
 
     def sigma_tip(self, K):
         K_eff = max(float(K) - self.K_shield(), 0.0)
@@ -117,14 +121,26 @@ class UnifiedMPZFrontEngine:
     def cleavage_diagnostics(self, sig_tip, T):
         sigma = max(float(sig_tip), 0.0)
         G = float(np.asarray(self.manifest.cleavage.values_eV(sigma, T)))
-        ds = max(1.0e5, 1.0e-5 * max(sigma, 1.0e9))
-        gp = float(np.asarray(self.manifest.cleavage.values_eV(sigma + ds, T)))
-        gm = float(np.asarray(self.manifest.cleavage.values_eV(max(sigma - ds, 0.0), T)))
-        dG_dsigma = (gp - gm) / (2.0 * ds)
-        dT = max(1.0e-3, 1.0e-5 * max(float(T), 1.0))
-        gTp = float(np.asarray(self.manifest.cleavage.values_eV(sigma, T + dT)))
-        gTm = float(np.asarray(self.manifest.cleavage.values_eV(sigma, max(T - dT, 1.0e-6))))
-        entropy_kB = -(gTp - gTm) / (2.0 * dT) / 8.617333262145e-5
+        surface = getattr(self.manifest.cleavage, "surface", None)
+        reference_only = (
+            getattr(surface, "thermal_model_status", None) == "reference_temperature_only"
+        )
+        if reference_only:
+            # Do not probe an unsupported temperature or manufacture S*=0.
+            # NaN is diagnostic metadata only; it never enters the rate/state.
+            dG_dsigma = float(np.asarray(surface.dG_dsigma_eV_per_Pa(sigma, T)))
+            entropy_kB = math.nan
+        else:
+            ds = max(1.0e5, 1.0e-5 * max(sigma, 1.0e9))
+            gp = float(np.asarray(self.manifest.cleavage.values_eV(sigma + ds, T)))
+            gm = float(np.asarray(self.manifest.cleavage.values_eV(max(sigma - ds, 0.0), T)))
+            dG_dsigma = (gp - gm) / (2.0 * ds)
+            dT = max(1.0e-3, 1.0e-5 * max(float(T), 1.0))
+            gTp = float(np.asarray(self.manifest.cleavage.values_eV(sigma, T + dT)))
+            gTm = float(np.asarray(self.manifest.cleavage.values_eV(
+                sigma, max(T - dT, 1.0e-6)
+            )))
+            entropy_kB = -(gTp - gTm) / (2.0 * dT) / 8.617333262145e-5
         return {
             "sigma_cleave_eff_Pa": sigma,
             "G_cleave_raw_eV": G,
@@ -159,7 +175,18 @@ class UnifiedMPZFrontEngine:
                 self.B = 0.0
             return {"fired": False, "n_fire": 0, "v_crack": 0.0, "wake": {}}
         self.B -= 1.0
-        wake = self.mpz.advance(self.f.da)
+        if bool(self.defer_mpz_advance):
+            self._pending_mpz_advance_m += float(self.f.da)
+            wake = {
+                "mpz_advance_deferred": True,
+                "mpz_pending_advance_m": self._pending_mpz_advance_m,
+            }
+        else:
+            wake = self.mpz.advance(self.f.da)
+            if hasattr(self.mpz, "convect_forward_blunting"):
+                wake["forward_blunting_survival"] = self.mpz.convect_forward_blunting(
+                    self.f.da
+                )
         self.a_adv += self.f.da
         self.n_adv += 1
         return {
@@ -169,6 +196,25 @@ class UnifiedMPZFrontEngine:
             "wake": wake,
         }
 
+    def commit_deferred_mpz_increment(self, distance_m: float) -> dict[str, Any]:
+        """Commit part of a deferred geometry event to the moving MPZ state."""
+        distance = max(float(distance_m), 0.0)
+        pending = max(float(self._pending_mpz_advance_m), 0.0)
+        tol = 1.0e-12 * max(pending, self.f.da, 1.0e-30)
+        if distance > pending + tol:
+            raise ValueError(
+                f"deferred MPZ increment {distance:.6g} exceeds pending {pending:.6g}"
+            )
+        distance = min(distance, pending)
+        audit = self.mpz.advance(distance)
+        if hasattr(self.mpz, "convect_forward_blunting"):
+            audit["forward_blunting_survival"] = self.mpz.convect_forward_blunting(
+                distance
+            )
+        self._pending_mpz_advance_m = max(pending - distance, 0.0)
+        audit["mpz_pending_advance_m"] = self._pending_mpz_advance_m
+        return audit
+
     def step(self, K, T, dt):
         dt = max(float(dt), 0.0)
         K = max(float(K), 0.0)
@@ -177,7 +223,17 @@ class UnifiedMPZFrontEngine:
         N_pre = self.N_em
         Kshield_pre = self.K_shield()
         r_pre = self.r_eff()
+        escaped_before = float(getattr(self.mpz, "escaped_total", 0.0))
         evolve = self.mpz.evolve(dt, T, sig_pre, self.b)
+        if hasattr(self.mpz, "register_source_passage"):
+            self.mpz.register_source_passage(evolve.get("dN_emit", 0.0))
+        escaped_increment = max(
+            float(getattr(self.mpz, "escaped_total", escaped_before)) - escaped_before,
+            0.0,
+        )
+        if hasattr(self.mpz, "register_forward_passage"):
+            self.mpz.register_forward_passage(escaped_increment)
+        evolve["dN_forward_passage"] = escaped_increment
         self.W_emit += sig_e * self.b * self.f.L_pz * max(evolve["dN_emit"], 0.0)
 
         sig_post = self.sigma_tip(K)
@@ -254,7 +310,17 @@ class UnifiedMPZFrontEngine:
         weights = np.maximum(lam_e_site, 0.0)
         avg_sig = float(np.sum(weights * sig) / np.sum(weights)) if np.sum(weights) > 0.0 else float(np.mean(sig))
         N_pre = self.N_em
+        escaped_before = float(getattr(self.mpz, "escaped_total", 0.0))
         evolve = self.mpz.evolve(dt_block, T_K, avg_sig, self.b)
+        if hasattr(self.mpz, "register_source_passage"):
+            self.mpz.register_source_passage(evolve.get("dN_emit", 0.0))
+        escaped_increment = max(
+            float(getattr(self.mpz, "escaped_total", escaped_before)) - escaped_before,
+            0.0,
+        )
+        if hasattr(self.mpz, "register_forward_passage"):
+            self.mpz.register_forward_passage(escaped_increment)
+        evolve["dN_forward_passage"] = escaped_increment
         self.W_emit += avg_sig * self.b * self.f.L_pz * evolve["dN_emit"]
         dB = 0.0
         for k in Kvals:

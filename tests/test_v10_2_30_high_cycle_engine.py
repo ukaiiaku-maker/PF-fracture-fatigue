@@ -18,6 +18,9 @@ from arrhenius_fracture.persistent_site_periodic_solver_v10230 import (
     solve_periodic_state,
 )
 from arrhenius_fracture.persistent_site_poincare_v10230 import one_cycle_map
+from arrhenius_fracture.persistent_site_high_cycle_propagation_v10230 import (
+    propagate_stationary_cycles,
+)
 
 
 class MPZ:
@@ -370,6 +373,16 @@ def test_one_cycle_map_preserves_first_passage_and_rng():
     assert result.stochastic_state_preserved is True
     assert capture_stochastic_state(engine) == stochastic
     assert engine.mpz.mobile_count == 0.0
+    assert len(result.phase_trace) == len(Controller()._phases())
+    assert sum(row["event_activity"] for row in result.phase_trace) == pytest.approx(
+        result.hazard_action_per_cycle
+    )
+    assert all(row["dt_s"] > 0.0 for row in result.phase_trace)
+    assert all("signed_local_stress_before_opening_clip_Pa" in row
+               for row in result.phase_trace)
+    assert all("glide_applied_stress_min_Pa" in row
+               and "glide_internal_stress_model" in row
+               for row in result.phase_trace)
 
 
 def test_periodic_solver_converges_without_consuming_production_state(monkeypatch):
@@ -395,6 +408,16 @@ def test_direct_1e12_cycle_right_censor(monkeypatch):
     assert abs(engine.B - 1.0e-3) < 1.0e-15
     assert engine.t == 1.0e12
     assert any(row["mode"] == "stationary_tail" for row in result["coupled_hazard_modes"])
+
+
+def test_stationary_subnormal_action_is_a_finite_right_censor():
+    engine = Engine(lambda_per_s=0.0, threshold=1.0, drift_per_cycle=0.0)
+    cycle = SimpleNamespace(hazard_action_per_cycle=5.0e-324,
+                            ledger_delta_per_cycle={})
+    result = propagate_stationary_cycles(engine, Waveform(), cycle, 9210.0)
+    assert result.cycles_consumed == 9210.0
+    assert result.event_within_guard is False
+    assert engine.t == 9210.0
 
 
 def test_first_passage_and_post_event_restart_inside_1e12_request(monkeypatch):

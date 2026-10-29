@@ -1,0 +1,38 @@
+[
+  {
+    "T": 298.15,
+    "Kc_first_MPa_sqrt_m": 59.999709755781716,
+    "a_final_mm": 0.5150000000000002,
+    "n_advances": 0,
+    "n_advances_primary": 0,
+    "n_advances_branch": 0,
+    "n_fronts": 1,
+    "n_active_fronts_final": 1,
+    "n_coalesced": 0,
+    "n_stagnant_retired": 0,
+    "branch_length_dx_mm": 0.0,
+    "N_em_final": 0.0,
+    "W_emit_J_per_m": 0.0033370383034259437,
+    "sigma_back_init_GPa": 0.0,
+    "r_eff_over_r0_init": 1.0277456462993166,
+    "N_em_init": 124.0109843511868,
+    "hbar_tip_m": 3.622095427872452e-07,
+    "n_nodes": 1397,
+    "deflection_deg": 0.0,
+    "path_span_dy_mm": 0.0,
+    "branched": false,
+    "mode": "brittle",
+    "shelf": {
+      "lambda_c_max": 180.20124225483758,
+      "lambda_e_max": 12239373.340396887,
+      "t_min_fire_s": 0.005549351311273519,
+      "clock_completable": true,
+      "lambda_e_shelf": 12239373.340396887,
+      "lambda_c_shelf": 180.20124225483758,
+      "t_emit_min": 8.170352943638313e-08,
+      "t_cleave_min": 0.005549351311273519,
+      "t_total": 500.0,
+      "material_class": "QSTE340TM_RESOLVED_SLOPING_BARRIER_2D"
+    }
+  }
+]

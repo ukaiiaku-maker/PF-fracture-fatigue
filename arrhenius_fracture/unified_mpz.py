@@ -28,6 +28,16 @@ class MPZConfig:
     mobile_shield_fraction: float = 0.0
     shielding_core_m: float = 2.5e-10
     blunting_length_m: float = 0.5e-6
+    # Optional second blunting owner used by the QSTE340TM transfer study.
+    # Source-linked slip remains owned by MaterialManifest.c_blunt.  Mobile
+    # line content that traverses the forward MPZ boundary is accumulated in a
+    # separate, moving-tip ledger and multiplied by this coefficient.
+    forward_slip_blunting_coefficient: float = 0.0
+    analytical_source_slip_ledger: bool = False
+    # Conversion from native gross line/site counts to the dimensionless
+    # passage coordinate used by transferred analytical blunting fits.
+    # A value of one preserves historical native behavior.
+    passage_count_normalization: float = 1.0
     forest_density_floor_m2: float = 5.0e12
     jump_fraction: float = 1.0
     peierls_stress_fraction: float = 1.0 / math.sqrt(3.0)
@@ -63,6 +73,16 @@ class UnifiedMPZState:
         self.mobile = np.zeros(shape, dtype=float)
         self.retained = np.zeros(shape, dtype=float)
         self.accumulated_slip = np.zeros(shape, dtype=float)
+        self.source_passage_slip_count = 0.0
+        self.forward_passage_slip_count = 0.0
+        # Opt-in 2-D signed-GND crack-swept transaction.  The local scalar is
+        # convected with the tip and contributes through the existing c_blunt
+        # conversion; the signed face/system ledger is retained for audit.
+        self.bulk_tip_opening_slip_count = 0.0
+        self.bulk_tip_signed_count = np.zeros((self.n_systems, 2), dtype=float)
+        self.bulk_tip_opening_count = np.zeros((self.n_systems, 2), dtype=float)
+        self.bulk_tip_absorbed_absolute_total = 0.0
+        self.bulk_tip_absorbed_opening_total = 0.0
 
         self.wake_length_m = max(float(cfg.wake_length_m), self.dx)
         self.wake_n_bins = int(cfg.wake_n_bins) if int(cfg.wake_n_bins) > 0 else max(int(round(self.wake_length_m / self.dx)), 1)
@@ -80,6 +100,11 @@ class UnifiedMPZState:
         self.wake_discarded_mobile_total = 0.0
         self.wake_discarded_retained_total = 0.0
         self.wake_discarded_slip_total = 0.0
+        # Counts imported from the resolved 2-D material field while a crack
+        # event is advanced in subincrements.  These are audit owners, not
+        # independently fitted state variables.
+        self.bulk_inherited_retained_total = 0.0
+        self.opening_generated_retained_total = 0.0
         self.time_s = 0.0
 
     def copy(self) -> "UnifiedMPZState":
@@ -117,20 +142,60 @@ class UnifiedMPZState:
         for name in (
             "site_capacity", "available_sites", "mobile", "retained",
             "accumulated_slip", "wake_mobile", "wake_retained", "wake_slip",
+            "bulk_tip_signed_count", "bulk_tip_opening_count",
         ):
             original = np.asarray(getattr(self, name), dtype=float).copy()
             setattr(child, name, original * frac)
             setattr(self, name, original * (1.0 - frac))
+        source = float(self.source_passage_slip_count)
+        child.source_passage_slip_count = source * frac
+        self.source_passage_slip_count = source * (1.0 - frac)
+        forward = float(self.forward_passage_slip_count)
+        child.forward_passage_slip_count = forward * frac
+        self.forward_passage_slip_count = forward * (1.0 - frac)
+        bulk_opening = float(self.bulk_tip_opening_slip_count)
+        child.bulk_tip_opening_slip_count = bulk_opening * frac
+        self.bulk_tip_opening_slip_count = bulk_opening * (1.0 - frac)
         for name in (
             "emitted_total", "escaped_total", "recovered_total",
             "wake_discarded_mobile_total", "wake_discarded_retained_total",
-            "wake_discarded_slip_total",
+            "wake_discarded_slip_total", "bulk_inherited_retained_total",
+            "opening_generated_retained_total",
+            "bulk_tip_absorbed_absolute_total", "bulk_tip_absorbed_opening_total",
         ):
             value = float(getattr(self, name))
             setattr(child, name, value * frac)
             setattr(self, name, value * (1.0 - frac))
         child.advance_total_m = 0.0
         return child
+
+    def inject_retained_profile(
+        self, counts_by_bin: np.ndarray, *, owner: str = "bulk_inherited"
+    ) -> float:
+        """Conservatively import resolved 2-D defect content into the active MPZ.
+
+        ``counts_by_bin`` is a physical line/event count integrated over each
+        tip-relative material bin.  The unsigned 2-D density owner does not
+        resolve slip-system identity, so the count is divided equally over the
+        existing systems; their already-authorized orientation factors retain
+        ownership of the signed shielding projection.
+        """
+        counts = np.asarray(counts_by_bin, dtype=float).reshape(-1)
+        if counts.size != self.n_bins:
+            raise ValueError("retained profile must have one count per active MPZ bin")
+        if np.any(~np.isfinite(counts)) or np.any(counts < 0.0):
+            raise ValueError("retained profile counts must be finite and nonnegative")
+        total = float(np.sum(counts))
+        if total <= 0.0:
+            return 0.0
+        self.retained += counts[None, :] / float(self.n_systems)
+        if owner == "bulk_inherited":
+            self.bulk_inherited_retained_total += total
+        elif owner == "opening_generated":
+            self.opening_generated_retained_total += total
+        else:
+            raise ValueError(f"unknown retained-profile owner: {owner}")
+        return total
 
     def _shielding_raw(self, retained: np.ndarray, mobile: np.ndarray, x: np.ndarray, G: float, nu: float, b: float) -> float:
         core = max(float(self.cfg.shielding_core_m), 0.25 * abs(float(b)), 1.0e-12)
@@ -157,7 +222,68 @@ class UnifiedMPZState:
         return float(np.sum(self.accumulated_slip * w[None, :]))
 
     def blunted_radius(self, r0: float, b: float) -> float:
-        return max(float(r0) + max(self.manifest.c_blunt, 0.0) * abs(float(b)) * self.local_slip_count(), float(r0))
+        source_count = (
+            max(float(self.source_passage_slip_count), 0.0)
+            if bool(self.cfg.analytical_source_slip_ledger)
+            else self.local_slip_count()
+        )
+        source = max(self.manifest.c_blunt, 0.0) * (
+            source_count + max(float(self.bulk_tip_opening_slip_count), 0.0)
+        )
+        forward = (
+            max(float(self.cfg.forward_slip_blunting_coefficient), 0.0)
+            * max(float(self.forward_passage_slip_count), 0.0)
+        )
+        return max(float(r0) + abs(float(b)) * (source + forward), float(r0))
+
+    def register_forward_passage(self, count: float) -> float:
+        """Commit gross mobile passage through the forward MPZ boundary."""
+        norm = max(float(self.cfg.passage_count_normalization), 1.0e-30)
+        increment = max(float(count), 0.0) / norm
+        if math.isfinite(increment):
+            self.forward_passage_slip_count += increment
+        return increment
+
+    def register_source_passage(self, count: float) -> float:
+        """Commit gross emitted line content to the analytical source ledger."""
+        norm = max(float(self.cfg.passage_count_normalization), 1.0e-30)
+        increment = max(float(count), 0.0) / norm
+        if math.isfinite(increment):
+            self.source_passage_slip_count += increment
+        return increment
+
+    def register_bulk_tip_absorption(
+        self, signed_count_by_system_face: np.ndarray,
+        opening_count_by_system_face: np.ndarray,
+    ) -> float:
+        """Commit signed crack-swept GND content and its opening projection."""
+        signed = np.asarray(signed_count_by_system_face, dtype=float)
+        opening = np.asarray(opening_count_by_system_face, dtype=float)
+        expected = (self.n_systems, 2)
+        if signed.shape != expected or opening.shape != expected:
+            raise ValueError(f"bulk-tip arrays must have shape {expected}")
+        if np.any(~np.isfinite(signed)) or np.any(~np.isfinite(opening)):
+            raise ValueError("bulk-tip absorption arrays must be finite")
+        if np.any(opening < 0.0):
+            raise ValueError("opening-projected bulk-tip counts must be nonnegative")
+        self.bulk_tip_signed_count += signed
+        self.bulk_tip_opening_count += opening
+        increment = float(np.sum(opening))
+        self.bulk_tip_opening_slip_count += increment
+        self.bulk_tip_absorbed_absolute_total += float(np.sum(np.abs(signed)))
+        self.bulk_tip_absorbed_opening_total += increment
+        return increment
+
+    def convect_forward_blunting(self, crack_advance_m: float) -> float:
+        """Translate the analytical-equivalent local passage ledger with the tip."""
+        length = max(float(self.cfg.blunting_length_m), self.dx, 1.0e-30)
+        survival = math.exp(-max(float(crack_advance_m), 0.0) / length)
+        self.source_passage_slip_count *= survival
+        self.forward_passage_slip_count *= survival
+        self.bulk_tip_opening_slip_count *= survival
+        self.bulk_tip_signed_count *= survival
+        self.bulk_tip_opening_count *= survival
+        return survival
 
     def local_forest_density_m2(self, wake: bool = False) -> np.ndarray:
         field = self.wake_retained if wake else self.retained
@@ -360,9 +486,33 @@ class UnifiedMPZState:
             "mpz_wake_K_shield_Pa_sqrt_m": wake,
             "mpz_total_K_shield_Pa_sqrt_m": active + wake,
             "mpz_blunted_radius_m": self.blunted_radius(r0, b),
+            "mpz_local_slip_count": self.local_slip_count(),
+            "mpz_source_passage_slip_count": self.source_passage_slip_count,
+            "mpz_forward_passage_slip_count": self.forward_passage_slip_count,
+            "mpz_bulk_tip_opening_slip_count": self.bulk_tip_opening_slip_count,
+            "mpz_bulk_tip_signed_count_by_system_face": (
+                self.bulk_tip_signed_count.tolist()
+            ),
+            "mpz_bulk_tip_opening_count_by_system_face": (
+                self.bulk_tip_opening_count.tolist()
+            ),
+            "mpz_bulk_tip_absorbed_absolute_total": (
+                self.bulk_tip_absorbed_absolute_total
+            ),
+            "mpz_bulk_tip_absorbed_opening_total": (
+                self.bulk_tip_absorbed_opening_total
+            ),
+            "mpz_forward_slip_blunting_coefficient": float(
+                self.cfg.forward_slip_blunting_coefficient
+            ),
+            "mpz_passage_count_normalization": float(
+                self.cfg.passage_count_normalization
+            ),
             "mpz_emitted_total": self.emitted_total,
             "mpz_escaped_total": self.escaped_total,
             "mpz_recovered_total": self.recovered_total,
             "mpz_wake_discarded_mobile_total": self.wake_discarded_mobile_total,
             "mpz_wake_discarded_retained_total": self.wake_discarded_retained_total,
+            "mpz_bulk_inherited_retained_total": self.bulk_inherited_retained_total,
+            "mpz_opening_generated_retained_total": self.opening_generated_retained_total,
         }

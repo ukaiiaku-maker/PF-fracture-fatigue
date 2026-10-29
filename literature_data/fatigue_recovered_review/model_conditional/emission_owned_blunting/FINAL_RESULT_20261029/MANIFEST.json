@@ -1,0 +1,2572 @@
+{
+  "accepted_1d_RMSE_log10": 0.29523348393431903,
+  "current_native_driver_L_pz_m": 1e-06,
+  "current_native_early_RMSE_log10": 0.4063853423730828,
+  "current_native_late_RMSE_log10": 0.5157911772928764,
+  "files": [
+    {
+      "path": "arrhenius_fracture/incremental_opening_advection.py",
+      "sha256": "bec4f6d1cb773d11adb038c8f88af26184db2cfc75272a2933c6a31229742536",
+      "size": 9678
+    },
+    {
+      "path": "arrhenius_fracture/persistent_site_high_cycle_propagation_v10230.py",
+      "sha256": "f1f95b3aed6e95deb56f08337cfea4d87955b90820c76069ad9c61ed7c59574e",
+      "size": 12817
+    },
+    {
+      "path": "arrhenius_fracture/persistent_site_high_cycle_state_v10230.py",
+      "sha256": "b8e11633645cebed92caf06c38843c14828e466251cf9d01be532727e85f893d",
+      "size": 15292
+    },
+    {
+      "path": "arrhenius_fracture/persistent_site_poincare_v10230.py",
+      "sha256": "e770398a7fbc4bd162e4e911f4f32aa27952451b29e982b098d56f92909afe01",
+      "size": 10754
+    },
+    {
+      "path": "arrhenius_fracture/persistent_site_reversible_transport_v10230.py",
+      "sha256": "9c9ad20ef507d36e4b569634847e67f21ebfac9f362721b399fa79277812a513",
+      "size": 19372
+    },
+    {
+      "path": "arrhenius_fracture/physical_fem_capture_v10212.py",
+      "sha256": "3c7a01c411576652f077c211b65e8599d2190fbe58e1cbb894d4d0a789bf9aca",
+      "size": 22243
+    },
+    {
+      "path": "arrhenius_fracture/qste340tm_restored_binding.py",
+      "sha256": "f16270313679fd94284d375ec2d717531de84c98bea25b22f015e2d71e46f8b7",
+      "size": 10480
+    },
+    {
+      "path": "arrhenius_fracture/reduced_persistent_reference_r2.py",
+      "sha256": "d4de5d0379cd31dd147f6a1f803e9dc51ac9cdb7b8fbd7606dc98efd969da4e6",
+      "size": 16564
+    },
+    {
+      "path": "arrhenius_fracture/sharp_front.py",
+      "sha256": "088de0a22a48e9278bcbb1dd599c8c7d95afd1ce7cf03bfc8face52feea9f3ff",
+      "size": 330231
+    },
+    {
+      "path": "arrhenius_fracture/signed_gnd_projection.py",
+      "sha256": "dce8af7d8fa6aea2fc5ce89f2974dcb13df3cd90122e6f0e7bd4c67ae12799a4",
+      "size": 8272
+    },
+    {
+      "path": "arrhenius_fracture/unified_front.py",
+      "sha256": "d326b4caa44889e389a5a46bc4e6021ed532e73b7dba5d462d73ed3de855a2e3",
+      "size": 16172
+    },
+    {
+      "path": "arrhenius_fracture/unified_mpz.py",
+      "sha256": "7efe8b0ff857392a34407461d7148200b9bc456ea74d7566f933ac8001aefe4e",
+      "size": 26621
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/FINAL_RESULT_20261029/paper_1d_curves_and_state.csv",
+      "sha256": "4c4ba469e83a688b0bc5d7c256fc402c41aebcbfa7449110f2aa041f0b54f741",
+      "size": 351738
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/FINAL_RESULT_20261029/paper_barrier_parameters.json",
+      "sha256": "dc68820324b20902a9916679ff26a399a5149dfa88380e5af8656a53a9a4871b",
+      "size": 11804
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/FINAL_RESULT_20261029/paper_native_2d_event_windows.csv",
+      "sha256": "13166c2cd85b43810a1f3e9ef3a0c937d4b9f1db8cfa8c38951e2573613041e8",
+      "size": 2916
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/AUDIT_HANDOFF.md",
+      "sha256": "39e0448d13e7f6d584f40c22cf9a0468f23a687c9d4d068f657a387f05e80057",
+      "size": 11195
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/AUDIT_RESPONSE.md",
+      "sha256": "65f0c70a2e75cdd17894f02e2eeabab2aada4797938e91389888685044bd1030",
+      "size": 7188
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/AUDIT_RESPONSE_ADDENDUM_20261029.md",
+      "sha256": "e2125993269e9a123948fdf96674755ed1c66c1e0dfd965f5d1e921682b20a9c",
+      "size": 9554
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/BOUND_CONTACT.json",
+      "sha256": "0f24d34f9ceab0e755a5596e586292d3352742d0b9af6cc743e0da4846e8e6a6",
+      "size": 914
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/REPORT.md",
+      "sha256": "b2229814cc7edf6973b1571a940748528470d8be67f342adc1b6dd8b4be3db6a",
+      "size": 6031
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/RESULT.md",
+      "sha256": "59871ffd347cc114195c59e1183aed1e7f6be8d96e339556f8c927be26c17af8",
+      "size": 1483
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/analysis/event_wait_and_tip_radius.png",
+      "sha256": "fc9b46497c88c447125d037003be10ff8c786fa1dab8bcd466cb4d33f004ca30",
+      "size": 106209
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/analysis/native_anchor_overlay.png",
+      "sha256": "c721a92e8d6f53c72b7cac1b6b2b295d66f8b737d281df21751b0d0e3a0401e0",
+      "size": 121372
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/analysis/native_signed_bulk_summary.json",
+      "sha256": "aee270d2275d2bface283d6fcf7fb0feaeeca09ce45742b9d025193717ab024d",
+      "size": 36988
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/CAMPAIGN.json",
+      "sha256": "482b2a59701c7999a24d573a90d04a446793cd8592821fb0639892d768caf6e1",
+      "size": 2533
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b1e24d8e1da10f9da95125dd79665907a6e6dab6e3d7a450020c6caec573177c",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "acb4acc28a984256a23f0d7bc42621d1405981bd3ea3133983c523c2330687ad",
+      "size": 32108
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/incremental_advection_operator.json",
+      "sha256": "898ca3394882710ae7b738a673c1b56905b4b2ac20d104c55fda47eca6ff8493",
+      "size": 185071
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/run_args.json",
+      "sha256": "e58f87b867bb2f3131cb87268710e39d354a21d641f549a31864e32e51bc9ee3",
+      "size": 10972
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "d0f028c9c790fcfa8397876b9278d2d8d387d88630fb61b68b447c991c73dd2c",
+      "size": 7929
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/steps_0298K.csv",
+      "sha256": "7ccc28aa52939d634fb45e4d6c80a74e4e5f350f5002e23cee9ad5245d807a87",
+      "size": 311752
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/summary.json",
+      "sha256": "d700755c51fc1d451cf68f57be19b2a746d637c063ece17001cf15d72d9b96e4",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/bulk_signed_absorption/R_0p1/toughness_vs_temperature.png",
+      "sha256": "12d31807effa1c634fecd11d74e17b7c0d68dc0d662e2467bf72a3f34299feda",
+      "size": 30248
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/tip_only/CAMPAIGN.json",
+      "sha256": "0c775278775c8261572a827ef4fc546a2b360ad8eb0cf9f17301ceb84e093e65",
+      "size": 2522
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/tip_only/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "394ab826986eeb92b2a1da6fcdd0c8c5358799bc690b76f93b9ddfaab3f4c56e",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/tip_only/R_0p1/run_args.json",
+      "sha256": "e397e95d3c659bb2c2df5287b0a07dace3ae079d81dcc7e20a922616affc944d",
+      "size": 10964
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/tip_only/R_0p1/steps_0298K.csv",
+      "sha256": "086ae071327dbc33ae00ec9e6a4a5619e1c019341dfd03e1fb736186179bcb73",
+      "size": 283366
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/tip_only/R_0p1/summary.json",
+      "sha256": "b22e71f98effe242f3eff4fab326ade7fb76fe1cdae712b045b50b1aefba63cf",
+      "size": 1085
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p1_DK40/tip_only/R_0p1/toughness_vs_temperature.png",
+      "sha256": "c7467338dccdf4df30662aa93203a9de1efb55883b68a04dd652762435cfa84f",
+      "size": 30875
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/CAMPAIGN.json",
+      "sha256": "70e5b4bd0f5ddb4feeb9f70d07976aaaf9bf289bdbe2016bb8efe3907bea95e4",
+      "size": 2530
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "394ab826986eeb92b2a1da6fcdd0c8c5358799bc690b76f93b9ddfaab3f4c56e",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "b3e708cb1d63b3d948787012f0863abb353962382f6a7555e12801125f800156",
+      "size": 30529
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/incremental_advection_operator.json",
+      "sha256": "d7733fa97664cd8c36f636d01fa3ee01b827684126f98fa8c9cc1e1ca1786f0c",
+      "size": 184945
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/run_args.json",
+      "sha256": "2dcf4c11f7b7aa27c599077a0b94431f25edc46cfa9628618a7df20f477f209f",
+      "size": 10969
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "f3d19b2902f012bb73eb5937ce8bb6a3dd3647ffb5c6b18242712353fce5e553",
+      "size": 7934
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/steps_0298K.csv",
+      "sha256": "0ab9c083df12a1c763b35db258d99397489f99a8896f8ca206238f25ed9c8d19",
+      "size": 301429
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/summary.json",
+      "sha256": "9b739a7a34215bbe3f3d24142b7f377ac486008654b79f3674a884cbb4d1c061",
+      "size": 1127
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_absorption/R_0p7/toughness_vs_temperature.png",
+      "sha256": "0feed0432bea3b1b282f209336ac1e4091761fb630c9177a65d4414df48729c6",
+      "size": 33438
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/CAMPAIGN.json",
+      "sha256": "be908cbd00a6cad723435ce9d2f77d463bca9cbad4732d7c120580937855c227",
+      "size": 2530
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "394ab826986eeb92b2a1da6fcdd0c8c5358799bc690b76f93b9ddfaab3f4c56e",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "f01c0842e958db8ba2e145e34e822f01444aca02dc531b7721285da04c2c535e",
+      "size": 23762
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/incremental_advection_operator.json",
+      "sha256": "d7733fa97664cd8c36f636d01fa3ee01b827684126f98fa8c9cc1e1ca1786f0c",
+      "size": 184945
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/run_args.json",
+      "sha256": "1bcb293769ec91e1cf08688554e68c3fb8cda0a69e8dc4024f68c9f78728fdb1",
+      "size": 10969
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "f6906662e37c091d5d61497930ad519b68eeeffd59aa48edabd081bfb46c700f",
+      "size": 7960
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/steps_0298K.csv",
+      "sha256": "cc271944b6273f8020f1e1c72515db255607d24ebc40afe2c2684ba67d2729ba",
+      "size": 136172
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/summary.json",
+      "sha256": "0011687be12f445dbf2116ba90f8e5effcf97ed81e7bd74793a8afb0dc39bc54",
+      "size": 1111
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/bulk_signed_shielding/R_0p7/toughness_vs_temperature.png",
+      "sha256": "0feed0432bea3b1b282f209336ac1e4091761fb630c9177a65d4414df48729c6",
+      "size": 33438
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/tip_only/CAMPAIGN.json",
+      "sha256": "32f45d72ffa1e99b922456289e7be83060f5e898fbd28c5c6660a17c55164df2",
+      "size": 2519
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/tip_only/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "394ab826986eeb92b2a1da6fcdd0c8c5358799bc690b76f93b9ddfaab3f4c56e",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/tip_only/R_0p7/run_args.json",
+      "sha256": "a6b004822e4bbdf55b7eaaa07e431670685206ae192654a2e9633236303c53d3",
+      "size": 10961
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/tip_only/R_0p7/steps_0298K.csv",
+      "sha256": "e190aad33740ea1fec2db9340fd76858264eefe53d6dfddf56e49101cd3aab6f",
+      "size": 136158
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/tip_only/R_0p7/summary.json",
+      "sha256": "ca68f9c9c6c569c714b0b340ddfcd64bf954e108afba4dac4e8ee9dd3747e893",
+      "size": 1085
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/anchor_R0p7_DK18/tip_only/R_0p7/toughness_vs_temperature.png",
+      "sha256": "a3eb0d259d9ab4d1cb097fd079b01b23673e7764d5b90f1c87d3af88d46bacd9",
+      "size": 33280
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_opening_barrier_comparison.json",
+      "sha256": "6a1b0b44d0b37e4a2ec9cdf4ee51d82e90f5e0c8c5fcf1aa8206893da6d1e5c0",
+      "size": 4928
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_opening_barrier_comparison.png",
+      "sha256": "26e59a103ed2b1f1eda8c1ed643d3e30414291f6135deb044c8437705346dc96",
+      "size": 122975
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_opening_barrier_comparison.svg",
+      "sha256": "f4b2cbde626cbe43bd1b6121959ce5005e81b776a2dad37c6f6cd7248546c6fd",
+      "size": 54846
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_plastic_barrier_comparison.json",
+      "sha256": "fb95e1c319de15372dbad75a0efa288c410fba98962b294d3cf3d49e85f884dd",
+      "size": 6329
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_plastic_barrier_comparison.png",
+      "sha256": "3d0109568bbf94ecef14e6e2091550d180c9a25adab708d278ac38f3d36302a5",
+      "size": 236855
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/audit_plastic_barrier_comparison.svg",
+      "sha256": "7184dda5e13454f576ed9d327381ed29501c6ad7cc56f3650581c9b164590383",
+      "size": 298292
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/CAMPAIGN.json",
+      "sha256": "0e02682e63c89adb393e01f64f32661ceddec9bf12a76196405227b0949c0db4",
+      "size": 2484
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b1e24d8e1da10f9da95125dd79665907a6e6dab6e3d7a450020c6caec573177c",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "de8db2659d65ac8bdd058bfb7e52e5a621d309cff33b85083dcaa97cd6b2b0fa",
+      "size": 32092
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/incremental_advection_operator.json",
+      "sha256": "c137c8e413ea5b87240ef0383ccd8eb23aea3c46b5772004e731477015dc3507",
+      "size": 184906
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/run_args.json",
+      "sha256": "c2bba12a1c1540a7fb8c092454744965e81ac06692e5df107dc92c29b0cff9f5",
+      "size": 10968
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "9238ab67eddf73dd73d4b21db5e6d5aa91932cd70c5ed48b3f26ca9745c53b2e",
+      "size": 8097
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/steps_0298K.csv",
+      "sha256": "5ca33ed9e25348c1ae128b234442440acf2ac461bc592ffc2133dd488d4860ba",
+      "size": 166668
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/summary.json",
+      "sha256": "42d89352fac6ed768d03c9288aa4c082a55f5bcdb73ede85e55f500c6863c1fb",
+      "size": 1117
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p1_DK40/bulk_signed_absorption/R_0p1/toughness_vs_temperature.png",
+      "sha256": "6a6adead13a274aa38ca17c4379f8651313c9e202f91c91847031811f2c920c0",
+      "size": 30223
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/CAMPAIGN.json",
+      "sha256": "8c778773b440aaeb4cc32331dfb6338055981e18351745e44cea6bfe404b7ee9",
+      "size": 2481
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b1e24d8e1da10f9da95125dd79665907a6e6dab6e3d7a450020c6caec573177c",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "77e677d3125fd37a0096a80c712cd6f0fe3e9aadbcb6efc8fc3f2fbac5d62a59",
+      "size": 31960
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/incremental_advection_operator.json",
+      "sha256": "a383f2d90f354d2dbc389418355ccc668bf56de2faaa855bb9dbda12bba1a2a7",
+      "size": 184831
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/run_args.json",
+      "sha256": "75f38a0c816d9915a70bb397553641fe254a38ba63ee7354c5d969ca46992fdb",
+      "size": 10965
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "ddbecb89443040a536aa1176e0eff14b824e1d188f2eace418aa3d14fb847199",
+      "size": 8344
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/steps_0298K.csv",
+      "sha256": "aa6baa2e55856edaa7fbcb7243abd6982423947bd7aec6aceccb10b40154b6d6",
+      "size": 53138
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/summary.json",
+      "sha256": "0ad524752234e72840d98bb9cefbf377205ea60852c7fe9705cc978bc54bd336",
+      "size": 1116
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidate_shape_01_R0p7_DK18/bulk_signed_absorption/R_0p7/toughness_vs_temperature.png",
+      "sha256": "419ddf5be1c1e918a915cc12d9c69b0a5af9a75f34284f7f113f6cfa5d481708",
+      "size": 33289
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/candidates/native_bulk_shape_01.json",
+      "sha256": "328cd2890f50cc758bafb423a9736d28d4e91659eb6688fe7da0f0cf7d3a1fb1",
+      "size": 1092
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/EXTENDED_EVENT_ANALYSIS.json",
+      "sha256": "f270732cfc994af50e0607c5d376e53930a40957abf0499026dd35137d747f3b",
+      "size": 3517
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/MATRIX.json",
+      "sha256": "e1e7b745b3f116a9c7f06c110a6acf59bfdb4c40c34848d10ea4850874f232c2",
+      "size": 5559
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/CAMPAIGN.json",
+      "sha256": "c1ed2b97b46885280cfce1c46dbb1fb2a4b3871f63cd1ea62058120466f7419f",
+      "size": 2624
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "6ea3cc20ed9fcadb350a7bf0b2832241c7bebd9339876cae4df1a43a9f4fb7b5",
+      "size": 38013
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/incremental_advection_operator.json",
+      "sha256": "ece69ca11317a3bc59900a3f358571fb8958bdf327ffd694a6d9071902cdae4b",
+      "size": 182932
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/run_args.json",
+      "sha256": "e40c52469ee53155df9b45130257273afc4769e5e15fa953f45e603a697a6d2f",
+      "size": 11019
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "092a00e45eecd8d4c4eac32eaf1c7263bce16b656ef83b145e7503d930c0049a",
+      "size": 7951
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/steps_0298K.csv",
+      "sha256": "8a943c307b882098999894663e4c1417ea0310355bf270c41760a23347f8207b",
+      "size": 3081000
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/summary.json",
+      "sha256": "7de98d3bcc9b1de8896b71e95b4e079bf4ac6f285d1cfbc3e228567bb7380bef",
+      "size": 1115
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/R_0p1/toughness_vs_temperature.png",
+      "sha256": "a12c0fb1c4529e059f07f4046cebf6a39022bcb7816e170ef8b2d4c98e6f6473",
+      "size": 38176
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p1_DK_18/execution.log",
+      "sha256": "b52ffd3f3d194b284642ccd9624385f261f6e12d175b74d05cfa37d11595224c",
+      "size": 177409
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/CAMPAIGN.json",
+      "sha256": "79f7dad7303c8c668ad37db449f1b0d9b6cf2390a8de73b152cb9a592fa87d29",
+      "size": 2623
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "92806f7afc7344647186569e6f91f2c7a0e3992e86da022516c4a28ecf87ef4d",
+      "size": 37767
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/incremental_advection_operator.json",
+      "sha256": "706b21561d6c096116fad306d7c1aeb69f979cc24de76d691f939a0cc57ec81e",
+      "size": 182920
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/run_args.json",
+      "sha256": "dbba14f14dffad196bdd558a8f7bf0267b4190e20ed38346acc8038d377913cd",
+      "size": 11018
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "67ef642a56e85dd28e52634caf3e4e648f44dce83dcf617170e305881b6526ed",
+      "size": 7936
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/steps_0298K.csv",
+      "sha256": "4ef351e4fb55b48c9c41bf1a01e6f404a1c6f33cf74c91b421d46c265a2fcac4",
+      "size": 390632
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/summary.json",
+      "sha256": "d2fa2a3333a50b1c7315d6fd5513c8af88c15a562ad03b56cb51349d3bcb97f7",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/R_0p5/toughness_vs_temperature.png",
+      "sha256": "f13e866b9349a03cd6f70fc001637e914d496c18eb01107f8c146850c407a9b6",
+      "size": 30892
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p5_DK_23/execution.log",
+      "sha256": "7f5fea579f84977523287faf556c349361de523a40dbcd7a23405b1aef333884",
+      "size": 23869
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/CAMPAIGN.json",
+      "sha256": "44e1cefef5245ff22ef03c8c2a49a3f776a7bf7c5ec3fc85896c02cf35770a4d",
+      "size": 2634
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "f8f9cd2c6007401833c6f7a7297949f934607c0c228c2f266303fce3193550fe",
+      "size": 37714
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/incremental_advection_operator.json",
+      "sha256": "9b0f43df6c8d74c3b90fcf4b7d28d10830e32bb3532bdd71649fc05e76c455b8",
+      "size": 182920
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/run_args.json",
+      "sha256": "8191ac57d5967170c73ebcbb29754fb9a5364598bb887f236eb7c0038cf3fc49",
+      "size": 11029
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "01bb098a6c3f3991b623a367dae8ce870ad26b078411eec98658863a9f50fb85",
+      "size": 7941
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/steps_0298K.csv",
+      "sha256": "b4a1018ee168a22dd07659fb08deb94b4b0add04909170c4aa2601863e92a413",
+      "size": 291279
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/summary.json",
+      "sha256": "d4d3ad197d1f568a81244f90b8f1f78aecafc250fcb2091cf5792310c0798b85",
+      "size": 1110
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/R_0p7/toughness_vs_temperature.png",
+      "sha256": "6b0f643fdf0c35a30ee76a5ec2f2f001346f5fbc32dc6323bee6f0742d36831e",
+      "size": 33224
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/R_0p7_DK_18/execution.log",
+      "sha256": "1534705eba2aa54e2218f725a287bd19dddfd70c07f925de9d02bbb16d41cf19",
+      "size": 18199
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/extended_event_rates.csv",
+      "sha256": "ed0d6a276240431cc48c238405152448311b2981edf958a22fc61377fec93127",
+      "size": 1754
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/extended_events/interevent_waits.png",
+      "sha256": "6e385941438b2ef24965696b74873bf3f2e6c14ace5b1c57e4c7fcb978a4204a",
+      "size": 86848
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/fit.json",
+      "sha256": "f93696bba83207db098e4bda8f02f6e8fdf70bb4b8bfe1493491e82ab6c1bfdc",
+      "size": 14521
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/ANALYSIS.json",
+      "sha256": "25c314873a2dea3addf0ab2be94073c6024d75d40b5366e7122c440fc05e0ac9",
+      "size": 1011
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/MATRIX.json",
+      "sha256": "020b69ff833a45ef96abfede3d53fc9ce9bd0ab98e16ae7c986e9f0bb89f2942",
+      "size": 28051
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/CAMPAIGN.json",
+      "sha256": "4af5963b4041f41fa628fe1437626e00a5fc29cbaa523ff01206eb2ac0093add",
+      "size": 2589
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "85d44848a1f08edb00799d4bb867ed7cd4c1e090b26b683bb57dd43a61591e36",
+      "size": 32218
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/incremental_advection_operator.json",
+      "sha256": "25871e9dec96e5f6446cf9b08dadf5a35bc9395691494c0b5fcd9919120ff764",
+      "size": 182935
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/run_args.json",
+      "sha256": "d3771e05fdf0254a610cce207d29e070d87df10eca609e27db077771535acbb8",
+      "size": 11026
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "93779a7bc30ec06b20eb367fddcb7ea4f3bf1184d83fe99a322a803bd0b848e4",
+      "size": 7955
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/steps_0298K.csv",
+      "sha256": "43ad61b2c9bb75734e5e012fae88a75000db22b09969c56b05a9b952582074e3",
+      "size": 1166522
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/summary.json",
+      "sha256": "b682f467f25536fe4e69a171e4c2ef4f2c9ca839c655ae028ea1444c6915de48",
+      "size": 1115
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/R_0p1/toughness_vs_temperature.png",
+      "sha256": "1bcc14d473579dd3844f5d87f7e5cb464c181ad150a48dfdc4eb6c4d5b8e1f54",
+      "size": 38260
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_18/execution.log",
+      "sha256": "d69da8686dff37a67c47f09efd6808518c75cfb8281b4b789362c6ee2d167507",
+      "size": 68092
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/CAMPAIGN.json",
+      "sha256": "2d42e5e19e379204107338c582e0f2246980f3b33053d1032fdd70c5d9e07258",
+      "size": 2603
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "92d872f001ba7b61b42ed5a92668b0e2bec0e844426d21b102f5fff975fc2684",
+      "size": 32224
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/incremental_advection_operator.json",
+      "sha256": "b6b48d92e49501d5888d77dfd23a696178db66764b8e43acf06f3e2224dce66b",
+      "size": 182942
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/run_args.json",
+      "sha256": "d1c7cbbc06eb94f46b5f576c6a3a9880e958e7a6400304a931ea165fa42f3c7b",
+      "size": 11040
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "b230b663144255d3988eee3848302dffa8718f6cd7e57c5cf384e84338f651cc",
+      "size": 7932
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/steps_0298K.csv",
+      "sha256": "47e23da27977bce50c8423d40bfcda135d08d61c363ef0df4766b920827588d7",
+      "size": 407985
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/summary.json",
+      "sha256": "f14a25857c1454fc22690368e9acab96c9dab6b3031bdc365f72457acc0b10ef",
+      "size": 1114
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/R_0p1/toughness_vs_temperature.png",
+      "sha256": "d558478206635ffb32f579ef2844302626e303dc0157485a0e0ee1b83b6ea4de",
+      "size": 34010
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_24/execution.log",
+      "sha256": "d693a34982dbbf33c9019b87a64889cad5f676a5ec64dc039f78bde96c0b7047",
+      "size": 24802
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/CAMPAIGN.json",
+      "sha256": "d9e89a9e9e00f2c46cd30a036f6ca0c930bf98d708d14dbd90c93f235001bef3",
+      "size": 2602
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "acea5ea5225afa878474b135c6c961c6ca499ee64a618806b1dbacd83f8814c2",
+      "size": 32137
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/incremental_advection_operator.json",
+      "sha256": "5f4343f1e8e2ff571de99c6c8e090ecda1d25e12d07c936c6333076f8d607d2a",
+      "size": 182941
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/run_args.json",
+      "sha256": "daccc42539352ddcb35f567acd7c0f0b1c94517e618f470c8892467fa8692454",
+      "size": 11039
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "89cc1205fa2039445ac3a5e329afa7e1a7cd91dbc85c17af16f1eb9d6dc0793d",
+      "size": 7950
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/steps_0298K.csv",
+      "sha256": "b2d688190730a0ad8bd47845f567f5539797c8fec759437bbf99c35dff948e22",
+      "size": 225047
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/summary.json",
+      "sha256": "8c9cbf58720d0615506767da9118f52935ee7a42cd81c735a0c170c1b1e32b3c",
+      "size": 1113
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/R_0p1/toughness_vs_temperature.png",
+      "sha256": "6385ba919ede796399a39606e23293c34c8c517fc04038f4c925f5708eaecfac",
+      "size": 36425
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_32/execution.log",
+      "sha256": "caa1d35ef0fb3e083e35c297443a7a52a0abed18f66501bd1029102c560fa37e",
+      "size": 14362
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/CAMPAIGN.json",
+      "sha256": "f7ef64c402d0d56e7a3c9300115b711c5b3d1b2e6a9a31086b5274be761017b3",
+      "size": 2602
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "270630d1a7b073521eff9264987543724ac7de5b8c9ffded567fe7a4b47538f6",
+      "size": 31991
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/incremental_advection_operator.json",
+      "sha256": "c47a71e4a56ba01c58fee9fee47c6080423ac9a29eebf07a6ea890ea89bf409f",
+      "size": 182940
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/run_args.json",
+      "sha256": "91c0e3c361172b50c53445f76398003dd2004998522260c22139ee89f2b33351",
+      "size": 11039
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "b9468e5f357eb22189acf153e5ca8feaaaf23c77cab3eff0af5c2d172c735baa",
+      "size": 7929
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/steps_0298K.csv",
+      "sha256": "42b87a5b39a9bb5f5875ab2b423f2f21f0de01bd69c075c4422959ca5da61b7b",
+      "size": 180913
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/summary.json",
+      "sha256": "d7288675823e416ab98ed63d47fee8f2be0fe91dc0d276afc1a2b7f95c602bb2",
+      "size": 1114
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/R_0p1/toughness_vs_temperature.png",
+      "sha256": "256c3b113a42236e88abab09e7af3131d2645de009bdbe019982ffeb9bec5214",
+      "size": 30290
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p1_DK_40/execution.log",
+      "sha256": "db983319150ad357db0ded796d39ca8bd4210aa80bf051416d5a0866b3c67058",
+      "size": 11842
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/CAMPAIGN.json",
+      "sha256": "6f44ba220e688f52ddfe26f9e7955f391b6360177d164ec3c5b8a21d2b854c3f",
+      "size": 2602
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "43115e296eaf2667211121b4126a74d31f62f86effcd4df01861bbd98d0594ec",
+      "size": 32142
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/incremental_advection_operator.json",
+      "sha256": "b38bb5e3d0a9a2922a94bc6cb88c65076d01f83dcbd7db2b43d894aef2ccd7dd",
+      "size": 182943
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/run_args.json",
+      "sha256": "3d00c4e179acc848a44fab31c4a52c19af38bb8e0881d959c9a27222e79593b6",
+      "size": 11039
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "568e43823a8faeb523ad13edf71c55f5b913888c6796971e69e5c6fa709ff6d0",
+      "size": 7943
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/steps_0298K.csv",
+      "sha256": "738b2aa6ab2e7b4d7926563661848d7fa8431bf132c5b7b36c787f4d6a64846b",
+      "size": 674498
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/summary.json",
+      "sha256": "f27db7af99c7b897a0c6cb290139a3115c65b7ab68ccb8d105608ef970d8022f",
+      "size": 1113
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/R_0p3/toughness_vs_temperature.png",
+      "sha256": "e709bbf275b1b050e30ff2d2ba0adc6d433f787fe48157ab4b3c65327c142877",
+      "size": 34037
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_17/execution.log",
+      "sha256": "fd585d04ebbc7a33aa75f539c59dfed8cad122a405a5a45c1f08bca90c098d6e",
+      "size": 40012
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/CAMPAIGN.json",
+      "sha256": "4e6f456375d24cfc6f3a3705218e6c61ae558088b7d10ce828a131bf0034f719",
+      "size": 2601
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "57855d13515610e6bd3d3e8cdd7d2734a9222495b096d03ef6d2311271521f40",
+      "size": 32088
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/incremental_advection_operator.json",
+      "sha256": "20554badf19fa53a0e22ba064c8c64b46d869b3ee06614426c83d632d31daa65",
+      "size": 182943
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/run_args.json",
+      "sha256": "1b1297830ee05e74827fbe2e2bcb1fac02fd06b58983001d055098eea2cba9fe",
+      "size": 11038
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "10fa816ed61aebe4482225ccee2daa4581e8d1cf15de36aaa1d20a4c3202456b",
+      "size": 7917
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/steps_0298K.csv",
+      "sha256": "04c1879e2a32388b503cc3cc19282bcce466e82a0e5cb5bef0c0f1a50f10cbbc",
+      "size": 286550
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/summary.json",
+      "sha256": "c738f4c835d794c805dc039df6012433ce6f8d5c8be1d0623099602bd607a07e",
+      "size": 1113
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/R_0p3/toughness_vs_temperature.png",
+      "sha256": "0127fafe0df5e4e8a4d8cbcff6942d27ad1c8e5d8a724395a9d7c0eee877e48a",
+      "size": 34673
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_23/execution.log",
+      "sha256": "9d46845bf29dad7cbd6738ed2117ddf88ecc8271ac5b78c8315ff4bd0fcc3e5f",
+      "size": 17872
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/CAMPAIGN.json",
+      "sha256": "d0cb41b662eb40fa7f12c8adee8faafa0ee68b9a608d1656082c5b67f199345d",
+      "size": 2601
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "ff7eaac7b0f36d4779ade893f3d15fd1c0a3affae174be86c1395b804ec41f08",
+      "size": 32009
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/incremental_advection_operator.json",
+      "sha256": "4d281131094d73121d3eea04c04710e25cffd2791afcc3926d66792b061e6267",
+      "size": 182938
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/run_args.json",
+      "sha256": "e071cd3ac74dfaa90398910243a7f532adc1c4f8745fe960c9b4d5f828a9f5b9",
+      "size": 11038
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "3570dc8d4c1b177063831cf90c8828fe93999d86aae5680534746df609f2db6e",
+      "size": 7953
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/steps_0298K.csv",
+      "sha256": "a10a158dc808ceac66930dd820916f18955960c9963377142608d0e591471a3a",
+      "size": 204547
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/summary.json",
+      "sha256": "cd5919c6269ef74a805c43f9ccc0e5a6e112c38b123b2795ec41ca136772be48",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/R_0p3/toughness_vs_temperature.png",
+      "sha256": "cb4fc14291735a0ca639d04bbaae9bab55ea61c6cd876d3cc0071d22c4204db6",
+      "size": 30524
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_30/execution.log",
+      "sha256": "0759058e53620e5b26a072bd925efc530a99a14db80cac365007c89c3aa33ce9",
+      "size": 13192
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/CAMPAIGN.json",
+      "sha256": "542356d733fbcad41c93a6d2090e8a6e3bc890da69d4b73c468853353d6eb4ec",
+      "size": 2601
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "f7e9f71dc543e7677ded5164ce0890c6937ba7d971e49a917b2e306da1d1aa34",
+      "size": 31954
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/incremental_advection_operator.json",
+      "sha256": "b432b5e66b938ddae2948dfc1cf79feff5fe9257a2179c2550c851106467c525",
+      "size": 182930
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/run_args.json",
+      "sha256": "23c27c8fe160db3e3cb1e41161b2230dede9ff223aa9df31fe6efe544630df8a",
+      "size": 11038
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "a696bec0a771dabc5103bc009455c0ef386cae9219ef4c320d87e02457235256",
+      "size": 7926
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/steps_0298K.csv",
+      "sha256": "f99c834b574c62341e072a6f1233589e1ce3cde55b5599d0ed6670f5ad68c597",
+      "size": 152505
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/summary.json",
+      "sha256": "6c4c1579d72c6e99f7673d0991d41dc39fe332b6a3839a7e454b1a78145e19f0",
+      "size": 1111
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/R_0p3/toughness_vs_temperature.png",
+      "sha256": "514b433770df566d67a6cf7329006842c56d3e2e22b42cf254da980b934d9199",
+      "size": 31820
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p3_DK_36/execution.log",
+      "sha256": "6f23371eca2faca5a76fc1af048aa9721c98a4aa91fed6e8d96d4527ad5f5d64",
+      "size": 10222
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/CAMPAIGN.json",
+      "sha256": "4a8a3a4be7b3e4dd1002c64206157d5b28af98978fe821b9d69288db53322fcc",
+      "size": 2590
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "c852f42e431610ff392c5e43c8acd227758784338dfefc0fcca62ae0c0972414",
+      "size": 32076
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/incremental_advection_operator.json",
+      "sha256": "4b7c854828f5344f18060dbf5d1aaa7626d561fcf4e951ccb207612877eafb6d",
+      "size": 182933
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/run_args.json",
+      "sha256": "5f6088d444146f627658a4cc43806f460582dd7f5283d5d0f6d134ea11c20eb2",
+      "size": 11027
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "74caea3500bec9f15e589f0e4085432ed312f6bb5dd72d3ebcab4ccd4bd0ee1d",
+      "size": 7947
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/steps_0298K.csv",
+      "sha256": "4bd10e8dab249b4cc028fb29e33268b69bdfd39e6323596780b61126895e5f21",
+      "size": 453712
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/summary.json",
+      "sha256": "d1aa034776da500c32dd2c646a978e6385c657e4ae083a0e04c2c55c3ce8cd93",
+      "size": 1115
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/R_0p5/toughness_vs_temperature.png",
+      "sha256": "bd6af6f8e2e64012da4fe1c80db15fedf35f72b17b7aa8d138274d986239ac86",
+      "size": 35083
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_15p5/execution.log",
+      "sha256": "bfc5b60c1a3b7ea04dbf64d48f8a881dfcce09aaf68e39bc03408e7ead5ccfd7",
+      "size": 27414
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/CAMPAIGN.json",
+      "sha256": "c480e4676e04cd78ff3ae4dfbd13c8071b5b220564cbd27ec15ee4ec1c831909",
+      "size": 2589
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "37a3584d45c68ff0eb949dec712372e38fe5f121ffb6d39c8a09cf4b9641e191",
+      "size": 31960
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/incremental_advection_operator.json",
+      "sha256": "cebb18766e7f8d5af4a720e6ec569282fd8bf92f4617fa68c320ba3738b81c3e",
+      "size": 182932
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/run_args.json",
+      "sha256": "6f2ad88a8b93fa8b26c71de8e602e82a7c1d28f5367ce67354ca7b4c1d0a8080",
+      "size": 11026
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "d484ca5f69a245a16de777e61afd09f64f6ec00bb7d93a10e6c4bc2601ac4af3",
+      "size": 7933
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/steps_0298K.csv",
+      "sha256": "614317a8879b5f207d104f86c2ca7bb0541ca3534e277df50d1167eb6663f1ff",
+      "size": 272357
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/summary.json",
+      "sha256": "3b99045dcf4634805b06af145062182817185c661ad65591ed0dd328cd52fe80",
+      "size": 1111
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/R_0p5/toughness_vs_temperature.png",
+      "sha256": "0dc96adb6540cabd015115ea5fbc3fa3529fc0589f89bd7ef3e357f85b945b67",
+      "size": 37876
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_19/execution.log",
+      "sha256": "5f00d10b828438ced9f97478447b5e9d419ed52f7e8952acfd1c4272cade1d1d",
+      "size": 17062
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/CAMPAIGN.json",
+      "sha256": "63d2fc82311237b34195b64cd1973bb040ed853ce9576b5e030c199e8312a814",
+      "size": 2588
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "97631ddb146adb320d0ebaa746b24f3fe85ee6a850a6822de31302430acc34fb",
+      "size": 31918
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/incremental_advection_operator.json",
+      "sha256": "1abae46f8d30617bf5807bcc5c2d77fd7fceec7e92568d2d96f0aed734d36507",
+      "size": 182917
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/run_args.json",
+      "sha256": "b337c953d682b09bc5a0df741b9bf1e28e0180ec5b1abb46e64c711d5bd27890",
+      "size": 11025
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "c372bc9b13a2c8a295894a6f6b8742399cad93b78f391a76dde1e12c3813154d",
+      "size": 7930
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/steps_0298K.csv",
+      "sha256": "d8a947b383cd8550271b14695e1d3b61f005bfb10b33d9c6514c05fb473716ee",
+      "size": 185622
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/summary.json",
+      "sha256": "b08f7e32392b72b51c01b71ed7b91d461842e467b547e52dbdfc8278baa20496",
+      "size": 1111
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/R_0p5/toughness_vs_temperature.png",
+      "sha256": "a055bf1f4e02e82d340c12084e3b1c4001bf63b341ce10137f9767a28bad1005",
+      "size": 30850
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_23/execution.log",
+      "sha256": "8c628eb0e33621ad867038d849b2dcd9cb60ad5ac0e70df4cd74940030612a98",
+      "size": 12112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/CAMPAIGN.json",
+      "sha256": "473699602e6d2199d57135dffb44a760e2068ddaef009be56a39ef5cc435f446",
+      "size": 2588
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "ae67c6c0f290645cea76bb97b3d11eed881b9b77fa6fd1195df9c2de8949e4c6",
+      "size": 31906
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/incremental_advection_operator.json",
+      "sha256": "49c8da829ba63aab5986bbcf7a2b423c662d24d10078a3a4dc4401621d1a6517",
+      "size": 182916
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/run_args.json",
+      "sha256": "9ab632a3c303d9f155479abfd7187dbf6d58e955e281d4f22ff4a2ba2ce393ac",
+      "size": 11025
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "84c4198c24af774ed215982df8aa78920a5e16e41fc55f91ea85eb3991bd1d83",
+      "size": 7934
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/steps_0298K.csv",
+      "sha256": "2dc9b97afd9d8757e3d33beb4fbf5814bdbaaf0b2e299f75a0d6ba43856e0665",
+      "size": 139889
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/summary.json",
+      "sha256": "c49d6dd6bd1a45219264e656dee60008f39dbf97ddb8f1a7ba4665df2be8b195",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/R_0p5/toughness_vs_temperature.png",
+      "sha256": "95fa8921ab75045826234f9b8cb14eda43418a17c8917b5442b24a128f4954e5",
+      "size": 31631
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p5_DK_27/execution.log",
+      "sha256": "3255b0a352b111a92e640f6c39e61c2d48b07f7b500531d67e0026f819051fee",
+      "size": 9502
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/CAMPAIGN.json",
+      "sha256": "2c54ba6373576116f89702804ef93a2bb0b1838cf79ac7fba0297d4636fb6062",
+      "size": 2601
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "7fa2e249d64141fa4d5d968069ff67d474b824159b4de21e88da378a63fcfd28",
+      "size": 31897
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/incremental_advection_operator.json",
+      "sha256": "e7604803e5b6f1b7fb5751ae4b472459bc66c037a74306e5830c1a7f62698d72",
+      "size": 182930
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/run_args.json",
+      "sha256": "422e8099a8c39922b6541202a69abb9188527a85b755847aa99a74c8c65b2da2",
+      "size": 11038
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "21ed130b7f3343c8c68cd66bddc0d095272fb002e35696b957b04ae8b815a23c",
+      "size": 7943
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/steps_0298K.csv",
+      "sha256": "fbcf5b3d2a176c6898c972b15fa716a223a759ff928d2b4aaf03ea72ff1da202",
+      "size": 411133
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/summary.json",
+      "sha256": "cdc73f181da37e939d5d0ded8e33cda24098dcc1d2b4ab7df4c23a59e8abc07b",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/R_0p7/toughness_vs_temperature.png",
+      "sha256": "e3100d513c4b1624056522c90c231194d163e70c49822f23c13414bafe6809be",
+      "size": 37196
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_12/execution.log",
+      "sha256": "a05961df481527ee9b3ed43d3cd9539d8c93710577caeddfb7fefe839a839297",
+      "size": 24982
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/CAMPAIGN.json",
+      "sha256": "761d8afa9d9e813226be4a0c8f42253bc7cb22c9d5516865f567b9aed85a131a",
+      "size": 2601
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "7b7dc21608a913929c7a4d866f5e66b92040b924644a93d474ae308ef5558910",
+      "size": 31851
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/incremental_advection_operator.json",
+      "sha256": "a05aa410d1ecc6ec2b97022ed0e9f32fa74576353b1d95ad4b254790e6e8fca2",
+      "size": 182925
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/run_args.json",
+      "sha256": "b378eda4892a53cbd7520c1b684b5d31b3323cf5dd675be741f6469ec342fdaf",
+      "size": 11038
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "11e7ef53f2a0811730571594a3d9548664b18c123b1b79a939d7786de6ec3718",
+      "size": 7934
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/steps_0298K.csv",
+      "sha256": "eb5e5df773c6da669a14b4a65b931173f2076d86c85938a5ba50043f4a6311c8",
+      "size": 248702
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/summary.json",
+      "sha256": "ba4f121947ec47589de4340e8c70d53fbc739c619939854cebec997a1e88573c",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/R_0p7/toughness_vs_temperature.png",
+      "sha256": "3aafd5d09865c6d90dbcc8b592e49289b3d4c55e172772a90590d8ee5bc78bb4",
+      "size": 31104
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_14/execution.log",
+      "sha256": "c6350cbd3fe55375576c1e0bf2d7f5c6974fea8803fc21f23ec44241f09db36c",
+      "size": 15712
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/CAMPAIGN.json",
+      "sha256": "cac446439c5cbdb12a7d5752427b91ac04d410d1ee0edb5e32373a73210deaeb",
+      "size": 2601
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "6af7eb933e659362769ff3ec9e90147f467ec0d8048329ce9738b02e445b520f",
+      "size": 31839
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/incremental_advection_operator.json",
+      "sha256": "aad525f5970aa66fa2d3969cff1b1cbe7b44722db9a97bd3df705fac9d671400",
+      "size": 182919
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/run_args.json",
+      "sha256": "44e5f0b532e454e9be317e9bf21c3af3e2d1d6951550965b445cbe6448ddcfb9",
+      "size": 11038
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "1ac49217bfdba9ba984652c417e0e0d28b08418522a30d116b9b22e2510c67f4",
+      "size": 7930
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/steps_0298K.csv",
+      "sha256": "fe6037e8f91b80cd98d6ed0b2ce3258f12a69858a57638e7ee3bdadc0ffa4b9d",
+      "size": 179314
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/summary.json",
+      "sha256": "8d1f766f4cc933d2a760f49587b96be1cfc80ca8b6bcb266750570934608c4f2",
+      "size": 1110
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/R_0p7/toughness_vs_temperature.png",
+      "sha256": "d356d7c36c0ff910887d3ae601d06f67b1473cca8eb2fae63802e2b6a0a59029",
+      "size": 31750
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_16/execution.log",
+      "sha256": "b1d81b7feb9e99da1876f260a06e0deb193601fb3a95602fb56cc5b4d123d048",
+      "size": 11752
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/CAMPAIGN.json",
+      "sha256": "61b6172ab3492bf8a46bca7997243e686a3aad28426420c8e10fefab66000f66",
+      "size": 2599
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "42037151aa7e40f9a04980f2ac55152b37655b93edd48ba63091e6b239acb523",
+      "size": 31859
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/incremental_advection_operator.json",
+      "sha256": "422bf3a78c5fcb520df87756662c5391438d400111e5d020ad6645de90baa12a",
+      "size": 182917
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/run_args.json",
+      "sha256": "3a26b2ed74af5d6f1362cbe8fd3872715136debee7d8a36734a4a15bb53f73ca",
+      "size": 11036
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "b58394dd70d6eafa0d2c9005ea6066c6ecfb82ea608e23ff844763a0d9b9a3c4",
+      "size": 7909
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/steps_0298K.csv",
+      "sha256": "8f627ca66895ea0f8858ecf71dd94e392accef59bf8d0b5d20219493ebfaf7a5",
+      "size": 173014
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/summary.json",
+      "sha256": "8d402c3e66cc18d3ca4d78a1ddbd72f19f393db8d9759a871e2fc080a8a43239",
+      "size": 1110
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/R_0p7/toughness_vs_temperature.png",
+      "sha256": "d0cd23fee2094bf008d04a60a94b9c12aa38f934d7d630cfccc8510d93d5427f",
+      "size": 33087
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/R_0p7_DK_18/execution.log",
+      "sha256": "1f1eac031b8974eaaeec050aa526b345e986e55b3bff32cb983a6fe93de3ce9e",
+      "size": 11392
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/experiment_1d_2d_signed_bulk_overlay.png",
+      "sha256": "893e6f89636603eb1e8d54ee9de7f4c1af4e4f568bcb548af1d8bf110da70460",
+      "size": 394373
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/experiment_1d_2d_signed_bulk_overlay.svg",
+      "sha256": "1c3ac8fe2f0a940d6f5aa3c2a315274c8fb4edb7d14fa169df6f3386a789694b",
+      "size": 110657
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/native_2d_rates.csv",
+      "sha256": "c83610e5516793993ae09f6767354bc1f9c1c361b23c128338d78f181fd9385f",
+      "size": 7388
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/native_2d_rates.json",
+      "sha256": "5fdc7cea319779660b43234522a68485c3b257f25abbf90e3474be913b730987",
+      "size": 15820
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/matrix/rate_comparison.csv",
+      "sha256": "0ccd369600c028a60aa329b062e34578781ccf998ca6667bee417b19ab75be04",
+      "size": 9260
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/CAMPAIGN.json",
+      "sha256": "2992339dea7e8acaeb47caf91a1521eabc5a7d339e6130f580699d03ff8ba065",
+      "size": 2470
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b1e24d8e1da10f9da95125dd79665907a6e6dab6e3d7a450020c6caec573177c",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "3e0050b06e7c13308ea80856be42f18cbcb470ce350d27d1ed7efe612c5a5e4d",
+      "size": 32146
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/incremental_advection_operator.json",
+      "sha256": "a57da93660a4410f01cf25605507c775b17b0c9c5eefff08a8ddb77ec982d95c",
+      "size": 184996
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/run_args.json",
+      "sha256": "40a24e92f2b1474c71285c1b0a542190bbaf9bc3a9dae45a682a0660c996c35a",
+      "size": 10966
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "fd5a847aac51bad67d178897750e0dbd958c60e518f987696d5c0568e2016279",
+      "size": 8080
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/steps_0298K.csv",
+      "sha256": "0f80122fcb5a4e50f619e21ed51e889665bd59c3df1ff4f8f2af8b5179169bb8",
+      "size": 313329
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/summary.json",
+      "sha256": "d4e741a9c6f07666dfcf7bf28948022b4385474bdf0a79ee5e69a8b854dddda7",
+      "size": 1115
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/bulk_signed_absorption/R_0p1/toughness_vs_temperature.png",
+      "sha256": "e6541ebdb1315395a77f140dda363ad036c42368fe4751d633e5d55629c3fb0b",
+      "size": 30277
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/tip_only/CAMPAIGN.json",
+      "sha256": "1612156916b02300c7bd42b7bf537b0f676b1ac6ca4f6c8b1e1689a56e00c127",
+      "size": 2459
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/tip_only/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b1e24d8e1da10f9da95125dd79665907a6e6dab6e3d7a450020c6caec573177c",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/tip_only/R_0p1/run_args.json",
+      "sha256": "a849012780a17e4c455ffadfa27e75ac0e8385e75cae53bfddc19b802c8b15c9",
+      "size": 10958
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/tip_only/R_0p1/steps_0298K.csv",
+      "sha256": "1b177ca589c6d0f089282899ad5c139532ba9900f326e3db809bb4579b593f17",
+      "size": 292828
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/tip_only/R_0p1/summary.json",
+      "sha256": "10d7ff0acf1716002c1fe446a10557c9cbe2b0745b92c46c79321bff9bc7d7d4",
+      "size": 1087
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p1_DK40/tip_only/R_0p1/toughness_vs_temperature.png",
+      "sha256": "c7467338dccdf4df30662aa93203a9de1efb55883b68a04dd652762435cfa84f",
+      "size": 30875
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/CAMPAIGN.json",
+      "sha256": "543bf193022c8a887b0ed7ef831ca59a1b265e3b849a2db174da6e72e33ad8ea",
+      "size": 2467
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "2c99fa9a6904ecb50841f7b9fc3ee50035cc90164004d36178cee3575a93a659",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "0ec500e5d01ce0ff9d633f59529ac6b08881bbf202406c0fdfe107e0d9771336",
+      "size": 32003
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/incremental_advection_operator.json",
+      "sha256": "e3a44a94ec0a5a4b7a000b180d3b029aaa7478f23a950a16c3fdb97df721921e",
+      "size": 184910
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/run_args.json",
+      "sha256": "deccfb56e951edc02cf723882d4537f10c6d783316a64b148d1580676fde83a0",
+      "size": 10963
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "31a7b9822f9cd1a94e8e1f595e08a9cb017ef741aba3fc2adc868bb43f52c00e",
+      "size": 8084
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/steps_0298K.csv",
+      "sha256": "57a42c990209fc2d78567f9a698080a1150ada18071f30ae78e2627fab87db59",
+      "size": 269268
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/summary.json",
+      "sha256": "ed9c863572f74517a09d98d68c67ccd719595912104903d4073ea7f28aa9adba",
+      "size": 1115
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/bulk_signed_absorption/R_0p7/toughness_vs_temperature.png",
+      "sha256": "5debf6216fda0cbdfeca5784f11ca73a2f5ddebc8f9f4da1636bff013acdb2f2",
+      "size": 33163
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/tip_only/CAMPAIGN.json",
+      "sha256": "b763689c7e6c1f261f893976f1a8ccaf61b8abcf1acbd8cd53b660a96a863fc7",
+      "size": 2456
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/tip_only/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "5d26a874dba02d5fdad2bfabc1a6d43dc6a2f439e8f8177e788762e7a15b4db3",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/tip_only/R_0p7/run_args.json",
+      "sha256": "3bde11829e30001cbdf7688699d42fdd7404717c7a8b3811cce947ef06e15199",
+      "size": 10955
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/tip_only/R_0p7/steps_0298K.csv",
+      "sha256": "fb348819cfc65800f0c439ec52344691582d990622fffd6de8da17beabee5d28",
+      "size": 141436
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/tip_only/R_0p7/summary.json",
+      "sha256": "2c41bb3d13adb5a18a683f983f6cdfdfce3318ce3f751a6ccf8c3711b4d1b58b",
+      "size": 1086
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028/sloping_seed_R0p7_DK18/tip_only/R_0p7/toughness_vs_temperature.png",
+      "sha256": "a3eb0d259d9ab4d1cb097fd079b01b23673e7764d5b90f1c87d3af88d46bacd9",
+      "size": 33280
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/EXTENDED_ANALYSIS.json",
+      "sha256": "32feb28305ff5c9b3f572952ac1329e579e87371f5a4db1bfee696c5e8991b78",
+      "size": 10453
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/MATRIX.json",
+      "sha256": "118c5496a8ea1c328ee7604f17cdb8f6531fb3ae9e5572ce776107078cb61aeb",
+      "size": 28385
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/README.md",
+      "sha256": "fea66178ec00e4bc96fb133e0acd8e30fe7ca5d9dbc0d915387707304f775f95",
+      "size": 855
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/CAMPAIGN.json",
+      "sha256": "f27bdf0c8012fdc64b7722b4fe2df070e103c81b025116f1829429269d4dbb56",
+      "size": 2625
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "6ea3cc20ed9fcadb350a7bf0b2832241c7bebd9339876cae4df1a43a9f4fb7b5",
+      "size": 38013
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/incremental_advection_operator.json",
+      "sha256": "ece69ca11317a3bc59900a3f358571fb8958bdf327ffd694a6d9071902cdae4b",
+      "size": 182932
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/run_args.json",
+      "sha256": "aaac9684477eb798ea53bdb9dedf8feb548a523c24bd90630d4d20ccb5da7c74",
+      "size": 11020
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "092a00e45eecd8d4c4eac32eaf1c7263bce16b656ef83b145e7503d930c0049a",
+      "size": 7951
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/steps_0298K.csv",
+      "sha256": "8a943c307b882098999894663e4c1417ea0310355bf270c41760a23347f8207b",
+      "size": 3081000
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/summary.json",
+      "sha256": "7de98d3bcc9b1de8896b71e95b4e079bf4ac6f285d1cfbc3e228567bb7380bef",
+      "size": 1115
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/R_0p1/toughness_vs_temperature.png",
+      "sha256": "a12c0fb1c4529e059f07f4046cebf6a39022bcb7816e170ef8b2d4c98e6f6473",
+      "size": 38176
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_18/execution.log",
+      "sha256": "f31db366342aca3e5fe6ffb537f44df837ee554262d355c76d324efc5d56d5e4",
+      "size": 176927
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/CAMPAIGN.json",
+      "sha256": "8f33c4d7904d7b33da1e3a1f940bd6831559b92558089d778080da63c5bd3f5a",
+      "size": 2639
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "e0e7350084f67e118e77570be77e5fec6ccf7b0997b8fe3d65ade9c04df319bd",
+      "size": 38120
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/incremental_advection_operator.json",
+      "sha256": "b7681a1cbe79469b9ba6e92a7bb54a14155da6f71d4b66511db347f80520768a",
+      "size": 182941
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/run_args.json",
+      "sha256": "2d5348b5bc9d22d786899613406d20037c16f4e207fdfde6c93dd98b2c71f450",
+      "size": 11034
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "a400081391e9f2fcdf607f1afa8e42e1e556f4c7a73adbe1f789780e024da881",
+      "size": 7945
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/steps_0298K.csv",
+      "sha256": "62b4f90367c2dd288e0770c3fc2efcb050df6c13a75edad63b61f555e77d2dc4",
+      "size": 999360
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/summary.json",
+      "sha256": "0774eec856e6d36ac0500fc4dcc128d8f743dd4578a3bcf467ad63fd8637a193",
+      "size": 1113
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/R_0p1/toughness_vs_temperature.png",
+      "sha256": "0981511393c95b852026721a5f71fa42781d79deaa25851eb2437df5aae08c78",
+      "size": 33999
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_24/execution.log",
+      "sha256": "71fce0945684858d7ceb427d98e60d014c0b04f9d1726a08e274fbe20364dbb9",
+      "size": 58127
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/CAMPAIGN.json",
+      "sha256": "967bedf9f38e9501e2e1ec2c21a0ab34e6f7006a306fced1b1516a8c395246e1",
+      "size": 2638
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "818778421cad102367a1fce7104fdba165d2091100963c4fd5ae91875da5f560",
+      "size": 37962
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/incremental_advection_operator.json",
+      "sha256": "fd180f7234cfb7be126e4bdd608ac4437bf9934bd27eba84ce4f6aba01a53e98",
+      "size": 182938
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/run_args.json",
+      "sha256": "2c8f1304f0e134d5bd6ae775c3c33d7d6140b3fd588890da1f0da327de2d447f",
+      "size": 11033
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "478b57de1dea677d4e2dee8667b7e6bc536bd08f63c26a4a3e2cd76cd2ee4fb4",
+      "size": 7923
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/steps_0298K.csv",
+      "sha256": "3f0104adcb6de55e3e13c0b0e2f34166d1ca74f2ffa86a31bf20e157dc239932",
+      "size": 707621
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/summary.json",
+      "sha256": "2faa06533cb089af78c625e51ee29b075af00d91bbe09e20b612bfb887c6a0ba",
+      "size": 1114
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/R_0p1/toughness_vs_temperature.png",
+      "sha256": "8dd2bfe643248a8133fd4097b8e4052f7f526bf936a2046ca81eb44a93d2f2bb",
+      "size": 36251
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_32/execution.log",
+      "sha256": "ddd2f2e37a351cbbaf9ba74c4f88916e4f4b9b97c6e0dde5b8c77fcb12d4de1a",
+      "size": 41477
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/CAMPAIGN.json",
+      "sha256": "016ee8995d046aa3a74954b1c7c9afdc8a9c3002b190a6bfd63d42dc00e2c1fb",
+      "size": 2638
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/incremental_advection_history_0298K.json",
+      "sha256": "6ee5cfe8083073101deb74eec30820112b256ebe935aeb4bef97cee37c7da888",
+      "size": 37786
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/incremental_advection_operator.json",
+      "sha256": "e953594dc59b4f5919589c8daf0473bea32e31c02346b08cef7844f056135678",
+      "size": 182936
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/run_args.json",
+      "sha256": "d9e751498ef6f0bc1e0b14f914517a209c3ebd2ba3d5cfb3a447dcc7dbceac74",
+      "size": 11033
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/signed_gnd_reload_scan_0298K.json",
+      "sha256": "541c8eba2f78d2476ac953e9d1808b6b892db63f220d4ae4f5583e2550e6439c",
+      "size": 7914
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/steps_0298K.csv",
+      "sha256": "cfc6b3330a3af51c5274c070ef43fc62b8afe6c14e567c72dbf7e5d2ffe9f9b0",
+      "size": 404847
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/summary.json",
+      "sha256": "e9cf7d1a2da302ed896f7e13b34447727b8dfbb920abaa32ac23a7b7867cdd99",
+      "size": 1113
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/R_0p1/toughness_vs_temperature.png",
+      "sha256": "765ba8e838f797cc673d4755f350e237456de97d53340f2cc9f9470231d031b7",
+      "size": 30279
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p1_DK_40/execution.log",
+      "sha256": "22ca5d828eeb6854a9e0a4897a1ea8cdb2674806af2cd998ddb3e914e58a4f60",
+      "size": 24197
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/CAMPAIGN.json",
+      "sha256": "dafac7a804d60af62f396411346593469937b9b8249abac36d7993d617c6500f",
+      "size": 2638
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "eaafdba3e1c98195f77ea4299ebd286ac06a892888b45108686a769ef1affc7a",
+      "size": 37995
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/incremental_advection_operator.json",
+      "sha256": "89d3e24bf7203b35c69e20ed7a8500e56146afd4a3db421a8af7cfa030ea58f4",
+      "size": 182939
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/run_args.json",
+      "sha256": "6bc41f0b78479bc1f2be203c0b4f9d6c73341d9f712a4ee8d7244243b89d2a0e",
+      "size": 11033
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "50e1f7003098d38e33c22ddc33afab3397596614232013d6487c248cc4245055",
+      "size": 7947
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/steps_0298K.csv",
+      "sha256": "a099bca7c530ede93202df3c4bc89dfc4c59aac50d0d66a8c0092c8dc5f5fb24",
+      "size": 1529232
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/summary.json",
+      "sha256": "7fe7b799689fe86a6f98e767bc16e959943794ce5d01583fadcecf5ce8d0f859",
+      "size": 1113
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/R_0p3/toughness_vs_temperature.png",
+      "sha256": "c615600a0fc52c1959073f359cd0a37390b68ad21ff58a7c4e4d1e965fd97f6d",
+      "size": 33812
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_17/execution.log",
+      "sha256": "13ca72373b0863287d4d4ff73c71b00f1c5b8954ddbc3a3555b0fe7e53c14385",
+      "size": 88367
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/CAMPAIGN.json",
+      "sha256": "f1456d633220787c8bf0f76023a198e99ac660f309aa7dbbc62273459635ba62",
+      "size": 2637
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "9e1f43a21d7a14200239a71aafd7baa9063747885cc80cbc51733faf9ce94f47",
+      "size": 38030
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/incremental_advection_operator.json",
+      "sha256": "341189580c4119de407a3ea8821d06c3ff47df8512da948f79bbf04a369c3320",
+      "size": 182945
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/run_args.json",
+      "sha256": "2983398ad929b2fbdddf732837aaee4c9ef7ce6f35581a111d074799fb84c691",
+      "size": 11032
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "a962a8f7e23444ec76d065a82c57336e66a04f9db06a11d9ed7c0fa7b728f29c",
+      "size": 7937
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/steps_0298K.csv",
+      "sha256": "71ea8b934cbc79f2afd7aa77c1372b8bd981d96c5306233f1612d4ab0bfed9be",
+      "size": 635067
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/summary.json",
+      "sha256": "2d8b100ab3165324c483ea9c5e9650c70b35658d10959209cf0fb61aa4b93909",
+      "size": 1114
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/R_0p3/toughness_vs_temperature.png",
+      "sha256": "6283a868abc185ebd8acd347d5b01e5f30489c9b96e1882fcfcf08b625a66fd8",
+      "size": 34669
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_23/execution.log",
+      "sha256": "b114c476dee64d720091cf1244df5b3c7f7ea8a26d2a66b5c2d97d60113e2348",
+      "size": 37337
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/CAMPAIGN.json",
+      "sha256": "6bb252ed8741e4c023088fd7dc0de52a5ce2b59b93a1986555bf3e8cf52a0e55",
+      "size": 2637
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "d7f9c0117c54239f0d5d43f84eb395eccf0ad0152c78bca28016b02a53d9eb0b",
+      "size": 37846
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/incremental_advection_operator.json",
+      "sha256": "c4b6c46c68fd64657bca7574a0cf7508d4bedad377bcd79a2c9ce36c95957e55",
+      "size": 182939
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/run_args.json",
+      "sha256": "18207ca1a5de790ef9ea6577106b161d501f01c6a97e50f906a2327cbb91e8ab",
+      "size": 11032
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "7cb008831bcce6969074547c7f31f72986a1de790b014a185d3474fb1a737b24",
+      "size": 7931
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/steps_0298K.csv",
+      "sha256": "9d1ae6ab1531eb9953d1afa7d1e715244b183f62fe2de81deb4ff4fd2f40d6aa",
+      "size": 441097
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/summary.json",
+      "sha256": "658ac3db9c1c0c32f7e46174de84d002afd3ead0e2df5498bcadbf5747ba6063",
+      "size": 1113
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/R_0p3/toughness_vs_temperature.png",
+      "sha256": "2192c659a1afafc2f134c4cfdd4d815a9c2bcb77b93c290cd97f08556c018753",
+      "size": 30505
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_30/execution.log",
+      "sha256": "47b479a82fee27f760ae329800bdd8af0eb6f852794700ae2883da38470f21e7",
+      "size": 26267
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/CAMPAIGN.json",
+      "sha256": "5ab35259d1acc81bc1e2e202ab8dc6759b40a9aa6a6e2f09fb2e22a074ef12d0",
+      "size": 2637
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/incremental_advection_history_0298K.json",
+      "sha256": "0a25cd30af6258854b168808650e78a30beaeec5c1692d9271ff883baa771ca0",
+      "size": 37670
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/incremental_advection_operator.json",
+      "sha256": "7736cd08fd2d8da05818fd99e9da286913507a58ee662d886fdadbde1ace0aa0",
+      "size": 182932
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/run_args.json",
+      "sha256": "7f43790f83a10b4dc2480d7fc7c75b9b7ec6a5fae6b23bfd64230c2597ee837e",
+      "size": 11032
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/signed_gnd_reload_scan_0298K.json",
+      "sha256": "397bfd7e3d9775ceb2f8bbcc7d848dd940e048d747b8d28cdd77ef2a94d48513",
+      "size": 7916
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/steps_0298K.csv",
+      "sha256": "97a59b61be55ea8f9615d934b5e4bf9935f741c87c9c3b12574164c68c4de2a7",
+      "size": 480526
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/summary.json",
+      "sha256": "e525100a86377eb76ceb087d5e55162021478609183314176fafddd66b891387",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/R_0p3/toughness_vs_temperature.png",
+      "sha256": "8e16acc2b17f9ff8f53d71effc48cf8421d12e8dcbe11cddb9a24fd2149b9bae",
+      "size": 31965
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p3_DK_36/execution.log",
+      "sha256": "6c23054ab4f3dfd6beb826ff605faa4c4f1bbf692776578955e9a900736c9036",
+      "size": 28517
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/CAMPAIGN.json",
+      "sha256": "493e662a4f10003fda37c045846a9539823dba21b76fc2496ed206e2299e85e5",
+      "size": 2626
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "147b57d49b2cd6cfc673e0a0d1b3359882eb3354e8f7599215eaf0b46d5d0b9d",
+      "size": 37992
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/incremental_advection_operator.json",
+      "sha256": "29d562480113cbc960079fe1a6fbf0b873d85ce1917969399b2332141212f8f9",
+      "size": 182931
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/run_args.json",
+      "sha256": "b66ef63a6353e7cd8d36cd730a8de35eb91004af73320c767311c888d8d3088d",
+      "size": 11021
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "d28deec783ab8dde2dd46e8f41e2764c9a54ddb88f26bf9358a2314ee0073627",
+      "size": 7950
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/steps_0298K.csv",
+      "sha256": "d09b5e78c7ec2e93fa213bb9d0181a48612ca7d01f93693bca9ffc8d40e0d54b",
+      "size": 912619
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/summary.json",
+      "sha256": "33c895f300d76eb755c2bc8a7f189a79167bf0525129be01c26781577ca06d0a",
+      "size": 1114
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/R_0p5/toughness_vs_temperature.png",
+      "sha256": "7550874a0138da7bc5050908c0477bfc7f914cd4dc9bd4a82ceb5a3f09a62ff8",
+      "size": 35039
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_15p5/execution.log",
+      "sha256": "09ee207f7489cf6f9df107aa5e447263dc210b448cbe4e0b0c95cd2ceb042506",
+      "size": 53179
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/CAMPAIGN.json",
+      "sha256": "32209940090a24240c79f82988e9021e51624b34d79ee968fdf1e0364476549e",
+      "size": 2625
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "df6ccf83ddb2059f4138aa16369dd09225b8157b9a6b5c3f59b2e54d36159607",
+      "size": 37795
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/incremental_advection_operator.json",
+      "sha256": "8ba5179dc3062d1e260e2c9689314dcab94eb2625d7d34330b683efe494c92e0",
+      "size": 182930
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/run_args.json",
+      "sha256": "ee895f09b4595ea30a645ba54e3d49f236d2f1514886ea7c0170eab9ab4b9403",
+      "size": 11020
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "e880e89aa8bd32519696b47a0cc031f9994e5e7073b67326e828e6070b2855bd",
+      "size": 7936
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/steps_0298K.csv",
+      "sha256": "504ba628723a8c241e656674186c224a0a64b6ffd76dd915b00dbcf53e481a68",
+      "size": 603527
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/summary.json",
+      "sha256": "fd25ab2ffc30d40dae255eae5c08b43a6bcb6bd526277737f48a08015833a456",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/R_0p5/toughness_vs_temperature.png",
+      "sha256": "61b977b57bee0d4918a8619e33fdd6005a6a41f277f264783863c92bd8918fc2",
+      "size": 37906
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_19/execution.log",
+      "sha256": "11ded3837bf67c74a2539a79122fed189c36c6f06147464d71c9ee339ec8188f",
+      "size": 35537
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/CAMPAIGN.json",
+      "sha256": "ba7a9168698868bd53115ae6992a0806b13cfa81bb3c0f44d2b4f1764cce6df0",
+      "size": 2624
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "92806f7afc7344647186569e6f91f2c7a0e3992e86da022516c4a28ecf87ef4d",
+      "size": 37767
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/incremental_advection_operator.json",
+      "sha256": "706b21561d6c096116fad306d7c1aeb69f979cc24de76d691f939a0cc57ec81e",
+      "size": 182920
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/run_args.json",
+      "sha256": "71beef92a7ed0eda286a131347e62bb0bd7ff6233b590ba305b558b79cebfa04",
+      "size": 11019
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "67ef642a56e85dd28e52634caf3e4e648f44dce83dcf617170e305881b6526ed",
+      "size": 7936
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/steps_0298K.csv",
+      "sha256": "4ef351e4fb55b48c9c41bf1a01e6f404a1c6f33cf74c91b421d46c265a2fcac4",
+      "size": 390632
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/summary.json",
+      "sha256": "d2fa2a3333a50b1c7315d6fd5513c8af88c15a562ad03b56cb51349d3bcb97f7",
+      "size": 1112
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/R_0p5/toughness_vs_temperature.png",
+      "sha256": "f13e866b9349a03cd6f70fc001637e914d496c18eb01107f8c146850c407a9b6",
+      "size": 30892
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_23/execution.log",
+      "sha256": "b47021303279e26d84a499d710d97f82550a7e3d6db2f17119cb205c489f6871",
+      "size": 23387
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/CAMPAIGN.json",
+      "sha256": "bfd6a5d593abbccb39013a4dd81da37f0a06786902bbdb096c070aecc247a627",
+      "size": 2624
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/incremental_advection_history_0298K.json",
+      "sha256": "897a12906663b0e18a1d1eb58f25361af1fe1c01c08de4e2549a7e1a7acf7463",
+      "size": 37719
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/incremental_advection_operator.json",
+      "sha256": "15490793838ec7a5fc0571f390ca062a62441fd1140e5e356c72d5c36575daf6",
+      "size": 182914
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/run_args.json",
+      "sha256": "e9ce06afa5ddbb122373d8619a25aca42fea37170a454dd145a59baf75088c44",
+      "size": 11019
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/signed_gnd_reload_scan_0298K.json",
+      "sha256": "63b741d48b6e4980ae143b4249d0b5e9346c63da825a69c54286c628a997c0a1",
+      "size": 7932
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/steps_0298K.csv",
+      "sha256": "436d3275ef149dfb8acf9cd068d416daefd108c5fed021f75393d856127afaaf",
+      "size": 297589
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/summary.json",
+      "sha256": "40ef0bc9852b16d007c0dab4142c25c47320d899cabe7f51dd7608a0d4b547b5",
+      "size": 1110
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/R_0p5/toughness_vs_temperature.png",
+      "sha256": "5353cf47f28ecf2854e2270b7afc9d4bbd76c09df4274f62d623b989497b553c",
+      "size": 31684
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p5_DK_27/execution.log",
+      "sha256": "f7972e671fb03acd4195cab642512253ceae2a837dcf30fe0db5b4adfe4227d2",
+      "size": 18077
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/CAMPAIGN.json",
+      "sha256": "a0d6a2c03d9fe06571609709ba163c480f68b5a582439db926eac46af84ad35b",
+      "size": 2637
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "c31432cc219cb4e40c81b1997152bc0ea3652fa48e9a086b7486545607937e66",
+      "size": 37707
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/incremental_advection_operator.json",
+      "sha256": "6bc199d1cfbc57c5737c070530e1d567757c9d3578fd6e53e9f20f2a76ea86b3",
+      "size": 182927
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/run_args.json",
+      "sha256": "32e863c6ce703ce15005670acb1fdf2d1a9fd67629b693bb8938c317e0ceee43",
+      "size": 11032
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "bcfca1531ea1635ce0d8b0bc97b8e8e26718171fe1d8b64add39fe9f86985586",
+      "size": 7947
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/steps_0298K.csv",
+      "sha256": "7df0c7ebded3c713ff5cd1e450be7850a9daaeac30868138019c9b5f23e1c151",
+      "size": 731264
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/summary.json",
+      "sha256": "8482cb55bde332ec6cb8e526e61989e7eba030a3cc6eddd0d4b6f708391cdef1",
+      "size": 1111
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/R_0p7/toughness_vs_temperature.png",
+      "sha256": "93c0c255dec1804d6eb2cf109ad8f0bc1bf1e2959b0bc1261510b90f84393559",
+      "size": 37142
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_12/execution.log",
+      "sha256": "1b164fb4126c6bdf70708c4e45612dace76874c2285acf3e82f8b03a725a109d",
+      "size": 42827
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/CAMPAIGN.json",
+      "sha256": "64809d456ae478011215e49115ed9a7606d676a616dd8fb7bf60ae1418d3c2e9",
+      "size": 2637
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "6860a1f67409ba4fc0aa2a3b5bc77da0d3e212f537f8e710141be6d1ee152080",
+      "size": 37691
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/incremental_advection_operator.json",
+      "sha256": "398e673b6be1a9c5ff8689c5eea79423bb463de68a882610f943fe2af23376e4",
+      "size": 182920
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/run_args.json",
+      "sha256": "020ccf44acc0fec51a62bef67a4936b6808ca86cc5c977d052746d4536110097",
+      "size": 11032
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "2672727372e29e52c7c798de640c00658d4d32a33a5209db5a251b1ecbac586e",
+      "size": 7935
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/steps_0298K.csv",
+      "sha256": "bfa7d74da1036f2295256c7def1d0424c087951c334f3e8aa0fb7099d7ce5818",
+      "size": 489983
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/summary.json",
+      "sha256": "e2354e1150cd6b319928c2bb7ba2659f934c717048cbcd799456c03936e44a97",
+      "size": 1110
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/R_0p7/toughness_vs_temperature.png",
+      "sha256": "607c8c8bffe3ab07853f98b0cd97e9767b6e0d336ee64125b6f962755b0b2472",
+      "size": 31191
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_14/execution.log",
+      "sha256": "00a0b77117b314b3a08b5f413e17d2c96d466dbfc664e0d5b16832bc26eb8215",
+      "size": 29057
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/CAMPAIGN.json",
+      "sha256": "42db3aaa30d9dc68b7d69f8c0966f1d3a9eb9cc4ce6300fa0fa4e39e0981dca3",
+      "size": 2637
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "237ac507f469dc87a780230d3f7cbe17dc108c61f323ea74897e45eab601e462",
+      "size": 37682
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/incremental_advection_operator.json",
+      "sha256": "ef4a39e69afb1a4431caf7cfd40f06a7032a4483f7fdc452f6cc9bd7ae138ec6",
+      "size": 182916
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/run_args.json",
+      "sha256": "298b86bb68f0fe1a1b8453518bbed8471add0505bcee9a52364c53b43deff0b9",
+      "size": 11032
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "80cfa88407a327d87ed18d788b97b1e3b553714f828960d36e6a755c55e6a2f6",
+      "size": 7940
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/steps_0298K.csv",
+      "sha256": "4018e8f53a6a2909b06c8d4c266098f260fd68dcdd45061211e8b4d6f3cf90d8",
+      "size": 360669
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/summary.json",
+      "sha256": "388a9fac68bd31d96676e4b187ed04265bb9486b348d2d4935e16849c67151e0",
+      "size": 1107
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/R_0p7/toughness_vs_temperature.png",
+      "sha256": "83853918f8d07c7d72e99f149ea276fb9b6c5b12b7e8e6e54a51b12492311dc2",
+      "size": 31517
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_16/execution.log",
+      "sha256": "e9c13c912d7adc4f5c74d953f414c4c8208698f90fe19649334ed7e48e097475",
+      "size": 21677
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/CAMPAIGN.json",
+      "sha256": "a9dfae7f874abbe0fb0d4dfc24d59a5fa7831107ac0a6f9e4a2fca70c949a8c1",
+      "size": 2635
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/fatigue_cycle_controller_config.json",
+      "sha256": "b43e4bba0da311c2a5340fba2a5d035f86874fa2514ddd259926d9c92a750832",
+      "size": 2082
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/incremental_advection_history_0298K.json",
+      "sha256": "f8f9cd2c6007401833c6f7a7297949f934607c0c228c2f266303fce3193550fe",
+      "size": 37714
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/incremental_advection_operator.json",
+      "sha256": "9b0f43df6c8d74c3b90fcf4b7d28d10830e32bb3532bdd71649fc05e76c455b8",
+      "size": 182920
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/run_args.json",
+      "sha256": "6453f029b2178d9a119697d9c39bfc6aaa370ccbc80b17c9f37c2ab63f49de2a",
+      "size": 11030
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/signed_gnd_reload_scan_0298K.json",
+      "sha256": "01bb098a6c3f3991b623a367dae8ce870ad26b078411eec98658863a9f50fb85",
+      "size": 7941
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/steps_0298K.csv",
+      "sha256": "b4a1018ee168a22dd07659fb08deb94b4b0add04909170c4aa2601863e92a413",
+      "size": 291279
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/summary.json",
+      "sha256": "d4d3ad197d1f568a81244f90b8f1f78aecafc250fcb2091cf5792310c0798b85",
+      "size": 1110
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/R_0p7/toughness_vs_temperature.png",
+      "sha256": "6b0f643fdf0c35a30ee76a5ec2f2f001346f5fbc32dc6323bee6f0742d36831e",
+      "size": 33224
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/R_0p7_DK_18/execution.log",
+      "sha256": "5f250645417c65a23c4bed7aead0eae1f333f24f9dc941a12021972bc05594dc",
+      "size": 17717
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_refit_20261028_extended_7events/extended_event_windows.png",
+      "sha256": "28d620642930840ef1f5803f357f633055b733db1aa90e3004de25b0c2931942",
+      "size": 323910
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_equal_effort_control_20261028/README.md",
+      "sha256": "a36e59ea35352e2b6a18a00a509b7e0367af4bd3a97b39a1e38609526bde870b",
+      "size": 540
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_equal_effort_control_20261028/fit.json",
+      "sha256": "b78a3425960c1e014fc9bc327ba25163bad35c77ccf029725a437d9d1136ebe7",
+      "size": 7194
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_equal_effort_control_20261028/predictions_no_bulk_refit.csv",
+      "sha256": "04e4313a5ea2e7ddee5aa7e96b8bd506879dc2b872d4cada2befe5a451a074c3",
+      "size": 288734
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_matched_refit_20261028/fit.json",
+      "sha256": "c6377059bb2c9695fc3dd8764468d8a7e465328e1e5e9fdcc575a6763eb93211",
+      "size": 6673
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/no_bulk_matched_refit_20261028/predictions.csv",
+      "sha256": "d14c37bc119e556a226bbd0ba7d08540776aa5a46d7fc80bc5dc2a9ed2d9e596",
+      "size": 288808
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/fit.json",
+      "sha256": "300fe9830d4d47afe23fa6d9d386a0fe81ee83fdfa5c4a52314ba7d3b39e8205",
+      "size": 9949
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/paired_common_axis_fit.png",
+      "sha256": "691956be69cdf0a66496dce0d0c7f50a7f9ff76cbba3ec144ec939fc7c796791",
+      "size": 489349
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/paired_common_axis_fit.svg",
+      "sha256": "0600911dcc861043968068d62fd3562096e9e89f13ccf563f4fe61dfdfc500b6",
+      "size": 287448
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/predictions_no_bulk.csv",
+      "sha256": "e81139f2390b6706ef254badf3b46e27c077cb33bd169ee2c0039372ba647798",
+      "size": 287749
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/predictions_signed_bulk.csv",
+      "sha256": "f7781b3623d6812b519b7df3b6e38bb6980a3b120db36fa80be0fd8245274cd5",
+      "size": 370790
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/signed_bulk_state_histories.png",
+      "sha256": "a13a7ad2b90a4910384e2f7c0289bbfe5753e58242287166296967aed72cd61e",
+      "size": 218455
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/signed_bulk_joint_refit_20261028/signed_bulk_state_histories.svg",
+      "sha256": "24ac4cf4b3d94121d6602b03cdeecbf062bdcdc168794b997f78ae277db5c63a",
+      "size": 79517
+    },
+    {
+      "path": "literature_data/fatigue_recovered_review/normalized/qste340tm_constant_amplitude.csv",
+      "sha256": "99f869f5fb4963d37791aceff144c56150fd27ab51c59735588446efba4e36cd",
+      "size": 150153
+    },
+    {
+      "path": "scripts/analyze_qste340tm_signed_bulk_2d_matrix.py",
+      "sha256": "c3d13bf246c479b62672eacdf2e03b1bbc4c417bbe6321b32a22e3edd78e6a62",
+      "size": 9526
+    },
+    {
+      "path": "scripts/analyze_qste340tm_signed_bulk_extended_events.py",
+      "sha256": "642e7ad384ce51c87dfb930d08f3b0872bae11bb0c8985fe64f38a3e9f425bfa",
+      "size": 7057
+    },
+    {
+      "path": "scripts/export_qste340tm_final_result_20261029.py",
+      "sha256": "b5865b9d3db45b09a72b5edcd40e5fc61f3d03ff01c6a5a5169f55da168dea76",
+      "size": 7724
+    },
+    {
+      "path": "scripts/plot_qste340tm_audit_barrier_comparison.py",
+      "sha256": "b3e63e652bd360b498c0a92457702c5512d9676cde439e481f85684b8614f666",
+      "size": 4947
+    },
+    {
+      "path": "scripts/plot_qste340tm_audit_plastic_barriers.py",
+      "sha256": "e32c6612d879221c2f63b86216416c323cab0dba99f439eaa6dc7c497c30e27e",
+      "size": 6417
+    },
+    {
+      "path": "scripts/qste340tm_emission_blunting_reduction.py",
+      "sha256": "15e8bc977db80fc5db1b19d314925e66c1c3727569e7693fb94615d75d86623d",
+      "size": 17513
+    },
+    {
+      "path": "scripts/qste340tm_signed_bulk_1d.py",
+      "sha256": "42b7d901b67bf2bfdd65ce1c4029c94ea0a1562d6c7dd65ae7955e601fc75f9c",
+      "size": 11244
+    },
+    {
+      "path": "scripts/refit_qste340tm_emission_owned_blunting.py",
+      "sha256": "6004e32972e8480939d7a231ddf1384713970a1007a8362ca7ba047e775e5ed1",
+      "size": 26195
+    },
+    {
+      "path": "scripts/refit_qste340tm_no_bulk_1d_control.py",
+      "sha256": "a8770b835298639d305eac53c56268386a5ce19a1646c218adee38c709513295",
+      "size": 6633
+    },
+    {
+      "path": "scripts/refit_qste340tm_no_bulk_matched.py",
+      "sha256": "4dd80643613db6de31a7d127be497aa856500f14826eb2eea4f8f26b726db8a0",
+      "size": 4675
+    },
+    {
+      "path": "scripts/refit_qste340tm_resolved_sloping_barrier.py",
+      "sha256": "313595602277a40b327680de7c8a9ce82ad9fba1b7c0544afc101675a3773ba9",
+      "size": 23919
+    },
+    {
+      "path": "scripts/refit_qste340tm_restored_native.py",
+      "sha256": "e6ee3b613197e539d2f8c19b51722b5078767e93efa605a2ca69f01154b0d092",
+      "size": 46946
+    },
+    {
+      "path": "scripts/refit_qste340tm_signed_bulk_1d.py",
+      "sha256": "1eb4645e09395d34638e0c61608db87929634e02c5a308ce543d1f27d7dc3b50",
+      "size": 15870
+    },
+    {
+      "path": "scripts/run_qste340tm_main_result_full_2d.py",
+      "sha256": "3722e958078e9a70a4f4608c16be7521a541e888e1d26f6db3381120198220e1",
+      "size": 20212
+    },
+    {
+      "path": "scripts/run_qste340tm_signed_bulk_2d_matrix.py",
+      "sha256": "cf6730a3c8449898139b5a4cc7587736605c2a02185fe5606d34e56476ad2d33",
+      "size": 5731
+    }
+  ],
+  "historical_three_event_result_is_not_current_baseline": true,
+  "identity": "QSTE340TM_FINAL_SIGNED_BULK_AUDITED_20261029",
+  "result_scope": "accepted 1-D fit plus audit-qualified all-16-case seven-event native comparison",
+  "schema": "qste340tm-final-result-manifest/1"
+}

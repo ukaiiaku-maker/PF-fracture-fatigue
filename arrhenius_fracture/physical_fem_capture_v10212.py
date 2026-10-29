@@ -196,13 +196,16 @@ def _engine_kinetic_state_digest(engine) -> str:
     for name in (
         "mobile", "retained", "accumulated_slip", "available_sites",
         "wake_mobile", "wake_retained", "wake_slip",
+        "bulk_tip_signed_count", "bulk_tip_opening_count",
     ):
         if hasattr(mpz, name):
             _digest_array(hasher, f"mpz.{name}", getattr(mpz, name))
     for name in (
         "advance_total_m", "wake_discarded_mobile_total",
         "wake_discarded_retained_total", "wake_discarded_slip_total",
-        "escaped_total", "recovered_total",
+        "escaped_total", "recovered_total", "source_passage_slip_count",
+        "forward_passage_slip_count", "bulk_tip_opening_slip_count",
+        "bulk_tip_absorbed_absolute_total", "bulk_tip_absorbed_opening_total",
     ):
         hasher.update(f"mpz.{name}".encode("utf-8"))
         hasher.update(repr(getattr(mpz, name, None)).encode("utf-8"))

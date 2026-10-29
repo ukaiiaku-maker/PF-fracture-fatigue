@@ -1,0 +1,443 @@
+{
+  "advection_step_m": 2.5e-07,
+  "barrier_over_kBT_range": [
+    16.880197597176178,
+    44.833788977169114
+  ],
+  "elapsed_s": 469.40353298187256,
+  "final_phases": 48,
+  "fit_phases": 6,
+  "full_data_opening_profile_SSE": 0.41132864729699853,
+  "limitations": [
+    "two-face 1-D spatial moment, not a replacement for native 2-D GND fields",
+    "experimental loading is treated through the reported DeltaK history; absolute CT force requires unresolved W/geometry",
+    "frequency remains the user-authorized provisional 10 Hz"
+  ],
+  "multi_start": [
+    {
+      "SSE": 0.6865805650143582,
+      "label": "perturb_017",
+      "nfev": 22
+    },
+    {
+      "SSE": 1.0762190572563906,
+      "label": "perturb_001",
+      "nfev": 13
+    },
+    {
+      "SSE": 1.1123348526376473,
+      "label": "perturb_003",
+      "nfev": 18
+    },
+    {
+      "SSE": 1.6653620996445015,
+      "label": "perturb_019",
+      "nfev": 10
+    }
+  ],
+  "native_history_refit": {
+    "parent_parameters": {
+      "blunting_length_m": 1.7353324956183803e-05,
+      "cleavage_backstress_fraction": 1.5681874331284933,
+      "emission_G0_298_eV": 0.7392106055606263,
+      "forward_slip_blunting_coefficient": 591.1111710249604,
+      "initial_mobile_count": 4741.455970969419,
+      "initial_retained_count": 1.6474723375453433e-11,
+      "opening_amplitude_over_kBT": 32.038570733521986,
+      "opening_exponent": 0.08872089681533074,
+      "opening_floor_over_kBT": 12.81800803283095,
+      "opening_sigma_b_Pa": 65182576.56221928,
+      "opening_smoothing_ratio": 0.0001,
+      "plastic_sigc_298_Pa": 3522536345.540295,
+      "retained_recovery_per_s": 5.61292721265342,
+      "source_slip_blunting_coefficient": 482.48785394840144,
+      "transport_G0_298_eV": 0.38542829060400086
+    },
+    "predictions": [
+      {
+        "DeltaK_MPa_sqrt_m": 18.0,
+        "R": 0.1,
+        "frozen_native_state_prediction_m_per_cycle": 1.5791010250068358e-08,
+        "observed_rate_m_per_cycle": 2.682579659061399e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 24.0,
+        "R": 0.1,
+        "frozen_native_state_prediction_m_per_cycle": 4.898994924686746e-08,
+        "observed_rate_m_per_cycle": 9.967971693672216e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 32.0,
+        "R": 0.1,
+        "frozen_native_state_prediction_m_per_cycle": 5.960670955113034e-08,
+        "observed_rate_m_per_cycle": 2.896917256052108e-07
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 40.0,
+        "R": 0.1,
+        "frozen_native_state_prediction_m_per_cycle": 1.1111681070008337e-07,
+        "observed_rate_m_per_cycle": 5.815170386892942e-07
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 17.0,
+        "R": 0.3,
+        "frozen_native_state_prediction_m_per_cycle": 2.721182928384439e-08,
+        "observed_rate_m_per_cycle": 3.190359297420563e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 23.0,
+        "R": 0.3,
+        "frozen_native_state_prediction_m_per_cycle": 5.1726563164924e-08,
+        "observed_rate_m_per_cycle": 9.789369629620402e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 30.0,
+        "R": 0.3,
+        "frozen_native_state_prediction_m_per_cycle": 1.0012259786178483e-07,
+        "observed_rate_m_per_cycle": 2.251511235841787e-07
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 36.0,
+        "R": 0.3,
+        "frozen_native_state_prediction_m_per_cycle": 1.5751236591894339e-07,
+        "observed_rate_m_per_cycle": 3.907206052147976e-07
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 15.5,
+        "R": 0.5,
+        "frozen_native_state_prediction_m_per_cycle": 3.189197797503176e-08,
+        "observed_rate_m_per_cycle": 2.4555559241234808e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 19.0,
+        "R": 0.5,
+        "frozen_native_state_prediction_m_per_cycle": 6.967996991922009e-08,
+        "observed_rate_m_per_cycle": 5.158229522419929e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 23.0,
+        "R": 0.5,
+        "frozen_native_state_prediction_m_per_cycle": 1.1733287840344263e-07,
+        "observed_rate_m_per_cycle": 1.1052810173354875e-07
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 27.0,
+        "R": 0.5,
+        "frozen_native_state_prediction_m_per_cycle": 1.681684689026258e-07,
+        "observed_rate_m_per_cycle": 1.8600034089345484e-07
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 12.0,
+        "R": 0.7,
+        "frozen_native_state_prediction_m_per_cycle": 5.3065853727850485e-08,
+        "observed_rate_m_per_cycle": 1.3183100898700865e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 14.0,
+        "R": 0.7,
+        "frozen_native_state_prediction_m_per_cycle": 8.814320144457342e-08,
+        "observed_rate_m_per_cycle": 1.9999559190176107e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 16.0,
+        "R": 0.7,
+        "frozen_native_state_prediction_m_per_cycle": 1.3296821481215235e-07,
+        "observed_rate_m_per_cycle": 3.014528843033079e-08
+      },
+      {
+        "DeltaK_MPa_sqrt_m": 18.0,
+        "R": 0.7,
+        "frozen_native_state_prediction_m_per_cycle": 3.476806971368293e-07,
+        "observed_rate_m_per_cycle": 4.2100995298063135e-08
+      }
+    ],
+    "rmse_log10": 0.4721421234910906,
+    "scope": "frozen developed native stress histories; requires fresh native validation",
+    "source_matrix": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/native_signed_bulk_matrix_corrected_transfer_20261028"
+  },
+  "no_bulk_metrics": {
+    "blocks": {
+      "0.1": {
+        "bias_log10_rate": -0.5456688534036153,
+        "forward_slip_final": 1.7330400574971268,
+        "observed_slope": 3.7092045452619558,
+        "predicted_slope": 3.6360591509235736,
+        "radius_range_m": [
+          1e-06,
+          1.4676241598707403e-06
+        ],
+        "rmse_log10_rate": 0.5536561567917324,
+        "source_slip_final": 13.0054956001005
+      },
+      "0.3": {
+        "bias_log10_rate": -0.2192827051594758,
+        "forward_slip_final": 3.576207442468305,
+        "observed_slope": 3.3783824529342126,
+        "predicted_slope": 3.3611716616828686,
+        "radius_range_m": [
+          1e-06,
+          1.7307404724127717e-06
+        ],
+        "rmse_log10_rate": 0.23429947116557995,
+        "source_slip_final": 21.391663169205767
+      },
+      "0.5": {
+        "bias_log10_rate": 0.12484268944850573,
+        "forward_slip_final": 7.804822166497176,
+        "observed_slope": 3.7618960539977753,
+        "predicted_slope": 3.356845626545956,
+        "radius_range_m": [
+          1e-06,
+          2.1483711089456744e-06
+        ],
+        "rmse_log10_rate": 0.18580301852966027,
+        "source_slip_final": 31.202962539241664
+      },
+      "0.7": {
+        "bias_log10_rate": 0.639628515475199,
+        "forward_slip_final": 21.6881915145322,
+        "observed_slope": 2.9204577070033,
+        "predicted_slope": 3.2974577016093147,
+        "radius_range_m": [
+          1e-06,
+          3.4749794669227336e-06
+        ],
+        "rmse_log10_rate": 0.6584903135601242,
+        "source_slip_final": 54.20181460754707
+      }
+    },
+    "maximum_backstress_Pa": 672568320.0131705,
+    "maximum_population_density_m-2": 383061251677853.75,
+    "maximum_radius_m": 3.4749794669227336e-06,
+    "overall_bias_log10_rate": -0.11048159117151712,
+    "overall_rmse_log10_rate": 0.4395672844578934
+  },
+  "opening_profiles": [
+    {
+      "label": "fixed_shape_control",
+      "opening_profile_SSE": 1.79899958537677
+    },
+    {
+      "label": "native_unit_blunting",
+      "opening_profile_SSE": 1.9084271136468955
+    },
+    {
+      "label": "source_owned",
+      "opening_profile_SSE": 1.9083502437641646
+    },
+    {
+      "label": "forward_plastic",
+      "opening_profile_SSE": 1.9457040722089176
+    },
+    {
+      "label": "mixed_blunting",
+      "opening_profile_SSE": 1.890644663972245
+    },
+    {
+      "label": "slow_transport",
+      "opening_profile_SSE": 1.9089246907584037
+    },
+    {
+      "label": "perturb_000",
+      "opening_profile_SSE": 1.8653081178510282
+    },
+    {
+      "label": "perturb_001",
+      "opening_profile_SSE": 1.2752973785645347
+    },
+    {
+      "label": "perturb_002",
+      "opening_profile_SSE": 1.7796059288000436
+    },
+    {
+      "label": "perturb_003",
+      "opening_profile_SSE": 1.7225247537771238
+    },
+    {
+      "label": "perturb_004",
+      "opening_profile_SSE": 1.8739387399139775
+    },
+    {
+      "label": "perturb_005",
+      "opening_profile_SSE": 1.7477171302137848
+    },
+    {
+      "label": "perturb_006",
+      "opening_profile_SSE": 134.8404175369183
+    },
+    {
+      "label": "perturb_007",
+      "opening_profile_SSE": 1.85875643770361
+    },
+    {
+      "label": "perturb_008",
+      "opening_profile_SSE": 3.9739867096057537
+    },
+    {
+      "label": "perturb_009",
+      "opening_profile_SSE": 1.9335154373000258
+    },
+    {
+      "label": "perturb_010",
+      "opening_profile_SSE": 1.78236769461556
+    },
+    {
+      "label": "perturb_011",
+      "opening_profile_SSE": 1.7333704917517923
+    },
+    {
+      "label": "perturb_012",
+      "opening_profile_SSE": 1.9813895445502272
+    },
+    {
+      "label": "perturb_013",
+      "opening_profile_SSE": 6.5683172519111785
+    },
+    {
+      "label": "perturb_014",
+      "opening_profile_SSE": 2.458428993130338
+    },
+    {
+      "label": "perturb_015",
+      "opening_profile_SSE": 6.93532559101121
+    },
+    {
+      "label": "perturb_016",
+      "opening_profile_SSE": 1.8923355761648948
+    },
+    {
+      "label": "perturb_017",
+      "opening_profile_SSE": 0.8862302968772731
+    },
+    {
+      "label": "perturb_018",
+      "opening_profile_SSE": 1.7802483152686754
+    },
+    {
+      "label": "perturb_019",
+      "opening_profile_SSE": 1.6864261950322303
+    }
+  ],
+  "parameters": {
+    "blunting_length_m": 1.7353324956183803e-05,
+    "cleavage_backstress_fraction": 1.5681874331284933,
+    "emission_G0_298_eV": 0.7392106055606263,
+    "forward_slip_blunting_coefficient": 591.1111710249604,
+    "initial_mobile_count": 4741.455970969419,
+    "initial_retained_count": 1.6474723375453433e-11,
+    "opening_amplitude_over_kBT": 69.99999999969688,
+    "opening_exponent": 0.4999999999974239,
+    "opening_floor_over_kBT": 17.083923690100974,
+    "opening_sigma_b_Pa": 271849296.9547652,
+    "opening_smoothing_ratio": 0.0001,
+    "plastic_sigc_298_Pa": 3522536345.540295,
+    "retained_recovery_per_s": 5.61292721265342,
+    "source_slip_blunting_coefficient": 482.48785394840144,
+    "transport_G0_298_eV": 0.38542829060400086
+  },
+  "parameters_vector": [
+    17.083923690100974,
+    69.99999999969688,
+    -1.302507421544866,
+    -0.6931471805650975,
+    1.5681874331284933,
+    0.7392106055606263,
+    1.259181282846848,
+    0.38542829060400086,
+    1.7250723682389641,
+    8.464310417837643,
+    1.6474723375317724e-11,
+    6.178955747298256,
+    6.382004106357481,
+    2.8537841281581127
+  ],
+  "schema": "qste340tm-signed-bulk-1d-joint-refit/1",
+  "selected_start": "perturb_017",
+  "signed_bulk_metrics": {
+    "blocks": {
+      "0.1": {
+        "bias_log10_rate": -0.3579697824601363,
+        "forward_slip_final": 0.0024609374370367734,
+        "observed_slope": 3.7092045452619558,
+        "predicted_slope": 3.572895450915434,
+        "radius_range_m": [
+          1e-06,
+          2.861842104596271e-06
+        ],
+        "rmse_log10_rate": 0.3602954067513296,
+        "source_slip_final": 15.476149353361885
+      },
+      "0.3": {
+        "bias_log10_rate": -0.15794779042252527,
+        "forward_slip_final": 0.0029820595124707733,
+        "observed_slope": 3.3783824529342126,
+        "predicted_slope": 3.386289662595489,
+        "radius_range_m": [
+          1e-06,
+          3.771846345932618e-06
+        ],
+        "rmse_log10_rate": 0.16016347198323758,
+        "source_slip_final": 21.826218254034394
+      },
+      "0.5": {
+        "bias_log10_rate": 0.057726869809644886,
+        "forward_slip_final": 0.004494557125226491,
+        "observed_slope": 3.7618960539977753,
+        "predicted_slope": 3.837146077753578,
+        "radius_range_m": [
+          1e-06,
+          5.8591168955913835e-06
+        ],
+        "rmse_log10_rate": 0.08405822521350297,
+        "source_slip_final": 33.6753245823606
+      },
+      "0.7": {
+        "bias_log10_rate": 0.4579190020325872,
+        "forward_slip_final": 0.010800131031720894,
+        "observed_slope": 2.9204577070033,
+        "predicted_slope": 3.162794110584854,
+        "radius_range_m": [
+          1e-06,
+          1.0213180301586993e-05
+        ],
+        "rmse_log10_rate": 0.4723854264201607,
+        "source_slip_final": 70.33529110993989
+      }
+    },
+    "maximum_backstress_Pa": 2366236538.12109,
+    "maximum_population_density_m-2": 4741455970969435.0,
+    "maximum_radius_m": 1.0213180301586993e-05,
+    "overall_bias_log10_rate": -0.07582849890423934,
+    "overall_rmse_log10_rate": 0.29523348393431903
+  },
+  "signed_bulk_owner": {
+    "R_specific_parameters": false,
+    "birth": "exact increment of existing gross forward-passage ledger",
+    "blunting": "existing source_slip_blunting_coefficient only",
+    "face_signs": "equal-and-opposite Mode-I lower/upper face moments",
+    "free_bulk_efficacy_parameter": false,
+    "sweep": "1-exp(-da/process_zone_length)",
+    "tip_projection": "positive lower plus negative upper outward-opening content"
+  },
+  "source_fit": "/Volumes/Data/Data/Nanopillar_calculation/PF-fracture-fatigue_worktrees/r10-cohesive-arrhenius-joint-sweep/literature_data/fatigue_recovered_review/model_conditional/emission_owned_blunting/resolved_increment_1d/released_sloping_barrier_search/fit.json",
+  "source_fit_parameters": {
+    "blunting_length_m": 5.5576743532943505e-06,
+    "cleavage_backstress_fraction": 1.6394752840428962e-34,
+    "emission_G0_298_eV": 0.8991514012082426,
+    "forward_slip_blunting_coefficient": 163.04402133488398,
+    "initial_mobile_count": 382.3880633719838,
+    "initial_retained_count": 0.6731883058699863,
+    "opening_amplitude_over_kBT": 13.026743804241374,
+    "opening_exponent": 1.0,
+    "opening_floor_over_kBT": 6.000000000000063,
+    "opening_sigma_b_Pa": 95502740877.45879,
+    "opening_smoothing_ratio": 0.0001,
+    "plastic_sigc_298_Pa": 1789447080.3218987,
+    "retained_recovery_per_s": 0.3815551213160423,
+    "source_slip_blunting_coefficient": 101.45128024180238,
+    "transport_G0_298_eV": 0.8162129355055648
+  },
+  "status": "executed_paired_four_R_refit",
+  "support_points": 64,
+  "total_points": 760
+}
