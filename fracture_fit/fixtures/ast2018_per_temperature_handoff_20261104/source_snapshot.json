@@ -1,0 +1,163 @@
+{
+  "source_branch": "codex/v9.14-v7-paris-physics-informed-continuation",
+  "source_head": "30964f2c8ab866d31d34a78d29d8987751977a72",
+  "copied_source_files": [
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/bulk_flow_fit.py",
+      "sha256": "909e3b80cfcbef79378bfa254b4aedc8579f9bbb006edb17052d543229031201"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/cantilever_loading.py",
+      "sha256": "2d425dd80837784b04e7be5a8f8b0a951790479221944bc710bd1058376687f8"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/config.py",
+      "sha256": "9fff4d3c49a0c6aa1ecd262014f610566a5ea226f567768a36d63cd4a9c8c3ae"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/conservative_transport.py",
+      "sha256": "f2f5916dd9817f78d3d2064bb824d743a1dad5b3ee8258a2626e9de95b4c58fb"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/data.py",
+      "sha256": "847f4268a359ac304948d0c76d06cb78aeee2da51dfe5fbd59d3e4cdadbf14fb"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/family_fit_v8.py",
+      "sha256": "4468b2dd073d8bd86a511809f8511cc7b66dd598a81478ec68d5f8b9d42b27bc"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/implicit_source.py",
+      "sha256": "92e357b0767764e1c3e180723e2c784b62c113971cda08e3cc847b1dfc790659"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/line_profile.py",
+      "sha256": "d23355003963ba575c91169083a7bc825b902d63ac0f565c68bb2561b98e67e1"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/mechanics.py",
+      "sha256": "e4e6df579bbc9d263e863ef6e34ddd07f269056e5d86ee9b035af59d057137ef"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/multi_temperature_bending_fit.py",
+      "sha256": "e99a00468ce9df9f180f314957bbecac073e2c23f4a70fa66d7d3a5c3196fe7a"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/native.py",
+      "sha256": "726cc38e45bd609862ca790fc801134d687832b7dec433130cf34ed6a615cbbe"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/objective.py",
+      "sha256": "247e8bd544acb8722b4bed9b450645731a473c96c66a3d5fef83c857fe6d4bdd"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/opening_surface.py",
+      "sha256": "a7d03072eb3a754f2c1f3ecc823f795cd8b26f4ec1e8b5626399c41627f13e98"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/parameterization.py",
+      "sha256": "88784242b81c43bd0c5f3e75f4d6b933474c8c4b177703d64a342de651957e4b"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/path_policy.py",
+      "sha256": "85c0474f8e2c2904d9b968124ce6f682761bfac216be499dbc047b8d47203f6a"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/per_temperature_joint_fit.py",
+      "sha256": "e6ac36e4b6ef533ae2c45213fb8ca4a805a102ee0e74057f4ac57acaa6dd5385"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/plot_per_temperature_joint_fit.py",
+      "sha256": "7250296e56490f3cd2ccf18865d4e3e124e224e00f1926e6bafb5550ab48a66e"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/primary_fit_v5.py",
+      "sha256": "c348e499e91cb36725b86d8b261650ca6773b2a2af86532d625597b983f79333"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/reduced.py",
+      "sha256": "87e173614b9c00342a4e5ff0eb18d81088a5a1c73e3eb385248f33fbef635bb6"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/refine_multi_temperature_bending.py",
+      "sha256": "bb9c573de746fea2df963a6ac4208cb7d76dafdd8e62931b821d2913e4f49c15"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/section_plasticity.py",
+      "sha256": "88f0003879ff2d1d69d6cf25295225a3e1dac35770e86818e6d0b80bf7335a3c"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/section_plasticity_replay.py",
+      "sha256": "96715095342779a1d0f4ba90abc1cf61596d118c11c2aba9e8ca6ab544e9e12d"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/shared_material_v10.py",
+      "sha256": "1acae09a361b4c1dc59ec0378237f19b1a05a64c0317de5781a5a329c11166a7"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/shared_material_v9.py",
+      "sha256": "d98586f2a5ce474b65b8db84f86c3b041496aecd914250b7746fff0b34b4544a"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/single_condition.py",
+      "sha256": "74874abdd4159f2a9b7571f8296b7db56efe913312bf1cbe24a4c88f9e478843"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/single_condition_ledger.py",
+      "sha256": "5f36e9bf20b4725f4acf9d338c063d12aa0f74dfdd259c943b6a753b1f179024"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/single_condition_search.py",
+      "sha256": "68df9a9946b1405cc04a81bba7c37cecc41d782fdccc00091d511772f7b8d0bb"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/single_temp_bending_fit.py",
+      "sha256": "55f28e3285af5609b3aa1bca4b4db2096a0c166dad735d8f0ce6435c76372a31"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/spatial.py",
+      "sha256": "c045de0290e1f0ab31742a8d14a41c4f9cd576d99cac97930685a2c49f831201"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/surfaces.py",
+      "sha256": "36ca53f346bcdd5a10dd43c0a7093381818fc7d195bd62cb0ceff66bbb57ea9b"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/thermal_floor_v10.py",
+      "sha256": "af397c6de399162a53cbfcb5380f0d1db6ddaae9ed3fb80107e95b0749e28e85"
+    },
+    {
+      "path": "fracture_fit/experimental_fits/ast2018/__init__.py",
+      "sha256": "5bc226c7158af082f5cc912098c34c11555bf0ffd13cc2ceae9b78a34269e308"
+    },
+    {
+      "path": "fracture_fit/tests/test_ast2018_per_temperature_joint_fit.py",
+      "sha256": "54dc7030a9e34ffe250e86c6aa5aa83a2d3505a106c3985a9b933b9bba51b40b"
+    },
+    {
+      "path": "fracture_fit/tests/test_ast2018_signed_pileup.py",
+      "sha256": "9492173d7c3ea8070e5c23113024884cd8032f622136793f4703711c2ccea239"
+    },
+    {
+      "path": "fracture_fit/tests/test_ast2018_section_plasticity.py",
+      "sha256": "b4bd1b20145cffadb2d2533c512e9f028c4bd270eaa7e20a1e580a6115882baa"
+    },
+    {
+      "path": "fracture_fit/tests/test_ast2018_source_bound_roundoff.py",
+      "sha256": "8c7751bb176118b464f40a5e082bb013fa8a9447ca41c71b390f2fea04d6c7bf"
+    },
+    {
+      "path": "fracture_fit/tests/test_ast2018_implicit_source.py",
+      "sha256": "d9edb83145dff8143900fbc14564b0c71fd2e3602196549c832cd2538baf72df"
+    }
+  ],
+  "physics_changes_during_publication": false,
+  "publication_validation": {
+    "date": "2026-11-05",
+    "focused_tests": "36 passed in 37.40 s; native-dependent tests enabled",
+    "four_temperature_initialization": "passed; no optimizer called",
+    "input_preparation": "passed; second run creates zero files; differing existing input is rejected without overwrite",
+    "scientific_source_copy_equality": "all copied source/test files exactly match original working copy",
+    "native_commit": "ce2bf9d4e868468b6979f0fc8398de95ce983367"
+  }
+}

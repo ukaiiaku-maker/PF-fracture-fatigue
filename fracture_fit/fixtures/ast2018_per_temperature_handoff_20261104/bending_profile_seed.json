@@ -1,0 +1,63 @@
+{
+  "status": "supported_candidate_with_residual",
+  "submissions": 7,
+  "elapsed_s": 253.38478829100495,
+  "best_floor_G_294_eV": 0.447,
+  "best_opening_sigc_294_GPa": 1.6,
+  "fixed_opening_G0_294_eV": 4.55,
+  "fixed_emission_G0_294_eV": 1.236,
+  "fixed_peierls_H0_eV": 0.8795,
+  "best_search_row": {
+    "index": 4,
+    "stage": "floor_at_selected_stress",
+    "floor_G_294_eV": 0.447,
+    "opening_sigc_294_GPa": 1.6,
+    "supported_points": 10,
+    "total_points": 10,
+    "maximum_supported_extension_um": 0.48000000000000004,
+    "support_shortfall_um": 0.0,
+    "weighted_rms_N_per_m": 54.50796626456848,
+    "level_N_per_m": -42.83193126939685,
+    "shape_rms_N_per_m": 33.712668984122274,
+    "objective": 3.204552401011854,
+    "status": "complete",
+    "numerical_failure": null,
+    "events": 24,
+    "final_J_N_per_m": 449.09999571564504,
+    "runtime_s": 29.614620333974017
+  },
+  "confirmations": {
+    "0.05": {
+      "supported_points": 10,
+      "total_points": 10,
+      "maximum_supported_extension_um": 0.48000000000000004,
+      "support_shortfall_um": 0.0,
+      "weighted_rms_N_per_m": 54.50029428780253,
+      "level_N_per_m": -42.822431058602305,
+      "shape_rms_N_per_m": 33.712334177394695,
+      "objective": 3.2042173588668326,
+      "status": "complete",
+      "events": 24,
+      "runtime_s": 22.647933250002097,
+      "numerical_failure": null
+    },
+    "0.025": {
+      "supported_points": 10,
+      "total_points": 10,
+      "maximum_supported_extension_um": 0.48000000000000004,
+      "support_shortfall_um": 0.0,
+      "weighted_rms_N_per_m": 54.503137865642714,
+      "level_N_per_m": -42.82908934939691,
+      "shape_rms_N_per_m": 33.70847286221423,
+      "objective": 3.2042367187459364,
+      "status": "complete",
+      "events": 24,
+      "runtime_s": 24.789316209004028,
+      "numerical_failure": null
+    }
+  },
+  "outcomes": {
+    "model_limit_nominal_K_window": 1,
+    "complete": 6
+  }
+}

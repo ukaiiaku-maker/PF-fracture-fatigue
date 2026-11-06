@@ -1,0 +1,91 @@
+{
+  "native_pin": "ce2bf9d4e868468b6979f0fc8398de95ce983367",
+  "inputs": [
+    {
+      "fixture": "extension_stop_seed.json",
+      "destination": "runs/ast2018_21c_rate0p5_extension_stop_v2/fit_summary.json",
+      "sha256": "bbd88a86192f0b47c931d29d244a5e7c6c2d97b78585219004a034881c215c01"
+    },
+    {
+      "fixture": "v12_seed_coordinates.json",
+      "destination": "runs/ast2018_shared_floor_v12_enthalpy_checked/selected_conditional_material.json",
+      "sha256": "c640a3d1a146e6a4ac0f1d3db255ffbb9dbb8a50a0245e63e61cce3223fde81b"
+    },
+    {
+      "fixture": "bending_profile_seed.json",
+      "destination": "runs/ast2018_21c_rate0p5_bending_fit_v1/stress_profile/profile_summary.json",
+      "sha256": "926c9462e9bd00885b36a3cf01c1ad3d83d21b93047358c32adb67ce6c78dbeb"
+    },
+    {
+      "fixture": "bending_seed_material.json",
+      "destination": "runs/ast2018_21c_rate0p5_bending_fit_v1/stress_profile/best_material.json",
+      "sha256": "8e9242fe81317e455dea7e2aa238a1e47777718771ce5a1f508178ac7f5d1675"
+    },
+    {
+      "fixture": "section_seed_material.json",
+      "destination": "runs/ast2018_multi_temperature_bending_v1/selected_material.json",
+      "sha256": "10632aff5f0ff251b12b21f8faf757561eb37197612a08545ac3b12e27c099de"
+    },
+    {
+      "fixture": "nominal_opening_shape.json",
+      "destination": "runs/ast2018_cantilever_elastic_2d/nominal_opening_shape.json",
+      "sha256": "e2489de01a9d16e52974dc3fc79e4bc208dd9bfc69491b8b7ac7e2c742a6c9a9"
+    },
+    {
+      "fixture": "archived_seed_rows_0.jsonl",
+      "destination": "runs/ast2018_shape_fit_v5/restart_all8/full_final_256/full_candidates.jsonl",
+      "sha256": "d5e18f7c3ceddeaa72935180722ea39d9d06729740e1973741a81f56f69754b2",
+      "scope": "only immutable selected seed rows, not the historical evaluation log"
+    },
+    {
+      "fixture": "archived_seed_rows_1.jsonl",
+      "destination": "runs/ast2018_shape_fit_v5/independent_floor_focused_restart/restart_candidates.jsonl",
+      "sha256": "5ceb50f26ffc7466ff7e2debfa7d690d400ff03c2021477a9f8f9b96ed350a75",
+      "scope": "only immutable selected seed rows, not the historical evaluation log"
+    },
+    {
+      "fixture": "bulk_flow_seeds/peierls_G0_T100.json",
+      "destination": "runs/ast2018_bulk_flow_per_temperature_v1/peierls_G0_T100.json",
+      "sha256": "0b4cda57d64469056787876c6f12787e18a30f775f3dae50278ccf760b299a72"
+    },
+    {
+      "fixture": "bulk_flow_seeds/peierls_G0_T21.json",
+      "destination": "runs/ast2018_bulk_flow_per_temperature_v1/peierls_G0_T21.json",
+      "sha256": "ece60069a9310266f9f01d17e44863658219949a9a555439c82ca2b545ab0879"
+    },
+    {
+      "fixture": "bulk_flow_seeds/peierls_G0_T250.json",
+      "destination": "runs/ast2018_bulk_flow_per_temperature_v1/peierls_G0_T250.json",
+      "sha256": "47288deab214f79e339654509ba886c2aa87bf20cb9b8be26101a1e0b3479656"
+    },
+    {
+      "fixture": "v4_starts/T21.jsonl",
+      "destination": "runs/ast2018_per_temperature_joint_v4/model_A/T21_evaluations.jsonl",
+      "sha256": "b698bb7d3e66e9fef6625a5c96c41e206299d27a7e203877e9ed0b5fd05beac0",
+      "scope": "top three valid prior starts only, not the historical evaluation log"
+    },
+    {
+      "fixture": "v4_starts/T100.jsonl",
+      "destination": "runs/ast2018_per_temperature_joint_v4/model_A/T100_evaluations.jsonl",
+      "sha256": "9ab84decfbbd7a84d9f7cb2f5ea97f9c864cbd72fcc212b4bfdcdae101312bd4",
+      "scope": "top three valid prior starts only, not the historical evaluation log"
+    },
+    {
+      "fixture": "v4_starts/T250.jsonl",
+      "destination": "runs/ast2018_per_temperature_joint_v4/model_A/T250_evaluations.jsonl",
+      "sha256": "e0d49d962f0245d7e1f30296d2c4e6ba0f07fb27cf125477bf3f7833879e9d86",
+      "scope": "top three valid prior starts only, not the historical evaluation log"
+    },
+    {
+      "fixture": "v4_starts/T500.jsonl",
+      "destination": "runs/ast2018_per_temperature_joint_v4/model_A/T500_evaluations.jsonl",
+      "sha256": "c3955792d9f8cba5f07e8f6cf66030f3ff8e8a9e8caed4cb76844eb17f625a54",
+      "scope": "top three valid prior starts only, not the historical evaluation log"
+    }
+  ],
+  "experimental_archive": {
+    "path": "Ast2018_tungsten_joint_fit_data.zip",
+    "sha256": "b0f8502165cf19d917d62dd2f4bbb18d2faf77c43bbe1f312d835de24dd1b237",
+    "provenance": "original supplied experimental extraction; already tracked in snapshot base"
+  }
+}

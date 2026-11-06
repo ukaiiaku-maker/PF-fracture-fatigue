@@ -1,0 +1,226 @@
+{
+  "decision": "A: conditional curve fit obtained and confirmed in 1-D",
+  "protocol": "measured_extension_stop_v2",
+  "winner_isothermal": [
+    4.3582858338409505,
+    1653261341.9323406,
+    2.7104143136241676,
+    2347978468.7400994,
+    0.8344988772426564,
+    1.4038469456939304,
+    0.4475922947003218
+  ],
+  "winner_completion": {
+    "opening_gT": 0.0011781567081509715,
+    "opening_sT": 4399175.167258,
+    "floor_Sf": -3.836272607942405,
+    "emission_gT": 0.0043876499262288544,
+    "emission_sT": -4530283.5171497995,
+    "peierls_entropy": -6.947384302524668,
+    "taylor_entropy": -7.951577733240114
+  },
+  "evaluation_ids": [
+    "astv2-0002",
+    "astv2-0036",
+    "astv2-0092",
+    "astv2-0093",
+    "astv2-0094",
+    "astv2-0095",
+    "astv2-0096"
+  ],
+  "metrics": {
+    "astv2-0002": {
+      "support_nm": 1580.0000000000014,
+      "shortfall_nm": 0.0,
+      "loss": 6.265771524686089,
+      "raw_rms": 214.48739199763548,
+      "level": -206.517790906112,
+      "shape_rms": 57.924462580215206,
+      "rise_error": -309.1274518114906,
+      "window_errors": [
+        -169.38548339982887,
+        -10.598849304733335,
+        6.447132122434311,
+        -135.59025122936282
+      ],
+      "predicted_rise": 731.3135481885092
+    },
+    "astv2-0036": {
+      "support_nm": 1580.0000000000014,
+      "shortfall_nm": 0.0,
+      "loss": 4.08514626119173,
+      "raw_rms": 151.50561658216054,
+      "level": -147.36146021306615,
+      "shape_rms": 35.193066075770815,
+      "rise_error": -126.25771596098616,
+      "window_errors": [
+        -170.07204028083603,
+        25.363927916956982,
+        92.70095194183097,
+        -74.25055553893822
+      ],
+      "predicted_rise": 914.1832840390136
+    },
+    "astv2-0092": {
+      "support_nm": 1580.0000000000014,
+      "shortfall_nm": 0.0,
+      "loss": 1.1204688436281303,
+      "raw_rms": 54.241321238917905,
+      "level": -36.42762515644642,
+      "shape_rms": 40.18891706932296,
+      "rise_error": -127.329957743269,
+      "window_errors": [
+        -70.92392415354368,
+        34.65770682689333,
+        32.35131376830623,
+        -123.415054184925
+      ],
+      "predicted_rise": 913.1110422567308
+    },
+    "astv2-0093": {
+      "support_nm": 1580.0000000000014,
+      "shortfall_nm": 0.0,
+      "loss": 2.87235995097266,
+      "raw_rms": 93.77152199786639,
+      "level": 39.469422307052156,
+      "shape_rms": 85.06034940290284,
+      "rise_error": 97.58024259817194,
+      "window_errors": [
+        -79.67618714496282,
+        97.10741068229822,
+        133.4300687142295,
+        -53.2810496533931
+      ],
+      "predicted_rise": 1138.0212425981717
+    },
+    "astv2-0094": {
+      "support_nm": 1580.0000000000014,
+      "shortfall_nm": 0.0,
+      "loss": 1.1203875724830912,
+      "raw_rms": 54.27809062440027,
+      "level": -36.52973686940536,
+      "shape_rms": 40.14585216535596,
+      "rise_error": -127.40884350871352,
+      "window_errors": [
+        -70.89760097136889,
+        34.37484827521331,
+        32.44634662415183,
+        -123.33243743670982
+      ],
+      "predicted_rise": 913.0321564912863
+    },
+    "astv2-0095": {
+      "support_nm": 1580.0000000000014,
+      "shortfall_nm": 0.0,
+      "loss": 1.12029792905284,
+      "raw_rms": 54.294699782794396,
+      "level": -36.57955216345785,
+      "shape_rms": 40.12294590411627,
+      "rise_error": -127.44049030309134,
+      "window_errors": [
+        -70.88415530605857,
+        34.231354528774034,
+        32.49943251669606,
+        -123.28712204250292
+      ],
+      "predicted_rise": 913.0005096969085
+    },
+    "astv2-0096": {
+      "support_nm": 1580.0000000000014,
+      "shortfall_nm": 0.0,
+      "loss": 3.2033984431481284,
+      "raw_rms": 102.54692895986403,
+      "level": 46.23796313407637,
+      "shape_rms": 91.53099695901489,
+      "rise_error": 116.23830401419286,
+      "window_errors": [
+        -82.37073583449225,
+        105.67934013067907,
+        141.10037673523584,
+        -48.17067701722999
+      ],
+      "predicted_rise": 1156.6793040141927
+    }
+  },
+  "predicted_endpoints": {
+    "astv2-0002": {
+      "u_um": 2.4609397888183504,
+      "t_s": 52.500048828125394,
+      "J_el_N_per_m": 94.9890402753923,
+      "J_pl_N_per_m": 648.6477614181092
+    },
+    "astv2-0036": {
+      "u_um": 2.4609397888183504,
+      "t_s": 52.500048828125394,
+      "J_el_N_per_m": 180.13248456362484,
+      "J_pl_N_per_m": 746.5343690719585
+    },
+    "astv2-0092": {
+      "u_um": 2.7142398834228474,
+      "t_s": 57.90378417968794,
+      "J_el_N_per_m": 139.09647538900504,
+      "J_pl_N_per_m": 830.1216631937134
+    },
+    "astv2-0093": {
+      "u_um": 2.7142398834228474,
+      "t_s": 57.90378417968794,
+      "J_el_N_per_m": 257.9673161949612,
+      "J_pl_N_per_m": 936.3410129887255
+    },
+    "astv2-0094": {
+      "u_um": 2.7141969680786455,
+      "t_s": 57.90286865234263,
+      "J_el_N_per_m": 139.16195094364065,
+      "J_pl_N_per_m": 829.9793381286747
+    },
+    "astv2-0095": {
+      "u_um": 2.7141763687132885,
+      "t_s": 57.9024291992167,
+      "J_el_N_per_m": 139.1997314453263,
+      "J_pl_N_per_m": 829.9104531678529
+    },
+    "astv2-0096": {
+      "u_um": 2.7141969680786455,
+      "t_s": 57.90286865234263,
+      "J_el_N_per_m": 268.3306342472835,
+      "J_pl_N_per_m": 944.6502510500038
+    }
+  },
+  "ledger": {
+    "submitted_reduced": 93,
+    "submitted_spatial": 3,
+    "completed": 96,
+    "unresolved_ids": [],
+    "first_submission_unix_s": 1792977717.045249,
+    "wall_limit_s": 900,
+    "limits": {
+      "reduced": 128,
+      "spatial": 3
+    }
+  },
+  "status_counts": {
+    "complete": 57,
+    "model_limit_nominal_K_window": 39
+  },
+  "earlier_prefix_check": {
+    "old_rows": 383,
+    "new_rows": 363,
+    "common_rows": 363,
+    "max_absolute_prefix_error": {
+      "u_m": 0.0,
+      "da_m": 0.0,
+      "force_N": 0.0,
+      "J_continuous_N_per_m": 0.0
+    },
+    "common_prefix_unchanged_at_1e-9_absolute": true
+  },
+  "spatial_shield_max_MPa_sqrt_m": 5.5618556282718136e-24,
+  "limitations": [
+    "nominal geometry and A2-derived C0; F3c raw specimen history unavailable",
+    "initial elastic rate maps to assumed 46.875 nm/s displacement ramp",
+    "fixed branch thermal completions, one temperature and deterministic threshold",
+    "20 nm full-front event and scalar work projection unvalidated",
+    "1-D step refinement passes but raw RMS is near its 104.0441 N/m threshold",
+    "negligible realized shielding does not validate 0-D shielding omission"
+  ]
+}
