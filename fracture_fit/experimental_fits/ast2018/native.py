@@ -10,6 +10,8 @@ import sys
 from dataclasses import replace
 from pathlib import Path
 
+from .implicit_source import solve_backstress_limited_activations
+
 PIN = "ce2bf9d4e868468b6979f0fc8398de95ce983367"
 REPOSITORY = "https://github.com/ukaiiaku-maker/Arrhenius_FEM_CZM_MPZ.git"
 FIRST_CANDIDATE = "v912_targeted_local_peak_013476_0368"
@@ -37,8 +39,18 @@ def load_native(source: Path):
     for module in (zero,spatial,campaign,types):
         if not Path(module.__file__).resolve().is_relative_to(source):
             raise RuntimeError(f"native import escaped selected checkout: {module.__file__}")
+    state = importlib.import_module("arrhenius_fracture.emergent_gnd_state_v913")
+    if not Path(state.__file__).resolve().is_relative_to(source):
+        raise RuntimeError(f"native state import escaped selected checkout: {state.__file__}")
+    # Both fidelities call the same backward-Euler emission equation.  Replace
+    # only its absolute root stopping scale; keep the pinned source immutable.
+    zero.solve_backstress_limited_activations = solve_backstress_limited_activations
+    state.solve_backstress_limited_activations = solve_backstress_limited_activations
     return (zero,spatial,campaign,types),{"repository":REPOSITORY,"commit":head,
-                                          "source":str(source),"sha256":receipt}
+                                          "source":str(source),"sha256":receipt,
+                                          "implicit_source_sha256":hashlib.sha256(
+                                              (Path(__file__).parent/"implicit_source.py")
+                                              .read_bytes()).hexdigest()}
 
 
 def historical_start(source: Path, campaign, physics_type):
