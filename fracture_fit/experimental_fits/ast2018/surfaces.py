@@ -4,6 +4,7 @@ from __future__ import annotations
 from math import exp
 
 from .native import PIN
+from .opening_surface import IndependentFloorSurface
 
 EV_TO_J=1.602176634e-19
 KB_J_PER_K=1.380649e-23
@@ -13,6 +14,15 @@ KB_EV_PER_K=KB_J_PER_K/EV_TO_J
 def surface_diagnostics(surface,stress_Pa:float,T_K:float,nu0_s:float)->dict:
     if stress_Pa<0 or T_K<=0 or nu0_s<=0:
         raise ValueError("physical stress, temperature and attempt frequency required")
+    if isinstance(surface,IndependentFloorSurface):
+        d=surface.derivatives(stress_Pa,T_K)
+        exponent=max(-700.0,min(0.0,-d["G_eV"]/(KB_EV_PER_K*T_K)))
+        return {"source_commit":PIN,"stress_Pa":stress_Pa,"temperature_K":T_K,
+                **d,"V_m3":d["V_eV_per_Pa"]*EV_TO_J,
+                "elementary_rate_s":nu0_s*exp(exponent),
+                "A_lower_clip":False,"c_lower_clip":False,
+                "outer_zero_clip":False,"exponent_clip":exponent==-700.0,
+                "V_zero_stress_singularity":stress_Pa==0 and surface.n<1}
     A_raw=surface.G00_eV+surface.gT_eV_per_K*(T_K-surface.Tref_K)
     c_raw=surface.sigc0_Pa+surface.sT_Pa_per_K*(T_K-surface.Tref_K)
     A=max(A_raw,1e-12);dA=surface.gT_eV_per_K if A_raw>1e-12 else 0.0

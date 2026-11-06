@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, replace
 from math import sqrt
 
+from .cantilever_loading import BendingOpeningShape
 from .mechanics import Specimen
 
 
@@ -28,6 +29,8 @@ class AstAssumptions:
     A2_reference_speed_m_per_s: float = 150e-9
     A2_reference_Kdot_MPa_sqrt_m_per_s: float = 1.6
     A2_reference_E_Pa: float = 411e9  # Table 1 at 21 C; A2 exact T unreported
+    loading_mode: str = "published_mode_i"
+    bending_opening_shape_path: str | None = None
 
     def __post_init__(self):
         if not (self.B_m>0 and self.W_m>self.a0_m>0 and self.L_m>0):
@@ -38,8 +41,19 @@ class AstAssumptions:
             raise ValueError("event length must resolve the 0.2 um onset")
         if self.nominal_K_step_MPa_sqrt_m<=0 or self.localization_bisections<8:
             raise ValueError("invalid numerical localization settings")
+        bending_modes = ("nominal_bending_shape",
+                         "nominal_bending_shared_temperature")
+        if self.loading_mode not in ("published_mode_i", *bending_modes):
+            raise ValueError("unknown Ast elastic loading mode")
+        if self.loading_mode in bending_modes and not self.bending_opening_shape_path:
+            raise ValueError("nominal bending mode requires an elastic field table")
+        if self.loading_mode in bending_modes and self.target_extension_m>1e-6:
+            raise ValueError("nominal bending table supports at most 1 um extension")
 
     def specimen(self, condition: dict[str,str]) -> Specimen:
+        if (self.loading_mode=="nominal_bending_shape" and
+                condition.get("condition_id")!="Tp21C_rate0p5"):
+            raise ValueError("nominal bending option is restricted to Tp21C_rate0p5")
         E = float(condition["young_modulus_GPa"])*1e9
         nu = float(condition["poisson_ratio"])
         provisional = Specimen(self.B_m,self.W_m,self.L_m,self.a0_m,E,nu,1e-4)
@@ -50,8 +64,13 @@ class AstAssumptions:
         C_total=max(C_total,5e-9*provisional.geometry_factor(self.a0_m)/Kdot)
         C_total=min(C_total,150e-9*provisional.geometry_factor(self.a0_m)/Kdot)
         C_specimen = C_total-self.instrument_compliance_m_per_N
+        field=(BendingOpeningShape.from_file(self.bending_opening_shape_path)
+               if self.loading_mode in ("nominal_bending_shape",
+                                        "nominal_bending_shared_temperature")
+               else None)
         return replace(provisional,initial_compliance_m_per_N=C_specimen,
-                       instrument_compliance_m_per_N=self.instrument_compliance_m_per_N)
+                       instrument_compliance_m_per_N=self.instrument_compliance_m_per_N,
+                       bending_opening_shape=field)
 
     def physics(self, base, specimen: Specimen):
         """Set declared Ast geometry; no inherited archived projection table."""

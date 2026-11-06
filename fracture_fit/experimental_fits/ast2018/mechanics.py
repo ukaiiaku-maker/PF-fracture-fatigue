@@ -7,10 +7,61 @@ the same experimental observation calculation.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import sqrt
+from math import pi, sqrt
 from typing import Iterable
 
 import numpy as np
+
+from .cantilever_loading import BendingOpeningShape
+
+
+_GAUSS4_NODES, _GAUSS4_WEIGHTS = np.polynomial.legendre.leggauss(4)
+
+
+def unit_force_resolved_stress(specimen:"Specimen",a_m:float,radius_m:float,
+                               x_m,drive_factors):
+    """Resolved external stress per newton, including optional bending shape."""
+    x=np.asarray(x_m,dtype=float)
+    factors=np.asarray(drive_factors,dtype=float)
+    shape=np.array([specimen.opening_shape(a_m,radius_m+xi) for xi in x])
+    return np.abs(factors)[...,None]*shape*specimen.geometry_factor(a_m)/np.sqrt(
+        2*pi*np.maximum(radius_m+x,1e-30))
+
+
+def birth_plastic_displacement(activation_increments,conversion,physics,
+                                specimen:"Specimen",a_m:float,radius_m:float,
+                                drive_factors)->float:
+    """Virtual work of forming finite tip-radius dislocation nuclei.
+
+    One emitted line quantum spans the specimen front and initially sweeps the
+    current tip radius on its slip plane. Thus b*B*r is its plastic shear
+    volume. This uses the native line-content conversion once; translation
+    never changes the cumulative activation ledger and creates no birth work.
+    """
+    counts=np.asarray(activation_increments,dtype=float)
+    conversion=np.asarray(conversion,dtype=float)
+    factors=np.asarray(drive_factors,dtype=float)
+    if counts.shape!=conversion.shape or counts.shape!=factors.shape or np.any(counts< -1e-9):
+        raise ValueError("invalid source activation increments")
+    if not np.any(counts>0):return 0.0
+    radius=max(float(radius_m),float(physics.b_m))
+    unit=unit_force_resolved_stress(specimen,a_m,radius,np.array([0.0]),factors)[:,0]
+    return float(np.sum(np.maximum(counts,0)*conversion*unit)*
+                 physics.b_m*specimen.B_m*radius)
+
+
+def transport_plastic_velocity(specimen:"Specimen",a_m:float,radius_m:float,
+                               b_m:float,strip_width_m:float,dx_m:float,
+                               mobile_m2,velocity_m_s,drive_factors)->float:
+    """Shared unit-force projection of signed Orowan shear transport."""
+    mobile=np.asarray(mobile_m2,dtype=float)
+    velocity=np.asarray(velocity_m_s,dtype=float)
+    if mobile.shape!=velocity.shape or mobile.ndim!=2 or np.any(mobile<0):
+        raise ValueError("transport fields must share nonnegative system/bin shape")
+    x=(np.arange(mobile.shape[1])+.5)*dx_m
+    unit=unit_force_resolved_stress(specimen,a_m,radius_m,x,drive_factors)
+    return float(np.sum(unit*b_m*mobile*velocity)*
+                 specimen.B_m*strip_width_m*dx_m)
 
 
 @dataclass(frozen=True)
@@ -23,6 +74,7 @@ class Specimen:
     nu: float
     initial_compliance_m_per_N: float
     instrument_compliance_m_per_N: float = 0.0
+    bending_opening_shape: BendingOpeningShape | None = None
 
     def __post_init__(self) -> None:
         if not (self.B_m > 0 and self.W_m > self.a0_m > 0 and self.L_m > 0):
@@ -31,6 +83,12 @@ class Specimen:
             raise ValueError("invalid isotropic elastic constants")
         if self.initial_compliance_m_per_N <= 0 or self.instrument_compliance_m_per_N < 0:
             raise ValueError("invalid compliance")
+        if self.bending_opening_shape is not None:
+            field=self.bending_opening_shape
+            if not (np.isclose(field.height_m,self.W_m,rtol=0,atol=1e-12) and
+                    np.isclose(field.thickness_m,self.B_m,rtol=0,atol=1e-12) and
+                    np.isclose(field.span_m,self.L_m,rtol=0,atol=1e-12)):
+                raise ValueError("elastic field geometry differs from scalar specimen")
 
     @property
     def Eprime_Pa(self) -> float:
@@ -39,6 +97,11 @@ class Specimen:
     @property
     def shear_modulus_Pa(self) -> float:
         return self.E_Pa / (2 * (1 + self.nu))
+
+    def opening_shape(self, a_m: float, radius_m: float) -> float:
+        if self.bending_opening_shape is None:
+            return 1.0
+        return self.bending_opening_shape.factor(a_m-self.a0_m,radius_m)
 
     def geometry_factor(self, a_m: float) -> float:
         if not self.a0_m <= a_m < self.W_m:
@@ -58,10 +121,10 @@ class Specimen:
             return self.initial_compliance_m_per_N
         if not self.a0_m < a_m < self.W_m:
             raise ValueError("crack length outside observed cantilever range")
-        nodes, weights = np.polynomial.legendre.leggauss(4)
         mid = 0.5*(self.a0_m+a_m)
         half = 0.5*(a_m-self.a0_m)
-        integral = sum(w * self.geometry_factor(mid+half*x)**2 for x,w in zip(nodes, weights))*half
+        integral = sum(w * self.geometry_factor(mid+half*x)**2
+                       for x,w in zip(_GAUSS4_NODES, _GAUSS4_WEIGHTS))*half
         return self.initial_compliance_m_per_N + 2*self.B_m*integral/self.Eprime_Pa
 
     def equilibrium_force(self, imposed_u_m: float, plastic_u_m: float, a_m: float) -> float:
@@ -107,15 +170,18 @@ class ObservedPoint:
     relative_stiffness: float
     event: bool
     physical_failure: bool
+    plastic_u_compliance_m: float = 0.0
+    plastic_closure_error_m: float = 0.0
+    elastic_crack_energy_increment_J: float = 0.0
+    contact_gap_m: float = 0.0
 
 
 def observe_like_ast(history: Iterable[HistoryPoint], specimen: Specimen) -> list[ObservedPoint]:
     """Apply Eqs. 1–6 to a sampled, ordered loading history.
 
-    The plastic area is external force-displacement work minus the current
-    elastic unloading triangle. Instrument compliance is subtracted from
-    specimen work. A crack jump at held displacement contributes no external
-    work. Each point is an accepted state, including event pre/post states.
+    Plastic area is trapezoidal force work against compliance-derived plastic
+    displacement. The separate crack-compliance energy term cannot enter Jpl.
+    The equilibrium convention includes instrument compliance in total C.
     """
     points = list(history)
     if not points:
@@ -123,28 +189,28 @@ def observe_like_ast(history: Iterable[HistoryPoint], specimen: Specimen) -> lis
     if abs(points[0].imposed_u_m) > 1e-15 or abs(points[0].force_N) > 1e-15:
         raise ValueError("history must begin at zero displacement and force")
     out: list[ObservedPoint] = []
-    work = 0.0
+    Apl = 0.0
     Jpl = 0.0
-    previous_Apl = 0.0
     old = None
+    old_upl = 0.0
     C0 = specimen.elastic_compliance(specimen.a0_m)
     for p in points:
+        Ce = specimen.elastic_compliance(p.a_m)
+        Ctotal = Ce+specimen.instrument_compliance_m_per_N
+        upl = p.imposed_u_m-p.force_N*Ctotal
+        crack_energy = 0.0
         if old is not None:
             if p.time_s < old.time_s or p.imposed_u_m < old.imposed_u_m - 1e-15 or p.a_m < old.a_m - 1e-15:
                 raise ValueError("history must be monotone in time, loading and crack length")
-            work += 0.5*(old.force_N+p.force_N)*(p.imposed_u_m-old.imposed_u_m)
-        Ce = specimen.elastic_compliance(p.a_m)
-        Apl = work - 0.5*p.force_N*p.force_N*(Ce+specimen.instrument_compliance_m_per_N)
-        # A negative value beyond roundoff signals inconsistent force/area data.
-        if Apl < -1e-10*max(work, 1e-18):
-            raise ValueError("negative plastic area from inconsistent mechanical history")
-        Apl = max(Apl, 0.0)
-        if old is not None:
+            Apl += 0.5*(old.force_N+p.force_N)*(upl-old_upl)
+            old_C = specimen.elastic_compliance(old.a_m)+specimen.instrument_compliance_m_per_N
+            crack_energy = 0.5*old.force_N*p.force_N*(Ctotal-old_C)
             ligament = specimen.W_m-old.a_m
             da = p.a_m-old.a_m
             if not 0 <= da < ligament:
                 raise ValueError("crack increment consumes ligament")
-            Jpl = (Jpl + 2*(Apl-previous_Apl)/(specimen.B_m*ligament))*(1-da/ligament)
+            dApl = 0.5*(old.force_N+p.force_N)*(upl-old_upl)
+            Jpl = (Jpl + 2*dApl/(specimen.B_m*ligament))*(1-da/ligament)
         Kcur = specimen.current_K_MPa_sqrt_m(p.force_N,p.a_m)
         J = (Kcur*1e6)**2/specimen.Eprime_Pa + Jpl
         if J < -1e-8:
@@ -153,30 +219,51 @@ def observe_like_ast(history: Iterable[HistoryPoint], specimen: Specimen) -> lis
                     specimen.nominal_K_MPa_sqrt_m(p.force_N),Kcur,
                     p.local_drive_K_MPa_sqrt_m,Apl,J,
                     sqrt(max(J,0)*specimen.Eprime_Pa)/1e6,
-                    C0/Ce,p.event,p.physical_failure))
+                    C0/Ce,p.event,p.physical_failure,upl,
+                    upl-p.plastic_u_m,crack_energy,
+                    max(p.plastic_u_m-p.imposed_u_m,0.0)))
         old = p
-        previous_Apl = Apl
+        old_upl = upl
     return out
+
+
+def post_event_J_curve(observed):
+    """Baseline and every committed post-event J sample in crack-growth order."""
+    points=list(observed)
+    if not points:
+        return np.empty(0),np.empty(0)
+    def field(point,key):
+        return point[key] if isinstance(point,dict) else getattr(point,key)
+    def event(point):
+        value=field(point,"event")
+        return value is True or value=="True"
+    a=[0.0];J=[float(field(points[0],"J_continuous_N_per_m"))]
+    for point in points:
+        if not event(point):
+            continue
+        advance=float(field(point,"da_m"))
+        if advance<a[-1]-1e-15:
+            raise ValueError("post-event crack extension decreased")
+        if advance<=a[-1]+1e-15:
+            J[-1]=float(field(point,"J_continuous_N_per_m"))
+        else:
+            a.append(advance);J.append(float(field(point,"J_continuous_N_per_m")))
+    return np.asarray(a),np.asarray(J)
 
 
 def continuous_onset_K(observed: Iterable[ObservedPoint], specimen: Specimen,
                        target_extension_m: float = 0.2e-6) -> float:
-    """Interpolate the event-resolved resistance curve only within achieved support."""
+    """Interpolate post-event J(a) only within achieved crack-growth support."""
     pts = list(observed)
     if not pts or max(p.da_m for p in pts) < target_extension_m - 1e-15:
         return float("nan")
     event_points = [p for p in pts if p.event and p.da_m > 0]
     if len(event_points) < 2:
         return float("nan")
-    # Duplicate extensions are loading points between events; use the latest
-    # value before the next extension, consistent with a loading R-curve.
-    a = np.array([0.0]+[p.da_m for p in event_points])
-    J = np.array([pts[0].J_continuous_N_per_m]+[p.J_continuous_N_per_m for p in event_points])
-    unique, indices = np.unique(a, return_index=True)
-    J = J[indices]
-    if len(unique) < 2:
+    a,J=post_event_J_curve(pts)
+    if len(a)<2:
         return float("nan")
-    Jq = float(np.interp(target_extension_m, unique, J))
+    Jq = float(np.interp(target_extension_m, a, J))
     return sqrt(max(Jq, 0.0)*specimen.Eprime_Pa)/1e6
 
 
